@@ -1,65 +1,56 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
+import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.IslandChestPagedObjectButton;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.IslandChestPagedObjectButton;
+import com.bgsoftware.superiorskyblock.core.menu.layout.PagedMenuLayoutImpl;
+import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
-public class MenuIslandChest extends PagedSuperiorMenu<MenuIslandChest, IslandChest> {
+public class MenuIslandChest extends AbstractPagedMenu<MenuIslandChest.View, IslandViewArgs, IslandChest> {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
-    private static PagedMenuPattern<MenuIslandChest, IslandChest> menuPattern;
-
-    private final Island island;
-
-    private MenuIslandChest(SuperiorPlayer superiorPlayer, Island island) {
-        super(menuPattern, superiorPlayer);
-        this.island = island;
-    }
-
-    public Island getTargetIsland() {
-        return island;
+    private MenuIslandChest(MenuParseResult<View> parseResult) {
+        super(MenuIdentifiers.MENU_ISLAND_CHEST, parseResult, false);
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu, island);
+    protected View createViewInternal(SuperiorPlayer superiorPlayer, IslandViewArgs args,
+                                      @Nullable MenuView<?, ?> previousMenuView) {
+        return new View(superiorPlayer, previousMenuView, this, args);
     }
 
-    @Override
-    protected List<IslandChest> requestObjects() {
-        return new SequentialListBuilder<IslandChest>()
-                .build(Arrays.asList(island.getChest()));
+    public void refreshViews(Island island) {
+        refreshViews(view -> view.island.equals(island));
     }
 
-    public static void init() {
-        menuPattern = null;
+    @Nullable
+    public static MenuIslandChest createInstance() {
+        MenuParseResult<View> menuParseResult = MenuParserImpl.getInstance().loadMenu("island-chest.yml",
+                null, new IslandChestPagedObjectButton.Builder());
 
-        PagedMenuPattern.Builder<MenuIslandChest, IslandChest> patternBuilder = new PagedMenuPattern.Builder<>();
+        if (menuParseResult == null) {
+            return null;
+        }
 
-        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "island-chest.yml", null);
-
-        if (menuLoadResult == null)
-            return;
-
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
-        CommentedConfiguration cfg = menuLoadResult.getConfig();
+        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        YamlConfiguration cfg = menuParseResult.getConfig();
+        PagedMenuLayoutImpl.Builder<View, IslandChest> patternBuilder = (PagedMenuLayoutImpl.Builder<View, IslandChest>) menuParseResult.getLayoutBuilder();
 
         if (cfg.isString("slots")) {
             for (char slotChar : cfg.getString("slots", "").toCharArray()) {
@@ -78,30 +69,33 @@ public class MenuIslandChest extends PagedSuperiorMenu<MenuIslandChest, IslandCh
                     continue;
                 }
 
-                patternBuilder.mapButtons(slots, new IslandChestPagedObjectButton.Builder()
-                        .setButtonItem(MenuParser.getItemStack("island-chest.yml", validPageSection))
-                        .setNullItem(MenuParser.getItemStack("island-chest.yml", invalidPageSection)));
+                IslandChestPagedObjectButton.Builder buttonBuilder = new IslandChestPagedObjectButton.Builder();
+                buttonBuilder.setButtonItem(MenuParserImpl.getInstance().getItemStack("island-chest.yml", validPageSection));
+                buttonBuilder.setNullItem(MenuParserImpl.getInstance().getItemStack("island-chest.yml", invalidPageSection));
+
+                patternBuilder.mapButtons(slots, buttonBuilder);
             }
         }
 
-        menuPattern = patternBuilder
-                .setPreviousPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))
-                .setCurrentPageSlots(getSlots(cfg, "current-page", menuPatternSlots))
-                .setNextPageSlots(getSlots(cfg, "next-page", menuPatternSlots))
-                .build();
+        return new MenuIslandChest(menuParseResult);
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island) {
-        MenuIslandChest menuIslandChest = new MenuIslandChest(superiorPlayer, island);
-        if (plugin.getSettings().isSkipOneItemMenus() && island.getChest().length == 1) {
-            island.getChest()[0].openChest(superiorPlayer);
-        } else {
-            menuIslandChest.open(previousMenu);
+    public static class View extends AbstractPagedMenuView<MenuIslandChest.View, IslandViewArgs, IslandChest> {
+
+        private final Island island;
+
+        View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView,
+             Menu<View, IslandViewArgs> menu, IslandViewArgs args) {
+            super(inventoryViewer, previousMenuView, menu);
+            this.island = args.getIsland();
         }
-    }
 
-    public static void refreshMenus(Island island) {
-        SuperiorMenu.refreshMenus(MenuIslandChest.class, superiorMenu -> superiorMenu.island.equals(island));
+        @Override
+        protected List<IslandChest> requestObjects() {
+            return new SequentialListBuilder<IslandChest>()
+                    .build(Arrays.asList(island.getChest()));
+        }
+
     }
 
 }

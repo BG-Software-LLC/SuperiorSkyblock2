@@ -1,129 +1,131 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
+import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.BankLogsPagedObjectButton;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.BankLogsSortButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankLogsPagedObjectButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankLogsSortButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
+import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
+import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
-public class MenuBankLogs extends PagedSuperiorMenu<MenuBankLogs, BankTransaction> {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+public class MenuBankLogs extends AbstractPagedMenu<MenuBankLogs.View, IslandViewArgs, BankTransaction> {
 
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
-    private static PagedMenuPattern<MenuBankLogs, BankTransaction> menuPattern;
 
-    private final Island island;
-
-    private UUID filteredPlayer;
-    private Comparator<BankTransaction> sorting;
-
-    private MenuBankLogs(SuperiorPlayer superiorPlayer, Island island) {
-        super(menuPattern, superiorPlayer);
-        this.island = island;
-    }
-
-    public void setSorting(Comparator<BankTransaction> sorting) {
-        this.sorting = sorting;
-    }
-
-    public void setFilteredPlayer(UUID filteredPlayer) {
-        this.filteredPlayer = filteredPlayer == null ? CONSOLE_UUID : filteredPlayer;
+    private MenuBankLogs(MenuParseResult<View> parseResult) {
+        super(MenuIdentifiers.MENU_BANK_LOGS, parseResult, false);
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu, island);
+    protected View createViewInternal(SuperiorPlayer superiorPlayer, IslandViewArgs args,
+                                      @Nullable MenuView<?, ?> previousMenuView) {
+        return new View(superiorPlayer, previousMenuView, this, args);
     }
 
-    @Override
-    protected String replaceTitle(String title) {
-        return title.replace("{0}", getFilteredPlayerName(filteredPlayer));
+    public void refreshViews(Island island) {
+        this.refreshViews(view -> Objects.equals(view.island, island));
     }
 
-    @Override
-    protected List<BankTransaction> requestObjects() {
-        List<BankTransaction> transactions = getTransactions();
+    @Nullable
+    public static MenuBankLogs createInstance() {
+        MenuParseResult<View> menuParseResult = MenuParserImpl.getInstance().loadMenu("bank-logs.yml",
+                MenuBankLogs::convertOldGUI, new BankLogsPagedObjectButton.Builder());
 
-        if (sorting == null) {
+        if (menuParseResult == null)
+            return null;
+
+        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        YamlConfiguration cfg = menuParseResult.getConfig();
+        MenuLayout.Builder<View> patternBuilder = menuParseResult.getLayoutBuilder();
+
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "time-sort", menuPatternSlots),
+                new BankLogsSortButton.Builder().setSortType(BankLogsSortButton.SortType.TIME));
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "money-sort", menuPatternSlots),
+                new BankLogsSortButton.Builder().setSortType(BankLogsSortButton.SortType.MONEY));
+
+        return new MenuBankLogs(menuParseResult);
+    }
+
+    public static class View extends AbstractPagedMenuView<View, IslandViewArgs, BankTransaction> {
+
+        private final Island island;
+
+        private Comparator<BankTransaction> sorting;
+        private UUID filteredPlayer;
+
+        View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView,
+             Menu<View, IslandViewArgs> menu, IslandViewArgs args) {
+            super(inventoryViewer, previousMenuView, menu);
+            this.island = args.getIsland();
+        }
+
+        public void setSorting(Comparator<BankTransaction> sorting) {
+            this.sorting = sorting;
+        }
+
+        public void setFilteredPlayer(UUID filteredPlayer) {
+            this.filteredPlayer = filteredPlayer == null ? CONSOLE_UUID : filteredPlayer;
+        }
+
+        @Override
+        public String replaceTitle(String title) {
+            return title.replace("{0}", getFilteredPlayerName(filteredPlayer));
+        }
+
+        @Override
+        protected List<BankTransaction> requestObjects() {
+            List<BankTransaction> transactions = getTransactions();
+
+            if (sorting == null) {
+                return transactions;
+            }
+
+            transactions.sort(sorting);
+
             return transactions;
         }
 
-        transactions.sort(sorting);
-
-        return transactions;
-    }
-
-    private List<BankTransaction> getTransactions() {
-        if (filteredPlayer == null) {
-            return island.getIslandBank().getAllTransactions();
-        } else if (filteredPlayer.equals(CONSOLE_UUID)) {
-            return island.getIslandBank().getConsoleTransactions();
-        } else {
-            return island.getIslandBank().getTransactions(plugin.getPlayers().getSuperiorPlayer(filteredPlayer));
+        private List<BankTransaction> getTransactions() {
+            if (filteredPlayer == null) {
+                return island.getIslandBank().getAllTransactions();
+            } else if (filteredPlayer.equals(CONSOLE_UUID)) {
+                return island.getIslandBank().getConsoleTransactions();
+            } else {
+                return island.getIslandBank().getTransactions(plugin.getPlayers().getSuperiorPlayer(filteredPlayer));
+            }
         }
-    }
 
-    private static String getFilteredPlayerName(UUID filteredPlayer) {
-        if (filteredPlayer == null) {
-            return "";
-        } else if (filteredPlayer.equals(CONSOLE_UUID)) {
-            return "Console";
-        } else {
-            return plugin.getPlayers().getSuperiorPlayer(filteredPlayer).getName();
+        private static String getFilteredPlayerName(UUID filteredPlayer) {
+            if (filteredPlayer == null) {
+                return "";
+            } else if (filteredPlayer.equals(CONSOLE_UUID)) {
+                return "Console";
+            } else {
+                return plugin.getPlayers().getSuperiorPlayer(filteredPlayer).getName();
+            }
         }
-    }
 
-    public static void init() {
-        menuPattern = null;
-
-        PagedMenuPattern.Builder<MenuBankLogs, BankTransaction> patternBuilder = new PagedMenuPattern.Builder<>();
-
-        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "bank-logs.yml", MenuBankLogs::convertOldGUI);
-
-        if (menuLoadResult == null)
-            return;
-
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
-        CommentedConfiguration cfg = menuLoadResult.getConfig();
-
-        menuPattern = patternBuilder
-                .setPreviousPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))
-                .setCurrentPageSlots(getSlots(cfg, "current-page", menuPatternSlots))
-                .setNextPageSlots(getSlots(cfg, "next-page", menuPatternSlots))
-                .setPagedObjectSlots(getSlots(cfg, "slots", menuPatternSlots), new BankLogsPagedObjectButton.Builder())
-                .mapButtons(getSlots(cfg, "time-sort", menuPatternSlots), new BankLogsSortButton.Builder()
-                        .setSortType(BankLogsSortButton.SortType.TIME))
-                .mapButtons(getSlots(cfg, "money-sort", menuPatternSlots), new BankLogsSortButton.Builder()
-                        .setSortType(BankLogsSortButton.SortType.MONEY))
-                .build();
-    }
-
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island) {
-        new MenuBankLogs(superiorPlayer, island).open(previousMenu);
-    }
-
-    public static void refreshMenus(Island island) {
-        SuperiorMenu.refreshMenus(MenuBankLogs.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
@@ -153,17 +155,17 @@ public class MenuBankLogs extends PagedSuperiorMenu<MenuBankLogs, BankTransactio
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char slotsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char slotsChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
 
         MenuConverter.convertPagedButtons(cfg.getConfigurationSection("members-panel"),
                 cfg.getConfigurationSection("members-panel.member-item"), newMenu, patternChars,
-                slotsChar, SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
-                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
-                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
+                slotsChar, AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++],
+                AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++],
+                AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++],
                 itemsSection, commandsSection, soundsSection);
 
         newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars,
-                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
+                AbstractMenuLayout.BUTTON_SYMBOLS[charCounter]));
 
         return true;
     }

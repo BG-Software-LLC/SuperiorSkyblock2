@@ -1,70 +1,59 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.ControlPanelButton;
-import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
+import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.ControlPanelButton;
+import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
+import com.bgsoftware.superiorskyblock.core.menu.view.IslandMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Arrays;
 
-public class MenuControlPanel extends SuperiorMenu<MenuControlPanel> {
+public class MenuControlPanel extends AbstractMenu<IslandMenuView, IslandViewArgs> {
 
-    private static RegularMenuPattern<MenuControlPanel> menuPattern;
-
-    private final Island targetIsland;
-
-    private MenuControlPanel(SuperiorPlayer superiorPlayer, Island targetIsland) {
-        super(menuPattern, superiorPlayer);
-        this.targetIsland = targetIsland;
-    }
-
-    public Island getTargetIsland() {
-        return targetIsland;
+    private MenuControlPanel(MenuParseResult<IslandMenuView> parseResult) {
+        super(MenuIdentifiers.MENU_CONTROL_PANEL, parseResult);
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu, targetIsland);
+    protected IslandMenuView createViewInternal(SuperiorPlayer superiorPlayer, IslandViewArgs args,
+                                                @Nullable MenuView<?, ?> previousMenuView) {
+        return new IslandMenuView(superiorPlayer, previousMenuView, this, args);
     }
 
-    public static void init() {
-        menuPattern = null;
-
-        RegularMenuPattern.Builder<MenuControlPanel> patternBuilder = new RegularMenuPattern.Builder<>();
-
-        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "control-panel.yml",
+    @Nullable
+    public static MenuControlPanel createInstance() {
+        MenuParseResult<IslandMenuView> menuParseResult = MenuParserImpl.getInstance().loadMenu("control-panel.yml",
                 MenuControlPanel::convertOldGUI);
 
-        if (menuLoadResult == null)
-            return;
+        if (menuParseResult == null) {
+            return null;
+        }
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
-        CommentedConfiguration cfg = menuLoadResult.getConfig();
+        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        YamlConfiguration cfg = menuParseResult.getConfig();
+        MenuLayout.Builder<IslandMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
 
-        menuPattern = patternBuilder
-                .mapButtons(getSlots(cfg, "members", menuPatternSlots),
-                        new ControlPanelButton.Builder().setAction(ControlPanelButton.ControlPanelAction.OPEN_MEMBERS))
-                .mapButtons(getSlots(cfg, "settings", menuPatternSlots),
-                        new ControlPanelButton.Builder().setAction(ControlPanelButton.ControlPanelAction.OPEN_SETTINGS))
-                .mapButtons(getSlots(cfg, "visitors", menuPatternSlots),
-                        new ControlPanelButton.Builder().setAction(ControlPanelButton.ControlPanelAction.OPEN_VISITORS))
-                .build();
-    }
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "members", menuPatternSlots),
+                new ControlPanelButton.Builder().setAction(ControlPanelButton.ControlPanelAction.OPEN_MEMBERS));
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "settings", menuPatternSlots),
+                new ControlPanelButton.Builder().setAction(ControlPanelButton.ControlPanelAction.OPEN_SETTINGS));
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "visitors", menuPatternSlots),
+                new ControlPanelButton.Builder().setAction(ControlPanelButton.ControlPanelAction.OPEN_VISITORS));
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island targetIsland) {
-        new MenuControlPanel(superiorPlayer, targetIsland).open(previousMenu);
+        return new MenuControlPanel(menuParseResult);
     }
 
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
@@ -94,9 +83,9 @@ public class MenuControlPanel extends SuperiorMenu<MenuControlPanel> {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char membersChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
-        char settingsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
-        char visitorsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char membersChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
+        char settingsChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
+        char visitorsChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
 
         MenuConverter.convertItem(cfg.getConfigurationSection("main-panel.members"), patternChars, membersChar,
                 itemsSection, commandsSection, soundsSection);
@@ -110,7 +99,7 @@ public class MenuControlPanel extends SuperiorMenu<MenuControlPanel> {
         newMenu.set("visitors", visitorsChar + "");
 
         newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars,
-                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
+                AbstractMenuLayout.BUTTON_SYMBOLS[charCounter]));
 
         return true;
     }

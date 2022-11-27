@@ -1,109 +1,110 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.WarpCategoryButton;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
+import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpCategoryPagedObjectButton;
+import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
-public class MenuWarpCategories extends SuperiorMenu<MenuWarpCategories> {
+public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.View, IslandViewArgs, WarpCategory> {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static RegularMenuPattern<MenuWarpCategories> menuPattern;
+    private final List<String> editLore;
+    private final int rowsSize;
 
-    public static int rowsSize;
-    public static List<String> editLore;
-
-    private final Island island;
-    private final boolean hasManagePerms;
-
-    private MenuWarpCategories(SuperiorPlayer superiorPlayer, Island island) {
-        super(buildPattern(island, superiorPlayer), superiorPlayer);
-        this.island = island;
-        hasManagePerms = island.hasPermission(superiorPlayer, IslandPrivileges.SET_WARP);
+    private MenuWarpCategories(MenuParseResult<View> parseResult, List<String> editLore, int rowsSize) {
+        super(MenuIdentifiers.MENU_WARP_CATEGORIES, parseResult, true);
+        this.editLore = editLore;
+        this.rowsSize = rowsSize;
     }
 
-    public Island getTargetIsland() {
-        return island;
+    public List<String> getEditLore() {
+        return editLore;
     }
 
-    public boolean hasManagePerms() {
-        return hasManagePerms;
+    public int getRowsSize() {
+        return rowsSize;
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu, island);
+    protected View createViewInternal(SuperiorPlayer superiorPlayer, IslandViewArgs args,
+                                      @Nullable MenuView<?, ?> previousMenuView) {
+        return new View(superiorPlayer, previousMenuView, this, args);
     }
 
-    public static void init() {
-        menuPattern = null;
-
-        RegularMenuPattern.Builder<MenuWarpCategories> patternBuilder = new RegularMenuPattern.Builder<>();
-
-        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "warp-categories.yml",
-                MenuWarpCategories::convertOldGUI);
-
-        if (menuLoadResult == null)
-            return;
-
-        CommentedConfiguration cfg = menuLoadResult.getConfig();
-
-        editLore = cfg.getStringList("edit-lore");
-        rowsSize = cfg.getStringList("pattern").size();
-
-        menuPattern = patternBuilder.build();
+    public void refreshViews(Island island) {
+        refreshViews(view -> view.island.equals(island));
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island) {
-        MenuWarpCategories menuWarpCategories = new MenuWarpCategories(superiorPlayer, island);
-        if (hasOnlyOneItem(island)) {
-            plugin.getMenus().openWarps(superiorPlayer, previousMenu, getOnlyOneItem(island));
-        } else {
-            menuWarpCategories.open(previousMenu);
-        }
+    public void closeViews(Island island) {
+        closeViews(view -> view.getIsland().equals(island));
     }
 
-    public static void refreshMenus(Island island) {
-        refreshMenus(MenuWarpCategories.class, superiorMenu -> superiorMenu.island.equals(island));
-    }
+    @Nullable
+    public static MenuWarpCategories createInstance() {
+        MenuParseResult<View> menuParseResult = MenuParserImpl.getInstance().loadMenu("warp-categories.yml",
+                MenuWarpCategories::convertOldGUI, new WarpCategoryPagedObjectButton.Builder());
 
-    public static void destroyMenus(Island island) {
-        destroyMenus(MenuWarpCategories.class, superiorMenu -> superiorMenu.island.equals(island));
-    }
-
-    private static boolean hasOnlyOneItem(Island island) {
-        return island.getWarpCategories().size() <= 1;
-    }
-
-    private static WarpCategory getOnlyOneItem(Island island) {
-        return island.getWarpCategories().values().stream().findFirst().orElseGet(() -> island.createWarpCategory("Default Category"));
-    }
-
-    private static RegularMenuPattern<MenuWarpCategories> buildPattern(Island island, SuperiorPlayer inventoryViewer) {
-        if (menuPattern == null)
+        if (menuParseResult == null)
             return null;
 
-        RegularMenuPattern.Builder<MenuWarpCategories> patternBuilder = menuPattern.builder();
-        for (WarpCategory warpCategory : island.getWarpCategories().values()) {
-            long accessAmount = warpCategory.getWarps().stream().filter(
-                    islandWarp -> island.isMember(inventoryViewer) || !islandWarp.hasPrivateFlag()
-            ).count();
-            if (accessAmount > 0) {
-                patternBuilder.mapButton(warpCategory.getSlot(), new WarpCategoryButton.Builder(warpCategory));
-            }
+        YamlConfiguration cfg = menuParseResult.getConfig();
+
+        List<String> editLore = cfg.getStringList("edit-lore");
+        int rowsSize = cfg.getStringList("pattern").size();
+
+        return new MenuWarpCategories(menuParseResult, editLore, rowsSize);
+    }
+
+    public static class View extends AbstractPagedMenuView<View, IslandViewArgs, WarpCategory> {
+
+        private final Island island;
+        private final boolean hasManagePerms;
+
+        protected View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView,
+                       Menu<View, IslandViewArgs> menu, IslandViewArgs args) {
+            super(inventoryViewer, previousMenuView, menu);
+            this.island = args.getIsland();
+            this.hasManagePerms = island.hasPermission(inventoryViewer, IslandPrivileges.SET_WARP);
         }
-        return patternBuilder.build();
+
+        @Override
+        protected List<WarpCategory> requestObjects() {
+            ArrayList<WarpCategory> warpCategories = new ArrayList<>();
+            island.getWarpCategories().values().forEach(warpCategory -> {
+                warpCategory.getWarps()
+                        .stream()
+                        .filter(islandWarp -> island.isMember(getInventoryViewer()) || !islandWarp.hasPrivateFlag())
+                        .findAny()
+                        .ifPresent(unused -> {
+                            warpCategories.ensureCapacity(warpCategory.getSlot() + 1);
+                            warpCategories.add(warpCategory.getSlot(), warpCategory);
+                        });
+            });
+            return warpCategories;
+        }
+
+        public Island getIsland() {
+            return island;
+        }
+
+        public boolean hasManagePerms() {
+            return hasManagePerms;
+        }
+
     }
 
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {

@@ -1,56 +1,47 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.OpenMissionCategoryButton;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
+import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.OpenMissionCategoryButton;
+import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
 
-public class MenuMissions extends SuperiorMenu<MenuMissions> {
+import javax.annotation.Nullable;
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+public class MenuMissions extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
 
-    private static RegularMenuPattern<MenuMissions> menuPattern;
-
-    private MenuMissions(SuperiorPlayer superiorPlayer) {
-        super(menuPattern, superiorPlayer);
+    private MenuMissions(MenuParseResult<BaseMenuView> parseResult) {
+        super(MenuIdentifiers.MENU_MISSIONS, parseResult);
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu);
+    protected BaseMenuView createViewInternal(SuperiorPlayer superiorPlayer, EmptyViewArgs unused,
+                                              @Nullable MenuView<?, ?> previousMenuView) {
+        return new BaseMenuView(superiorPlayer, previousMenuView, this);
     }
 
-    public static void init() {
-        menuPattern = null;
+    @Nullable
+    public static MenuMissions createInstance() {
+        MenuParseResult<BaseMenuView> menuParseResult = MenuParserImpl.getInstance().loadMenu("missions.yml",
+                null);
 
-        RegularMenuPattern.Builder<MenuMissions> patternBuilder = new RegularMenuPattern.Builder<>();
+        if (menuParseResult == null) {
+            return null;
+        }
 
-        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "missions.yml", null);
+        MenuLayout.Builder<BaseMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
 
-        if (menuLoadResult == null)
-            return;
+        plugin.getMissions().getMissionCategories().forEach(missionCategory -> {
+            patternBuilder.mapButton(missionCategory.getSlot(),
+                    new OpenMissionCategoryButton.Builder().setMissionsCategory(missionCategory));
+        });
 
-        BukkitExecutor.sync(() -> {
-            plugin.getMissions().getMissionCategories().forEach(missionCategory -> {
-                patternBuilder.mapButton(missionCategory.getSlot(), new OpenMissionCategoryButton.Builder()
-                        .setMissionsCategory(missionCategory));
-            });
-
-            menuPattern = patternBuilder.build();
-        }, 1L);
-    }
-
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu) {
-        new MenuMissions(superiorPlayer).open(previousMenu);
-    }
-
-    public static MenuMissions createEmptyInstance() {
-        return new MenuMissions(null);
+        return new MenuMissions(menuParseResult);
     }
 
 }

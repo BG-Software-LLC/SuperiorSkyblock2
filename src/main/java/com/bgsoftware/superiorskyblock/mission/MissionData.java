@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.mission;
 
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import org.bukkit.configuration.ConfigurationSection;
@@ -43,7 +43,7 @@ public class MissionData {
 
         if (section.contains("rewards.items")) {
             for (String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
-                TemplateItem templateItem = MenuParser.getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key));
+                TemplateItem templateItem = MenuParserImpl.getInstance().getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key));
                 if (templateItem != null) {
                     ItemStack itemStack = templateItem.build();
                     itemStack.setAmount(section.getInt("rewards.items." + key + ".amount", 1));
@@ -54,9 +54,9 @@ public class MissionData {
 
         this.commandRewards.addAll(section.getStringList("rewards.commands"));
 
-        this.notCompleted = MenuParser.getItemStack("config.yml", section.getConfigurationSection("icons.not-completed"));
-        this.canComplete = MenuParser.getItemStack("config.yml", section.getConfigurationSection("icons.can-complete"));
-        this.completed = MenuParser.getItemStack("config.yml", section.getConfigurationSection("icons.completed"));
+        this.notCompleted = MenuParserImpl.getInstance().getItemStack("config.yml", section.getConfigurationSection("icons.not-completed"));
+        this.canComplete = MenuParserImpl.getInstance().getItemStack("config.yml", section.getConfigurationSection("icons.can-complete"));
+        this.completed = MenuParserImpl.getInstance().getItemStack("config.yml", section.getConfigurationSection("icons.completed"));
     }
 
     public boolean isAutoReward() {

@@ -1,60 +1,120 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
+import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.GameSound;
+import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.BankCustomDepositButton;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.BankCustomWithdrawButton;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.BankDepositButton;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.BankWithdrawButton;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.OpenBankLogsButton;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
+import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
+import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankCustomDepositButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankCustomWithdrawButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankDepositButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankWithdrawButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.OpenBankLogsButton;
+import com.bgsoftware.superiorskyblock.core.menu.view.IslandMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import org.bukkit.configuration.file.YamlConfiguration;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class MenuIslandBank extends SuperiorMenu<MenuIslandBank> {
+public class MenuIslandBank extends AbstractMenu<IslandMenuView, IslandViewArgs> {
 
-    private static RegularMenuPattern<MenuIslandBank> menuPattern;
-
-    private final Island island;
-
-    private MenuIslandBank(SuperiorPlayer superiorPlayer, Island island) {
-        super(menuPattern, superiorPlayer);
-        this.island = island;
-    }
-
-    public Island getTargetIsland() {
-        return island;
+    private MenuIslandBank(MenuParseResult<IslandMenuView> parseResult) {
+        super(MenuIdentifiers.MENU_ISLAND_BANK, parseResult);
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu, island);
+    protected IslandMenuView createViewInternal(SuperiorPlayer superiorPlayer, IslandViewArgs args,
+                                                @Nullable MenuView<?, ?> previousMenuView) {
+        return new IslandMenuView(superiorPlayer, previousMenuView, this, args);
     }
 
-    public static void init() {
-        menuPattern = null;
+    public void refreshViews(Island island) {
+        refreshViews(view -> view.getIsland().equals(island));
+    }
 
-        RegularMenuPattern.Builder<MenuIslandBank> patternBuilder = new RegularMenuPattern.Builder<>();
+    public void handleDeposit(SuperiorPlayer superiorPlayer, Island island, BankTransaction bankTransaction,
+                              @Nullable GameSound successSound, @Nullable GameSound failSound, BigDecimal amount) {
+        if (bankTransaction.getFailureReason().isEmpty()) {
+            superiorPlayer.runIfOnline(player -> GameSoundImpl.playSound(player, successSound));
+        } else {
+            superiorPlayer.runIfOnline(player -> GameSoundImpl.playSound(player, failSound));
 
-        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "island-bank.yml", null);
+            String failureReason = bankTransaction.getFailureReason();
 
-        if (menuLoadResult == null)
-            return;
+            if (!failureReason.isEmpty()) {
+                switch (failureReason) {
+                    case "No permission":
+                        Message.NO_DEPOSIT_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.DEPOSIT_MONEY));
+                        break;
+                    case "Invalid amount":
+                        Message.INVALID_AMOUNT.send(superiorPlayer, Formatters.NUMBER_FORMATTER.format(amount));
+                        break;
+                    case "Not enough money":
+                        Message.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, Formatters.NUMBER_FORMATTER.format(amount));
+                        break;
+                    case "Exceed bank limit":
+                        Message.BANK_LIMIT_EXCEED.send(superiorPlayer);
+                        break;
+                    default:
+                        Message.DEPOSIT_ERROR.send(superiorPlayer, failureReason);
+                        break;
+                }
+            }
+        }
+    }
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
-        CommentedConfiguration cfg = menuLoadResult.getConfig();
+    public void handleWithdraw(SuperiorPlayer superiorPlayer, Island island, BankTransaction bankTransaction,
+                               GameSound successSound, GameSound failSound, BigDecimal amount) {
+        if (bankTransaction.getFailureReason().isEmpty()) {
+            superiorPlayer.runIfOnline(player -> GameSoundImpl.playSound(player, successSound));
+        } else {
+            superiorPlayer.runIfOnline(player -> GameSoundImpl.playSound(player, failSound));
+
+            String failureReason = bankTransaction.getFailureReason();
+
+            if (!failureReason.isEmpty()) {
+                switch (failureReason) {
+                    case "No permission":
+                        Message.NO_WITHDRAW_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.WITHDRAW_MONEY));
+                        break;
+                    case "Invalid amount":
+                        Message.INVALID_AMOUNT.send(superiorPlayer, Formatters.NUMBER_FORMATTER.format(amount));
+                        break;
+                    case "Bank is empty":
+                        Message.ISLAND_BANK_EMPTY.send(superiorPlayer);
+                        break;
+                    default:
+                        Message.WITHDRAW_ERROR.send(superiorPlayer, failureReason);
+                        break;
+                }
+            }
+        }
+    }
+
+    @Nullable
+    public static MenuIslandBank createInstance() {
+        MenuParseResult<IslandMenuView> menuParseResult = MenuParserImpl.getInstance().loadMenu("island-bank.yml",
+                null);
+
+        if (menuParseResult == null) {
+            return null;
+        }
+
+        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        YamlConfiguration cfg = menuParseResult.getConfig();
+        MenuLayout.Builder<IslandMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
 
         if (cfg.isConfigurationSection("items")) {
             for (String itemChar : cfg.getConfigurationSection("items").getKeys(false)) {
@@ -65,8 +125,8 @@ public class MenuIslandBank extends SuperiorMenu<MenuIslandBank> {
                         continue;
                     }
 
-                    GameSound successSound = MenuParser.getSound(cfg.getConfigurationSection("sounds." + itemChar + ".success-sound"));
-                    GameSound failSound = MenuParser.getSound(cfg.getConfigurationSection("sounds." + itemChar + ".fail-sound"));
+                    GameSound successSound = MenuParserImpl.getInstance().getSound(cfg.getConfigurationSection("sounds." + itemChar + ".success-sound"));
+                    GameSound failSound = MenuParserImpl.getInstance().getSound(cfg.getConfigurationSection("sounds." + itemChar + ".fail-sound"));
 
                     if (cfg.isDouble("items." + itemChar + ".bank-action.withdraw")) {
                         double withdrawPercentage = cfg.getDouble("items." + itemChar + ".bank-action.withdraw");
@@ -95,90 +155,10 @@ public class MenuIslandBank extends SuperiorMenu<MenuIslandBank> {
             }
         }
 
-        menuPattern = patternBuilder
-                .mapButtons(getSlots(cfg, "logs", menuPatternSlots), new OpenBankLogsButton.Builder())
-                .build();
-    }
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "logs", menuPatternSlots),
+                new OpenBankLogsButton.Builder());
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island) {
-        new MenuIslandBank(superiorPlayer, island).open(previousMenu);
-    }
-
-    public static void refreshMenus(Island island) {
-        SuperiorMenu.refreshMenus(MenuIslandBank.class, superiorMenu -> superiorMenu.island.equals(island));
-    }
-
-    public static void handleDeposit(SuperiorPlayer superiorPlayer, Island island, MenuIslandBank menuIslandBank,
-                                     BankTransaction bankTransaction, GameSound successSound,
-                                     GameSound failSound, BigDecimal amount) {
-        if (bankTransaction.getFailureReason().isEmpty()) {
-            if (menuIslandBank != null) {
-                if (successSound != null)
-                    superiorPlayer.runIfOnline(successSound::playSound);
-            }
-        } else {
-            if (menuIslandBank != null) {
-                if (failSound != null)
-                    superiorPlayer.runIfOnline(failSound::playSound);
-            }
-
-            String failureReason = bankTransaction.getFailureReason();
-
-            if (!failureReason.isEmpty()) {
-                switch (failureReason) {
-                    case "No permission":
-                        Message.NO_DEPOSIT_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.DEPOSIT_MONEY));
-                        break;
-                    case "Invalid amount":
-                        Message.INVALID_AMOUNT.send(superiorPlayer, Formatters.NUMBER_FORMATTER.format(amount));
-                        break;
-                    case "Not enough money":
-                        Message.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, Formatters.NUMBER_FORMATTER.format(amount));
-                        break;
-                    case "Exceed bank limit":
-                        Message.BANK_LIMIT_EXCEED.send(superiorPlayer);
-                        break;
-                    default:
-                        Message.DEPOSIT_ERROR.send(superiorPlayer, failureReason);
-                        break;
-                }
-            }
-        }
-    }
-
-    public static void handleWithdraw(SuperiorPlayer superiorPlayer, Island island, MenuIslandBank menuIslandBank,
-                                      BankTransaction bankTransaction, GameSound successSound,
-                                      GameSound failSound, BigDecimal amount) {
-        if (bankTransaction.getFailureReason().isEmpty()) {
-            if (menuIslandBank != null) {
-                if (successSound != null)
-                    superiorPlayer.runIfOnline(successSound::playSound);
-            }
-        } else {
-            if (menuIslandBank != null) {
-                if (failSound != null)
-                    superiorPlayer.runIfOnline(failSound::playSound);
-            }
-
-            String failureReason = bankTransaction.getFailureReason();
-
-            if (!failureReason.isEmpty()) {
-                switch (failureReason) {
-                    case "No permission":
-                        Message.NO_WITHDRAW_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.WITHDRAW_MONEY));
-                        break;
-                    case "Invalid amount":
-                        Message.INVALID_AMOUNT.send(superiorPlayer, Formatters.NUMBER_FORMATTER.format(amount));
-                        break;
-                    case "Bank is empty":
-                        Message.ISLAND_BANK_EMPTY.send(superiorPlayer);
-                        break;
-                    default:
-                        Message.WITHDRAW_ERROR.send(superiorPlayer, failureReason);
-                        break;
-                }
-            }
-        }
+        return new MenuIslandBank(menuParseResult);
     }
 
 }

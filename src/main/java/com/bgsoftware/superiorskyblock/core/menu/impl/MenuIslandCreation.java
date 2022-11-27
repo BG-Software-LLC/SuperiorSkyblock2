@@ -1,78 +1,69 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
+import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.menu.button.SuperiorMenuButton;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.IslandCreationButton;
-import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern;
+import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
+import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
-import org.bukkit.Bukkit;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.IslandCreationButton;
+import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
+import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Locale;
 
-public class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
+public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, MenuIslandCreation.Args> {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
-    private static RegularMenuPattern<MenuIslandCreation> menuPattern;
-
-    private final String islandName;
-
-    private MenuIslandCreation(SuperiorPlayer superiorPlayer, String islandName) {
-        super(menuPattern, superiorPlayer);
-        this.islandName = islandName;
-    }
-
-    public String getIslandName() {
-        return islandName;
+    private MenuIslandCreation(MenuParseResult<View> parseResult) {
+        super(MenuIdentifiers.MENU_ISLAND_CREATION, parseResult);
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu, islandName);
+    protected View createViewInternal(SuperiorPlayer superiorPlayer, Args args,
+                                      @Nullable MenuView<?, ?> previousMenuView) {
+        return new View(superiorPlayer, previousMenuView, this, args);
     }
 
-    @Override
-    public void onButtonClickLackPermission(SuperiorMenuButton<MenuIslandCreation> menuButton,
-                                            InventoryClickEvent clickEvent) {
-        super.onButtonClickLackPermission(menuButton, clickEvent);
-
-        if (menuButton instanceof IslandCreationButton) {
-            ((IslandCreationButton) menuButton).getLackPermissionCommands()
-                    .forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                            command.replace("%player%", clickEvent.getWhoClicked().getName())));
-        }
+    public void simulateClick(SuperiorPlayer superiorPlayer, String islandName, String schematic, boolean rightClick) {
+        IslandCreationButton button = getButtonForSchematic(schematic);
+        if (button != null)
+            button.clickButton(plugin, superiorPlayer.asPlayer(), rightClick, islandName, null);
     }
 
-    public static void init() {
-        menuPattern = null;
+    private IslandCreationButton getButtonForSchematic(String schematicName) {
+        return (IslandCreationButton) menuLayout.getButtons().stream()
+                .filter(button -> button instanceof IslandCreationButton &&
+                        ((IslandCreationButton) button).getTemplate().getSchematic().getName().equals(schematicName))
+                .findFirst().orElse(null);
+    }
 
-        RegularMenuPattern.Builder<MenuIslandCreation> patternBuilder = new RegularMenuPattern.Builder<>();
-
-        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "island-creation.yml",
+    @Nullable
+    public static MenuIslandCreation createInstance() {
+        MenuParseResult<View> menuParseResult = MenuParserImpl.getInstance().loadMenu("island-creation.yml",
                 MenuIslandCreation::convertOldGUI);
 
-        if (menuLoadResult == null)
-            return;
+        if (menuParseResult == null) {
+            return null;
+        }
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
-        CommentedConfiguration cfg = menuLoadResult.getConfig();
+        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        YamlConfiguration cfg = menuParseResult.getConfig();
+        MenuLayout.Builder<View> patternBuilder = menuParseResult.getLayoutBuilder();
 
         if (cfg.isConfigurationSection("items")) {
             for (String itemSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
@@ -125,43 +116,53 @@ public class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
 
                 ConfigurationSection soundSection = cfg.getConfigurationSection("sounds." + itemSectionName);
                 if (soundSection != null) {
-                    buttonBuilder
-                            .setAccessSound(MenuParser.getSound(soundSection.getConfigurationSection("access")))
-                            .setNoAccessSound(MenuParser.getSound(soundSection.getConfigurationSection("no-access")));
+                    buttonBuilder.setAccessSound(MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("access")));
+                    buttonBuilder.setNoAccessSound(MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("no-access")));
                 }
 
                 ConfigurationSection commandSection = cfg.getConfigurationSection("commands." + itemSectionName);
                 if (commandSection != null) {
-                    buttonBuilder
-                            .setAccessCommands(commandSection.getStringList("access"))
-                            .setNoAccessCommands(commandSection.getStringList("no-access"));
+                    buttonBuilder.setAccessCommands(commandSection.getStringList("access"));
+                    buttonBuilder.setNoAccessCommands(commandSection.getStringList("no-access"));
                 }
 
-                patternBuilder.mapButtons(menuPatternSlots.getSlots(itemSectionName), buttonBuilder
-                        .setOffset(itemSection.getBoolean("offset", false))
-                        .setAccessItem(MenuParser.getItemStack("island-creation.yml",
-                                itemSection.getConfigurationSection("access")))
-                        .setNoAccessItem(MenuParser.getItemStack("island-creation.yml",
-                                itemSection.getConfigurationSection("no-access"))));
+                buttonBuilder.setOffset(itemSection.getBoolean("offset", false));
+                buttonBuilder.setAccessItem(MenuParserImpl.getInstance().getItemStack("island-creation.yml",
+                        itemSection.getConfigurationSection("access")));
+                buttonBuilder.setNoAccessItem(MenuParserImpl.getInstance().getItemStack("island-creation.yml",
+                        itemSection.getConfigurationSection("no-access")));
+
+                patternBuilder.mapButtons(menuPatternSlots.getSlots(itemSectionName), buttonBuilder);
             }
         }
 
-        menuPattern = patternBuilder.build();
+        return new MenuIslandCreation(menuParseResult);
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, String islandName) {
-        if (plugin.getSettings().isSkipOneItemMenus() && hasOnlyOneItem()) {
-            String schematicName = getOnlyOneItem();
-            simulateClick(superiorPlayer, islandName, schematicName, false);
-        } else {
-            new MenuIslandCreation(superiorPlayer, islandName).open(previousMenu);
+    public static class Args implements ViewArgs {
+
+        private final String islandName;
+
+        public Args(String islandName) {
+            this.islandName = islandName;
         }
+
     }
 
-    public static void simulateClick(SuperiorPlayer superiorPlayer, String islandName, String schematic, boolean rightClick) {
-        IslandCreationButton button = getButtonForSchematic(schematic);
-        if (button != null)
-            button.clickButton(plugin, superiorPlayer.asPlayer(), rightClick, islandName, null);
+    public static class View extends AbstractMenuView<View, Args> {
+
+        private final String islandName;
+
+        View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView,
+             Menu<View, Args> menu, Args args) {
+            super(inventoryViewer, previousMenuView, menu);
+            this.islandName = args.islandName;
+        }
+
+        public String getIslandName() {
+            return islandName;
+        }
+
     }
 
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
@@ -194,36 +195,16 @@ public class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
         if (cfg.contains("creation-gui.schematics")) {
             for (String schemName : cfg.getConfigurationSection("creation-gui.schematics").getKeys(false)) {
                 ConfigurationSection section = cfg.getConfigurationSection("creation-gui.schematics." + schemName);
-                char itemChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+                char itemChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
                 section.set("schematic", schemName);
                 MenuConverter.convertItemAccess(section, patternChars, itemChar, itemsSection, commandsSection, soundsSection);
             }
         }
 
         newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars,
-                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
+                AbstractMenuLayout.BUTTON_SYMBOLS[charCounter]));
 
         return true;
-    }
-
-    private static boolean hasOnlyOneItem() {
-        return menuPattern.getButtons().stream()
-                .filter(button -> button instanceof IslandCreationButton)
-                .count() == 1;
-    }
-
-    private static String getOnlyOneItem() {
-        return menuPattern.getButtons().stream()
-                .filter(button -> button instanceof IslandCreationButton)
-                .map(button -> ((IslandCreationButton) button).getSchematic().getName())
-                .findFirst().orElse(null);
-    }
-
-    private static IslandCreationButton getButtonForSchematic(String schematicName) {
-        return (IslandCreationButton) menuPattern.getButtons().stream()
-                .filter(button -> button instanceof IslandCreationButton &&
-                        ((IslandCreationButton) button).getSchematic().getName().equals(schematicName))
-                .findFirst().orElse(null);
     }
 
 }

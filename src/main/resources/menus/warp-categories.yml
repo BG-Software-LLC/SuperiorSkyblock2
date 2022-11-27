@@ -16,6 +16,11 @@ pattern:
   - '$ $ $ $ $ $ $ $ $'
   - '# # % # * # ^ # #'
 
+slots: '@'
+previous-page: '%'
+current-page: '*'
+next-page: '^'
+
 # This lore is added to category icons.
 edit-lore:
   - '&f '

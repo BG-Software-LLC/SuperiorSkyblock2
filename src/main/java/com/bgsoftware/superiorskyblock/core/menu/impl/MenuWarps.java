@@ -1,24 +1,25 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
+import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.DummyButton;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.WarpPagedObjectButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
+import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
+import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -29,49 +30,40 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
-public class MenuWarps extends PagedSuperiorMenu<MenuWarps, IslandWarp> {
+public class MenuWarps extends AbstractPagedMenu<MenuWarps.View, MenuWarps.Args, IslandWarp> {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static PagedMenuPattern<MenuWarps, IslandWarp> menuPattern;
+    private final List<String> editLore;
 
-    public static List<String> editLore;
-
-    private final WarpCategory warpCategory;
-    private final boolean hasManagePermission;
-
-    private MenuWarps(SuperiorPlayer superiorPlayer, WarpCategory warpCategory) {
-        super(menuPattern, superiorPlayer);
-        this.warpCategory = warpCategory;
-        this.hasManagePermission = warpCategory != null && warpCategory.getIsland().hasPermission(superiorPlayer, IslandPrivileges.SET_WARP);
+    private MenuWarps(MenuParseResult<View> parseResult, List<String> editLore) {
+        super(MenuIdentifiers.MENU_WARPS, parseResult, true);
+        this.editLore = editLore;
     }
 
-    public WarpCategory getWarpCategory() {
-        return warpCategory;
-    }
-
-    public boolean hasManagePermission() {
-        return hasManagePermission;
+    public List<String> getEditLore() {
+        return editLore;
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu, warpCategory);
+    protected View createViewInternal(SuperiorPlayer superiorPlayer, Args args,
+                                      @Nullable MenuView<?, ?> previousMenuView) {
+        return new View(superiorPlayer, previousMenuView, this, args);
     }
 
-    @Override
-    protected List<IslandWarp> requestObjects() {
-        boolean isMember = warpCategory.getIsland().isMember(inventoryViewer);
-        return new SequentialListBuilder<IslandWarp>()
-                .filter(islandWarp -> isMember || !islandWarp.hasPrivateFlag())
-                .build(warpCategory.getWarps());
+    public void refreshViews(WarpCategory warpCategory) {
+        refreshViews(view -> view.warpCategory.equals(warpCategory));
     }
 
-    public static void simulateClick(SuperiorPlayer superiorPlayer, Island island, String warpName) {
+    public void closeViews(WarpCategory warpCategory) {
+        closeViews(view -> view.getWarpCategory().equals(warpCategory));
+    }
+
+    public void simulateClick(SuperiorPlayer superiorPlayer, Island island, String warpName) {
         if (!superiorPlayer.hasBypassModeEnabled() && plugin.getSettings().getChargeOnWarp() > 0) {
             if (plugin.getProviders().getEconomyProvider().getBalance(superiorPlayer)
                     .compareTo(BigDecimal.valueOf(plugin.getSettings().getChargeOnWarp())) < 0) {
@@ -89,66 +81,76 @@ public class MenuWarps extends PagedSuperiorMenu<MenuWarps, IslandWarp> {
         }, 1L);
     }
 
-    public static void init() {
-        menuPattern = null;
+    @Nullable
+    public static MenuWarps createInstance() {
+        MenuParseResult<View> menuParseResult = MenuParserImpl.getInstance().loadMenu("warps.yml",
+                MenuWarps::convertOldGUI, new WarpPagedObjectButton.Builder());
 
-        PagedMenuPattern.Builder<MenuWarps, IslandWarp> patternBuilder = new PagedMenuPattern.Builder<>();
+        if (menuParseResult == null)
+            return null;
 
-        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "warps.yml", MenuWarps::convertOldGUI);
+        YamlConfiguration cfg = menuParseResult.getConfig();
 
-        if (menuLoadResult == null)
-            return;
+        List<String> editLore = cfg.getStringList("edit-lore");
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
-        CommentedConfiguration cfg = menuLoadResult.getConfig();
+        if (SIslandWarp.DEFAULT_WARP_ICON == null) {
+            ItemStack defaultWarpIcon = menuParseResult.getLayoutBuilder().build().getButtons().stream()
+                    .filter(button -> button.getViewButtonType().equals(WarpPagedObjectButton.class))
+                    .findFirst().map(MenuTemplateButton::getButtonItem)
+                    .orElse(null);
 
-        editLore = cfg.getStringList("edit-lore");
-
-        menuPattern = patternBuilder
-                .setPreviousPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))
-                .setCurrentPageSlots(getSlots(cfg, "current-page", menuPatternSlots))
-                .setNextPageSlots(getSlots(cfg, "next-page", menuPatternSlots))
-                .setPagedObjectSlots(getSlots(cfg, "slots", menuPatternSlots), new WarpPagedObjectButton.Builder())
-                .build();
-
-        ItemStack defaultWarpIcon = menuPattern.getButtons().stream()
-                .filter(button -> button instanceof WarpPagedObjectButton)
-                .findFirst().orElse(new DummyButton.Builder<MenuWarps>().build())
-                .getRawButtonItem();
-
-        SIslandWarp.DEFAULT_WARP_ICON = new TemplateItem(defaultWarpIcon == null ? new ItemBuilder(Material.AIR) :
-                new ItemBuilder(defaultWarpIcon));
-    }
-
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, WarpCategory warpCategory) {
-        if (plugin.getSettings().isSkipOneItemMenus() && hasOnlyOneItem(warpCategory, superiorPlayer) &&
-                !warpCategory.getIsland().hasPermission(superiorPlayer, IslandPrivileges.SET_WARP)) {
-            simulateClick(superiorPlayer, warpCategory.getIsland(), getOnlyOneItem(warpCategory, superiorPlayer).getName());
-        } else {
-            new MenuWarps(superiorPlayer, warpCategory).open(previousMenu);
+            SIslandWarp.DEFAULT_WARP_ICON = new TemplateItem(defaultWarpIcon == null ? new ItemBuilder(Material.AIR) :
+                    new ItemBuilder(defaultWarpIcon));
         }
+
+        return new MenuWarps(menuParseResult, editLore);
     }
 
-    public static void refreshMenus(WarpCategory warpCategory) {
-        refreshMenus(MenuWarps.class, superiorMenu -> superiorMenu.warpCategory.equals(warpCategory));
+    public static class Args extends IslandViewArgs {
+
+        private final WarpCategory warpCategory;
+
+        public Args(WarpCategory warpCategory) {
+            super(warpCategory.getIsland());
+            this.warpCategory = warpCategory;
+        }
+
     }
 
-    public static void destroyMenus(WarpCategory warpCategory) {
-        destroyMenus(MenuWarps.class, superiorMenu -> superiorMenu.warpCategory.equals(warpCategory));
-    }
+    public static class View extends AbstractPagedMenuView<View, Args, IslandWarp> {
 
-    private static boolean hasOnlyOneItem(WarpCategory warpCategory, SuperiorPlayer superiorPlayer) {
-        boolean isMember = warpCategory.getIsland().isMember(superiorPlayer);
-        return warpCategory.getWarps().stream()
-                .filter(islandWarp -> isMember || !islandWarp.hasPrivateFlag())
-                .count() == 1;
-    }
+        private final Island island;
+        private final WarpCategory warpCategory;
+        private final boolean hasManagePerms;
 
-    private static IslandWarp getOnlyOneItem(WarpCategory warpCategory, SuperiorPlayer superiorPlayer) {
-        boolean isMember = warpCategory.getIsland().isMember(superiorPlayer);
-        return warpCategory.getWarps().stream()
-                .filter(islandWarp -> isMember || !islandWarp.hasPrivateFlag())
-                .findFirst().orElse(null);
+        protected View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView,
+                       Menu<View, Args> menu, Args args) {
+            super(inventoryViewer, previousMenuView, menu);
+            this.island = args.getIsland();
+            this.warpCategory = args.warpCategory;
+            this.hasManagePerms = warpCategory.getIsland().hasPermission(inventoryViewer, IslandPrivileges.SET_WARP);
+        }
+
+        @Override
+        protected List<IslandWarp> requestObjects() {
+            boolean isMember = warpCategory.getIsland().isMember(getInventoryViewer());
+            return new SequentialListBuilder<IslandWarp>()
+                    .filter(islandWarp -> isMember || !islandWarp.hasPrivateFlag())
+                    .build(warpCategory.getWarps());
+        }
+
+        public Island getIsland() {
+            return island;
+        }
+
+        public WarpCategory getWarpCategory() {
+            return warpCategory;
+        }
+
+        public boolean hasManagePerms() {
+            return hasManagePerms;
+        }
+
     }
 
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
@@ -178,17 +180,17 @@ public class MenuWarps extends PagedSuperiorMenu<MenuWarps, IslandWarp> {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char slotsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char slotsChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
 
         MenuConverter.convertPagedButtons(cfg.getConfigurationSection("warps-gui"),
                 cfg.getConfigurationSection("warps-gui.warp-item"),
                 newMenu, patternChars,
-                slotsChar, SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
-                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++], SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
+                slotsChar, AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++],
+                AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++], AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++],
                 itemsSection, commandsSection, soundsSection);
 
         newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars,
-                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
+                AbstractMenuLayout.BUTTON_SYMBOLS[charCounter]));
 
         return true;
     }

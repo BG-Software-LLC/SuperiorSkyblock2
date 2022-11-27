@@ -1,66 +1,57 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.DisbandButton;
-import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
+import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.DisbandButton;
+import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
+import com.bgsoftware.superiorskyblock.core.menu.view.IslandMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Arrays;
 
-public class MenuConfirmDisband extends SuperiorMenu<MenuConfirmDisband> {
+public class MenuConfirmDisband extends AbstractMenu<IslandMenuView, IslandViewArgs> {
 
-    private static RegularMenuPattern<MenuConfirmDisband> menuPattern;
-
-    private final Island targetIsland;
-
-    private MenuConfirmDisband(SuperiorPlayer superiorPlayer, Island targetIsland) {
-        super(menuPattern, superiorPlayer);
-        this.targetIsland = targetIsland;
-    }
-
-    public Island getTargetIsland() {
-        return targetIsland;
+    private MenuConfirmDisband(MenuParseResult<IslandMenuView> parseResult) {
+        super(MenuIdentifiers.MENU_CONFIRM_DISBAND, parseResult);
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu, targetIsland);
+    protected IslandMenuView createViewInternal(SuperiorPlayer superiorPlayer, IslandViewArgs args,
+                                                @Nullable MenuView<?, ?> previousMenuView) {
+        return new IslandMenuView(superiorPlayer, previousMenuView, this, args);
     }
 
-    public static void init() {
-        menuPattern = null;
-
-        RegularMenuPattern.Builder<MenuConfirmDisband> patternBuilder = new RegularMenuPattern.Builder<>();
-
-        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "confirm-disband.yml",
+    @Nullable
+    public static MenuConfirmDisband createInstance() {
+        MenuParseResult<IslandMenuView> menuParseResult = MenuParserImpl.getInstance().loadMenu("confirm-disband.yml",
                 MenuConfirmDisband::convertOldGUI);
 
-        if (menuLoadResult == null)
-            return;
+        if (menuParseResult == null) {
+            return null;
+        }
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
-        CommentedConfiguration cfg = menuLoadResult.getConfig();
+        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        YamlConfiguration cfg = menuParseResult.getConfig();
+        MenuLayout.Builder<IslandMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
 
-        menuPattern = patternBuilder
-                .mapButtons(getSlots(cfg, "confirm", menuPatternSlots), new DisbandButton.Builder().setDisbandIsland(true))
-                .mapButtons(getSlots(cfg, "cancel", menuPatternSlots), new DisbandButton.Builder())
-                .build();
-    }
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "confirm", menuPatternSlots),
+                new DisbandButton.Builder().setDisbandIsland(true));
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "cancel", menuPatternSlots),
+                new DisbandButton.Builder());
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island targetIsland) {
-        new MenuConfirmDisband(superiorPlayer, targetIsland).open(previousMenu);
+        return new MenuConfirmDisband(menuParseResult);
     }
 
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
@@ -89,8 +80,8 @@ public class MenuConfirmDisband extends SuperiorMenu<MenuConfirmDisband> {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char confirmChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
-        char cancelChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char confirmChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
+        char cancelChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
 
         MenuConverter.convertItem(cfg.getConfigurationSection("disband-gui.confirm"), patternChars, confirmChar,
                 itemsSection, commandsSection, soundsSection);
@@ -101,7 +92,7 @@ public class MenuConfirmDisband extends SuperiorMenu<MenuConfirmDisband> {
         newMenu.set("cancel", cancelChar + "");
 
         newMenu.set("pattern", MenuConverter.buildPattern(1, patternChars,
-                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
+                AbstractMenuLayout.BUTTON_SYMBOLS[charCounter]));
 
         return true;
     }

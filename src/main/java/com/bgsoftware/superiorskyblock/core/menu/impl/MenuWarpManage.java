@@ -1,81 +1,104 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
+import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
+import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.GameSound;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.WarpManageIconButton;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.WarpManageLocationButton;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.WarpManagePrivateButton;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.WarpManageRenameButton;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
+import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpManageIconButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpManageLocationButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpManagePrivateButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpManageRenameButton;
+import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
+import org.bukkit.configuration.file.YamlConfiguration;
 
-public class MenuWarpManage extends SuperiorMenu<MenuWarpManage> {
+import javax.annotation.Nullable;
 
-    private static RegularMenuPattern<MenuWarpManage> menuPattern;
+public class MenuWarpManage extends AbstractMenu<MenuWarpManage.View, MenuWarpManage.Args> {
 
-    public static GameSound successUpdateSound;
+    private final GameSound successUpdateSound;
 
-    private final IslandWarp islandWarp;
-
-    private MenuWarpManage(SuperiorPlayer superiorPlayer, IslandWarp islandWarp) {
-        super(menuPattern, superiorPlayer);
-        this.islandWarp = islandWarp;
+    private MenuWarpManage(MenuParseResult<View> parseResult, GameSound successUpdateSound) {
+        super(MenuIdentifiers.MENU_WARP_MANAGE, parseResult);
+        this.successUpdateSound = successUpdateSound;
     }
 
-    public IslandWarp getIslandWarp() {
-        return islandWarp;
+    public GameSound getSuccessUpdateSound() {
+        return successUpdateSound;
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu, islandWarp);
+    protected View createViewInternal(SuperiorPlayer superiorPlayer, Args args, @Nullable MenuView<?, ?> previousMenu) {
+        return new View(superiorPlayer, previousMenu, this, args);
     }
 
-    @Override
-    protected String replaceTitle(String title) {
-        return title.replace("{0}", islandWarp.getName());
+    public void refreshViews(IslandWarp islandWarp) {
+        refreshViews(view -> view.islandWarp.equals(islandWarp));
     }
 
-    public static void init() {
-        menuPattern = null;
+    @Nullable
+    public static MenuWarpManage createInstance() {
+        MenuParseResult<View> menuParseResult = MenuParserImpl.getInstance().loadMenu("warp-manage.yml",
+                null);
 
-        RegularMenuPattern.Builder<MenuWarpManage> patternBuilder = new RegularMenuPattern.Builder<>();
+        if (menuParseResult == null) {
+            return null;
+        }
 
-        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "warp-manage.yml", null);
+        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        YamlConfiguration cfg = menuParseResult.getConfig();
+        MenuLayout.Builder<View> patternBuilder = menuParseResult.getLayoutBuilder();
 
-        if (menuLoadResult == null)
-            return;
+        GameSound successUpdateSound = cfg.isConfigurationSection("success-update-sound") ?
+                MenuParserImpl.getInstance().getSound(cfg.getConfigurationSection("success-update-sound")) : null;
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
-        CommentedConfiguration cfg = menuLoadResult.getConfig();
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "warp-rename", menuPatternSlots),
+                new WarpManageRenameButton.Builder());
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "warp-icon", menuPatternSlots),
+                new WarpManageIconButton.Builder());
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "warp-location", menuPatternSlots),
+                new WarpManageLocationButton.Builder());
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "warp-private", menuPatternSlots),
+                new WarpManagePrivateButton.Builder());
 
-        if (cfg.isConfigurationSection("success-update-sound"))
-            successUpdateSound = MenuParser.getSound(cfg.getConfigurationSection("success-update-sound"));
-
-        menuPattern = patternBuilder
-                .mapButtons(getSlots(cfg, "warp-rename", menuPatternSlots),
-                        new WarpManageRenameButton.Builder())
-                .mapButtons(getSlots(cfg, "warp-icon", menuPatternSlots),
-                        new WarpManageIconButton.Builder())
-                .mapButtons(getSlots(cfg, "warp-location", menuPatternSlots),
-                        new WarpManageLocationButton.Builder())
-                .mapButtons(getSlots(cfg, "warp-private", menuPatternSlots),
-                        new WarpManagePrivateButton.Builder())
-                .build();
+        return new MenuWarpManage(menuParseResult, successUpdateSound);
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, IslandWarp islandWarp) {
-        new MenuWarpManage(superiorPlayer, islandWarp).open(previousMenu);
+    public static class Args implements ViewArgs {
+
+        private final IslandWarp islandWarp;
+
+        public Args(IslandWarp islandWarp) {
+            this.islandWarp = islandWarp;
+        }
+
     }
 
-    public static void refreshMenus(IslandWarp islandWarp) {
-        refreshMenus(MenuWarpManage.class, superiorMenu -> superiorMenu.islandWarp.equals(islandWarp));
+    public static class View extends AbstractMenuView<View, Args> {
+
+        private final IslandWarp islandWarp;
+
+        protected View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView, Menu<View, Args> menu, Args args) {
+            super(inventoryViewer, previousMenuView, menu);
+            this.islandWarp = args.islandWarp;
+        }
+
+        public IslandWarp getIslandWarp() {
+            return islandWarp;
+        }
+
+        @Override
+        public String replaceTitle(String title) {
+            return title.replace("{0}", islandWarp.getName());
+        }
+
     }
 
 }

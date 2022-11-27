@@ -1,43 +1,47 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
+import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.LanguageButton;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.LanguageButton;
+import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 
-public class MenuPlayerLanguage extends SuperiorMenu<MenuPlayerLanguage> {
+import javax.annotation.Nullable;
 
-    private static RegularMenuPattern<MenuPlayerLanguage> menuPattern;
+public class MenuPlayerLanguage extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
 
-    private MenuPlayerLanguage(SuperiorPlayer superiorPlayer) {
-        super(menuPattern, superiorPlayer);
+    private MenuPlayerLanguage(MenuParseResult<BaseMenuView> parseResult) {
+        super(MenuIdentifiers.MENU_PLAYER_LANGUAGE, parseResult);
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu);
+    protected BaseMenuView createViewInternal(SuperiorPlayer superiorPlayer, EmptyViewArgs unused,
+                                              @Nullable MenuView<?, ?> previousMenuView) {
+        return new BaseMenuView(superiorPlayer, previousMenuView, this);
     }
 
-    public static void init() {
-        menuPattern = null;
+    @Nullable
+    public static MenuPlayerLanguage createInstance() {
+        MenuParseResult<BaseMenuView> menuParseResult = MenuParserImpl.getInstance().loadMenu("player-language.yml",
+                null);
 
-        RegularMenuPattern.Builder<MenuPlayerLanguage> patternBuilder = new RegularMenuPattern.Builder<>();
+        if (menuParseResult == null) {
+            return null;
+        }
 
-        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "player-language.yml", null);
-
-        if (menuLoadResult == null)
-            return;
-
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
-        CommentedConfiguration cfg = menuLoadResult.getConfig();
+        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        YamlConfiguration cfg = menuParseResult.getConfig();
+        MenuLayout.Builder<BaseMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
 
         if (cfg.contains("items")) {
             for (String itemsSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
@@ -62,17 +66,12 @@ public class MenuPlayerLanguage extends SuperiorMenu<MenuPlayerLanguage> {
                     continue;
                 }
 
-                patternBuilder
-                        .mapButtons(menuPatternSlots.getSlots(itemsSectionName),
-                                new LanguageButton.Builder().setLanguage(locale));
+                patternBuilder.mapButtons(menuPatternSlots.getSlots(itemsSectionName),
+                        new LanguageButton.Builder().setLanguage(locale));
             }
         }
 
-        menuPattern = patternBuilder.build();
-    }
-
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu) {
-        new MenuPlayerLanguage(superiorPlayer).open(previousMenu);
+        return new MenuPlayerLanguage(menuParseResult);
     }
 
 }

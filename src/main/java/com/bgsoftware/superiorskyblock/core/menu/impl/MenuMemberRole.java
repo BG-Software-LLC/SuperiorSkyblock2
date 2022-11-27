@@ -1,59 +1,58 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.MemberRoleButton;
-import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
+import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.MemberRoleButton;
+import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
+import com.bgsoftware.superiorskyblock.core.menu.view.PlayerMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.args.PlayerViewArgs;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Arrays;
 
-public class MenuMemberRole extends SuperiorMenu<MenuMemberRole> {
+public class MenuMemberRole extends AbstractMenu<PlayerMenuView, PlayerViewArgs> {
 
-    private static RegularMenuPattern<MenuMemberRole> menuPattern;
-
-    private MenuMemberRole(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer) {
-        super(menuPattern, superiorPlayer);
-        updateTargetPlayer(targetPlayer);
+    private MenuMemberRole(MenuParseResult<PlayerMenuView> parseResult) {
+        super(MenuIdentifiers.MENU_MEMBER_ROLE, parseResult);
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu, targetPlayer);
+    protected PlayerMenuView createViewInternal(SuperiorPlayer superiorPlayer, PlayerViewArgs args,
+                                                @Nullable MenuView<?, ?> previousMenuView) {
+        return new PlayerMenuView(superiorPlayer, previousMenuView, this, args);
     }
 
-    @Override
-    protected String replaceTitle(String title) {
-        return title.replace("{}", targetPlayer.getName());
+    public void closeViews(SuperiorPlayer islandMember) {
+        closeViews(view -> view.getSuperiorPlayer().equals(islandMember));
     }
 
-    public static void init() {
-        menuPattern = null;
-
-        RegularMenuPattern.Builder<MenuMemberRole> patternBuilder = new RegularMenuPattern.Builder<>();
-
-        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "member-role.yml",
+    @Nullable
+    public static MenuMemberRole createInstance() {
+        MenuParseResult<PlayerMenuView> menuParseResult = MenuParserImpl.getInstance().loadMenu("member-role.yml",
                 MenuMemberRole::convertOldGUI);
 
-        if (menuLoadResult == null)
-            return;
+        if (menuParseResult == null) {
+            return null;
+        }
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
-        CommentedConfiguration cfg = menuLoadResult.getConfig();
+        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        YamlConfiguration cfg = menuParseResult.getConfig();
+        MenuLayout.Builder<PlayerMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
 
         if (cfg.isConfigurationSection("items")) {
             for (String itemsSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
@@ -81,20 +80,12 @@ public class MenuMemberRole extends SuperiorMenu<MenuMemberRole> {
                 if (playerRole == null)
                     continue;
 
-                patternBuilder.mapButtons(menuPatternSlots.getSlots(itemsSectionName), new MemberRoleButton.Builder()
-                        .setPlayerRole(playerRole));
+                patternBuilder.mapButtons(menuPatternSlots.getSlots(itemsSectionName),
+                        new MemberRoleButton.Builder().setPlayerRole(playerRole));
             }
         }
 
-        menuPattern = patternBuilder.build();
-    }
-
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, SuperiorPlayer targetPlayer) {
-        new MenuMemberRole(superiorPlayer, targetPlayer).open(previousMenu);
-    }
-
-    public static void destroyMenus(SuperiorPlayer targetPlayer) {
-        destroyMenus(MenuMemberRole.class, menuMemberRole -> menuMemberRole.targetPlayer.equals(targetPlayer));
+        return new MenuMemberRole(menuParseResult);
     }
 
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
@@ -127,14 +118,14 @@ public class MenuMemberRole extends SuperiorMenu<MenuMemberRole> {
         if (cfg.contains("roles-panel.roles")) {
             for (String roleName : cfg.getConfigurationSection("roles-panel.roles").getKeys(false)) {
                 ConfigurationSection section = cfg.getConfigurationSection("roles-panel.roles." + roleName);
-                char itemChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+                char itemChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
                 section.set("role", Formatters.CAPITALIZED_FORMATTER.format(roleName));
                 MenuConverter.convertItem(section, patternChars, itemChar, itemsSection, commandsSection, soundsSection);
             }
         }
 
         newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars,
-                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
+                AbstractMenuLayout.BUTTON_SYMBOLS[charCounter]));
 
         return true;
     }

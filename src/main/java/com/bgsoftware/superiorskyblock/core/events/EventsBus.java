@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.player.container.PlayersContainer;
@@ -582,14 +583,14 @@ public class EventsBus {
         return callEvent(() -> new PlayerChangeRoleEvent(superiorPlayer, newPlayer), "playerchangeroleevent");
     }
 
-    public EventResult<ISuperiorMenu> callPlayerCloseMenuEvent(SuperiorPlayer superiorPlayer, ISuperiorMenu superiorMenu,
-                                                               @Nullable ISuperiorMenu newMenu) {
-        return callEvent(() -> new PlayerCloseMenuEvent(superiorPlayer, superiorMenu, newMenu),
-                "playerclosemenuevent", newMenu, PlayerCloseMenuEvent::getNewMenu);
+    public EventResult<MenuView<?, ?>> callPlayerCloseMenuEvent(SuperiorPlayer superiorPlayer, MenuView<?, ?> menuView,
+                                                                @Nullable MenuView<?, ?> newMenuView) {
+        return callEvent(() -> new PlayerCloseMenuEvent(superiorPlayer, menuView, newMenuView),
+                "playerclosemenuevent", newMenuView, PlayerCloseMenuEvent::getNewMenuView);
     }
 
-    public boolean callPlayerOpenMenuEvent(SuperiorPlayer superiorPlayer, ISuperiorMenu superiorMenu) {
-        return callEvent(() -> new PlayerOpenMenuEvent(superiorPlayer, superiorMenu), "playeropenmenuevent");
+    public boolean callPlayerOpenMenuEvent(SuperiorPlayer superiorPlayer, MenuView<?, ?> menuView) {
+        return callEvent(() -> new PlayerOpenMenuEvent(superiorPlayer, menuView), "playeropenmenuevent");
     }
 
     public void callPlayerReplaceEvent(SuperiorPlayer oldPlayer, SuperiorPlayer newPlayer) {

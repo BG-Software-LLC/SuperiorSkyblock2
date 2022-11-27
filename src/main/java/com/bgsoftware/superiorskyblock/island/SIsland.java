@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
@@ -42,7 +43,6 @@ import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
@@ -551,14 +551,18 @@ public class SIsland implements Island {
 
         superiorPlayer.setIsland(null);
 
-        if (superiorPlayer.isOnline()) {
-            SuperiorMenu.killMenu(superiorPlayer);
+        superiorPlayer.runIfOnline(player -> {
+            MenuView<?, ?> openedView = superiorPlayer.getOpenedView();
+
+            if (openedView != null)
+                openedView.closeView();
+
             if (plugin.getSettings().isTeleportOnKick() && getAllPlayersInside().contains(superiorPlayer)) {
                 superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             } else {
                 updateIslandFly(superiorPlayer);
             }
-        }
+        });
 
         plugin.getMissions().getAllMissions().stream().filter(mission -> {
             MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
@@ -653,7 +657,10 @@ public class SIsland implements Island {
         Location location = superiorPlayer.getLocation();
 
         if (isLocked() && location != null && isInside(location)) {
-            SuperiorMenu.killMenu(superiorPlayer);
+            MenuView<?, ?> openedView = superiorPlayer.getOpenedView();
+            if (openedView != null)
+                openedView.closeView();
+
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
         }
 

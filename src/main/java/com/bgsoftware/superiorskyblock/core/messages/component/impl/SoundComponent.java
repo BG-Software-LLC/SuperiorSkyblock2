@@ -1,8 +1,9 @@
 package com.bgsoftware.superiorskyblock.core.messages.component.impl;
 
-import com.bgsoftware.superiorskyblock.core.GameSound;
-import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
+import com.bgsoftware.superiorskyblock.api.world.GameSound;
+import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
+import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -10,14 +11,14 @@ import javax.annotation.Nullable;
 
 public class SoundComponent implements IMessageComponent {
 
-    private final GameSound soundWrapper;
+    private final GameSound gameSound;
 
-    public static IMessageComponent of(@Nullable GameSound soundWrapper) {
-        return GameSound.isEmpty(soundWrapper) ? EmptyMessageComponent.getInstance() : new SoundComponent(soundWrapper);
+    public static IMessageComponent of(@Nullable GameSound gameSound) {
+        return GameSoundImpl.isEmpty(gameSound) ? EmptyMessageComponent.getInstance() : new SoundComponent(gameSound);
     }
 
-    private SoundComponent(GameSound soundWrapper) {
-        this.soundWrapper = soundWrapper;
+    private SoundComponent(GameSound gameSound) {
+        this.gameSound = gameSound;
     }
 
 
@@ -34,7 +35,7 @@ public class SoundComponent implements IMessageComponent {
     @Override
     public void sendMessage(CommandSender sender, Object... args) {
         if (sender instanceof Player)
-            soundWrapper.playSound((Player) sender);
+            GameSoundImpl.playSound((Player) sender, gameSound);
     }
 
 }

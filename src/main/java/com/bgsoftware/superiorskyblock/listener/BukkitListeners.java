@@ -72,7 +72,7 @@ public class BukkitListeners {
             .put(MenusListener.class, new Singleton<Listener>() {
                 @Override
                 protected Listener create() {
-                    return new MenusListener(plugin);
+                    return new MenusListener();
                 }
             })
             .put(PlayersListener.class, new Singleton<Listener>() {
