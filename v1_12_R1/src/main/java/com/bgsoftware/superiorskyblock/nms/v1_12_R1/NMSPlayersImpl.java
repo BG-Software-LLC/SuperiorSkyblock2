@@ -48,7 +48,7 @@ public class NMSPlayersImpl implements NMSPlayers {
             return;
         }
 
-        GameProfile profile = new GameProfile(offlinePlayer.getUniqueId(), offlinePlayer.getName());
+        GameProfile profile = new GameProfile(offlinePlayer.getUniqueId(), Optional.ofNullable(offlinePlayer.getName()).orElse(""));
 
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
         WorldServer worldServer = server.getWorldServer(0);

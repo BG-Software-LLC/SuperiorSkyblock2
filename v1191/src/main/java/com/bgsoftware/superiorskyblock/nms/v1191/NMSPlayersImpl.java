@@ -30,6 +30,7 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 import java.util.Locale;
+import java.util.Optional;
 
 public class NMSPlayersImpl implements NMSPlayers {
 
@@ -51,7 +52,7 @@ public class NMSPlayersImpl implements NMSPlayers {
             return;
         }
 
-        GameProfile profile = new GameProfile(offlinePlayer.getUniqueId(), offlinePlayer.getName());
+        GameProfile profile = new GameProfile(offlinePlayer.getUniqueId(), Optional.ofNullable(offlinePlayer.getName()).orElse(""));
 
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
         ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
