@@ -34,7 +34,11 @@ public class TopIslandsPagedObjectButton extends AbstractPagedMenuButton<MenuTop
 
     @Override
     public ItemStack modifyViewItem(ItemStack buttonItem) {
-        return TopIslandsSelfIslandButton.modifyViewItem(menuView, pagedObject, getTemplate().islandItem);
+        if (pagedObject == null) {
+            return getTemplate().getNullTemplateItem().build();
+        } else {
+            return TopIslandsSelfIslandButton.modifyViewItem(menuView, pagedObject, getTemplate().islandItem);
+        }
     }
 
     public static class Builder extends PagedMenuTemplateButtonImpl.AbstractBuilder<MenuTopIslands.View, Island> {
@@ -93,7 +97,8 @@ public class TopIslandsPagedObjectButton extends AbstractPagedMenuButton<MenuTop
             this.islandCommands = islandCommands == null ? Collections.emptyList() : islandCommands;
             this.noIslandSound = noIslandSound;
             this.noIslandCommands = noIslandCommands == null ? Collections.emptyList() : noIslandCommands;
-            this.getNullTemplateItem().getEditableBuilder().asSkullOf((SuperiorPlayer) null);
+            if (this.getNullTemplateItem() != null)
+                this.getNullTemplateItem().getEditableBuilder().asSkullOf((SuperiorPlayer) null);
         }
 
     }

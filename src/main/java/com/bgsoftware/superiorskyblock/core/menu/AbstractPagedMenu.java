@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public abstract class AbstractPagedMenu<V extends AbstractPagedMenuView<V, A, E>
 
     protected AbstractPagedMenu(String identifier, MenuParseResult<V> parseResult, boolean acceptNull) {
         super(identifier, parseResult);
+        Preconditions.checkState(parseResult.getLayoutBuilder() instanceof PagedMenuLayout.Builder, "Paged menu " + identifier + " doesn't use the correct layout.");
         this.acceptNull = acceptNull;
     }
 

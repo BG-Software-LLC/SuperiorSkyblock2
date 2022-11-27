@@ -226,6 +226,8 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
             this.islandCommands = islandCommands == null ? Collections.emptyList() : islandCommands;
             this.noIslandSound = noIslandSound;
             this.noIslandCommands = noIslandCommands == null ? Collections.emptyList() : noIslandCommands;
+            if (noIslandItem != null)
+                noIslandItem.getEditableBuilder().asSkullOf((SuperiorPlayer) null);
         }
 
     }

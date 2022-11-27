@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuTopIslands.Args, Island> {
 
@@ -50,6 +51,21 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
         return new View(superiorPlayer, previousMenuView, this, args);
     }
 
+    @Override
+    public CompletableFuture<View> refreshView(View view) {
+        CompletableFuture<View> res = new CompletableFuture<>();
+        plugin.getGrid().sortIslands(view.sortingType, () -> {
+            super.refreshView(view).whenComplete((v, err) -> {
+                if (err != null) {
+                    res.completeExceptionally(err);
+                } else {
+                    res.complete(v);
+                }
+            });
+        });
+        return res;
+    }
+
     public void refreshViews(SortingType sortingType) {
         refreshViews(view -> view.sortingType.equals(sortingType));
     }
@@ -57,7 +73,7 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
     @Nullable
     public static MenuTopIslands createInstance() {
         MenuParseResult<View> menuParseResult = MenuParserImpl.getInstance().loadMenu("top-islands.yml",
-                MenuTopIslands::convertOldGUI);
+                MenuTopIslands::convertOldGUI, new TopIslandsPagedObjectButton.Builder());
 
         if (menuParseResult == null)
             return null;
