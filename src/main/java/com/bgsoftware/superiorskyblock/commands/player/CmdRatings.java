@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -60,7 +61,7 @@ public class CmdRatings implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        plugin.getMenus().openIslandRatings(superiorPlayer, null, island);
+        plugin.getMenus().openIslandRatings(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
     }
 
 }

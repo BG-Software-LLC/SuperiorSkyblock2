@@ -172,7 +172,7 @@ public class MenuParserImpl implements MenuParser {
             try {
                 return parseMenu(fileName, cfg, pagedButtonItemBuilder);
             } catch (MenuParseException error) {
-                Log.error(file, error.getMessage());
+                Log.errorFromFile(fileName, error.getMessage());
             }
         }
 
@@ -184,7 +184,7 @@ public class MenuParserImpl implements MenuParser {
         try {
             return getItemStackUnsafe(fileName, section);
         } catch (MenuParseException error) {
-            Log.error(new File(fileName), error.getMessage());
+            Log.errorFromFile(fileName, error.getMessage());
             return null;
         }
     }
@@ -224,7 +224,7 @@ public class MenuParserImpl implements MenuParser {
             try {
                 return parseMenu(fileName, cfg);
             } catch (MenuParseException error) {
-                Log.error(file, error.getMessage());
+                Log.errorFromFile(fileName, error.getMessage());
             }
         }
 
@@ -242,10 +242,10 @@ public class MenuParserImpl implements MenuParser {
         try {
             cfg.load(file);
         } catch (InvalidConfigurationException error) {
-            Log.error(error, file, "There is an issue with the format of the file:");
+            Log.errorFromFile(error, fileName, "There is an issue with the format of the file:");
             return null;
         } catch (IOException error) {
-            Log.error(error, file, "An unexpected error occurred while parsing file:");
+            Log.errorFromFile(error, fileName, "An unexpected error occurred while parsing file:");
             return null;
         }
 
@@ -253,7 +253,7 @@ public class MenuParserImpl implements MenuParser {
             try {
                 cfg.save(file);
             } catch (Exception error) {
-                Log.error(error, file, "An unexpected error occurred while saving file:");
+                Log.errorFromFile(error, fileName, "An unexpected error occurred while saving file:");
             }
         }
 
@@ -271,7 +271,7 @@ public class MenuParserImpl implements MenuParser {
             templateItem = getItemStackUnsafe(fileName, section.getRoot().getConfigurationSection(sourceItem));
         } else {
             if (!section.contains("type"))
-                throw new MenuParseException("Couldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & data sections!");
+                return null;
 
             Material type;
             short data;

@@ -140,7 +140,7 @@ public class MenuCustom extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
         @Override
         public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-            MenuCustom.this.createView(superiorPlayer, EmptyViewArgs.INSTANCE, null);
+            MenuCustom.this.createView(superiorPlayer, EmptyViewArgs.INSTANCE);
         }
 
         @Override

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
+import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -62,9 +63,9 @@ public class CmdBank implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = arguments.getSuperiorPlayer();
 
         if (args.length == 2 && args[1].equalsIgnoreCase("logs")) {
-            plugin.getMenus().openBankLogs(superiorPlayer, null, island);
+            plugin.getMenus().openBankLogs(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
         } else {
-            plugin.getMenus().openIslandBank(superiorPlayer, null, island);
+            plugin.getMenus().openIslandBank(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
         }
     }
 

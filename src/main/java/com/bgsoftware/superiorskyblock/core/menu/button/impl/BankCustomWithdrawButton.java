@@ -53,7 +53,7 @@ public class BankCustomWithdrawButton extends AbstractMenuViewButton<IslandMenuV
 
             PlayerChat.remove(player);
 
-            plugin.getMenus().openIslandBank(clickedPlayer, null, clickedPlayer.getIsland());
+            menuView.refreshView();
 
             return true;
         });

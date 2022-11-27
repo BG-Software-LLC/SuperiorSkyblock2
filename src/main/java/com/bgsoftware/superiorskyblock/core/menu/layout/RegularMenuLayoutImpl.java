@@ -27,7 +27,7 @@ public class RegularMenuLayoutImpl<V extends MenuView<V, ?>> extends AbstractMen
     }
 
     public static <V extends MenuView<V, ?>> Builder<V> newBuilder() {
-        return new RegularMenuLayoutImpl.Builder<>();
+        return new Builder<>();
     }
 
     public static class Builder<V extends MenuView<V, ?>> extends AbstractBuilder<V> implements MenuLayout.Builder<V> {

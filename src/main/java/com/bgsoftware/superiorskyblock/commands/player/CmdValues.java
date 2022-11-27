@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
+import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -63,7 +64,7 @@ public class CmdValues implements ISuperiorCommand {
             return;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        plugin.getMenus().openValues(superiorPlayer, null, island);
+        plugin.getMenus().openValues(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
     }
 
     @Override

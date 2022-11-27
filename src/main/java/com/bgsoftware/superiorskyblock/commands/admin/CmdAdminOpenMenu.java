@@ -63,7 +63,7 @@ public class CmdAdminOpenMenu implements IAdminPlayerCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
         Menu<BaseMenuView, EmptyViewArgs> menu = plugin.getMenus().getMenu(MenuIdentifiers.MENU_CUSTOM_PREFIX + args[3]);
         if (menu != null)
-            menu.createView(targetPlayer, EmptyViewArgs.INSTANCE, null);
+            menu.createView(targetPlayer, EmptyViewArgs.INSTANCE);
     }
 
     @Override

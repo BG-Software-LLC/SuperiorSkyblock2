@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
+import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -57,7 +58,7 @@ public class CmdAdminChest implements IAdminIslandCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        plugin.getMenus().openIslandChest(superiorPlayer, null, island);
+        plugin.getMenus().openIslandChest(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
     }
 
 }

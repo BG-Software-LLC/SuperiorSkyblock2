@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.menu.impl;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
@@ -14,7 +15,6 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.OpenUniqueVisitorsB
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.VisitorPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
-import com.bgsoftware.superiorskyblock.core.menu.layout.PagedMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.configuration.ConfigurationSection;
@@ -52,7 +52,7 @@ public class MenuIslandVisitors extends AbstractPagedMenu<MenuIslandVisitors.Vie
 
         MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
-        PagedMenuLayoutImpl.Builder<View, SuperiorPlayer> patternBuilder = PagedMenuLayoutImpl.newBuilder();
+        MenuLayout.Builder<View> patternBuilder = menuParseResult.getLayoutBuilder();
 
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "unique-visitors", menuPatternSlots),
                 new OpenUniqueVisitorsButton.Builder());

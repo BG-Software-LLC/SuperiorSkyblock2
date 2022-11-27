@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
+import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -84,7 +85,7 @@ public class CmdPanel implements ISuperiorCommand {
             }
         }
 
-        plugin.getMenus().openControlPanel(superiorPlayer, null, island);
+        plugin.getMenus().openControlPanel(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
     }
 
     @Override

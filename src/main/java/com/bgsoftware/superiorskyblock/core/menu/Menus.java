@@ -88,6 +88,10 @@ public class Menus {
 
     }
 
+    public static void registerMenus() {
+        // Do nothing, only trigger all the register calls
+    }
+
     private static <M extends AbstractMenu<V, A>, V extends AbstractMenuView<V, A>, A extends ViewArgs> M createMenu(@Nullable M menu) {
         if (menu == null)
             throw new IllegalStateException("Menu could not be initialized.");

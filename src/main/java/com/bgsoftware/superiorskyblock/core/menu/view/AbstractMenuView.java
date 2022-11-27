@@ -34,7 +34,7 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
     private boolean refreshing = false;
 
     protected AbstractMenuView(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView, Menu<V, A> menu) {
-        super(inventoryViewer, menu, previousMenuView == null ? inventoryViewer.getOpenedView() : previousMenuView);
+        super(inventoryViewer, menu, previousMenuView);
     }
 
     @Override

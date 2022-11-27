@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import org.bukkit.command.CommandSender;
@@ -50,7 +51,7 @@ public class CmdLang implements ISuperiorCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        plugin.getMenus().openPlayerLanguage(superiorPlayer, null);
+        plugin.getMenus().openPlayerLanguage(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()));
     }
 
     @Override

@@ -61,6 +61,8 @@ public class MenusProvider_Default implements MenusProvider {
             guiFolder.renameTo(oldGuisFolder);
         }
 
+        Menus.registerMenus();
+
         File customMenusFolder = new File(plugin.getDataFolder(), "menus/custom");
 
         if (!customMenusFolder.exists()) {

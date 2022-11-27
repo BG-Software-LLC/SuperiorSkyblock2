@@ -53,7 +53,7 @@ public class BankCustomDepositButton extends AbstractMenuViewButton<IslandMenuVi
 
             PlayerChat.remove(player);
 
-            plugin.getMenus().openIslandBank(clickedPlayer, null, clickedPlayer.getIsland());
+            menuView.refreshView();
 
             return true;
         });

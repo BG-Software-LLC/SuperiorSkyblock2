@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
+import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.command.CommandSender;
@@ -67,7 +68,7 @@ public class CmdLeave implements ISuperiorCommand {
         }
 
         if (plugin.getSettings().isLeaveConfirm()) {
-            plugin.getMenus().openConfirmLeave(superiorPlayer, null);
+            plugin.getMenus().openConfirmLeave(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()));
             return;
         }
 

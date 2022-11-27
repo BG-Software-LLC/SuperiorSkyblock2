@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
@@ -15,7 +16,6 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.MissionsPagedObjectButton;
-import com.bgsoftware.superiorskyblock.core.menu.layout.PagedMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -57,7 +57,7 @@ public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory
 
         MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
-        PagedMenuLayoutImpl.Builder<View, Mission<?>> patternBuilder = PagedMenuLayoutImpl.newBuilder();
+        PagedMenuLayout.Builder<View, Mission<?>> patternBuilder = (PagedMenuLayout.Builder<View, Mission<?>>) menuParseResult.getLayoutBuilder();
 
         boolean sortByCompletion = cfg.getBoolean("sort-by-completion", false);
         boolean removeCompleted = cfg.getBoolean("remove-completed", false);

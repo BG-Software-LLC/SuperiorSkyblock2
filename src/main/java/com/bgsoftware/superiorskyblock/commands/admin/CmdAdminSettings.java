@@ -49,7 +49,7 @@ public class CmdAdminSettings implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        Menus.MENU_CONFIG_EDITOR.createView(plugin.getPlayers().getSuperiorPlayer(sender), MenuConfigEditor.Args.ROOT, null);
+        Menus.MENU_CONFIG_EDITOR.createView(plugin.getPlayers().getSuperiorPlayer(sender), MenuConfigEditor.Args.ROOT);
     }
 
     @Override

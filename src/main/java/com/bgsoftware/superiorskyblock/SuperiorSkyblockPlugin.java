@@ -233,6 +233,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 }
             }
 
+            modulesHandler.loadData();
+
             EventsBus.PluginInitializeResult eventResult = eventsBus.callPluginInitializeEvent(this);
             this.playersHandler.setPlayersContainer(Optional.ofNullable(eventResult.getPlayersContainer()).orElse(new DefaultPlayersContainer()));
             this.gridHandler.setIslandsContainer(Optional.ofNullable(eventResult.getIslandsContainer()).orElse(new DefaultIslandsContainer(this)));
@@ -558,7 +560,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             modulesHandler.loadModulesData(this);
             modulesHandler.enableModules(ModuleLoadTime.AFTER_MODULE_DATA_LOAD);
         } else {
-            menusHandler.loadData();
             modulesHandler.reloadModules(this);
         }
 
