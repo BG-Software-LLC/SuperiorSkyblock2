@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
@@ -17,9 +18,9 @@ public class PlayerCloseMenuEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
     private final SuperiorPlayer superiorPlayer;
-    private final ISuperiorMenu superiorMenu;
+    private final MenuView<?, ?> openedMenuView;
     @Nullable
-    private ISuperiorMenu newMenu;
+    private MenuView<?, ?> newMenuView;
 
     private boolean cancelled = false;
 
@@ -30,12 +31,26 @@ public class PlayerCloseMenuEvent extends Event implements Cancellable {
      * @param superiorMenu   The menu that was closed.
      * @param newMenu        The new menu that will be opened.
      *                       If null, no menu will be opened.
+     * @deprecated See {@link #PlayerCloseMenuEvent(SuperiorPlayer, MenuView, MenuView)}
      */
+    @Deprecated
     public PlayerCloseMenuEvent(SuperiorPlayer superiorPlayer, ISuperiorMenu superiorMenu, @Nullable ISuperiorMenu newMenu) {
+        this(superiorPlayer, (MenuView<?, ?>) superiorMenu, newMenu);
+    }
+
+    /**
+     * The constructor of the event.
+     *
+     * @param superiorPlayer The player that closed the menu.
+     * @param openedMenuView The menu view that is opened for the player.
+     * @param newMenuView    The new menu view that will be opened.
+     *                       If null, no menu will be opened.
+     */
+    public PlayerCloseMenuEvent(SuperiorPlayer superiorPlayer, MenuView<?, ?> openedMenuView, @Nullable MenuView<?, ?> newMenuView) {
         super(!Bukkit.isPrimaryThread());
         this.superiorPlayer = superiorPlayer;
-        this.superiorMenu = superiorMenu;
-        this.newMenu = newMenu;
+        this.openedMenuView = openedMenuView;
+        this.newMenuView = newMenuView;
     }
 
     /**
@@ -47,18 +62,40 @@ public class PlayerCloseMenuEvent extends Event implements Cancellable {
 
     /**
      * Get the menu that was opened by the player.
+     *
+     * @deprecated See {@link #getOpenedMenuView()}
      */
+    @Deprecated
     public ISuperiorMenu getSuperiorMenu() {
-        return superiorMenu;
+        return ISuperiorMenu.convertFromView(this.getOpenedMenuView());
+    }
+
+    /**
+     * Get the menu view that is opened for the player.
+     */
+    public MenuView<?, ?> getOpenedMenuView() {
+        return this.openedMenuView;
     }
 
     /**
      * Get the new menu that will be opened.
      * If null, no menu will be opened.
+     *
+     * @deprecated See {@link #getNewMenuView()}
      */
     @Nullable
+    @Deprecated
     public ISuperiorMenu getNewMenu() {
-        return newMenu;
+        return ISuperiorMenu.convertFromView(this.getNewMenuView());
+    }
+
+    /**
+     * Get the new menu view that will be opened.
+     * If null, no menu will be opened.
+     */
+    @Nullable
+    public MenuView<?, ?> getNewMenuView() {
+        return this.newMenuView;
     }
 
     /**
@@ -66,9 +103,21 @@ public class PlayerCloseMenuEvent extends Event implements Cancellable {
      *
      * @param newMenu The new menu that will be opened.
      *                If null, no menu will be opened.
+     * @deprecated See {@link #setNewMenuView(MenuView)}
      */
+    @Deprecated
     public void setNewMenu(@Nullable ISuperiorMenu newMenu) {
-        this.newMenu = newMenu;
+        this.setNewMenuView(newMenu);
+    }
+
+    /**
+     * Set the new menu view that will be opened.
+     *
+     * @param newMenuView The new menu that will be opened.
+     *                    If null, no menu will be opened.
+     */
+    public void setNewMenuView(@Nullable MenuView<?, ?> newMenuView) {
+        this.newMenuView = newMenuView;
     }
 
     @Override

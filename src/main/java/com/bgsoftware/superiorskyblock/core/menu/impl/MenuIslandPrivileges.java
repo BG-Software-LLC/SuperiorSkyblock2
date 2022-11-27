@@ -4,26 +4,27 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
+import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
+import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.GameSound;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
+import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.IslandPrivilegePagedObjectButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.IslandPrivilegePagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
+import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
+import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,69 +32,65 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
-public class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPrivileges,
-        MenuIslandPrivileges.IslandPrivilegeInfo> {
+public class MenuIslandPrivileges extends AbstractPagedMenu<
+        MenuIslandPrivileges.View, MenuIslandPrivileges.Args, MenuIslandPrivileges.IslandPrivilegeInfo> {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private final List<MenuIslandPrivileges.IslandPrivilegeInfo> islandPrivileges;
+    private final String noRolePermission;
+    private final String exactRolePermission;
+    private final String higherRolePermission;
 
-    private static PagedMenuPattern<MenuIslandPrivileges, IslandPrivilegeInfo> menuPattern;
-
-    private static final List<IslandPrivilegeInfo> islandPrivileges = new LinkedList<>();
-
-    public static String noRolePermission = "";
-    public static String exactRolePermission = "";
-    public static String higherRolePermission = "";
-
-    private final Island island;
-    private final Object permissionHolder;
-
-    private MenuIslandPrivileges(SuperiorPlayer superiorPlayer, Island island, Object permissionHolder) {
-        super(menuPattern, superiorPlayer);
-        this.island = island;
-        this.permissionHolder = permissionHolder;
-        if (permissionHolder instanceof SuperiorPlayer)
-            updateTargetPlayer((SuperiorPlayer) permissionHolder);
+    private MenuIslandPrivileges(MenuParseResult<View> parseResult, List<IslandPrivilegeInfo> islandPrivileges,
+                                 String noRolePermission, String exactRolePermission, String higherRolePermission) {
+        super(MenuIdentifiers.MENU_ISLAND_PRIVILEGES, parseResult, false);
+        this.islandPrivileges = islandPrivileges;
+        this.noRolePermission = noRolePermission;
+        this.exactRolePermission = exactRolePermission;
+        this.higherRolePermission = higherRolePermission;
     }
 
-    public Island getTargetIsland() {
-        return island;
+    public String getNoRolePermission() {
+        return noRolePermission;
     }
 
-    public Object getPermissionHolder() {
-        return permissionHolder;
+    public String getExactRolePermission() {
+        return exactRolePermission;
+    }
+
+    public String getHigherRolePermission() {
+        return higherRolePermission;
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu, island, permissionHolder);
+    protected View createViewInternal(SuperiorPlayer superiorPlayer, Args args,
+                                      @Nullable MenuView<?, ?> previousMenuView) {
+        return new View(superiorPlayer, previousMenuView, this, args);
     }
 
-    @Override
-    protected List<IslandPrivilegeInfo> requestObjects() {
-        return Collections.unmodifiableList(islandPrivileges);
+    public void refreshViews(Island island) {
+        refreshViews(view -> view.island.equals(island));
     }
 
-    public static void init() {
-        menuPattern = null;
-        islandPrivileges.clear();
+    public void refreshViews(Island island, Object permissionHolder) {
+        refreshViews(view -> view.island.equals(island) && view.permissionHolder.equals(permissionHolder));
+    }
 
-        PagedMenuPattern.Builder<MenuIslandPrivileges, IslandPrivilegeInfo> patternBuilder =
-                new PagedMenuPattern.Builder<>();
+    @Nullable
+    public static MenuIslandPrivileges createInstance() {
+        MenuParseResult<View> menuParseResult = MenuParserImpl.getInstance().loadMenu("permissions.yml",
+                MenuIslandPrivileges::convertOldGUI, new IslandPrivilegePagedObjectButton.Builder());
 
-        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "permissions.yml",
-                MenuIslandPrivileges::convertOldGUI);
+        if (menuParseResult == null)
+            return null;
 
-        if (menuLoadResult == null)
-            return;
+        YamlConfiguration cfg = menuParseResult.getConfig();
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
-        CommentedConfiguration cfg = menuLoadResult.getConfig();
+        String noRolePermission = cfg.getString("messages.no-role-permission", "");
+        String exactRolePermission = cfg.getString("messages.exact-role-permission", "");
+        String higherRolePermission = cfg.getString("messages.higher-role-permission", "");
 
-        noRolePermission = cfg.getString("messages.no-role-permission", "");
-        exactRolePermission = cfg.getString("messages.exact-role-permission", "");
-        higherRolePermission = cfg.getString("messages.higher-role-permission", "");
+        List<MenuIslandPrivileges.IslandPrivilegeInfo> islandPrivileges = new LinkedList<>();
 
-        islandPrivileges.clear();
         int position = 0;
 
         ConfigurationSection permissionsSection = cfg.getConfigurationSection("permissions");
@@ -102,37 +99,20 @@ public class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPrivileges
                 if (permissionsSection.getBoolean(key + ".display-menu", true)) {
                     String permission = key.toLowerCase(Locale.ENGLISH);
                     try {
-                        updatePermission(IslandPrivilege.getByName(permission), cfg, position++);
+                        updatePermissionInternal(islandPrivileges, IslandPrivilege.getByName(permission), cfg, position++);
                     } catch (NullPointerException error) {
-                        Log.warnFromFile("permissions.yml", "The island-privilege '", permission, "' is not a valid privilege, skipping...");
+                        Log.warnFromFile("permissions.yml", "The island-privilege '",
+                                permission, "' is not a valid privilege, skipping...");
                     }
                 }
             }
         }
 
-        menuPattern = patternBuilder
-                .setPreviousPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))
-                .setCurrentPageSlots(getSlots(cfg, "current-page", menuPatternSlots))
-                .setNextPageSlots(getSlots(cfg, "next-page", menuPatternSlots))
-                .setPagedObjectSlots(getSlots(cfg, "slots", menuPatternSlots),
-                        new IslandPrivilegePagedObjectButton.Builder())
-                .build();
+        return new MenuIslandPrivileges(menuParseResult, islandPrivileges, noRolePermission,
+                exactRolePermission, higherRolePermission);
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island, Object permissionHolder) {
-        new MenuIslandPrivileges(superiorPlayer, island, permissionHolder).open(previousMenu);
-    }
-
-    public static void refreshMenus(Island island) {
-        SuperiorMenu.refreshMenus(MenuIslandPrivileges.class, superiorMenu -> superiorMenu.island.equals(island));
-    }
-
-    public static void refreshMenus(Island island, Object permissionHolder) {
-        SuperiorMenu.refreshMenus(MenuIslandPrivileges.class, superiorMenu -> superiorMenu.island.equals(island) &&
-                superiorMenu.permissionHolder.equals(permissionHolder));
-    }
-
-    public static void updatePermission(IslandPrivilege islandPrivilege) {
+    public void updatePermission(IslandPrivilege islandPrivilege) {
         File file = new File(plugin.getDataFolder(), "menus/permissions.yml");
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         int position = 0;
@@ -144,10 +124,11 @@ public class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPrivileges
             position++;
         }
 
-        updatePermission(islandPrivilege, cfg, position);
+        updatePermissionInternal(islandPrivileges, islandPrivilege, cfg, position);
     }
 
-    public static void updatePermission(IslandPrivilege islandPrivilege, YamlConfiguration cfg, int position) {
+    private static void updatePermissionInternal(List<IslandPrivilegeInfo> islandPrivileges,
+                                                 IslandPrivilege islandPrivilege, YamlConfiguration cfg, int position) {
         islandPrivileges.removeIf(islandPrivilegeInfo -> islandPrivilegeInfo.getIslandPrivilege() == islandPrivilege);
 
         TemplateItem enabledIslandPrivilegeItem = null;
@@ -162,69 +143,64 @@ public class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPrivileges
                 islandPrivilege.getName().toLowerCase(Locale.ENGLISH));
 
         if (itemPrivilegeSection != null) {
-            enabledIslandPrivilegeItem = MenuParser.getItemStack("permissions.yml",
+            enabledIslandPrivilegeItem = MenuParserImpl.getInstance().getItemStack("permissions.yml",
                     itemPrivilegeSection.getConfigurationSection("permission-enabled"));
-            disabledIslandPrivilegeItem = MenuParser.getItemStack("permissions.yml",
+            disabledIslandPrivilegeItem = MenuParserImpl.getInstance().getItemStack("permissions.yml",
                     itemPrivilegeSection.getConfigurationSection("permission-disabled"));
-            rolePrivilegeItem = MenuParser.getItemStack("permissions.yml",
+            rolePrivilegeItem = MenuParserImpl.getInstance().getItemStack("permissions.yml",
                     itemPrivilegeSection.getConfigurationSection("role-permission"));
-            accessSound = MenuParser.getSound(itemPrivilegeSection.getConfigurationSection("has-access.sound"));
-            noAccessSound = MenuParser.getSound(itemPrivilegeSection.getConfigurationSection("no-access.sound"));
+            accessSound = MenuParserImpl.getInstance().getSound(itemPrivilegeSection.getConfigurationSection("has-access.sound"));
+            noAccessSound = MenuParserImpl.getInstance().getSound(itemPrivilegeSection.getConfigurationSection("no-access.sound"));
             accessCommands = itemPrivilegeSection.getStringList("has-access.commands");
             noAccessCommands = itemPrivilegeSection.getStringList("no-access.commands");
         }
 
-        islandPrivileges.add(new IslandPrivilegeInfo(islandPrivilege, enabledIslandPrivilegeItem,
+        islandPrivileges.add(new MenuIslandPrivileges.IslandPrivilegeInfo(islandPrivilege, enabledIslandPrivilegeItem,
                 disabledIslandPrivilegeItem, rolePrivilegeItem, accessSound, noAccessSound, accessCommands,
                 noAccessCommands, position));
         Collections.sort(islandPrivileges);
     }
 
-    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
-        File oldFile = new File(plugin.getDataFolder(), "guis/permissions-gui.yml");
+    public static class Args implements ViewArgs {
 
-        if (!oldFile.exists())
-            return false;
+        private final Island island;
+        private final Object permissionHolder;
 
-        //We want to reset the items of newMenu.
-        ConfigurationSection itemsSection = newMenu.createSection("items");
-        ConfigurationSection soundsSection = newMenu.createSection("sounds");
-        ConfigurationSection commandsSection = newMenu.createSection("commands");
-
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(oldFile);
-
-        newMenu.set("title", cfg.getString("permissions-gui.title"));
-
-        int size = cfg.getInt("permissions-gui.size");
-
-        char[] patternChars = new char[size * 9];
-        Arrays.fill(patternChars, '\n');
-
-        int charCounter = 0;
-
-        if (cfg.contains("permissions-gui.fill-items")) {
-            charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("permissions-gui.fill-items"),
-                    charCounter, patternChars, itemsSection, commandsSection, soundsSection);
+        public Args(Island island, Object permissionHolder) {
+            this.island = island;
+            this.permissionHolder = permissionHolder;
         }
 
-        char slotsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
-
-        MenuConverter.convertPagedButtons(cfg.getConfigurationSection("permissions-gui"), newMenu,
-                patternChars, slotsChar, SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
-                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++], SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
-                itemsSection, commandsSection, soundsSection);
-
-        newMenu.set("permissions", cfg.getConfigurationSection("permissions-gui.permissions"));
-        newMenu.set("sounds", null);
-        newMenu.set("commands", null);
-
-        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars,
-                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
-
-        return true;
     }
 
-    public static class IslandPrivilegeInfo implements Comparable<IslandPrivilegeInfo> {
+    public class View extends AbstractPagedMenuView<MenuIslandPrivileges.View, MenuIslandPrivileges.Args, IslandPrivilegeInfo> {
+
+        private final Island island;
+        private final Object permissionHolder;
+
+        View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView,
+             Menu<View, MenuIslandPrivileges.Args> menu, Args args) {
+            super(inventoryViewer, previousMenuView, menu);
+            this.island = args.island;
+            this.permissionHolder = args.permissionHolder;
+        }
+
+        public Island getIsland() {
+            return island;
+        }
+
+        public Object getPermissionHolder() {
+            return permissionHolder;
+        }
+
+        @Override
+        protected List<IslandPrivilegeInfo> requestObjects() {
+            return Collections.unmodifiableList(islandPrivileges);
+        }
+
+    }
+
+    public static class IslandPrivilegeInfo implements Comparable<MenuIslandPrivileges.IslandPrivilegeInfo> {
 
         private final IslandPrivilege islandPrivilege;
         private final TemplateItem enabledIslandPrivilegeItem;
@@ -287,10 +263,54 @@ public class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPrivileges
         }
 
         @Override
-        public int compareTo(@NotNull IslandPrivilegeInfo other) {
+        public int compareTo(@NotNull MenuIslandPrivileges.IslandPrivilegeInfo other) {
             return Integer.compare(position, other.position);
         }
 
+    }
+
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+        File oldFile = new File(plugin.getDataFolder(), "guis/permissions-gui.yml");
+
+        if (!oldFile.exists())
+            return false;
+
+        //We want to reset the items of newMenu.
+        ConfigurationSection itemsSection = newMenu.createSection("items");
+        ConfigurationSection soundsSection = newMenu.createSection("sounds");
+        ConfigurationSection commandsSection = newMenu.createSection("commands");
+
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(oldFile);
+
+        newMenu.set("title", cfg.getString("permissions-gui.title"));
+
+        int size = cfg.getInt("permissions-gui.size");
+
+        char[] patternChars = new char[size * 9];
+        Arrays.fill(patternChars, '\n');
+
+        int charCounter = 0;
+
+        if (cfg.contains("permissions-gui.fill-items")) {
+            charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("permissions-gui.fill-items"),
+                    charCounter, patternChars, itemsSection, commandsSection, soundsSection);
+        }
+
+        char slotsChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
+
+        MenuConverter.convertPagedButtons(cfg.getConfigurationSection("permissions-gui"), newMenu,
+                patternChars, slotsChar, AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++],
+                AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++], AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++],
+                itemsSection, commandsSection, soundsSection);
+
+        newMenu.set("permissions", cfg.getConfigurationSection("permissions-gui.permissions"));
+        newMenu.set("sounds", null);
+        newMenu.set("commands", null);
+
+        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars,
+                AbstractMenuLayout.BUTTON_SYMBOLS[charCounter]));
+
+        return true;
     }
 
 }

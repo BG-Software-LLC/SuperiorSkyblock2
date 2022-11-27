@@ -1,93 +1,83 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
+import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.ChangeSortingTypeButton;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.TopIslandsPagedObjectButton;
-import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
+import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
+import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.ChangeSortingTypeButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.TopIslandsPagedObjectButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.TopIslandsSelfIslandButton;
+import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
+import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MenuTopIslands extends PagedSuperiorMenu<MenuTopIslands, Island> {
+public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuTopIslands.Args, Island> {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private final boolean sortGlowWhenSelected;
 
-    private static PagedMenuPattern<MenuTopIslands, Island> menuPattern;
-
-    public static boolean sortGlowWhenSelected;
-
-    private final Set<SortingType> alreadySorted = new HashSet<>();
-    private SortingType sortingType;
-
-    private MenuTopIslands(SuperiorPlayer superiorPlayer, SortingType sortingType) {
-        super(menuPattern, superiorPlayer, true);
-        this.sortingType = sortingType;
+    private MenuTopIslands(MenuParseResult<View> parseResult, boolean sortGlowWhenSelected) {
+        super(MenuIdentifiers.MENU_TOP_ISLANDS, parseResult, false);
+        this.sortGlowWhenSelected = sortGlowWhenSelected;
     }
 
-    public SortingType getSortingType() {
-        return sortingType;
-    }
-
-    public boolean setSortingType(SortingType sortingType) {
-        this.sortingType = sortingType;
-        this.updatePagedObjects();
-        return this.alreadySorted.add(sortingType);
+    public boolean isSortGlowWhenSelected() {
+        return sortGlowWhenSelected;
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu, sortingType);
+    protected View createViewInternal(SuperiorPlayer superiorPlayer, Args args,
+                                      @Nullable MenuView<?, ?> previousMenuView) {
+        return new View(superiorPlayer, previousMenuView, this, args);
     }
 
-    @Override
-    protected List<Island> requestObjects() {
-        return plugin.getGrid().getIslands(sortingType);
+    public void refreshViews(SortingType sortingType) {
+        refreshViews(view -> view.sortingType.equals(sortingType));
     }
 
-    public static void init() {
-        menuPattern = null;
+    @Nullable
+    public static MenuTopIslands createInstance() {
+        MenuParseResult<View> menuParseResult = MenuParserImpl.getInstance().loadMenu("top-islands.yml",
+                MenuTopIslands::convertOldGUI);
 
-        PagedMenuPattern.Builder<MenuTopIslands, Island> patternBuilder = new PagedMenuPattern.Builder<>();
+        if (menuParseResult == null)
+            return null;
 
-        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "top-islands.yml", MenuTopIslands::convertOldGUI);
+        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        YamlConfiguration cfg = menuParseResult.getConfig();
+        MenuLayout.Builder<View> patternBuilder = menuParseResult.getLayoutBuilder();
 
-        if (menuLoadResult == null)
-            return;
+        boolean sortGlowWhenSelected = cfg.getBoolean("sort-glow-when-selected", false);
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
-        CommentedConfiguration cfg = menuLoadResult.getConfig();
-
-        sortGlowWhenSelected = cfg.getBoolean("sort-glow-when-selected", false);
-
-        patternBuilder.mapButtons(getSlots(cfg, "worth-sort", menuPatternSlots),
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "worth-sort", menuPatternSlots),
                 new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_WORTH));
 
-        patternBuilder.mapButtons(getSlots(cfg, "level-sort", menuPatternSlots),
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "level-sort", menuPatternSlots),
                 new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_LEVEL));
 
-        patternBuilder.mapButtons(getSlots(cfg, "rating-sort", menuPatternSlots),
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "rating-sort", menuPatternSlots),
                 new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_RATING));
 
-        patternBuilder.mapButtons(getSlots(cfg, "players-sort", menuPatternSlots),
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "players-sort", menuPatternSlots),
                 new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_PLAYERS));
 
         if (cfg.isConfigurationSection("items")) {
@@ -118,37 +108,73 @@ public class MenuTopIslands extends PagedSuperiorMenu<MenuTopIslands, Island> {
                 if (itemsSection == null)
                     continue;
 
-                TopIslandsPagedObjectButton.Builder slotsBuilder = new TopIslandsPagedObjectButton.Builder()
-                        .setIslandItem(MenuParser.getItemStack("top-islands.yml", itemsSection.getConfigurationSection("island")))
-                        .setNoIslandItem(MenuParser.getItemStack("top-islands.yml", itemsSection.getConfigurationSection("no-island")))
-                        .setIslandSound(MenuParser.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")))
-                        .setNoIslandSound(MenuParser.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")))
-                        .setIslandCommands(cfg.getStringList("commands." + slotsChar + ".island"))
-                        .setNoIslandCommands(cfg.getStringList("commands." + slotsChar + ".no-island"));
+                TopIslandsPagedObjectButton.Builder slotsBuilder = new TopIslandsPagedObjectButton.Builder();
+                slotsBuilder.setIslandItem(MenuParserImpl.getInstance().getItemStack("top-islands.yml", itemsSection.getConfigurationSection("island")));
+                slotsBuilder.setNoIslandItem(MenuParserImpl.getInstance().getItemStack("top-islands.yml", itemsSection.getConfigurationSection("no-island")));
+                slotsBuilder.setIslandSound(MenuParserImpl.getInstance().getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")));
+                slotsBuilder.setNoIslandSound(MenuParserImpl.getInstance().getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")));
+                slotsBuilder.setIslandCommands(cfg.getStringList("commands." + slotsChar + ".island"));
+                slotsBuilder.setNoIslandCommands(cfg.getStringList("commands." + slotsChar + ".no-island"));
 
                 patternBuilder.mapButtons(menuPatternSlots.getSlots(slotsChar), slotsBuilder);
 
                 if (!configuredSelfPlayerButton) {
                     configuredSelfPlayerButton = true;
-                    patternBuilder.mapButtons(getSlots(cfg, "player-island", menuPatternSlots),
-                            slotsBuilder.copy().setPlayerSelfIsland(true));
+
+                    TopIslandsSelfIslandButton.Builder selfIslandBuilder = new TopIslandsSelfIslandButton.Builder();
+                    selfIslandBuilder.setIslandItem(MenuParserImpl.getInstance().getItemStack("top-islands.yml", itemsSection.getConfigurationSection("island")));
+                    selfIslandBuilder.setNoIslandItem(MenuParserImpl.getInstance().getItemStack("top-islands.yml", itemsSection.getConfigurationSection("no-island")));
+                    selfIslandBuilder.setIslandSound(MenuParserImpl.getInstance().getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")));
+                    selfIslandBuilder.setNoIslandSound(MenuParserImpl.getInstance().getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")));
+                    selfIslandBuilder.setIslandCommands(cfg.getStringList("commands." + slotsChar + ".island"));
+                    selfIslandBuilder.setNoIslandCommands(cfg.getStringList("commands." + slotsChar + ".no-island"));
+
+                    patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "player-island", menuPatternSlots),
+                            selfIslandBuilder);
                 }
             }
         }
 
-        menuPattern = patternBuilder
-                .setPreviousPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))
-                .setCurrentPageSlots(getSlots(cfg, "current-page", menuPatternSlots))
-                .setNextPageSlots(getSlots(cfg, "next-page", menuPatternSlots))
-                .build();
+
+        return new MenuTopIslands(menuParseResult, sortGlowWhenSelected);
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, SortingType sortingType) {
-        plugin.getGrid().sortIslands(sortingType, () -> new MenuTopIslands(superiorPlayer, sortingType).open(previousMenu));
+    public static class Args implements ViewArgs {
+
+        private final SortingType sortingType;
+
+        public Args(SortingType sortingType) {
+            this.sortingType = sortingType;
+        }
+
     }
 
-    public static void refreshMenus(SortingType sortingType) {
-        SuperiorMenu.refreshMenus(MenuTopIslands.class, superiorMenu -> superiorMenu.sortingType.equals(sortingType));
+    public static class View extends AbstractPagedMenuView<View, Args, Island> {
+
+        private final Set<SortingType> alreadySorted = new HashSet<>();
+        private SortingType sortingType;
+
+        View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView,
+             Menu<View, Args> menu, Args args) {
+            super(inventoryViewer, previousMenuView, menu);
+            this.sortingType = args.sortingType;
+        }
+
+        public SortingType getSortingType() {
+            return sortingType;
+        }
+
+        public boolean setSortingType(SortingType sortingType) {
+            this.sortingType = sortingType;
+            this.updatePagedObjects();
+            return this.alreadySorted.add(sortingType);
+        }
+
+        @Override
+        protected List<Island> requestObjects() {
+            return plugin.getGrid().getIslands(sortingType);
+        }
+
     }
 
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
@@ -178,12 +204,12 @@ public class MenuTopIslands extends PagedSuperiorMenu<MenuTopIslands, Island> {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char slotsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
-        char worthChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
-        char levelChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
-        char ratingChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
-        char playersChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
-        char playerIslandChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char slotsChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
+        char worthChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
+        char levelChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
+        char ratingChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
+        char playersChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
+        char playerIslandChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
 
         for (String slot : cfg.getString("top-islands.slots").split(","))
             patternChars[Integer.parseInt(slot)] = slotsChar;
@@ -225,7 +251,7 @@ public class MenuTopIslands extends PagedSuperiorMenu<MenuTopIslands, Island> {
         newMenu.set("player-island", playerIslandChar);
         newMenu.set("sort-glow-when-selected", false);
 
-        char invalidChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char invalidChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
 
         newMenu.set("slots", slotsChar);
         newMenu.set("previous-page", invalidChar);
@@ -233,7 +259,7 @@ public class MenuTopIslands extends PagedSuperiorMenu<MenuTopIslands, Island> {
         newMenu.set("next-page", invalidChar);
 
         newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars,
-                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
+                AbstractMenuLayout.BUTTON_SYMBOLS[charCounter]));
 
         return true;
     }

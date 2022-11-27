@@ -17,10 +17,12 @@ import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
+import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
@@ -43,6 +45,7 @@ import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.World;
 
 import javax.annotation.Nullable;
@@ -174,6 +177,12 @@ public class FactoriesManagerImpl implements FactoriesManager {
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null");
         Preconditions.checkNotNull(environment, "environment parameter cannot be null");
         return new WorldInfoImpl(worldName, environment);
+    }
+
+    @Override
+    public GameSound createGameSound(Sound sound, float volume, float pitch) {
+        Preconditions.checkNotNull(sound, "sound parameter cannot be null");
+        return new GameSoundImpl(sound, volume, pitch);
     }
 
     public IslandBank createIslandBank(Island island, Supplier<Boolean> isGiveInterestFailed) {

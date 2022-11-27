@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
@@ -31,6 +32,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nonnull;
@@ -233,6 +236,23 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public boolean hasFlyGamemode() {
         Player player = asPlayer();
         return player != null && (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR);
+    }
+
+    @Nullable
+    @Override
+    public MenuView<?, ?> getOpenedView() {
+        Player player = asPlayer();
+
+        if (player != null) {
+            InventoryView openInventory = player.getOpenInventory();
+            if (openInventory != null && openInventory.getTopInventory() != null) {
+                InventoryHolder inventoryHolder = openInventory.getTopInventory().getHolder();
+                if (inventoryHolder instanceof MenuView)
+                    return (MenuView<?, ?>) inventoryHolder;
+            }
+        }
+
+        return null;
     }
 
     @Override

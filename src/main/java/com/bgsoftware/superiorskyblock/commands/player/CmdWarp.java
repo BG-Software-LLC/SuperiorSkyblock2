@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -92,13 +93,13 @@ public class CmdWarp implements ISuperiorCommand {
         if (islandWarp == null) {
             switch (args.length) {
                 case 1:
-                    plugin.getMenus().openWarpCategories(superiorPlayer, null, targetIsland);
+                    plugin.getMenus().openWarpCategories(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), targetIsland);
                     break;
                 case 2:
                     IslandArgument arguments = CommandArguments.getIsland(plugin, sender, args[1]);
                     targetIsland = arguments.getIsland();
                     if (targetIsland != null) {
-                        plugin.getMenus().openWarpCategories(superiorPlayer, null, targetIsland);
+                        plugin.getMenus().openWarpCategories(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), targetIsland);
                     }
                     break;
                 case 3:

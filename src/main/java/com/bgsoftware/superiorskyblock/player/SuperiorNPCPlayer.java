@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
@@ -106,6 +107,12 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
     @Override
     public boolean hasFlyGamemode() {
         return false;
+    }
+
+    @Nullable
+    @Override
+    public MenuView<?, ?> getOpenedView() {
+        return null;
     }
 
     @Override

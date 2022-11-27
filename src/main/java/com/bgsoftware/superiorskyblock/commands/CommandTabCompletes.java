@@ -13,7 +13,8 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.menu.impl.internal.SuperiorMenuCustom;
+import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
+import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuCustom;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -203,8 +204,10 @@ public class CommandTabCompletes {
         return filterByArgument(plugin.getMissions().getAllMissions(), Mission::getName, argument.toLowerCase(Locale.ENGLISH));
     }
 
-    public static List<String> getMenus(String argument) {
-        return filterByArgument(SuperiorMenuCustom.getCustomMenus(), argument.toLowerCase(Locale.ENGLISH));
+    public static List<String> getMenus(SuperiorSkyblockPlugin plugin, String argument) {
+        return filterByArgument(plugin.getMenus().getMenus().values(), menu -> menu instanceof MenuCustom ?
+                        menu.getIdentifier().substring(MenuIdentifiers.MENU_CUSTOM_PREFIX.length()) : menu.getIdentifier(),
+                argument.toLowerCase(Locale.ENGLISH));
     }
 
     public static List<String> getBiomes(String argument) {

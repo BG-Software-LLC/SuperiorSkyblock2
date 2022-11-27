@@ -1,34 +1,31 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.GameSound;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
-import com.bgsoftware.superiorskyblock.core.menu.button.SuperiorMenuButton;
+import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
+import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-import java.util.List;
+public class DummyButton<V extends MenuView<V, ?>> extends AbstractMenuViewButton<V> {
 
-public class DummyButton<M extends ISuperiorMenu> extends SuperiorMenuButton<M> {
+    public static final MenuTemplateButton EMPTY_BUTTON = new DummyButton.Builder<>().build();
 
-    @SuppressWarnings("rawtypes")
-    public static final DummyButton EMPTY_BUTTON = new Builder().build();
-
-    private DummyButton(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
-                        String requiredPermission, GameSound lackPermissionSound) {
-        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
+    private DummyButton(AbstractMenuTemplateButton<V> templateButton, V menuView) {
+        super(templateButton, menuView);
     }
 
     @Override
-    public void onButtonClick(SuperiorSkyblockPlugin plugin, ISuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
-        // Dummy button, doesn't do anything when clicked.
+    public void onButtonClick(InventoryClickEvent clickEvent) {
+        // Dummy button
     }
 
-    public static class Builder<M extends ISuperiorMenu> extends AbstractBuilder<Builder<M>, DummyButton<M>, M> {
+    public static class Builder<V extends MenuView<V, ?>> extends AbstractMenuTemplateButton.AbstractBuilder<V> {
 
         @Override
-        public DummyButton<M> build() {
-            return new DummyButton<>(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
+        public MenuTemplateButton<V> build() {
+            return new MenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
+                    lackPermissionSound, DummyButton.class, DummyButton::new);
         }
 
     }

@@ -1,34 +1,31 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.core.GameSound;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
-import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.button.SuperiorMenuButton;
+import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-import java.util.List;
+public class PreviousPageButton<V extends PagedMenuView<V, ?, E>, E> extends AbstractMenuViewButton<V> {
 
-public class PreviousPageButton<M extends PagedSuperiorMenu<M, T>, T> extends SuperiorMenuButton<M> {
-
-    private PreviousPageButton(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
-                               String requiredPermission, GameSound lackPermissionSound) {
-        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
+    private PreviousPageButton(AbstractMenuTemplateButton<V> templateButton, V menuView) {
+        super(templateButton, menuView);
     }
 
     @Override
-    public void onButtonClick(SuperiorSkyblockPlugin plugin, M superiorMenu, InventoryClickEvent clickEvent) {
-        int newPage = superiorMenu.getCurrentPage() - 1;
+    public void onButtonClick(InventoryClickEvent clickEvent) {
+        int newPage = menuView.getCurrentPage() - 1;
         if (newPage >= 1)
-            superiorMenu.movePage(newPage);
+            menuView.setCurrentPage(newPage);
     }
 
-    public static class Builder<M extends PagedSuperiorMenu<M, T>, T> extends
-            AbstractBuilder<Builder<M, T>, PreviousPageButton<M, T>, M> {
+    public static class Builder<V extends PagedMenuView<V, ?, E>, E> extends AbstractMenuTemplateButton.AbstractBuilder<V> {
 
         @Override
-        public PreviousPageButton<M, T> build() {
-            return new PreviousPageButton<>(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
+        public MenuTemplateButton<V> build() {
+            return new MenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
+                    lackPermissionSound, PreviousPageButton.class, PreviousPageButton::new);
         }
 
     }

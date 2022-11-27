@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
@@ -109,6 +110,13 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * When the player is offline, false will be returned.
      */
     boolean hasFlyGamemode();
+
+    /**
+     * Get the opened view for the player.
+     * When the player is offline or no view is opened, null will be returned.
+     */
+    @Nullable
+    MenuView<?, ?> getOpenedView();
 
     /**
      * Check whether or not the player is AFK.

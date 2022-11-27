@@ -14,44 +14,22 @@ import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuBiomes;
-import com.bgsoftware.superiorskyblock.core.menu.impl.internal.SuperiorMenuBlank;
-import com.bgsoftware.superiorskyblock.core.menu.impl.internal.SuperiorMenuCustom;
-import com.bgsoftware.superiorskyblock.core.menu.impl.internal.SuperiorMenuSettings;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuBankLogs;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuBorderColor;
+import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmBan;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmDisband;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmKick;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmLeave;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuControlPanel;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCoops;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCounts;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuGlobalWarps;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandBank;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandChest;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandCreation;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandRate;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandRatings;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMemberManage;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMemberRole;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMembers;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMissions;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMissionsCategory;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandPrivileges;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuPlayerLanguage;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandFlags;
+import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMissionsCategory;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuTopIslands;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuUniqueVisitors;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuUpgrades;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuValues;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuVisitors;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategories;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategoryIconEdit;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategoryManage;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpIconEdit;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpManage;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarps;
+import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuCustom;
+import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
+import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
+import com.bgsoftware.superiorskyblock.core.menu.view.args.PlayerViewArgs;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.Nullable;
 
@@ -76,54 +54,14 @@ public class MenusProvider_Default implements MenusProvider {
 
     @Override
     public void initializeMenus() {
-        SuperiorMenuCustom.resetMenus();
-
-        //Reload all menus
-        handleExceptions(SuperiorMenuBlank::init);
-        handleExceptions(SuperiorMenuSettings::init);
-
-        handleExceptions(MenuBankLogs::init);
-        handleExceptions(MenuBiomes::init);
-        handleExceptions(MenuBorderColor::init);
-        handleExceptions(MenuConfirmBan::init);
-        handleExceptions(MenuConfirmDisband::init);
-        handleExceptions(MenuConfirmKick::init);
-        handleExceptions(MenuConfirmLeave::init);
-        handleExceptions(MenuControlPanel::init);
-        handleExceptions(MenuCoops::init);
-        handleExceptions(MenuCounts::init);
-        handleExceptions(MenuGlobalWarps::init);
-        handleExceptions(MenuIslandBank::init);
-        handleExceptions(MenuIslandChest::init);
-        handleExceptions(MenuIslandCreation::init);
-        handleExceptions(MenuIslandRate::init);
-        handleExceptions(MenuIslandRatings::init);
-        handleExceptions(MenuMemberManage::init);
-        handleExceptions(MenuMemberRole::init);
-        handleExceptions(MenuMembers::init);
-        handleExceptions(MenuMissions::init);
-        handleExceptions(MenuMissionsCategory::init);
-        handleExceptions(MenuIslandPrivileges::init);
-        handleExceptions(MenuPlayerLanguage::init);
-        handleExceptions(MenuIslandFlags::init);
-        handleExceptions(MenuTopIslands::init);
-        handleExceptions(MenuUniqueVisitors::init);
-        handleExceptions(MenuUpgrades::init);
-        handleExceptions(MenuValues::init);
-        handleExceptions(MenuVisitors::init);
-        handleExceptions(MenuWarpCategories::init);
-        handleExceptions(MenuWarpCategoryIconEdit::init);
-        handleExceptions(MenuWarpCategoryManage::init);
-        handleExceptions(MenuWarpIconEdit::init);
-        handleExceptions(MenuWarpManage::init);
-        handleExceptions(MenuWarps::init);
-
         File guiFolder = new File(plugin.getDataFolder(), "guis");
         if (guiFolder.exists()) {
             File oldGuisFolder = new File(plugin.getDataFolder(), "old-guis");
             //noinspection ResultOfMethodCallIgnored
             guiFolder.renameTo(oldGuisFolder);
         }
+
+        Menus.registerMenus();
 
         File customMenusFolder = new File(plugin.getDataFolder(), "menus/custom");
 
@@ -136,7 +74,7 @@ public class MenusProvider_Default implements MenusProvider {
         File[] customMenuFiles = customMenusFolder.listFiles();
         if (customMenuFiles != null) {
             for (File menuFile : customMenuFiles) {
-                handleExceptions(() -> SuperiorMenuCustom.createMenu(menuFile));
+                handleExceptions(() -> plugin.getMenus().registerMenu(MenuCustom.createInstance(menuFile)));
             }
         }
     }
@@ -145,26 +83,26 @@ public class MenusProvider_Default implements MenusProvider {
     public void openBankLogs(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuBankLogs.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_BANK_LOGS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
     public void refreshBankLogs(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuBankLogs.refreshMenus(island);
+        Menus.MENU_BANK_LOGS.refreshViews(island);
     }
 
     @Override
     public void openBiomes(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuBiomes.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_BIOMES.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
     public void openBorderColor(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
-        MenuBorderColor.openInventory(targetPlayer, previousMenu);
+        Menus.MENU_BORDER_COLOR.createView(targetPlayer, EmptyViewArgs.INSTANCE, previousMenu);
     }
 
     @Override
@@ -172,14 +110,14 @@ public class MenusProvider_Default implements MenusProvider {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
         Preconditions.checkNotNull(bannedPlayer, "bannedPlayer parameter cannot be null.");
-        MenuConfirmBan.openInventory(targetPlayer, previousMenu, targetIsland, bannedPlayer);
+        Menus.MENU_CONFIRM_BAN.createView(targetPlayer, new MenuConfirmBan.Args(targetIsland, bannedPlayer), previousMenu);
     }
 
     @Override
     public void openConfirmDisband(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuConfirmDisband.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_CONFIRM_DISBAND.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
@@ -187,167 +125,168 @@ public class MenusProvider_Default implements MenusProvider {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
         Preconditions.checkNotNull(kickedPlayer, "kickedPlayer parameter cannot be null.");
-        MenuConfirmKick.openInventory(targetPlayer, previousMenu, targetIsland, kickedPlayer);
+        Menus.MENU_CONFIRM_KICK.createView(targetPlayer, new MenuConfirmKick.Args(targetIsland, kickedPlayer), previousMenu);
     }
 
     @Override
     public void openConfirmLeave(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu) {
-        MenuConfirmLeave.openInventory(targetPlayer, previousMenu);
+        Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
+        Menus.MENU_CONFIRM_LEAVE.createView(targetPlayer, EmptyViewArgs.INSTANCE, previousMenu);
     }
 
     @Override
     public void openControlPanel(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuControlPanel.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_CONTROL_PANEL.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
     public void openCoops(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuCoops.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_COOPS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
     public void refreshCoops(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuCoops.refreshMenus(island);
+        Menus.MENU_COOPS.refreshViews(island);
     }
 
     @Override
     public void openCounts(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuCounts.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_COUNTS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
     public void refreshCounts(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuCounts.refreshMenus(island);
+        Menus.MENU_COUNTS.refreshViews(island);
     }
 
     @Override
     public void openGlobalWarps(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
-        MenuGlobalWarps.openInventory(targetPlayer, previousMenu);
+        Menus.MENU_GLOBAL_WARPS.createView(targetPlayer, EmptyViewArgs.INSTANCE, previousMenu);
     }
 
     @Override
     public void refreshGlobalWarps() {
-        MenuGlobalWarps.refreshMenus();
+        Menus.MENU_GLOBAL_WARPS.refreshViews();
     }
 
     @Override
     public void openIslandBank(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuIslandBank.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_ISLAND_BANK.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
     public void refreshIslandBank(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuIslandBank.refreshMenus(island);
+        Menus.MENU_ISLAND_BANK.refreshViews(island);
     }
 
     @Override
     public void openIslandChest(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuIslandChest.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_ISLAND_CHEST.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
     public void refreshIslandChest(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuIslandChest.refreshMenus(island);
+        Menus.MENU_ISLAND_CHEST.refreshViews(island);
     }
 
     @Override
     public void openIslandCreation(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, String islandName) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
-        MenuIslandCreation.openInventory(targetPlayer, previousMenu, islandName);
+        Menus.MENU_ISLAND_CREATION.createView(targetPlayer, new MenuIslandCreation.Args(islandName), previousMenu);
     }
 
     @Override
     public void openIslandRate(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuIslandRate.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_ISLAND_RATE.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
     public void openIslandRatings(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuIslandRatings.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_ISLAND_RATINGS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
     public void refreshIslandRatings(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuIslandRatings.refreshMenus(island);
+        Menus.MENU_ISLAND_RATINGS.refreshViews(island);
     }
 
     @Override
     public void openMemberManage(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, SuperiorPlayer islandMember) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(islandMember, "islandMember parameter cannot be null.");
-        MenuMemberManage.openInventory(targetPlayer, previousMenu, islandMember);
+        Menus.MENU_MEMBER_MANAGE.createView(targetPlayer, new PlayerViewArgs(islandMember), previousMenu);
     }
 
     @Override
     public void destroyMemberManage(SuperiorPlayer islandMember) {
         Preconditions.checkNotNull(islandMember, "islandMember parameter cannot be null.");
-        MenuMemberManage.destroyMenus(islandMember);
+        Menus.MENU_MEMBER_MANAGE.closeViews(islandMember);
     }
 
     @Override
     public void openMemberRole(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, SuperiorPlayer islandMember) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(islandMember, "islandMember parameter cannot be null.");
-        MenuMemberRole.openInventory(targetPlayer, previousMenu, islandMember);
+        Menus.MENU_MEMBER_ROLE.createView(targetPlayer, new PlayerViewArgs(islandMember), previousMenu);
     }
 
     @Override
     public void destroyMemberRole(SuperiorPlayer islandMember) {
         Preconditions.checkNotNull(islandMember, "islandMember parameter cannot be null.");
-        MenuMemberRole.destroyMenus(islandMember);
+        Menus.MENU_MEMBER_ROLE.closeViews(islandMember);
     }
 
     @Override
     public void openMembers(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuMembers.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_ISLAND_MEMBERS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
     public void refreshMembers(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuMembers.refreshMenus(island);
+        Menus.MENU_ISLAND_MEMBERS.refreshViews(island);
     }
 
     @Override
     public void openMissions(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
-        MenuMissions.openInventory(targetPlayer, previousMenu);
+        Menus.MENU_MISSIONS.createView(targetPlayer, EmptyViewArgs.INSTANCE, previousMenu);
     }
 
     @Override
     public void openMissionsCategory(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, MissionCategory missionCategory) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(missionCategory, "missionCategory parameter cannot be null.");
-        MenuMissionsCategory.openInventory(targetPlayer, previousMenu, missionCategory);
+        Menus.MENU_MISSIONS_CATEGORY.createView(targetPlayer, new MenuMissionsCategory.Args(missionCategory), previousMenu);
     }
 
     @Override
     public void refreshMissionsCategory(MissionCategory missionCategory) {
         Preconditions.checkNotNull(missionCategory, "missionCategory parameter cannot be null.");
-        MenuMissionsCategory.refreshMenus(missionCategory);
+        Menus.MENU_MISSIONS_CATEGORY.refreshViews(missionCategory);
     }
 
     @Override
@@ -355,7 +294,7 @@ public class MenusProvider_Default implements MenusProvider {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
         Preconditions.checkNotNull(permissiblePlayer, "permissiblePlayer parameter cannot be null.");
-        MenuIslandPrivileges.openInventory(targetPlayer, previousMenu, targetIsland, permissiblePlayer);
+        Menus.MENU_ISLAND_PRIVILEGES.createView(targetPlayer, new MenuIslandPrivileges.Args(targetIsland, permissiblePlayer), previousMenu);
     }
 
     @Override
@@ -363,201 +302,201 @@ public class MenusProvider_Default implements MenusProvider {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
         Preconditions.checkNotNull(permissibleRole, "permissibleRole parameter cannot be null.");
-        MenuIslandPrivileges.openInventory(targetPlayer, previousMenu, targetIsland, permissibleRole);
+        Menus.MENU_ISLAND_PRIVILEGES.createView(targetPlayer, new MenuIslandPrivileges.Args(targetIsland, permissibleRole), previousMenu);
     }
 
     @Override
     public void refreshPermissions(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuIslandPrivileges.refreshMenus(island);
+        Menus.MENU_ISLAND_PRIVILEGES.refreshViews(island);
     }
 
     @Override
     public void refreshPermissions(Island island, SuperiorPlayer permissiblePlayer) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
         Preconditions.checkNotNull(permissiblePlayer, "permissiblePlayer parameter cannot be null.");
-        MenuIslandPrivileges.refreshMenus(island, permissiblePlayer);
+        Menus.MENU_ISLAND_PRIVILEGES.refreshViews(island, permissiblePlayer);
     }
 
     @Override
     public void refreshPermissions(Island island, PlayerRole permissibleRole) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
         Preconditions.checkNotNull(permissibleRole, "permissibleRole parameter cannot be null.");
-        MenuIslandPrivileges.refreshMenus(island, permissibleRole);
+        Menus.MENU_ISLAND_PRIVILEGES.refreshViews(island, permissibleRole);
     }
 
     @Override
     public void updatePermission(IslandPrivilege islandPrivilege) {
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
-        MenuIslandPrivileges.updatePermission(islandPrivilege);
+        Menus.MENU_ISLAND_PRIVILEGES.updatePermission(islandPrivilege);
     }
 
     @Override
     public void openPlayerLanguage(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
-        MenuPlayerLanguage.openInventory(targetPlayer, previousMenu);
+        Menus.MENU_PLAYER_LANGUAGE.createView(targetPlayer, EmptyViewArgs.INSTANCE, previousMenu);
     }
 
     @Override
     public void openSettings(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuIslandFlags.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_ISLAND_FLAGS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
     public void refreshSettings(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuIslandFlags.refreshMenus(island);
+        Menus.MENU_ISLAND_FLAGS.refreshViews(island);
     }
 
     @Override
     public void updateSettings(IslandFlag islandFlag) {
         Preconditions.checkNotNull(islandFlag, "islandFlag parameter cannot be null.");
-        MenuIslandFlags.updateSettings(islandFlag.getName());
+        Menus.MENU_ISLAND_FLAGS.updateSettings(islandFlag);
     }
 
     @Override
     public void openTopIslands(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, SortingType sortingType) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
-        MenuTopIslands.openInventory(targetPlayer, previousMenu, sortingType);
+        Menus.MENU_TOP_ISLANDS.createView(targetPlayer, new MenuTopIslands.Args(sortingType), previousMenu);
     }
 
     @Override
     public void refreshTopIslands(SortingType sortingType) {
         Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
-        MenuTopIslands.refreshMenus(sortingType);
+        Menus.MENU_TOP_ISLANDS.refreshViews(sortingType);
     }
 
     @Override
     public void openUniqueVisitors(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuUniqueVisitors.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_ISLAND_UNIQUE_VISITORS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
     public void refreshUniqueVisitors(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuUniqueVisitors.refreshMenus(island);
+        Menus.MENU_ISLAND_UNIQUE_VISITORS.refreshViews(island);
     }
 
     @Override
     public void openUpgrades(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuUpgrades.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_ISLAND_UPGRADES.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
     public void refreshUpgrades(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuUpgrades.refreshMenus(island);
+        Menus.MENU_ISLAND_UPGRADES.refreshViews(island);
     }
 
     @Override
     public void openValues(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuValues.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_ISLAND_VALUES.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
     public void refreshValues(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuValues.refreshMenus(island);
+        Menus.MENU_ISLAND_VALUES.refreshViews(island);
     }
 
     @Override
     public void openVisitors(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuVisitors.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_ISLAND_VISITORS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
     public void refreshVisitors(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuVisitors.refreshMenus(island);
+        Menus.MENU_ISLAND_VISITORS.refreshViews(island);
     }
 
     @Override
     public void openWarpCategories(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuWarpCategories.openInventory(targetPlayer, previousMenu, targetIsland);
+        Menus.MENU_WARP_CATEGORIES.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
     @Override
     public void refreshWarpCategories(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuWarpCategories.refreshMenus(island);
+        Menus.MENU_WARP_CATEGORIES.refreshViews(island);
     }
 
     @Override
     public void destroyWarpCategories(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuWarpCategories.destroyMenus(island);
+        Menus.MENU_WARP_CATEGORIES.closeViews(island);
     }
 
     @Override
     public void openWarpCategoryIconEdit(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, WarpCategory targetCategory) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetCategory, "targetCategory parameter cannot be null.");
-        MenuWarpCategoryIconEdit.openInventory(targetPlayer, previousMenu, targetCategory);
+        Menus.MENU_WARP_CATEGORY_ICON_EDIT.createView(targetPlayer, new MenuWarpCategoryIconEdit.Args(targetCategory), previousMenu);
     }
 
     @Override
     public void openWarpCategoryManage(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, WarpCategory targetCategory) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetCategory, "targetCategory parameter cannot be null.");
-        MenuWarpCategoryManage.openInventory(targetPlayer, previousMenu, targetCategory);
+        Menus.MENU_WARP_CATEGORY_MANAGE.createView(targetPlayer, new MenuWarpCategoryManage.Args(targetCategory), previousMenu);
     }
 
     @Override
     public void refreshWarpCategoryManage(WarpCategory warpCategory) {
         Preconditions.checkNotNull(warpCategory, "warpCategory parameter cannot be null.");
-        MenuWarpCategoryManage.refreshMenus(warpCategory);
+        Menus.MENU_WARP_CATEGORY_MANAGE.refreshViews(warpCategory);
     }
 
     @Override
     public void openWarpIconEdit(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, IslandWarp targetWarp) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetWarp, "targetWarp parameter cannot be null.");
-        MenuWarpIconEdit.openInventory(targetPlayer, previousMenu, targetWarp);
+        Menus.MENU_WARP_ICON_EDIT.createView(targetPlayer, new MenuWarpIconEdit.Args(targetWarp), previousMenu);
     }
 
     @Override
     public void openWarpManage(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, IslandWarp targetWarp) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetWarp, "targetWarp parameter cannot be null.");
-        MenuWarpManage.openInventory(targetPlayer, previousMenu, targetWarp);
+        Menus.MENU_WARP_MANAGE.createView(targetPlayer, new MenuWarpManage.Args(targetWarp), previousMenu);
     }
 
     @Override
     public void refreshWarpManage(IslandWarp islandWarp) {
         Preconditions.checkNotNull(islandWarp, "islandWarp parameter cannot be null.");
-        MenuWarpManage.refreshMenus(islandWarp);
+        Menus.MENU_WARP_MANAGE.refreshViews(islandWarp);
     }
 
     @Override
     public void openWarps(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, WarpCategory targetCategory) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetCategory, "targetCategory parameter cannot be null.");
-        MenuWarps.openInventory(targetPlayer, previousMenu, targetCategory);
+        Menus.MENU_WARPS.createView(targetPlayer, new MenuWarps.Args(targetCategory), previousMenu);
     }
 
     @Override
     public void refreshWarps(WarpCategory warpCategory) {
         Preconditions.checkNotNull(warpCategory, "warpCategory parameter cannot be null.");
-        MenuWarps.refreshMenus(warpCategory);
+        Menus.MENU_WARPS.refreshViews(warpCategory);
     }
 
     @Override
     public void destroyWarps(WarpCategory warpCategory) {
         Preconditions.checkNotNull(warpCategory, "warpCategory parameter cannot be null.");
-        MenuWarps.destroyMenus(warpCategory);
+        Menus.MENU_WARPS.closeViews(warpCategory);
     }
 
 }

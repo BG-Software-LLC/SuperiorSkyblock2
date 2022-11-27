@@ -15,7 +15,7 @@ import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.DateFormatter;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.NumberFormatter;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
@@ -438,7 +438,7 @@ public class SettingsContainer {
                     for (String slot : containerSection.getKeys(false)) {
                         try {
                             // Reading the item from the config
-                            TemplateItem templateItem = MenuParser.getItemStack("config.yml", containerSection.getConfigurationSection(slot));
+                            TemplateItem templateItem = MenuParserImpl.getInstance().getItemStack("config.yml", containerSection.getConfigurationSection(slot));
 
                             if (templateItem == null)
                                 continue;

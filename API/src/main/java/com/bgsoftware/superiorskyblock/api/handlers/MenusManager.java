@@ -8,10 +8,22 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.MenuCommands;
+import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.parser.MenuParser;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
+import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
+import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.entity.HumanEntity;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 
 public interface MenusManager {
 
@@ -798,5 +810,64 @@ public interface MenusManager {
      * @param warpCategory The warp category to close menus of.
      */
     void destroyWarps(WarpCategory warpCategory);
+
+    /**
+     * Register a new menu to the plugin.
+     *
+     * @param menu The menu to register.
+     */
+    void registerMenu(Menu<?, ?> menu);
+
+    /**
+     * Get a menu by its identifier.
+     *
+     * @param identifier The identifier of the menu.
+     */
+    @Nullable
+    <V extends MenuView<V, A>, A extends ViewArgs> Menu<V, A> getMenu(String identifier);
+
+    /**
+     * Get all the registered menus.
+     */
+    Map<String, Menu<?, ?>> getMenus();
+
+    /**
+     * Create a new pattern builder for building a menu.
+     */
+    <V extends MenuView<V, ?>> MenuLayout.Builder<V> createPatternBuilder();
+
+    /**
+     * Create a new pattern builder for building a paged-based menu.
+     */
+    <V extends PagedMenuView<V, ?, E>, E> PagedMenuLayout.Builder<V, E> createPagedPatternBuilder();
+
+    /**
+     * Create a new button builder.
+     */
+    <V extends MenuView<V, ?>> MenuTemplateButton.Builder<V> createButtonBuilder(
+            Class<?> viewButtonType, MenuTemplateButton.MenuViewButtonCreator<V> viewButtonCreator);
+
+    /**
+     * Create a new button builder.
+     */
+    <V extends MenuView<V, ?>, E> PagedMenuTemplateButton.Builder<V, E> createPagedButtonBuilder(
+            Class<?> viewButtonType, PagedMenuTemplateButton.PagedMenuViewButtonCreator<V, E> viewButtonCreator);
+
+    /**
+     * Get the parser instance.
+     */
+    MenuParser getParser();
+
+    /**
+     * Get the commands executor instance.
+     */
+    MenuCommands getMenuCommands();
+
+
+    /**
+     * Helper method to cast the new {@link MenuView} object to the old {@link ISuperiorMenu} object.
+     */
+    @Deprecated
+    ISuperiorMenu getOldMenuFromView(MenuView<?, ?> menuView);
 
 }

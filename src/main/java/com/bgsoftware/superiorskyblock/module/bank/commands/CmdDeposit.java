@@ -7,8 +7,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
+import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandBank;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
@@ -74,8 +74,7 @@ public class CmdDeposit implements ISuperiorCommand {
         }
 
         BankTransaction transaction = island.getIslandBank().depositMoney(superiorPlayer, amount);
-        MenuIslandBank.handleDeposit(superiorPlayer, island, null, transaction,
-                null, null, amount);
+        Menus.MENU_ISLAND_BANK.handleDeposit(superiorPlayer, island, transaction, null, null, amount);
     }
 
     @Override

@@ -1,102 +1,104 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
+import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.GlobalWarpsPagedObjectButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.GlobalWarpsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
+import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
+import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
 import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class MenuGlobalWarps extends PagedSuperiorMenu<MenuGlobalWarps, Island> {
+public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, EmptyViewArgs, Island> {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private final boolean visitorWarps;
 
-    private static PagedMenuPattern<MenuGlobalWarps, Island> menuPattern;
+    private MenuGlobalWarps(MenuParseResult<View> parseResult, boolean visitorWarps) {
+        super(MenuIdentifiers.MENU_GLOBAL_WARPS, parseResult, false);
+        this.visitorWarps = visitorWarps;
+    }
 
-    public static boolean visitorWarps;
-
-    private final Predicate<Island> ISLANDS_FILTER = island -> {
-        if (visitorWarps)
-            return island.getVisitorsLocation(null /* unused */) != null;
-        else if (island.equals(inventoryViewer.getIsland()))
-            return !island.getIslandWarps().isEmpty();
-        else
-            return island.getIslandWarps().values().stream().anyMatch(islandWarp -> !islandWarp.hasPrivateFlag());
-    };
-
-    private MenuGlobalWarps(SuperiorPlayer superiorPlayer) {
-        super(menuPattern, superiorPlayer);
+    public boolean isVisitorWarps() {
+        return visitorWarps;
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu);
+    protected View createViewInternal(SuperiorPlayer superiorPlayer, EmptyViewArgs unused,
+                                      @Nullable MenuView<?, ?> previousMenuView) {
+        return new View(superiorPlayer, previousMenuView, this);
     }
 
-    @Override
-    protected List<Island> requestObjects() {
-        return new SequentialListBuilder<Island>()
-                .sorted(SortingComparators.WORTH_COMPARATOR)
-                .filter(ISLANDS_FILTER)
-                .build(plugin.getGrid().getIslands());
-    }
+    @Nullable
+    public static MenuGlobalWarps createInstance() {
+        MenuParseResult<View> menuParseResult = MenuParserImpl.getInstance().loadMenu("global-warps.yml",
+                MenuGlobalWarps::convertOldGUI, new GlobalWarpsPagedObjectButton.Builder());
 
-    public static void init() {
-        menuPattern = null;
+        if (menuParseResult == null)
+            return null;
 
-        PagedMenuPattern.Builder<MenuGlobalWarps, Island> patternBuilder = new PagedMenuPattern.Builder<>();
+        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        YamlConfiguration cfg = menuParseResult.getConfig();
+        PagedMenuLayout.Builder<View, Island> patternBuilder = (PagedMenuLayout.Builder<View, Island>) menuParseResult.getLayoutBuilder();
 
-        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "global-warps.yml", MenuGlobalWarps::convertOldGUI);
-
-        if (menuLoadResult == null)
-            return;
-
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
-        CommentedConfiguration cfg = menuLoadResult.getConfig();
-
-        visitorWarps = cfg.getBoolean("visitor-warps", false);
+        boolean visitorWarps = cfg.getBoolean("visitor-warps", false);
 
         List<Integer> slots = new LinkedList<>();
 
         if (cfg.contains("warps"))
-            slots.addAll(getSlots(cfg, "warps", menuPatternSlots));
+            slots.addAll(MenuParserImpl.getInstance().parseButtonSlots(cfg, "warps", menuPatternSlots));
         if (cfg.contains("slots"))
-            slots.addAll(getSlots(cfg, "slots", menuPatternSlots));
+            slots.addAll(MenuParserImpl.getInstance().parseButtonSlots(cfg, "slots", menuPatternSlots));
         if (slots.isEmpty())
             slots.add(-1);
 
-        menuPattern = patternBuilder
-                .setPreviousPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))
-                .setCurrentPageSlots(getSlots(cfg, "current-page", menuPatternSlots))
-                .setNextPageSlots(getSlots(cfg, "next-page", menuPatternSlots))
-                .setPagedObjectSlots(slots, new GlobalWarpsPagedObjectButton.Builder())
-                .build();
+        patternBuilder.setPagedObjectSlots(slots, new GlobalWarpsPagedObjectButton.Builder());
+
+        return new MenuGlobalWarps(menuParseResult, visitorWarps);
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu) {
-        new MenuGlobalWarps(superiorPlayer).open(previousMenu);
-    }
+    public class View extends AbstractPagedMenuView<MenuGlobalWarps.View, EmptyViewArgs, Island> {
 
-    public static void refreshMenus() {
-        SuperiorMenu.refreshMenus(MenuGlobalWarps.class, superiorMenu -> true);
+        View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView,
+             Menu<View, EmptyViewArgs> menu) {
+            super(inventoryViewer, previousMenuView, menu);
+        }
+
+        @Override
+        protected List<Island> requestObjects() {
+            return new SequentialListBuilder<Island>()
+                    .sorted(SortingComparators.WORTH_COMPARATOR)
+                    .filter(ISLANDS_FILTER)
+                    .build(plugin.getGrid().getIslands());
+        }
+
+        private final Predicate<Island> ISLANDS_FILTER = island -> {
+            if (visitorWarps)
+                return island.getVisitorsLocation(null /* unused */) != null;
+            else if (island.equals(getInventoryViewer().getIsland()))
+                return !island.getIslandWarps().isEmpty();
+            else
+                return island.getIslandWarps().values().stream().anyMatch(islandWarp -> !islandWarp.hasPrivateFlag());
+        };
+
     }
 
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
@@ -126,14 +128,14 @@ public class MenuGlobalWarps extends PagedSuperiorMenu<MenuGlobalWarps, Island> 
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char slotsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char slotsChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
 
         MenuConverter.convertPagedButtons(cfg.getConfigurationSection("global-gui"),
                 cfg.getConfigurationSection("global-gui.warp-item"),
                 newMenu, patternChars,
-                slotsChar, SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
-                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
-                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
+                slotsChar, AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++],
+                AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++],
+                AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++],
                 itemsSection, commandsSection, soundsSection);
 
         newMenu.set("visitor-warps", cfg.getConfigurationSection("global-gui.visitor-warps"));
@@ -141,7 +143,7 @@ public class MenuGlobalWarps extends PagedSuperiorMenu<MenuGlobalWarps, Island> 
         newMenu.set("slots", null);
 
         newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars,
-                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
+                AbstractMenuLayout.BUTTON_SYMBOLS[charCounter]));
 
         return true;
     }

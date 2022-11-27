@@ -5,7 +5,8 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandCreation;
+import com.bgsoftware.superiorskyblock.core.menu.Menus;
+import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
 import org.bukkit.command.CommandSender;
@@ -104,9 +105,9 @@ public class CmdCreate implements ISuperiorCommand {
         }
 
         if (schematicName == null) {
-            plugin.getMenus().openIslandCreation(superiorPlayer, null, islandName);
+            plugin.getMenus().openIslandCreation(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), islandName);
         } else {
-            MenuIslandCreation.simulateClick(superiorPlayer, islandName, schematicName, false);
+            Menus.MENU_ISLAND_CREATION.simulateClick(superiorPlayer, islandName, schematicName, false);
         }
     }
 

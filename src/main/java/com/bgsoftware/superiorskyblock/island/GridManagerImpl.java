@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
@@ -26,7 +27,6 @@ import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -370,7 +370,10 @@ public class GridManagerImpl extends Manager implements GridManager {
         Log.debug(Debug.DELETE_ISLAND, "GridManagerImpl", "deleteIsland", island.getOwner().getName());
 
         island.getAllPlayersInside().forEach(superiorPlayer -> {
-            SuperiorMenu.killMenu(superiorPlayer);
+            MenuView<?, ?> openedView = superiorPlayer.getOpenedView();
+            if (openedView != null)
+                openedView.closeView();
+
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             Message.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
         });

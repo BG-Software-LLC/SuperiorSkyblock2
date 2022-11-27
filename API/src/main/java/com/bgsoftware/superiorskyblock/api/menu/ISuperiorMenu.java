@@ -1,21 +1,15 @@
 package com.bgsoftware.superiorskyblock.api.menu;
 
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import org.bukkit.inventory.InventoryHolder;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 
 import javax.annotation.Nullable;
 
-public interface ISuperiorMenu extends InventoryHolder {
-
-    /**
-     * Get the player currently viewing the menu.
-     */
-    SuperiorPlayer getInventoryViewer();
-
-    /**
-     * Set whether closing the menu should open the previous menu.
-     */
-    void setPreviousMove(boolean previousMove);
+/**
+ * @deprecated See {@link MenuView}
+ */
+@Deprecated
+public interface ISuperiorMenu extends MenuView {
 
     /**
      * Clone and open this menu to the {@link #getInventoryViewer()}
@@ -29,5 +23,13 @@ public interface ISuperiorMenu extends InventoryHolder {
      */
     @Nullable
     ISuperiorMenu getPreviousMenu();
+
+    /**
+     * Helper method to cast the new {@link MenuView} object to the old {@link ISuperiorMenu} object.
+     */
+    @Deprecated
+    static ISuperiorMenu convertFromView(MenuView<?, ?> menuView) {
+        return SuperiorSkyblockAPI.getMenus().getOldMenuFromView(menuView);
+    }
 
 }

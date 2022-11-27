@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 
@@ -82,7 +83,7 @@ public class CmdChest implements IPermissibleCommand {
 
             islandChests[page].openChest(superiorPlayer);
         } else {
-            plugin.getMenus().openIslandChest(superiorPlayer, null, island);
+            plugin.getMenus().openIslandChest(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
         }
     }
 

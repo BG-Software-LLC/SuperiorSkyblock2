@@ -10,12 +10,36 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.MenuCommands;
+import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.parser.MenuParser;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
+import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
+import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
+import com.bgsoftware.superiorskyblock.core.menu.layout.PagedMenuLayoutImpl;
+import com.bgsoftware.superiorskyblock.core.menu.layout.RegularMenuLayoutImpl;
+import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
+import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 public class MenusManagerImpl extends Manager implements MenusManager {
+
+    private final Map<String, Menu<?, ?>> registeredMenus = new HashMap<>();
 
     public MenusManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -465,6 +489,63 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     @Override
     public void destroyWarps(WarpCategory warpCategory) {
         plugin.getProviders().getMenusProvider().destroyWarps(warpCategory);
+    }
+
+    @Override
+    public void registerMenu(Menu<?, ?> menu) {
+        Preconditions.checkNotNull(menu, "menu parameter cannot be null");
+        Preconditions.checkState(getMenu(menu.getIdentifier()) == null, "There is already a menu with a similar identifier: " + menu.getIdentifier());
+        this.registeredMenus.put(menu.getIdentifier().toLowerCase(Locale.ENGLISH), menu);
+    }
+
+    @Nullable
+    @Override
+    public <V extends MenuView<V, A>, A extends ViewArgs> Menu<V, A> getMenu(String identifier) {
+        Preconditions.checkNotNull(identifier, "identifier parameter cannot be null");
+        return (Menu<V, A>) this.registeredMenus.get(identifier.toLowerCase(Locale.ENGLISH));
+    }
+
+    @Override
+    public Map<String, Menu<?, ?>> getMenus() {
+        return Collections.unmodifiableMap(this.registeredMenus);
+    }
+
+    @Override
+    public <V extends MenuView<V, ?>> MenuLayout.Builder<V> createPatternBuilder() {
+        return RegularMenuLayoutImpl.newBuilder();
+    }
+
+    @Override
+    public <V extends PagedMenuView<V, ?, E>, E> PagedMenuLayout.Builder<V, E> createPagedPatternBuilder() {
+        return PagedMenuLayoutImpl.newBuilder();
+    }
+
+    @Override
+    public <V extends MenuView<V, ?>> MenuTemplateButton.Builder<V> createButtonBuilder(
+            Class<?> viewButtonType, MenuTemplateButton.MenuViewButtonCreator<V> viewButtonCreator) {
+        return AbstractMenuTemplateButton.newBuilder(viewButtonType, viewButtonCreator);
+    }
+
+    @Override
+    public <V extends MenuView<V, ?>, E> PagedMenuTemplateButton.Builder<V, E> createPagedButtonBuilder(
+            Class<?> viewButtonType, PagedMenuTemplateButton.PagedMenuViewButtonCreator<V, E> viewButtonCreator) {
+        return PagedMenuTemplateButtonImpl.newBuilder(viewButtonType, viewButtonCreator);
+    }
+
+    @Override
+    public MenuParser getParser() {
+        return MenuParserImpl.getInstance();
+    }
+
+    @Override
+    public MenuCommands getMenuCommands() {
+        return MenuCommandsImpl.getInstance();
+    }
+
+    @Override
+    @Deprecated
+    public ISuperiorMenu getOldMenuFromView(MenuView<?, ?> menuView) {
+        return MenuViewWrapper.fromView(menuView);
     }
 
 }

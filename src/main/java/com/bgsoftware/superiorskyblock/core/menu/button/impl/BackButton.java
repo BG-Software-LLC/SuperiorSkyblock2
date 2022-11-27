@@ -1,31 +1,29 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.GameSound;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
-import com.bgsoftware.superiorskyblock.core.menu.button.SuperiorMenuButton;
+import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-import java.util.List;
+public class BackButton<V extends PagedMenuView<V, ?, E>, E> extends AbstractMenuViewButton<V> {
 
-public class BackButton<M extends ISuperiorMenu> extends SuperiorMenuButton<M> {
-
-    private BackButton(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
-                       String requiredPermission, GameSound lackPermissionSound) {
-        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
+    private BackButton(AbstractMenuTemplateButton<V> templateButton, V menuView) {
+        super(templateButton, menuView);
     }
 
     @Override
-    public void onButtonClick(SuperiorSkyblockPlugin plugin, M superiorMenu, InventoryClickEvent clickEvent) {
-        // Do nothing.
+    public void onButtonClick(InventoryClickEvent clickEvent) {
+        // Dummy button
     }
 
-    public static class Builder<M extends ISuperiorMenu> extends AbstractBuilder<Builder<M>, BackButton<M>, M> {
+    public static class Builder<V extends PagedMenuView<V, ?, E>, E> extends AbstractMenuTemplateButton.AbstractBuilder<V> {
 
         @Override
-        public BackButton<M> build() {
-            return new BackButton<>(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
+        public MenuTemplateButton<V> build() {
+            return new MenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
+                    lackPermissionSound, BackButton.class, BackButton::new);
         }
 
     }

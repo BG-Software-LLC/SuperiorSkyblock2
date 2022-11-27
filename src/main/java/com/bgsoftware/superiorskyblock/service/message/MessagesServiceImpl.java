@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.service.message;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
-import com.bgsoftware.superiorskyblock.core.GameSound;
+import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.messages.component.MultipleComponents;
@@ -91,7 +91,7 @@ public class MessagesServiceImpl implements MessagesService {
 
         @Override
         public boolean addSound(Sound sound, float volume, float pitch) {
-            return addMessageComponent(SoundComponent.of(new GameSound(sound, volume, pitch)));
+            return addMessageComponent(SoundComponent.of(new GameSoundImpl(sound, volume, pitch)));
         }
 
         @Override

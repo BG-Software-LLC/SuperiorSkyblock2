@@ -7,11 +7,13 @@ import com.bgsoftware.superiorskyblock.api.factory.IslandsFactory;
 import com.bgsoftware.superiorskyblock.api.factory.PlayersFactory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
+import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.World;
 
 import javax.annotation.Nullable;
@@ -150,5 +152,15 @@ public interface FactoriesManager {
      * @param environment The environment of the world.
      */
     WorldInfo createWorldInfo(String worldName, World.Environment environment);
+
+    /**
+     * Create a new game sound instance.
+     *
+     * @param sound  The sound to play.
+     * @param volume The volume to play the sound.
+     * @param pitch  The pitch to play the sound.
+     * @return
+     */
+    GameSound createGameSound(Sound sound, float volume, float pitch);
 
 }

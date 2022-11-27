@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.island.preview;
 
+import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandCreation;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -63,7 +63,7 @@ public class SIslandPreview implements IslandPreview {
 
     @Override
     public void handleConfirm() {
-        MenuIslandCreation.simulateClick(superiorPlayer, islandName, schematic, false);
+        Menus.MENU_ISLAND_CREATION.simulateClick(superiorPlayer, islandName, schematic, false);
         Player player = superiorPlayer.asPlayer();
         assert player != null;
         PlayerChat.remove(player);

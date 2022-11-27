@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.Bukkit;
@@ -111,7 +112,7 @@ public class CmdAdminCount implements IAdminIslandCommand {
             }
 
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-            plugin.getMenus().openCounts(superiorPlayer, null, island);
+            plugin.getMenus().openCounts(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
             return;
         }
 
