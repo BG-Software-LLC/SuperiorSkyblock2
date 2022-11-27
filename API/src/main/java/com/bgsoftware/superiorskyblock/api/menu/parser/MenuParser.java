@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * Singleton class used to parse menus out of files.
@@ -65,6 +66,13 @@ public interface MenuParser {
          * Get whether it is possible to open the previous opened menu after closing the current one.
          */
         boolean isPreviousMoveAllowed();
+
+        /**
+         * Get the slots in the layout for a char.
+         *
+         * @param ch The char to get slots for.
+         */
+        List<Integer> getSlotsForChar(char ch);
 
     }
 

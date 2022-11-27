@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.CurrentPageButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.NextPageButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.PreviousPageButton;
-import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -36,14 +35,14 @@ public class PagedMenuLayoutImpl<V extends MenuView<V, ?>, E> extends AbstractMe
 
     @Override
     protected void populateInventory(Inventory inventory, V menuView) {
-        if (!(menuView instanceof AbstractPagedMenuView))
+        if (!(menuView instanceof PagedMenuView))
             return;
 
         // noinspection unchecked
-        AbstractPagedMenuView<V, ?, E> abstractPagedMenuView = (AbstractPagedMenuView<V, ?, E>) menuView;
+        PagedMenuView<V, ?, E> pagedMenuView = (PagedMenuView<V, ?, E>) menuView;
 
-        int currentPage = abstractPagedMenuView.getCurrentPage();
-        List<E> pagedObjects = abstractPagedMenuView.getPagedObjects();
+        int currentPage = pagedMenuView.getCurrentPage();
+        List<E> pagedObjects = pagedMenuView.getPagedObjects();
         int pagedObjectSlot = 0;
 
         // Set all regular buttons in the menu

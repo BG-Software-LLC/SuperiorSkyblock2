@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class MenuParseResult<V extends MenuView<V, ?>> implements MenuParser.ParseResult<V> {
 
@@ -38,6 +39,11 @@ public class MenuParseResult<V extends MenuView<V, ?>> implements MenuParser.Par
     @Override
     public boolean isPreviousMoveAllowed() {
         return isPreviousMoveAllowed;
+    }
+
+    @Override
+    public List<Integer> getSlotsForChar(char ch) {
+        return patternSlots.getSlots(ch);
     }
 
     public MenuPatternSlots getPatternSlots() {
