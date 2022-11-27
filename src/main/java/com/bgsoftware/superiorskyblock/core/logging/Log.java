@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.core.logging;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
 import javax.annotation.Nullable;
-import java.io.File;
 import java.util.EnumSet;
 import java.util.logging.Level;
 
@@ -39,12 +38,12 @@ public class Log {
         error.printStackTrace();
     }
 
-    public static void error(File file, Object first, Object... parts) {
-        logInternal(Level.SEVERE, file, first, parts);
+    public static void errorFromFile(String fileName, Object first, Object... parts) {
+        logInternalWithFile(Level.SEVERE, fileName, first, parts);
     }
 
-    public static void error(Throwable error, File file, Object first, Object... parts) {
-        error(file, first, parts);
+    public static void errorFromFile(Throwable error, String fileName, Object first, Object... parts) {
+        errorFromFile(fileName, first, parts);
         error.printStackTrace();
     }
 

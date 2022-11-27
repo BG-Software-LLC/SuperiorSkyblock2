@@ -79,7 +79,7 @@ public class MenuParser {
             try {
                 cfg.save(file);
             } catch (Exception error) {
-                Log.error(error, file, "An unexpected error occurred while saving file:");
+                Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving file:");
             }
         }
 
@@ -124,7 +124,7 @@ public class MenuParser {
         }
 
         if (plugin.getSettings().isOnlyBackButton() && !backButtonFound) {
-            Log.error(file, "Menu doesn't have a back button, it's impossible to close it.");
+            Log.errorFromFile(file.getName(), "Menu doesn't have a back button, it's impossible to close it.");
             return null;
         }
 
@@ -155,7 +155,7 @@ public class MenuParser {
                 type = Material.valueOf(section.getString("type"));
                 data = (short) section.getInt("data");
             } catch (IllegalArgumentException error) {
-                Log.error(new File(fileName), "Couldn't convert ", section.getCurrentPath(), " into an itemstack. Check type & data sections!");
+                Log.errorFromFile(fileName, "Couldn't convert ", section.getCurrentPath(), " into an itemstack. Check type & data sections!");
                 return null;
             }
 
