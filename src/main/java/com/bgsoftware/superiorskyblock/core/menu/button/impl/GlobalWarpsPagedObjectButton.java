@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuGlobalWarps;
-import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -25,7 +24,7 @@ public class GlobalWarpsPagedObjectButton extends AbstractPagedMenuButton<MenuGl
             plugin.getCommands().dispatchSubCommand(menuView.getInventoryViewer().asPlayer(),
                     "visit", pagedObject.getOwner().getName());
         } else {
-            plugin.getMenus().openWarpCategories(menuView.getInventoryViewer(), MenuViewWrapper.fromView(menuView), pagedObject);
+            Menus.MENU_WARP_CATEGORIES.openMenu(menuView.getInventoryViewer(), menuView, pagedObject);
         }
     }
 
