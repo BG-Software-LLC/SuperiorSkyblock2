@@ -31,16 +31,29 @@ public class SkinsRestorerHook {
 
     public static void register(SuperiorSkyblockPlugin plugin) {
         SkinsRestorerHook.plugin = plugin;
-        try {
-            Class.forName("net.skinsrestorer.bukkit.SkinsRestorer");
-            skinsRestorer = new SkinsRestorerNew();
-        } catch (Exception ex) {
-            skinsRestorer = new SkinsRestorerOld();
-        }
+
+        skinsRestorer = isNewVersionDetected() ? new SkinsRestorerNew() : new SkinsRestorerOld();
+
         if (skinsRestorer.isLocalMode()) {
             plugin.getProviders().registerSkinsListener(SkinsRestorerHook::setSkinTexture);
             plugin.getServer().getPluginManager().registerEvents(new SkinsListener(), plugin);
         }
+    }
+
+    private static boolean isNewVersionDetected() {
+        try {
+            Class.forName("net.skinsrestorer.bukkit.SkinsRestorer");
+            return true;
+        } catch (Exception ignored) {
+        }
+
+        try {
+            Class.forName("net.skinsrestorer.bukkit.SkinsRestorerBukkit");
+            return true;
+        } catch (Exception ignored) {
+        }
+
+        return false;
     }
 
     private static void setSkinTexture(SuperiorPlayer superiorPlayer) {
