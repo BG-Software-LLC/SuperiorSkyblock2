@@ -245,7 +245,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 providersHandler.getWorldsProvider().prepareWorlds();
             } catch (RuntimeException ex) {
                 shouldEnable = false;
-                ManagerLoadException handlerError = new ManagerLoadException(ex.getMessage(), ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+                ManagerLoadException handlerError = new ManagerLoadException(ex, ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
                 Log.error(handlerError, "An error occurred while preparing worlds:");
                 Bukkit.shutdown();
                 return;
