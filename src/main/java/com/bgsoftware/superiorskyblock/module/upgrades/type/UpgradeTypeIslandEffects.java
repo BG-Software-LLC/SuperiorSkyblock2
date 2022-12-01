@@ -40,7 +40,7 @@ public class UpgradeTypeIslandEffects implements IUpgradeType {
         @EventHandler(ignoreCancelled = true)
         public void onPlayerEffect(EntityPotionEffectEvent e) {
             if (e.getAction() == EntityPotionEffectEvent.Action.ADDED || !(e.getEntity() instanceof Player) ||
-                    e.getCause() == EntityPotionEffectEvent.Cause.PLUGIN)
+                    e.getCause() == EntityPotionEffectEvent.Cause.PLUGIN || e.getCause() == EntityPotionEffectEvent.Cause.BEACON)
                 return;
 
             Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
