@@ -324,11 +324,12 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
     @Override
     public void onDisable() {
+        BukkitExecutor.prepareDisable();
+
         if (!shouldEnable)
             return;
 
         ChunksProvider.stop();
-        BukkitExecutor.syncDatabaseCalls();
 
         try {
             dataHandler.saveDatabase(false);
@@ -363,11 +364,11 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             Log.info("Shutting down calculation task...");
             CalcTask.cancelTask();
 
-            Log.info("Shutting down executor");
-            BukkitExecutor.close();
-
             if (nmsChunks != null)
                 nmsChunks.shutdown();
+
+            Log.info("Shutting down executor");
+            BukkitExecutor.close();
 
             Log.info("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
             dataHandler.closeConnection();

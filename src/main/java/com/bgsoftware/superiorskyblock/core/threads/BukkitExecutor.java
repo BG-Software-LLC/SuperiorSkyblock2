@@ -19,6 +19,7 @@ public class BukkitExecutor {
     private static ExecutorService databaseExecutor;
     private static boolean shutdown = false;
     private static boolean syncDatabaseCalls = false;
+    private static boolean syncBukkitCalls = false;
 
     private BukkitExecutor() {
 
@@ -30,10 +31,10 @@ public class BukkitExecutor {
     }
 
     public static void ensureMain(Runnable runnable) {
-        if (shutdown)
+        if (ensureNotShudown())
             return;
 
-        if (!Bukkit.isPrimaryThread()) {
+        if (!syncBukkitCalls && !Bukkit.isPrimaryThread()) {
             sync(runnable);
         } else {
             runnable.run();
@@ -41,21 +42,23 @@ public class BukkitExecutor {
     }
 
     public static BukkitTask sync(Runnable runnable) {
-        if (shutdown)
-            return null;
-
         return sync(runnable, 0);
     }
 
     public static BukkitTask sync(Runnable runnable, long delay) {
-        if (shutdown)
+        if (ensureNotShudown())
             return null;
 
-        return Bukkit.getScheduler().runTaskLater(plugin, runnable, delay);
+        if (syncBukkitCalls) {
+            runnable.run();
+            return null;
+        } else {
+            return Bukkit.getScheduler().runTaskLater(plugin, runnable, delay);
+        }
     }
 
     public static void data(Runnable runnable) {
-        if (shutdown)
+        if (ensureNotShudown())
             return;
 
         if (syncDatabaseCalls) {
@@ -70,28 +73,36 @@ public class BukkitExecutor {
     }
 
     public static void async(Runnable runnable) {
-        if (shutdown)
+        if (ensureNotShudown())
             return;
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
+        if (syncBukkitCalls) {
+            runnable.run();
+        } else {
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
+        }
     }
 
     public static void async(Runnable runnable, long delay) {
-        if (shutdown)
+        if (ensureNotShudown())
             return;
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, delay);
+        if (syncBukkitCalls) {
+            runnable.run();
+        } else {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, delay);
+        }
     }
 
     public static void asyncTimer(Runnable runnable, long delay) {
-        if (shutdown)
+        if (ensureNotShudown())
             return;
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, delay, delay);
     }
 
     public static void timer(Runnable runnable, long delay) {
-        if (shutdown)
+        if (ensureNotShudown())
             return;
 
         Bukkit.getScheduler().runTaskTimer(plugin, runnable, delay, delay);
@@ -101,8 +112,9 @@ public class BukkitExecutor {
         return new NestedTask<Void>().complete();
     }
 
-    public static void syncDatabaseCalls() {
+    public static void prepareDisable() {
         syncDatabaseCalls = true;
+        syncBukkitCalls = true;
     }
 
     public static void close() {
@@ -113,6 +125,15 @@ public class BukkitExecutor {
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while shutting down database executor:");
         }
+    }
+
+    private static boolean ensureNotShudown() {
+        if (shutdown) {
+            new RuntimeException("Tried to call BukkitExecutor after it was shut down").printStackTrace();
+            return true;
+        }
+
+        return false;
     }
 
     private static void shutdownAndAwaitTermination() {
@@ -142,31 +163,49 @@ public class BukkitExecutor {
 
         public <R> NestedTask<R> runSync(Function<T, R> function) {
             NestedTask<R> nestedTask = new NestedTask<>();
-            value.whenComplete((value, ex) -> BukkitExecutor.ensureMain(() -> nestedTask.value.complete(function.apply(value))));
+            if (syncBukkitCalls) {
+                nestedTask.value.complete(function.apply(value.join()));
+            } else {
+                value.whenComplete((value, ex) -> BukkitExecutor.ensureMain(() -> nestedTask.value.complete(function.apply(value))));
+            }
             return nestedTask;
         }
 
         public NestedTask<Void> runSync(Consumer<T> consumer) {
             NestedTask<Void> nestedTask = new NestedTask<>();
-            value.whenComplete((value, ex) -> BukkitExecutor.ensureMain(() -> {
-                consumer.accept(value);
+            if (syncBukkitCalls) {
+                consumer.accept(value.join());
                 nestedTask.value.complete(null);
-            }));
+            } else {
+                value.whenComplete((value, ex) -> BukkitExecutor.ensureMain(() -> {
+                    consumer.accept(value);
+                    nestedTask.value.complete(null);
+                }));
+            }
             return nestedTask;
         }
 
         public <R> NestedTask<R> runAsync(Function<T, R> function) {
             NestedTask<R> nestedTask = new NestedTask<>();
-            value.whenComplete((value, ex) -> BukkitExecutor.async(() -> nestedTask.value.complete(function.apply(value))));
+            if (syncBukkitCalls) {
+                nestedTask.value.complete(function.apply(value.join()));
+            } else {
+                value.whenComplete((value, ex) -> BukkitExecutor.async(() -> nestedTask.value.complete(function.apply(value))));
+            }
             return nestedTask;
         }
 
         public NestedTask<Void> runAsync(Consumer<T> consumer) {
             NestedTask<Void> nestedTask = new NestedTask<>();
-            value.whenComplete((value, ex) -> BukkitExecutor.async(() -> {
-                consumer.accept(value);
+            if (syncBukkitCalls) {
+                consumer.accept(value.join());
                 nestedTask.value.complete(null);
-            }));
+            } else {
+                value.whenComplete((value, ex) -> BukkitExecutor.async(() -> {
+                    consumer.accept(value);
+                    nestedTask.value.complete(null);
+                }));
+            }
             return nestedTask;
         }
 
