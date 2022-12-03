@@ -63,7 +63,7 @@ public class CmdAdminSetSpawn implements ISuperiorCommand {
             plugin.getSettings().updateValue("spawn.location", newSpawnLocation);
             plugin.getGrid().updateSpawn();
         } catch (Exception error) {
-            Log.entering("CmdAdminSetSpawn", "execute", "ENTER", spawnLocation);
+            Log.entering("ENTER", spawnLocation);
             Log.error(error, "An unexpected error occurred while setting spawn:");
         }
 

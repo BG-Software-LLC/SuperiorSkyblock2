@@ -232,8 +232,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
             java.util.Locale locale = PlayerLocales.getLocale(sender);
 
             if (args.length > 0) {
-                Log.debug(Debug.EXECUTE_COMMAND, "CommandsManagerImpl#PluginCommand", "execute",
-                        sender.getName(), args[0]);
+                Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), args[0]);
 
                 SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
                 if (command != null) {
@@ -243,15 +242,13 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                     }
 
                     if (!command.getPermission().isEmpty() && !sender.hasPermission(command.getPermission())) {
-                        Log.debugResult(Debug.EXECUTE_COMMAND, "CommandsManagerImpl#PluginCommand", "execute",
-                                "Return Missing Permission", command.getPermission());
+                        Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", command.getPermission());
                         Message.NO_COMMAND_PERMISSION.send(sender, locale);
                         return false;
                     }
 
                     if (args.length < command.getMinArgs() || args.length > command.getMaxArgs()) {
-                        Log.debugResult(Debug.EXECUTE_COMMAND, "CommandsManagerImpl#PluginCommand", "execute",
-                                "Return Incorrect Usage", command.getUsage(locale));
+                        Log.debugResult(Debug.EXECUTE_COMMAND, "Return Incorrect Usage", command.getUsage(locale));
                         Message.COMMAND_USAGE.send(sender, locale, getLabel() + " " + command.getUsage(locale));
                         return false;
                     }
@@ -272,8 +269,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                                     if (timeToExecute != null) {
                                         if (timeNow < timeToExecute) {
                                             String formattedTime = Formatters.TIME_FORMATTER.format(Duration.ofMillis(timeToExecute - timeNow), locale);
-                                            Log.debugResult(Debug.EXECUTE_COMMAND, "CommandsManagerImpl#PluginCommand", "execute",
-                                                    "Return Cooldown", formattedTime);
+                                            Log.debugResult(Debug.EXECUTE_COMMAND, "Return Cooldown", formattedTime);
                                             Message.COMMAND_COOLDOWN_FORMAT.send(sender, locale, formattedTime);
                                             return false;
                                         }

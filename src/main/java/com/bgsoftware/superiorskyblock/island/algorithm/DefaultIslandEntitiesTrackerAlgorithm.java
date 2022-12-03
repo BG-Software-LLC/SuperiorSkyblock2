@@ -34,26 +34,22 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
     public boolean trackEntity(Key key, int amount) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        Log.debug(Debug.ENTITY_SPAWN, "DefaultIslandEntitiesTrackerAlgorithm", "trackEntity",
-                island.getOwner().getName(), key, amount);
+        Log.debug(Debug.ENTITY_SPAWN, island.getOwner().getName(), key, amount);
 
         if (amount <= 0) {
-            Log.debugResult(Debug.ENTITY_SPAWN, "DefaultIslandEntitiesTrackerAlgorithm", "trackEntity",
-                    "Return", "Negative Amount");
+            Log.debugResult(Debug.ENTITY_SPAWN, "Return", "Negative Amount");
             return false;
         }
 
         if (!canTrackEntity(key)) {
-            Log.debugResult(Debug.ENTITY_SPAWN, "DefaultIslandEntitiesTrackerAlgorithm", "trackEntity",
-                    "Return", "Cannot Track Entity");
+            Log.debugResult(Debug.ENTITY_SPAWN, "Return", "Cannot Track Entity");
             return false;
         }
 
         int currentAmount = entityCounts.getOrDefault(key, 0);
         entityCounts.put(key, currentAmount + amount);
 
-        Log.debugResult(Debug.ENTITY_SPAWN, "DefaultIslandEntitiesTrackerAlgorithm", "trackEntity",
-                "Return", "Success");
+        Log.debugResult(Debug.ENTITY_SPAWN, "Return", "Success");
 
         return true;
     }
@@ -62,18 +58,15 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
     public boolean untrackEntity(Key key, int amount) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        Log.debug(Debug.ENTITY_DESPAWN, "DefaultIslandEntitiesTrackerAlgorithm", "untrackEntity",
-                island.getOwner().getName(), key, amount);
+        Log.debug(Debug.ENTITY_DESPAWN, island.getOwner().getName(), key, amount);
 
         if (amount <= 0) {
-            Log.debugResult(Debug.ENTITY_DESPAWN, "DefaultIslandEntitiesTrackerAlgorithm", "untrackEntity",
-                    "Return", "Negative Amount");
+            Log.debugResult(Debug.ENTITY_DESPAWN, "Return", "Negative Amount");
             return false;
         }
 
         if (!canTrackEntity(key)) {
-            Log.debugResult(Debug.ENTITY_DESPAWN, "DefaultIslandEntitiesTrackerAlgorithm", "untrackEntity",
-                    "Return", "Cannot Untrack Entity");
+            Log.debugResult(Debug.ENTITY_DESPAWN, "Return", "Cannot Untrack Entity");
             return false;
         }
 
@@ -87,8 +80,7 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
             }
         }
 
-        Log.debugResult(Debug.ENTITY_DESPAWN, "DefaultIslandEntitiesTrackerAlgorithm", "untrackEntity",
-                "Return", "Success");
+        Log.debugResult(Debug.ENTITY_DESPAWN, "Return", "Success");
 
         return true;
     }

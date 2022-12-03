@@ -93,12 +93,11 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
     public BigDecimal getBlockWorth(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        Log.debug(Debug.GET_WORTH, "BlockValuesManagerImpl", "getBlockWorth", key);
+        Log.debug(Debug.GET_WORTH, key);
 
         BigDecimal customBlockValue = customBlockWorthValues.getBlockValue(key);
         if (customBlockValue != null) {
-            Log.debugResult(Debug.GET_WORTH, "BlockValuesManagerImpl", "getBlockWorth",
-                    "Return Custom Block Worth", customBlockValue);
+            Log.debugResult(Debug.GET_WORTH, "Return Custom Block Worth", customBlockValue);
             return customBlockValue;
         }
 
@@ -106,29 +105,25 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
             BigDecimal value = blockWorthValues.getBlockValue(key);
 
             if (value != null) {
-                Log.debugResult(Debug.GET_WORTH, "BlockValuesManagerImpl", "getBlockWorth",
-                        "Return Worth File", value);
+                Log.debugResult(Debug.GET_WORTH, "Return Worth File", value);
                 return value;
             }
         }
 
         if (plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
             BigDecimal price = plugin.getProviders().getPricesProvider().getPrice(key);
-            Log.debugResult(Debug.GET_WORTH, "BlockValuesManagerImpl", "getBlockWorth",
-                    "Return Price", price);
+            Log.debugResult(Debug.GET_WORTH, "Return Price", price);
             return price;
         }
 
         BigDecimal value = blockWorthValues.getBlockValue(key);
 
         if (value != null) {
-            Log.debugResult(Debug.GET_WORTH, "BlockValuesManagerImpl", "getBlockWorth",
-                    "Return Worth File", value);
+            Log.debugResult(Debug.GET_WORTH, "Return Worth File", value);
             return value;
         }
 
-        Log.debugResult(Debug.GET_WORTH, "BlockValuesManagerImpl", "getBlockWorth",
-                "Return Worth File", 0);
+        Log.debugResult(Debug.GET_WORTH, "Return Worth File", 0);
 
         return BigDecimal.ZERO;
     }
@@ -137,12 +132,11 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
     public BigDecimal getBlockLevel(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        Log.debug(Debug.GET_LEVEL, "BlockValuesManagerImpl", "getBlockLevel", key);
+        Log.debug(Debug.GET_LEVEL, key);
 
         BigDecimal customBlockLevel = customBlockLevels.getBlockValue(key);
         if (customBlockLevel != null) {
-            Log.debugResult(Debug.GET_LEVEL, "BlockValuesManagerImpl", "getBlockLevel",
-                    "Return Custom Block Level", customBlockLevel);
+            Log.debugResult(Debug.GET_LEVEL, "Return Custom Block Level", customBlockLevel);
             return customBlockLevel;
         }
 
@@ -151,11 +145,9 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
         if (level == null) {
             level = convertValueToLevel(getBlockWorth(key));
             blockLevels.setBlockValue(key, level);
-            Log.debugResult(Debug.GET_LEVEL, "BlockValuesManagerImpl", "getBlockLevel",
-                    "Return Converted From Worth", level);
+            Log.debugResult(Debug.GET_LEVEL, "Return Converted From Worth", level);
         } else {
-            Log.debugResult(Debug.GET_LEVEL, "BlockValuesManagerImpl", "getBlockLevel",
-                    "Return Levels File", level);
+            Log.debugResult(Debug.GET_LEVEL, "Return Levels File", level);
         }
 
         return level;
@@ -284,7 +276,7 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
 
             return fastBigDecimalFromString(evaluated.toString());
         } catch (ScriptException error) {
-            Log.entering("BlockValuesManagerImpl", "convertValueToLevel", "ENTER", value);
+            Log.entering("ENTER", value);
             Log.error(error, "An unexpected error occurred while converting level from worth:");
             return value;
         }

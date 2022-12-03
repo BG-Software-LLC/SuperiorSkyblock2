@@ -101,8 +101,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
             Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
         Preconditions.checkNotNull(blockKey, "blockKey parameter cannot be null.");
 
-        Log.debug(Debug.SET_BLOCK_AMOUNT, "StackedBlocksManagerImpl", "setStackedBlock",
-                location, blockKey, amount);
+        Log.debug(Debug.SET_BLOCK_AMOUNT, location, blockKey, amount);
 
         StackedBlock stackedBlock = this.stackedBlocksContainer.createStackedBlock(location);
 

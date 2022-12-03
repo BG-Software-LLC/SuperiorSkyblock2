@@ -42,7 +42,7 @@ public class SQLDatabaseBridge implements DatabaseBridge {
                 try {
                     resultConsumer.accept(new ResultSetMapBridge(resultSet));
                 } catch (Exception error) {
-                    Log.entering("SQLDatabaseBridge", "loadAllObjects", "ENTER", table);
+                    Log.entering("ENTER", table);
                     Log.error(error, "An unexpected error occurred while loading data from database:");
                 }
             }
@@ -145,7 +145,7 @@ public class SQLDatabaseBridge implements DatabaseBridge {
                 try {
                     resultConsumer.accept(new ResultSetMapBridge(resultSet));
                 } catch (Exception error) {
-                    Log.entering("SQLDatabaseBridge", "loadObject", "ENTER", table, columnFilter);
+                    Log.entering("ENTER", table, columnFilter);
                     Log.error(error, "An unexpected error occurred while loading data from database:");
                 }
             }

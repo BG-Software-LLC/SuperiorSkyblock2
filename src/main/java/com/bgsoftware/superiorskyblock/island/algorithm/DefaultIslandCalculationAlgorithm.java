@@ -51,7 +51,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
     public CompletableFuture<IslandCalculationResult> calculateIsland(Island island) {
         CompletableFutureList<List<CalculatedChunk>> chunksToLoad = new CompletableFutureList<>();
 
-        Log.debug(Debug.CHUNK_CALCULATION, "DefaultIslandCalculationAlgorithm", "calculateIsland", island.getOwner().getName());
+        Log.debug(Debug.CHUNK_CALCULATION, island.getOwner().getName());
 
         if (!plugin.getProviders().hasSnapshotsSupport()) {
             IslandUtils.getChunkCoords(island, true, true).values().forEach(worldChunks ->
@@ -75,8 +75,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
 
         BukkitExecutor.createTask().runAsync(v -> {
             chunksToLoad.forEachCompleted(worldCalculatedChunks -> worldCalculatedChunks.forEach(calculatedChunk -> {
-                Log.debugResult(Debug.CHUNK_CALCULATION, "DefaultIslandCalculationAlgorithm", "calculateIsland",
-                        "Chunk Finished", calculatedChunk.getPosition());
+                Log.debugResult(Debug.CHUNK_CALCULATION, "Chunk Finished", calculatedChunk.getPosition());
 
                 // We want to remove spawners from the chunkInfo, as it will be used later
                 calculatedChunk.getBlockCounts().removeIf(key ->

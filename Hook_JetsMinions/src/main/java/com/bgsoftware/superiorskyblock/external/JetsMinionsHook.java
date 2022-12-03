@@ -33,8 +33,7 @@ public class JetsMinionsHook implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onMinionBreak(MinerBlockBreakEvent e) {
-        Log.debug(Debug.BLOCK_BREAK, "JetsMinionsHook", "onMinionBreak", e.getBlock().getLocation(),
-                e.getBlock().getType());
+        Log.debug(Debug.BLOCK_BREAK, e.getBlock().getType());
         if (stackedBlocksListener.get().tryUnstack(null, e.getBlock())) {
             e.setCancelled(true);
         } else {

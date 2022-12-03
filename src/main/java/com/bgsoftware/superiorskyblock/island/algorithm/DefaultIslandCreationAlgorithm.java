@@ -62,8 +62,7 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
         Preconditions.checkArgument(builder.owner != null, "Cannot create an island from builder with no valid owner.");
         Preconditions.checkArgument(schematic != null, "Cannot create an island from builder with invalid schematic name.");
 
-        Log.debug(Debug.CREATE_ISLAND, "DefaultIslandCreationAlgorithm", "createIsland",
-                builder.owner.getName(), schematic.getName(), lastIsland);
+        Log.debug(Debug.CREATE_ISLAND, builder.owner.getName(), schematic.getName(), lastIsland);
 
         CompletableFuture<IslandCreationResult> completableFuture = new CompletableFuture<>();
 
@@ -75,8 +74,7 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
                 builder.uuid
         );
 
-        Log.debugResult(Debug.CREATE_ISLAND, "DefaultIslandCreationAlgorithm", "createIsland",
-                "Next Island Position", islandLocation);
+        Log.debugResult(Debug.CREATE_ISLAND, "Next Island Position", islandLocation);
 
         Island island = builder.setCenter(islandLocation.add(0.5, 0, 0.5)).build();
 

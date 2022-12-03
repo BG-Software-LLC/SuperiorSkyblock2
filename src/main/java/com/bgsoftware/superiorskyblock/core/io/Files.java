@@ -45,7 +45,7 @@ public class Files {
                     }
                 }
             } catch (Exception error) {
-                Log.entering("Files", "replaceString", "ENTER", file.getName(), str, replace);
+                Log.entering("ENTER", file.getName(), str, replace);
                 Log.error(error, "An unexpected error occurred while replacing strings in file:");
             }
         }

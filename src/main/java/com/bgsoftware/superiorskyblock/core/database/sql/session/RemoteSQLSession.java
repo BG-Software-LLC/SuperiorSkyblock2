@@ -117,7 +117,7 @@ public abstract class RemoteSQLSession implements SQLSession {
         String prefix = plugin.getSettings().getDatabase().getPrefix();
         String query = statement.replace("{prefix}", prefix);
 
-        Log.debug(Debug.DATABASE_QUERY, "RemoteSQLSession", "customQuery", query);
+        Log.debug(Debug.DATABASE_QUERY, query);
 
         try (Connection conn = this.dataSource.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query)) {
@@ -137,7 +137,7 @@ public abstract class RemoteSQLSession implements SQLSession {
                 .replace("LONG_UNIQUE_TEXT", "VARCHAR(255)")
                 .replace("UNIQUE_TEXT", "VARCHAR(30)");
 
-        Log.debug(Debug.DATABASE_QUERY, "RemoteSQLSession", "executeUpdate", query);
+        Log.debug(Debug.DATABASE_QUERY, query);
 
         try (Connection conn = this.dataSource.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query)) {
@@ -151,7 +151,7 @@ public abstract class RemoteSQLSession implements SQLSession {
     private void executeQuery(String query, QueryResult<ResultSet> queryResult) {
         Preconditions.checkNotNull(this.dataSource, "Session was not initialized.");
 
-        Log.debug(Debug.DATABASE_QUERY, "RemoteSQLSession", "executeQuery", query);
+        Log.debug(Debug.DATABASE_QUERY, query);
 
         try (Connection conn = this.dataSource.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query);

@@ -161,7 +161,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void setTextureValue(@Nonnull String textureValue) {
         Preconditions.checkNotNull(textureValue, "textureValue parameter cannot be null.");
 
-        Log.debug(Debug.SET_TEXTURE_VALUE, "SSuperiorPlayer", "setTextureValue", getName(), textureValue);
+        Log.debug(Debug.SET_TEXTURE_VALUE, getName(), textureValue);
 
         this.textureValue = textureValue;
 
@@ -175,7 +175,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setLastTimeStatus(long lastTimeStatus) {
-        Log.debug(Debug.SET_PLAYER_LAST_TIME_UPDATED, "SSuperiorPlayer", "setLastTimeStatus", getName(), lastTimeStatus);
+        Log.debug(Debug.SET_PLAYER_LAST_TIME_UPDATED, getName(), lastTimeStatus);
 
         this.lastTimeStatus = lastTimeStatus;
 
@@ -417,8 +417,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setIsland(Island island) {
-        Log.debug(Debug.SET_PLAYER_ISLAND, "SSuperiorPlayer", "setIsland", getName(),
-                island == null ? "null" : island.getOwner().getName());
+        Log.debug(Debug.SET_PLAYER_ISLAND, getName(), island == null ? "null" : island.getOwner().getName());
 
         this.playerIsland = island;
     }
@@ -456,7 +455,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void setPlayerRole(PlayerRole playerRole) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
 
-        Log.debug(Debug.SET_PLAYER_ROLE, "SSuperiorPlayer", "setPlayerRole", getName(), playerRole.getName());
+        Log.debug(Debug.SET_PLAYER_ROLE, getName(), playerRole.getName());
 
         this.playerRole = playerRole;
 
@@ -474,7 +473,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void setDisbands(int disbands) {
         this.disbands = Math.max(disbands, 0);
 
-        Log.debug(Debug.SET_DISBANDS, "SSuperiorPlayer", "setDisbands", getName(), this.disbands);
+        Log.debug(Debug.SET_DISBANDS, getName(), this.disbands);
 
         PlayersDatabaseBridge.saveDisbands(this);
     }
@@ -500,8 +499,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(userLocale, "userLocale parameter cannot be null.");
         Preconditions.checkArgument(PlayerLocales.isValidLocale(userLocale), "Locale " + userLocale + " is not a valid locale.");
 
-        Log.debug(Debug.SET_LANGUAGE, "SSuperiorPlayer", "setUserLocale", getName(),
-                userLocale.getLanguage() + "-" + userLocale.getCountry());
+        Log.debug(Debug.SET_LANGUAGE, getName(), userLocale.getLanguage() + "-" + userLocale.getCountry());
 
         this.userLocale = userLocale;
 
@@ -520,7 +518,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setWorldBorderEnabled(boolean enabled) {
-        Log.debug(Debug.SET_TOGGLED_BORDER, "SSuperiorPlayer", "setWorldBorderEnabled", getName(), enabled);
+        Log.debug(Debug.SET_TOGGLED_BORDER, getName(), enabled);
         this.worldBorderEnabled = enabled;
         PlayersDatabaseBridge.saveToggledBorder(this);
     }
@@ -542,7 +540,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setBlocksStacker(boolean enabled) {
-        Log.debug(Debug.SET_TOGGLED_STACKER, "SSuperiorPlayer", "setBlocksStacker", getName(), enabled);
+        Log.debug(Debug.SET_TOGGLED_STACKER, getName(), enabled);
         blocksStackerEnabled = enabled;
     }
 
@@ -558,7 +556,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setSchematicMode(boolean enabled) {
-        Log.debug(Debug.SET_TOGGLED_SCHEMATIC, "SSuperiorPlayer", "setSchematicMode", getName(), enabled);
+        Log.debug(Debug.SET_TOGGLED_SCHEMATIC, getName(), enabled);
         schematicModeEnabled = enabled;
     }
 
@@ -574,7 +572,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setTeamChat(boolean enabled) {
-        Log.debug(Debug.SET_TEAM_CHAT, "SSuperiorPlayer", "setTeamChat", getName(), enabled);
+        Log.debug(Debug.SET_TEAM_CHAT, getName(), enabled);
         teamChatEnabled = enabled;
     }
 
@@ -595,7 +593,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setBypassMode(boolean enabled) {
-        Log.debug(Debug.SET_ADMIN_BYPASS, "SSuperiorPlayer", "setBypassMode", getName(), enabled);
+        Log.debug(Debug.SET_ADMIN_BYPASS, getName(), enabled);
         bypassModeEnabled = enabled;
     }
 
@@ -606,7 +604,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setToggledPanel(boolean toggledPanel) {
-        Log.debug(Debug.SET_TOGGLED_PANEL, "SSuperiorPlayer", "setToggledPanel", getName(), toggledPanel);
+        Log.debug(Debug.SET_TOGGLED_PANEL, getName(), toggledPanel);
         this.toggledPanel = toggledPanel;
         PlayersDatabaseBridge.saveToggledPanel(this);
     }
@@ -633,7 +631,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setIslandFly(boolean enabled) {
-        Log.debug(Debug.SET_ISLAND_FLY, "SSuperiorPlayer", "setIslandFly", getName(), enabled);
+        Log.debug(Debug.SET_ISLAND_FLY, getName(), enabled);
         islandFly = enabled;
         PlayersDatabaseBridge.saveIslandFly(this);
     }
@@ -650,7 +648,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setAdminSpy(boolean enabled) {
-        Log.debug(Debug.SET_ADMIN_SPY, "SSuperiorPlayer", "setAdminSpy", getName(), enabled);
+        Log.debug(Debug.SET_ADMIN_SPY, getName(), enabled);
         adminSpyEnabled = enabled;
     }
 
@@ -663,7 +661,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void setBorderColor(BorderColor borderColor) {
         Preconditions.checkNotNull(borderColor, "borderColor parameter cannot be null.");
 
-        Log.debug(Debug.SET_BORDER_COLOR, "SSuperiorPlayer", "setBorderColor", getName(), borderColor);
+        Log.debug(Debug.SET_BORDER_COLOR, getName(), borderColor);
 
         this.borderColor = borderColor;
 
@@ -681,8 +679,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setSchematicPos1(@Nullable Block block) {
-        Log.debug(Debug.SET_SCHEMATIC_POSITION, "SSuperiorPlayer", "setSchematicPos1", getName(),
-                block == null ? "null" : block.getLocation());
+        Log.debug(Debug.SET_SCHEMATIC_POSITION, getName(), block == null ? "null" : block.getLocation());
         this.schematicPos1 = block == null ? null : new SBlockPosition(block.getLocation());
     }
 
@@ -693,8 +690,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setSchematicPos2(@Nullable Block block) {
-        Log.debug(Debug.SET_SCHEMATIC_POSITION, "SSuperiorPlayer", "setSchematicPos2", getName(),
-                block == null ? "null" : block.getLocation());
+        Log.debug(Debug.SET_SCHEMATIC_POSITION, getName(), block == null ? "null" : block.getLocation());
         this.schematicPos2 = block == null ? null : new SBlockPosition(block.getLocation());
     }
 
@@ -709,7 +705,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setImmunedToPvP(boolean immunedToPvP) {
-        Log.debug(Debug.SET_PVP_IMMUNED, "SSuperiorPlayer", "setImmunedToPvP", getName(), immunedToPvP);
+        Log.debug(Debug.SET_PVP_IMMUNED, getName(), immunedToPvP);
         this.immuneToPvP = immunedToPvP;
     }
 
@@ -720,7 +716,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setLeavingFlag(boolean leavingFlag) {
-        Log.debug(Debug.SET_LEAVING_FLAG, "SSuperiorPlayer", "setLeavingFlag", getName(), leavingFlag);
+        Log.debug(Debug.SET_LEAVING_FLAG, getName(), leavingFlag);
         this.leavingFlag = leavingFlag;
     }
 
@@ -747,7 +743,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setImmunedToPortals(boolean immuneToTeleport) {
-        Log.debug(Debug.SET_PORTALS_IMMUNED, "SSuperiorPlayer", "setImmunedToPortals", getName(), immuneToTeleport);
+        Log.debug(Debug.SET_PORTALS_IMMUNED, getName(), immuneToTeleport);
         this.immuneToPortals = immuneToTeleport;
     }
 
@@ -842,8 +838,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
 
-        Log.debug(Debug.SET_PLAYER_MISSION_COMPLETED, "SSuperiorPlayer", "setAmountMissionCompleted",
-                getName(), mission.getName(), finishCount);
+        Log.debug(Debug.SET_PLAYER_MISSION_COMPLETED, getName(), mission.getName(), finishCount);
 
         if (finishCount > 0) {
             completedMissions.put(mission, finishCount);

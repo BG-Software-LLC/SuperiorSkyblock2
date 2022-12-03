@@ -180,8 +180,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
         Preconditions.checkNotNull(pos2, "pos2 parameter cannot be null.");
         Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
 
-        Log.debug(Debug.SAVE_SCHEMATIC, "SchematicsManagerImpl", "saveSchematic",
-                pos1, pos2, offsetX, offsetY, offsetZ, yaw, pitch, schematicName);
+        Log.debug(Debug.SAVE_SCHEMATIC, pos1, pos2, offsetX, offsetY, offsetZ, yaw, pitch, schematicName);
 
         World world = pos1.getWorld();
         Location min = new Location(world,

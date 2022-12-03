@@ -286,7 +286,7 @@ public class PlayersListener implements Listener {
                     !plugin.getSettings().getVoidTeleport().isVisitors() : !plugin.getSettings().getVoidTeleport().isMembers()))
                 return;
 
-            Log.debug(Debug.VOID_TELEPORT, "PlayersListener", "onPlayerMove", superiorPlayer.getName());
+            Log.debug(Debug.VOID_TELEPORT, superiorPlayer.getName());
 
             noFallDamage.add(e.getPlayer().getUniqueId());
             superiorPlayer.teleport(island, result -> {

@@ -657,7 +657,7 @@ public class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains(eventName))
             return EventResult.of(false, def);
 
-        Log.debug(Debug.FIRE_EVENT, "EventsBus", "callEvent", eventName);
+        Log.debug(Debug.FIRE_EVENT, eventName);
 
         E event = eventSupplier.get();
 
@@ -666,8 +666,8 @@ public class EventsBus {
         boolean cancelled = event.isCancelled();
         T result = getResultFunction.apply(event);
 
-        Log.debugResult(Debug.FIRE_EVENT, "EventsBus", "callEvent", "Cancelled:", cancelled);
-        Log.debugResult(Debug.FIRE_EVENT, "EventsBus", "callEvent", "Result:", result);
+        Log.debugResult(Debug.FIRE_EVENT, "Cancelled:", cancelled);
+        Log.debugResult(Debug.FIRE_EVENT, "Result:", result);
 
         return EventResult.of(cancelled, result);
     }
@@ -676,19 +676,19 @@ public class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains(eventName))
             return true;
 
-        Log.debug(Debug.FIRE_EVENT, "EventsBus", "callEvent", eventName);
+        Log.debug(Debug.FIRE_EVENT, eventName);
 
         E event = eventSupplier.get();
 
         Bukkit.getPluginManager().callEvent(event);
 
-        Log.debugResult(Debug.FIRE_EVENT, "EventsBus", "callEvent", "Cancelled:", event.isCancelled());
+        Log.debugResult(Debug.FIRE_EVENT, "Cancelled:", event.isCancelled());
 
         return !event.isCancelled();
     }
 
     private static <T extends Event> T callEvent(T event) {
-        Log.debug(Debug.FIRE_EVENT, "EventsBus", "callEvent", event.getEventName());
+        Log.debug(Debug.FIRE_EVENT, event.getEventName());
         Bukkit.getPluginManager().callEvent(event);
         return event;
     }

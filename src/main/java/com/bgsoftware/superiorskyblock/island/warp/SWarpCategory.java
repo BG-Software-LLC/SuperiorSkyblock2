@@ -54,7 +54,7 @@ public class SWarpCategory implements WarpCategory {
     public void setName(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
 
-        Log.debug(Debug.SET_WARP_CATEGORY_NAME, "SWarpCategory", "setName", getOwnerName(), this.name, name);
+        Log.debug(Debug.SET_WARP_CATEGORY_NAME, getOwnerName(), this.name, name);
 
         String oldName = this.name;
         this.name = name;
@@ -77,7 +77,7 @@ public class SWarpCategory implements WarpCategory {
 
     @Override
     public void setSlot(int slot) {
-        Log.debug(Debug.SET_WARP_CATEGORY_SLOT, "SWarpCategory", "setSlot", getOwnerName(), this.name, slot);
+        Log.debug(Debug.SET_WARP_CATEGORY_SLOT, getOwnerName(), this.name, slot);
 
         this.slot = slot;
 
@@ -98,7 +98,7 @@ public class SWarpCategory implements WarpCategory {
 
     @Override
     public void setIcon(@Nullable ItemStack icon) {
-        Log.debug(Debug.SET_WARP_CATEGORY_ICON, "SWarpCategory", "setSlot", getOwnerName(), this.name, icon);
+        Log.debug(Debug.SET_WARP_CATEGORY_ICON, getOwnerName(), this.name, icon);
 
         this.icon = icon == null ? DEFAULT_WARP_ICON.clone() : icon.clone();
 

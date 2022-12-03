@@ -39,7 +39,7 @@ public class ItemSkulls {
         try {
             cfg.syncWithConfig(file, plugin.getResource("heads.yml"));
         } catch (Exception error) {
-            Log.entering("ItemSkulls", "readTextures", "ENTER");
+            Log.entering("ENTER");
             Log.error(error, "An unexpected error occurred while syncing heads file:");
         }
 

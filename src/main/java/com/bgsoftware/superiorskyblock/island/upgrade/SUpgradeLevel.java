@@ -119,8 +119,7 @@ public class SUpgradeLevel implements UpgradeLevel {
                     if (!Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + ""))
                         return requirement.getErrorMessage();
                 } catch (ScriptException error) {
-                    Log.entering("SUpgradeLevel", "checkRequirements", "ENTER",
-                            level, superiorPlayer.getName(), requirement.getPlaceholder());
+                    Log.entering("ENTER", level, superiorPlayer.getName(), requirement.getPlaceholder());
                     Log.error(error, "An unexpected error occurred while checking for upgrade requirement:");
                 }
             }

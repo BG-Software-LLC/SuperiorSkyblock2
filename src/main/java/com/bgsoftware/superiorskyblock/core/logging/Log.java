@@ -47,35 +47,27 @@ public class Log {
         error.printStackTrace();
     }
 
-    public static void debug(Debug debug, String clazz, String method, Object... params) {
+    public static void debug(Debug debug, Object... params) {
         if (isDebugged(debug)) {
-            entering(clazz, method, null, params);
+            String[] classAndMethod = getClassAndMethodNames();
+            enteringInternal(Level.INFO, classAndMethod[0], classAndMethod[1], null, params);
             if (isDebugged(Debug.SHOW_STACKTRACE))
                 printStackTrace();
         }
     }
 
-    public static void debugResult(Debug debug, String clazz, String method, @Nullable String message, Object result) {
+    public static void debugResult(Debug debug, @Nullable String message, Object result) {
         if (isDebugged(debug)) {
-            entering(clazz, method, message, result);
+            String[] classAndMethod = getClassAndMethodNames();
+            enteringInternal(Level.INFO, classAndMethod[0], classAndMethod[1], message, result);
             if (isDebugged(Debug.SHOW_STACKTRACE))
                 printStackTrace();
         }
     }
 
-    public static void debugResult(Debug debug, String clazz, String method, @Nullable String message, Throwable error) {
-        if (isDebugged(debug)) {
-            enteringInternal(Level.SEVERE, clazz, method, message);
-            error.printStackTrace();
-        }
-    }
-
-    private static void printStackTrace() {
-        new Exception().printStackTrace();
-    }
-
-    public static void entering(String clazz, String method, @Nullable String message, Object... params) {
-        enteringInternal(Level.INFO, clazz, method, message, params);
+    public static void entering(@Nullable String message, Object... params) {
+        String[] classAndMethod = getClassAndMethodNames();
+        enteringInternal(Level.INFO, classAndMethod[0], classAndMethod[1], message, params);
     }
 
     public static boolean isDebugMode() {
@@ -127,6 +119,23 @@ public class Log {
         for (Object part : parts)
             builder.append(part);
         return builder.toString();
+    }
+
+    private static String[] getClassAndMethodNames() {
+        StackTraceElement currentElement = Thread.currentThread().getStackTrace()[3];
+
+        String methodName = currentElement.getMethodName();
+        if (methodName.contains("lambda")) {
+            methodName = methodName.split("\\$")[1];
+        }
+
+        String className = currentElement.getClassName();
+
+        return new String[]{className.substring(className.lastIndexOf(".") + 1), methodName};
+    }
+
+    private static void printStackTrace() {
+        new Exception().printStackTrace();
     }
 
 }

@@ -35,7 +35,7 @@ public class ChunksProvider {
         if (stopped)
             return new CompletableFuture<>();
 
-        Log.debug(Debug.LOAD_CHUNK, "ChunksProvider", "loadChunk", chunkPosition, chunkLoadReason);
+        Log.debug(Debug.LOAD_CHUNK, chunkPosition, chunkLoadReason);
 
         PendingChunkLoadRequest pendingRequest = pendingRequests.get(chunkPosition);
 
@@ -85,12 +85,12 @@ public class ChunksProvider {
             if (stopped)
                 return;
 
-            Log.debug(Debug.LOAD_CHUNK, "ChunksProvider", "work", chunkPosition, chunkLoadReason);
+            Log.debug(Debug.LOAD_CHUNK, chunkPosition, chunkLoadReason);
 
             plugin.getProviders().getChunksProvider().loadChunk(chunkPosition.getWorld(),
                     chunkPosition.getX(), chunkPosition.getZ()).whenComplete((chunk, error) -> {
                 if (error != null) {
-                    Log.entering("ChunksProvider", "work", "ENTER", chunkPosition, chunkLoadReason);
+                    Log.entering("ENTER", chunkPosition, chunkLoadReason);
                     Log.error(error, "An unexpected error occurred while loading chunk:");
                     error.printStackTrace();
                 }
@@ -98,7 +98,7 @@ public class ChunksProvider {
                 try {
                     finishLoad(chunk);
                 } catch (Exception error2) {
-                    Log.entering("ChunksProvider", "work", "ENTER", chunkPosition, chunkLoadReason);
+                    Log.entering("ENTER", chunkPosition, chunkLoadReason);
                     Log.error(error2, "An unexpected error occurred while finishing chunk loading:");
                 }
             });
@@ -107,7 +107,7 @@ public class ChunksProvider {
         private void finishLoad(Chunk chunk) {
             PendingChunkLoadRequest pendingRequest = pendingRequests.remove(chunkPosition);
 
-            Log.debug(Debug.LOAD_CHUNK, "ChunksProvider", "finishLoad", chunkPosition, chunkLoadReason);
+            Log.debug(Debug.LOAD_CHUNK, chunkPosition, chunkLoadReason);
 
             if (pendingRequest != null) {
                 pendingRequest.callbacks.forEach(chunkConsumer -> chunkConsumer.accept(chunk));

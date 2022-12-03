@@ -64,8 +64,7 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
     @Override
     public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
         try {
-            Log.debug(Debug.PASTE_SCHEMATIC, "WorldEditSchematic", "pasteSchematic",
-                    this.name, island.getOwner().getName(), location);
+            Log.debug(Debug.PASTE_SCHEMATIC, this.name, island.getOwner().getName(), location);
 
             Object _point = AT.invoke(null, location.getBlockX(), location.getBlockY(), location.getBlockZ());
             EditSession editSession = PASTE.invoke(schematic, new BukkitWorld(location.getWorld()), _point, false, true, null);
@@ -76,8 +75,7 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
             }
 
             editSession.addNotifyTask(() -> {
-                Log.debugResult(Debug.PASTE_SCHEMATIC, "WorldEditSchematic", "pasteSchematic",
-                        "Task Finished", "");
+                Log.debugResult(Debug.PASTE_SCHEMATIC, "Task Finished", "");
 
                 try {
                     island.handleBlocksPlace(cachedCounts);

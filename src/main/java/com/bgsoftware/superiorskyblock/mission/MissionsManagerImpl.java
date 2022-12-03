@@ -175,8 +175,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             try {
                 return Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + "");
             } catch (ScriptException error) {
-                Log.entering("MissionsManagerImpl", "canPassAllChecks", "ENTER",
-                        superiorPlayer.getName(), mission.getName());
+                Log.entering("ENTER", superiorPlayer.getName(), mission.getName());
                 Log.error(error, "An unexpected error occurred while checking mission requirements:");
                 return false;
             }
@@ -216,8 +215,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             return;
         }
 
-        Log.debug(Debug.REWARD_MISSION, "MissionsManagerImpl", "rewardMission", mission.getName(),
-                superiorPlayer.getName(), checkAutoReward, forceReward);
+        Log.debug(Debug.REWARD_MISSION, mission.getName(), superiorPlayer.getName(), checkAutoReward, forceReward);
 
         synchronized (superiorPlayer) {
             MissionData missionData = missionDataOptional.get();

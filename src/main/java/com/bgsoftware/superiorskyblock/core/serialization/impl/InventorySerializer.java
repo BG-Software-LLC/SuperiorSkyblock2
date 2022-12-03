@@ -51,7 +51,7 @@ public class InventorySerializer implements ISerializer<ItemStack[], String> {
         try {
             compoundTag.write(dataOutput);
         } catch (Exception error) {
-            Log.entering("InventorySerializer", "serialize", "ENTER", Arrays.asList(serializable));
+            Log.entering("ENTER", Arrays.asList(serializable));
             Log.error(error, "An unexpected error occurred while serializing inventory:");
             return "";
         }
@@ -70,7 +70,7 @@ public class InventorySerializer implements ISerializer<ItemStack[], String> {
         try {
             compoundTag = (CompoundTag) Tag.fromStream(new DataInputStream(inputStream), 0);
         } catch (Exception error) {
-            Log.entering("InventorySerializer", "deserialize", "ENTER", deserializable);
+            Log.entering("ENTER", deserializable);
             Log.error(error, "An unexpected error occurred while deserializing inventory:");
             return EMPTY_CONTENTS;
         }

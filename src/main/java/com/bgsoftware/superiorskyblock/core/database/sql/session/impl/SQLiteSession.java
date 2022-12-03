@@ -160,7 +160,7 @@ public class SQLiteSession implements SQLSession {
     public void customQuery(String query, QueryResult<PreparedStatement> queryResult) {
         Preconditions.checkNotNull(this.conn, "Session was not initialized.");
 
-        Log.debug(Debug.DATABASE_QUERY, "SQLiteSession", "customQuery", query);
+        Log.debug(Debug.DATABASE_QUERY, query);
 
         try (PreparedStatement preparedStatement =
                      this.conn.prepareStatement(query.replace("{prefix}", ""))) {
@@ -179,7 +179,7 @@ public class SQLiteSession implements SQLSession {
                 .replace("LONG_UNIQUE_TEXT", "VARCHAR(255)")
                 .replace("UNIQUE_TEXT", "VARCHAR(30)");
 
-        Log.debug(Debug.DATABASE_QUERY, "SQLiteSession", "executeUpdate", query);
+        Log.debug(Debug.DATABASE_QUERY, query);
 
         try (PreparedStatement preparedStatement = this.conn.prepareStatement(query)) {
             preparedStatement.executeUpdate();
@@ -192,7 +192,7 @@ public class SQLiteSession implements SQLSession {
     private void executeQuery(String query, QueryResult<ResultSet> queryResult) {
         Preconditions.checkNotNull(this.conn, "Session was not initialized.");
 
-        Log.debug(Debug.DATABASE_QUERY, "SQLiteSession", "executeQuery", query);
+        Log.debug(Debug.DATABASE_QUERY, query);
 
         try (PreparedStatement preparedStatement = this.conn.prepareStatement(query);
              ResultSet resultSet = preparedStatement.executeQuery()) {

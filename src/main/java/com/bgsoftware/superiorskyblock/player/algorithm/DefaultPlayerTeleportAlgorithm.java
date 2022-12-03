@@ -46,31 +46,25 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
         Preconditions.checkNotNull(homeLocation, "Cannot find a suitable home location for island " +
                 island.getUniqueId());
 
-        Log.debug(Debug.TELEPORT_PLAYER, "DefaultPlayerTeleportAlgorithm", "teleport",
-                player.getName(), island.getOwner().getName(), environment);
+        Log.debug(Debug.TELEPORT_PLAYER, player.getName(), island.getOwner().getName(), environment);
 
         CompletableFuture<Boolean> teleportResult = new CompletableFuture<>();
 
         EntityTeleports.findIslandSafeLocation(island, environment).whenComplete((safeSpot, error) -> {
             if (error != null) {
-                Log.debugResult(Debug.TELEPORT_PLAYER, "DefaultPlayerTeleportAlgorithm", "teleport",
-                        "Teleport Location", (Object) null);
+                Log.debugResult(Debug.TELEPORT_PLAYER, "Teleport Location", null);
                 teleportResult.completeExceptionally(error);
             } else if (safeSpot == null) {
-                Log.debugResult(Debug.TELEPORT_PLAYER, "DefaultPlayerTeleportAlgorithm", "teleport",
-                        "Teleport Location", (Object) null);
+                Log.debugResult(Debug.TELEPORT_PLAYER, "Teleport Location", null);
                 teleportResult.complete(false);
             } else {
-                Log.debugResult(Debug.TELEPORT_PLAYER, "DefaultPlayerTeleportAlgorithm", "teleport",
-                        "Teleport Location", safeSpot);
+                Log.debugResult(Debug.TELEPORT_PLAYER, "Teleport Location", safeSpot);
                 teleport(player, safeSpot).whenComplete((teleport, teleportError) -> {
                     if (teleportError != null) {
-                        Log.debugResult(Debug.TELEPORT_PLAYER, "DefaultPlayerTeleportAlgorithm", "teleport",
-                                "Teleport Result", false);
+                        Log.debugResult(Debug.TELEPORT_PLAYER, "Teleport Result", false);
                         teleportResult.completeExceptionally(teleportError);
                     } else {
-                        Log.debugResult(Debug.TELEPORT_PLAYER, "DefaultPlayerTeleportAlgorithm", "teleport",
-                                "Teleport Result", true);
+                        Log.debugResult(Debug.TELEPORT_PLAYER, "Teleport Result", true);
                         teleportResult.complete(teleport);
                     }
                 });

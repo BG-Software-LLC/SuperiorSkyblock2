@@ -593,7 +593,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         } catch (ClassNotFoundException ignored) {
             return Optional.empty();
         } catch (Exception error) {
-            Log.entering("ProvidersManagerImpl", "createInstance", "ENTER", className);
+            Log.entering("ENTER", className);
             Log.error(error, "An unexpected error occurred while creating hook instance:");
             return Optional.empty();
         }

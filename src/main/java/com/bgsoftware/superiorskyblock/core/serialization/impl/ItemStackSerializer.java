@@ -39,7 +39,7 @@ public class ItemStackSerializer implements ISerializer<ItemStack, String> {
         try {
             Serializers.ITEM_STACK_TO_TAG_SERIALIZER.serialize(serializable).write(dataOutput);
         } catch (Exception error) {
-            Log.entering("ItemStackSerializer", "serialize", "ENTER", serializable);
+            Log.entering("ENTER", serializable);
             Log.error(error, "An unexpected error occurred while serializing item:");
             return "";
         }
@@ -59,7 +59,7 @@ public class ItemStackSerializer implements ISerializer<ItemStack, String> {
             CompoundTag compoundTag = (CompoundTag) Tag.fromStream(new DataInputStream(inputStream), 0);
             return Serializers.ITEM_STACK_TO_TAG_SERIALIZER.deserialize(compoundTag);
         } catch (Exception error) {
-            Log.entering("ItemStackSerializer", "deserialize", "ENTER", deserializable);
+            Log.entering("ENTER", deserializable);
             Log.error(error, "An unexpected error occurred while deserializing item:");
             return null;
         }

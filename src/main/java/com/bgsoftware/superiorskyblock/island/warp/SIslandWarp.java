@@ -49,7 +49,7 @@ public class SIslandWarp implements IslandWarp {
     public void setName(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
 
-        Log.debug(Debug.SET_WARP_NAME, "SIslandWarp", "setName", getOwnerName(), this.name, name);
+        Log.debug(Debug.SET_WARP_NAME, getOwnerName(), this.name, name);
 
         String oldName = this.name;
         this.name = name;
@@ -66,7 +66,7 @@ public class SIslandWarp implements IslandWarp {
     public void setLocation(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
 
-        Log.debug(Debug.SET_WARP_LOCATION, "SIslandWarp", "setLocation", getOwnerName(), this.name, location);
+        Log.debug(Debug.SET_WARP_LOCATION, getOwnerName(), this.name, location);
 
         this.location = location.clone();
 
@@ -80,7 +80,7 @@ public class SIslandWarp implements IslandWarp {
 
     @Override
     public void setPrivateFlag(boolean privateFlag) {
-        Log.debug(Debug.SET_WARP_PRIVATE, "SIslandWarp", "setPrivateFlag", getOwnerName(), this.name, privateFlag);
+        Log.debug(Debug.SET_WARP_PRIVATE, getOwnerName(), this.name, privateFlag);
 
         this.isPrivate = privateFlag;
 
@@ -109,7 +109,7 @@ public class SIslandWarp implements IslandWarp {
 
     @Override
     public void setIcon(ItemStack icon) {
-        Log.debug(Debug.SET_WARP_ICON, "SIslandWarp", "setIcon", getOwnerName(), this.name, icon);
+        Log.debug(Debug.SET_WARP_ICON, getOwnerName(), this.name, icon);
 
         this.icon = icon == null ? null : icon.clone();
 

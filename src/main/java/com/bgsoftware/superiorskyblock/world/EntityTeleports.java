@@ -70,14 +70,12 @@ public class EntityTeleports {
         Preconditions.checkNotNull(homeLocation, "Cannot find a suitable home location for island " +
                 island.getUniqueId());
 
-        Log.debug(Debug.FIND_SAFE_TELEPORT, "EntityTeleports", "findIslandSafeLocation",
-                island.getOwner().getName(), environment);
+        Log.debug(Debug.FIND_SAFE_TELEPORT, island.getOwner().getName(), environment);
 
         Block islandTeleportBlock = homeLocation.getBlock();
 
         if (island.isSpawn()) {
-            Log.debug(Debug.FIND_SAFE_TELEPORT, "EntityTeleports", "findIslandSafeLocation",
-                    "Result Location", homeLocation);
+            Log.debugResult(Debug.FIND_SAFE_TELEPORT, "Result Location", homeLocation);
             return CompletableFuture.completedFuture(homeLocation.add(0, 0.5, 0));
         }
 
@@ -198,8 +196,7 @@ public class EntityTeleports {
 
         Location locationResult = changeIslandHome(island, homeLocation).add(0, 1.5, 0);
 
-        Log.debug(Debug.FIND_SAFE_TELEPORT, "EntityTeleports", "findIslandSafeLocation",
-                "Result Location", locationResult);
+        Log.debugResult(Debug.FIND_SAFE_TELEPORT, "Result Location", locationResult);
 
         result.accept(locationResult);
     }
@@ -225,8 +222,7 @@ public class EntityTeleports {
 
             toTeleport = changeIslandHome(island, toTeleport).add(0, 1.5, 0);
 
-            Log.debug(Debug.FIND_SAFE_TELEPORT, "EntityTeleports", "findIslandSafeLocation",
-                    "Result Location", toTeleport);
+            Log.debugResult(Debug.FIND_SAFE_TELEPORT, "Result Location", toTeleport);
 
             if (teleportResult != null)
                 teleportResult.accept(true, toTeleport);

@@ -105,7 +105,7 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
         if (!plugin.getEventsBus().callPlayerOpenMenuEvent(inventoryViewer, this))
             return;
 
-        Log.debug(Debug.OPEN_MENU, getClass().getName(), "open", inventoryViewer.getName());
+        Log.debug(Debug.OPEN_MENU, inventoryViewer.getName());
 
         if (inventory == null || menu.getLayout() == null) {
             if (!(menu instanceof MenuBlank)) {

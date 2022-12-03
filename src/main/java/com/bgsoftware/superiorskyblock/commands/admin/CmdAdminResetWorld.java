@@ -86,8 +86,7 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
             try {
                 world = island.getCenter(environment).getWorld();
             } catch (NullPointerException error) {
-                Log.entering("CmdAdminResetWorld", "execute", "ENTER",
-                        island.getOwner().getName(), environment);
+                Log.entering("ENTER", island.getOwner().getName(), environment);
                 Log.error(error, "An unexpected error occurred while resetting world:");
                 return;
             }

@@ -56,7 +56,7 @@ public class Resources {
                 file.renameTo(dest);
             }
         } catch (Exception error) {
-            Log.entering("Resources", "saveResource", "ENTER", destination, resourcePath);
+            Log.entering("ENTER", destination, resourcePath);
             Log.error(error, "An unexpected error occurred while saving resource:");
         }
     }
@@ -76,7 +76,7 @@ public class Resources {
 
             return plugin.getResource(resourcePath);
         } catch (Exception error) {
-            Log.entering("Resources", "getResource", "ENTER", resourcePath);
+            Log.entering("ENTER", resourcePath);
             Log.error(error, "An unexpected error occurred while retrieving resource:");
             return null;
         }

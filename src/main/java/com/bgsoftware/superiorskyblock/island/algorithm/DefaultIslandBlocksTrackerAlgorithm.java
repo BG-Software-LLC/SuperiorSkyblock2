@@ -52,8 +52,7 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
         boolean valuesMenu = plugin.getBlockValues().isValuesMenu(key);
 
         if (increaseAmount || hasBlockLimit || valuesMenu) {
-            Log.debug(Debug.BLOCK_PLACE, "DefaultIslandBlocksTrackerAlgorithm", "trackBlock",
-                    island.getOwner().getName(), key, amount);
+            Log.debug(Debug.BLOCK_PLACE, island.getOwner().getName(), key, amount);
 
             addCounts(key, amount);
 
@@ -88,8 +87,7 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
         boolean valuesMenu = plugin.getBlockValues().isValuesMenu(key);
 
         if (decreaseAmount || hasBlockLimit || valuesMenu) {
-            Log.debug(Debug.BLOCK_BREAK, "DefaultIslandBlocksTrackerAlgorithm", "untrackBlock",
-                    island.getOwner().getName(), key, amount);
+            Log.debug(Debug.BLOCK_BREAK, island.getOwner().getName(), key, amount);
 
             Key valueKey = plugin.getBlockValues().getBlockKey(key);
             removeCounts(valueKey, amount);
@@ -145,8 +143,7 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
     private void addCounts(Key key, BigInteger amount) {
         Key valueKey = plugin.getBlockValues().getBlockKey(key);
 
-        Log.debug(Debug.BLOCK_COUNT_INCREASE, "DefaultIslandBlocksTrackerAlgorithm", "addCounts",
-                island.getOwner().getName(), key, amount);
+        Log.debug(Debug.BLOCK_COUNT_INCREASE, island.getOwner().getName(), key, amount);
 
         BigInteger currentAmount = blockCounts.getRaw(valueKey, BigInteger.ZERO);
         blockCounts.put(valueKey, currentAmount.add(amount));
@@ -159,8 +156,7 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
         boolean limitCount = false;
 
         if (!limitKey.equals(valueKey)) {
-            Log.debugResult(Debug.BLOCK_COUNT_INCREASE, "DefaultIslandBlocksTrackerAlgorithm",
-                    "addCounts", "Limit Key", limitKey);
+            Log.debugResult(Debug.BLOCK_COUNT_INCREASE, "Limit Key", limitKey);
             currentAmount = blockCounts.getRaw(limitKey, BigInteger.ZERO);
             blockCounts.put(limitKey, currentAmount.add(amount));
             limitCount = true;
@@ -169,16 +165,14 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
         if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
                 (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() != 0 ||
                         plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() != 0)) {
-            Log.debugResult(Debug.BLOCK_COUNT_INCREASE, "DefaultIslandBlocksTrackerAlgorithm",
-                    "addCounts", "Global Key", globalKey);
+            Log.debugResult(Debug.BLOCK_COUNT_INCREASE, "Global Key", globalKey);
             currentAmount = blockCounts.getRaw(globalKey, BigInteger.ZERO);
             blockCounts.put(globalKey, currentAmount.add(amount));
         }
     }
 
     private void removeCounts(Key key, BigInteger amount) {
-        Log.debug(Debug.BLOCK_COUNT_DECREASE, "DefaultIslandBlocksTrackerAlgorithm", "removeCounts",
-                island.getOwner().getName(), key, amount);
+        Log.debug(Debug.BLOCK_COUNT_DECREASE, island.getOwner().getName(), key, amount);
         BigInteger currentAmount = blockCounts.getRaw(key, BigInteger.ZERO);
         if (currentAmount.compareTo(amount) <= 0)
             blockCounts.remove(key);

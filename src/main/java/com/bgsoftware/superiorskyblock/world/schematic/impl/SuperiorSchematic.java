@@ -116,8 +116,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
             return;
         }
 
-        Log.debug(Debug.PASTE_SCHEMATIC, "SuperiorSchematic", "pasteSchematic",
-                this.name, island.getOwner().getName(), location);
+        Log.debug(Debug.PASTE_SCHEMATIC, this.name, island.getOwner().getName(), location);
 
         WorldEditSession worldEditSession = plugin.getNMSWorld().createEditSession(location.getWorld());
         Location min = this.offset.applyToLocation(location);
@@ -157,11 +156,9 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
                     island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
 
-                    Log.debugResult(Debug.PASTE_SCHEMATIC, "SuperiorSchematic", "pasteSchematic",
-                            "Loaded Chunk", chunkPosition);
+                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Loaded Chunk", chunkPosition);
                 } catch (Throwable error) {
-                    Log.debugResult(Debug.PASTE_SCHEMATIC, "SuperiorSchematic", "pasteSchematic",
-                            "Failed Loading Chunk", error);
+                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Failed Loading Chunk", error);
                     failed.set(true);
                     if (onFailure != null)
                         onFailure.accept(error);
@@ -173,8 +170,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
             if (failed.get())
                 return;
 
-            Log.debugResult(Debug.PASTE_SCHEMATIC, "SuperiorSchematic", "pasteSchematic",
-                    "Finished Chunks Loading", "");
+            Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Chunks Loading", "");
 
             BukkitExecutor.ensureMain(() -> {
                 try {
@@ -195,8 +191,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                     callback.run();
                     this.affectedChunks = null;
                 } catch (Throwable error2) {
-                    Log.debugResult(Debug.PASTE_SCHEMATIC, "SuperiorSchematic", "pasteSchematic",
-                            "Failed Finishing Placement", error2);
+                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Failed Finishing Placement", error2);
                     if (onFailure != null)
                         onFailure.accept(error2);
                 }

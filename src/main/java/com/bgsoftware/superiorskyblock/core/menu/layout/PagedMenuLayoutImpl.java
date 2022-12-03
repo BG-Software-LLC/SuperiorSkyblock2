@@ -68,7 +68,7 @@ public class PagedMenuLayoutImpl<V extends MenuView<V, ?>, E> extends AbstractMe
             try {
                 buttonItem = button.createViewItem();
             } catch (Exception error) {
-                Log.entering(getClass().getName(), "setupInventory", "ENTER", slot);
+                Log.entering("ENTER", slot);
                 Log.error(error, "An unexpected error occurred while setting up menu:");
                 return;
             }
