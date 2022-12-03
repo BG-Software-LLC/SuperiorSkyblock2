@@ -24,6 +24,8 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.PortalType;
@@ -653,23 +655,38 @@ public class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains(eventName))
             return EventResult.of(false, def);
 
+        Log.debug(Debug.FIRE_EVENT, "EventsBus", "callEvent", eventName);
+
         E event = eventSupplier.get();
 
         Bukkit.getPluginManager().callEvent(event);
-        return EventResult.of(event.isCancelled(), getResultFunction.apply(event));
+
+        boolean cancelled = event.isCancelled();
+        T result = getResultFunction.apply(event);
+
+        Log.debugResult(Debug.FIRE_EVENT, "EventsBus", "callEvent", "Cancelled:", cancelled);
+        Log.debugResult(Debug.FIRE_EVENT, "EventsBus", "callEvent", "Result:", result);
+
+        return EventResult.of(cancelled, result);
     }
 
     private <E extends Event & Cancellable> boolean callEvent(Supplier<E> eventSupplier, String eventName) {
         if (plugin.getSettings().getDisabledEvents().contains(eventName))
             return true;
 
+        Log.debug(Debug.FIRE_EVENT, "EventsBus", "callEvent", eventName);
+
         E event = eventSupplier.get();
 
         Bukkit.getPluginManager().callEvent(event);
+
+        Log.debugResult(Debug.FIRE_EVENT, "EventsBus", "callEvent", "Cancelled:", event.isCancelled());
+
         return !event.isCancelled();
     }
 
     private static <T extends Event> T callEvent(T event) {
+        Log.debug(Debug.FIRE_EVENT, "EventsBus", "callEvent", event.getEventName());
         Bukkit.getPluginManager().callEvent(event);
         return event;
     }

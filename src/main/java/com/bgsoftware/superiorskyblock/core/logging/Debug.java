@@ -130,6 +130,7 @@ public enum Debug {
     TELEPORT_PLAYER,
     LOAD_CHUNK,
     PASTE_SCHEMATIC,
+    FIRE_EVENT,
 
     SHOW_STACKTRACE;
 
