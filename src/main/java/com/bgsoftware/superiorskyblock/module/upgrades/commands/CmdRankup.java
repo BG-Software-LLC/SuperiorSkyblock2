@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
@@ -106,7 +107,7 @@ public class CmdRankup implements IPermissibleCommand {
                 hasNextLevel = false;
             } else {
                 EventResult<EventsBus.UpgradeResult> event = plugin.getEventsBus().callIslandUpgradeEvent(
-                        superiorPlayer, island, upgrade, upgradeLevel);
+                        superiorPlayer, island, upgrade, upgradeLevel, IslandUpgradeEvent.Cause.PLAYER_RANKUP);
 
                 UpgradeCost upgradeCost = event.getResult().getUpgradeCost();
 

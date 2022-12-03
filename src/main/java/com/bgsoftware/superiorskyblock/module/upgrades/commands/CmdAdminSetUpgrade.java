@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -83,7 +84,7 @@ public class CmdAdminSetUpgrade implements IAdminIslandCommand {
         }
 
         EventResult<EventsBus.UpgradeResult> eventResult = plugin.getEventsBus().callIslandUpgradeEvent(
-                sender, island, upgrade, upgrade.getUpgradeLevel(level));
+                sender, island, upgrade, upgrade.getUpgradeLevel(level), IslandUpgradeEvent.Cause.ADMIN_SET_UPGRADE);
 
         if (eventResult.isCancelled())
             return;

@@ -24,6 +24,7 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
     private final Upgrade upgrade;
     private final UpgradeLevel upgradeLevel;
     private final List<String> commands;
+    private final Cause cause;
     @Nullable
     private UpgradeCost upgradeCost;
     private boolean cancelled = false;
@@ -36,7 +37,7 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
      * @param upgradeName    The name of the upgrade.
      * @param commands       The commands that will be ran upon upgrade.
      * @param upgradeCost    The cost of the upgrade
-     * @deprecated See {@link #IslandUpgradeEvent(SuperiorPlayer, Island, Upgrade, UpgradeLevel, List, UpgradeCost)}
+     * @deprecated See {@link #IslandUpgradeEvent(SuperiorPlayer, Island, Upgrade, UpgradeLevel, List, Cause, UpgradeCost)}
      */
     @Deprecated
     public IslandUpgradeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, String upgradeName,
@@ -48,6 +49,7 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
         this.upgrade = Preconditions.checkNotNull(upgrade, "upgrade cannot be null");
         this.upgradeLevel = Preconditions.checkNotNull(island.getUpgradeLevel(upgrade), "upgradeLevel cannot be null");
         this.commands = new LinkedList<>(Preconditions.checkNotNull(commands, "commands cannot be null"));
+        this.cause = Cause.UNKONWN;
         this.upgradeCost = upgradeCost;
     }
 
@@ -63,13 +65,34 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
      * @param upgradeCost    The cost of the upgrade.
      *                       If null, there was no cost for the upgrade (For example, setupgrade command).
      */
+    @Deprecated
     public IslandUpgradeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Upgrade upgrade,
                               UpgradeLevel upgradeLevel, List<String> commands, @Nullable UpgradeCost upgradeCost) {
+        this(superiorPlayer, island, upgrade, upgradeLevel, commands, Cause.UNKONWN, upgradeCost);
+    }
+
+    /**
+     * The constructor for the event.
+     *
+     * @param superiorPlayer The player who upgraded the island.
+     *                       Can be null if ran by the console.
+     * @param island         The island that was upgraded.
+     * @param upgrade        The upgrade.
+     * @param upgradeLevel   The level that will be upgraded into.
+     * @param commands       The commands that will be running upon upgrade.
+     * @param upgradeCost    The cost of the upgrade.
+     *                       If null, there was no cost for the upgrade (For example, setupgrade command).
+     * @param cause          The cause of the upgrade.
+     */
+    public IslandUpgradeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Upgrade upgrade,
+                              UpgradeLevel upgradeLevel, List<String> commands, Cause cause,
+                              @Nullable UpgradeCost upgradeCost) {
         super(island);
         this.superiorPlayer = superiorPlayer;
         this.upgrade = Preconditions.checkNotNull(upgrade, "upgrade cannot be null");
         this.upgradeLevel = Preconditions.checkNotNull(upgradeLevel, "upgradeLevel cannot be null");
         this.commands = new LinkedList<>(Preconditions.checkNotNull(commands, "commands cannot be null"));
+        this.cause = Preconditions.checkNotNull(cause, "cause cannot be null");
         this.upgradeCost = upgradeCost;
     }
 
@@ -108,6 +131,13 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
      */
     public List<String> getCommands() {
         return commands;
+    }
+
+    /**
+     * Get the cause of this event.
+     */
+    public Cause getCause() {
+        return cause;
     }
 
     /**
@@ -175,6 +205,32 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
     @Override
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
+    }
+
+
+    public enum Cause {
+
+        /**
+         * Used when player runs '/is rankup'.
+         */
+        PLAYER_RANKUP,
+
+        /**
+         * Used when player or console runs '/is admin rankup'.
+         */
+        ADMIN_RANKUP,
+
+        /**
+         * Used when an admin or console runs '/is admin setupgrade'
+         */
+        ADMIN_SET_UPGRADE,
+
+        /**
+         * Used only for deprecated usage of the old constructors.
+         */
+        @Deprecated
+        UNKONWN
+
     }
 
 }

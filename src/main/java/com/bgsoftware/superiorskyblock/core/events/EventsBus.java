@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
@@ -517,20 +516,23 @@ public class EventsBus {
     }
 
     public EventResult<UpgradeResult> callIslandUpgradeEvent(CommandSender commandSender, Island island,
-                                                             Upgrade upgrade, UpgradeLevel upgradeLevel) {
+                                                             Upgrade upgrade, UpgradeLevel upgradeLevel,
+                                                             IslandUpgradeEvent.Cause cause) {
         return callIslandUpgradeEvent(getSuperiorPlayer(commandSender), island, upgrade, upgradeLevel,
-                Collections.emptyList(), null);
-    }
-
-    public EventResult<UpgradeResult> callIslandUpgradeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island,
-                                                             Upgrade upgrade, UpgradeLevel upgradeLevel) {
-        return callIslandUpgradeEvent(superiorPlayer, island, upgrade, upgradeLevel, upgradeLevel.getCommands(), upgradeLevel.getCost());
+                Collections.emptyList(), cause, null);
     }
 
     public EventResult<UpgradeResult> callIslandUpgradeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island,
                                                              Upgrade upgrade, UpgradeLevel upgradeLevel,
-                                                             List<String> commands, @Nullable UpgradeCost upgradeCost) {
-        return callEvent(() -> new IslandUpgradeEvent(superiorPlayer, island, upgrade, upgradeLevel, commands, upgradeCost),
+                                                             IslandUpgradeEvent.Cause cause) {
+        return callIslandUpgradeEvent(superiorPlayer, island, upgrade, upgradeLevel, upgradeLevel.getCommands(), cause, upgradeLevel.getCost());
+    }
+
+    public EventResult<UpgradeResult> callIslandUpgradeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island,
+                                                             Upgrade upgrade, UpgradeLevel upgradeLevel,
+                                                             List<String> commands, IslandUpgradeEvent.Cause cause,
+                                                             @Nullable UpgradeCost upgradeCost) {
+        return callEvent(() -> new IslandUpgradeEvent(superiorPlayer, island, upgrade, upgradeLevel, commands, cause, upgradeCost),
                 "islandupgradeevent", new UpgradeResult(commands, upgradeCost), UpgradeResult::new);
     }
 

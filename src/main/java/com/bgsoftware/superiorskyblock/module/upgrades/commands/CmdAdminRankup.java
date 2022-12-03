@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
@@ -14,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
@@ -71,11 +73,13 @@ public class CmdAdminRankup implements IAdminIslandCommand {
         if (upgrade == null)
             return;
 
+        SuperiorPlayer playerSender = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
+
         islands.forEach(island -> {
             UpgradeLevel upgradeLevel = island.getUpgradeLevel(upgrade);
 
             EventResult<EventsBus.UpgradeResult> event = plugin.getEventsBus().callIslandUpgradeEvent(
-                    (SuperiorPlayer) null, island, upgrade, upgradeLevel);
+                    playerSender, island, upgrade, upgradeLevel, IslandUpgradeEvent.Cause.PLAYER_RANKUP);
 
             if (!event.isCancelled()) {
                 PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
