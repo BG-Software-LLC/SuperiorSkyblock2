@@ -25,6 +25,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.PortalType;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -99,25 +100,31 @@ public class PortalsListener implements Listener {
             }
         }
 
-        if (!(e.getEntity() instanceof Player) || ServerVersion.isLessThan(ServerVersion.v1_16))
+        if (ServerVersion.isLessThan(ServerVersion.v1_16))
             return;
+
+        boolean isPlayer = e.getEntity() instanceof Player;
 
         Material originalMaterial = e.getLocation().getBlock().getType();
 
         PlayerTeleportEvent.TeleportCause teleportCause = originalMaterial == Materials.NETHER_PORTAL.toBukkitType() ?
                 PlayerTeleportEvent.TeleportCause.NETHER_PORTAL : PlayerTeleportEvent.TeleportCause.END_PORTAL;
 
-        if (teleportCause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ? Bukkit.getAllowNether() : Bukkit.getAllowEnd())
+        if (isPlayer && (teleportCause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ? Bukkit.getAllowNether() : Bukkit.getAllowEnd()))
             return;
 
         if (teleportCause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) {
-            int ticksDelay = ((Player) e.getEntity()).getGameMode() == GameMode.CREATIVE ? 1 : 80;
+            int ticksDelay = !isPlayer ? 0 : ((Player) e.getEntity()).getGameMode() == GameMode.CREATIVE ? 1 : 80;
             int portalTicks = plugin.getNMSEntities().getPortalTicks(e.getEntity());
             if (portalTicks != ticksDelay)
                 return;
         }
 
-        onPlayerPortal((Player) e.getEntity(), e.getLocation(), teleportCause, false);
+        if (isPlayer) {
+            onPlayerPortal((Player) e.getEntity(), e.getLocation(), teleportCause, false);
+        } else {
+            simulateEntityPortal(e.getEntity(), e.getLocation(), teleportCause);
+        }
     }
 
     public void onPlayerPortal(Player player, Location portalLocation,
@@ -138,26 +145,63 @@ public class PortalsListener implements Listener {
         if (!isAdminCommand && superiorPlayer.isImmunedToPortals())
             return true;
 
+        EntityPortalResult portalResult = simulateEntityPortal(player, portalLocation, teleportCause);
+
+        switch (portalResult) {
+            case PORTAL_NOT_IN_ISLAND:
+                return false;
+            case PENDING_TELEPORT:
+            case DESTINATION_NOT_ISLAND_WORLD:
+            case PORTAL_EVENT_CANCELLED:
+            case INVALID_SCHEMATIC:
+            case SUCCEED:
+                return true;
+            case WORLD_NOT_UNLOCKED: {
+                if (!Message.WORLD_NOT_UNLOCKED.isEmpty(superiorPlayer.getUserLocale())) {
+                    World.Environment originalDestination = getTargetWorld(portalLocation, teleportCause);
+                    Message.SCHEMATICS.send(superiorPlayer, Message.WORLD_NOT_UNLOCKED.getMessage(
+                            superiorPlayer.getUserLocale(), Formatters.CAPITALIZED_FORMATTER.format(originalDestination.name())));
+                }
+                return true;
+            }
+        }
+
+        throw new IllegalStateException("No handling for result: " + portalResult);
+    }
+
+    private enum EntityPortalResult {
+
+        PORTAL_NOT_IN_ISLAND,
+        DESTINATION_NOT_ISLAND_WORLD,
+        WORLD_NOT_UNLOCKED,
+        PENDING_TELEPORT,
+        PORTAL_EVENT_CANCELLED,
+        INVALID_SCHEMATIC,
+        SUCCEED
+
+    }
+
+    private EntityPortalResult simulateEntityPortal(Entity entity, Location portalLocation,
+                                                    PlayerTeleportEvent.TeleportCause teleportCause) {
         Island island = plugin.getGrid().getIslandAt(portalLocation);
 
-        if (island == null || !plugin.getGrid().isIslandsWorld(portalLocation.getWorld()))
-            return false;
+        if (island == null || !plugin.getGrid().isIslandsWorld(portalLocation.getWorld())) {
+            return EntityPortalResult.PORTAL_NOT_IN_ISLAND;
+        }
 
         World.Environment originalDestination = getTargetWorld(portalLocation, teleportCause);
 
-        if (plugin.getGrid().getIslandsWorld(island, originalDestination) == null)
-            return true;
+        if (plugin.getGrid().getIslandsWorld(island, originalDestination) == null) {
+            return EntityPortalResult.DESTINATION_NOT_ISLAND_WORLD;
+        }
 
         if (!isIslandWorldEnabled(originalDestination, island)) {
-            if (!Message.WORLD_NOT_UNLOCKED.isEmpty(superiorPlayer.getUserLocale()))
-                Message.SCHEMATICS.send(superiorPlayer, Message.WORLD_NOT_UNLOCKED.getMessage(
-                        superiorPlayer.getUserLocale(), Formatters.CAPITALIZED_FORMATTER.format(originalDestination.name())));
-            return true;
+            return EntityPortalResult.WORLD_NOT_UNLOCKED;
         }
 
         try {
             if (generatingSchematicsIslands.contains(island.getUniqueId()))
-                return true; // We want to prevent the players from being teleported in this time.
+                return EntityPortalResult.PENDING_TELEPORT; // We want to prevent the players from being teleported in this time.
 
             String destinationEnvironmentName = originalDestination.name().toLowerCase(Locale.ENGLISH);
             String islandSchematic = island.getSchematicName();
@@ -170,24 +214,37 @@ public class PortalsListener implements Listener {
                     PortalType.NETHER : PortalType.ENDER;
 
             boolean schematicGenerated = island.wasSchematicGenerated(originalDestination);
+            SuperiorPlayer superiorPlayer = entity instanceof Player ? plugin.getPlayers().getSuperiorPlayer(entity) : null;
 
-            EventResult<EventsBus.PortalEventResult> eventResult = plugin.getEventsBus().callIslandEnterPortalEvent(
-                    superiorPlayer, island, portalType, originalDestination, schematicGenerated ? null : originalSchematic,
-                    schematicGenerated);
+            World.Environment destination;
+            Schematic schematic;
+            boolean ignoreInvalidSchematic;
 
-            if (eventResult.isCancelled())
-                return true;
+            if (superiorPlayer != null) {
+                EventResult<EventsBus.PortalEventResult> eventResult = plugin.getEventsBus().callIslandEnterPortalEvent(
+                        superiorPlayer, island, portalType, originalDestination, schematicGenerated ? null : originalSchematic,
+                        schematicGenerated);
 
-            World.Environment destination = eventResult.getResult().getDestination();
-            Schematic schematic = eventResult.getResult().getSchematic();
-            boolean ignoreInvalidSchematic = eventResult.getResult().isIgnoreInvalidSchematic();
+                if (eventResult.isCancelled())
+                    return EntityPortalResult.PORTAL_EVENT_CANCELLED;
+
+                destination = eventResult.getResult().getDestination();
+                schematic = eventResult.getResult().getSchematic();
+                ignoreInvalidSchematic = eventResult.getResult().isIgnoreInvalidSchematic();
+            } else {
+                destination = originalDestination;
+                schematic = schematicGenerated ? null : originalSchematic;
+                ignoreInvalidSchematic = schematicGenerated;
+            }
 
             if (schematic == null && !ignoreInvalidSchematic) {
-                Message.SCHEMATICS.send(superiorPlayer, ChatColor.RED + "The server hasn't added a " +
-                        destinationEnvironmentName + " schematic. Please contact administrator to solve the problem. " +
-                        "The format for " + destinationEnvironmentName + " schematic is \"" +
-                        islandSchematic + "_" + destinationEnvironmentName + "\".");
-                return true;
+                if (superiorPlayer != null) {
+                    Message.SCHEMATICS.send(superiorPlayer, ChatColor.RED + "The server hasn't added a " +
+                            destinationEnvironmentName + " schematic. Please contact administrator to solve the problem. " +
+                            "The format for " + destinationEnvironmentName + " schematic is \"" +
+                            islandSchematic + "_" + destinationEnvironmentName + "\".");
+                }
+                return EntityPortalResult.INVALID_SCHEMATIC;
             }
 
             generatingSchematicsIslands.add(island.getUniqueId());
@@ -195,10 +252,19 @@ public class PortalsListener implements Listener {
             // If schematic was already generated, or no schematic should be generated, simply
             // teleport player to destination location.
             if (schematic == null || island.wasSchematicGenerated(destination)) {
-                superiorPlayer.teleport(island, destination, result -> {
-                    generatingSchematicsIslands.remove(island.getUniqueId());
-                });
-                return true;
+                if (superiorPlayer != null) {
+                    superiorPlayer.teleport(island, destination, result -> {
+                        generatingSchematicsIslands.remove(island.getUniqueId());
+                    });
+                } else {
+                    EntityTeleports.findIslandSafeLocation(island, destination).whenComplete((safeSpot, error) -> {
+                        generatingSchematicsIslands.remove(island.getUniqueId());
+
+                        if (error == null && safeSpot != null)
+                            EntityTeleports.teleport(entity, safeSpot);
+                    });
+                }
+                return EntityPortalResult.SUCCEED;
             }
 
             Location schematicPlacementLocation = island.getCenter(destination).subtract(0, 1, 0);
@@ -216,7 +282,7 @@ public class PortalsListener implements Listener {
                         BigDecimal schematicWorth = island.getRawWorth().subtract(originalWorth);
                         EventResult<BigDecimal> bonusEventResult = plugin.getEventsBus().callIslandChangeWorthBonusEvent(null, island,
                                 IslandChangeWorthBonusEvent.Reason.SCHEMATIC, island.getBonusWorth().subtract(schematicWorth));
-                        if (!eventResult.isCancelled())
+                        if (!bonusEventResult.isCancelled())
                             island.setBonusWorth(bonusEventResult.getResult());
                     }
                     {
@@ -230,22 +296,27 @@ public class PortalsListener implements Listener {
 
                 Location destinationLocation = island.getIslandHome(destination);
 
-                if (destination == World.Environment.THE_END) {
-                    plugin.getNMSDragonFight().awardTheEndAchievement(player);
+                if (destination == World.Environment.THE_END && superiorPlayer != null) {
+                    plugin.getNMSDragonFight().awardTheEndAchievement((Player) entity);
                     plugin.getServices().getDragonBattleService().resetEnderDragonBattle(island);
                 }
 
-                superiorPlayer.teleport(schematic.adjustRotation(destinationLocation));
+                if (superiorPlayer != null) {
+                    superiorPlayer.teleport(schematic.adjustRotation(destinationLocation));
+                } else {
+                    EntityTeleports.teleport(entity, schematic.adjustRotation(destinationLocation));
+                }
             }, error -> {
                 generatingSchematicsIslands.remove(island.getUniqueId());
                 error.printStackTrace();
-                Message.CREATE_WORLD_FAILURE.send(player);
+                if (superiorPlayer != null)
+                    Message.CREATE_WORLD_FAILURE.send(superiorPlayer);
             });
 
         } catch (NullPointerException ignored) {
         }
 
-        return true;
+        return EntityPortalResult.SUCCEED;
     }
 
     private boolean shouldOffsetSchematic(World.Environment environment) {

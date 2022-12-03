@@ -131,6 +131,7 @@ public enum Debug {
     LOAD_CHUNK,
     PASTE_SCHEMATIC,
     FIRE_EVENT,
+    FIND_SAFE_TELEPORT,
 
     SHOW_STACKTRACE;
 
