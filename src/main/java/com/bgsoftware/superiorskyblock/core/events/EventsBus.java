@@ -516,23 +516,23 @@ public class EventsBus {
     }
 
     public EventResult<UpgradeResult> callIslandUpgradeEvent(CommandSender commandSender, Island island,
-                                                             Upgrade upgrade, UpgradeLevel upgradeLevel,
+                                                             Upgrade upgrade, UpgradeLevel nextUpdate,
                                                              IslandUpgradeEvent.Cause cause) {
-        return callIslandUpgradeEvent(getSuperiorPlayer(commandSender), island, upgrade, upgradeLevel,
+        return callIslandUpgradeEvent(getSuperiorPlayer(commandSender), island, upgrade, nextUpdate,
                 Collections.emptyList(), cause, null);
     }
 
     public EventResult<UpgradeResult> callIslandUpgradeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island,
-                                                             Upgrade upgrade, UpgradeLevel upgradeLevel,
-                                                             IslandUpgradeEvent.Cause cause) {
-        return callIslandUpgradeEvent(superiorPlayer, island, upgrade, upgradeLevel, upgradeLevel.getCommands(), cause, upgradeLevel.getCost());
+                                                             Upgrade upgrade, UpgradeLevel currentLevel,
+                                                             UpgradeLevel nextLevel, IslandUpgradeEvent.Cause cause) {
+        return callIslandUpgradeEvent(superiorPlayer, island, upgrade, nextLevel, currentLevel.getCommands(), cause, currentLevel.getCost());
     }
 
     public EventResult<UpgradeResult> callIslandUpgradeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island,
-                                                             Upgrade upgrade, UpgradeLevel upgradeLevel,
+                                                             Upgrade upgrade, UpgradeLevel nextLevel,
                                                              List<String> commands, IslandUpgradeEvent.Cause cause,
                                                              @Nullable UpgradeCost upgradeCost) {
-        return callEvent(() -> new IslandUpgradeEvent(superiorPlayer, island, upgrade, upgradeLevel, commands, cause, upgradeCost),
+        return callEvent(() -> new IslandUpgradeEvent(superiorPlayer, island, upgrade, nextLevel, commands, cause, upgradeCost),
                 "islandupgradeevent", new UpgradeResult(commands, upgradeCost), UpgradeResult::new);
     }
 

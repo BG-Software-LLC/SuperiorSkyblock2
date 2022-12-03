@@ -80,10 +80,10 @@ public class CmdRankup implements IPermissibleCommand {
         if (upgrade == null)
             return;
 
-        UpgradeLevel upgradeLevel = island.getUpgradeLevel(upgrade);
-        UpgradeLevel nextUpgradeLevel = upgrade.getUpgradeLevel(upgradeLevel.getLevel() + 1);
+        UpgradeLevel currentLevel = island.getUpgradeLevel(upgrade);
+        UpgradeLevel nextLevel = upgrade.getUpgradeLevel(currentLevel.getLevel() + 1);
 
-        String permission = nextUpgradeLevel == null ? "" : nextUpgradeLevel.getPermission();
+        String permission = nextLevel == null ? "" : nextLevel.getPermission();
 
         if (!permission.isEmpty() && !superiorPlayer.hasPermission(permission)) {
             Message.NO_UPGRADE_PERMISSION.send(superiorPlayer);
@@ -100,14 +100,14 @@ public class CmdRankup implements IPermissibleCommand {
                     Duration.ofMillis(duration), superiorPlayer.getUserLocale()));
             hasNextLevel = false;
         } else {
-            String requiredCheckFailure = nextUpgradeLevel == null ? "" : nextUpgradeLevel.checkRequirements(superiorPlayer);
+            String requiredCheckFailure = nextLevel == null ? "" : nextLevel.checkRequirements(superiorPlayer);
 
             if (!requiredCheckFailure.isEmpty()) {
                 Message.CUSTOM.send(superiorPlayer, requiredCheckFailure, false);
                 hasNextLevel = false;
             } else {
                 EventResult<EventsBus.UpgradeResult> event = plugin.getEventsBus().callIslandUpgradeEvent(
-                        superiorPlayer, island, upgrade, upgradeLevel, IslandUpgradeEvent.Cause.PLAYER_RANKUP);
+                        superiorPlayer, island, upgrade, currentLevel, nextLevel, IslandUpgradeEvent.Cause.PLAYER_RANKUP);
 
                 UpgradeCost upgradeCost = event.getResult().getUpgradeCost();
 
@@ -136,7 +136,7 @@ public class CmdRankup implements IPermissibleCommand {
             }
         }
 
-        SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) upgradeLevel).getItemData();
+        SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) currentLevel).getItemData();
         GameSound sound = hasNextLevel ? itemData.hasNextLevelSound : itemData.noNextLevelSound;
 
         if (sound != null)
