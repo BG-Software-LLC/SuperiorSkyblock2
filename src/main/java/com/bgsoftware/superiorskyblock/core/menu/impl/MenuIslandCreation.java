@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.IslandCreationButto
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -25,7 +26,9 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, MenuIslandCreation.Args> {
 
@@ -39,10 +42,10 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
         return new View(superiorPlayer, previousMenuView, this, args);
     }
 
-    public void simulateClick(SuperiorPlayer superiorPlayer, String islandName, String schematic, boolean rightClick) {
+    public void simulateClick(SuperiorPlayer superiorPlayer, String islandName, String schematic, boolean isPreviewMode) {
         IslandCreationButton button = getButtonForSchematic(schematic);
         if (button != null)
-            button.clickButton(plugin, superiorPlayer.asPlayer(), rightClick, islandName, null);
+            button.clickButton(plugin, superiorPlayer.asPlayer(), isPreviewMode, islandName, null);
     }
 
     private IslandCreationButton getButtonForSchematic(String schematicName) {
@@ -50,6 +53,22 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
                 .filter(button -> button instanceof IslandCreationButton &&
                         ((IslandCreationButton) button).getTemplate().getSchematic().getName().equals(schematicName))
                 .findFirst().orElse(null);
+    }
+
+    public void openMenu(SuperiorPlayer superiorPlayer, @Nullable MenuView<?, ?> previousMenu, String islandName) {
+        if (isSkipOneItem()) {
+            List<String> schematicButtons = menuLayout.getButtons().stream()
+                    .filter(button -> button instanceof IslandCreationButton)
+                    .map(button -> ((IslandCreationButton) button).getTemplate().getSchematic().getName())
+                    .collect(Collectors.toList());
+
+            if (schematicButtons.size() == 1) {
+                simulateClick(superiorPlayer, islandName, schematicButtons.get(0), false);
+                return;
+            }
+        }
+
+        plugin.getMenus().openIslandCreation(superiorPlayer, MenuViewWrapper.fromView(previousMenu), islandName);
     }
 
     @Nullable

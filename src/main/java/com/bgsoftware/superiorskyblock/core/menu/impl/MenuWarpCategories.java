@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpCategoryPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
@@ -60,7 +61,7 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
         } else {
             WarpCategory warpCategory = island.getWarpCategories().values().stream().findFirst()
                     .orElseGet(() -> island.createWarpCategory("Default Category"));
-            plugin.getMenus().openWarps(superiorPlayer, MenuViewWrapper.fromView(previousMenu), warpCategory);
+            Menus.MENU_WARPS.openMenu(superiorPlayer, previousMenu, warpCategory);
         }
     }
 
