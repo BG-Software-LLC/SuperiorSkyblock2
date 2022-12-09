@@ -613,7 +613,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     }
 
     @Override
-    public MenusManager getMenus() {
+    public MenusManagerImpl getMenus() {
         return menusHandler;
     }
 

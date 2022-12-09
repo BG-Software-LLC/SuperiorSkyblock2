@@ -498,6 +498,10 @@ public class MenusManagerImpl extends Manager implements MenusManager {
         this.registeredMenus.put(menu.getIdentifier().toLowerCase(Locale.ENGLISH), menu);
     }
 
+    public void unregisterMenus() {
+        this.registeredMenus.clear();
+    }
+
     @Nullable
     @Override
     public <V extends MenuView<V, A>, A extends ViewArgs> Menu<V, A> getMenu(String identifier) {

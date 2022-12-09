@@ -61,6 +61,9 @@ public class MenusProvider_Default implements MenusProvider {
             guiFolder.renameTo(oldGuisFolder);
         }
 
+        // We first want to unregister all menus
+        plugin.getMenus().unregisterMenus();
+
         Menus.registerMenus();
 
         File customMenusFolder = new File(plugin.getDataFolder(), "menus/custom");
