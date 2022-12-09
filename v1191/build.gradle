@@ -26,7 +26,7 @@ assemble {
 
 tasks {
     reobfJar {
-        File outputFile = new File(parent.projectDir, "archive/${project.name}.jar")
+        File outputFile = new File(rootProject.archiveFolder, "reobf/${project.name}.jar")
         outputJar.set(layout.buildDirectory.file(outputFile.getPath()))
     }
 }

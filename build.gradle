@@ -7,6 +7,12 @@ plugins {
 group 'SuperiorSkyblock'
 version = "2022.9"
 
+project.ext {
+    archiveFolder = file("archive/")
+    targetFolder = file("target/")
+    buildVersion = System.getenv("BUILD_NUMBER") == null ? version : version + "-b" + System.getenv("BUILD_NUMBER")
+}
+
 allprojects {
     apply plugin: 'java'
     apply plugin: 'com.github.johnrengelman.shadow'
@@ -40,7 +46,7 @@ allprojects {
 subprojects {
     shadowJar {
         archiveFileName = "${project.name}.jar"
-        destinationDirectory = file("../archive/")
+        destinationDirectory = rootProject.archiveFolder
     }
 }
 
@@ -49,7 +55,7 @@ repositories {
 }
 
 dependencies {
-    implementation fileTree("archive")
+    implementation fileTree(rootProject.archiveFolder.getAbsolutePath())
     implementation project(":API")
 
     implementation 'com.bgsoftware.common.config:CommentedConfiguration:1.0.3'
@@ -68,7 +74,7 @@ dependencies {
 
 jar {
     from {
-        for (File file : new File("archive").listFiles()) {
+        for (File file : rootProject.archiveFolder.listFiles()) {
             zipTree(file)
         }
     }
@@ -76,11 +82,10 @@ jar {
 
 processResources {
     outputs.upToDateWhen { false }
-    String versionNumber = System.getenv("BUILD_NUMBER") == null ? version : version + "-b" + System.getenv("BUILD_NUMBER")
     eachFile { details ->
         if (details.name.contentEquals('plugin.yml')) {
             filter { String line ->
-                line.replace('${project.version}', versionNumber)
+                line.replace('${project.version}', rootProject.buildVersion)
             }
         }
     }
@@ -92,31 +97,25 @@ shadowJar {
     relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.libs.hikari'
     relocate 'org.bstats', 'com.bgsoftware.superiorskyblock.libs.bstats'
 
-    if (System.getenv("BUILD_NUMBER") == null) {
-        archiveName = rootProject.name + "-" + version + ".jar"
-    } else {
-        archiveName = rootProject.name + "-" + version + "-b" + System.getenv("BUILD_NUMBER") + ".jar"
-    }
+    archiveName = rootProject.name + "-" + rootProject.buildVersion + ".jar"
 
-    delete fileTree('./target/') {
-        exclude archiveName
-    }
+    delete fileTree(rootProject.targetFolder.getAbsolutePath())
 
     exclude '*exclude.jar'
 
-    destinationDir = file("./target/")
+    destinationDir = rootProject.targetFolder
     from sourceSets.getByName("main").output
     configurations = [project.configurations.getByName("runtimeClasspath")]
 }
 
 task copyAPI(type: Copy) {
-    from './archive/API.jar'
-    into './target/'
+    from rootProject.archiveFolder.getAbsolutePath() + '/API.jar'
+    into rootProject.targetFolder.getAbsolutePath()
     rename('API.jar', rootProject.name + 'API.jar')
 }
 
 clean {
-    delete file('./archive/')
+    delete rootProject.archiveFolder
 }
 
 build {
