@@ -56,7 +56,8 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
     }
 
     public void openMenu(SuperiorPlayer superiorPlayer, @Nullable MenuView<?, ?> previousMenu, Island island) {
-        if (plugin.getSettings().isWarpCategories()) {
+        // The warp categories menu should be opened only if A) its enabled B) there are more than 1 categories
+        if (plugin.getSettings().isWarpCategories() && island.getWarpCategories().size() > 1) {
             plugin.getMenus().openWarpCategories(superiorPlayer, MenuViewWrapper.fromView(previousMenu), island);
         } else {
             WarpCategory warpCategory = island.getWarpCategories().values().stream().findFirst()
