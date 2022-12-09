@@ -63,6 +63,10 @@ public class ManagerLoadException extends Exception {
         Log.error("## An error occured while loading the plugin! ##");
         Log.error("##                                            ##");
         Log.error("################################################");
+        if (!messageLines.isEmpty()) {
+            Log.error(" ");
+            messageLines.forEach(line -> Log.error(line));
+        }
         Log.error(" ");
         Log.error("Stack Trace:");
 
