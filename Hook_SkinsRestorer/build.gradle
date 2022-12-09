@@ -1,8 +1,7 @@
 group 'Hook_SkinsRestorer'
 
 dependencies {
-    compileOnly 'net.skinsrestorer:SkinsRestorer:latest'
-    compileOnly 'net.skinsrestorer:SkinsRestorer14:latest'
+    compileOnly 'net.skinsrestorer:SkinsRestorer:13.7.5'
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
     compileOnly parent

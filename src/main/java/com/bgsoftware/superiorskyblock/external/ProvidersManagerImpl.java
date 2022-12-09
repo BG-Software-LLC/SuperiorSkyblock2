@@ -360,14 +360,19 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     }
 
     private void registerGeneralHooks() {
-        if (canRegisterHook("LeaderHeads"))
-            registerHook("LeaderHeadsHook");
-
         if (canRegisterHook("JetsMinions"))
             registerHook("JetsMinionsHook");
 
-        if (canRegisterHook("SkinsRestorer"))
-            registerHook("SkinsRestorerHook");
+        if (canRegisterHook("SkinsRestorer")) {
+            try {
+                // Detection of old version
+                Class.forName("skinsrestorer.shared.storage.SkinStorage");
+                registerHook("SkinsRestorerHook");
+            } catch (ClassNotFoundException error) {
+                // New version was detected
+                registerHook("SkinsRestorer14Hook");
+            }
+        }
 
         if (canRegisterHook("ChangeSkin"))
             registerHook("ChangeSkinHook");

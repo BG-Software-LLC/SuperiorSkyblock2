@@ -1,7 +1,7 @@
 group 'Hook_Vault'
 
 dependencies {
-    compileOnly 'net.milkbowl:Vault:latest'
+    compileOnly 'net.milkbowl:Vault:1.6.1'
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
     compileOnly parent

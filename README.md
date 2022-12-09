@@ -16,25 +16,6 @@ You can compile the project using gradlew.<br>
 Run `gradlew build` in console to build the project.<br>
 You can find already compiled jars on our [Jenkins](https://hub.bg-software.com/) hub!<br>
 
-When compiling you will receive errors about missing dependencies.<br>
-These dependencies are premium plugins that cannot be published on a public repository.<br>
-You can do either of the followings in order to solve it:
-
-- Add manually all the jar files of the premium plugins.
-- Purchase access to our private repository.
-- Disabling compiling of the modules of these dependencies in the `gradle.properties` file.
-
-<br>
-
-### Private Jars
-
-- AdvancedSpawners by GC [[link]](https://advancedplugins.net/item/2)
-- CMI by Zrips [[link]](https://www.spigotmc.org/resources/3742/)
-- EpicSpawners by Songoda [[link]](https://songoda.com/marketplace/product/13)
-- JetsMinions by jet315 [[link]](https://www.spigotmc.org/resources/59972/)
-- MergedSpawner by vk2gpz [[link]](https://polymart.org/resource/189)
-- ShopGUIPlus by brcdev [[link]](https://www.spigotmc.org/resources/6515/)
-
 ## API
 
 The plugin is packed with a rich API for interacting with islands, players and more. When hooking into the plugin, it's
@@ -57,7 +38,7 @@ to do any additional changes to your code between updates.
 <dependency>
     <groupId>com.bgsoftware</groupId>
     <artifactId>SuperiorSkyblockAPI</artifactId>
-    <version>latest</version>
+    <version>VERSION</version>
     <scope>provided</scope>
 </dependency>
 </dependencies>
@@ -71,9 +52,11 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.bgsoftware:SuperiorSkyblockAPI:latest'
+    compileOnly 'com.bgsoftware:SuperiorSkyblockAPI:VERSION'
 }
 ```
+
+Make sure you replace `VERSION` with the matching version.
 
 ## Updates
 

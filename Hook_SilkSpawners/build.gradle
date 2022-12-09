@@ -1,7 +1,7 @@
 group 'Hook_SilkSpawners'
 
 dependencies {
-    compileOnly 'de.candc:SilkSpawners:latest'
+    compileOnly 'de.candc:SilkSpawners:1.6'
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
     compileOnly parent

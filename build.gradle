@@ -15,20 +15,7 @@ allprojects {
         maven { url 'https://repo.bg-software.com/repository/nms/' }
         maven { url 'https://repo.bg-software.com/repository/api/' }
         maven { url 'https://repo.bg-software.com/repository/common/' }
-        maven { url 'https://repo.bg-software.com/repository/public-libs/' }
-
-        String mavenUsername = System.getenv('mavenUsername') == null ? project.mavenUsername : System.getenv('mavenUsername');
-        String mavenPassword = System.getenv('mavenPassword') == null ? project.mavenPassword : System.getenv('mavenPassword');
-
-        if (mavenUsername != null && mavenPassword != null) {
-            maven {
-                url 'https://repo.bg-software.com/repository/private-libs/'
-                credentials {
-                    username mavenUsername
-                    password mavenPassword
-                }
-            }
-        }
+        maven { url 'https://repo.bg-software.com/repository/dependencies/' }
     }
 
     dependencies {
@@ -70,8 +57,8 @@ dependencies {
     implementation 'com.bgsoftware.common.reflection:ReflectionUtils:1.0.2'
     implementation 'com.bgsoftware.common.executors:Executors:1.0.1'
 
-    implementation 'com.zaxxer:HikariCP:latest'
-    implementation 'org.slf4j:SLF4J:latest'
+    implementation 'com.zaxxer:HikariCP:4.0.3'
+    implementation 'org.slf4j:slf4j-api:2.0.5'
     implementation 'org.bstats:bstats-bukkit:3.0.0'
 
     // Spigot jars

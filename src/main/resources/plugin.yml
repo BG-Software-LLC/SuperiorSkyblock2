@@ -16,7 +16,6 @@ softdepend:
   - Essentials
   - FastAsyncWorldEdit
   - JetsMinions
-  - LeaderHeads
   - LuckPerms
   - MergedSpawner
   - MVdWPlaceholderAPI

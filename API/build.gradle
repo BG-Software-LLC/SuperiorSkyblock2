@@ -21,8 +21,8 @@ publishing {
     }
 
     repositories {
-        String mavenUsername = System.getenv('mavenUsername') == null ? project.mavenUsername : System.getenv('mavenUsername');
-        String mavenPassword = System.getenv('mavenPassword') == null ? project.mavenPassword : System.getenv('mavenPassword');
+        String mavenUsername = System.getenv('mavenUsername');
+        String mavenPassword = System.getenv('mavenPassword');
 
         if (mavenUsername != null && mavenPassword != null) {
             maven {

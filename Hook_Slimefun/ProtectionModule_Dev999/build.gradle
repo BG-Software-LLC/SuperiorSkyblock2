@@ -1,0 +1,13 @@
+group 'ProtectionModule_Dev999'
+
+dependencies {
+    compileOnly 'me.mrcookieslime:Slimefun:4.Dev999'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_slimefun') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_slimefun").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

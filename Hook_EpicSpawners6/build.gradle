@@ -1,7 +1,7 @@
 group 'Hook_EpicSpawners6'
 
 dependencies {
-    compileOnly 'com.songoda:EpicSpawners-6:latest'
+    compileOnly 'com.songoda:EpicSpawners:6.0.6'
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
     compileOnly parent

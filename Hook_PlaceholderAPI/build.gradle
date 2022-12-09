@@ -1,7 +1,7 @@
 group 'Hook_PlaceholderAPI'
 
 dependencies {
-    compileOnly 'me.clip:PlaceholderAPI:latest'
+    compileOnly 'me.clip:PlaceholderAPI:2.10.3'
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
     compileOnly parent

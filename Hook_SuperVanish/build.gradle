@@ -1,7 +1,7 @@
 group 'Hook_SuperVanish'
 
 dependencies {
-    compileOnly 'de.myzelyam:SuperVanish:latest'
+    compileOnly 'de.myzelyam:SuperVanish:6.1.6'
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
     compileOnly parent

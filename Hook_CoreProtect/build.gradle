@@ -1,7 +1,7 @@
 group 'Hook_CoreProtect'
 
 dependencies {
-    compileOnly 'net.coreprotect:CoreProtect-6:latest'
+    compileOnly 'net.coreprotect:CoreProtect:19.0'
     compileOnly "org.spigotmc:v1_16_R3:latest"
     compileOnly project(":API")
     compileOnly parent

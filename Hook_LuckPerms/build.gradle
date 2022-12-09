@@ -1,7 +1,7 @@
 group 'Hook_LuckPerms'
 
 dependencies {
-    compileOnly 'net.luckperms:LuckPerms:latest'
+    compileOnly 'net.luckperms:LuckPerms:5.1.15'
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
     compileOnly parent
