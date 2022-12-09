@@ -43,6 +43,12 @@ public interface Menu<V extends MenuView<V, A>, A extends ViewArgs> {
     boolean isPreviousMoveAllowed();
 
     /**
+     * Get whether this menu should be skipped when it only contains one item.
+     * This is only useful for menus that have their buttons open other menus.
+     */
+    boolean isSkipOneItem();
+
+    /**
      * Create a new menu view for a player.
      * If the player already has a view opened, make sure you call {@link MenuView#setPreviousMove(boolean)} on
      * the opened view and pass 'false' as an argument, otherwise unexpected behavior may occur.

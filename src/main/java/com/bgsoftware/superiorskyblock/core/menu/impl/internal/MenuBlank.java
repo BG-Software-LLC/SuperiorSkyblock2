@@ -55,7 +55,7 @@ public class MenuBlank extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
         button.setClickSound(new GameSoundImpl(sound, 0.2f, 0.2f));
         patternBuilder.setButton(13, button.build());
 
-        return new MenuBlank(new MenuParseResult<>(patternBuilder, null, false, null, null));
+        return new MenuBlank(new MenuParseResult<>(patternBuilder));
     }
 
 }

@@ -14,14 +14,21 @@ public class MenuParseResult<V extends MenuView<V, ?>> implements MenuParser.Par
     private final MenuLayout.Builder<V> menuLayoutBuilder;
     private final GameSound openingSound;
     private final boolean isPreviousMoveAllowed;
+    private final boolean isSkipOneItem;
     private final MenuPatternSlots patternSlots;
     private final YamlConfiguration config;
 
+    public MenuParseResult(MenuLayout.Builder<V> menuLayoutBuilder) {
+        this(menuLayoutBuilder, null, true, false, null, null);
+    }
+
     public MenuParseResult(MenuLayout.Builder<V> menuLayoutBuilder, @Nullable GameSound openingSound,
-                           boolean isPreviousMoveAllowed, MenuPatternSlots patternSlots, YamlConfiguration config) {
+                           boolean isPreviousMoveAllowed, boolean isSkipOneItem,
+                           MenuPatternSlots patternSlots, YamlConfiguration config) {
         this.menuLayoutBuilder = menuLayoutBuilder;
         this.openingSound = openingSound;
         this.isPreviousMoveAllowed = isPreviousMoveAllowed;
+        this.isSkipOneItem = isSkipOneItem;
         this.patternSlots = patternSlots;
         this.config = config;
     }
@@ -39,6 +46,11 @@ public class MenuParseResult<V extends MenuView<V, ?>> implements MenuParser.Par
     @Override
     public boolean isPreviousMoveAllowed() {
         return isPreviousMoveAllowed;
+    }
+
+    @Override
+    public boolean isSkipOneItem() {
+        return isSkipOneItem;
     }
 
     @Override

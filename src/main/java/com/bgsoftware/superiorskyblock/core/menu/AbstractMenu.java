@@ -23,7 +23,8 @@ public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends V
     protected static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     protected AbstractMenu(String identifier, MenuParseResult<V> parseResult) {
-        super(identifier, parseResult.getLayoutBuilder().build(), parseResult.getOpeningSound(), parseResult.isPreviousMoveAllowed());
+        super(identifier, parseResult.getLayoutBuilder().build(), parseResult.getOpeningSound(),
+                parseResult.isPreviousMoveAllowed(), parseResult.isSkipOneItem());
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.menu;
 
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuViewButton;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
@@ -32,15 +33,17 @@ public abstract class BaseMenu<V extends MenuView<V, A>, A extends ViewArgs> imp
     @Nullable
     protected final GameSound openingSound;
     protected final boolean isPreviousMoveAllowed;
+    protected final boolean isSkipOneItem;
 
-
-    protected BaseMenu(String identifier, MenuLayout<V> menuLayout, @Nullable GameSound openingSound, boolean isPreviousMoveAllowed) {
+    protected BaseMenu(String identifier, MenuLayout<V> menuLayout, @Nullable GameSound openingSound,
+                       boolean isPreviousMoveAllowed, boolean isSkipOneItem) {
         Preconditions.checkNotNull(identifier, "identifier parameter cannot be null.");
         Preconditions.checkNotNull(menuLayout, "menuLayout parameter cannot be null.");
         this.identifier = identifier;
         this.menuLayout = menuLayout;
         this.openingSound = openingSound;
         this.isPreviousMoveAllowed = isPreviousMoveAllowed;
+        this.isSkipOneItem = isSkipOneItem;
     }
 
     @Override
@@ -62,6 +65,11 @@ public abstract class BaseMenu<V extends MenuView<V, A>, A extends ViewArgs> imp
     @Override
     public boolean isPreviousMoveAllowed() {
         return this.isPreviousMoveAllowed;
+    }
+
+    @Override
+    public boolean isSkipOneItem() {
+        return this.isSkipOneItem || SuperiorSkyblockAPI.getSettings().isSkipOneItemMenus();
     }
 
     @Override

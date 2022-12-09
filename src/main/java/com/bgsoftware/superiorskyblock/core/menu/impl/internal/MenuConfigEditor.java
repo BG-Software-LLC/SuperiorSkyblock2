@@ -113,7 +113,7 @@ public class MenuConfigEditor extends AbstractPagedMenu<MenuConfigEditor.View, M
 
         patternBuilder.setButton(40, new ConfigEditorSaveButton.Builder().build());
 
-        return new MenuConfigEditor(new MenuParseResult<>(patternBuilder, null, true, null, null),
+        return new MenuConfigEditor(new MenuParseResult<>(patternBuilder),
                 new File(plugin.getDataFolder(), "config.yml"),
                 new String[]{"database", "max-island-size", "island-roles", "worlds.normal-world", "commands-cooldown", "starter-chest", "event-commands"});
     }

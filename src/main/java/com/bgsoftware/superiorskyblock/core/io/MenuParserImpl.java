@@ -87,9 +87,10 @@ public class MenuParserImpl implements MenuParser {
         }
 
         boolean previousMoveAllowed = cfg.getBoolean("previous-menu", true);
+        boolean skipOneItem = cfg.getBoolean("skip-one-item", false);
         GameSound openingSound = getSound(cfg.getConfigurationSection("open-sound"));
 
-        return new MenuParseResult<>(menuLayoutBuilder, openingSound, previousMoveAllowed, menuPatternSlots, cfg);
+        return new MenuParseResult<>(menuLayoutBuilder, openingSound, previousMoveAllowed, skipOneItem, menuPatternSlots, cfg);
     }
 
     @Override
@@ -146,9 +147,10 @@ public class MenuParserImpl implements MenuParser {
         menuLayoutBuilder.setPagedObjectSlots(parseButtonSlots(cfg, "slots", menuPatternSlots), pagedButtonBuilder);
 
         boolean previousMoveAllowed = cfg.getBoolean("previous-menu", true);
+        boolean skipOneItem = cfg.getBoolean("skip-one-item", false);
         GameSound openingSound = getSound(cfg.getConfigurationSection("open-sound"));
 
-        return new MenuParseResult<>(menuLayoutBuilder, openingSound, previousMoveAllowed, menuPatternSlots, cfg);
+        return new MenuParseResult<>(menuLayoutBuilder, openingSound, previousMoveAllowed, skipOneItem, menuPatternSlots, cfg);
     }
 
     @Nullable

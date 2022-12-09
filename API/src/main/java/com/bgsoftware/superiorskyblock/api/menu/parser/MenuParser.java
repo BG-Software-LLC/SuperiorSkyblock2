@@ -68,6 +68,12 @@ public interface MenuParser {
         boolean isPreviousMoveAllowed();
 
         /**
+         * Get whether this menu should be skipped when it only contains one item.
+         * This is only useful for menus that have their buttons open other menus.
+         */
+        boolean isSkipOneItem();
+
+        /**
          * Get the slots in the layout for a char.
          *
          * @param ch The char to get slots for.
