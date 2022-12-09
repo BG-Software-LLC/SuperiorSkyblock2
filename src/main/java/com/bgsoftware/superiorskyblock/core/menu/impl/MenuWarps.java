@@ -28,7 +28,6 @@ import com.bgsoftware.superiorskyblock.island.warp.SIslandWarp;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
@@ -78,8 +77,15 @@ public class MenuWarps extends AbstractPagedMenu<MenuWarps.View, MenuWarps.Args,
         }
 
         BukkitExecutor.sync(() -> {
-            superiorPlayer.runIfOnline(Player::closeInventory);
-            island.warpPlayer(superiorPlayer, islandWarp.getName());
+            superiorPlayer.runIfOnline(player -> {
+                MenuView<?, ?> currentView = superiorPlayer.getOpenedView();
+                if (currentView == null) {
+                    player.closeInventory();
+                } else {
+                    currentView.closeView();
+                }
+                island.warpPlayer(superiorPlayer, islandWarp.getName());
+            });
         }, 1L);
     }
 
