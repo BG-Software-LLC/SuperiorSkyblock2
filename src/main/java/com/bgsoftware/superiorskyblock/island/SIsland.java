@@ -2103,6 +2103,7 @@ public class SIsland implements Island {
 
         this.bonusWorth.set(bonusWorth);
 
+        plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_WORTH, this);
         plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
 
         IslandsDatabaseBridge.saveBonusWorth(this);
@@ -2121,6 +2122,7 @@ public class SIsland implements Island {
 
         this.bonusLevel.set(bonusLevel);
 
+        plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_LEVEL, this);
         plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
 
         IslandsDatabaseBridge.saveBonusLevel(this);

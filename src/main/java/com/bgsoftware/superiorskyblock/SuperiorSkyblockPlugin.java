@@ -557,6 +557,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         if (loadGrid) {
             dataHandler.loadData();
             stackedBlocksHandler.loadData();
+            plugin.getGrid().setForceSort(true);
             SortingType.values().forEach(gridHandler::sortIslands);
             modulesHandler.loadModulesData(this);
             modulesHandler.enableModules(ModuleLoadTime.AFTER_MODULE_DATA_LOAD);
