@@ -4,6 +4,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
@@ -56,6 +58,8 @@ public class CmdAdmin implements ISuperiorCommand {
         java.util.Locale locale = PlayerLocales.getLocale(sender);
 
         if (args.length > 1 && !isNumber(args[1])) {
+            Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), args[1]);
+
             SuperiorCommand command = plugin.getCommands().getAdminCommand(args[1]);
             if (command != null) {
                 if (!(sender instanceof Player) && !command.canBeExecutedByConsole()) {
@@ -64,11 +68,13 @@ public class CmdAdmin implements ISuperiorCommand {
                 }
 
                 if (!command.getPermission().isEmpty() && !sender.hasPermission(command.getPermission())) {
+                    Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", command.getPermission());
                     Message.NO_COMMAND_PERMISSION.send(sender, locale);
                     return;
                 }
 
                 if (args.length < command.getMinArgs() || args.length > command.getMaxArgs()) {
+                    Log.debugResult(Debug.EXECUTE_COMMAND, "Return Incorrect Usage", command.getUsage(locale));
                     Message.COMMAND_USAGE.send(sender, locale, plugin.getCommands().getLabel() + " " + command.getUsage(locale));
                     return;
                 }

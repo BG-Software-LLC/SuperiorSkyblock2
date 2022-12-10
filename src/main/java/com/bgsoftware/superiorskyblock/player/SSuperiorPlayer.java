@@ -276,15 +276,45 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public boolean hasPermission(String permission) {
         Preconditions.checkNotNull(permission, "permission parameter cannot be null.");
+
+        if (permission.isEmpty())
+            return true;
+
+        Log.debug(Debug.PERMISSION_LOOKUP, getName(), permission);
+
         Player player = asPlayer();
-        return permission.isEmpty() || (player != null && player.hasPermission(permission));
+        if (player == null) {
+            Log.debugResult(Debug.PERMISSION_LOOKUP, "Result", "Player is not online");
+            return false;
+        }
+
+        boolean res = player.hasPermission(permission);
+
+        Log.debugResult(Debug.PERMISSION_LOOKUP, "Result", res);
+
+        return res;
     }
 
     @Override
     public boolean hasPermissionWithoutOP(String permission) {
         Preconditions.checkNotNull(permission, "permission parameter cannot be null.");
+
+        if (permission.isEmpty())
+            return true;
+
+        Log.debug(Debug.PERMISSION_LOOKUP, getName(), permission, "No-Op Check");
+
         Player player = asPlayer();
-        return player != null && plugin.getProviders().getPermissionsProvider().hasPermission(player, permission);
+        if (player == null) {
+            Log.debugResult(Debug.PERMISSION_LOOKUP, "Result", "Player is not online");
+            return false;
+        }
+
+        boolean res = plugin.getProviders().getPermissionsProvider().hasPermission(player, permission);
+
+        Log.debugResult(Debug.PERMISSION_LOOKUP, "Result", res);
+
+        return res;
     }
 
     @Override

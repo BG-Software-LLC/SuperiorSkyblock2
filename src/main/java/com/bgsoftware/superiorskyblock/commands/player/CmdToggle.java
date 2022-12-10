@@ -52,7 +52,7 @@ public class CmdToggle implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
         if (args[1].equalsIgnoreCase("border")) {
-            if (!sender.hasPermission("superior.island.toggle.border")) {
+            if (!superiorPlayer.hasPermission("superior.island.toggle.border")) {
                 Message.NO_COMMAND_PERMISSION.send(sender);
                 return;
             }
@@ -69,7 +69,7 @@ public class CmdToggle implements ISuperiorCommand {
             superiorPlayer.toggleWorldBorder();
             superiorPlayer.updateWorldBorder(plugin.getGrid().getIslandAt(superiorPlayer.getLocation()));
         } else if (args[1].equalsIgnoreCase("blocks")) {
-            if (!sender.hasPermission("superior.island.toggle.blocks")) {
+            if (!superiorPlayer.hasPermission("superior.island.toggle.blocks")) {
                 Message.NO_COMMAND_PERMISSION.send(sender);
                 return;
             }
