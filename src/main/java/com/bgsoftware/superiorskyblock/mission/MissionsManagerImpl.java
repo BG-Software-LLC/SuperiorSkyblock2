@@ -330,8 +330,8 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
         if (!dataFolder.exists())
             dataFolder.mkdirs();
-
-        for (Mission<?> mission : getAllMissions()) {
+        for(Iterator<Mission<?>> missions = getAllMissions(); missions.hasNext(); ){
+            Mission<?> mission = missions.next();
             YamlConfiguration data = new YamlConfiguration();
 
             try {
