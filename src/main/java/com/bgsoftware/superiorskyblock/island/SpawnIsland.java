@@ -500,11 +500,13 @@ public class SpawnIsland implements Island {
 
     @Override
     public boolean isInside(World world, int chunkX, int chunkZ) {
-        return world.equals(this.spawnWorld) && isInside(chunkX, chunkZ);
+        return world.equals(this.spawnWorld) && isChunkInside(chunkX, chunkZ);
     }
 
-    public boolean isInside(int chunkX, int chunkZ) {
-        return this.islandArea.intercepts(chunkX << 4, chunkZ << 4);
+    public boolean isChunkInside(int chunkX, int chunkZ) {
+        IslandArea islandArea = this.islandArea.copy();
+        islandArea.rshift(4);
+        return islandArea.intercepts(chunkX, chunkZ);
     }
 
     @Override
@@ -938,7 +940,7 @@ public class SpawnIsland implements Island {
     @Override
     public boolean isChunkDirty(String worldName, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null.");
-        Preconditions.checkArgument(this.spawnWorldInfo.getName().equals(worldName) && isInside(chunkX, chunkZ),
+        Preconditions.checkArgument(this.spawnWorldInfo.getName().equals(worldName) && isChunkInside(chunkX, chunkZ),
                 "Chunk must be within the island boundaries.");
         return this.dirtyChunksContainer.isMarkedDirty(ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ));
     }

@@ -1074,9 +1074,7 @@ public class SIsland implements Island {
         return islandArea.intercepts(chunkX, chunkZ);
     }
 
-    public boolean isInside(WorldInfo worldInfo, int chunkX, int chunkZ) {
-        Preconditions.checkNotNull(worldInfo, "world parameter cannot be null.");
-
+    private boolean isChunkInside(int chunkX, int chunkZ) {
         int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
                 (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
         IslandArea islandArea = new IslandArea(this.center, islandDistance);
@@ -2021,7 +2019,7 @@ public class SIsland implements Island {
     public boolean isChunkDirty(String worldName, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null.");
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, worldName);
-        Preconditions.checkArgument(worldInfo == null || isInside(worldInfo, chunkX, chunkZ),
+        Preconditions.checkArgument(worldInfo == null || isChunkInside(chunkX, chunkZ),
                 "Chunk must be within the island boundaries.");
         return this.dirtyChunksContainer.isMarkedDirty(ChunkPosition.of(worldInfo, chunkX, chunkZ));
     }
