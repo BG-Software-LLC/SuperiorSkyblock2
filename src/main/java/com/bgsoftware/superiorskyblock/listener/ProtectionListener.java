@@ -688,12 +688,6 @@ public class ProtectionListener implements Listener {
             return true;
         }
 
-        if (island.isSpawn() && plugin.getSettings().getSpawn().isProtected()) {
-            if (sendMessages)
-                Message.PROTECTION.send(superiorPlayer);
-            return true;
-        }
-
         return false;
     }
 
