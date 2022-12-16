@@ -520,6 +520,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
         if (!loadGrid) {
             settingsHandler = new SettingsManagerImpl(this);
+            modulesHandler.reloadModules(ModuleLoadTime.NORMAL);
         } else {
             commandsHandler.loadData();
             modulesHandler.enableModules(ModuleLoadTime.NORMAL);
@@ -563,7 +564,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             modulesHandler.loadModulesData(this);
             modulesHandler.enableModules(ModuleLoadTime.AFTER_MODULE_DATA_LOAD);
         } else {
-            modulesHandler.reloadModules(this);
+            modulesHandler.reloadModules(ModuleLoadTime.AFTER_MODULE_DATA_LOAD);
         }
 
         BukkitExecutor.sync(() -> {

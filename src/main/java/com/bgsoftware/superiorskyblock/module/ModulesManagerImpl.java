@@ -159,15 +159,18 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
         filterModules(moduleLoadTime).forEach(this::enableModule);
     }
 
-    public void reloadModules(SuperiorSkyblockPlugin plugin) {
-        getModules().forEach(pluginModule -> {
-            try {
-                pluginModule.onReload(plugin);
-            } catch (Throwable error) {
-                Log.error("An unexpected error occurred while reloading the module ", pluginModule.getName(), ".");
-                Log.error(error, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");
-            }
-        });
+    public void reloadModules(ModuleLoadTime moduleLoadTime) {
+        Preconditions.checkNotNull(moduleLoadTime, "moduleLoadTime parameter cannot be null.");
+        filterModules(moduleLoadTime).forEach(this::reloadModuleInternal);
+    }
+
+    private void reloadModuleInternal(PluginModule pluginModule) {
+        try {
+            pluginModule.onReload(plugin);
+        } catch (Throwable error) {
+            Log.error("An unexpected error occurred while reloading the module ", pluginModule.getName(), ".");
+            Log.error(error, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");
+        }
     }
 
     public void loadModulesData(SuperiorSkyblockPlugin plugin) {
