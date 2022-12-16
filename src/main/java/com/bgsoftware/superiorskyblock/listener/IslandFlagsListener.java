@@ -70,7 +70,7 @@ public class IslandFlagsListener implements Listener {
     }
 
     public boolean preventEntitySpawn(Location location, CreatureSpawnEvent.SpawnReason spawnReason, EntityType entityType) {
-        IslandFlag triggeredFlag = null;
+        IslandFlag actionFlag;
 
         switch (spawnReason.name()) {
             case "JOCKEY":
@@ -79,19 +79,37 @@ public class IslandFlagsListener implements Listener {
             case "TRAP":
             case "MOUNT":
             case "BEEHIVE": {
-                triggeredFlag = BukkitEntities.isMonster(entityType) ? IslandFlags.NATURAL_MONSTER_SPAWN :
-                        BukkitEntities.isAnimal(entityType) ? IslandFlags.NATURAL_ANIMALS_SPAWN : null;
+                switch (BukkitEntities.getCategory(entityType)) {
+                    case ANIMAL:
+                        actionFlag = IslandFlags.NATURAL_ANIMALS_SPAWN;
+                        break;
+                    case MONSTER:
+                        actionFlag = IslandFlags.NATURAL_MONSTER_SPAWN;
+                        break;
+                    default:
+                        return false;
+                }
                 break;
             }
             case "SPAWNER":
             case "SPAWNER_EGG": {
-                triggeredFlag = BukkitEntities.isMonster(entityType) ? IslandFlags.SPAWNER_MONSTER_SPAWN :
-                        BukkitEntities.isAnimal(entityType) ? IslandFlags.SPAWNER_ANIMALS_SPAWN : null;
+                switch (BukkitEntities.getCategory(entityType)) {
+                    case ANIMAL:
+                        actionFlag = IslandFlags.SPAWNER_ANIMALS_SPAWN;
+                        break;
+                    case MONSTER:
+                        actionFlag = IslandFlags.SPAWNER_MONSTER_SPAWN;
+                        break;
+                    default:
+                        return false;
+                }
                 break;
             }
+            default:
+                return false;
         }
 
-        return triggeredFlag != null && preventAction(location, triggeredFlag);
+        return preventAction(location, actionFlag);
     }
 
     /* ENTITY EXPLOSIONS */
