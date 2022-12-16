@@ -57,10 +57,7 @@ public class IslandFlagPagedObjectButton extends AbstractPagedMenuButton<MenuIsl
 
         IslandFlag islandFlag = pagedObject.getIslandFlag();
 
-        if (islandFlag == null)
-            return buttonItem;
-
-        return island.hasSettingsEnabled(islandFlag) ?
+        return islandFlag != null && island.hasSettingsEnabled(islandFlag) ?
                 pagedObject.getEnabledIslandFlagItem().build(inventoryViewer) :
                 pagedObject.getDisabledIslandFlagItem().build(inventoryViewer);
     }

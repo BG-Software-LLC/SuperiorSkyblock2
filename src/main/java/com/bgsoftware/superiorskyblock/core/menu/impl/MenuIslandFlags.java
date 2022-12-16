@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
@@ -8,9 +7,9 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
-import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
@@ -30,7 +29,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
+import java.util.Optional;
 
 public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, IslandViewArgs, MenuIslandFlags.IslandFlagInfo> {
 
@@ -64,59 +63,32 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
 
         List<MenuIslandFlags.IslandFlagInfo> islandFlags = new LinkedList<>();
 
-        int position = 0;
-
-        if (cfg.isConfigurationSection("settings")) {
-            for (String islandFlag : cfg.getConfigurationSection("settings").getKeys(false)) {
-                try {
-                    updateSettingsInternal(islandFlags, IslandFlag.getByName(islandFlag), cfg, position++);
-                } catch (NullPointerException error) {
-                    Log.warnFromFile("settings.yml", "The island-flag '", islandFlag, "' is not a valid flag, skipping...");
-                }
+        Optional.ofNullable(cfg.getConfigurationSection("settings")).ifPresent(settingsSection -> {
+            for (String islandFlagName : settingsSection.getKeys(false)) {
+                Optional.ofNullable(settingsSection.getConfigurationSection(islandFlagName)).ifPresent(islandFlagSection -> {
+                    islandFlags.add(loadIslandFlagInfo(islandFlagSection, islandFlagName, islandFlags.size()));
+                });
             }
-        }
+        });
 
         return new MenuIslandFlags(menuParseResult, islandFlags);
     }
 
-    public void updateSettings(IslandFlag islandFlag) {
-        File file = new File(plugin.getDataFolder(), "menus/settings.yml");
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
-        int position = 0;
-
-        for (String key : cfg.getConfigurationSection("settings").getKeys(false)) {
-            if (islandFlag.getName().equalsIgnoreCase(key))
-                break;
-
-            position++;
-        }
-
-        updateSettingsInternal(islandFlags, islandFlag, cfg, position);
-    }
-
-    private static void updateSettingsInternal(List<IslandFlagInfo> islandFlags, IslandFlag islandFlag,
-                                               YamlConfiguration cfg, int position) {
-        islandFlags.removeIf(islandFlagInfo -> islandFlagInfo.getIslandFlag() == islandFlag);
-
+    private static IslandFlagInfo loadIslandFlagInfo(ConfigurationSection islandFlagSection, String islandFlagName, int position) {
         TemplateItem enabledIslandFlagItem = null;
         TemplateItem disabledIslandFlagItem = null;
         GameSound clickSound = null;
 
-        ConfigurationSection itemFlagSection = cfg.getConfigurationSection("settings." +
-                islandFlag.getName().toLowerCase(Locale.ENGLISH));
-
-        if (itemFlagSection != null) {
+        if (islandFlagSection != null) {
             enabledIslandFlagItem = MenuParserImpl.getInstance().getItemStack("settings.yml",
-                    itemFlagSection.getConfigurationSection("settings-enabled"));
+                    islandFlagSection.getConfigurationSection("settings-enabled"));
             disabledIslandFlagItem = MenuParserImpl.getInstance().getItemStack("settings.yml",
-                    itemFlagSection.getConfigurationSection("settings-disabled"));
-            clickSound = MenuParserImpl.getInstance().getSound(itemFlagSection.getConfigurationSection("sound"));
+                    islandFlagSection.getConfigurationSection("settings-disabled"));
+            clickSound = MenuParserImpl.getInstance().getSound(islandFlagSection.getConfigurationSection("sound"));
         }
 
-        islandFlags.add(new MenuIslandFlags.IslandFlagInfo(islandFlag, enabledIslandFlagItem,
-                disabledIslandFlagItem, clickSound, position));
-
-        Collections.sort(islandFlags);
+        return new MenuIslandFlags.IslandFlagInfo(islandFlagName, enabledIslandFlagItem,
+                disabledIslandFlagItem, clickSound, position);
     }
 
     public class View extends AbstractPagedMenuView<MenuIslandFlags.View, IslandViewArgs, IslandFlagInfo> {
@@ -142,16 +114,27 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
 
     public static class IslandFlagInfo implements Comparable<MenuIslandFlags.IslandFlagInfo> {
 
-        private final IslandFlag islandFlag;
+        private final LazyReference<IslandFlag> islandFlag = new LazyReference<IslandFlag>() {
+            @Override
+            protected IslandFlag create() {
+                try {
+                    return IslandFlag.getByName(IslandFlagInfo.this.islandFlagName);
+                } catch (Exception error) {
+                    return null;
+                }
+            }
+        };
+
+        private final String islandFlagName;
         private final TemplateItem enabledIslandFlagItem;
         private final TemplateItem disabledIslandFlagItem;
         private final GameSound clickSound;
         private final int position;
 
 
-        public IslandFlagInfo(IslandFlag islandFlag, TemplateItem enabledIslandFlagItem,
+        public IslandFlagInfo(String islandFlagName, TemplateItem enabledIslandFlagItem,
                               TemplateItem disabledIslandFlagItem, GameSound clickSound, int position) {
-            this.islandFlag = islandFlag;
+            this.islandFlagName = islandFlagName;
             this.enabledIslandFlagItem = enabledIslandFlagItem;
             this.disabledIslandFlagItem = disabledIslandFlagItem;
             this.clickSound = clickSound;
@@ -160,7 +143,7 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
 
         @Nullable
         public IslandFlag getIslandFlag() {
-            return this.islandFlag;
+            return islandFlag.get();
         }
 
         public ItemBuilder getEnabledIslandFlagItem() {

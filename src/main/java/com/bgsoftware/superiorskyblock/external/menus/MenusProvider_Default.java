@@ -330,8 +330,10 @@ public class MenusProvider_Default implements MenusProvider {
 
     @Override
     public void updatePermission(IslandPrivilege islandPrivilege) {
-        Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
-        Menus.MENU_ISLAND_PRIVILEGES.updatePermission(islandPrivilege);
+        // The default implementation does not care if the island privilege is valid for showing the island
+        // privileges in the menu. If the island privilege is not valid at the time of opening the menu, it
+        // will show it as it was disabled. This is the responsibility of the server owners to properly
+        // configure the menu.
     }
 
     @Override
@@ -355,8 +357,9 @@ public class MenusProvider_Default implements MenusProvider {
 
     @Override
     public void updateSettings(IslandFlag islandFlag) {
-        Preconditions.checkNotNull(islandFlag, "islandFlag parameter cannot be null.");
-        Menus.MENU_ISLAND_FLAGS.updateSettings(islandFlag);
+        // The default implementation does not care if the island flag is valid for showing the island flags
+        // in the menu. If the island flag is not valid at the time of opening the menu, it will show it as
+        // it was disabled. This is the responsibility of the server owners to properly configure the menu.
     }
 
     @Override

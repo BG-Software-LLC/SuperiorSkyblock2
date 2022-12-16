@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -9,9 +8,9 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
-import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
@@ -30,7 +29,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
+import java.util.Optional;
 
 public class MenuIslandPrivileges extends AbstractPagedMenu<
         MenuIslandPrivileges.View, MenuIslandPrivileges.Args, MenuIslandPrivileges.IslandPrivilegeInfo> {
@@ -91,46 +90,21 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
 
         List<MenuIslandPrivileges.IslandPrivilegeInfo> islandPrivileges = new LinkedList<>();
 
-        int position = 0;
-
-        ConfigurationSection permissionsSection = cfg.getConfigurationSection("permissions");
-        if (permissionsSection != null) {
-            for (String key : permissionsSection.getKeys(false)) {
-                if (permissionsSection.getBoolean(key + ".display-menu", true)) {
-                    String permission = key.toLowerCase(Locale.ENGLISH);
-                    try {
-                        updatePermissionInternal(islandPrivileges, IslandPrivilege.getByName(permission), cfg, position++);
-                    } catch (NullPointerException error) {
-                        Log.warnFromFile("permissions.yml", "The island-privilege '",
-                                permission, "' is not a valid privilege, skipping...");
+        Optional.ofNullable(cfg.getConfigurationSection("permissions")).ifPresent(permissionsSection -> {
+            for (String islandPrivilegeName : permissionsSection.getKeys(false)) {
+                Optional.ofNullable(permissionsSection.getConfigurationSection(islandPrivilegeName)).ifPresent(islandPrivilegeSection -> {
+                    if (islandPrivilegeSection.getBoolean("display-menu", true)) {
+                        islandPrivileges.add(loadIslandPrivilegeInfo(islandPrivilegeSection, islandPrivilegeName, islandPrivileges.size()));
                     }
-                }
+                });
             }
-        }
+        });
 
         return new MenuIslandPrivileges(menuParseResult, islandPrivileges, noRolePermission,
                 exactRolePermission, higherRolePermission);
     }
 
-    public void updatePermission(IslandPrivilege islandPrivilege) {
-        File file = new File(plugin.getDataFolder(), "menus/permissions.yml");
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
-        int position = 0;
-
-        for (String key : cfg.getConfigurationSection("permissions").getKeys(false)) {
-            if (islandPrivilege.getName().equalsIgnoreCase(key))
-                break;
-
-            position++;
-        }
-
-        updatePermissionInternal(islandPrivileges, islandPrivilege, cfg, position);
-    }
-
-    private static void updatePermissionInternal(List<IslandPrivilegeInfo> islandPrivileges,
-                                                 IslandPrivilege islandPrivilege, YamlConfiguration cfg, int position) {
-        islandPrivileges.removeIf(islandPrivilegeInfo -> islandPrivilegeInfo.getIslandPrivilege() == islandPrivilege);
-
+    private static IslandPrivilegeInfo loadIslandPrivilegeInfo(ConfigurationSection islandPrivilegeSection, String islandPrivilegeName, int position) {
         TemplateItem enabledIslandPrivilegeItem = null;
         TemplateItem disabledIslandPrivilegeItem = null;
         TemplateItem rolePrivilegeItem = null;
@@ -139,26 +113,22 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
         List<String> accessCommands = null;
         List<String> noAccessCommands = null;
 
-        ConfigurationSection itemPrivilegeSection = cfg.getConfigurationSection("permissions." +
-                islandPrivilege.getName().toLowerCase(Locale.ENGLISH));
-
-        if (itemPrivilegeSection != null) {
+        if (islandPrivilegeSection != null) {
             enabledIslandPrivilegeItem = MenuParserImpl.getInstance().getItemStack("permissions.yml",
-                    itemPrivilegeSection.getConfigurationSection("permission-enabled"));
+                    islandPrivilegeSection.getConfigurationSection("permission-enabled"));
             disabledIslandPrivilegeItem = MenuParserImpl.getInstance().getItemStack("permissions.yml",
-                    itemPrivilegeSection.getConfigurationSection("permission-disabled"));
+                    islandPrivilegeSection.getConfigurationSection("permission-disabled"));
             rolePrivilegeItem = MenuParserImpl.getInstance().getItemStack("permissions.yml",
-                    itemPrivilegeSection.getConfigurationSection("role-permission"));
-            accessSound = MenuParserImpl.getInstance().getSound(itemPrivilegeSection.getConfigurationSection("has-access.sound"));
-            noAccessSound = MenuParserImpl.getInstance().getSound(itemPrivilegeSection.getConfigurationSection("no-access.sound"));
-            accessCommands = itemPrivilegeSection.getStringList("has-access.commands");
-            noAccessCommands = itemPrivilegeSection.getStringList("no-access.commands");
+                    islandPrivilegeSection.getConfigurationSection("role-permission"));
+            accessSound = MenuParserImpl.getInstance().getSound(islandPrivilegeSection.getConfigurationSection("has-access.sound"));
+            noAccessSound = MenuParserImpl.getInstance().getSound(islandPrivilegeSection.getConfigurationSection("no-access.sound"));
+            accessCommands = islandPrivilegeSection.getStringList("has-access.commands");
+            noAccessCommands = islandPrivilegeSection.getStringList("no-access.commands");
         }
 
-        islandPrivileges.add(new MenuIslandPrivileges.IslandPrivilegeInfo(islandPrivilege, enabledIslandPrivilegeItem,
+        return new MenuIslandPrivileges.IslandPrivilegeInfo(islandPrivilegeName, enabledIslandPrivilegeItem,
                 disabledIslandPrivilegeItem, rolePrivilegeItem, accessSound, noAccessSound, accessCommands,
-                noAccessCommands, position));
-        Collections.sort(islandPrivileges);
+                noAccessCommands, position);
     }
 
     public static class Args implements ViewArgs {
@@ -200,9 +170,20 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
 
     }
 
-    public static class IslandPrivilegeInfo implements Comparable<MenuIslandPrivileges.IslandPrivilegeInfo> {
+    public static class IslandPrivilegeInfo implements Comparable<IslandPrivilegeInfo> {
 
-        private final IslandPrivilege islandPrivilege;
+        private final LazyReference<IslandPrivilege> islandPrivilege = new LazyReference<IslandPrivilege>() {
+            @Override
+            protected IslandPrivilege create() {
+                try {
+                    return IslandPrivilege.getByName(IslandPrivilegeInfo.this.islandPrivilegeName);
+                } catch (Exception error) {
+                    return null;
+                }
+            }
+        };
+
+        private final String islandPrivilegeName;
         private final TemplateItem enabledIslandPrivilegeItem;
         private final TemplateItem disabledIslandPrivilegeItem;
         private final TemplateItem roleIslandPrivilegeItem;
@@ -212,11 +193,11 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
         private final List<String> noAccessCommands;
         private final int position;
 
-        public IslandPrivilegeInfo(IslandPrivilege islandPrivilege, TemplateItem enabledIslandPrivilegeItem,
+        public IslandPrivilegeInfo(String islandPrivilegeName, TemplateItem enabledIslandPrivilegeItem,
                                    TemplateItem disabledIslandPrivilegeItem, TemplateItem roleIslandPrivilegeItem,
                                    GameSound accessSound, GameSound noAccessSound, List<String> accessCommands,
                                    List<String> noAccessCommands, int position) {
-            this.islandPrivilege = islandPrivilege;
+            this.islandPrivilegeName = islandPrivilegeName;
             this.enabledIslandPrivilegeItem = enabledIslandPrivilegeItem;
             this.disabledIslandPrivilegeItem = disabledIslandPrivilegeItem;
             this.roleIslandPrivilegeItem = roleIslandPrivilegeItem;
@@ -228,7 +209,7 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
         }
 
         public IslandPrivilege getIslandPrivilege() {
-            return islandPrivilege;
+            return islandPrivilege.get();
         }
 
         public ItemBuilder getEnabledIslandPrivilegeItem() {

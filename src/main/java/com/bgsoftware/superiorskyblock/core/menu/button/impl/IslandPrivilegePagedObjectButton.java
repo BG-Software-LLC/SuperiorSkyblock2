@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
@@ -54,11 +55,12 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
 
         if (permissionHolder instanceof PlayerRole) {
             if (pagedObject.getRoleIslandPrivilegeItem() != null) {
-                permissionItem = modifyRoleButtonItem(targetIsland, pagedObject);
+                permissionItem = modifyRoleButtonItem(targetIsland);
             }
         } else if (permissionHolder instanceof SuperiorPlayer) {
-            boolean hasPermission = targetIsland.getPermissionNode((SuperiorPlayer) permissionHolder)
-                    .hasPermission(pagedObject.getIslandPrivilege());
+            IslandPrivilege islandPrivilege = pagedObject.getIslandPrivilege();
+            boolean hasPermission = islandPrivilege != null && targetIsland.getPermissionNode(
+                    (SuperiorPlayer) permissionHolder).hasPermission(islandPrivilege);
             permissionItem = hasPermission ? pagedObject.getEnabledIslandPrivilegeItem() :
                     pagedObject.getDisabledIslandPrivilegeItem();
         }
@@ -67,7 +69,12 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
     }
 
     private void onRoleButtonClick(Island island, SuperiorPlayer clickedPlayer, InventoryClickEvent clickEvent) {
-        PlayerRole currentRole = island.getRequiredPlayerRole(pagedObject.getIslandPrivilege());
+        IslandPrivilege islandPrivilege = pagedObject.getIslandPrivilege();
+
+        if (islandPrivilege == null)
+            return;
+
+        PlayerRole currentRole = island.getRequiredPlayerRole(islandPrivilege);
 
         if (clickedPlayer.getPlayerRole().isLessThan(currentRole)) {
             onFailurePermissionChange(clickedPlayer, false);
@@ -91,26 +98,29 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
         }
 
         if (plugin.getEventsBus().callIslandChangeRolePrivilegeEvent(island, clickedPlayer, newRole)) {
-            island.setPermission(newRole, pagedObject.getIslandPrivilege());
-            onSuccessfulPermissionChange(clickedPlayer, Formatters.CAPITALIZED_FORMATTER.format(pagedObject.getIslandPrivilege().getName()));
+            island.setPermission(newRole, islandPrivilege);
+            onSuccessfulPermissionChange(clickedPlayer, Formatters.CAPITALIZED_FORMATTER.format(islandPrivilege.getName()));
         }
     }
 
     private void onPlayerButtonClick(Island island, SuperiorPlayer clickedPlayer, SuperiorPlayer permissionHolder) {
-        if (island.hasPermission(clickedPlayer, pagedObject.getIslandPrivilege())) {
-            PermissionNode permissionNode = island.getPermissionNode(permissionHolder);
+        IslandPrivilege islandPrivilege = pagedObject.getIslandPrivilege();
 
-            String permissionHolderName = permissionHolder.getName();
+        if (islandPrivilege == null || !island.hasPermission(clickedPlayer, islandPrivilege))
+            return;
 
-            boolean currentValue = permissionNode.hasPermission(pagedObject.getIslandPrivilege());
+        PermissionNode permissionNode = island.getPermissionNode(permissionHolder);
 
-            if (!plugin.getEventsBus().callIslandChangePlayerPrivilegeEvent(island, clickedPlayer, permissionHolder, !currentValue))
-                return;
+        String permissionHolderName = permissionHolder.getName();
 
-            island.setPermission(permissionHolder, pagedObject.getIslandPrivilege(), !currentValue);
+        boolean currentValue = permissionNode.hasPermission(islandPrivilege);
 
-            onSuccessfulPermissionChange(clickedPlayer, permissionHolderName);
-        }
+        if (!plugin.getEventsBus().callIslandChangePlayerPrivilegeEvent(island, clickedPlayer, permissionHolder, !currentValue))
+            return;
+
+        island.setPermission(permissionHolder, islandPrivilege, !currentValue);
+
+        onSuccessfulPermissionChange(clickedPlayer, permissionHolderName);
     }
 
     private void onSuccessfulPermissionChange(SuperiorPlayer clickedPlayer, String permissionHolderName) {
@@ -144,18 +154,21 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
                 command.replace("%player%", clickedPlayer.getName())));
     }
 
-    private ItemBuilder modifyRoleButtonItem(Island island, MenuIslandPrivileges.IslandPrivilegeInfo islandPrivilegeInfo) {
-        Preconditions.checkNotNull(islandPrivilegeInfo.getRoleIslandPrivilegeItem(), "role item cannot be null.");
-        PlayerRole requiredRole = island.getRequiredPlayerRole(islandPrivilegeInfo.getIslandPrivilege());
-        ItemBuilder permissionItem = islandPrivilegeInfo.getRoleIslandPrivilegeItem()
-                .replaceAll("{}", requiredRole.toString());
+    private ItemBuilder modifyRoleButtonItem(Island island) {
+        Preconditions.checkNotNull(pagedObject.getRoleIslandPrivilegeItem(), "role item cannot be null.");
+
+        IslandPrivilege islandPrivilege = pagedObject.getIslandPrivilege();
+
+        PlayerRole requiredRole = islandPrivilege == null ? null : island.getRequiredPlayerRole(islandPrivilege);
+        ItemBuilder permissionItem = pagedObject.getRoleIslandPrivilegeItem()
+                .replaceAll("{}", requiredRole == null ? "" : requiredRole.toString());
 
         if (!Menus.MENU_ISLAND_PRIVILEGES.getNoRolePermission().isEmpty() &&
                 !Menus.MENU_ISLAND_PRIVILEGES.getExactRolePermission().isEmpty() &&
                 !Menus.MENU_ISLAND_PRIVILEGES.getHigherRolePermission().isEmpty()) {
             List<String> roleString = new ArrayList<>();
 
-            int roleWeight = requiredRole.getWeight();
+            int roleWeight = requiredRole == null ? Integer.MAX_VALUE : requiredRole.getWeight();
             PlayerRole currentRole;
 
             for (int i = -2; (currentRole = SPlayerRole.of(i)) != null; i++) {

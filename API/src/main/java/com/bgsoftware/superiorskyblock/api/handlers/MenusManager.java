@@ -20,7 +20,6 @@ import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import org.bukkit.entity.HumanEntity;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -567,6 +566,7 @@ public interface MenusManager {
      *
      * @param islandFlag The settings to update.
      */
+    @Deprecated
     void updateSettings(IslandFlag islandFlag);
 
     /**
