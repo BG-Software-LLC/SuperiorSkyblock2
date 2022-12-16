@@ -1,22 +1,17 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
+import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandCreation;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -46,8 +41,9 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
 
     @Override
     public void onButtonClick(InventoryClickEvent clickEvent) {
-        clickButton(plugin, (Player) clickEvent.getWhoClicked(), clickEvent.getClick().isRightClick(),
-                menuView.getIslandName(), menuView);
+        SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
+        Menus.MENU_ISLAND_CREATION.simulateClick(clickedPlayer, menuView.getIslandName(), getTemplate(),
+                clickEvent.getClick().isRightClick(), menuView);
     }
 
     @Override
@@ -55,39 +51,6 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
         super.onButtonClickLackPermission(clickEvent);
         getTemplate().lackPermissionCommands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                 command.replace("%player%", clickEvent.getWhoClicked().getName())));
-    }
-
-    public void clickButton(SuperiorSkyblockPlugin plugin, Player whoClicked, boolean isRightClick,
-                            String islandName, @Nullable MenuIslandCreation.View menuView) {
-        SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(whoClicked);
-
-        // Checking for preview of islands.
-        if (isRightClick) {
-            Location previewLocation = plugin.getSettings().getPreviewIslands().get(getTemplate().schematic.getName());
-            if (previewLocation != null) {
-                plugin.getGrid().startIslandPreview(clickedPlayer, getTemplate().schematic.getName(), islandName);
-                return;
-            }
-        }
-
-        GameSoundImpl.playSound(whoClicked, getTemplate().accessSound);
-
-        getTemplate().accessCommands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                command.replace("%player%", clickedPlayer.getName())));
-
-        Message.ISLAND_CREATE_PROCCESS_REQUEST.send(clickedPlayer);
-
-        if (menuView != null)
-            menuView.closeView();
-
-        World.Environment environment = plugin.getSettings().getWorlds().getDefaultWorld();
-        boolean offset = getTemplate().isOffset || (environment == World.Environment.NORMAL ?
-                plugin.getSettings().getWorlds().getNormal().isSchematicOffset() :
-                environment == World.Environment.NETHER ? plugin.getSettings().getWorlds().getNether().isSchematicOffset() :
-                        plugin.getSettings().getWorlds().getEnd().isSchematicOffset());
-
-        plugin.getGrid().createIsland(clickedPlayer, getTemplate().schematic.getName(), getTemplate().bonusWorth,
-                getTemplate().bonusLevel, getTemplate().biome, islandName, offset);
     }
 
     public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<MenuIslandCreation.View> {
@@ -179,6 +142,31 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
             this.bonusLevel = bonusLevel;
             this.isOffset = isOffset;
             this.schematic = schematic;
+        }
+
+        @Nullable
+        public GameSound getAccessSound() {
+            return accessSound;
+        }
+
+        public List<String> getAccessCommands() {
+            return accessCommands;
+        }
+
+        public Biome getBiome() {
+            return biome;
+        }
+
+        public BigDecimal getBonusWorth() {
+            return bonusWorth;
+        }
+
+        public BigDecimal getBonusLevel() {
+            return bonusLevel;
+        }
+
+        public boolean isOffset() {
+            return isOffset;
         }
 
         public Schematic getSchematic() {

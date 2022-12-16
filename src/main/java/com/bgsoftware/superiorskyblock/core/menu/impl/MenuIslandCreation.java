@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
@@ -18,9 +19,14 @@ import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -42,28 +48,60 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
         return new View(superiorPlayer, previousMenuView, this, args);
     }
 
-    public void simulateClick(SuperiorPlayer superiorPlayer, String islandName, String schematic, boolean isPreviewMode) {
-        IslandCreationButton button = getButtonForSchematic(schematic);
-        if (button != null)
-            button.clickButton(plugin, superiorPlayer.asPlayer(), isPreviewMode, islandName, null);
+    public void simulateClick(SuperiorPlayer clickedPlayer, String islandName, String schematic,
+                              boolean isPreviewMode, @Nullable MenuView<?, ?> menuView) {
+        menuLayout.getButtons().stream()
+                .filter(button -> IslandCreationButton.class.equals(button.getViewButtonType()) &&
+                        ((IslandCreationButton.Template) button).getSchematic().getName().equals(schematic))
+                .map(button -> (IslandCreationButton.Template) button)
+                .findFirst().ifPresent(template -> simulateClick(clickedPlayer, islandName, template, isPreviewMode, menuView));
     }
 
-    private IslandCreationButton getButtonForSchematic(String schematicName) {
-        return (IslandCreationButton) menuLayout.getButtons().stream()
-                .filter(button -> button instanceof IslandCreationButton &&
-                        ((IslandCreationButton) button).getTemplate().getSchematic().getName().equals(schematicName))
-                .findFirst().orElse(null);
+    public void simulateClick(SuperiorPlayer clickedPlayer, String islandName,
+                              IslandCreationButton.Template template, boolean isPreviewMode,
+                              @Nullable MenuView<?, ?> menuView) {
+        String schematic = template.getSchematic().getName();
+
+        // Checking for preview of islands.
+        if (isPreviewMode) {
+            Location previewLocation = plugin.getSettings().getPreviewIslands().get(schematic);
+            if (previewLocation != null) {
+                plugin.getGrid().startIslandPreview(clickedPlayer, schematic, islandName);
+                return;
+            }
+        }
+
+        Player whoClicked = clickedPlayer.asPlayer();
+
+        GameSoundImpl.playSound(whoClicked, template.getAccessSound());
+
+        template.getAccessCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                command.replace("%player%", clickedPlayer.getName())));
+
+        Message.ISLAND_CREATE_PROCCESS_REQUEST.send(clickedPlayer);
+
+        if (menuView != null)
+            menuView.closeView();
+
+        World.Environment environment = plugin.getSettings().getWorlds().getDefaultWorld();
+        boolean offset = template.isOffset() || (environment == World.Environment.NORMAL ?
+                plugin.getSettings().getWorlds().getNormal().isSchematicOffset() :
+                environment == World.Environment.NETHER ? plugin.getSettings().getWorlds().getNether().isSchematicOffset() :
+                        plugin.getSettings().getWorlds().getEnd().isSchematicOffset());
+
+        plugin.getGrid().createIsland(clickedPlayer, schematic, template.getBonusWorth(),
+                template.getBonusLevel(), template.getBiome(), islandName, offset);
     }
 
     public void openMenu(SuperiorPlayer superiorPlayer, @Nullable MenuView<?, ?> previousMenu, String islandName) {
         if (isSkipOneItem()) {
             List<String> schematicButtons = menuLayout.getButtons().stream()
-                    .filter(button -> button instanceof IslandCreationButton)
-                    .map(button -> ((IslandCreationButton) button).getTemplate().getSchematic().getName())
+                    .filter(button -> IslandCreationButton.class.equals(button.getViewButtonType()))
+                    .map(button -> ((IslandCreationButton.Template) button).getSchematic().getName())
                     .collect(Collectors.toList());
 
             if (schematicButtons.size() == 1) {
-                simulateClick(superiorPlayer, islandName, schematicButtons.get(0), false);
+                simulateClick(superiorPlayer, islandName, schematicButtons.get(0), false, superiorPlayer.getOpenedView());
                 return;
             }
         }

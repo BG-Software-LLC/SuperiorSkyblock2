@@ -106,7 +106,7 @@ public class CmdCreate implements ISuperiorCommand {
         if (schematicName == null) {
             Menus.MENU_ISLAND_CREATION.openMenu(superiorPlayer, superiorPlayer.getOpenedView(), islandName);
         } else {
-            Menus.MENU_ISLAND_CREATION.simulateClick(superiorPlayer, islandName, schematicName, false);
+            Menus.MENU_ISLAND_CREATION.simulateClick(superiorPlayer, islandName, schematicName, false, superiorPlayer.getOpenedView());
         }
     }
 
