@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.handlers.ModulesManager;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
+import com.bgsoftware.superiorskyblock.core.Either;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -55,21 +56,20 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
 
     @Override
     public PluginModule registerModule(File moduleFile) throws IOException, ReflectiveOperationException {
-        if (!moduleFile.exists())
-            throw new IllegalArgumentException("The given file does not exist.");
-
-        if (!moduleFile.getName().endsWith(".jar"))
-            throw new IllegalArgumentException("The given file is not a valid jar file.");
-
-        String moduleName = moduleFile.getName().replace(".jar", "");
+        Preconditions.checkArgument(moduleFile.exists(), "The file " + moduleFile.getName() + " does not exist.");
+        Preconditions.checkArgument(moduleFile.getName().endsWith(".jar"), "The file " + moduleFile.getName() + " is not a valid jar file.");
 
         ModuleClassLoader moduleClassLoader = new ModuleClassLoader(moduleFile, plugin.getPluginClassLoader());
 
-        //noinspection deprecation
-        Class<?> moduleClass = JarFiles.getClass(moduleFile.toURL(), PluginModule.class, moduleClassLoader);
+        Either<Class<?>, Throwable> moduleClassLookup = JarFiles.getClass(moduleFile.toURL(), PluginModule.class, moduleClassLoader);
+
+        if (moduleClassLookup.getLeft() != null)
+            throw new RuntimeException("An error occurred while reading " + moduleFile.getName(), moduleClassLookup.getLeft());
+
+        Class<?> moduleClass = moduleClassLookup.getRight();
 
         if (moduleClass == null)
-            throw new IllegalArgumentException("The file " + moduleName + " is not a valid module.");
+            throw new RuntimeException("The module file " + moduleFile.getName() + " is not valid.");
 
         PluginModule pluginModule = createInstance(moduleClass);
         pluginModule.initModuleLoader(moduleFile, moduleClassLoader);

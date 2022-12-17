@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.io;
 
-import javax.annotation.Nullable;
+import com.bgsoftware.superiorskyblock.core.Either;
+
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.jar.JarEntry;
@@ -12,8 +13,7 @@ public class JarFiles {
 
     }
 
-    @Nullable
-    public static Class<?> getClass(URL jar, Class<?> clazz, ClassLoader classLoader) {
+    public static Either<Class<?>, Throwable> getClass(URL jar, Class<?> clazz, ClassLoader classLoader) {
         try (URLClassLoader cl = new URLClassLoader(new URL[]{jar}, classLoader); JarInputStream jis = new JarInputStream(jar.openStream())) {
             JarEntry jarEntry;
             while ((jarEntry = jis.getNextJarEntry()) != null) {
@@ -29,13 +29,14 @@ public class JarFiles {
                 Class<?> c = cl.loadClass(clazzName);
 
                 if (clazz.isAssignableFrom(c)) {
-                    return c;
+                    return Either.right(c);
                 }
             }
-        } catch (Throwable ignored) {
+        } catch (Throwable error) {
+            return Either.left(error);
         }
 
-        return null;
+        return Either.right(null);
     }
 
 }
