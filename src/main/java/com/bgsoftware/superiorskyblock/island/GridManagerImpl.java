@@ -480,6 +480,12 @@ public class GridManagerImpl extends Manager implements GridManager {
         sortIslands(sortingType, null);
     }
 
+    public void forceSortIslands(SortingType sortingType) {
+        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
+        setForceSort(true);
+        sortIslands(sortingType, null);
+    }
+
     @Override
     public void sortIslands(SortingType sortingType, Runnable onFinish) {
         Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
