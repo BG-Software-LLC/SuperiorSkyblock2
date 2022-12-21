@@ -1425,10 +1425,14 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(originalPlayer, "originalPlayer parameter cannot be null.");
         Preconditions.checkNotNull(newPlayer, "newPlayer parameter cannot be null.");
 
-        if (owner == originalPlayer) {
+        Log.debug(Debug.REPLACE_PLAYER, owner.getName(), originalPlayer.getName(), newPlayer.getName());
+
+        if (owner.equals(originalPlayer)) {
+            Log.debugResult(Debug.REPLACE_PLAYER, "Action", "Replace Owner");
             owner = newPlayer;
             IslandsDatabaseBridge.saveIslandLeader(this);
         } else if (isMember(originalPlayer)) {
+            Log.debugResult(Debug.REPLACE_PLAYER, "Action", "Replace Member");
             members.write(members -> {
                 members.remove(originalPlayer);
                 members.add(newPlayer);
@@ -3555,6 +3559,7 @@ public class SIsland implements Island {
         uniqueVisitors.write(uniqueVisitors -> {
             for (UniqueVisitor uniqueVisitor : uniqueVisitors) {
                 if (uniqueVisitor.getSuperiorPlayer().equals(originalPlayer)) {
+                    Log.debugResult(Debug.REPLACE_PLAYER, "Action", "Replace Visitor");
                     uniqueVisitor.setSuperiorPlayer(newPlayer);
                 }
             }
@@ -3563,6 +3568,7 @@ public class SIsland implements Island {
 
     private void replaceBannedPlayer(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer) {
         if (bannedPlayers.remove(originalPlayer)) {
+            Log.debugResult(Debug.REPLACE_PLAYER, "Action", "Replace Banned Player");
             bannedPlayers.add(newPlayer);
         }
     }
@@ -3570,6 +3576,7 @@ public class SIsland implements Island {
     private void replacePermissions(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer) {
         PlayerPrivilegeNode playerPermissionNode = playerPermissions.remove(originalPlayer);
         if (playerPermissionNode != null) {
+            Log.debugResult(Debug.REPLACE_PLAYER, "Action", "Replace Permissions");
             playerPermissions.put(newPlayer, playerPermissionNode);
             IslandsDatabaseBridge.clearPlayerPermission(this, originalPlayer);
             for (Map.Entry<IslandPrivilege, Boolean> privilegeEntry : playerPermissionNode.getCustomPermissions().entrySet())

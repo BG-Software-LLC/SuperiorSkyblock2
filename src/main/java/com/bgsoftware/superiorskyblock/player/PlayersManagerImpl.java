@@ -9,6 +9,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -134,6 +136,8 @@ public class PlayersManagerImpl extends Manager implements PlayersManager {
     }
 
     public void replacePlayers(SuperiorPlayer originPlayer, SuperiorPlayer newPlayer) {
+        Log.debug(Debug.REPLACE_PLAYER, originPlayer.getName(), newPlayer.getName());
+
         this.playersContainer.removePlayer(originPlayer);
 
         newPlayer.merge(originPlayer);
