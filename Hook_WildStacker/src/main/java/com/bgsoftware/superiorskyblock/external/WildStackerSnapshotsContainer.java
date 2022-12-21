@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.external;
 
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
 import org.bukkit.Chunk;
@@ -35,7 +36,8 @@ public class WildStackerSnapshotsContainer {
             if (stackedSnapshot != null) {
                 cachedSnapshots.put(chunkPosition, stackedSnapshot);
             }
-        } catch (Throwable ignored) {
+        } catch (Throwable error) {
+            Log.error(error, "Received an unexpected error while taking a snapshot for WildStacker:");
         }
     }
 
