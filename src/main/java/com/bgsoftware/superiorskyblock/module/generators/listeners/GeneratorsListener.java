@@ -22,7 +22,7 @@ import org.bukkit.event.block.BlockFromToEvent;
 public class GeneratorsListener implements Listener {
 
     private static final BlockFace[] nearbyFaces = new BlockFace[]{
-            BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
+            BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.UP
     };
     private static final Material BLUE_ICE_MATERIAL = Materials.getMaterialSafe("BLUE_ICE");
     private static final Material SOUL_SOIL_MATERIAL = Materials.getMaterialSafe("SOUL_SOIL");
