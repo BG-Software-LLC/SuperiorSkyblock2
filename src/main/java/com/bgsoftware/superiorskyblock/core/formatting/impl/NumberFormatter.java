@@ -24,7 +24,7 @@ public class NumberFormatter implements IFormatter<Number> {
         numberFormat = numberFormat.replace("_", "-");
 
         if (!NUMBER_PATTERN.matcher(numberFormat).matches()) {
-            Log.warnFromFile("&cThe number format \"", numberFormat, "\" is invalid. Using default one: en-US.");
+            Log.warn("The number format \"", numberFormat, "\" is invalid. Using default one: en-US.");
             numberFormat = "en-US";
         }
 

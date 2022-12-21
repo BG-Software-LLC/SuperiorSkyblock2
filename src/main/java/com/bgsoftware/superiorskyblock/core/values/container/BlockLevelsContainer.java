@@ -26,7 +26,7 @@ public class BlockLevelsContainer extends BlockValuesContainer {
             try {
                 setBlockValue(KeyImpl.of(key), new BigDecimal(value));
             } catch (Exception ex) {
-                Log.warnFromFile("Cannot parse level value for ", key + ", skipping...");
+                Log.warnFromFile("levels.yml", "Cannot parse level value for ", key + ", skipping...");
             }
         }
     }

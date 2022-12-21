@@ -196,7 +196,7 @@ public class SuperiorSchematicDeserializer {
 
             combinedId = plugin.getNMSAlgorithms().getCombinedId(type, (byte) data);
         } else {
-            Log.warnFromFile("Couldn't find combinedId for the block ", compoundTag.getString("blockPosition"), " - skipping...");
+            Log.warn("Couldn't find combinedId for the block ", compoundTag.getString("blockPosition"), " - skipping...");
             return null;
         }
 

@@ -235,7 +235,7 @@ public class SettingsContainer {
             String[] sections = line.split(":");
 
             if (sections.length < 2) {
-                Log.warnFromFile("Cannot parse block limit '", line, "', skipping...");
+                Log.warnFromFile("config.yml", "Cannot parse block limit '", line, "', skipping...");
                 continue;
             }
 
@@ -251,7 +251,7 @@ public class SettingsContainer {
             String[] sections = line.split(":");
 
             if (sections.length < 2) {
-                Log.warnFromFile("Cannot parse entity limit '", line, "', skipping...");
+                Log.warnFromFile("config.yml", "Cannot parse entity limit '", line, "', skipping...");
                 continue;
             }
 
@@ -333,7 +333,7 @@ public class SettingsContainer {
             String portalOffset = config.getString("worlds.end.dragon-fight.portal-offset");
             endDragonFightPortalOffset = Serializers.OFFSET_SPACED_SERIALIZER.deserialize(portalOffset);
             if (endDragonFightPortalOffset == null) {
-                Log.warnFromFile("Cannot parse portal-offset '", portalOffset, "' to a valid offset, skipping...");
+                Log.warnFromFile("config.yml", "Cannot parse portal-offset '", portalOffset, "' to a valid offset, skipping...");
             }
         }
         this.endDragonFightPortalOffset = endDragonFightPortalOffset == null ? SBlockOffset.ZERO : endDragonFightPortalOffset;

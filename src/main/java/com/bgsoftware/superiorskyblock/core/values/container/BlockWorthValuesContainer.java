@@ -32,7 +32,7 @@ public class BlockWorthValuesContainer extends BlockValuesContainer {
             try {
                 setBlockValue(KeyImpl.of(key), new BigDecimal(value));
             } catch (Exception ex) {
-                Log.warnFromFile("Cannot parse worth value for ", key + ", skipping...");
+                Log.warnFromFile("worth.yml", "Cannot parse worth value for ", key + ", skipping...");
             }
         }
     }

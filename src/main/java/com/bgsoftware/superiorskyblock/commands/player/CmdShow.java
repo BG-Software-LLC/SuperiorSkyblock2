@@ -117,7 +117,7 @@ public class CmdShow implements ISuperiorCommand {
                         rolesStrings.get(superiorPlayer.getPlayerRole())
                                 .append(Message.ISLAND_INFO_PLAYER_LINE.getMessage(locale, superiorPlayer.getName())).append("\n");
                     } catch (NullPointerException ex) {
-                        Log.warnFromFile("It seems like ", superiorPlayer.getName(), " isn't part of the island of "
+                        Log.warn("It seems like ", superiorPlayer.getName(), " isn't part of the island of "
                                 , island.getOwner().getName(), ".");
                     }
                 });

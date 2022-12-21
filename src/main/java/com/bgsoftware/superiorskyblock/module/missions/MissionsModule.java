@@ -180,12 +180,12 @@ public class MissionsModule extends BuiltinModule {
         File categoryFolder = new File(getModuleFolder(), "categories/" + categoryName);
 
         if (!categoryFolder.exists()) {
-            Log.warnFromFile("The directory of the mission category ", categoryName, " doesn't exist, skipping...");
+            Log.warn("The directory of the mission category ", categoryName, " doesn't exist, skipping...");
             return false;
         }
 
         if (!categoryFolder.isDirectory()) {
-            Log.warnFromFile("The directory of the mission category ", categoryName, " is not valid, skipping...");
+            Log.warn("The directory of the mission category ", categoryName, " is not valid, skipping...");
             return false;
         }
 
@@ -193,7 +193,7 @@ public class MissionsModule extends BuiltinModule {
                 file.isFile() && file.getName().endsWith(".yml"));
 
         if (missionFiles == null || missionFiles.length == 0) {
-            Log.warnFromFile("The mission category ", categoryName, " doesn't have missions, skipping...");
+            Log.warn("The mission category ", categoryName, " doesn't have missions, skipping...");
             return false;
         }
 
@@ -228,7 +228,7 @@ public class MissionsModule extends BuiltinModule {
         }
 
         if (categoryMissions.isEmpty()) {
-            Log.warnFromFile("The mission category ", categoryName, " doesn't have missions, skipping...");
+            Log.warn("The mission category ", categoryName, " doesn't have missions, skipping...");
             return false;
         }
 

@@ -870,7 +870,7 @@ public enum Message {
             try {
                 fileLocale = PlayerLocales.getLocale(fileName);
             } catch (IllegalArgumentException ex) {
-                Log.warnFromFile("The language ", fileName, " is invalid, skipping...");
+                Log.warn("The language ", fileName, " is invalid, skipping...");
                 continue;
             }
 

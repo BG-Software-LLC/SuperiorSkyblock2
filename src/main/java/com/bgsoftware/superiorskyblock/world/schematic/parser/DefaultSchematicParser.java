@@ -31,7 +31,7 @@ public class DefaultSchematicParser implements SchematicParser {
 
             if (ServerVersion.isLegacy() && compoundTag.containsKey("version") &&
                     !ServerVersion.getBukkitVersion().equals(compoundTag.getString("version")))
-                Log.warnFromFile("Schematic ", schematicName, " was created in a different version, may cause issues.");
+                Log.warn("Schematic ", schematicName, " was created in a different version, may cause issues.");
 
             if (!compoundTag.isEmpty())
                 return new SuperiorSchematic(schematicName, compoundTag);

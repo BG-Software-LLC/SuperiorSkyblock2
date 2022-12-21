@@ -176,7 +176,7 @@ public class UpgradesModule extends BuiltinModule {
         UpgradeCostLoader costLoader = plugin.getUpgrades().getUpgradeCostLoader(priceType);
 
         if (costLoader == null) {
-            Log.warnFromFile("Upgrade by name ", upgrade.getName(), " (level ", level, ") has invalid price-type. Skipping...");
+            Log.warn("Upgrade by name ", upgrade.getName(), " (level ", level, ") has invalid price-type. Skipping...");
             return;
         }
 
@@ -206,7 +206,7 @@ public class UpgradesModule extends BuiltinModule {
         Value<Integer> borderSize = Value.syncedFixed(levelSection.getInt("border-size", -1));
 
         if (borderSize.get() > plugin.getSettings().getMaxIslandSize()) {
-            Log.warnFromFile("Upgrade by name ", upgrade.getName(), " (level ", level, ") has illegal border-size, skipping...");
+            Log.warn("Upgrade by name ", upgrade.getName(), " (level ", level, ") has illegal border-size, skipping...");
             return;
         }
 
