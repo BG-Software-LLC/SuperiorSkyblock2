@@ -27,12 +27,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public class BukkitEntities {
@@ -146,23 +148,41 @@ public class BukkitEntities {
         return EntityCategory.UNKNOWN;
     }
 
+    private static EnumSet<EntityType> createEntityTypesSet(Predicate<EntityType> predicate) {
+        EnumSet<EntityType> entityTypes = EnumSet.noneOf(EntityType.class);
+        for (EntityType entityType : EntityType.values()) {
+            if (predicate.test(entityType))
+                entityTypes.add(entityType);
+        }
+        return entityTypes;
+    }
+
     public enum EntityCategory {
 
         MONSTER(IslandPrivileges.MONSTER_DAMAGE, IslandPrivileges.MONSTER_SPAWN) {
-            @Override
-            boolean isFromCategory(EntityType entityType) {
+
+            private final EnumSet<EntityType> MONSTER_TYPES = createEntityTypesSet(entityType -> {
                 Class<? extends Entity> entityClass = entityType.getEntityClass();
                 return entityClass != null && (Monster.class.isAssignableFrom(entityClass) ||
                         // Checks for slimes & magma cubes
                         Slime.class.isAssignableFrom(entityClass) ||
                         // Checks for ghasts and phantoms
-                        Flying.class.isAssignableFrom(entityClass));
+                        Flying.class.isAssignableFrom(entityClass) ||
+                        // In Bukkit, Hoglins are considered as Animals for no reason.
+                        // We want to explicitly tell the plugin its monster type.
+                        entityClass == HOGLIN_CLASS
+                );
+            });
+
+            @Override
+            boolean isFromCategory(EntityType entityType) {
+                return MONSTER_TYPES.contains(entityType);
             }
         },
         // !!!Never put this above Monster category!!!
         ANIMAL(IslandPrivileges.ANIMAL_DAMAGE, IslandPrivileges.ANIMAL_SPAWN) {
-            @Override
-            boolean isFromCategory(EntityType entityType) {
+
+            private final EnumSet<EntityType> ANIMAL_TYPES = createEntityTypesSet(entityType -> {
                 Class<? extends Entity> entityClass = entityType.getEntityClass();
                 // This call is done after Monster category is checked.
                 // Therefore, the checks below are enough.
@@ -171,6 +191,11 @@ public class BukkitEntities {
                         (Creature.class.isAssignableFrom(entityClass) || Ambient.class.isAssignableFrom(entityClass)) &&
                         // We make sure this is not Hoglin; In Bukkit, they are considered Animals.
                         entityClass != HOGLIN_CLASS;
+            });
+
+            @Override
+            boolean isFromCategory(EntityType entityType) {
+                return ANIMAL_TYPES.contains(entityType);
             }
         },
         PAINTING(IslandPrivileges.PAINTING, IslandPrivileges.BUILD) {
