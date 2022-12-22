@@ -138,12 +138,17 @@ public class PlayersManagerImpl extends Manager implements PlayersManager {
     public void replacePlayers(SuperiorPlayer originPlayer, SuperiorPlayer newPlayer) {
         Log.debug(Debug.REPLACE_PLAYER, originPlayer.getName(), newPlayer.getName());
 
-        this.playersContainer.removePlayer(originPlayer);
-
         newPlayer.merge(originPlayer);
 
-        for (Island island : plugin.getGrid().getIslands())
-            island.replacePlayers(originPlayer, newPlayer);
+        // We first want to replace the player for his own island
+        Island playerIsland = originPlayer.getIsland();
+        if (playerIsland != null)
+            playerIsland.replacePlayers(originPlayer, newPlayer);
+
+        for (Island island : plugin.getGrid().getIslands()) {
+            if (island != playerIsland)
+                island.replacePlayers(originPlayer, newPlayer);
+        }
 
         plugin.getEventsBus().callPlayerReplaceEvent(originPlayer, newPlayer);
     }

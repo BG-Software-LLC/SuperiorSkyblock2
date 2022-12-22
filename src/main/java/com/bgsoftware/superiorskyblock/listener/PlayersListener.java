@@ -83,14 +83,20 @@ public class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onPlayerLogin(PlayerLoginEvent e) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-        List<SuperiorPlayer> duplicatedPlayers = plugin.getPlayers().matchAllPlayers(_superiorPlayer ->
-                _superiorPlayer != superiorPlayer && _superiorPlayer.getName().equalsIgnoreCase(e.getPlayer().getName()));
+        List<SuperiorPlayer> duplicatedPlayers = plugin.getPlayers().matchAllPlayers(superiorPlayer ->
+                superiorPlayer.getName().equalsIgnoreCase(e.getPlayer().getName()));
+
         if (!duplicatedPlayers.isEmpty()) {
-            Log.info("Changing UUID of " + superiorPlayer.getName() + " to " + superiorPlayer.getUniqueId());
-            for (SuperiorPlayer duplicatePlayer : duplicatedPlayers) {
-                plugin.getPlayers().replacePlayers(duplicatePlayer, superiorPlayer);
-            }
+            Log.info("Changing UUID of " + e.getPlayer().getName() + " to " + e.getPlayer().getUniqueId());
+
+            // We first want to remove all original players.
+            duplicatedPlayers.forEach(plugin.getPlayers().getPlayersContainer()::removePlayer);
+
+            // We now want to create the new player.
+            SuperiorPlayer newPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+
+            // We now want to replace all existing players
+            duplicatedPlayers.forEach(originalPlayer -> plugin.getPlayers().replacePlayers(originalPlayer, newPlayer));
         }
     }
 
