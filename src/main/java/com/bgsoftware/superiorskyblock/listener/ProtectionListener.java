@@ -523,9 +523,10 @@ public class ProtectionListener implements Listener {
     }
 
     public boolean preventPlayerPickupItem(Player player, Location location, Flag... flags) {
+        Location blockLocation = new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
         Island island = plugin.getGrid().getIslandAt(location);
-        return preventInteraction(island, location, superiorPlayer, IslandPrivileges.PICKUP_DROPS, flags);
+        return preventInteraction(island, blockLocation, superiorPlayer, IslandPrivileges.PICKUP_DROPS, flags);
     }
 
     /* PROJECTILE INTERACTS */
