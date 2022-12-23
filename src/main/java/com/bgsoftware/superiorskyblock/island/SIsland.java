@@ -1425,7 +1425,7 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(originalPlayer, "originalPlayer parameter cannot be null.");
         Preconditions.checkNotNull(newPlayer, "newPlayer parameter cannot be null.");
 
-        Log.debug(Debug.REPLACE_PLAYER, owner.getName(), originalPlayer.getName(), newPlayer.getName());
+        Log.debug(Debug.REPLACE_PLAYER, owner, originalPlayer, newPlayer);
 
         if (owner.equals(originalPlayer)) {
             Log.debugResult(Debug.REPLACE_PLAYER, "Action", "Replace Owner");
