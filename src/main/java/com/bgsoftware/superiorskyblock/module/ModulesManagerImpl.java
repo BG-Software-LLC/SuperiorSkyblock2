@@ -18,6 +18,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -94,6 +95,18 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
         }
 
         this.modulesContainer.unregisterModule(pluginModule);
+
+        // We now want to unload the ClassLoader and free the held handles for the file.
+        ClassLoader classLoader = pluginModule.getClassLoader();
+        if (classLoader instanceof URLClassLoader) {
+            try {
+                ((URLClassLoader) classLoader).close();
+                // This is an attempt to force Windows to free the handles of the file.
+                System.gc();
+            } catch (IOException ignored) {
+            }
+        }
+
     }
 
     @Override
