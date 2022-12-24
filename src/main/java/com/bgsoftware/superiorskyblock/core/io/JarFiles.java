@@ -26,10 +26,13 @@ public class JarFiles {
                 name = name.replace("/", ".");
                 String clazzName = name.substring(0, name.lastIndexOf(".class"));
 
-                Class<?> c = cl.loadClass(clazzName);
-
-                if (clazz.isAssignableFrom(c)) {
-                    return Either.right(c);
+                try {
+                    Class<?> c = cl.loadClass(clazzName);
+                    if (clazz.isAssignableFrom(c)) {
+                        return Either.right(c);
+                    }
+                } catch (NoClassDefFoundError ignored) {
+                    // If we can't find the class, can just be ignored.
                 }
             }
         } catch (Throwable error) {
