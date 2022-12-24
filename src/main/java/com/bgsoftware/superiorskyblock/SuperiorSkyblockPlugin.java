@@ -518,6 +518,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         ItemSkulls.readTextures(this);
 
         if (!loadGrid) {
+            modulesHandler.reloadModules(ModuleLoadTime.BEFORE_WORLD_CREATION);
             settingsHandler = new SettingsManagerImpl(this);
             modulesHandler.reloadModules(ModuleLoadTime.NORMAL);
         } else {
@@ -576,6 +577,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         });
 
         CalcTask.startTask();
+
+        if (!loadGrid)
+            modulesHandler.reloadModules(ModuleLoadTime.AFTER_HANDLERS_LOADING);
     }
 
     @Override
