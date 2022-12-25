@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -163,6 +164,9 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         Log.debug(Debug.SET_TEXTURE_VALUE, getName(), textureValue);
 
+        if (Objects.equals(this.textureValue, textureValue))
+            return;
+
         this.textureValue = textureValue;
 
         PlayersDatabaseBridge.saveTextureValue(this);
@@ -176,6 +180,9 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void setLastTimeStatus(long lastTimeStatus) {
         Log.debug(Debug.SET_PLAYER_LAST_TIME_UPDATED, getName(), lastTimeStatus);
+
+        if (this.lastTimeStatus == lastTimeStatus)
+            return;
 
         this.lastTimeStatus = lastTimeStatus;
 
@@ -198,14 +205,15 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void setName(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
 
-        if (!this.name.equals(name)) {
-            try {
-                plugin.getPlayers().getPlayersContainer().removePlayer(this);
-                this.name = name;
-                PlayersDatabaseBridge.savePlayerName(this);
-            } finally {
-                plugin.getPlayers().getPlayersContainer().addPlayer(this);
-            }
+        if (Objects.equals(this.name, name))
+            return;
+
+        try {
+            plugin.getPlayers().getPlayersContainer().removePlayer(this);
+            this.name = name;
+            PlayersDatabaseBridge.savePlayerName(this);
+        } finally {
+            plugin.getPlayers().getPlayersContainer().addPlayer(this);
         }
     }
 
@@ -501,9 +509,14 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setDisbands(int disbands) {
-        this.disbands = Math.max(disbands, 0);
+        disbands = Math.max(disbands, 0);
 
-        Log.debug(Debug.SET_DISBANDS, getName(), this.disbands);
+        Log.debug(Debug.SET_DISBANDS, getName(), disbands);
+
+        if (this.disbands == disbands)
+            return;
+
+        this.disbands = disbands;
 
         PlayersDatabaseBridge.saveDisbands(this);
     }
@@ -531,6 +544,9 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         Log.debug(Debug.SET_LANGUAGE, getName(), userLocale.getLanguage() + "-" + userLocale.getCountry());
 
+        if (Objects.equals(this.userLocale, userLocale))
+            return;
+
         this.userLocale = userLocale;
 
         PlayersDatabaseBridge.saveUserLocale(this);
@@ -549,6 +565,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void setWorldBorderEnabled(boolean enabled) {
         Log.debug(Debug.SET_TOGGLED_BORDER, getName(), enabled);
+
+        if (this.worldBorderEnabled == enabled)
+            return;
+
         this.worldBorderEnabled = enabled;
         PlayersDatabaseBridge.saveToggledBorder(this);
     }
@@ -635,6 +655,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void setToggledPanel(boolean toggledPanel) {
         Log.debug(Debug.SET_TOGGLED_PANEL, getName(), toggledPanel);
+
+        if (this.toggledPanel == toggledPanel)
+            return;
+
         this.toggledPanel = toggledPanel;
         PlayersDatabaseBridge.saveToggledPanel(this);
     }
@@ -662,7 +686,11 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void setIslandFly(boolean enabled) {
         Log.debug(Debug.SET_ISLAND_FLY, getName(), enabled);
-        islandFly = enabled;
+
+        if (this.islandFly == enabled)
+            return;
+
+        this.islandFly = enabled;
         PlayersDatabaseBridge.saveIslandFly(this);
     }
 
@@ -693,8 +721,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         Log.debug(Debug.SET_BORDER_COLOR, getName(), borderColor);
 
-        this.borderColor = borderColor;
+        if (this.borderColor == borderColor)
+            return;
 
+        this.borderColor = borderColor;
         PlayersDatabaseBridge.saveBorderColor(this);
     }
 
@@ -870,15 +900,24 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         Log.debug(Debug.SET_PLAYER_MISSION_COMPLETED, getName(), mission.getName(), finishCount);
 
+        // We always want to reset data
+        mission.clearData(this);
+
         if (finishCount > 0) {
-            completedMissions.put(mission, finishCount);
+            Integer oldFinishCount = completedMissions.put(mission, finishCount);
+
+            if (Objects.equals(oldFinishCount, finishCount))
+                return;
+
             PlayersDatabaseBridge.saveMission(this, mission, finishCount);
         } else {
-            completedMissions.remove(mission);
+            Integer oldFinishCount = completedMissions.remove(mission);
+
+            if (oldFinishCount == null)
+                return;
+
             PlayersDatabaseBridge.removeMission(this, mission);
         }
-
-        mission.clearData(this);
     }
 
     @Override

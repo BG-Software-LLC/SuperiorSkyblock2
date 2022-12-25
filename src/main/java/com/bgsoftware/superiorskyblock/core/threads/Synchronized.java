@@ -34,10 +34,12 @@ public class Synchronized<T> {
         }
     }
 
-    public void set(T value) {
+    public T set(T value) {
         try {
             lock.writeLock().lock();
+            T oldValue = this.value;
             this.value = value;
+            return oldValue;
         } finally {
             lock.writeLock().unlock();
         }
