@@ -84,19 +84,39 @@ public class PlayersListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onPlayerLogin(PlayerLoginEvent e) {
         List<SuperiorPlayer> duplicatedPlayers = plugin.getPlayers().matchAllPlayers(superiorPlayer ->
-                superiorPlayer.getName().equalsIgnoreCase(e.getPlayer().getName()));
+                superiorPlayer.getName().equalsIgnoreCase(e.getPlayer().getName()) &&
+                        !superiorPlayer.getUniqueId().equals(e.getPlayer().getUniqueId()));
 
         if (!duplicatedPlayers.isEmpty()) {
             Log.info("Changing UUID of " + e.getPlayer().getName() + " to " + e.getPlayer().getUniqueId());
 
-            // We first want to remove all original players.
-            duplicatedPlayers.forEach(plugin.getPlayers().getPlayersContainer()::removePlayer);
+            SuperiorPlayer playerWithNewUUID = plugin.getPlayers().getSuperiorPlayer(e.getPlayer().getUniqueId(), false);
 
-            // We now want to create the new player.
-            SuperiorPlayer newPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+            if (playerWithNewUUID != null) {
+                // Even tho we have duplicates, there's already a record for the new player.
+                // Therefore, we just want to delete the old records from DB and cache.
+                Log.info("Detected a record for the new player uuid already - deleting old ones...");
+                // Delete all records
+                duplicatedPlayers.forEach(duplicatedPlayer -> {
+                    plugin.getPlayers().replacePlayers(duplicatedPlayer, null);
+                    plugin.getPlayers().getPlayersContainer().removePlayer(duplicatedPlayer);
+                });
+                // We make sure the new player is correctly set in all caches by removing it and adding it.
+                plugin.getPlayers().getPlayersContainer().removePlayer(playerWithNewUUID);
+                plugin.getPlayers().getPlayersContainer().addPlayer(playerWithNewUUID);
+            } else {
+                // We first want to remove all original players.
+                duplicatedPlayers.forEach(plugin.getPlayers().getPlayersContainer()::removePlayer);
 
-            // We now want to replace all existing players
-            duplicatedPlayers.forEach(originalPlayer -> plugin.getPlayers().replacePlayers(originalPlayer, newPlayer));
+                // We now want to create the new player.
+                SuperiorPlayer newPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer().getUniqueId(), true, false);
+
+                // We now want to replace all existing players
+                duplicatedPlayers.forEach(originalPlayer -> {
+                    if (originalPlayer != newPlayer)
+                        plugin.getPlayers().replacePlayers(originalPlayer, newPlayer);
+                });
+            }
         }
     }
 

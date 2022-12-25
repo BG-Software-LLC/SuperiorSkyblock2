@@ -721,8 +721,10 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      *
      * @param originalPlayer The old player to be replaced.
      * @param newPlayer      The new player.
+     *                       If null, the original player should just be removed.
+     *                       If this is the owner of the island, the island will be disbanded.
      */
-    void replacePlayers(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer);
+    void replacePlayers(SuperiorPlayer originalPlayer, @Nullable SuperiorPlayer newPlayer);
 
     /**
      * Recalculate the island's worth value.

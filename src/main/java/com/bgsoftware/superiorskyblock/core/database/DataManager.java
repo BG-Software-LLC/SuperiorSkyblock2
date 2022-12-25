@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
+import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.core.database.loader.DatabaseLoader;
 import com.bgsoftware.superiorskyblock.core.database.loader.backup.BackupDatabase;
@@ -108,7 +109,7 @@ public class DataManager extends Manager {
     private void loadPlayers() {
         Log.info("Starting to load players...");
 
-        DatabaseBridge playersLoader = plugin.getFactory().createDatabaseBridge((SuperiorPlayer) null);
+        DatabaseBridge playersLoader = PlayersDatabaseBridge.getGlobalPlayersBridge();
 
         DatabaseCache<SuperiorPlayer.Builder> databaseCache = new DatabaseCache<>();
         AtomicInteger playersCount = new AtomicInteger();
@@ -185,7 +186,8 @@ public class DataManager extends Manager {
                 return;
             }
 
-            Optional<SuperiorPlayer> owner = databaseResult.getUUID("owner").map(plugin.getPlayers()::getSuperiorPlayer);
+            Optional<SuperiorPlayer> owner = databaseResult.getUUID("owner").map(ownerUUID ->
+                    plugin.getPlayers().getSuperiorPlayer(ownerUUID, false));
             if (!owner.isPresent()) {
                 Log.warn("Cannot load island with invalid owner uuid, skipping...");
                 return;

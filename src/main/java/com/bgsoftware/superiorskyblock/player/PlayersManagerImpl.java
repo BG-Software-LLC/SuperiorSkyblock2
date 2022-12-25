@@ -16,8 +16,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -51,13 +53,24 @@ public class PlayersManagerImpl extends Manager implements PlayersManager {
 
     @Override
     public SuperiorPlayer getSuperiorPlayer(UUID uuid) {
+        return Objects.requireNonNull(getSuperiorPlayer(uuid, true));
+    }
+
+    @Nullable
+    public SuperiorPlayer getSuperiorPlayer(UUID uuid, boolean createIfNotExists) {
+        return this.getSuperiorPlayer(uuid, createIfNotExists, true);
+    }
+
+    @Nullable
+    public SuperiorPlayer getSuperiorPlayer(UUID uuid, boolean createIfNotExists, boolean saveToDatabase) {
         Preconditions.checkNotNull(uuid, "uuid parameter cannot be null.");
         SuperiorPlayer superiorPlayer = this.playersContainer.getSuperiorPlayer(uuid);
 
-        if (superiorPlayer == null) {
+        if (createIfNotExists && superiorPlayer == null) {
             superiorPlayer = plugin.getFactory().createPlayer(uuid);
             this.playersContainer.addPlayer(superiorPlayer);
-            PlayersDatabaseBridge.insertPlayer(superiorPlayer);
+            if (saveToDatabase)
+                PlayersDatabaseBridge.insertPlayer(superiorPlayer);
         }
 
         return superiorPlayer;
@@ -135,10 +148,8 @@ public class PlayersManagerImpl extends Manager implements PlayersManager {
                 .build(this.playersContainer.getAllPlayers());
     }
 
-    public void replacePlayers(SuperiorPlayer originPlayer, SuperiorPlayer newPlayer) {
+    public void replacePlayers(SuperiorPlayer originPlayer, @Nullable SuperiorPlayer newPlayer) {
         Log.debug(Debug.REPLACE_PLAYER, originPlayer, newPlayer);
-
-        newPlayer.merge(originPlayer);
 
         // We first want to replace the player for his own island
         Island playerIsland = originPlayer.getIsland();
@@ -153,7 +164,12 @@ public class PlayersManagerImpl extends Manager implements PlayersManager {
                 island.replacePlayers(originPlayer, newPlayer);
         }
 
-        plugin.getEventsBus().callPlayerReplaceEvent(originPlayer, newPlayer);
+        if (newPlayer == null) {
+            PlayersDatabaseBridge.deletePlayer(originPlayer);
+        } else {
+            newPlayer.merge(originPlayer);
+            plugin.getEventsBus().callPlayerReplaceEvent(originPlayer, newPlayer);
+        }
     }
 
     // Updating last time status
@@ -167,7 +183,6 @@ public class PlayersManagerImpl extends Manager implements PlayersManager {
 
         if (!modifiedPlayers.isEmpty())
             modifiedPlayers.forEach(PlayersDatabaseBridge::executeFutureSaves);
-
     }
 
 }

@@ -72,14 +72,17 @@ public class IslandsDeserializer {
                 return;
             }
 
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get(), false);
+            if (superiorPlayer == null)
+                return;
+
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
 
             PlayerRole playerRole = members.getInt("role").map(SPlayerRole::fromId)
                     .orElse(SPlayerRole.defaultRole());
 
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get());
-            superiorPlayer.setPlayerRole(playerRole);
 
+            superiorPlayer.setPlayerRole(playerRole);
             builder.addIslandMember(superiorPlayer);
         });
     }
@@ -100,8 +103,11 @@ public class IslandsDeserializer {
                 return;
             }
 
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get(), false);
+            if (superiorPlayer == null)
+                return;
+
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get());
             builder.addBannedPlayer(superiorPlayer);
         });
     }
@@ -122,8 +128,11 @@ public class IslandsDeserializer {
                 return;
             }
 
+            SuperiorPlayer visitorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid.get(), false);
+            if (visitorPlayer == null)
+                return;
+
             Island.Builder builder = databaseCache.computeIfAbsentInfo(islandUUID.get(), IslandBuilderImpl::new);
-            SuperiorPlayer visitorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid.get());
             long visitTime = visitors.getLong("visit_time").orElse(System.currentTimeMillis());
             builder.addUniqueVisitor(visitorPlayer, visitTime);
         });
@@ -145,6 +154,10 @@ public class IslandsDeserializer {
                 return;
             }
 
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get(), false);
+            if (superiorPlayer == null)
+                return;
+
             Optional<IslandPrivilege> islandPrivilege = playerPermissions.getString("permission").map(name -> {
                 try {
                     return IslandPrivilege.getByName(name);
@@ -164,7 +177,6 @@ public class IslandsDeserializer {
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get());
             builder.setPlayerPermission(superiorPlayer, islandPrivilege.get(), status.get() == 1);
         });
     }
@@ -396,6 +408,10 @@ public class IslandsDeserializer {
                 return;
             }
 
+            SuperiorPlayer ratingPlayer = plugin.getPlayers().getSuperiorPlayer(uuid.get(), false);
+            if (ratingPlayer == null)
+                return;
+
             Optional<Rating> rating = ratings.getInt("rating").map(value -> {
                 try {
                     return Rating.valueOf(value);
@@ -409,7 +425,6 @@ public class IslandsDeserializer {
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(islandUUID.get(), IslandBuilderImpl::new);
-            SuperiorPlayer ratingPlayer = plugin.getPlayers().getSuperiorPlayer(uuid.get());
             builder.setRating(ratingPlayer, rating.get());
         });
     }

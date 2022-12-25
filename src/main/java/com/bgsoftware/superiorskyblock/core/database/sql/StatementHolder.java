@@ -1,24 +1,27 @@
 package com.bgsoftware.superiorskyblock.core.database.sql;
 
+import com.bgsoftware.superiorskyblock.core.Mutable;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.HashMap;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.regex.Pattern;
 
 public class StatementHolder {
 
-    private final List<Map<Integer, Object>> batches = new LinkedList<>();
+    private static final Pattern QUERY_VALUE_PATTERN = Pattern.compile("\\?");
 
-    private final Map<Integer, Object> values = new HashMap<>();
+    private final List<List<Object>> batches = new LinkedList<>();
+
+    private final List<Object> values = new LinkedList<>();
     private String query;
-    private int currentIndex = 1;
 
     public StatementHolder(String statement) {
         setQuery(statement);
@@ -29,31 +32,36 @@ public class StatementHolder {
     }
 
     public void addBatch() {
-        batches.add(new HashMap<>(values));
-        values.clear();
-        currentIndex = 1;
+        this.batches.add(this.values);
+        this.values.clear();
     }
 
     public StatementHolder setObject(Object value) {
-        values.put(currentIndex++, value);
+        this.values.add(value);
         return this;
     }
 
     public void executeBatch(boolean async) {
-        if (batches.isEmpty())
+        if (this.batches.isEmpty())
             return;
 
-        StringHolder errorQuery = new StringHolder(query);
+        // Commit changes if exists.
+        if (!this.values.isEmpty())
+            addBatch();
+
+        Mutable<String> rawQuery = new Mutable<>(this.query);
 
         executeQuery(async, new QueryResult<PreparedStatement>().onSuccess(preparedStatement -> {
             Connection connection = preparedStatement.getConnection();
             connection.setAutoCommit(false);
 
-            for (Map<Integer, Object> values : batches) {
-                for (Map.Entry<Integer, Object> entry : values.entrySet()) {
-                    preparedStatement.setObject(entry.getKey(), entry.getValue());
-                    errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
-                }
+            for (List<Object> values : batches) {
+                rawQuery.setValue(this.query);
+
+                populateStatement(preparedStatement, values, rawQuery);
+
+                Log.debug(Debug.DATABASE_QUERY, rawQuery.getValue());
+
                 preparedStatement.addBatch();
             }
 
@@ -66,21 +74,21 @@ public class StatementHolder {
 
             connection.setAutoCommit(true);
         }).onFail(error -> {
-            Log.error(error, "An unexpected error occurred while executing query `", errorQuery, "`:");
+            Log.error(error, "An unexpected error occurred while executing query `", rawQuery.getValue(), "`:");
         }));
     }
 
     public void execute(boolean async) {
-        StringHolder errorQuery = new StringHolder(query);
+        Mutable<String> rawQuery = new Mutable<>(query);
 
         executeQuery(async, new QueryResult<PreparedStatement>().onSuccess(preparedStatement -> {
-            for (Map.Entry<Integer, Object> entry : values.entrySet()) {
-                preparedStatement.setObject(entry.getKey(), entry.getValue());
-                errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
-            }
+            populateStatement(preparedStatement, this.values, rawQuery);
+
+            Log.debug(Debug.DATABASE_QUERY, rawQuery.getValue());
+
             preparedStatement.executeUpdate();
         }).onFail(error -> {
-            Log.error(error, "An unexpected error occurred while executing query `", errorQuery, "`:");
+            Log.error(error, "An unexpected error occurred while executing query `", rawQuery.getValue(), "`:");
         }));
     }
 
@@ -102,17 +110,12 @@ public class StatementHolder {
         }
     }
 
-    private static class StringHolder {
-
-        private String value;
-
-        StringHolder(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return value;
+    private static void populateStatement(PreparedStatement preparedStatement, List<Object> values,
+                                          Mutable<String> rawQuery) throws SQLException {
+        int currentIndex = 1;
+        for (Object value : values) {
+            preparedStatement.setObject(currentIndex++, value);
+            rawQuery.setValue(QUERY_VALUE_PATTERN.matcher(rawQuery.getValue()).replaceFirst(value + ""));
         }
     }
 

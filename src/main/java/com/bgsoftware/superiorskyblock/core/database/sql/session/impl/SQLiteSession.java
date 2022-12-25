@@ -160,8 +160,6 @@ public class SQLiteSession implements SQLSession {
     public void customQuery(String query, QueryResult<PreparedStatement> queryResult) {
         Preconditions.checkNotNull(this.conn, "Session was not initialized.");
 
-        Log.debug(Debug.DATABASE_QUERY, query);
-
         try (PreparedStatement preparedStatement =
                      this.conn.prepareStatement(query.replace("{prefix}", ""))) {
             queryResult.complete(preparedStatement);

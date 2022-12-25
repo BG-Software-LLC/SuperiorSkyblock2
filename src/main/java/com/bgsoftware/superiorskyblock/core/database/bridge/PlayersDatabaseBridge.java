@@ -1,11 +1,13 @@
 package com.bgsoftware.superiorskyblock.core.database.bridge;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -22,9 +24,22 @@ import java.util.function.Consumer;
 @SuppressWarnings("unchecked")
 public class PlayersDatabaseBridge {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final Map<UUID, Map<FutureSave, Set<Object>>> SAVE_METHODS_TO_BE_EXECUTED = new ConcurrentHashMap<>();
+    private static final LazyReference<DatabaseBridge> GLOBAL_PLAYERS_BRIDGE = new LazyReference<DatabaseBridge>() {
+        @Override
+        protected DatabaseBridge create() {
+            DatabaseBridge databaseBridge = plugin.getFactory().createDatabaseBridge((SuperiorPlayer) null);
+            databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
+            return databaseBridge;
+        }
+    };
 
     private PlayersDatabaseBridge() {
+    }
+
+    public static DatabaseBridge getGlobalPlayersBridge() {
+        return GLOBAL_PLAYERS_BRIDGE.get();
     }
 
     public static void saveTextureValue(SuperiorPlayer superiorPlayer) {
@@ -140,47 +155,49 @@ public class PlayersDatabaseBridge {
         });
     }
 
-    public static void updatePlayer(SuperiorPlayer superiorPlayer) {
-        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> {
-            Locale userLocale = superiorPlayer.getUserLocale();
-            databaseBridge.updateObject("players",
-                    createFilter("uuid", superiorPlayer),
-                    new Pair<>("last_used_name", superiorPlayer.getName()),
-                    new Pair<>("last_used_skin", superiorPlayer.getTextureValue()),
-                    new Pair<>("disbands", superiorPlayer.getDisbands()),
-                    new Pair<>("last_time_updated", superiorPlayer.getLastTimeStatus())
-            );
+    public static void replacePlayer(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer) {
+        DatabaseBridge playersReplacer = getGlobalPlayersBridge();
 
-            databaseBridge.updateObject("players_custom_data",
-                    createFilter("player", superiorPlayer),
-                    new Pair<>("data", superiorPlayer.getPersistentDataContainer().serialize())
-            );
+        Pair<String, Object> uuidColumn = new Pair<>("uuid", newPlayer.getUniqueId().toString());
+        DatabaseFilter uuidFilter = createFilter("uuid", originalPlayer);
 
-            databaseBridge.updateObject("players_settings",
-                    createFilter("player", superiorPlayer),
-                    new Pair<>("language", userLocale.getLanguage() + "-" + userLocale.getCountry()),
-                    new Pair<>("toggled_panel", superiorPlayer.hasToggledPanel()),
-                    new Pair<>("border_color", superiorPlayer.getBorderColor().name()),
-                    new Pair<>("toggled_border", superiorPlayer.hasWorldBorderEnabled()),
-                    new Pair<>("island_fly", superiorPlayer.hasIslandFlyEnabled())
-            );
+        Pair<String, Object> playerColumn = new Pair<>("player", newPlayer.getUniqueId().toString());
+        DatabaseFilter playerFilter = createFilter("player", originalPlayer);
 
-            databaseBridge.deleteObject("players_missions", createFilter("player", superiorPlayer));
-
-            for (Map.Entry<Mission<?>, Integer> missionEntry : superiorPlayer.getCompletedMissionsWithAmounts().entrySet()) {
-                saveMission(superiorPlayer, missionEntry.getKey(), missionEntry.getValue());
-            }
-        });
+        // We go through all possible tables (both island and players) and replace the player uuids.
+        playersReplacer.updateObject("bank_transactions", playerFilter, playerColumn);
+        playersReplacer.updateObject("islands", createFilter("owner", originalPlayer), new Pair<>("owner", newPlayer.getUniqueId().toString()));
+        playersReplacer.updateObject("islands_bans", playerFilter, playerColumn);
+        playersReplacer.updateObject("islands_bans", createFilter("banned_by", originalPlayer), new Pair<>("banned_by", newPlayer.getUniqueId().toString()));
+        playersReplacer.updateObject("islands_members", playerFilter, playerColumn);
+        playersReplacer.updateObject("islands_player_permissions", playerFilter, playerColumn);
+        playersReplacer.updateObject("islands_ratings", playerFilter, playerColumn);
+        playersReplacer.updateObject("islands_visitors", playerFilter, playerColumn);
+        playersReplacer.updateObject("players", uuidFilter, uuidColumn);
+        playersReplacer.updateObject("players_custom_data", playerFilter, playerColumn);
+        playersReplacer.updateObject("players_settings", playerFilter, playerColumn);
+        playersReplacer.updateObject("players_missions", playerFilter, playerColumn);
     }
 
     public static void deletePlayer(SuperiorPlayer superiorPlayer) {
-        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> {
-            DatabaseFilter playerFilter = createFilter("player", superiorPlayer);
-            databaseBridge.deleteObject("players", createFilter("uuid", superiorPlayer));
-            databaseBridge.deleteObject("players_custom_data", playerFilter);
-            databaseBridge.deleteObject("players_settings", playerFilter);
-            databaseBridge.deleteObject("players_missions", playerFilter);
-        });
+        DatabaseBridge playersReplacer = getGlobalPlayersBridge();
+
+        DatabaseFilter uuidFilter = createFilter("uuid", superiorPlayer);
+        DatabaseFilter playerFilter = createFilter("player", superiorPlayer);
+
+        // We go through all possible tables (both island and players) and replace the player uuids.
+        playersReplacer.deleteObject("bank_transactions", playerFilter);
+        playersReplacer.deleteObject("islands", createFilter("owner", superiorPlayer));
+        playersReplacer.deleteObject("islands_bans", playerFilter);
+        playersReplacer.deleteObject("islands_bans", createFilter("banned_by", superiorPlayer));
+        playersReplacer.deleteObject("islands_members", playerFilter);
+        playersReplacer.deleteObject("islands_player_permissions", playerFilter);
+        playersReplacer.deleteObject("islands_ratings", playerFilter);
+        playersReplacer.deleteObject("islands_visitors", playerFilter);
+        playersReplacer.deleteObject("players", uuidFilter);
+        playersReplacer.deleteObject("players_custom_data", playerFilter);
+        playersReplacer.deleteObject("players_settings", playerFilter);
+        playersReplacer.deleteObject("players_missions", playerFilter);
     }
 
     public static void markPersistentDataContainerToBeSaved(SuperiorPlayer superiorPlayer) {
