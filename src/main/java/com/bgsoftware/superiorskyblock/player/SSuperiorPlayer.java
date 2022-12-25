@@ -164,11 +164,14 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         Log.debug(Debug.SET_TEXTURE_VALUE, getName(), textureValue);
 
-        if (Objects.equals(this.textureValue, textureValue))
-            return;
-
+        // We first update the texture value, even if they are equal.
         this.textureValue = textureValue;
 
+        // We now compare them but remove the timestamp when comparing.
+        if (Objects.equals(removeTextureValueTimeStamp(this.textureValue), removeTextureValueTimeStamp(textureValue)))
+            return;
+
+        // We only save the value if it's actually different.
         PlayersDatabaseBridge.saveTextureValue(this);
     }
 
@@ -836,8 +839,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         // Convert data for missions
         plugin.getMissions().convertPlayerData(otherPlayer, this);
 
-        PlayersDatabaseBridge.updatePlayer(this);
-        PlayersDatabaseBridge.deletePlayer(otherPlayer);
+        // Replace player in DB.
+        PlayersDatabaseBridge.replacePlayer(otherPlayer, this);
     }
 
     @Override
@@ -950,6 +953,14 @@ public class SSuperiorPlayer implements SuperiorPlayer {
                 "uuid=[" + uuid + "]," +
                 "name=[" + name + "]" +
                 "}";
+    }
+
+    private static String removeTextureValueTimeStamp(@Nullable String textureValue) {
+        // The texture value string is a json containing a timestamp value.
+        // However, when we compare texture values, we want to emit the timestamp value.
+        // This value is found at index 35->41 (6 chars in length).
+        Preconditions.checkState(textureValue == null || textureValue.length() > 42);
+        return textureValue == null ? null : textureValue.substring(0, 35) + textureValue.substring(42);
     }
 
 }
