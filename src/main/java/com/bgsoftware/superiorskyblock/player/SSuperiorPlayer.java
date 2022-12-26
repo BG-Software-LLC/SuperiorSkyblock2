@@ -941,7 +941,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public int hashCode() {
         return uuid.hashCode();
     }
-F
+
     @Override
     public boolean equals(Object obj) {
         return obj instanceof SuperiorPlayer && (this == obj || uuid.equals(((SuperiorPlayer) obj).getUniqueId()));
