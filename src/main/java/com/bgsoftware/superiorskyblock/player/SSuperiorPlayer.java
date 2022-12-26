@@ -941,7 +941,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public int hashCode() {
         return uuid.hashCode();
     }
-
+F
     @Override
     public boolean equals(Object obj) {
         return obj instanceof SuperiorPlayer && (this == obj || uuid.equals(((SuperiorPlayer) obj).getUniqueId()));
@@ -959,8 +959,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         // The texture value string is a json containing a timestamp value.
         // However, when we compare texture values, we want to emit the timestamp value.
         // This value is found at index 35->41 (6 chars in length).
-        Preconditions.checkState(textureValue == null || textureValue.length() > 42);
-        return textureValue == null ? null : textureValue.substring(0, 35) + textureValue.substring(42);
+        return textureValue == null || textureValue.length() <= 42 ? null : textureValue.substring(0, 35) + textureValue.substring(42);
     }
 
 }
