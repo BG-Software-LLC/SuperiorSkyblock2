@@ -186,10 +186,15 @@ public class DataManager extends Manager {
                 return;
             }
 
-            Optional<SuperiorPlayer> owner = databaseResult.getUUID("owner").map(ownerUUID ->
-                    plugin.getPlayers().getSuperiorPlayer(ownerUUID, false));
-            if (!owner.isPresent()) {
+            Optional<UUID> ownerUUID = databaseResult.getUUID("owner");
+            if (!ownerUUID.isPresent()) {
                 Log.warn("Cannot load island with invalid owner uuid, skipping...");
+                return;
+            }
+
+            SuperiorPlayer owner = plugin.getPlayers().getSuperiorPlayer(ownerUUID.get(), false);
+            if (owner == null) {
+                Log.warn("Cannot load island with unrecognized owner uuid: " + ownerUUID.get() + ", skipping...");
                 return;
             }
 
@@ -200,7 +205,7 @@ public class DataManager extends Manager {
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new)
-                    .setOwner(owner.get())
+                    .setOwner(owner)
                     .setUniqueId(uuid.get())
                     .setCenter(center.get())
                     .setName(databaseResult.getString("name").orElse(""))

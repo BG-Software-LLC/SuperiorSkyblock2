@@ -73,8 +73,10 @@ public class IslandsDeserializer {
             }
 
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get(), false);
-            if (superiorPlayer == null)
+            if (superiorPlayer == null) {
+                Log.warn("Cannot load island member with unrecognized uuid: " + playerUUID.get() + ", skipping...");
                 return;
+            }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
 
@@ -104,8 +106,10 @@ public class IslandsDeserializer {
             }
 
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get(), false);
-            if (superiorPlayer == null)
+            if (superiorPlayer == null) {
+                Log.warn("Cannot load island ban with unrecognized uuid: " + playerUUID.get() + ", skipping...");
                 return;
+            }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
             builder.addBannedPlayer(superiorPlayer);
@@ -129,8 +133,10 @@ public class IslandsDeserializer {
             }
 
             SuperiorPlayer visitorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid.get(), false);
-            if (visitorPlayer == null)
+            if (visitorPlayer == null) {
+                Log.warn("Cannot load island visitor with unrecognized uuid: " + uuid.get() + ", skipping...");
                 return;
+            }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(islandUUID.get(), IslandBuilderImpl::new);
             long visitTime = visitors.getLong("visit_time").orElse(System.currentTimeMillis());
@@ -155,8 +161,10 @@ public class IslandsDeserializer {
             }
 
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get(), false);
-            if (superiorPlayer == null)
+            if (superiorPlayer == null) {
+                Log.warn("Cannot load island player permissions with unrecognized uuid: " + playerUUID.get() + ", skipping...");
                 return;
+            }
 
             Optional<IslandPrivilege> islandPrivilege = playerPermissions.getString("permission").map(name -> {
                 try {
@@ -409,8 +417,10 @@ public class IslandsDeserializer {
             }
 
             SuperiorPlayer ratingPlayer = plugin.getPlayers().getSuperiorPlayer(uuid.get(), false);
-            if (ratingPlayer == null)
+            if (ratingPlayer == null) {
+                Log.warn("Cannot load island rating with unrecognized uuid: " + uuid.get() + ", skipping...");
                 return;
+            }
 
             Optional<Rating> rating = ratings.getInt("rating").map(value -> {
                 try {
