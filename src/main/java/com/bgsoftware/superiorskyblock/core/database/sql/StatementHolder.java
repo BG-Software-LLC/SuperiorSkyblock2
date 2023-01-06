@@ -32,7 +32,7 @@ public class StatementHolder {
     }
 
     public void addBatch() {
-        this.batches.add(this.values);
+        this.batches.add(new LinkedList<>(this.values));
         this.values.clear();
     }
 
