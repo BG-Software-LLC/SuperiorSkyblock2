@@ -28,6 +28,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
@@ -45,6 +46,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.material.Directional;
+import org.bukkit.material.Dispenser;
+import org.bukkit.material.MaterialData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -134,9 +138,43 @@ public class BlockChangesListener implements Listener {
         )
             return;
 
+        onMinecartPlace(handItemType, e.getClickedBlock().getLocation());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private void onMinecartPlaceByDispenser(BlockDispenseEvent e) {
+        Material dispenseItemType = e.getItem().getType();
+
+        if (!Materials.isMinecart(dispenseItemType) || e.getBlock().getType() != Material.DISPENSER)
+            return;
+
+        Block targetBlock = null;
+
+        if (ServerVersion.isLegacy()) {
+            MaterialData materialData = e.getBlock().getState().getData();
+            if (materialData instanceof Directional) {
+                targetBlock = e.getBlock().getRelative(((Directional) materialData).getFacing());
+            }
+        } else {
+            Object blockData = plugin.getNMSWorld().getBlockData(e.getBlock());
+            if (blockData instanceof org.bukkit.block.data.Directional) {
+                targetBlock = e.getBlock().getRelative(((org.bukkit.block.data.Directional) blockData).getFacing());
+            }
+        }
+
+        if (targetBlock == null)
+            return;
+
+        if (!Materials.isRail(targetBlock.getType()))
+            return;
+
+        onMinecartPlace(dispenseItemType, targetBlock.getLocation());
+    }
+
+    private void onMinecartPlace(Material minecartType, Location location) {
         Key blockKey;
 
-        switch (handItemType.name()) {
+        switch (minecartType.name()) {
             case "HOPPER_MINECART":
                 blockKey = ConstantKeys.HOPPER;
                 break;
@@ -161,7 +199,7 @@ public class BlockChangesListener implements Listener {
                 return;
         }
 
-        onBlockPlace(blockKey, e.getClickedBlock().getLocation(), 1, null, Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
+        onBlockPlace(blockKey, location, 1, null, Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
