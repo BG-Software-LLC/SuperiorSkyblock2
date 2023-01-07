@@ -339,8 +339,16 @@ public class GridManagerImpl extends Manager implements GridManager {
     @Override
     public void cancelAllIslandPreviews() {
         if (!Bukkit.isPrimaryThread()) {
-            BukkitExecutor.sync(this::cancelAllIslandPreviews);
-            return;
+            BukkitExecutor.sync(this::cancelAllIslandPreviewsSync);
+        } else {
+            cancelAllIslandPreviewsSync();
+        }
+    }
+
+    private void cancelAllIslandPreviewsSync() {
+        if (!Bukkit.isPrimaryThread()) {
+            Log.warn("Trying to cancel all island previews asynchronous. Stack trace:");
+            new Exception().printStackTrace();
         }
 
         this.islandPreviews.getActivePreviews().forEach(islandPreview -> {
