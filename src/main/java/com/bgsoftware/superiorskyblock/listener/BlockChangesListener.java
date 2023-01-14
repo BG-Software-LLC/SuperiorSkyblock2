@@ -120,10 +120,8 @@ public class BlockChangesListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onBlockFrom(BlockFormEvent e) {
         Location location = e.getNewState().getLocation();
-        BukkitExecutor.sync(() -> {
-            // Do not save block counts
-            onBlockBreak(KeyImpl.of(e.getNewState()), location, 1, Flag.DIRTY_CHUNK);
-        }, 1L);
+        // Do not save block counts
+        onBlockBreak(KeyImpl.of(e.getBlock()), location, 1, Flag.DIRTY_CHUNK);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
