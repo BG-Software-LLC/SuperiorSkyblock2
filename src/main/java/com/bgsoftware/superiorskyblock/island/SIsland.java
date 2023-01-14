@@ -3360,12 +3360,19 @@ public class SIsland implements Island {
         if (worldGeneratorRates == null)
             return;
 
-        Value<Integer> oldGeneratorRate = worldGeneratorRates.remove(key);
+        Value<Integer> oldGeneratorRate = worldGeneratorRates.get(key);
 
-        if (oldGeneratorRate == null)
+        if (oldGeneratorRate == null || oldGeneratorRate.get() <= 0)
             return;
 
-        IslandsDatabaseBridge.removeGeneratorRate(this, environment, key);
+        if (oldGeneratorRate instanceof SyncedValue) {
+            // In case the old rate was upgrade-synced, we want to keep it in DB and cache as a 0 rate.
+            IslandsDatabaseBridge.saveGeneratorRate(this, environment, key, 0);
+            worldGeneratorRates.put(key, Value.fixed(0));
+        } else {
+            IslandsDatabaseBridge.removeGeneratorRate(this, environment, key);
+            worldGeneratorRates.remove(key);
+        }
     }
 
     /*
