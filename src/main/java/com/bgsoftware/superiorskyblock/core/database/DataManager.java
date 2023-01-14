@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @SuppressWarnings("WeakerAccess")
 public class DataManager extends Manager {
 
+    private static final UUID CONSOLE_UUID = new UUID(0, 0);
     private final List<DatabaseLoader> databaseLoaders = new LinkedList<>();
 
     public DataManager(SuperiorSkyblockPlugin plugin) {
@@ -125,6 +126,11 @@ public class DataManager extends Manager {
             Optional<UUID> uuid = databaseResult.getUUID("uuid");
             if (!uuid.isPresent()) {
                 Log.warn("Cannot load player with null uuid, skipping...");
+                return;
+            }
+
+            if (uuid.get().equals(CONSOLE_UUID)) {
+                Log.warn("Cannot load player with uuid 0 (it is reserved to CONSOLE), skipping...");
                 return;
             }
 
