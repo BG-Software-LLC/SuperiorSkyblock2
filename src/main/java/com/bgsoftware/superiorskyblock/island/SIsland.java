@@ -296,9 +296,8 @@ public class SIsland implements Island {
             }
         });
         if (!builder.blockCounts.isEmpty()) {
-            BukkitExecutor.sync(() -> builder.blockCounts.forEach((block, count) ->
-                    handleBlockPlace(block, count, false, false)
-            ), 20L);
+            plugin.getProviders().addPricesLoadCallback(() -> builder.blockCounts.forEach((block, count) ->
+                    handleBlockPlace(block, count, false, false)));
         }
 
         builder.warpCategories.forEach(warpCategoryRecord -> {

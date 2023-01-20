@@ -63,6 +63,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private static final BigDecimal MAX_DOUBLE = BigDecimal.valueOf(Double.MAX_VALUE);
 
     private final List<AFKProvider> AFKProvidersList = new LinkedList<>();
+    private List<Runnable> pricesLoadCallbacks = new LinkedList<>();
     private SpawnersProvider spawnersProvider = new SpawnersProvider_Default();
     private StackedBlocksProvider stackedBlocksProvider = new StackedBlocksProvider_Default();
     private EconomyProvider economyProvider = new EconomyProvider_Default();
@@ -209,6 +210,10 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     @Override
     public void setPricesProvider(PricesProvider pricesProvider) {
         this.pricesProvider = pricesProvider;
+        this.pricesProvider.getWhenPricesAreReady().whenComplete((result, error) -> {
+            this.pricesLoadCallbacks.forEach(Runnable::run);
+            this.pricesLoadCallbacks = null;
+        });
     }
 
     @Override
@@ -244,6 +249,14 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     @Override
     public void unregisterStackedBlocksListener(IStackedBlocksListener stackedBlocksListener) {
         this.stackedBlocksListeners.remove(stackedBlocksListener);
+    }
+
+    public void addPricesLoadCallback(Runnable callback) {
+        if (this.pricesLoadCallbacks == null) {
+            callback.run();
+        } else {
+            this.pricesLoadCallbacks.add(callback);
+        }
     }
 
     public void notifyStackedBlocksListeners(OfflinePlayer offlinePlayer, Block block,

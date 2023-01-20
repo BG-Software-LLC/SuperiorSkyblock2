@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
+import java.util.concurrent.CompletableFuture;
 
 public interface PricesProvider {
 
@@ -24,5 +25,12 @@ public interface PricesProvider {
      */
     @Nullable
     Key getBlockKey(Key blockKey);
+
+    /**
+     * Get a CompletableFuture that is completed when all prices and data of this provider are ready.
+     */
+    default CompletableFuture<Void> getWhenPricesAreReady() {
+        return CompletableFuture.completedFuture(null);
+    }
 
 }

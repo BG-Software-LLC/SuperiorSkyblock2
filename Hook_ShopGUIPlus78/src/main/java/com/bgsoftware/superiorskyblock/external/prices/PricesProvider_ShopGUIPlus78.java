@@ -6,21 +6,33 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import net.brcdev.shopgui.ShopGuiPlugin;
+import net.brcdev.shopgui.event.ShopGUIPlusPostEnableEvent;
 import net.brcdev.shopgui.shop.Shop;
 import net.brcdev.shopgui.shop.item.ShopItem;
+import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
 import java.math.BigDecimal;
+import java.util.concurrent.CompletableFuture;
 
 public class PricesProvider_ShopGUIPlus78 implements PricesProvider {
 
     private final ShopGuiPlugin shopPlugin = ShopGuiPlugin.getInstance();
     private final KeyMap<Double> cachedPrices = KeyMap.createConcurrentKeyMap();
+    private final CompletableFuture<Void> readyFuture = new CompletableFuture<>();
 
     private final SuperiorSkyblockPlugin plugin;
 
     public PricesProvider_ShopGUIPlus78(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         Log.info("Using ShopGUIPlus as a prices provider.");
+        Bukkit.getPluginManager().registerEvents(new Listener() {
+            @EventHandler
+            public void onShopsLoaded(ShopGUIPlusPostEnableEvent event) {
+                readyFuture.complete(null);
+            }
+        }, plugin);
     }
 
     @Override
@@ -60,6 +72,11 @@ public class PricesProvider_ShopGUIPlus78 implements PricesProvider {
     @Override
     public Key getBlockKey(Key blockKey) {
         return cachedPrices.getKey(blockKey, null);
+    }
+
+    @Override
+    public CompletableFuture<Void> getWhenPricesAreReady() {
+        return this.readyFuture;
     }
 
 }
