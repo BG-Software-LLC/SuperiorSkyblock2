@@ -43,7 +43,7 @@ public class EntityTrackingListener implements Listener {
 
     public void onEntitySpawn(Entity entity) {
         if (!BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class) ||
-                BukkitEntities.canBypassEntityLimit(entity) || BukkitEntities.canHaveLimit(entity.getType()))
+                BukkitEntities.canBypassEntityLimit(entity) || !BukkitEntities.canHaveLimit(entity.getType()))
             return;
 
         Island island = plugin.getGrid().getIslandAt(entity.getLocation());
