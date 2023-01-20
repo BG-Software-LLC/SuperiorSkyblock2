@@ -68,7 +68,7 @@ public abstract class AbstractMenuLayout<V extends MenuView<V, ?>> implements Me
         String title = placeholdersService.parsePlaceholders(menuView.getInventoryViewer().asOfflinePlayer(),
                 menuView instanceof AbstractMenuView ? ((AbstractMenuView<?, ?>) menuView).replaceTitle(this.title) : this.title);
 
-        Inventory inventory = Optional.ofNullable(menuView.getInventory()).orElse(createInventory(menuView, title));
+        Inventory inventory = createInventory(menuView, title);
 
         populateInventory(inventory, menuView);
 
