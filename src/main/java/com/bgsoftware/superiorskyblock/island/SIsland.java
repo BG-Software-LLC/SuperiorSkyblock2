@@ -3495,14 +3495,13 @@ public class SIsland implements Island {
 
         Key generatedBlock = eventResult.getResult().getBlock();
 
-        if (optimizeCobblestone && generatedBlock.getGlobalKey().equals("COBBLESTONE")) {
-            Log.debugResult(Debug.GENERATE_BLOCK, "Return Cobblestone", generatedBlock);
-            /* Block is being counted in BlocksListener#onBlockFromToMonitor */
-            return generatedBlock;
-        }
-
         // If the block is a custom block, and the event was cancelled - we need to call the handleBlockPlace manually.
         handleBlockPlace(generatedBlock, 1);
+
+        if (optimizeCobblestone && generatedBlock.getGlobalKey().equals("COBBLESTONE")) {
+            Log.debugResult(Debug.GENERATE_BLOCK, "Return Cobblestone", generatedBlock);
+            return generatedBlock;
+        }
 
         // Checking whether the plugin should set the block in the world.
         if (eventResult.getResult().isPlaceBlock()) {
