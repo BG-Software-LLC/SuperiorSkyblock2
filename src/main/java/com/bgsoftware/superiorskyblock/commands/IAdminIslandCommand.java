@@ -49,7 +49,7 @@ public interface IAdminIslandCommand extends ISuperiorCommand {
             }
         }
 
-        return Collections.unmodifiableList(tabVariables);
+        return tabVariables == null ? Collections.emptyList() : Collections.unmodifiableList(tabVariables);
     }
 
     boolean supportMultipleIslands();
