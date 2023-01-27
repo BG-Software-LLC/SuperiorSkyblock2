@@ -508,9 +508,14 @@ public class SettingsContainer {
                 .map(KeyImpl::of).collect(Collectors.toSet()));
         islandPreviewLocations = new HashMap<>();
         if (config.isConfigurationSection("preview-islands")) {
-            for (String schematic : config.getConfigurationSection("preview-islands").getKeys(false))
-                islandPreviewLocations.put(schematic.toLowerCase(Locale.ENGLISH), Serializers.LOCATION_SERIALIZER
-                        .deserialize(config.getString("preview-islands." + schematic)));
+            for (String schematic : config.getConfigurationSection("preview-islands").getKeys(false)) {
+                try {
+                    islandPreviewLocations.put(schematic.toLowerCase(Locale.ENGLISH), Serializers.LOCATION_SERIALIZER
+                            .deserialize(config.getString("preview-islands." + schematic)));
+                } catch (Exception error) {
+                    Log.warn("Cannot deserialize island preview for ", schematic, ", skipping...");
+                }
+            }
         }
         tabCompleteHideVanished = config.getBoolean("tab-complete-hide-vanished", true);
         dropsUpgradePlayersMultiply = config.getBoolean("drops-upgrade-players-multiply", false);
