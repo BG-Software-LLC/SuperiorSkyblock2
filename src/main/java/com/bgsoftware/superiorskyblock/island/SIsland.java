@@ -1417,10 +1417,7 @@ public class SIsland implements Island {
     }
 
     @Override
-    public void replacePlayers(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer) {
-        Preconditions.checkNotNull(originalPlayer, "originalPlayer parameter cannot be null.");
-        Preconditions.checkNotNull(newPlayer, "newPlayer parameter cannot be null.");
-
+    public void replacePlayers(@NotNull SuperiorPlayer originalPlayer, @NotNull SuperiorPlayer newPlayer) {
         if (owner == originalPlayer) {
             owner = newPlayer;
             IslandsDatabaseBridge.saveIslandLeader(this);
