@@ -1464,9 +1464,8 @@ public class SIsland implements Island {
     }
 
     @Override
-    public void replacePlayers(SuperiorPlayer originalPlayer, @Nullable SuperiorPlayer newPlayer) {
+    public void replacePlayers(SuperiorPlayer originalPlayer, @Nullable SuperiorPlayer newPlayer) {F
         Preconditions.checkNotNull(originalPlayer, "originalPlayer parameter cannot be null.");
-        Preconditions.checkNotNull(newPlayer, "newPlayer parameter cannot be null.");
         Preconditions.checkState(originalPlayer != newPlayer, "originalPlayer and newPlayer cannot equal.");
 
         Log.debug(Debug.REPLACE_PLAYER, owner, originalPlayer, newPlayer);
