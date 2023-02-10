@@ -305,7 +305,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                     }
 
                     if (playerIsland != null)
-                        playerIsland.setCurrentlyActive();
+                        playerIsland.setCurrentlyActive(true);
 
                     if (island != null)
                         island.setPlayerInside(superiorPlayer, true);

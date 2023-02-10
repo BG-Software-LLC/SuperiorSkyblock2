@@ -685,6 +685,16 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public void setCurrentlyActive(boolean active) {
+        this.handle.setCurrentlyActive(active);
+    }
+
+    @Override
+    public boolean isCurrentlyActive() {
+        return this.handle.isCurrentlyActive();
+    }
+
+    @Override
     public long getLastTimeUpdate() {
         return this.handle.getLastTimeUpdate();
     }

@@ -204,6 +204,7 @@ public class SIsland implements Island {
      * Island Time-Trackers
      */
     private volatile long lastTimeUpdate;
+    private volatile boolean currentlyActive = false;
     private volatile long lastInterest;
     private volatile long lastUpgradeTime = -1L;
     private volatile boolean giveInterestFailed = false;
@@ -1795,18 +1796,27 @@ public class SIsland implements Island {
 
     @Override
     public void updateLastTime() {
-        if (this.lastTimeUpdate != -1)
-            setLastTimeUpdate(System.currentTimeMillis() / 1000);
+        setLastTimeUpdate(System.currentTimeMillis() / 1000);
     }
 
     @Override
     public void setCurrentlyActive() {
-        this.lastTimeUpdate = -1L;
+        setCurrentlyActive(true);
+    }
+
+    @Override
+    public void setCurrentlyActive(boolean active) {
+        this.currentlyActive = active;
+    }
+
+    @Override
+    public boolean isCurrentlyActive() {
+        return this.currentlyActive;
     }
 
     @Override
     public long getLastTimeUpdate() {
-        return lastTimeUpdate;
+        return this.currentlyActive ? -1 : lastTimeUpdate;
     }
 
     public void setLastTimeUpdate(long lastTimeUpdate) {

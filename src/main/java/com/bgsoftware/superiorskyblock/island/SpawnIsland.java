@@ -811,6 +811,16 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public boolean isCurrentlyActive() {
+        return true;
+    }
+
+    @Override
+    public void setCurrentlyActive(boolean active) {
+        // Do nothing.
+    }
+
+    @Override
     public long getLastTimeUpdate() {
         return -1;
     }

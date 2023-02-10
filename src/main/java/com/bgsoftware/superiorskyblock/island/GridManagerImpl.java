@@ -232,6 +232,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
                         island.setBiome(biome);
                         island.setSchematicGenerate(plugin.getSettings().getWorlds().getDefaultWorld());
+                        island.setCurrentlyActive(true);
 
                         if (offset) {
                             island.setBonusWorth(island.getRawWorth().negate());

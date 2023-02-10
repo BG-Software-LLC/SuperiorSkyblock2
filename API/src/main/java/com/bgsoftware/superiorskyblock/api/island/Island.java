@@ -897,7 +897,22 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setCurrentlyActive();
 
     /**
+     * Set whether the island is currently active.
+     * Active islands are islands that have at least one island member online.
+     *
+     * @param active Whether the island is active.
+     */
+    void setCurrentlyActive(boolean active);
+
+    /**
+     * Check whether the island is currently active.
+     * Active islands are islands that have at least one island member online.
+     */
+    boolean isCurrentlyActive();
+
+    /**
      * Get the last time the island was updated.
+     * In case the island is active, -1 will be returned.
      */
     long getLastTimeUpdate();
 

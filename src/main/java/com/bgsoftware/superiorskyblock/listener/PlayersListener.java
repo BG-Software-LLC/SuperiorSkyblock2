@@ -183,7 +183,7 @@ public class PlayersListener implements Listener {
         if (island != null) {
             IslandUtils.sendMessage(island, Message.PLAYER_JOIN_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
             island.updateLastTime();
-            island.setCurrentlyActive();
+            island.setCurrentlyActive(true);
         }
     }
 
@@ -256,8 +256,10 @@ public class PlayersListener implements Listener {
         boolean anyOnline = island.getIslandMembers(true).stream().anyMatch(islandMember ->
                 islandMember != superiorPlayer && islandMember.isOnline());
 
-        if (!anyOnline)
+        if (!anyOnline) {
             island.setLastTimeUpdate(System.currentTimeMillis() / 1000);
+            island.setCurrentlyActive(false);
+        }
     }
 
     /* PLAYER MOVES */

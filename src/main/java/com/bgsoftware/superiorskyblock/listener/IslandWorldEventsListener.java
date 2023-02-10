@@ -27,7 +27,7 @@ public class IslandWorldEventsListener implements Listener {
         if (island == null || island.isSpawn())
             return;
 
-        if ((plugin.getSettings().isDisableRedstoneOffline() && island.getLastTimeUpdate() != -1) ||
+        if ((plugin.getSettings().isDisableRedstoneOffline() && !island.isCurrentlyActive()) ||
                 (plugin.getSettings().getAFKIntegrations().isDisableRedstone() &&
                         island.getAllPlayersInside().stream().allMatch(SuperiorPlayer::isAFK))) {
             e.setNewCurrent(0);
