@@ -3408,9 +3408,16 @@ public class SIsland implements Island {
         if (worldGeneratorRates == null)
             return Collections.emptyMap();
 
-        return Collections.unmodifiableMap(worldGeneratorRates.entrySet().stream().collect(Collectors.toMap(
-                entry -> entry.getKey().toString(),
-                entry -> entry.getValue().get())));
+        Map<String, Integer> generatorAmountsResult = new HashMap<>();
+
+        worldGeneratorRates.forEach((blockKey, valueAmount) -> {
+            int amount = valueAmount.get();
+            if (amount > 0) {
+                generatorAmountsResult.put(blockKey.toString(), amount);
+            }
+        });
+
+        return generatorAmountsResult.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorAmountsResult);
     }
 
     @Override
@@ -3493,13 +3500,13 @@ public class SIsland implements Island {
 
         Key generatedBlock = eventResult.getResult().getBlock();
 
-        // If the block is a custom block, and the event was cancelled - we need to call the handleBlockPlace manually.
-        handleBlockPlace(generatedBlock, 1);
-
         if (optimizeCobblestone && generatedBlock.getGlobalKey().equals("COBBLESTONE")) {
             Log.debugResult(Debug.GENERATE_BLOCK, "Return Cobblestone", generatedBlock);
             return generatedBlock;
         }
+
+        // If the block is a custom block, and the event was cancelled - we need to call the handleBlockPlace manually.
+        handleBlockPlace(generatedBlock, 1);
 
         // Checking whether the plugin should set the block in the world.
         if (eventResult.getResult().isPlaceBlock()) {

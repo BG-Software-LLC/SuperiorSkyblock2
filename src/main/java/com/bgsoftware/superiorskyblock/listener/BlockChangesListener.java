@@ -325,9 +325,15 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onBlockFromTo(BlockFromToEvent e) {
-        if (e.getToBlock().getType() != Material.AIR)
+        if (e.getToBlock().getType() != Material.AIR) {
             // Do not save block counts
             onBlockBreak(KeyImpl.of(e.getToBlock()), e.getToBlock().getLocation(), 1, Flag.DIRTY_CHUNK);
+        } else {
+            BukkitExecutor.sync(() -> {
+                // Do not save block counts
+                onBlockPlace(KeyImpl.of(e.getToBlock()), e.getToBlock().getLocation(), 1, null, Flag.DIRTY_CHUNK);
+            });
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
