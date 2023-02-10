@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.DynamicArray;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
@@ -19,7 +20,6 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.View, IslandViewArgs, WarpCategory> {
@@ -96,18 +96,15 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
 
         @Override
         protected List<WarpCategory> requestObjects() {
-            ArrayList<WarpCategory> warpCategories = new ArrayList<>();
+            DynamicArray<WarpCategory> warpCategories = new DynamicArray<>();
             island.getWarpCategories().values().forEach(warpCategory -> {
                 warpCategory.getWarps()
                         .stream()
                         .filter(islandWarp -> island.isMember(getInventoryViewer()) || !islandWarp.hasPrivateFlag())
                         .findAny()
-                        .ifPresent(unused -> {
-                            warpCategories.ensureCapacity(warpCategory.getSlot() + 1);
-                            warpCategories.add(warpCategory.getSlot(), warpCategory);
-                        });
+                        .ifPresent(unused -> warpCategories.set(warpCategory.getSlot(), warpCategory));
             });
-            return warpCategories;
+            return warpCategories.toList();
         }
 
         public Island getIsland() {
