@@ -22,6 +22,10 @@ public class WarpCategoryPagedObjectButton extends AbstractPagedMenuButton<MenuW
 
     @Override
     public ItemStack modifyViewItem(ItemStack buttonItem) {
+        if (pagedObject == null) {
+            return ((PagedMenuTemplateButtonImpl<MenuWarpCategories.View, WarpCategory>) getTemplate()).getNullTemplateItem().build();
+        }
+
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
         Island island = menuView.getIsland();
 
