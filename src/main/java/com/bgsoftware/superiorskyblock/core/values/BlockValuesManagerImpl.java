@@ -86,7 +86,7 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
 
         this.blockWorthValues.loadDefaultValues(plugin);
         this.blockLevels.loadDefaultValues(plugin);
-        convertValuesToLevels();
+        plugin.getProviders().addPricesLoadCallback(this::convertValuesToLevels);
     }
 
     @Override
