@@ -40,29 +40,33 @@ public class PricesProvider_ShopGUIPlus78 implements PricesProvider {
         double price = cachedPrices.getOrDefault(key, 0D);
 
         if (price == 0) {
-            for (Shop shop : shopPlugin.getShopManager().getShops()) {
-                for (ShopItem shopItem : shop.getShopItems()) {
-                    if (Key.of(shopItem.getItem()).equals(key)) {
-                        double shopPrice;
+            try {
+                for (Shop shop : shopPlugin.getShopManager().getShops()) {
+                    for (ShopItem shopItem : shop.getShopItems()) {
+                        if (Key.of(shopItem.getItem()).equals(key)) {
+                            double shopPrice;
 
-                        switch (plugin.getSettings().getSyncWorth()) {
-                            case BUY:
-                                shopPrice = shopItem.getBuyPriceForAmount(1);
-                                break;
-                            case SELL:
-                                shopPrice = shopItem.getSellPriceForAmount(1);
-                                break;
-                            default:
-                                shopPrice = 0;
-                                break;
-                        }
+                            switch (plugin.getSettings().getSyncWorth()) {
+                                case BUY:
+                                    shopPrice = shopItem.getBuyPriceForAmount(1);
+                                    break;
+                                case SELL:
+                                    shopPrice = shopItem.getSellPriceForAmount(1);
+                                    break;
+                                default:
+                                    shopPrice = 0;
+                                    break;
+                            }
 
-                        if (shopPrice > price) {
-                            price = shopPrice;
-                            cachedPrices.put(key, price);
+                            if (shopPrice > price) {
+                                price = shopPrice;
+                                cachedPrices.put(key, price);
+                            }
                         }
                     }
                 }
+            } catch (Throwable error) {
+                Log.warn(error, "Failed to load prices for item " + key);
             }
         }
 

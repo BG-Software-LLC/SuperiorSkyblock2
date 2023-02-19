@@ -210,10 +210,14 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     @Override
     public void setPricesProvider(PricesProvider pricesProvider) {
         this.pricesProvider = pricesProvider;
-        this.pricesProvider.getWhenPricesAreReady().whenComplete((result, error) -> {
+        this.pricesProvider.getWhenPricesAreReady().whenComplete((result, error) -> this.forcePricesLoad());
+    }
+
+    public void forcePricesLoad() {
+        if (this.pricesLoadCallbacks != null) {
             this.pricesLoadCallbacks.forEach(Runnable::run);
             this.pricesLoadCallbacks = null;
-        });
+        }
     }
 
     @Override

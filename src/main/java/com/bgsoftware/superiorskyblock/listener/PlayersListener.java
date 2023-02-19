@@ -72,6 +72,7 @@ public class PlayersListener implements Listener {
     private final SuperiorSkyblockPlugin plugin;
     private final Singleton<IslandPreviewListener> islandPreviewListener;
     private final Singleton<IslandOutsideListener> islandOutsideListener;
+    private boolean firstPlayerJoin = true;
 
     public PlayersListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
@@ -83,6 +84,12 @@ public class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onPlayerLogin(PlayerLoginEvent e) {
+        if (firstPlayerJoin) {
+            // On first player join, we want to force all prices to be loaded if they haven't by now
+            plugin.getProviders().forcePricesLoad();
+            firstPlayerJoin = false;
+        }
+
         List<SuperiorPlayer> duplicatedPlayers = plugin.getPlayers().matchAllPlayers(superiorPlayer ->
                 superiorPlayer.getName().equalsIgnoreCase(e.getPlayer().getName()) &&
                         !superiorPlayer.getUniqueId().equals(e.getPlayer().getUniqueId()));
