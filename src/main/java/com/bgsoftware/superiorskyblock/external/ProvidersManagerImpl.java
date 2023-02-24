@@ -585,6 +585,10 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private void registerHook(String className) {
         try {
             Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.external." + className);
+            
+            if (!isHookCompatible(clazz))
+                return;
+
             Method registerMethod = clazz.getMethod("register", SuperiorSkyblockPlugin.class);
             registerMethod.invoke(null, plugin);
         } catch (Throwable error) {
@@ -599,9 +603,8 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private <T> Optional<T> createInstance(String className) {
         try {
             Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.external." + className);
-            ReflectMethod<Boolean> compatibleMethod = new ReflectMethod<>(clazz, "isCompatible");
 
-            if (compatibleMethod.isValid() && !compatibleMethod.invoke(null))
+            if (!isHookCompatible(clazz))
                 return Optional.empty();
 
             try {
@@ -627,6 +630,11 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
     private boolean isHookEnabled(String pluginName) {
         return !plugin.getSettings().getDisabledHooks().contains(pluginName.toLowerCase(Locale.ENGLISH));
+    }
+
+    private boolean isHookCompatible(Class<?> clazz) {
+        ReflectMethod<Boolean> compatibleMethod = new ReflectMethod<>(clazz, "isCompatible");
+        return !compatibleMethod.isValid() || compatibleMethod.invoke(null);
     }
 
 }

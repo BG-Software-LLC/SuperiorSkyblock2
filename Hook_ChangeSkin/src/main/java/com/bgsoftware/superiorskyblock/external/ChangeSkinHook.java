@@ -2,28 +2,42 @@ package com.bgsoftware.superiorskyblock.external;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.github.games647.changeskin.bukkit.events.PlayerChangeSkinEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-@SuppressWarnings("unused")
 public class ChangeSkinHook implements Listener {
 
-    private final SuperiorSkyblockPlugin plugin;
+    public static boolean isCompatible(SuperiorSkyblockPlugin plugin) {
+        try {
+            Class.forName("com.github.games647.changeskin.bukkit.events.PlayerChangeSkinEvent");
+            return true;
+        } catch (ClassNotFoundException error) {
+            return false;
+        }
+    }
 
-    ChangeSkinHook(SuperiorSkyblockPlugin plugin) {
-        this.plugin = plugin;
+    private ChangeSkinHook() {
     }
 
     public static void register(SuperiorSkyblockPlugin plugin) {
-        Bukkit.getPluginManager().registerEvents(new ChangeSkinHook(plugin), plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerChangeSkinListener(plugin), plugin);
     }
 
-    @EventHandler
-    public void onPlayerChangeSkin(PlayerChangeSkinEvent e) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-        superiorPlayer.setTextureValue(e.getSkinModel().getEncodedValue());
+    private static class PlayerChangeSkinListener implements Listener {
+
+        private final SuperiorSkyblockPlugin plugin;
+
+        PlayerChangeSkinListener(SuperiorSkyblockPlugin plugin) {
+            this.plugin = plugin;
+        }
+
+        @EventHandler
+        public void onPlayerChangeSkin(com.github.games647.changeskin.bukkit.events.PlayerChangeSkinEvent e) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+            superiorPlayer.setTextureValue(e.getSkinModel().getEncodedValue());
+        }
+
     }
 
 }
