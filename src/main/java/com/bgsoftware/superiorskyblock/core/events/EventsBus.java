@@ -369,10 +369,8 @@ public class EventsBus {
         return callEvent(() -> new IslandJoinEvent(superiorPlayer, island, cause), "islandjoinevent");
     }
 
-    public void callIslandKickEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island) {
-        if (!plugin.getSettings().getDisabledEvents().contains("islandkickevent")) {
-            callEvent(new IslandKickEvent(superiorPlayer, targetPlayer, island));
-        }
+    public boolean callIslandKickEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island) {
+        return callEvent(() -> new IslandKickEvent(superiorPlayer, targetPlayer, island), "islandkickevent");
     }
 
     public boolean callIslandLeaveEvent(SuperiorPlayer superiorPlayer, Island island,

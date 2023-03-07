@@ -2,15 +2,17 @@ package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.event.Cancellable;
 
 /**
  * IslandKickEvent is called when a player is kicked from his island.
  */
-public class IslandKickEvent extends IslandEvent {
+public class IslandKickEvent extends IslandEvent implements Cancellable {
 
     private final SuperiorPlayer superiorPlayer;
     private final SuperiorPlayer targetPlayer;
 
+    private boolean cancelled = false;
     /**
      * The constructor of the event.
      *
@@ -38,4 +40,14 @@ public class IslandKickEvent extends IslandEvent {
         return targetPlayer;
     }
 
+
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
 }
