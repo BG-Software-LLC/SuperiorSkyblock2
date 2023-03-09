@@ -32,7 +32,10 @@ import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class MissionsManagerImpl extends Manager implements MissionsManager {
@@ -327,8 +330,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
         if (!dataFolder.exists())
             dataFolder.mkdirs();
-        for(Iterator<Mission<?>> missions = getAllMissions().iterator(); missions.hasNext(); ){
-            Mission<?> mission = missions.next();
+        for (Mission<?> mission : getAllMissions()) {
             YamlConfiguration data = new YamlConfiguration();
 
             try {
