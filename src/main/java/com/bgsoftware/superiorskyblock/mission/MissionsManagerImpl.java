@@ -332,7 +332,6 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             dataFolder.mkdirs();
         for (Mission<?> mission : getAllMissions()) {
             YamlConfiguration data = new YamlConfiguration();
-
             try {
                 mission.saveProgress(data);
             } catch (Throwable error) {
