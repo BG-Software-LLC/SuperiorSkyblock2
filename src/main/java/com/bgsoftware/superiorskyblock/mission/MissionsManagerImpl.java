@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Either;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
@@ -330,8 +331,10 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
         if (!dataFolder.exists())
             dataFolder.mkdirs();
+
         for (Mission<?> mission : getAllMissions()) {
             YamlConfiguration data = new YamlConfiguration();
+
             try {
                 mission.saveProgress(data);
             } catch (Throwable error) {
@@ -440,9 +443,17 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
             if (mission == null) {
                 File missionJar = new File(missionsFolder, missionSection.getString("mission-file") + ".jar");
-                Class<?> missionClass = Objects.requireNonNull(JarFiles.getClass(missionJar.toURL(), Mission.class,
-                                plugin.getPluginClassLoader()),
-                        "The mission file " + missionJar.getName() + " is not valid.");
+
+                Either<Class<?>, Throwable> missionClassLookup = JarFiles.getClass(missionJar.toURL(), Mission.class,
+                        plugin.getPluginClassLoader());
+
+                if (missionClassLookup.getLeft() != null)
+                    throw new RuntimeException("An unexpected error occurred while reading " + missionJar.getName() + ".", missionClassLookup.getLeft());
+
+                Class<?> missionClass = missionClassLookup.getRight();
+
+                if (missionClass == null)
+                    throw new RuntimeException("The mission file " + missionJar.getName() + " is not valid.");
 
                 boolean islandMission = missionSection.getBoolean("island", false);
                 List<String> requiredMissions = missionSection.getStringList("required-missions");
