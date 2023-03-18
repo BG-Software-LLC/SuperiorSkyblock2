@@ -34,7 +34,7 @@ import java.util.Optional;
 
 public class NMSPlayersImpl implements NMSPlayers {
 
-    private static final ReflectMethod<Locale> PLAYER_LOCALE = new ReflectMethod<>(Player.class, "locale");
+    private static final ReflectMethod<Locale> PLAYER_LOCALE = new ReflectMethod<>(ServerPlayer.class, "locale");
 
     private final SuperiorSkyblockPlugin plugin;
 
