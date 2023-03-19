@@ -12,6 +12,8 @@ public class IslandKickEvent extends IslandEvent implements Cancellable {
     private final SuperiorPlayer superiorPlayer;
     private final SuperiorPlayer targetPlayer;
 
+    private boolean cancelled = false;
+
     /**
      * The constructor of the event.
      *
