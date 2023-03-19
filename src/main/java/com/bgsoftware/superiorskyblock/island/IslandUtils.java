@@ -218,7 +218,8 @@ public class IslandUtils {
     }
 
     public static void handleKickPlayer(SuperiorPlayer caller, String callerName, Island island, SuperiorPlayer target) {
-        plugin.getEventsBus().callIslandKickEvent(caller, target, island);
+        if(!plugin.getEventsBus().callIslandKickEvent(caller, target, island))
+            return;
 
         island.kickMember(target);
 
