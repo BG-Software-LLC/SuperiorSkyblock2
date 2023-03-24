@@ -66,7 +66,7 @@ public class PricesProvider_ShopGUIPlus78 implements PricesProvider {
                     }
                 }
             } catch (Throwable error) {
-                Log.warn(error, "Failed to load prices for item " + key);
+                Log.error(error, "Failed to load prices for item " + key);
             }
         }
 
