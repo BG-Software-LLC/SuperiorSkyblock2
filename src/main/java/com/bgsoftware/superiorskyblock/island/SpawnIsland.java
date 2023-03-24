@@ -1280,6 +1280,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void applyEffects() {
+        // Do nothing.
+    }
+
+    @Override
     public void removeEffects(SuperiorPlayer superiorPlayer) {
         // Do nothing.
     }

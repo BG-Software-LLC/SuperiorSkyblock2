@@ -1145,6 +1145,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public void applyEffects() {
+        this.handle.applyEffects();
+    }
+
+    @Override
     public void removeEffects(SuperiorPlayer superiorPlayer) {
         this.handle.removeEffects(superiorPlayer);
     }

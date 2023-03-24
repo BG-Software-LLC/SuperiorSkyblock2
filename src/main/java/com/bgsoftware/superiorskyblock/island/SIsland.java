@@ -2738,6 +2738,12 @@ public class SIsland implements Island {
     }
 
     @Override
+    public void applyEffects() {
+        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class))
+            getAllPlayersInside().forEach(this::applyEffects);
+    }
+
+    @Override
     public void removeEffects(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class))
@@ -4266,10 +4272,18 @@ public class SIsland implements Island {
             });
         }
 
+        boolean editedIslandEffects = false;
+
         for (Map.Entry<PotionEffectType, Value<Integer>> entry : upgradeLevel.getPotionEffectsUpgradeValue().entrySet()) {
             Value<Integer> currentValue = islandEffects.get(entry.getKey());
-            if (currentValue == null || ((overrideCustom || currentValue instanceof SyncedValue) && currentValue.get() < entry.getValue().get()))
+            if (currentValue == null || ((overrideCustom || currentValue instanceof SyncedValue) && currentValue.get() < entry.getValue().get())) {
                 islandEffects.put(entry.getKey(), entry.getValue());
+                editedIslandEffects = true;
+            }
+        }
+
+        if (editedIslandEffects) {
+            applyEffects();
         }
 
         for (Map.Entry<PlayerRole, Value<Integer>> entry : upgradeLevel.getRoleLimitsUpgradeValue().entrySet()) {

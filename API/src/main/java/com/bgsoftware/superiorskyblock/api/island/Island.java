@@ -1526,6 +1526,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void applyEffects(SuperiorPlayer superiorPlayer);
 
     /**
+     * Give all the island effects to the players inside the island.
+     */
+    void applyEffects();
+
+    /**
      * Remove all the island effects from a player.
      * If the player is offline, nothing will happen.
      *
