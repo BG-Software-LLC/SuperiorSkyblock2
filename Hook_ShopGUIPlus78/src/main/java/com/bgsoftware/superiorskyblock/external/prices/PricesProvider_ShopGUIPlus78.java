@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import net.brcdev.shopgui.ShopGuiPlugin;
 import net.brcdev.shopgui.event.ShopGUIPlusPostEnableEvent;
+import net.brcdev.shopgui.event.ShopsPostLoadEvent;
 import net.brcdev.shopgui.shop.Shop;
 import net.brcdev.shopgui.shop.item.ShopItem;
 import org.bukkit.Bukkit;
@@ -29,7 +30,7 @@ public class PricesProvider_ShopGUIPlus78 implements PricesProvider {
         Log.info("Using ShopGUIPlus as a prices provider.");
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
-            public void onShopsLoaded(ShopGUIPlusPostEnableEvent event) {
+            public void onShopsLoaded(ShopsPostLoadEvent event) {
                 readyFuture.complete(null);
             }
         }, plugin);
