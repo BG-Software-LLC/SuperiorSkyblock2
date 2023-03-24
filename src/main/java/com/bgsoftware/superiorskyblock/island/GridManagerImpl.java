@@ -381,6 +381,8 @@ public class GridManagerImpl extends Manager implements GridManager {
             if (openedView != null)
                 openedView.closeView();
 
+            island.removeEffects(superiorPlayer);
+
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             Message.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
         });
