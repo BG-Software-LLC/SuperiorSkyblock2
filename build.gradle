@@ -97,13 +97,13 @@ shadowJar {
     relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.libs.hikari'
     relocate 'org.bstats', 'com.bgsoftware.superiorskyblock.libs.bstats'
 
-    archiveName = rootProject.name + "-" + rootProject.buildVersion + ".jar"
+    archiveFileName = rootProject.name + "-" + rootProject.buildVersion + ".jar"
 
     delete fileTree(rootProject.targetFolder.getAbsolutePath())
 
     exclude '*exclude.jar'
 
-    destinationDir = rootProject.targetFolder
+    destinationDirectory = rootProject.targetFolder
     from sourceSets.getByName("main").output
     configurations = [project.configurations.getByName("runtimeClasspath")]
 }
