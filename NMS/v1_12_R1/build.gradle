@@ -1,0 +1,11 @@
+group 'NMS:v1_12_R1'
+
+dependencies {
+    compileOnly "org.spigotmc:v1_12_R1-Paper:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('nms.compile_v1_12') && !Boolean.valueOf(project.findProperty("nms.compile_v1_12").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

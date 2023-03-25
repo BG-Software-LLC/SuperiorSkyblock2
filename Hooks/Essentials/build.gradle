@@ -1,0 +1,13 @@
+group 'Hooks:Essentials'
+
+dependencies {
+    compileOnly 'com.earth2me:Essentials:2.16.0.3'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_essentials') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_essentials").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

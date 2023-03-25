@@ -1,0 +1,13 @@
+group 'Hooks:ChangeSkin'
+
+dependencies {
+    compileOnly 'com.github.games647:ChangeSkin:3.1'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_changeskin') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_changeskin").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

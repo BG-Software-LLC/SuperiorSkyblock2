@@ -1,0 +1,13 @@
+group 'Hooks:JetsMinions'
+
+dependencies {
+    compileOnly 'me.jet315:JetsMinions:6.9.2'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_jetsminions') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_jetsminions").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

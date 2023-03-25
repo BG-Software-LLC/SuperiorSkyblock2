@@ -1,0 +1,13 @@
+group 'NMS:v1_16_R3'
+
+dependencies {
+    compileOnly "org.spigotmc:v1_16_R3-Tuinity:latest"
+    compileOnly project(":NMS:Spigot")
+    compileOnly project(":NMS:Paper")
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('nms.compile_v1_16') && !Boolean.valueOf(project.findProperty("nms.compile_v1_16").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

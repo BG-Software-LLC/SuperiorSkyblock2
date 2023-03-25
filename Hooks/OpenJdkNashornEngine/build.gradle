@@ -1,0 +1,17 @@
+group 'Hooks:OpenJdkNashornEngine'
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'org.openjdk.nashorn:nashorn-core:15.4'
+    compileOnly project(":API")
+    compileOnly rootProject
+}

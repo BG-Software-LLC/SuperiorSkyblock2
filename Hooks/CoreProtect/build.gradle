@@ -1,0 +1,13 @@
+group 'Hooks:CoreProtect'
+
+dependencies {
+    compileOnly 'net.coreprotect:CoreProtect:19.0'
+    compileOnly "org.spigotmc:v1_16_R3:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_coreprotect') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_coreprotect").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

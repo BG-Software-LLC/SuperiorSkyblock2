@@ -1,0 +1,13 @@
+group 'Hooks:SuperVanish'
+
+dependencies {
+    compileOnly 'de.myzelyam:SuperVanish:6.1.6'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_supervanish') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_supervanish").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

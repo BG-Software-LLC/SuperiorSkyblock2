@@ -1,0 +1,13 @@
+group 'Hooks:ProtocolLib'
+
+dependencies {
+    compileOnly "com.comphenix.protocol:ProtocolLib:4.8.0"
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_protocollib') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_protocollib").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

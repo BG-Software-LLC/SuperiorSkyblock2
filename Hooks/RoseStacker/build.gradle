@@ -1,0 +1,13 @@
+group 'Hooks:RoseStacker'
+
+dependencies {
+    compileOnly 'dev.rosewood:RoseStacker:1.4.1'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_rosestacker') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_rosestacker").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

@@ -1,0 +1,13 @@
+group 'Hooks:LuckPerms'
+
+dependencies {
+    compileOnly 'net.luckperms:LuckPerms:5.1.15'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_luckperms') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_luckperms").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

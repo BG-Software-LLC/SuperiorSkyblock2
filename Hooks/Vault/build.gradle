@@ -1,0 +1,13 @@
+group 'Hooks:Vault'
+
+dependencies {
+    compileOnly 'net.milkbowl:Vault:1.6.1'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_vault') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_vault").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

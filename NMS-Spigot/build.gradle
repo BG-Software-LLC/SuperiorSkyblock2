@@ -1,5 +1,0 @@
-dependencies {
-    compileOnly "org.spigotmc:v1_16_R3:latest"
-    compileOnly project(":API")
-    compileOnly parent
-}

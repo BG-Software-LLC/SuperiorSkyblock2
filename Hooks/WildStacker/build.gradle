@@ -1,0 +1,13 @@
+group 'Hooks:WildStacker'
+
+dependencies {
+    compileOnly 'com.bgsoftware:WildStackerAPI:3.6.1'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_wildstacker') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_wildstacker").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

@@ -1,0 +1,13 @@
+group 'Hooks:UltimateStacker'
+
+dependencies {
+    compileOnly 'com.songoda:UltimateStacker:2.1.7'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_ultimatestacker') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_ultimatestacker").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

@@ -1,0 +1,13 @@
+group 'Hooks:SkinsRestorer'
+
+dependencies {
+    compileOnly 'net.skinsrestorer:SkinsRestorer:13.7.5'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_skinsrestorer') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_skinsrestorer").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

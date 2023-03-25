@@ -1,0 +1,12 @@
+group 'Hooks:PaperMC'
+
+dependencies {
+    compileOnly "org.spigotmc:v1_16_R3-Tuinity:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_papermc') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_papermc").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}
