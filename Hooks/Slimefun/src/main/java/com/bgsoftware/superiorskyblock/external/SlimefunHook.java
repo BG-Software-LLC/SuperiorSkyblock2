@@ -108,7 +108,10 @@ public class SlimefunHook {
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onAndroidMiner(AndroidMineEvent e) {
             Log.debug(Debug.BLOCK_BREAK, e.getBlock().getLocation(), e.getBlock().getType());
-            if (stackedBlocksListener.get().tryUnstack(null, e.getBlock())) {
+
+            StackedBlocksListener.UnstackResult unstackResult = stackedBlocksListener.get().tryUnstack(null, e.getBlock());
+
+            if (unstackResult.shouldCancelOriginalEvent()) {
                 e.setCancelled(true);
             } else {
                 blockChangesListener.get().onBlockBreak(KeyImpl.of(e.getBlock()), e.getBlock().getLocation(),

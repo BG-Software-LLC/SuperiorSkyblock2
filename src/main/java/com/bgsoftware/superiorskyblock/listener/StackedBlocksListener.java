@@ -123,7 +123,8 @@ public class StackedBlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockUnstack(BlockBreakEvent e) {
-        if (tryUnstack(e.getPlayer(), e.getBlock()))
+        UnstackResult unstackResult = tryUnstack(e.getPlayer(), e.getBlock());
+        if (unstackResult.shouldCancelOriginalEvent())
             e.setCancelled(true);
     }
 
@@ -142,14 +143,15 @@ public class StackedBlocksListener implements Listener {
             StackedBlocksDepositMenu depositMenu = new StackedBlocksDepositMenu(e.getClickedBlock().getLocation());
             e.getPlayer().openInventory(depositMenu.getInventory());
         } else if (protectionListener.get().preventBlockBreak(e.getClickedBlock(), e.getPlayer(), ProtectionListener.Flag.SEND_MESSAGES) ||
-                tryUnstack(e.getPlayer(), e.getClickedBlock())) {
+                tryUnstack(e.getPlayer(), e.getClickedBlock()).shouldCancelOriginalEvent()) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockUnstack(EntityChangeBlockEvent e) {
-        if (tryUnstack(null, e.getBlock()))
+        UnstackResult unstackResult = tryUnstack(null, e.getBlock());
+        if (unstackResult.shouldCancelOriginalEvent())
             e.setCancelled(true);
     }
 
@@ -323,11 +325,11 @@ public class StackedBlocksListener implements Listener {
         return true;
     }
 
-    public boolean tryUnstack(@Nullable Player player, Block block) {
+    public UnstackResult tryUnstack(@Nullable Player player, Block block) {
         int blockAmount = plugin.getStackedBlocks().getStackedBlockAmount(block);
 
         if (blockAmount <= 1)
-            return false;
+            return UnstackResult.NOT_STACKED;
 
         // When sneaking, you'll break 64 from the stack. Otherwise, 1.
         int amount = player == null || !player.isSneaking() ? 1 : 64;
@@ -336,7 +338,7 @@ public class StackedBlocksListener implements Listener {
         amount = Math.min(amount, blockAmount);
 
         if (!plugin.getEventsBus().callBlockUnstackEvent(block, player, blockAmount, blockAmount - amount))
-            return false;
+            return UnstackResult.CANCELLED;
 
         Island island = plugin.getGrid().getIslandAt(block.getLocation());
 
@@ -381,7 +383,7 @@ public class StackedBlocksListener implements Listener {
             block.getWorld().dropItemNaturally(block.getLocation(), blockItem);
         }
 
-        return true;
+        return UnstackResult.SUCCESS;
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -477,6 +479,18 @@ public class StackedBlocksListener implements Listener {
         public void onSpongeAbsorb(org.bukkit.event.block.SpongeAbsorbEvent e) {
             if (plugin.getStackedBlocks().getStackedBlockAmount(e.getBlock()) > 1)
                 e.setCancelled(true);
+        }
+
+    }
+
+    public enum UnstackResult {
+
+        NOT_STACKED,
+        CANCELLED,
+        SUCCESS;
+
+        public boolean shouldCancelOriginalEvent() {
+            return this != NOT_STACKED;
         }
 
     }
