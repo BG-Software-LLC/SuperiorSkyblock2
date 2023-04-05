@@ -102,6 +102,8 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             registerPlaceholdersProvider();
             registerChunksProvider();
         });
+        // We try to forcefully load prices after a second the server has enabled.
+        BukkitExecutor.sync(this::forcePricesLoad, 20L);
     }
 
     @Override
@@ -585,7 +587,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private void registerHook(String className) {
         try {
             Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.external." + className);
-            
+
             if (!isHookCompatible(clazz))
                 return;
 
