@@ -192,8 +192,10 @@ island-roles:
       - MONSTER_DAMAGE
       - NAME_ENTITY
       - PAINTING
+      - PICKUP_AXOLOTL
       - PICKUP_DROPS
       - PICKUP_FISH
+      - PICKUP_LECTERN_BOOK
       - SIGN_INTERACT
       - TURTLE_EGG_TRAMPING
       - USE

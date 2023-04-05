@@ -58,6 +58,8 @@ public class IslandPrivileges {
     public static final IslandPrivilege PICKUP_DROPS = register("PICKUP_DROPS");
     @Nullable
     public static final IslandPrivilege PICKUP_FISH = register("PICKUP_FISH", !ServerVersion.isLegacy());
+    @Nullable
+    public static final IslandPrivilege PICKUP_LECTERN_BOOK = register("PICKUP_LECTERN_BOOK", ServerVersion.isAtLeast(ServerVersion.v1_14));
     public static final IslandPrivilege PROMOTE_MEMBERS = register("PROMOTE_MEMBERS");
     public static final IslandPrivilege RANKUP = register("RANKUP");
     public static final IslandPrivilege RATINGS_SHOW = register("RATINGS_SHOW");

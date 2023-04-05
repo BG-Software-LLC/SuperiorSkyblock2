@@ -65,6 +65,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
+import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
@@ -100,6 +101,7 @@ public class ProtectionListener implements Listener {
         this.plugin = plugin;
         this.registerPlayerArrowPickupListener();
         this.registerPlayerAttemptPickupItemListener();
+        this.registerPlayerTakeLecternBookListener();
     }
 
     public enum Flag {
@@ -693,6 +695,14 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    private void registerPlayerTakeLecternBookListener() {
+        try {
+            Class.forName("org.bukkit.event.player.PlayerTakeLecternBookEvent");
+            Bukkit.getPluginManager().registerEvents(new PlayerTakeLecternBookListener(), plugin);
+        } catch (Exception ignored) {
+        }
+    }
+
     private class PaperAttemptPickupListener implements Listener {
 
         @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -708,6 +718,20 @@ public class ProtectionListener implements Listener {
         @EventHandler
         public void onPlayerArrowPickup(PlayerPickupArrowEvent e) {
             if (preventPlayerPickupItem(e.getPlayer(), e.getPlayer().getLocation(), Flag.SEND_MESSAGES, Flag.PREVENT_OUTSIDE_ISLANDS))
+                e.setCancelled(true);
+        }
+
+    }
+
+    private class PlayerTakeLecternBookListener implements Listener {
+
+        @EventHandler
+        public void onPlayerTakeLecternBook(PlayerTakeLecternBookEvent e) {
+            Location blockLocation = e.getLectern().getLocation();
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+            Island island = plugin.getGrid().getIslandAt(blockLocation);
+            if (preventInteraction(island, blockLocation, superiorPlayer, IslandPrivileges.PICKUP_LECTERN_BOOK,
+                    Flag.SEND_MESSAGES, Flag.PREVENT_OUTSIDE_ISLANDS))
                 e.setCancelled(true);
         }
 
