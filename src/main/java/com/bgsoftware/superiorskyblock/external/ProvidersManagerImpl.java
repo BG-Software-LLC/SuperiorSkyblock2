@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.ISkinsListener;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IWorldsListener;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
@@ -219,6 +220,8 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         if (this.pricesLoadCallbacks != null) {
             this.pricesLoadCallbacks.forEach(Runnable::run);
             this.pricesLoadCallbacks = null;
+            // After we loaded all the price callbacks, we want to sort the top islands.
+            SortingType.values().forEach(plugin.getGrid()::forceSortIslands);
         }
     }
 
