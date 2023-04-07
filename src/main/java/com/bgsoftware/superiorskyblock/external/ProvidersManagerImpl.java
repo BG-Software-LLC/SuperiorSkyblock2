@@ -104,7 +104,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             registerChunksProvider();
         });
         // We try to forcefully load prices after a second the server has enabled.
-        BukkitExecutor.sync(this::forcePricesLoad, 20L);
+        BukkitExecutor.sync(this::forcePricesLoad, 60L);
     }
 
     @Override
