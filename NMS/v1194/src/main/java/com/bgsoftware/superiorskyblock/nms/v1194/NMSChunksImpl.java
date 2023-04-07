@@ -365,7 +365,7 @@ public class NMSChunksImpl implements NMSChunks {
     public org.bukkit.Chunk getChunkIfLoaded(ChunkPosition chunkPosition) {
         ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
         ChunkAccess chunkAccess = serverLevel.getChunkSource().getChunk(chunkPosition.getX(), chunkPosition.getZ(), false);
-        return chunkAccess instanceof LevelChunk levelChunk ? levelChunk.getBukkitChunk() : null;
+        return chunkAccess instanceof LevelChunk levelChunk ? new CraftChunk(levelChunk) : null;
     }
 
     @Override
