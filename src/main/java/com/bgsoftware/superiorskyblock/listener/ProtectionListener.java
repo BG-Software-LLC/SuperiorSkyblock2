@@ -119,7 +119,7 @@ public class ProtectionListener implements Listener {
             e.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockFertilize(PlayerInteractEvent e) {
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getItem() != null &&
                 Materials.BONE_MEAL.toBukkitItem().isSimilar(e.getItem())) {
@@ -130,6 +130,17 @@ public class ProtectionListener implements Listener {
                     Flag.SEND_MESSAGES, Flag.PREVENT_OUTSIDE_ISLANDS))
                 e.setCancelled(true);
         }
+    }
+
+    // Patching a dupe glitch with crops and beds: https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/1672
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onBedPlace(PlayerInteractEvent e) {
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null || !e.getItem().getType().name().contains("BED"))
+            return;
+
+        // The player right-clicked a block with a bed in his hand
+        if (preventBlockPlace(e.getClickedBlock(), e.getPlayer(), Flag.SEND_MESSAGES, Flag.PREVENT_OUTSIDE_ISLANDS))
+            e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
