@@ -356,7 +356,7 @@ public class NMSChunksImpl implements NMSChunks {
 
     @Override
     public boolean isChunkEmpty(org.bukkit.Chunk bukkitChunk) {
-        LevelChunk levelChunk = ((CraftChunk) bukkitChunk).getHandle();
+        LevelChunk levelChunk = NMSUtils.getCraftChunkHandle((CraftChunk) bukkitChunk);
         return Arrays.stream(levelChunk.getSections()).allMatch(chunkSection ->
                 chunkSection == null || chunkSection.hasOnlyAir());
     }
@@ -373,7 +373,7 @@ public class NMSChunksImpl implements NMSChunks {
         if (plugin.getSettings().getCropsInterval() <= 0)
             return;
 
-        LevelChunk levelChunk = ((CraftChunk) chunk).getHandle();
+        LevelChunk levelChunk = NMSUtils.getCraftChunkHandle((CraftChunk) chunk);
 
         if (stop) {
             CropsBlockEntity cropsBlockEntity = CropsBlockEntity.remove(levelChunk.getPos());
@@ -405,7 +405,7 @@ public class NMSChunksImpl implements NMSChunks {
 
     @Override
     public List<Location> getBlockEntities(Chunk chunk) {
-        LevelChunk levelChunk = ((CraftChunk) chunk).getHandle();
+        LevelChunk levelChunk = NMSUtils.getCraftChunkHandle((CraftChunk) chunk);
         List<Location> blockEntities = new LinkedList<>();
 
         World bukkitWorld = chunk.getWorld();
