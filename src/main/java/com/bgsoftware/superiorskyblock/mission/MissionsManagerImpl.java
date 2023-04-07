@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.Either;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
+import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
 import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
@@ -35,7 +36,6 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -444,8 +444,9 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             if (mission == null) {
                 File missionJar = new File(missionsFolder, missionSection.getString("mission-file") + ".jar");
 
-                Either<Class<?>, Throwable> missionClassLookup = JarFiles.getClass(missionJar.toURL(), Mission.class,
-                        plugin.getPluginClassLoader());
+                FileClassLoader missionClassLoader = new FileClassLoader(missionJar, plugin.getPluginClassLoader());
+
+                Either<Class<?>, Throwable> missionClassLookup = JarFiles.getClass(missionJar.toURL(), Mission.class, missionClassLoader);
 
                 if (missionClassLookup.getLeft() != null)
                     throw new RuntimeException("An unexpected error occurred while reading " + missionJar.getName() + ".", missionClassLookup.getLeft());

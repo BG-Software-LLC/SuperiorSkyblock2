@@ -1,6 +1,5 @@
-package com.bgsoftware.superiorskyblock.module;
+package com.bgsoftware.superiorskyblock.core.io;
 
-import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.google.common.io.ByteStreams;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +16,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-public class ModuleClassLoader extends URLClassLoader {
+public class FileClassLoader extends URLClassLoader {
 
     private final Map<String, Class<?>> classes = new ConcurrentHashMap<>();
 
@@ -25,7 +24,7 @@ public class ModuleClassLoader extends URLClassLoader {
     private final Manifest manifest;
     private final URL url;
 
-    public ModuleClassLoader(File file, ClassLoader pluginClassLoader) throws IOException {
+    public FileClassLoader(File file, ClassLoader pluginClassLoader) throws IOException {
         super(new URL[]{file.toURI().toURL()}, pluginClassLoader);
 
         this.jar = new JarFile(file);
