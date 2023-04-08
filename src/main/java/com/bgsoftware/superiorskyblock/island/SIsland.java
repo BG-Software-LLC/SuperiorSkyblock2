@@ -2429,9 +2429,9 @@ public class SIsland implements Island {
 
     @Override
     public Map<Key, Integer> getBlocksLimits() {
-        return Collections.unmodifiableMap(this.blockLimits.entrySet().stream().collect(
-                KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())
-        ));
+        KeyMap<Integer> blockLimits = KeyMap.createKeyMap();
+        this.blockLimits.forEach((block, limit) -> blockLimits.put(block, limit.get()));
+        return Collections.unmodifiableMap(blockLimits);
     }
 
     @Override
