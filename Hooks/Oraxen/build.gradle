@@ -7,7 +7,7 @@ java {
 }
 
 dependencies {
-    compileOnly 'io.th0rgal:Oraxen:1.133.0'
+    compileOnly 'io.th0rgal:Oraxen:1.155.1'
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
     compileOnly rootProject
