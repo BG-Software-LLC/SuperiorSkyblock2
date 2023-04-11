@@ -52,9 +52,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
 
 public class WorldEditSessionImpl implements WorldEditSession {
 
@@ -62,11 +65,19 @@ public class WorldEditSessionImpl implements WorldEditSession {
             ChunkBiomeContainer.class, Biome[].class, "f");
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final boolean isStarLightInterface = ((Supplier<Boolean>) () -> {
+        try {
+            Class.forName("ca.spottedleaf.starlight.common.light.StarLightInterface");
+            return true;
+        } catch (ClassNotFoundException error) {
+            return false;
+        }
+    }).get();
 
     private final Map<Long, ChunkData> chunks = new HashMap<>();
     private final List<Pair<BlockPos, BlockState>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPos, CompoundTag>> blockEntities = new LinkedList<>();
-
+    private final Set<ChunkPos> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
     private final ServerLevel serverLevel;
 
     public WorldEditSessionImpl(ServerLevel serverLevel) {
@@ -120,7 +131,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
         ChunkData chunkData = this.chunks.computeIfAbsent(chunkPos.toLong(), ChunkData::new);
 
-        if (plugin.getSettings().isLightsUpdate() && blockState.getLightEmission() > 0)
+        if (plugin.getSettings().isLightsUpdate() && !isStarLightInterface && blockState.getLightEmission() > 0)
             chunkData.lights.add(blockPos);
 
         LevelChunkSection levelChunkSection = chunkData.chunkSections[serverLevel.getSectionIndex(blockPos.getY())];
@@ -174,12 +185,15 @@ public class WorldEditSessionImpl implements WorldEditSession {
             Arrays.fill(biomes, biome);
         }
 
-        // Update lights
-        if (plugin.getSettings().isLightsUpdate() && !chunkData.lights.isEmpty()) {
-            ThreadedLevelLightEngine threadedLevelLightEngine = serverLevel.getChunkSource().getLightEngine();
-            chunkData.lights.forEach(threadedLevelLightEngine::checkBlock);
-            // Queues chunk light for this chunk.
-            threadedLevelLightEngine.lightChunk(levelChunk, false);
+        if (plugin.getSettings().isLightsUpdate()) {
+            if (isStarLightInterface) {
+                this.lightenChunks.add(chunkPos);
+            } else {
+                ThreadedLevelLightEngine threadedLevelLightEngine = serverLevel.getChunkSource().getLightEngine();
+                chunkData.lights.forEach(threadedLevelLightEngine::checkBlock);
+                // Queues chunk light for this chunk.
+                threadedLevelLightEngine.lightChunk(levelChunk, false);
+            }
         }
 
         levelChunk.setUnsaved(true);
@@ -215,6 +229,14 @@ public class WorldEditSessionImpl implements WorldEditSession {
                     worldBlockEntity.load(blockEntityCompound);
             }
         });
+
+        if (plugin.getSettings().isLightsUpdate() && isStarLightInterface && !lightenChunks.isEmpty()) {
+            ThreadedLevelLightEngine threadedLevelLightEngine = serverLevel.getChunkSource().getLightEngine();
+            threadedLevelLightEngine.relight(lightenChunks, chunkCallback -> {
+            }, completeCallback -> {
+            });
+            this.lightenChunks.clear();
+        }
     }
 
     private boolean isValidPosition(BlockPos blockPos) {
