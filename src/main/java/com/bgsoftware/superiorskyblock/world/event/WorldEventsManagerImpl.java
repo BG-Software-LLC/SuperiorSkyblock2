@@ -19,12 +19,18 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 @Deprecated
 public class WorldEventsManagerImpl implements WorldEventsManager {
 
     private final SuperiorSkyblockPlugin plugin;
     private final Singleton<EntityTrackingListener> entityTrackingListener;
+    private final Map<UUID, Set<Chunk>> pendingLoadedChunks = new HashMap<>();
 
     public WorldEventsManagerImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
@@ -48,6 +54,9 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
 
         plugin.getNMSChunks().injectChunkSections(chunk);
 
+        Set<Chunk> pendingLoadedChunksForIsland = this.pendingLoadedChunks.computeIfAbsent(island.getUniqueId(), u -> new LinkedHashSet<>());
+        pendingLoadedChunksForIsland.add(chunk);
+
         boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
         if (cropGrowthEnabled && island.isInsideRange(chunk))
             plugin.getNMSChunks().startTickingChunk(island, chunk, false);
@@ -57,6 +66,7 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
 
         Location islandCenter = island.getCenter(chunk.getWorld().getEnvironment());
 
+        boolean entityLimitsEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class);
         Mutable<Boolean> recalculateEntities = new Mutable<>(false);
 
         if (chunk.getX() == (islandCenter.getBlockX() >> 4) && chunk.getZ() == (islandCenter.getBlockZ() >> 4)) {
@@ -64,25 +74,32 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
                 island.setBiome(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ()), false);
             }
 
-            recalculateEntities.setValue(true);
+            if (entityLimitsEnabled)
+                recalculateEntities.setValue(true);
         }
 
         BukkitExecutor.sync(() -> {
-            if (!chunk.isLoaded())
+            if (!pendingLoadedChunksForIsland.remove(chunk) || !chunk.isLoaded())
                 return;
 
-            // We want to delete old holograms of stacked blocks + count entities for the chunk
             for (Entity entity : chunk.getEntities()) {
+                // We want to delete old holograms of stacked blocks + count entities for the chunk
                 if (entity instanceof ArmorStand && isHologram((ArmorStand) entity) &&
-                        plugin.getStackedBlocks().getStackedBlockAmount(entity.getLocation().subtract(0, 1, 0)) > 1)
+                        plugin.getStackedBlocks().getStackedBlockAmount(entity.getLocation().subtract(0, 1, 0)) > 1) {
                     entity.remove();
+                }
+
+                // We simulate the spawning of the entities in the newly loaded chunk.
+                // We do it only if we do not need to recalculate the entities.
+                if (entityLimitsEnabled && !recalculateEntities.getValue()) {
+                    entityTrackingListener.get().onEntitySpawn(entity);
+                }
             }
 
-            // We want to recalculate entities
-            if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
-                Arrays.stream(chunk.getEntities()).forEach(entityTrackingListener.get()::onEntitySpawn);
-                if (recalculateEntities.getValue())
-                    island.getEntitiesTracker().recalculateEntityCounts();
+            if (recalculateEntities.getValue()) {
+                island.getEntitiesTracker().recalculateEntityCounts();
+                pendingLoadedChunksForIsland.clear();
+                this.pendingLoadedChunks.remove(island.getUniqueId());
             }
         }, 2L);
 
