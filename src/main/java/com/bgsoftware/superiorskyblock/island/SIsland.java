@@ -1828,8 +1828,8 @@ public class SIsland implements Island {
 
         this.lastTimeUpdate = lastTimeUpdate;
 
-        if (lastTimeUpdate != -1)
-            IslandsDatabaseBridge.saveLastTimeUpdate(this, lastTimeUpdate);
+        if (!isCurrentlyActive())
+            IslandsDatabaseBridge.saveLastTimeUpdate(this);
     }
 
     @Override
