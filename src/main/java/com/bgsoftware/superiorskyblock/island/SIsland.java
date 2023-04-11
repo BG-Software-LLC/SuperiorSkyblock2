@@ -1819,16 +1819,17 @@ public class SIsland implements Island {
         return this.currentlyActive ? -1 : lastTimeUpdate;
     }
 
+    @Override
     public void setLastTimeUpdate(long lastTimeUpdate) {
         Log.debug(Debug.SET_ISLAND_LAST_TIME_UPDATED, owner.getName(), lastTimeUpdate);
 
-        if (this.lastUpgradeTime == lastTimeUpdate)
+        if (this.lastTimeUpdate == lastTimeUpdate)
             return;
 
         this.lastTimeUpdate = lastTimeUpdate;
 
         if (lastTimeUpdate != -1)
-            IslandsDatabaseBridge.saveLastTimeUpdate(this);
+            IslandsDatabaseBridge.saveLastTimeUpdate(this, lastTimeUpdate);
     }
 
     @Override

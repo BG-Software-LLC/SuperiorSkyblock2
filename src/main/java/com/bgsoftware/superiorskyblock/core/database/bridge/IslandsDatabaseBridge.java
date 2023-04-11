@@ -203,10 +203,10 @@ public class IslandsDatabaseBridge {
         ));
     }
 
-    public static void saveLastTimeUpdate(Island island) {
+    public static void saveLastTimeUpdate(Island island, long lastTimeUpdate) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands",
                 createFilter("uuid", island),
-                new Pair<>("last_time_updated", island.getLastTimeUpdate())
+                new Pair<>("last_time_updated", lastTimeUpdate)
         ));
     }
 
