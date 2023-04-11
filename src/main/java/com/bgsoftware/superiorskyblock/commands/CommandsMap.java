@@ -72,7 +72,7 @@ public abstract class CommandsMap {
     public List<SuperiorCommand> getSubCommands(boolean includeDisabled) {
         SequentialListBuilder<SuperiorCommand> listBuilder = new SequentialListBuilder<>();
 
-        if (includeDisabled)
+        if (!includeDisabled)
             listBuilder.filter(this::isCommandEnabled);
 
         return listBuilder.build(this.subCommands.values());
