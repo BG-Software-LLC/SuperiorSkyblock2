@@ -125,7 +125,6 @@ public class SIsland implements Island {
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
     private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static int blocksUpdateCounter = 0;
 
     private final DatabaseBridge databaseBridge;
     private final IslandBank islandBank;
@@ -134,6 +133,7 @@ public class SIsland implements Island {
     private final IslandEntitiesTrackerAlgorithm entitiesTracker;
     private final Synchronized<BukkitTask> bankInterestTask = Synchronized.of(null);
     private final DirtyChunksContainer dirtyChunksContainer;
+
     /*
      * Island Identifiers
      */
@@ -198,6 +198,7 @@ public class SIsland implements Island {
      * Island Flags
      */
     private volatile boolean beingRecalculated = false;
+    private final AtomicInteger blocksUpdateCounter = new AtomicInteger(0);
     private SuperiorPlayer owner;
     private String creationTimeDate;
     /*
@@ -3810,9 +3811,9 @@ public class SIsland implements Island {
             BukkitExecutor.async(() -> plugin.getEventsBus().callIslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel), 0L);
         }
 
-        if (++blocksUpdateCounter >= Bukkit.getOnlinePlayers().size() * 10) {
+        if (blocksUpdateCounter.incrementAndGet() >= Bukkit.getOnlinePlayers().size() * 10) {
             IslandsDatabaseBridge.saveBlockCounts(this);
-            blocksUpdateCounter = 0;
+            blocksUpdateCounter.set(0);
             plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
             plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
             plugin.getMenus().refreshValues(this);
