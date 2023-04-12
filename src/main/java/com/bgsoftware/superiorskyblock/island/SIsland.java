@@ -1554,6 +1554,12 @@ public class SIsland implements Island {
         if (islandSize == getIslandSizeRaw())
             return;
 
+        setIslandSizeInternal(Value.fixed(islandSize));
+
+        IslandsDatabaseBridge.saveSize(this);
+    }
+
+    private void setIslandSizeInternal(Value<Integer> islandSize) {
         boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
 
         if (cropGrowthEnabled) {
@@ -1562,7 +1568,7 @@ public class SIsland implements Island {
                     plugin.getNMSChunks().startTickingChunk(this, chunk, true));
         }
 
-        this.islandSize.set(Value.fixed(islandSize));
+        this.islandSize.set(islandSize);
 
         if (cropGrowthEnabled) {
             // Now, we want to update the tile entities again
@@ -1570,7 +1576,7 @@ public class SIsland implements Island {
                     plugin.getNMSChunks().startTickingChunk(this, chunk, false));
         }
 
-        IslandsDatabaseBridge.saveSize(this);
+        updateBorder();
     }
 
     @Override
@@ -2285,9 +2291,6 @@ public class SIsland implements Island {
             syncUpgrade((SUpgradeLevel) upgradeLevel, false);
         }
 
-        if (upgradeLevel.getBorderSize() != -1)
-            updateBorder();
-
         plugin.getMenus().refreshUpgrades(this);
     }
 
@@ -2348,12 +2351,7 @@ public class SIsland implements Island {
 
         IslandsDatabaseBridge.saveCropGrowth(this);
 
-        // Update the crop growth ticking
-        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class)) {
-            double newCropGrowthMultiplier = cropGrowth - 1;
-            IslandUtils.getChunkCoords(this, true, true).values()
-                    .forEach(chunkPositions -> plugin.getNMSChunks().updateCropsTicker(chunkPositions, newCropGrowthMultiplier));
-        }
+        notifyCropGrowthChange(cropGrowth);
     }
 
     @Override
@@ -2666,7 +2664,6 @@ public class SIsland implements Island {
 
         Log.debug(Debug.SET_ISLAND_EFFECT, owner.getName(), type.getName(), level);
 
-        PotionEffect potionEffect = new PotionEffect(type, Integer.MAX_VALUE, level - 1);
         Value<Integer> oldPotionLevel = islandEffects.put(type, Value.fixed(level));
 
         if (level == Value.getRaw(oldPotionLevel, -1))
@@ -2677,6 +2674,8 @@ public class SIsland implements Island {
             assert player != null;
             if (oldPotionLevel != null && oldPotionLevel.get() > level)
                 player.removePotionEffect(type);
+
+            PotionEffect potionEffect = new PotionEffect(type, Integer.MAX_VALUE, level - 1);
             player.addPotionEffect(potionEffect, true);
         }));
 
@@ -3832,9 +3831,6 @@ public class SIsland implements Island {
 
         // Syncing all real upgrades
         plugin.getUpgrades().getUpgrades().forEach(upgrade -> syncUpgrade((SUpgradeLevel) getUpgradeLevel(upgrade), overrideCustom));
-
-        if (getIslandSize() != -1)
-            updateBorder();
     }
 
     /*
@@ -4082,15 +4078,12 @@ public class SIsland implements Island {
     }
 
     private void clearUpgrades(boolean overrideCustom) {
-        islandSize.set(islandSize -> {
-            if (overrideCustom || islandSize instanceof SyncedValue) {
-                if (overrideCustom)
-                    IslandsDatabaseBridge.saveSize(this);
-                return Value.syncedFixed(-1);
-            }
+        if (overrideCustom || this.islandSize.get() instanceof SyncedValue) {
+            if (overrideCustom)
+                IslandsDatabaseBridge.saveSize(this);
 
-            return islandSize;
-        });
+            setIslandSizeInternal(Value.syncedFixed(-1));
+        }
 
         warpsLimit.set(warpsLimit -> {
             if (overrideCustom || warpsLimit instanceof SyncedValue) {
@@ -4123,8 +4116,12 @@ public class SIsland implements Island {
             if (overrideCustom || cropGrowth instanceof SyncedValue) {
                 if (overrideCustom)
                     IslandsDatabaseBridge.saveCropGrowth(this);
+
+                notifyCropGrowthChange(-1D);
+
                 return Value.syncedFixed(-1D);
             }
+
             return cropGrowth;
         });
 
@@ -4182,8 +4179,11 @@ public class SIsland implements Island {
 
     private void syncUpgrade(SUpgradeLevel upgradeLevel, boolean overrideCustom) {
         cropGrowth.set(cropGrowth -> {
-            if ((overrideCustom || cropGrowth instanceof SyncedValue) && cropGrowth.get() < upgradeLevel.getCropGrowth())
+            if ((overrideCustom || cropGrowth instanceof SyncedValue) && cropGrowth.get() < upgradeLevel.getCropGrowth()) {
+                notifyCropGrowthChange(upgradeLevel.getCropGrowth());
                 return upgradeLevel.getCropGrowthUpgradeValue();
+            }
+
             return cropGrowth;
         });
 
@@ -4217,11 +4217,9 @@ public class SIsland implements Island {
             return coopLimit;
         });
 
-        islandSize.set(islandSize -> {
-            if ((overrideCustom || islandSize instanceof SyncedValue) && islandSize.get() < upgradeLevel.getBorderSize())
-                return upgradeLevel.getBorderSizeUpgradeValue();
-            return islandSize;
-        });
+        Value<Integer> islandSize = this.islandSize.get();
+        if ((overrideCustom || islandSize instanceof SyncedValue) && islandSize.get() < upgradeLevel.getBorderSize())
+            setIslandSizeInternal(upgradeLevel.getBorderSizeUpgradeValue());
 
         bankLimit.set(bankLimit -> {
             if ((overrideCustom || bankLimit instanceof SyncedValue) && bankLimit.get().compareTo(upgradeLevel.getBankLimit()) < 0)
@@ -4327,6 +4325,15 @@ public class SIsland implements Island {
                 islandMemberConsumer.accept(islandMember);
             }
         }
+    }
+
+    private void notifyCropGrowthChange(double newCropGrowth) {
+        if (!BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class))
+            return;
+
+        double newCropGrowthMultiplier = newCropGrowth - 1;
+        IslandUtils.getChunkCoords(this, true, true).values().forEach(chunkPositions ->
+                plugin.getNMSChunks().updateCropsTicker(chunkPositions, newCropGrowthMultiplier));
     }
 
     public static class UniqueVisitor {

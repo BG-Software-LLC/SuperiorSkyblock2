@@ -85,8 +85,6 @@ public class CmdAdminSetSize implements IAdminIslandCommand {
         if (!anyIslandChanged)
             return;
 
-        islands.forEach(Island::updateBorder);
-
         if (islands.size() > 1)
             Message.CHANGED_ISLAND_SIZE_ALL.send(sender);
         else if (targetPlayer == null)
