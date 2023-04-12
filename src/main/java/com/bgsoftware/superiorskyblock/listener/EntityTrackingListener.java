@@ -14,6 +14,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
+import org.bukkit.event.vehicle.VehicleDestroyEvent;
 
 public class EntityTrackingListener implements Listener {
 
@@ -100,6 +101,11 @@ public class EntityTrackingListener implements Listener {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         private void onEntityDeath(EntityDeathEvent e) {
             onEntityDespawn(e.getEntity());
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        private void onVehicleDestroy(VehicleDestroyEvent e) {
+            onEntityDespawn(e.getVehicle());
         }
 
     }
