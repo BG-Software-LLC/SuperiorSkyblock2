@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.external;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.common.shopsbridge.ShopsProvider;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
 import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
@@ -34,6 +35,7 @@ import com.bgsoftware.superiorskyblock.external.menus.MenusProvider_Default;
 import com.bgsoftware.superiorskyblock.external.permissions.PermissionsProvider_Default;
 import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.external.prices.PricesProvider_Default;
+import com.bgsoftware.superiorskyblock.external.prices.PricesProvider_ShopsBridgeWrapper;
 import com.bgsoftware.superiorskyblock.external.spawners.SpawnersProvider_AutoDetect;
 import com.bgsoftware.superiorskyblock.external.spawners.SpawnersProvider_Default;
 import com.bgsoftware.superiorskyblock.external.stackedblocks.StackedBlocksProvider_AutoDetect;
@@ -492,18 +494,9 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     }
 
     private void registerPricesProvider() {
-        Optional<PricesProvider> pricesProvider = Optional.empty();
-
-        if (canRegisterHook("ShopGUIPlus")) {
-            try {
-                Class.forName("net.brcdev.shopgui.shop.item.ShopItem");
-                pricesProvider = createInstance("prices.PricesProvider_ShopGUIPlus78");
-            } catch (ClassNotFoundException error) {
-                pricesProvider = createInstance("prices.PricesProvider_ShopGUIPlus");
-            }
-        }
-
-        pricesProvider.ifPresent(this::setPricesProvider);
+        ShopsProvider.SHOPGUIPLUS.createInstance(plugin)
+                .map(shopsBridge -> new PricesProvider_ShopsBridgeWrapper(plugin, ShopsProvider.SHOPGUIPLUS, shopsBridge))
+                .ifPresent(this::setPricesProvider);
     }
 
     private void registerVanishProvider() {
