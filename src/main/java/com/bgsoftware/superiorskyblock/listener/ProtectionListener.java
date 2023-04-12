@@ -144,6 +144,22 @@ public class ProtectionListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onSignColorChange(PlayerInteractEvent e) {
+        if (e.getItem() == null || e.getAction() != Action.RIGHT_CLICK_BLOCK || ServerVersion.isLegacy() ||
+                !Materials.isDye(e.getItem().getType()))
+            return;
+
+        BlockState blockState = e.getClickedBlock().getState();
+
+        if (!(blockState instanceof Sign))
+            return;
+
+        // The player right-clicked a sign with a dye in his hand.
+        if (preventBlockPlace(e.getClickedBlock(), e.getPlayer(), Flag.SEND_MESSAGES, Flag.PREVENT_OUTSIDE_ISLANDS))
+            e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent e) {
         if (preventBlockBreak(e.getBlock(), e.getPlayer(), Flag.SEND_MESSAGES, Flag.PREVENT_OUTSIDE_ISLANDS))
             e.setCancelled(true);
