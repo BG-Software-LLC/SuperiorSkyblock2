@@ -121,52 +121,51 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void setWorldBorder(SuperiorPlayer superiorPlayer, Island island) {
-        try {
-            if (!plugin.getSettings().isWorldBorders())
-                return;
+        if (!plugin.getSettings().isWorldBorders())
+            return;
 
-            boolean disabled = !superiorPlayer.hasWorldBorderEnabled();
+        Player player = superiorPlayer.asPlayer();
+        org.bukkit.World world = superiorPlayer.getWorld();
 
-            Player player = superiorPlayer.asPlayer();
-            org.bukkit.World world = superiorPlayer.getWorld();
+        if (world == null || player == null)
+            return;
 
-            if (world == null || player == null)
-                return;
+        int islandSize = island == null ? 0 : island.getIslandSize();
 
-            WorldServer worldServer = ((CraftWorld) superiorPlayer.getWorld()).getHandle();
+        boolean disabled = !superiorPlayer.hasWorldBorderEnabled() || islandSize < 0;
 
-            WorldBorder worldBorder;
+        WorldServer worldServer = ((CraftWorld) superiorPlayer.getWorld()).getHandle();
 
-            if (disabled || island == null || (!plugin.getSettings().getSpawn().isWorldBorder() && island.isSpawn())) {
-                worldBorder = worldServer.getWorldBorder();
-            } else {
-                worldBorder = new WorldBorder();
+        WorldBorder worldBorder;
 
-                worldBorder.setWarningDistance(0);
+        if (disabled || island == null || (!plugin.getSettings().getSpawn().isWorldBorder() && island.isSpawn())) {
+            worldBorder = worldServer.getWorldBorder();
+        } else {
+            worldBorder = new WorldBorder();
 
-                worldBorder.world = worldServer;
-                worldBorder.setSize((island.getIslandSize() * 2) + 1);
+            worldBorder.setWarningDistance(0);
 
-                org.bukkit.World.Environment environment = world.getEnvironment();
+            worldBorder.world = worldServer;
+            worldBorder.setSize((islandSize * 2) + 1);
 
-                Location center = island.getCenter(environment);
-                worldBorder.setCenter(center.getX(), center.getZ());
+            org.bukkit.World.Environment environment = world.getEnvironment();
 
-                switch (superiorPlayer.getBorderColor()) {
-                    case GREEN:
-                        worldBorder.transitionSizeBetween(worldBorder.getSize() - 0.1D, worldBorder.getSize(), Long.MAX_VALUE);
-                        break;
-                    case RED:
-                        worldBorder.transitionSizeBetween(worldBorder.getSize(), worldBorder.getSize() - 1.0D, Long.MAX_VALUE);
-                        break;
-                }
+            Location center = island.getCenter(environment);
+            worldBorder.setCenter(center.getX(), center.getZ());
+
+            switch (superiorPlayer.getBorderColor()) {
+                case GREEN:
+                    worldBorder.transitionSizeBetween(worldBorder.getSize() - 0.1D, worldBorder.getSize(), Long.MAX_VALUE);
+                    break;
+                case RED:
+                    worldBorder.transitionSizeBetween(worldBorder.getSize(), worldBorder.getSize() - 1.0D, Long.MAX_VALUE);
+                    break;
             }
-
-            PacketPlayOutWorldBorder packetPlayOutWorldBorder = new PacketPlayOutWorldBorder(worldBorder,
-                    PacketPlayOutWorldBorder.EnumWorldBorderAction.INITIALIZE);
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutWorldBorder);
-        } catch (NullPointerException ignored) {
         }
+
+        PacketPlayOutWorldBorder packetPlayOutWorldBorder = new PacketPlayOutWorldBorder(worldBorder,
+                PacketPlayOutWorldBorder.EnumWorldBorderAction.INITIALIZE);
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutWorldBorder);
     }
 
     @Override

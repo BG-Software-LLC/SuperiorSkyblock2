@@ -103,56 +103,56 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void setWorldBorder(SuperiorPlayer superiorPlayer, Island island) {
-        try {
-            if (!plugin.getSettings().isWorldBorders())
-                return;
+        if (!plugin.getSettings().isWorldBorders())
+            return;
 
-            Player player = superiorPlayer.asPlayer();
-            World world = superiorPlayer.getWorld();
+        Player player = superiorPlayer.asPlayer();
+        World world = superiorPlayer.getWorld();
 
-            if (world == null || player == null)
-                return;
+        if (world == null || player == null)
+            return;
 
-            WorldServer worldServer = ((CraftWorld) superiorPlayer.getWorld()).getHandle();
+        int islandSize = island == null ? 0 : island.getIslandSize();
 
-            WorldBorder worldBorder;
+        boolean disabled = !superiorPlayer.hasWorldBorderEnabled() || islandSize < 0;
 
-            if (!superiorPlayer.hasWorldBorderEnabled() || island == null ||
-                    (!plugin.getSettings().getSpawn().isWorldBorder() && island.isSpawn())) {
-                worldBorder = worldServer.getWorldBorder();
+        WorldServer worldServer = ((CraftWorld) superiorPlayer.getWorld()).getHandle();
+
+        WorldBorder worldBorder;
+
+        if (disabled || island == null || (!plugin.getSettings().getSpawn().isWorldBorder() && island.isSpawn())) {
+            worldBorder = worldServer.getWorldBorder();
+        } else {
+            worldBorder = new WorldBorder();
+
+            worldBorder.setWarningDistance(0);
+
+            worldBorder.world = worldServer;
+            worldBorder.setSize((islandSize * 2) + 1);
+
+            World.Environment environment = world.getEnvironment();
+
+            Location center = island.getCenter(environment);
+
+            if (environment == World.Environment.NETHER) {
+                worldBorder.setCenter(center.getX() * 8, center.getZ() * 8);
             } else {
-                worldBorder = new WorldBorder();
-
-                worldBorder.setWarningDistance(0);
-
-                worldBorder.world = worldServer;
-                worldBorder.setSize((island.getIslandSize() * 2) + 1);
-
-                World.Environment environment = world.getEnvironment();
-
-                Location center = island.getCenter(environment);
-
-                if (environment == World.Environment.NETHER) {
-                    worldBorder.setCenter(center.getX() * 8, center.getZ() * 8);
-                } else {
-                    worldBorder.setCenter(center.getX(), center.getZ());
-                }
-
-                switch (superiorPlayer.getBorderColor()) {
-                    case GREEN:
-                        worldBorder.transitionSizeBetween(worldBorder.getSize() - 0.1D, worldBorder.getSize(), Long.MAX_VALUE);
-                        break;
-                    case RED:
-                        worldBorder.transitionSizeBetween(worldBorder.getSize(), worldBorder.getSize() - 1.0D, Long.MAX_VALUE);
-                        break;
-                }
+                worldBorder.setCenter(center.getX(), center.getZ());
             }
 
-            PacketPlayOutWorldBorder packetPlayOutWorldBorder = new PacketPlayOutWorldBorder(worldBorder,
-                    PacketPlayOutWorldBorder.EnumWorldBorderAction.INITIALIZE);
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutWorldBorder);
-        } catch (NullPointerException ignored) {
+            switch (superiorPlayer.getBorderColor()) {
+                case GREEN:
+                    worldBorder.transitionSizeBetween(worldBorder.getSize() - 0.1D, worldBorder.getSize(), Long.MAX_VALUE);
+                    break;
+                case RED:
+                    worldBorder.transitionSizeBetween(worldBorder.getSize(), worldBorder.getSize() - 1.0D, Long.MAX_VALUE);
+                    break;
+            }
         }
+
+        PacketPlayOutWorldBorder packetPlayOutWorldBorder = new PacketPlayOutWorldBorder(worldBorder,
+                PacketPlayOutWorldBorder.EnumWorldBorderAction.INITIALIZE);
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutWorldBorder);
     }
 
     @Override

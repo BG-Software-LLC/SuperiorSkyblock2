@@ -129,46 +129,45 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void setWorldBorder(SuperiorPlayer superiorPlayer, Island island) {
-        try {
-            if (!plugin.getSettings().isWorldBorders())
-                return;
+        if (!plugin.getSettings().isWorldBorders())
+            return;
 
-            boolean disabled = !superiorPlayer.hasWorldBorderEnabled();
+        Player player = superiorPlayer.asPlayer();
+        org.bukkit.World world = superiorPlayer.getWorld();
 
-            Player player = superiorPlayer.asPlayer();
-            org.bukkit.World world = superiorPlayer.getWorld();
+        if (world == null || player == null)
+            return;
 
-            if (world == null || player == null)
-                return;
+        int islandSize = island == null ? 0 : island.getIslandSize();
 
-            ServerLevel serverLevel = ((CraftWorld) world).getHandle();
+        boolean disabled = !superiorPlayer.hasWorldBorderEnabled() || islandSize < 0;
 
-            WorldBorder worldBorder;
+        ServerLevel serverLevel = ((CraftWorld) world).getHandle();
 
-            if (disabled || island == null || (!plugin.getSettings().getSpawn().isWorldBorder() && island.isSpawn())) {
-                worldBorder = serverLevel.getWorldBorder();
-            } else {
-                worldBorder = new WorldBorder();
-                worldBorder.world = serverLevel;
+        WorldBorder worldBorder;
 
-                org.bukkit.World.Environment environment = world.getEnvironment();
-                Location center = island.getCenter(environment);
+        if (disabled || island == null || (!plugin.getSettings().getSpawn().isWorldBorder() && island.isSpawn())) {
+            worldBorder = serverLevel.getWorldBorder();
+        } else {
+            worldBorder = new WorldBorder();
+            worldBorder.world = serverLevel;
 
-                worldBorder.setWarningBlocks(0);
-                worldBorder.setSize((island.getIslandSize() * 2) + 1);
-                worldBorder.setCenter(center.getX(), center.getZ());
+            org.bukkit.World.Environment environment = world.getEnvironment();
+            Location center = island.getCenter(environment);
 
-                double worldBorderSize = worldBorder.getSize();
-                switch (superiorPlayer.getBorderColor()) {
-                    case GREEN -> worldBorder.lerpSizeBetween(worldBorderSize - 0.1D, worldBorderSize, Long.MAX_VALUE);
-                    case RED -> worldBorder.lerpSizeBetween(worldBorderSize, worldBorderSize - 1.0D, Long.MAX_VALUE);
-                }
+            worldBorder.setWarningBlocks(0);
+            worldBorder.setSize((islandSize * 2) + 1);
+            worldBorder.setCenter(center.getX(), center.getZ());
+
+            double worldBorderSize = worldBorder.getSize();
+            switch (superiorPlayer.getBorderColor()) {
+                case GREEN -> worldBorder.lerpSizeBetween(worldBorderSize - 0.1D, worldBorderSize, Long.MAX_VALUE);
+                case RED -> worldBorder.lerpSizeBetween(worldBorderSize, worldBorderSize - 1.0D, Long.MAX_VALUE);
             }
-
-            ClientboundInitializeBorderPacket initializeBorderPacket = new ClientboundInitializeBorderPacket(worldBorder);
-            ((CraftPlayer) player).getHandle().connection.send(initializeBorderPacket);
-        } catch (NullPointerException ignored) {
         }
+
+        ClientboundInitializeBorderPacket initializeBorderPacket = new ClientboundInitializeBorderPacket(worldBorder);
+        ((CraftPlayer) player).getHandle().connection.send(initializeBorderPacket);
     }
 
     @Override
