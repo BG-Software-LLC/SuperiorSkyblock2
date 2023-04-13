@@ -56,6 +56,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -106,7 +107,8 @@ public class GridManagerImpl extends Manager implements GridManager {
             throw new RuntimeException("GridManager was not initialized correctly. Contact Ome_R regarding this!");
 
         initializeDatabaseBridge();
-        this.islandCreationAlgorithm = DefaultIslandCreationAlgorithm.getInstance();
+        if (this.islandCreationAlgorithm == null)
+            this.islandCreationAlgorithm = DefaultIslandCreationAlgorithm.getInstance();
 
         this.lastIsland = new SBlockPosition(plugin.getSettings().getWorlds().getDefaultWorldName(), 0, 100, 0);
         BukkitExecutor.sync(this::updateSpawn);
@@ -294,7 +296,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     @Override
     public IslandCreationAlgorithm getIslandCreationAlgorithm() {
-        return this.islandCreationAlgorithm;
+        return Optional.ofNullable(this.islandCreationAlgorithm).orElse(DefaultIslandCreationAlgorithm.getInstance());
     }
 
     @Override
