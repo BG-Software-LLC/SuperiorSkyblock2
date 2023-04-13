@@ -28,6 +28,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -563,6 +564,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     @Override
     public List<RespawnAction> getPlayerRespawn() {
         return this.container.playerRespawnActions;
+    }
+
+    @Override
+    public BigInteger getBlockCountsSaveThreshold() {
+        return this.container.blockCountsSaveThreshold;
     }
 
     public void updateValue(String path, Object value) throws IOException {

@@ -11,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -605,6 +606,12 @@ public interface SettingsManager {
      * Config-path: player-respawn
      */
     List<RespawnAction> getPlayerRespawn();
+
+    /**
+     * Get the threshold between saves for block counts.
+     * Config-path: block-counts-save-threshold
+     */
+    BigInteger getBlockCountsSaveThreshold();
 
     interface Database {
 

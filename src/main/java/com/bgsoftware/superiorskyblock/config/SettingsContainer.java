@@ -37,6 +37,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -211,6 +212,7 @@ public class SettingsContainer {
     public final int bossBarLimit;
     public final boolean deleteUnsafeWarps;
     public final List<RespawnAction> playerRespawnActions;
+    public final BigInteger blockCountsSaveThreshold;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws ManagerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
@@ -544,6 +546,7 @@ public class SettingsContainer {
                 Log.warn("Invalid respawn action ", respawnAction + ", skipping...");
             }
         });
+        blockCountsSaveThreshold = BigInteger.valueOf(config.getInt("block-counts-save-threshold", 100));
     }
 
     private List<String> loadInteractables(SuperiorSkyblockPlugin plugin) {

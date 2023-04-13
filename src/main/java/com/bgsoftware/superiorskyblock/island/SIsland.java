@@ -198,7 +198,8 @@ public class SIsland implements Island {
      * Island Flags
      */
     private volatile boolean beingRecalculated = false;
-    private final AtomicInteger blocksUpdateCounter = new AtomicInteger(0);
+    private final AtomicReference<BigInteger> currentTotalBlockCounts = new AtomicReference<>(BigInteger.ZERO);
+    private volatile BigInteger lastSavedBlockCounts = BigInteger.ZERO;
     private SuperiorPlayer owner;
     private String creationTimeDate;
     /*
@@ -298,8 +299,10 @@ public class SIsland implements Island {
             }
         });
         if (!builder.blockCounts.isEmpty()) {
-            plugin.getProviders().addPricesLoadCallback(() -> builder.blockCounts.forEach((block, count) ->
-                    handleBlockPlace(block, count, false, false)));
+            plugin.getProviders().addPricesLoadCallback(() -> {
+                builder.blockCounts.forEach((block, count) -> handleBlockPlace(block, count, false, false));
+                this.lastSavedBlockCounts = this.currentTotalBlockCounts.get();
+            });
         }
 
         builder.warpCategories.forEach(warpCategoryRecord -> {
@@ -2002,6 +2005,8 @@ public class SIsland implements Island {
         if (!trackedBlock)
             return;
 
+        BigInteger newTotalBlocksCount = this.currentTotalBlockCounts.updateAndGet(count -> count.add(amount));
+
         BigDecimal oldWorth = getWorth();
         BigDecimal oldLevel = getIslandLevel();
 
@@ -2024,7 +2029,7 @@ public class SIsland implements Island {
             updateLastTime();
 
         if (save)
-            saveBlockCounts(oldWorth, oldLevel);
+            saveBlockCounts(newTotalBlocksCount, oldWorth, oldLevel);
     }
 
     @Override
@@ -2036,6 +2041,8 @@ public class SIsland implements Island {
 
         blocks.forEach((blockKey, amount) ->
                 handleBlockPlace(blockKey, BigInteger.valueOf(amount), false, false));
+
+        this.lastSavedBlockCounts = this.currentTotalBlockCounts.get();
 
         IslandsDatabaseBridge.saveBlockCounts(this);
         IslandsDatabaseBridge.saveDirtyChunks(this.dirtyChunksContainer);
@@ -2083,6 +2090,8 @@ public class SIsland implements Island {
         if (!untrackedBlocks)
             return;
 
+        BigInteger newTotalBlocksCount = this.currentTotalBlockCounts.updateAndGet(count -> count.subtract(amount));
+
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
 
         BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
@@ -2103,7 +2112,7 @@ public class SIsland implements Island {
         updateLastTime();
 
         if (save)
-            saveBlockCounts(oldWorth, oldLevel);
+            saveBlockCounts(newTotalBlocksCount, oldWorth, oldLevel);
     }
 
     @Override
@@ -3698,7 +3707,7 @@ public class SIsland implements Island {
             plugin.getMenus().refreshValues(this);
             plugin.getMenus().refreshCounts(this);
 
-            saveBlockCounts(oldWorth, oldLevel);
+            saveBlockCounts(this.currentTotalBlockCounts.get(), oldWorth, oldLevel);
             updateLastTime();
 
             beingRecalculated = false;
@@ -3802,7 +3811,7 @@ public class SIsland implements Island {
         }
     }
 
-    private void saveBlockCounts(BigDecimal oldWorth, BigDecimal oldLevel) {
+    private void saveBlockCounts(BigInteger currentTotalBlocksCount, BigDecimal oldWorth, BigDecimal oldLevel) {
         BigDecimal newWorth = getWorth();
         BigDecimal newLevel = getIslandLevel();
 
@@ -3810,9 +3819,13 @@ public class SIsland implements Island {
             BukkitExecutor.async(() -> plugin.getEventsBus().callIslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel), 0L);
         }
 
-        if (blocksUpdateCounter.incrementAndGet() >= Bukkit.getOnlinePlayers().size() * 10) {
+        BigInteger deltaBlockCounts = this.lastSavedBlockCounts.subtract(currentTotalBlocksCount);
+        if (deltaBlockCounts.compareTo(BigInteger.ZERO) < 0)
+            deltaBlockCounts = deltaBlockCounts.negate();
+
+        if (deltaBlockCounts.compareTo(plugin.getSettings().getBlockCountsSaveThreshold()) >= 0) {
+            this.lastSavedBlockCounts = currentTotalBlocksCount;
             IslandsDatabaseBridge.saveBlockCounts(this);
-            blocksUpdateCounter.set(0);
             plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
             plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
             plugin.getMenus().refreshValues(this);
@@ -3820,7 +3833,6 @@ public class SIsland implements Island {
         } else {
             IslandsDatabaseBridge.markBlockCountsToBeSaved(this);
         }
-
     }
 
     public void syncUpgrades(boolean overrideCustom) {

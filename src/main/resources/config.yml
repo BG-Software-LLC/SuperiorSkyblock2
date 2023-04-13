@@ -797,3 +797,9 @@ delete-unsafe-warps: true
 player-respawn:
   - ISLAND_TELEPORT
   - SPAWN_TELEPORT
+
+# The amount of blocks that are required to be updated on the island before updating the block counts in the database.
+# This means that if the threshold is at 100, it will require 100 blocks to be added/removed before updating the
+# database with the new block counts. If the server stops and there was a change to the block counts, the block counts
+# will be saved to the database despite the threshold.
+block-counts-save-threshold: 100
