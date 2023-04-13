@@ -217,6 +217,20 @@ public class GridManagerImpl extends Manager implements GridManager {
         this.islandCreationAlgorithm.createIsland(builder, this.lastIsland).whenComplete((islandCreationResult, error) -> {
             pendingCreationTasks.remove(builder.owner.getUniqueId());
 
+            switch (islandCreationResult.getStatus()) {
+                case NAME_OCCUPIED:
+                    builder.owner.setIsland(null);
+                    Message.ISLAND_ALREADY_EXIST.send(builder.owner);
+                    return;
+                case SUCCESS:
+                    break;
+                default:
+                    Log.warn("Cannot handle creation status: " + islandCreationResult.getStatus());
+                    builder.owner.setIsland(null);
+                    Message.CREATE_ISLAND_FAILURE.send(builder.owner);
+                    return;
+            }
+
             if (error == null) {
                 try {
                     Island island = islandCreationResult.getIsland();

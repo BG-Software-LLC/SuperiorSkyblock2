@@ -65,6 +65,12 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
 
         Log.debug(Debug.CREATE_ISLAND, builder.owner.getName(), schematic.getName(), lastIslandPosition);
 
+        // Making sure an island with the same name does not exist.
+        if (plugin.getGrid().getIsland(builder.islandName) != null) {
+            Log.debugResult(Debug.CREATE_ISLAND, "Creation Failed", "Island with the name " + builder.islandName + " already exists.");
+            return CompletableFuture.completedFuture(new IslandCreationResult(IslandCreationResult.Status.NAME_OCCUPIED, null, null, false));
+        }
+
         CompletableFuture<IslandCreationResult> completableFuture = new CompletableFuture<>();
 
         World spawnWorld = plugin.getGrid().getSpawnIsland().getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld();
@@ -89,7 +95,7 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
             schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
                 plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
                         builder.owner.getUniqueId(), builder.uuid);
-                completableFuture.complete(new IslandCreationResult(island, islandLocation, event.getResult()));
+                completableFuture.complete(new IslandCreationResult(IslandCreationResult.Status.SUCCESS, island, islandLocation, event.getResult()));
                 island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
             }, error -> {
                 island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);

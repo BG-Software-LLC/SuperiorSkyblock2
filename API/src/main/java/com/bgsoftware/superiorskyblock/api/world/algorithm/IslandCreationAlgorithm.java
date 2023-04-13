@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 
 import java.util.UUID;
@@ -40,6 +41,7 @@ public interface IslandCreationAlgorithm {
      */
     class IslandCreationResult {
 
+        private final Status status;
         private final Island island;
         private final Location islandLocation;
         private final boolean shouldTeleportPlayer;
@@ -47,20 +49,31 @@ public interface IslandCreationAlgorithm {
         /**
          * Constructor of the result.
          *
+         * @param status               The status of the creation result.
+         *                             In case of failure, the rest of the parameters are undefined.
          * @param island               The created island.
          * @param islandLocation       The location of the island.
          * @param shouldTeleportPlayer Whether to teleport the player to his island or not.
          */
-        public IslandCreationResult(Island island, Location islandLocation, boolean shouldTeleportPlayer) {
+        public IslandCreationResult(Status status, Island island, Location islandLocation, boolean shouldTeleportPlayer) {
+            this.status = status;
             this.island = island;
             this.islandLocation = islandLocation;
             this.shouldTeleportPlayer = shouldTeleportPlayer;
         }
 
         /**
+         * Get the status of the creation task.
+         */
+        public Status getStatus() {
+            return status;
+        }
+
+        /**
          * Get the created island object.
          */
         public Island getIsland() {
+            Preconditions.checkState(this.getStatus() == Status.SUCCESS, "Result is not successful.");
             return island;
         }
 
@@ -68,6 +81,7 @@ public interface IslandCreationAlgorithm {
          * Get the location of the new island.
          */
         public Location getIslandLocation() {
+            Preconditions.checkState(this.getStatus() == Status.SUCCESS, "Result is not successful.");
             return islandLocation;
         }
 
@@ -75,7 +89,15 @@ public interface IslandCreationAlgorithm {
          * Get whether the player that created the island should be teleported to it.
          */
         public boolean shouldTeleportPlayer() {
+            Preconditions.checkState(this.getStatus() == Status.SUCCESS, "Result is not successful.");
             return shouldTeleportPlayer;
+        }
+
+        public enum Status {
+
+            NAME_OCCUPIED,
+            SUCCESS
+
         }
 
     }
