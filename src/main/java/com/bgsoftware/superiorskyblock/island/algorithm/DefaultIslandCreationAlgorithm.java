@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -66,7 +67,7 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
         Log.debug(Debug.CREATE_ISLAND, builder.owner.getName(), schematic.getName(), lastIslandPosition);
 
         // Making sure an island with the same name does not exist.
-        if (plugin.getGrid().getIsland(builder.islandName) != null) {
+        if (!Text.isBlank(builder.islandName) && plugin.getGrid().getIsland(builder.islandName) != null) {
             Log.debugResult(Debug.CREATE_ISLAND, "Creation Failed", "Island with the name " + builder.islandName + " already exists.");
             return CompletableFuture.completedFuture(new IslandCreationResult(IslandCreationResult.Status.NAME_OCCUPIED, null, null, false));
         }
