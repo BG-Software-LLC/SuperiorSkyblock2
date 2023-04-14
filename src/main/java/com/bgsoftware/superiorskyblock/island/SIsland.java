@@ -2163,8 +2163,11 @@ public class SIsland implements Island {
     @Override
     public void clearBlockCounts() {
         blocksTracker.clearBlockCounts();
+        this.currentTotalBlockCounts.set(BigInteger.ZERO);
+
         islandWorth.set(BigDecimal.ZERO);
         islandLevel.set(BigDecimal.ZERO);
+
         plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_WORTH, this);
         plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_LEVEL, this);
     }
