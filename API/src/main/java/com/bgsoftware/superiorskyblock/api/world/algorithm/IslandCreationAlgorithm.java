@@ -49,6 +49,19 @@ public interface IslandCreationAlgorithm {
         /**
          * Constructor of the result.
          *
+         * @param island               The created island.
+         * @param islandLocation       The location of the island.
+         * @param shouldTeleportPlayer Whether to teleport the player to his island or not.
+         * @deprecated See {@link #IslandCreationResult(Status, Island, Location, boolean)}
+         */
+        @Deprecated
+        public IslandCreationResult(Island island, Location islandLocation, boolean shouldTeleportPlayer) {
+            this(Status.SUCCESS, island, islandLocation, shouldTeleportPlayer);
+        }
+
+        /**
+         * Constructor of the result.
+         *
          * @param status               The status of the creation result.
          *                             In case of failure, the rest of the parameters are undefined.
          * @param island               The created island.
