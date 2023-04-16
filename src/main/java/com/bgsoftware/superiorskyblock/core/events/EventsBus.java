@@ -275,6 +275,10 @@ public class EventsBus {
         return callEvent(() -> new IslandCoopPlayerEvent(island, player, target), "islandcoopplayerevent");
     }
 
+    public boolean callIslandRemoveCoopPlayerEvent(Island island, SuperiorPlayer player, SuperiorPlayer target) {
+        return callEvent(() -> new IslandCoopRemovePlayerEvent(island, player, target), "islandremovecoopplayerevent");
+    }
+
     public EventResult<Boolean> callIslandCreateEvent(SuperiorPlayer superiorPlayer, Island island, String schemName) {
         return callEvent(() -> new IslandCreateEvent(superiorPlayer, island, schemName),
                 "islandcreateevent", true, IslandCreateEvent::canTeleport);

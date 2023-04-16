@@ -14,6 +14,7 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminAdd(), false);
         registerCommand(new CmdAdminAddBlockLimit(), false);
         registerCommand(new CmdAdminAddBonus(), false);
+        registerCommand(new CmdAdminAddCoop(), false);
         registerCommand(new CmdAdminAddCoopLimit(), false);
         registerCommand(new CmdAdminAddDisbands(), false);
         registerCommand(new CmdAdminAddEntityLimit(), false);
@@ -44,6 +45,7 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminRecalc(), false);
         registerCommand(new CmdAdminReload(), false);
         registerCommand(new CmdAdminRemoveBlockLimit(), false);
+        registerCommand(new CmdAdminRemoveCoop(), false);
         registerCommand(new CmdAdminRemoveRatings(), false);
         registerCommand(new CmdAdminResetWorld(), false);
         registerCommand(new CmdAdminSchematic(), false);

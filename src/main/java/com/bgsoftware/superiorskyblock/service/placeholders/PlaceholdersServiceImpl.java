@@ -62,6 +62,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService {
     private static final Pattern VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN = Pattern.compile("visitor_last_join_(.+)");
     private static final Pattern ISLAND_FLAG_PLACEHOLDER_PATTERN = Pattern.compile("flag_(.+)");
     private static final Pattern MISSIONS_COMPLETED_PATTERN = Pattern.compile("missions_completed_(.+)");
+    private static final Pattern ISLAND_COOP_PATTERN = Pattern.compile("island_coop_(.+)");
 
     private static final Map<String, PlayerPlaceholderParser> PLAYER_PARSES =
             new ImmutableMap.Builder<String, PlayerPlaceholderParser>()
@@ -182,6 +183,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService {
                     .put("bank_limit", (island, superiorPlayer) -> Formatters.NUMBER_FORMATTER.format(island.getBankLimit()))
                     .put("bank_limit_format", (island, superiorPlayer) ->
                             Formatters.FANCY_NUMBER_FORMATTER.format(island.getBankLimit(), superiorPlayer.getUserLocale()))
+                    .put("island_coop_online", (island, superiorPlayer) -> String.valueOf(island.getCoopPlayers().stream().filter(SuperiorPlayer::isOnline).count()))
                     .build();
 
     private static final Map<SortingType, BiFunction<Island, SuperiorPlayer, String>> TOP_VALUE_FORMAT_FUNCTIONS =
@@ -331,6 +333,8 @@ public class PlaceholdersServiceImpl implements PlaceholdersService {
                     return Optional.of(Formatters.NUMBER_FORMATTER.format(island.getEntitiesTracker().getEntityCount(KeyImpl.of(keyName))));
                 } else if ((matcher = MEMBER_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
                     return handleMembersPlaceholder(island, matcher.group(1));
+                } else if ((matcher = ISLAND_COOP_PATTERN.matcher(subPlaceholder)).matches()) {
+                    return handleCoopPlaceholder(island, matcher.group(1));
                 } else if ((matcher = VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
                     String visitorName = matcher.group(1);
                     return Optional.of(island.getUniqueVisitorsWithTimes().stream()
@@ -466,6 +470,22 @@ public class PlaceholdersServiceImpl implements PlaceholdersService {
             return Optional.empty();
 
         return Optional.of(members.get(targetMemberIndex).getName());
+    }
+
+    private static Optional<String> handleCoopPlaceholder(@NotNull Island island, String placeholder) {
+        List<SuperiorPlayer> coopPlayers = island.getCoopPlayers();
+
+        int targetCoopIndex = -1;
+
+        try {
+            targetCoopIndex = Integer.parseInt(placeholder) - 1;
+        } catch (NumberFormatException ignored) {
+        }
+
+        if (targetCoopIndex < 0 || targetCoopIndex >= coopPlayers.size())
+            return Optional.empty();
+
+        return Optional.of(coopPlayers.get(targetCoopIndex).getName());
     }
 
 }
