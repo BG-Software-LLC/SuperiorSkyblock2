@@ -150,6 +150,7 @@ COMMAND_DESCRIPTION_ADMIN: 'Use the admin commands.'
 COMMAND_DESCRIPTION_ADMIN_ADD: 'Add a user to an island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: 'Increase block limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: 'Add a bonus to a player.'
+COMMAND_DESCRIPTION_ADMIN_ADD_COOP: 'Add a player to the coop list of another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT: 'Increase coop players limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_CROP_GROWTH: 'Increase the crop growth multiplier for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_EFFECT: 'Add an island effect for another player''s island.'
@@ -190,6 +191,7 @@ COMMAND_DESCRIPTION_ADMIN_RANKUP: 'Rankup an upgrade for an island.'
 COMMAND_DESCRIPTION_ADMIN_RECALC: 'Re-calculates the worth of an island.'
 COMMAND_DESCRIPTION_ADMIN_RELOAD: 'Reload all configurations and tasks of the plugin.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Remove a block limit from an island.'
+COMMAND_DESCRIPTION_ADMIN_REMOVE_COOP: 'Remove a player from the coop list of another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: 'Remove all ratings given by a player.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Reset a world for an island.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: 'Create schematics for the plugin.'
@@ -525,6 +527,7 @@ LACK_CHANGE_PERMISSION: '&c&lError | &7You must have this permission in order to
 LAST_ROLE_DEMOTE: '&c&lError | &7You cannot demote this player anymore.'
 LAST_ROLE_PROMOTE: '&c&lError | &7You cannot promote this player anymore.'
 LEAVE_ANNOUNCEMENT: '&e&lIsland | &7{0} left the island.'
+LEAVE_COOP_ANNOUNCEMENT: '&e&lIsland | &7{0} left the island as a co-op member.'
 LEAVE_ISLAND_AS_LEADER: |-
   &c&lError | &7You cannot leave your island when you own it.
   &c&lError | &7You can transfer the ownership using /is transfer.

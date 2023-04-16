@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.command.CommandSender;
@@ -60,13 +61,13 @@ public class CmdAdminRemoveCoop implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[3]);
+        SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, sender, args[3]);
 
         if (targetPlayer == null)
             return;
 
         if (!targetPlayer.isOnline()) {
-            Message.PLAYER_NOT_ONLINE.send(sender, args[3]);
+            Message.PLAYER_NOT_ONLINE.send(sender);
             return;
         }
 
@@ -79,10 +80,10 @@ public class CmdAdminRemoveCoop implements IAdminIslandCommand {
             return;
 
         island.removeCoop(targetPlayer);
-        IslandUtils.sendMessage(island, Message.LEAVE_COOP_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(), targetPlayer.getName());
+        IslandUtils.sendMessage(island, Message.LEAVE_COOP_ANNOUNCEMENT, Collections.emptyList(), targetPlayer.getName());
 
         if (island.getName().isEmpty())
-            Message.LEFT_ISLAND_COOP.send(targetPlayer, superiorPlayer.getName());
+            Message.LEFT_ISLAND_COOP.send(targetPlayer, island.getOwner().getName());
         else
             Message.LEFT_ISLAND_COOP_NAME.send(targetPlayer, island.getName());
     }

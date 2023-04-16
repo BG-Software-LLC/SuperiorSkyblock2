@@ -62,7 +62,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService {
     private static final Pattern VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN = Pattern.compile("visitor_last_join_(.+)");
     private static final Pattern ISLAND_FLAG_PLACEHOLDER_PATTERN = Pattern.compile("flag_(.+)");
     private static final Pattern MISSIONS_COMPLETED_PATTERN = Pattern.compile("missions_completed_(.+)");
-    private static final Pattern ISLAND_COOP_PATTERN = Pattern.compile("island_coop_(.+)");
+    private static final Pattern ISLAND_COOP_PATTERN = Pattern.compile("coop_(.+)");
 
     private static final Map<String, PlayerPlaceholderParser> PLAYER_PARSES =
             new ImmutableMap.Builder<String, PlayerPlaceholderParser>()
@@ -183,7 +183,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService {
                     .put("bank_limit", (island, superiorPlayer) -> Formatters.NUMBER_FORMATTER.format(island.getBankLimit()))
                     .put("bank_limit_format", (island, superiorPlayer) ->
                             Formatters.FANCY_NUMBER_FORMATTER.format(island.getBankLimit(), superiorPlayer.getUserLocale()))
-                    .put("island_coop_online", (island, superiorPlayer) -> String.valueOf(island.getCoopPlayers().stream().filter(SuperiorPlayer::isOnline).count()))
+                    .put("online_coop", (island, superiorPlayer) -> String.valueOf(island.getCoopPlayers().stream().filter(SuperiorPlayer::isOnline).count()))
                     .build();
 
     private static final Map<SortingType, BiFunction<Island, SuperiorPlayer, String>> TOP_VALUE_FORMAT_FUNCTIONS =

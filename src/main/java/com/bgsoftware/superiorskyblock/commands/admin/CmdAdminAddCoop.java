@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.command.CommandSender;
@@ -60,13 +61,13 @@ public class CmdAdminAddCoop implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[3]);
+        SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, sender, args[3]);
 
         if (targetPlayer == null)
             return;
 
         if (!targetPlayer.isOnline()) {
-            Message.PLAYER_NOT_ONLINE.send(sender, args[3]);
+            Message.PLAYER_NOT_ONLINE.send(sender);
             return;
         }
 
@@ -93,12 +94,11 @@ public class CmdAdminAddCoop implements IAdminIslandCommand {
         if (!plugin.getEventsBus().callIslandCoopPlayerEvent(island, superiorPlayer, targetPlayer))
             return;
 
-
         island.addCoop(targetPlayer);
-        IslandUtils.sendMessage(island, Message.COOP_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(), targetPlayer.getName());
+        IslandUtils.sendMessage(island, Message.COOP_ANNOUNCEMENT, Collections.emptyList(), sender.getName(), targetPlayer.getName());
 
         if (island.getName().isEmpty())
-            Message.JOINED_ISLAND_AS_COOP.send(targetPlayer, superiorPlayer.getName());
+            Message.JOINED_ISLAND_AS_COOP.send(targetPlayer, island.getOwner().getName());
         else
             Message.JOINED_ISLAND_AS_COOP_NAME.send(targetPlayer, island.getName());
     }
