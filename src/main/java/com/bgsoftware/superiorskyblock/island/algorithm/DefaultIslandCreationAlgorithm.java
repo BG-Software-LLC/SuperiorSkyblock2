@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 
 import java.util.UUID;
@@ -52,10 +51,10 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
     }
 
     @Override
-    public CompletableFuture<IslandCreationResult> createIsland(Island.Builder builderParam, BlockPosition lastIslandPosition) {
+    public CompletableFuture<IslandCreationResult> createIsland(Island.Builder builderParam, BlockPosition lastIsland) {
         Preconditions.checkNotNull(builderParam, "builder parameter cannot be null.");
         Preconditions.checkArgument(builderParam instanceof IslandBuilderImpl, "Cannot create an island from custom builder.");
-        Preconditions.checkNotNull(lastIslandPosition, "lastIsland parameter cannot be null.");
+        Preconditions.checkNotNull(lastIsland, "lastIsland parameter cannot be null.");
 
         IslandBuilderImpl builder = (IslandBuilderImpl) builderParam;
 
@@ -64,7 +63,7 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
         Preconditions.checkArgument(builder.owner != null, "Cannot create an island from builder with no valid owner.");
         Preconditions.checkArgument(schematic != null, "Cannot create an island from builder with invalid schematic name.");
 
-        Log.debug(Debug.CREATE_ISLAND, builder.owner.getName(), schematic.getName(), lastIslandPosition);
+        Log.debug(Debug.CREATE_ISLAND, builder.owner.getName(), schematic.getName(), lastIsland);
 
         // Making sure an island with the same name does not exist.
         if (!Text.isBlank(builder.islandName) && plugin.getGrid().getIsland(builder.islandName) != null) {
@@ -74,10 +73,8 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
 
         CompletableFuture<IslandCreationResult> completableFuture = new CompletableFuture<>();
 
-        World spawnWorld = plugin.getGrid().getSpawnIsland().getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld();
-        Location lastIsland = new Location(spawnWorld, lastIslandPosition.getX(), lastIslandPosition.getY(), lastIslandPosition.getZ());
         Location islandLocation = plugin.getProviders().getWorldsProvider().getNextLocation(
-                lastIsland,
+                lastIsland.parse().clone(),
                 plugin.getSettings().getIslandHeight(),
                 plugin.getSettings().getMaxIslandSize(),
                 builder.owner.getUniqueId(),
