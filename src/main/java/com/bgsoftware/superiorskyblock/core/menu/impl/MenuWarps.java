@@ -42,7 +42,7 @@ public class MenuWarps extends AbstractPagedMenu<MenuWarps.View, MenuWarps.Args,
     private final List<String> editLore;
 
     private MenuWarps(MenuParseResult<View> parseResult, List<String> editLore) {
-        super(MenuIdentifiers.MENU_WARPS, parseResult, true);
+        super(MenuIdentifiers.MENU_WARPS, parseResult, false);
         this.editLore = editLore;
     }
 
