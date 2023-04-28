@@ -76,7 +76,7 @@ public class SchematicBlock {
         this.tileEntityData = new CompoundTag(originalTileEntity);
         String id = this.tileEntityData.getString("id");
 
-        if (id.equalsIgnoreCase(ServerVersion.isEquals(ServerVersion.v1_8) ? "Sign" : "minecraft:sign")) {
+        if (id.equalsIgnoreCase(ServerVersion.isLegacy() ? "Sign" : "minecraft:sign")) {
             boolean needSignFormat = false;
             for (int i = 1; i <= 4; i++) {
                 boolean isDefaultSignLine = false;
@@ -101,7 +101,7 @@ public class SchematicBlock {
             }
             if (needSignFormat)
                 this.tileEntityData.setByte("SSB.HasSignLines", (byte) 1);
-        } else if (id.equalsIgnoreCase(ServerVersion.isEquals(ServerVersion.v1_8) ? "Chest" : "minecraft:chest")) {
+        } else if (id.equalsIgnoreCase(ServerVersion.isLegacy() ? "Chest" : "minecraft:chest")) {
             if (plugin.getSettings().getDefaultContainers().isEnabled()) {
                 String inventoryType = this.tileEntityData.getString("inventoryType");
                 if (inventoryType != null) {
