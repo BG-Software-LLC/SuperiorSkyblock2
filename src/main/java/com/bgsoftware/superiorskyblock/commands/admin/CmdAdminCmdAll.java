@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import org.bukkit.command.CommandSender;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
@@ -59,7 +60,7 @@ public class CmdAdminCmdAll implements IAdminIslandCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         String command = CommandArguments.buildLongString(args, 4, false);
         boolean onlyOnline = Boolean.parseBoolean(args[3]);
 

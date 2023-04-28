@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
@@ -67,7 +68,7 @@ public class CmdAdminSyncBonus implements IAdminIslandCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         boolean isWorthBonus = !args[3].equalsIgnoreCase("level");
 
         boolean anyIslandChanged = false;

@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import org.bukkit.command.CommandSender;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
@@ -58,7 +59,7 @@ public class CmdAdminWithdraw implements IAdminIslandCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
         BigDecimal amount = BigDecimal.valueOf(-1);
 
         if (args[3].equalsIgnoreCase("all") || args[3].equals("*")) {

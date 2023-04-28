@@ -17,6 +17,7 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -104,7 +105,7 @@ public class CmdAdminCount implements IAdminIslandCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
         if (args.length == 3) {
             if (!(sender instanceof Player)) {
                 Message.CUSTOM.send(sender, "&cYou must be a player in order to open the counts menu.", true);

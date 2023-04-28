@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -59,7 +60,7 @@ public class CmdAdminClearGenerator implements IAdminIslandCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         World.Environment environment = args.length == 3 ? plugin.getSettings().getWorlds().getDefaultWorld() :
                 CommandArguments.getEnvironment(sender, args[3]);
 

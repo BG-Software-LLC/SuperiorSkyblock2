@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -63,7 +64,7 @@ public class CmdAdminUnlockWorld implements IAdminIslandCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         World.Environment environment = CommandArguments.getEnvironment(sender, args[3]);
 
         if (environment == null)
