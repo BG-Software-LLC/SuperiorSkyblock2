@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,37 +22,19 @@ public class MenuPatternSlots {
         this.charSlots.computeIfAbsent(character, ch -> new LinkedList<>()).add(slot);
     }
 
-    public List<Integer> getSlots(char character, Integer... defaultSlots) {
+    public List<Integer> getSlots(char character) {
         List<Integer> slots = this.charSlots.get(character);
-        return slots == null ? Arrays.asList(defaultSlots) : slots;
+        return slots == null ? Collections.emptyList() : slots;
     }
 
-    public List<Integer> getSlots(String str, Integer... defaultSlots) {
+    public List<Integer> getSlots(String str) {
         for (char ch : str.toCharArray()) {
             List<Integer> slots = getSlots(ch);
             if (!slots.isEmpty())
                 return slots;
         }
 
-        return Arrays.asList(defaultSlots);
-    }
-
-    public int getSlot(char character, int defaultSlot) {
-        List<Integer> slots = getSlots(character);
-        return slots.isEmpty() ? defaultSlot : slots.get(0);
-    }
-
-    public int getSlot(char character) {
-        return getSlot(character, -1);
-    }
-
-    public int getSlot(String str, int defaultSlot) {
-        List<Integer> slots = getSlots(str);
-        return slots.isEmpty() ? defaultSlot : slots.get(0);
-    }
-
-    public int getSlot(String str) {
-        return getSlot(str, -1);
+        return Collections.emptyList();
     }
 
 }

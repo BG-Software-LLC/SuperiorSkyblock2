@@ -76,8 +76,7 @@ public class MenuIslandValues extends AbstractMenu<MenuIslandValues.View, Island
                 Key blockKey = KeyImpl.of(block);
                 keysToUpdate.add(blockKey);
 
-                patternBuilder.mapButton(menuPatternSlots.getSlot(itemsSectionName),
-                        new ValuesButton.Builder(blockKey));
+                patternBuilder.mapButtons(menuPatternSlots.getSlots(itemsSectionName), new ValuesButton.Builder(blockKey));
             }
         }
 

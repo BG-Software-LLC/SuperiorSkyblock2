@@ -256,16 +256,16 @@ public class MissionsModule extends BuiltinModule {
         MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
         YamlConfiguration missionsMenuConfig = menuLoadResult.getConfig();
 
-        int islandsCategorySlot = menuPatternSlots.getSlot(missionsMenuConfig.getString("island-missions", ""));
-        if (islandsCategorySlot != -1) {
+        List<Integer> islandsCategorySlot = menuPatternSlots.getSlots(missionsMenuConfig.getString("island-missions", ""));
+        if (islandsCategorySlot.isEmpty()) {
             categoriesSection.set("islands.name", "Islands");
-            categoriesSection.set("islands.slot", islandsCategorySlot);
+            categoriesSection.set("islands.slot", islandsCategorySlot.get(0));
         }
 
-        int playersCategorySlot = menuPatternSlots.getSlot(missionsMenuConfig.getString("player-missions", ""));
-        if (playersCategorySlot != -1) {
+        List<Integer> playersCategorySlot = menuPatternSlots.getSlots(missionsMenuConfig.getString("player-missions", ""));
+        if (playersCategorySlot.isEmpty()) {
             categoriesSection.set("players.name", "Players");
-            categoriesSection.set("players.slot", playersCategorySlot);
+            categoriesSection.set("players.slot", playersCategorySlot.get(0));
         }
 
         File islandsCategoryFile = new File(getModuleFolder(), "categories/islands");

@@ -382,8 +382,7 @@ public class MenuParserImpl implements MenuParser {
     }
 
     public List<Integer> parseButtonSlots(ConfigurationSection section, String key, MenuPatternSlots menuPatternSlots) {
-        return !section.contains(key) ? Collections.singletonList(-1) :
-                menuPatternSlots.getSlots(section.getString(key), -1);
+        return !section.contains(key) ? Collections.emptyList() : menuPatternSlots.getSlots(section.getString(key));
     }
 
     public interface IMenuConverter {
