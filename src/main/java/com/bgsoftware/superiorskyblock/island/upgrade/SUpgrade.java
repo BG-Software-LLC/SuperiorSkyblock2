@@ -1,16 +1,19 @@
 package com.bgsoftware.superiorskyblock.island.upgrade;
 
-import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
-import com.bgsoftware.superiorskyblock.island.upgrade.cost.EmptyUpgradeCost;
-import com.bgsoftware.superiorskyblock.island.container.value.Value;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
-import org.bukkit.World;
+import com.bgsoftware.superiorskyblock.island.container.value.Value;
+import com.bgsoftware.superiorskyblock.island.upgrade.cost.EmptyUpgradeCost;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class SUpgrade implements Upgrade {
 
@@ -36,7 +39,7 @@ public class SUpgrade implements Upgrade {
     private final String name;
 
     private SUpgradeLevel[] upgradeLevels = new SUpgradeLevel[0];
-    private int slot = -1;
+    private final Set<Integer> slots = new LinkedHashSet<>();
 
     public SUpgrade(String name) {
         this.name = name;
@@ -59,12 +62,31 @@ public class SUpgrade implements Upgrade {
 
     @Override
     public int getSlot() {
-        return slot;
+        return getSlots().get(0);
+    }
+
+    @Override
+    public List<Integer> getSlots() {
+        return Collections.unmodifiableList(new LinkedList<>(this.slots));
+    }
+
+    @Override
+    public boolean isSlot(int slot) {
+        return this.slots.contains(slot);
     }
 
     @Override
     public void setSlot(int slot) {
-        this.slot = slot;
+        this.slots.add(slot);
+    }
+
+    @Override
+    public void setSlots(@Nullable List<Integer> slots) {
+        if (slots == null) {
+            this.slots.clear();
+        } else {
+            this.slots.addAll(slots);
+        }
     }
 
     public void addUpgradeLevel(int level, SUpgradeLevel upgradeLevel) {

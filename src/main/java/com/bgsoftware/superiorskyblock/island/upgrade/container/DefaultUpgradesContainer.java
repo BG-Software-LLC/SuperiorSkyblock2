@@ -25,7 +25,7 @@ public class DefaultUpgradesContainer implements UpgradesContainer {
     @Override
     public Upgrade getUpgrade(int slot) {
         return this.upgrades.values().stream()
-                .filter(upgrade -> upgrade.getSlot() == slot)
+                .filter(upgrade -> upgrade.isSlot(slot))
                 .findFirst()
                 .orElse(null);
     }

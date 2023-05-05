@@ -66,10 +66,10 @@ public class MenuIslandUpgrades extends AbstractMenu<IslandMenuView, IslandViewA
                     continue;
                 }
 
-                int slot = MenuParserImpl.getInstance().parseButtonSlots(upgradeSection, "item", menuPatternSlots).get(0);
-                upgrade.setSlot(slot);
+                List<Integer> slots = MenuParserImpl.getInstance().parseButtonSlots(upgradeSection, "item", menuPatternSlots);
+                upgrade.setSlots(slots);
 
-                patternBuilder.mapButton(slot, new UpgradeButton.Builder(upgrade));
+                patternBuilder.mapButtons(slots, new UpgradeButton.Builder(upgrade));
 
                 for (String levelSectionKey : upgradeSection.getKeys(false)) {
                     int level;
@@ -81,7 +81,7 @@ public class MenuIslandUpgrades extends AbstractMenu<IslandMenuView, IslandViewA
                         continue;
                     }
 
-                    if (slot == -1) {
+                    if (slots.isEmpty()) {
                         Log.warnFromFile("upgrades.yml", "The item of the upgrade ", upgrade.getName(),
                                 " (level ", level, ") is not inside the pattern, skipping...");
                         continue;
