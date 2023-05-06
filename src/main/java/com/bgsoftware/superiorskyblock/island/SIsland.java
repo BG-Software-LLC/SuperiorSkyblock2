@@ -2039,13 +2039,13 @@ public class SIsland implements Island {
         if (blocks.isEmpty())
             return;
 
+        BigDecimal oldWorth = getWorth();
+        BigDecimal oldLevel = getIslandLevel();
+
         blocks.forEach((blockKey, amount) ->
                 handleBlockPlace(blockKey, BigInteger.valueOf(amount), false, false));
 
-        this.lastSavedBlockCounts = this.currentTotalBlockCounts.get();
-
-        IslandsDatabaseBridge.saveBlockCounts(this);
-        IslandsDatabaseBridge.saveDirtyChunks(this.dirtyChunksContainer);
+        saveBlockCounts(this.currentTotalBlockCounts.get(), oldWorth, oldLevel);
 
         updateLastTime();
     }
