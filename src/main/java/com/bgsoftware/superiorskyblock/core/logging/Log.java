@@ -12,9 +12,18 @@ public class Log {
 
     private static final EnumSet<Debug> DEBUG_FILTERS = EnumSet.noneOf(Debug.class);
     private static boolean debugMode = false;
+    private static final ThreadLocal<StackTrace> originalStackTrace = new ThreadLocal<>();
 
     private Log() {
 
+    }
+
+    public static void attachStackTrace(StackTrace stackTrace) {
+        originalStackTrace.set(stackTrace);
+    }
+
+    public static void detachStackTrace() {
+        originalStackTrace.set(null);
     }
 
     public static void info(Object first, Object... parts) {
@@ -135,7 +144,10 @@ public class Log {
     }
 
     private static void printStackTrace() {
-        new Exception().printStackTrace();
+        Thread.dumpStack();
+        StackTrace originalStackTrace = Log.originalStackTrace.get();
+        if (originalStackTrace != null)
+            originalStackTrace.dump();
     }
 
 }
