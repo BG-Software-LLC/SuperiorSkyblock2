@@ -7,6 +7,7 @@ public enum ProfileType {
 
     CREATE_ISLAND,
     DISBAND_ISLAND,
+    LOAD_CHUNK,
     SCHEMATIC_PLACE;
 
     private final LazyReference<String> prettyName = new LazyReference<String>() {

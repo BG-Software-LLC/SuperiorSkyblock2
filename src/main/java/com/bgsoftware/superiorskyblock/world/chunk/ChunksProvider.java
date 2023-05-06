@@ -6,6 +6,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
+import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import org.bukkit.Chunk;
 
 import javax.annotation.Nullable;
@@ -85,6 +87,7 @@ public class ChunksProvider {
             if (stopped)
                 return;
 
+            long profiler = Profiler.start(ProfileType.LOAD_CHUNK);
             Log.debug(Debug.LOAD_CHUNK, chunkPosition, chunkLoadReason);
 
             plugin.getProviders().getChunksProvider().loadChunk(chunkPosition.getWorld(),
@@ -96,7 +99,7 @@ public class ChunksProvider {
                 }
 
                 try {
-                    finishLoad(chunk);
+                    finishLoad(chunk, profiler);
                 } catch (Exception error2) {
                     Log.entering("ENTER", chunkPosition, chunkLoadReason);
                     Log.error(error2, "An unexpected error occurred while finishing chunk loading:");
@@ -104,9 +107,10 @@ public class ChunksProvider {
             });
         }
 
-        private void finishLoad(Chunk chunk) {
+        private void finishLoad(Chunk chunk, long profiler) {
             PendingChunkLoadRequest pendingRequest = pendingRequests.remove(chunkPosition);
 
+            Profiler.end(profiler);
             Log.debug(Debug.LOAD_CHUNK, chunkPosition, chunkLoadReason);
 
             if (pendingRequest != null) {
