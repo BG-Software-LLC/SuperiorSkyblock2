@@ -45,6 +45,8 @@ import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
+import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
@@ -1401,6 +1403,8 @@ public class SIsland implements Island {
 
     @Override
     public void disbandIsland() {
+        long profilerId = Profiler.start(ProfileType.DISBAND_ISLAND, 2);
+
         forEachIslandMember(Collections.emptyList(), false, islandMember -> {
             if (islandMember.equals(owner)) {
                 owner.setIsland(null);
@@ -1427,9 +1431,11 @@ public class SIsland implements Island {
 
         plugin.getMissions().getAllMissions().forEach(this::resetMission);
 
-        resetChunks(true);
+        resetChunks(true, () -> Profiler.end(profilerId));
 
         plugin.getGrid().deleteIsland(this);
+
+        Profiler.end(profilerId);
     }
 
     @Override

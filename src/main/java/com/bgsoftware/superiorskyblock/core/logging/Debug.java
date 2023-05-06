@@ -135,7 +135,8 @@ public enum Debug {
     PERMISSION_LOOKUP,
     REPLACE_PLAYER,
 
-    SHOW_STACKTRACE;
+    SHOW_STACKTRACE,
+    PROFILER;
 
     private static String[] DEBUG_NAMES = null;
 

@@ -56,6 +56,14 @@ public class Log {
         error.printStackTrace();
     }
 
+    public static void profile(String[] profiledDataLines) {
+        if (!isDebugged(Debug.PROFILER))
+            return;
+
+        for (String line : profiledDataLines)
+            logInternal(Level.INFO, line);
+    }
+
     public static void debug(Debug debug, Object... params) {
         if (isDebugged(debug)) {
             String[] classAndMethod = getClassAndMethodNames();

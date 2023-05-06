@@ -13,6 +13,8 @@ import com.bgsoftware.superiorskyblock.nms.v1194.menu.MenuHopperBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.commands.SummonCommand;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.level.block.Block;
@@ -158,6 +160,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public int getMaxWorldSize() {
         return Bukkit.getMaxWorldSize();
+    }
+
+    @Override
+    public double getCurrentTps() {
+        return MinecraftServer.getServer().tps1.getAverage();
     }
 
     private interface MenuCreator extends BiFunction<InventoryHolder, String, Container> {

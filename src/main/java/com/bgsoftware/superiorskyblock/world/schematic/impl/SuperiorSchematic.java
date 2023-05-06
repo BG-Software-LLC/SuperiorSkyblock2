@@ -12,6 +12,8 @@ import com.bgsoftware.superiorskyblock.core.SchematicEntity;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
+import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
@@ -116,6 +118,8 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
             return;
         }
 
+        long profiler = Profiler.start(ProfileType.SCHEMATIC_PLACE);
+
         Log.debug(Debug.PASTE_SCHEMATIC, this.name, island.getOwner().getName(), location);
 
         WorldEditSession worldEditSession = plugin.getNMSWorld().createEditSession(location.getWorld());
@@ -186,6 +190,8 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                     island.handleBlocksPlace(cachedCounts);
 
                     plugin.getEventsBus().callIslandSchematicPasteEvent(island, name, location);
+
+                    Profiler.end(profiler);
 
                     this.affectedChunks = new LinkedList<>(affectedChunks);
                     callback.run();

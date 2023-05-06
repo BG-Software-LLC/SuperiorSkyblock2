@@ -160,6 +160,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         return Bukkit.getMaxWorldSize();
     }
 
+    @Override
+    public double getCurrentTps() {
+        return Bukkit.getTPS()[0];
+    }
+
     private interface MenuCreator extends BiFunction<InventoryHolder, String, Container> {
     }
 

@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.nms.v1182.menu.MenuHopperBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.level.block.Block;
@@ -158,6 +159,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     public Object createMenuInventoryHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title) {
         MenuCreator menuCreator = MENUS_HOLDER_CREATORS.get(inventoryType);
         return menuCreator == null ? null : menuCreator.apply(defaultHolder, title);
+    }
+
+    @Override
+    public double getCurrentTps() {
+        return Bukkit.getTPS()[0];
     }
 
     private interface MenuCreator extends BiFunction<InventoryHolder, String, Container> {

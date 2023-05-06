@@ -11,6 +11,8 @@ import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
+import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
@@ -71,6 +73,8 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
             return CompletableFuture.completedFuture(new IslandCreationResult(IslandCreationResult.Status.NAME_OCCUPIED, null, null, false));
         }
 
+        long profiler = Profiler.start(ProfileType.CREATE_ISLAND);
+
         CompletableFuture<IslandCreationResult> completableFuture = new CompletableFuture<>();
 
         Location islandLocation = plugin.getProviders().getWorldsProvider().getNextLocation(
@@ -95,11 +99,13 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
                         builder.owner.getUniqueId(), builder.uuid);
                 completableFuture.complete(new IslandCreationResult(IslandCreationResult.Status.SUCCESS, island, islandLocation, event.getResult()));
                 island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
+                Profiler.end(profiler);
             }, error -> {
                 island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
                 plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
                         builder.owner.getUniqueId(), builder.uuid);
                 completableFuture.completeExceptionally(error);
+                Profiler.end(profiler);
             });
         }
 

@@ -119,6 +119,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
+    public double getCurrentTps() {
+        return Bukkit.getTPS()[0];
+    }
+
+    @Override
     public Object createMenuInventoryHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title) {
         return defaultHolder;
     }
