@@ -15,6 +15,8 @@ import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
+import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
@@ -51,6 +53,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
     public CompletableFuture<IslandCalculationResult> calculateIsland(Island island) {
         CompletableFutureList<List<CalculatedChunk>> chunksToLoad = new CompletableFutureList<>();
 
+        long profiler = Profiler.start(ProfileType.CALCULATE_ISLAND);
         Log.debug(Debug.CHUNK_CALCULATION, island.getOwner().getName());
 
         if (!plugin.getProviders().hasSnapshotsSupport()) {
@@ -150,6 +153,8 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
             }
 
             chunksToCheck.clear();
+
+            Profiler.end(profiler);
 
             result.complete(blockCounts);
         });
