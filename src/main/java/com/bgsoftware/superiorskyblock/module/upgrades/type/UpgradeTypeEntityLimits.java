@@ -105,27 +105,32 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
         @EventHandler
         public void onVehicleSpawn(PlayerInteractEvent e) {
             if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null ||
-                    e.getPlayer().getGameMode() == GameMode.CREATIVE ||
-                    !Materials.isRail(e.getClickedBlock().getType()) ||
-                    !Materials.isMinecart(e.getItem().getType()))
+                    e.getPlayer().getGameMode() == GameMode.CREATIVE)
+                return;
+
+            Material handType = e.getItem().getType();
+
+            // Check if minecart or boat
+            boolean isMinecart = Materials.isRail(e.getClickedBlock().getType()) && Materials.isMinecart(handType);
+            boolean isBoat = Materials.isBoat(handType);
+            if (!isMinecart && !isBoat)
                 return;
 
             if (INTERACT_GET_HAND.isValid() && INTERACT_GET_HAND.invoke(e) != EquipmentSlot.HAND)
                 return;
 
-            Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
+            Location blockLocation = e.getClickedBlock().getLocation();
+            Island island = plugin.getGrid().getIslandAt(blockLocation);
 
             if (island == null)
                 return;
-
-            Location blockLocation = e.getClickedBlock().getLocation();
 
             vehiclesOwners.put(new LocationKey(blockLocation), e.getPlayer().getUniqueId());
         }
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onVehicleSpawn(VehicleCreateEvent e) {
-            if (!(e.getVehicle() instanceof Minecart) || BukkitEntities.canBypassEntityLimit(e.getVehicle()))
+            if (BukkitEntities.canBypassEntityLimit(e.getVehicle()))
                 return;
 
             Island island = plugin.getGrid().getIslandAt(e.getVehicle().getLocation());

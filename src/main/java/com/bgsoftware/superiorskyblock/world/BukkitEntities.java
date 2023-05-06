@@ -21,6 +21,7 @@ import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
+import org.bukkit.entity.Vehicle;
 import org.bukkit.inventory.AbstractHorseInventory;
 import org.bukkit.inventory.HorseInventory;
 import org.bukkit.inventory.ItemStack;
@@ -131,8 +132,8 @@ public class BukkitEntities {
 
     public static boolean canHaveLimit(EntityType entityType) {
         Class<?> entityClass = entityType.getEntityClass();
-        return entityType.name().contains("MINECART") || (entityClass != null &&
-                (LivingEntity.class.isAssignableFrom(entityClass) || Hanging.class.isAssignableFrom(entityClass)));
+        return (entityClass != null && (LivingEntity.class.isAssignableFrom(entityClass) ||
+                Hanging.class.isAssignableFrom(entityClass) || Vehicle.class.isAssignableFrom(entityClass)));
     }
 
     public static boolean canBypassEntityLimit(Entity entity) {
