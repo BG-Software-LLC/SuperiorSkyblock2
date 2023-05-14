@@ -81,7 +81,7 @@ public class SpawnersProvider_EpicSpawners6 implements SpawnersProvider_AutoDete
                 // Custom spawners are egg spawners. Therefore, we want to remove one egg spawner from the counts and
                 // replace it with the custom spawner. We subtract the spawner 1 tick later, so it will be registered
                 // before removing it.
-                BukkitExecutor.sync(() -> island.handleBlockBreak(ConstantKeys.EGG_MOB_SPAWNER, 1), 1L);
+                BukkitExecutor.sync((bukkitRunnable) -> island.handleBlockBreak(ConstantKeys.EGG_MOB_SPAWNER, 1), 1L);
             } else {
                 // Vanilla spawners are listened in the vanilla listeners as well, and therefore 1 spawner is already
                 // being counted by the other listeners. We need to subtract 1 so the counts will be adjusted correctly.

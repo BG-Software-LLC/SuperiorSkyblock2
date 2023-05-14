@@ -128,13 +128,8 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
         ChunkData chunkData = this.chunks.computeIfAbsent(chunkPos.toLong(), ChunkData::new);
 
-        if (plugin.getSettings().isLightsUpdate() && blockState.getLightEmission() > 0) {
-            if (isStarLightInterface) {
-                this.lightenChunks.add(chunkPos);
-            } else {
-                chunkData.lights.add(blockPos);
-            }
-        }
+        if (plugin.getSettings().isLightsUpdate() && !isStarLightInterface && blockState.getLightEmission() > 0)
+            chunkData.lights.add(blockPos);
 
         LevelChunkSection levelChunkSection = chunkData.chunkSections[serverLevel.getSectionIndex(blockPos.getY())];
 
@@ -179,11 +174,15 @@ public class WorldEditSessionImpl implements WorldEditSession {
             levelChunk.setHeightmap(type, heightmap.getRawData());
         }));
 
-        if (plugin.getSettings().isLightsUpdate() && !isStarLightInterface && !chunkData.lights.isEmpty()) {
-            ThreadedLevelLightEngine threadedLevelLightEngine = serverLevel.getChunkSource().getLightEngine();
-            chunkData.lights.forEach(threadedLevelLightEngine::checkBlock);
-            // Queues chunk light for this chunk.
-            threadedLevelLightEngine.lightChunk(levelChunk, false);
+        if (plugin.getSettings().isLightsUpdate()) {
+            if (isStarLightInterface) {
+                this.lightenChunks.add(chunkPos);
+            } else {
+                ThreadedLevelLightEngine threadedLevelLightEngine = serverLevel.getChunkSource().getLightEngine();
+                chunkData.lights.forEach(threadedLevelLightEngine::checkBlock);
+                // Queues chunk light for this chunk.
+                threadedLevelLightEngine.lightChunk(levelChunk, false);
+            }
         }
 
         levelChunk.setUnsaved(true);
@@ -225,6 +224,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
             threadedLevelLightEngine.relight(lightenChunks, chunkCallback -> {
             }, completeCallback -> {
             });
+            this.lightenChunks.clear();
         }
 
     }

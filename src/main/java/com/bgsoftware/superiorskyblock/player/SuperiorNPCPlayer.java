@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.persistence.EmptyPersistentDataContainer;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -445,12 +446,12 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Nullable
     @Override
-    public BukkitTask getTeleportTask() {
+    public ScheduledTask getTeleportTask() {
         return null;
     }
 
     @Override
-    public void setTeleportTask(@Nullable BukkitTask teleportTask) {
+    public void setTeleportTask(@Nullable ScheduledTask teleportTask) {
         // Do nothing.
     }
 

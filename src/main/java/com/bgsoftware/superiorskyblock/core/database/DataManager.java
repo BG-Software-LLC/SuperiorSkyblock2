@@ -78,7 +78,7 @@ public class DataManager extends Manager {
 
     public void saveDatabase(boolean async) {
         if (async && Bukkit.isPrimaryThread()) {
-            BukkitExecutor.async(() -> saveDatabase(false));
+            BukkitExecutor.async((runnableBukkit) -> saveDatabase(false));
             return;
         }
 

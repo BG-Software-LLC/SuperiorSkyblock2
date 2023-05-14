@@ -36,6 +36,7 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.levelgen.Heightmap;
+import org.bukkit.craftbukkit.v1_19_R3.CraftChunk;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -56,6 +57,9 @@ public class NMSUtils {
             ChunkHolder.class, 1, Packet.class, boolean.class);
     private static final ReflectField<Map<Long, ChunkHolder>> VISIBLE_CHUNKS = new ReflectField<>(
             ChunkMap.class, Map.class, Modifier.PUBLIC | Modifier.VOLATILE, 1);
+
+    private static final ReflectMethod<LevelChunk> CRAFT_CHUNK_GET_HANDLE = new ReflectMethod<>(
+            CraftChunk.class, LevelChunk.class, "getHandle");
 
     private static final List<CompletableFuture<Void>> PENDING_CHUNK_ACTIONS = new LinkedList<>();
 
@@ -268,6 +272,14 @@ public class NMSUtils {
     public static boolean isDoubleBlock(Block block, BlockState blockState) {
         return (block.defaultBlockState().is(BlockTags.SLABS) || block.defaultBlockState().is(BlockTags.WOODEN_SLABS)) &&
                 blockState.getValue(SlabBlock.TYPE) == SlabType.DOUBLE;
+    }
+
+    public static LevelChunk getCraftChunkHandle(CraftChunk craftChunk) {
+        if (CRAFT_CHUNK_GET_HANDLE.isValid())
+            return CRAFT_CHUNK_GET_HANDLE.invoke(craftChunk);
+
+        ServerLevel serverLevel = craftChunk.getCraftWorld().getHandle();
+        return serverLevel.getChunk(craftChunk.getX(), craftChunk.getZ());
     }
 
     public record UnloadedChunkCompound(net.minecraft.nbt.CompoundTag chunkCompound, ChunkPos chunkPos) {

@@ -153,7 +153,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
         if (plugin.getSettings().isLightsUpdate() && !lights.isEmpty()) {
             // For each light block, we calculate its light
             // We only update the lights after all the chunks were loaded.
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync((a) -> {
                 lights.forEach(blockPosition -> worldServer.c(EnumSkyBlock.BLOCK, blockPosition));
                 this.chunks.keySet().forEach(chunkKey -> {
                     ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair((int) (long) chunkKey, (int) (chunkKey >> 32));

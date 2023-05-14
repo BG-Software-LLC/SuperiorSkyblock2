@@ -120,4 +120,9 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         return server.getPropertyManager().getInt("max-world-size", 29999984);
     }
 
+    @Override
+    public double getCurrentTps() {
+        return MinecraftServer.getServer().recentTps[0];
+    }
+
 }

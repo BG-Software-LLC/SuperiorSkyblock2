@@ -206,7 +206,7 @@ public class BlockChangesListener implements Listener {
 
         if (ServerVersion.isLegacy()) {
             // noinspection deprecated
-            blockKey = KeyImpl.of(e.getTo(), e.getData());
+            blockKey = KeyImpl.of(e.getTo(), e.getBlock().getData());
         } else {
             blockKey = KeyImpl.of(e.getTo(), (byte) 0);
         }
@@ -329,7 +329,7 @@ public class BlockChangesListener implements Listener {
             // Do not save block counts
             onBlockBreak(KeyImpl.of(e.getToBlock()), e.getToBlock().getLocation(), 1, Flag.DIRTY_CHUNK);
         } else {
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync((bukkitRunnable) -> {
                 // Do not save block counts
                 onBlockPlace(KeyImpl.of(e.getToBlock()), e.getToBlock().getLocation(), 1, null, Flag.DIRTY_CHUNK);
             });
@@ -398,7 +398,7 @@ public class BlockChangesListener implements Listener {
                 }
             }
 
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync((bukkitRunnable) -> {
                 if (dirtyChunk) {
                     if (plugin.getNMSChunks().isChunkEmpty(block.getChunk())) {
                         island.markChunkEmpty(block.getWorld(), block.getX() >> 4,

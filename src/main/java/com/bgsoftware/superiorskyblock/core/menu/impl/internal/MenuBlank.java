@@ -37,7 +37,7 @@ public class MenuBlank extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
         try {
             sound = Sound.valueOf("BLOCK_ANVIL_PLACE");
         } catch (Throwable error) {
-            sound = Sound.ANVIL_LAND;
+            sound = Sound.BLOCK_ANVIL_LAND;
         }
 
         RegularMenuLayoutImpl.Builder<BaseMenuView> patternBuilder = RegularMenuLayoutImpl.newBuilder();

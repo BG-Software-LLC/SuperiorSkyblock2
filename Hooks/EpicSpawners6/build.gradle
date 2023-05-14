@@ -1,7 +1,13 @@
 group 'Hooks:EpicSpawners6'
 
+repositories {
+    maven { url "https://papermc.io/repo/repository/maven-public/"}
+}
+
 dependencies {
     compileOnly 'com.songoda:EpicSpawners:6.0.6'
+    compileOnly 'dev.folia:folia-api:1.19.4-R0.1-SNAPSHOT'
+
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
     compileOnly rootProject

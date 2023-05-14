@@ -246,7 +246,7 @@ public class IslandFlagsListener implements Listener {
 
             List<Entity> nearbyEntities = e.getEntity().getNearbyEntities(2, 2, 2);
 
-            BukkitExecutor.sync(() -> nearbyEntities.forEach(entity -> {
+            BukkitExecutor.sync((bukkitRunnable) -> nearbyEntities.forEach(entity -> {
                 if (entity instanceof LivingEntity && !entity.getUniqueId().equals(shooterPlayer.getUniqueId()))
                     ((LivingEntity) entity).removePotionEffect(PotionEffectType.POISON);
             }), 1L);

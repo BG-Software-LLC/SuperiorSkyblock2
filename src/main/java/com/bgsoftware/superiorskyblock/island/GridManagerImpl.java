@@ -109,7 +109,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         this.islandCreationAlgorithm = DefaultIslandCreationAlgorithm.getInstance();
 
         this.lastIsland = new SBlockPosition(plugin.getSettings().getWorlds().getDefaultWorldName(), 0, 100, 0);
-        BukkitExecutor.sync(this::updateSpawn);
+        BukkitExecutor.sync((a) -> this.updateSpawn());
     }
 
     public void updateSpawn() {
@@ -182,7 +182,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         try {
             if (!Bukkit.isPrimaryThread()) {
-                BukkitExecutor.sync(() -> createIslandInternalAsync(builder, biome, offset, schematic));
+                BukkitExecutor.sync((bukkitRunnable) -> createIslandInternalAsync(builder, biome, offset, schematic));
             } else {
                 createIslandInternalAsync(builder, biome, offset, schematic);
             }
@@ -246,7 +246,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
                     island.setIslandHome(schematic.adjustRotation(islandLocation));
 
-                    BukkitExecutor.sync(() -> builder.owner.runIfOnline(player -> {
+                    BukkitExecutor.sync((bukkitRunnable) -> builder.owner.runIfOnline(player -> {
                         if (updateGamemode)
                             player.setGameMode(GameMode.SURVIVAL);
 
@@ -260,7 +260,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
                                 if (result) {
                                     if (affectedChunks != null)
-                                        BukkitExecutor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, affectedChunks), 10L);
+                                        BukkitExecutor.sync((bukkitRunnable1) -> IslandUtils.resetChunksExcludedFromList(island, affectedChunks), 10L);
                                     if (plugin.getSettings().getWorlds().getDefaultWorld() == World.Environment.THE_END) {
                                         plugin.getNMSDragonFight().awardTheEndAchievement(player);
                                         plugin.getServices().getDragonBattleService().resetEnderDragonBattle(island);
@@ -314,7 +314,7 @@ public class GridManagerImpl extends Manager implements GridManager {
             superiorPlayer.teleport(previewLocation, result -> {
                 if (result) {
                     this.islandPreviews.startIslandPreview(new SIslandPreview(superiorPlayer, previewLocation, schemName, islandName));
-                    BukkitExecutor.ensureMain(() -> superiorPlayer.runIfOnline(player -> player.setGameMode(GameMode.SPECTATOR)));
+                    BukkitExecutor.sync((bukkitRunnable) -> superiorPlayer.runIfOnline(player -> player.setGameMode(GameMode.SPECTATOR)));
                     Message.ISLAND_PREVIEW_START.send(superiorPlayer, schemName);
                 }
             });
@@ -328,7 +328,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         IslandPreview islandPreview = this.islandPreviews.endIslandPreview(superiorPlayer);
         if (islandPreview != null) {
             superiorPlayer.runIfOnline(player -> {
-                BukkitExecutor.ensureMain(() -> superiorPlayer.teleport(plugin.getGrid().getSpawnIsland(), teleportResult -> {
+                BukkitExecutor.ensureMain((a) -> superiorPlayer.teleport(plugin.getGrid().getSpawnIsland(), teleportResult -> {
                     if (teleportResult && superiorPlayer.isOnline())
                         player.setGameMode(GameMode.SURVIVAL);
                 }));
@@ -340,7 +340,7 @@ public class GridManagerImpl extends Manager implements GridManager {
     @Override
     public void cancelAllIslandPreviews() {
         if (!Bukkit.isPrimaryThread()) {
-            BukkitExecutor.sync(this::cancelAllIslandPreviewsSync);
+            BukkitExecutor.sync((a) -> this.cancelAllIslandPreviewsSync());
         } else {
             cancelAllIslandPreviewsSync();
         }

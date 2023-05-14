@@ -28,7 +28,7 @@ public class BorderColorButton extends AbstractMenuViewButton<BaseMenuView> {
     @Override
     public void onButtonClick(InventoryClickEvent clickEvent) {
         if (IslandUtils.handleBorderColorUpdate(menuView.getInventoryViewer(), getTemplate().borderColor))
-            BukkitExecutor.sync(menuView::closeView, 1L);
+            BukkitExecutor.sync((a) -> menuView.closeView(), 1L);
     }
 
     public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<BaseMenuView> {

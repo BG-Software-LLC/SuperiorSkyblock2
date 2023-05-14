@@ -67,7 +67,7 @@ public class CmdAdminPurge implements ISuperiorCommand {
             if (islands.isEmpty()) {
                 Message.NO_ISLANDS_TO_PURGE.send(sender);
             } else {
-                BukkitExecutor.async(() -> islands.forEach(island -> plugin.getGrid().addIslandToPurge(island)));
+                BukkitExecutor.async((runnableBukkit) -> islands.forEach(island -> plugin.getGrid().addIslandToPurge(island)));
                 Message.PURGED_ISLANDS.send(sender, islands.size());
             }
         }

@@ -11,12 +11,12 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -442,12 +442,12 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
 
     @Nullable
     @Override
-    public BukkitTask getTeleportTask() {
+    public ScheduledTask getTeleportTask() {
         return this.handle.getTeleportTask();
     }
 
     @Override
-    public void setTeleportTask(@Nullable BukkitTask teleportTask) {
+    public void setTeleportTask(ScheduledTask teleportTask) {
         this.handle.setTeleportTask(teleportTask);
     }
 

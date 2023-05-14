@@ -112,7 +112,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
     @Override
     public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
         if (Bukkit.isPrimaryThread()) {
-            BukkitExecutor.async(() -> pasteSchematic(island, location, callback, onFailure));
+            BukkitExecutor.async((runnableBukkit) -> pasteSchematic(island, location, callback, onFailure));
             return;
         }
 
@@ -172,7 +172,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
             Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Chunks Loading", "");
 
-            BukkitExecutor.ensureMain(() -> {
+            BukkitExecutor.sync((bukkitRunnable) -> {
                 try {
                     worldEditSession.finish(island);
 

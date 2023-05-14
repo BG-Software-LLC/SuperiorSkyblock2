@@ -52,7 +52,7 @@ public class SIslandChest implements IslandChest {
 
     @Override
     public void setRows(int rows) {
-        BukkitExecutor.ensureMain(() -> {
+        BukkitExecutor.sync((bukkitRunnable) -> {
             try {
                 updateFlag.set(true);
                 ItemStack[] oldContents = inventory.getContents();

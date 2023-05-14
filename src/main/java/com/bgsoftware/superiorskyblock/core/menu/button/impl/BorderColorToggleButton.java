@@ -35,7 +35,7 @@ public class BorderColorToggleButton extends AbstractMenuViewButton<BaseMenuView
     @Override
     public void onButtonClick(InventoryClickEvent clickEvent) {
         plugin.getCommands().dispatchSubCommand(clickEvent.getWhoClicked(), "toggle", "border");
-        BukkitExecutor.sync(menuView::closeView, 1L);
+        BukkitExecutor.sync((t) -> menuView.closeView(), 1L);
     }
 
     public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<BaseMenuView> {

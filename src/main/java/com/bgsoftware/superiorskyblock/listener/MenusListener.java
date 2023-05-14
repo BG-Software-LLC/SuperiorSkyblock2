@@ -38,7 +38,7 @@ public class MenusListener implements Listener {
     private void onInventoryCloseMonitor(InventoryCloseEvent e) {
         ItemStack clickedItem = latestClickedItem.get(e.getPlayer().getUniqueId());
         if (clickedItem != null) {
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync((bukkitRunnable) -> {
                 e.getPlayer().getInventory().removeItem(clickedItem);
                 ((Player) e.getPlayer()).updateInventory();
             }, 1L);

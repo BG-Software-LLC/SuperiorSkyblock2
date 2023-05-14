@@ -25,7 +25,7 @@ public class CoreProtectHook {
     private static void recordBlockAction(OfflinePlayer offlinePlayer, Block block,
                                           IStackedBlocksListener.Action action) {
         if (!Bukkit.isPrimaryThread()) {
-            BukkitExecutor.sync(() -> recordBlockAction(offlinePlayer, block, action));
+            BukkitExecutor.sync((bukkitRunnable) -> recordBlockAction(offlinePlayer, block, action));
             return;
         }
 

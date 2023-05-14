@@ -61,7 +61,7 @@ public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends V
             if (error != null) {
                 res.completeExceptionally(error);
             } else {
-                BukkitExecutor.sync(() -> {
+                BukkitExecutor.sync((bukkitRunnable) -> {
                     view.setInventory(inventory);
                     res.complete(view);
                 });
@@ -76,7 +76,7 @@ public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends V
         }
 
         CompletableFuture<Inventory> inventoryFuture = new CompletableFuture<>();
-        BukkitExecutor.async(() -> inventoryFuture.complete(this.menuLayout.buildInventory(menuView)));
+        BukkitExecutor.async((runnableBukkit) -> inventoryFuture.complete(this.menuLayout.buildInventory(menuView)));
         return inventoryFuture;
     }
 

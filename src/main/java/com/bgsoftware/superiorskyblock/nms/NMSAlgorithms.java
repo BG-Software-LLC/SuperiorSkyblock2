@@ -47,4 +47,6 @@ public interface NMSAlgorithms {
 
     int getMaxWorldSize();
 
+    double getCurrentTps();
+
 }

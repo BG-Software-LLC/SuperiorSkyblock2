@@ -54,7 +54,7 @@ public class EntityTeleports {
         teleport(entity, location, succeed -> {
             if (!succeed) {
                 if (cooldown > 0) {
-                    BukkitExecutor.sync(() -> teleportUntilSuccess(entity, location, cooldown, onFinish), cooldown);
+                    BukkitExecutor.sync((bukkitRunnable) -> teleportUntilSuccess(entity, location, cooldown, onFinish), cooldown);
                 } else {
                     teleportUntilSuccess(entity, location, cooldown, onFinish);
                 }

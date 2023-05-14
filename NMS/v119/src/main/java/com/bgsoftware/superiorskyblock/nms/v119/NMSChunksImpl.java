@@ -354,26 +354,26 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     @Override
-    public void injectChunkSections(org.bukkit.Chunk chunk) {
+    public void injectChunkSections(Chunk chunk) {
         // No implementation
     }
 
     @Override
-    public boolean isChunkEmpty(org.bukkit.Chunk bukkitChunk) {
+    public boolean isChunkEmpty(Chunk bukkitChunk) {
         LevelChunk levelChunk = ((CraftChunk) bukkitChunk).getHandle();
         return Arrays.stream(levelChunk.getSections()).allMatch(chunkSection ->
                 chunkSection == null || chunkSection.hasOnlyAir());
     }
 
     @Override
-    public org.bukkit.Chunk getChunkIfLoaded(ChunkPosition chunkPosition) {
+    public Chunk getChunkIfLoaded(ChunkPosition chunkPosition) {
         ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
         ChunkAccess chunkAccess = serverLevel.getChunkSource().getChunk(chunkPosition.getX(), chunkPosition.getZ(), false);
         return chunkAccess instanceof LevelChunk levelChunk ? levelChunk.getBukkitChunk() : null;
     }
 
     @Override
-    public void startTickingChunk(Island island, org.bukkit.Chunk chunk, boolean stop) {
+    public void startTickingChunk(Island island, Chunk chunk, boolean stop) {
         if (plugin.getSettings().getCropsInterval() <= 0)
             return;
 

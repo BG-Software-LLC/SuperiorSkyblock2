@@ -58,7 +58,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
         });
 
         if (updateBlockKeys.get()) {
-            BukkitExecutor.sync(this::updateStackedBlockKeys);
+            BukkitExecutor.sync((a) -> this.updateStackedBlockKeys());
         }
 
         Log.info("Finished stacked blocks!");
@@ -117,7 +117,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
             stackedBlock.setBlockKey(blockKey);
             stackedBlock.setAmount(amount);
             // Must be called with delay in order to fix issue #632
-            BukkitExecutor.sync(() -> stackedBlock.updateName(plugin), 2L);
+            BukkitExecutor.sync((bukkitRunnable) -> stackedBlock.updateName(plugin), 2L);
             StackedBlocksDatabaseBridge.saveStackedBlock(this, stackedBlock);
         } else {
             stackedBlock.removeHologram();

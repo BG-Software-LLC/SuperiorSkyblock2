@@ -145,7 +145,7 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
         closed = true;
 
         if (!nextMove && !closeButton && plugin.getSettings().isOnlyBackButton()) {
-            BukkitExecutor.sync(this::openView);
+            BukkitExecutor.sync((a) -> this.openView());
         } else if (this.previousMenuView != null && this.menu.isPreviousMoveAllowed()) {
             EventResult<MenuView<?, ?>> eventResult = plugin.getEventsBus().callPlayerCloseMenuEvent(this.inventoryViewer,
                     this, previousMove ? this.previousMenuView : null);
@@ -154,11 +154,11 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
                 if (!eventResult.isCancelled()) {
                     MenuView<?, ?> newMenu = eventResult.getResult();
                     if (newMenu != null)
-                        BukkitExecutor.sync(newMenu::refreshView);
+                        BukkitExecutor.sync((a) -> newMenu.refreshView());
 
                 }
             } else if (eventResult.isCancelled()) {
-                BukkitExecutor.sync(this::openView);
+                BukkitExecutor.sync((a) -> this.openView());
             } else {
                 previousMove = true;
             }

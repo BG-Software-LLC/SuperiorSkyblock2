@@ -140,7 +140,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
             island.hasReachedEntityLimit(KeyImpl.of(e.getVehicle())).whenComplete((result, ex) -> {
                 if (result) {
-                    BukkitExecutor.sync(() -> {
+                    BukkitExecutor.sync((bukkitRunnable) -> {
                         removeEntity(e.getVehicle());
                         if (placedVehicle != null) {
                             Player player = Bukkit.getPlayer(placedVehicle);
@@ -168,13 +168,13 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
                     case "COMMAND_BLOCK":
                         return new ItemStack(Material.valueOf("COMMAND_BLOCK_MINECART"));
                     case "COMMAND":
-                        return new ItemStack(Material.COMMAND_MINECART);
+                        return new ItemStack(Material.COMMAND_BLOCK_MINECART);
                     case "TNT":
-                        return new ItemStack(ServerVersion.isLegacy() ? Material.EXPLOSIVE_MINECART : Material.valueOf("TNT_MINECART"));
+                        return new ItemStack(ServerVersion.isLegacy() ? Material.TNT_MINECART : Material.valueOf("TNT_MINECART"));
                     case "FURNACE":
-                        return new ItemStack(ServerVersion.isLegacy() ? Material.POWERED_MINECART : Material.valueOf("FURNACE_MINECART"));
+                        return new ItemStack(ServerVersion.isLegacy() ? Material.FURNACE_MINECART : Material.valueOf("FURNACE_MINECART"));
                     case "CHEST":
-                        return new ItemStack(ServerVersion.isLegacy() ? Material.STORAGE_MINECART : Material.valueOf("CHEST_MINECART"));
+                        return new ItemStack(ServerVersion.isLegacy() ? Material.CHEST_MINECART : Material.valueOf("CHEST_MINECART"));
                     default:
                         return new ItemStack(Material.MINECART);
                 }
@@ -185,7 +185,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
         private void removeEntity(Entity entity) {
             if (ServerVersion.isAtLeast(ServerVersion.v1_17)) {
-                BukkitExecutor.ensureMain(entity::remove);
+                BukkitExecutor.ensureMain((a) -> entity.remove());
             } else {
                 entity.remove();
             }

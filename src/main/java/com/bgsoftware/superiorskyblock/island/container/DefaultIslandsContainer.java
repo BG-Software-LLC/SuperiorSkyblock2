@@ -157,7 +157,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
         }
 
         if (Bukkit.isPrimaryThread()) {
-            BukkitExecutor.async(() -> sortIslandsInternal(sortingType, onFinish));
+            BukkitExecutor.async((runnableBukkit) -> sortIslandsInternal(sortingType, onFinish));
         } else {
             sortIslandsInternal(sortingType, onFinish);
         }

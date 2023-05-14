@@ -91,7 +91,7 @@ public class PortalsListener implements Listener {
                 if (teleportedPlayer != null)
                     teleportedPlayer.setLeavingFlag(true);
 
-                BukkitExecutor.sync(() -> {
+                BukkitExecutor.sync((bukkitRunnable) -> {
                     EntityTeleports.teleportUntilSuccess(e.getEntity(), island.getIslandHome(World.Environment.NORMAL), 5, () -> {
                         if (teleportedPlayer != null)
                             teleportedPlayer.setLeavingFlag(false);

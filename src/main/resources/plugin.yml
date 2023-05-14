@@ -6,7 +6,7 @@ description: Feature packed Skyblock core.
 website: https://bg-software.com/
 api-version: '1.13'
 author: Ome_R
-
+folia-supported: true
 softdepend:
   - AdvancedSpawners
   - CMI

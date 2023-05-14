@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.google.common.base.Preconditions;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -34,7 +35,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
-import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -87,7 +87,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private boolean immuneToPortals = false;
     private boolean leavingFlag = false;
 
-    private BukkitTask teleportTask = null;
+    private ScheduledTask teleportTask = null;
 
     public SSuperiorPlayer(SuperiorPlayerBuilderImpl builder) {
         this.uuid = builder.uuid;
@@ -784,12 +784,12 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public BukkitTask getTeleportTask() {
+    public ScheduledTask getTeleportTask() {
         return teleportTask;
     }
 
     @Override
-    public void setTeleportTask(BukkitTask teleportTask) {
+    public void setTeleportTask(ScheduledTask teleportTask) {
         if (this.teleportTask != null)
             this.teleportTask.cancel();
         this.teleportTask = teleportTask;

@@ -53,7 +53,7 @@ public class ControlPanelButton extends AbstractMenuViewButton<IslandMenuView> {
                 break;
         }
 
-        BukkitExecutor.sync(menuView::closeView, 1L);
+        BukkitExecutor.sync((a) -> menuView.closeView(), 1L);
     }
 
     public enum ControlPanelAction {

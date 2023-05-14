@@ -98,7 +98,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void listenSpawner(Location location, IntFunction<Integer> delayChangeCallback) {
-        org.bukkit.World world = location.getWorld();
+        World world = location.getWorld();
 
         if (world == null)
             return;
@@ -129,46 +129,45 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void setWorldBorder(SuperiorPlayer superiorPlayer, Island island) {
-        try {
-            if (!plugin.getSettings().isWorldBorders())
-                return;
+        if (!plugin.getSettings().isWorldBorders())
+            return;
 
-            boolean disabled = !superiorPlayer.hasWorldBorderEnabled();
+        Player player = superiorPlayer.asPlayer();
+        World world = superiorPlayer.getWorld();
 
-            Player player = superiorPlayer.asPlayer();
-            org.bukkit.World world = superiorPlayer.getWorld();
+        if (world == null || player == null)
+            return;
 
-            if (world == null || player == null)
-                return;
+        int islandSize = island == null ? 0 : island.getIslandSize();
 
-            ServerLevel serverLevel = ((CraftWorld) world).getHandle();
+        boolean disabled = !superiorPlayer.hasWorldBorderEnabled() || islandSize < 0;
 
-            WorldBorder worldBorder;
+        ServerLevel serverLevel = ((CraftWorld) world).getHandle();
 
-            if (disabled || island == null || (!plugin.getSettings().getSpawn().isWorldBorder() && island.isSpawn())) {
-                worldBorder = serverLevel.getWorldBorder();
-            } else {
-                worldBorder = new WorldBorder();
-                worldBorder.world = serverLevel;
+        WorldBorder worldBorder;
 
-                org.bukkit.World.Environment environment = world.getEnvironment();
-                Location center = island.getCenter(environment);
+        if (disabled || island == null || (!plugin.getSettings().getSpawn().isWorldBorder() && island.isSpawn())) {
+            worldBorder = serverLevel.getWorldBorder();
+        } else {
+            worldBorder = new WorldBorder();
+            worldBorder.world = serverLevel;
 
-                worldBorder.setWarningBlocks(0);
-                worldBorder.setSize((island.getIslandSize() * 2) + 1);
-                worldBorder.setCenter(center.getX(), center.getZ());
+            World.Environment environment = world.getEnvironment();
+            Location center = island.getCenter(environment);
 
-                double worldBorderSize = worldBorder.getSize();
-                switch (superiorPlayer.getBorderColor()) {
-                    case GREEN -> worldBorder.lerpSizeBetween(worldBorderSize - 0.1D, worldBorderSize, Long.MAX_VALUE);
-                    case RED -> worldBorder.lerpSizeBetween(worldBorderSize, worldBorderSize - 1.0D, Long.MAX_VALUE);
-                }
+            worldBorder.setWarningBlocks(0);
+            worldBorder.setSize((islandSize * 2) + 1);
+            worldBorder.setCenter(center.getX(), center.getZ());
+
+            double worldBorderSize = worldBorder.getSize();
+            switch (superiorPlayer.getBorderColor()) {
+                case GREEN -> worldBorder.lerpSizeBetween(worldBorderSize - 0.1D, worldBorderSize, Long.MAX_VALUE);
+                case RED -> worldBorder.lerpSizeBetween(worldBorderSize, worldBorderSize - 1.0D, Long.MAX_VALUE);
             }
-
-            ClientboundInitializeBorderPacket initializeBorderPacket = new ClientboundInitializeBorderPacket(worldBorder);
-            ((CraftPlayer) player).getHandle().connection.send(initializeBorderPacket);
-        } catch (NullPointerException ignored) {
         }
+
+        ClientboundInitializeBorderPacket initializeBorderPacket = new ClientboundInitializeBorderPacket(worldBorder);
+        ((CraftPlayer) player).getHandle().connection.send(initializeBorderPacket);
     }
 
     @Override
@@ -178,7 +177,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void setBlock(Location location, int combinedId) {
-        org.bukkit.World bukkitWorld = location.getWorld();
+        World bukkitWorld = location.getWorld();
 
         if (bukkitWorld == null)
             return;
@@ -198,7 +197,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public CompoundTag readBlockStates(Location location) {
-        org.bukkit.World bukkitWorld = location.getWorld();
+        World bukkitWorld = location.getWorld();
 
         if (bukkitWorld == null)
             return null;
@@ -229,7 +228,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public byte[] getLightLevels(Location location) {
-        org.bukkit.World bukkitWorld = location.getWorld();
+        World bukkitWorld = location.getWorld();
 
         if (bukkitWorld == null)
             return new byte[0];
@@ -239,7 +238,7 @@ public class NMSWorldImpl implements NMSWorld {
 
         LevelLightEngine lightEngine = serverLevel.getLightEngine();
         return new byte[]{
-                location.getWorld().getEnvironment() != org.bukkit.World.Environment.NORMAL ? 0 :
+                location.getWorld().getEnvironment() != World.Environment.NORMAL ? 0 :
                         (byte) lightEngine.getLayerListener(LightLayer.SKY).getLightValue(blockPos),
                 (byte) lightEngine.getLayerListener(LightLayer.BLOCK).getLightValue(blockPos)
         };
@@ -247,7 +246,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public CompoundTag readTileEntity(Location location) {
-        org.bukkit.World bukkitWorld = location.getWorld();
+        World bukkitWorld = location.getWorld();
 
         if (bukkitWorld == null)
             return null;
@@ -287,7 +286,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void placeSign(Island island, Location location) {
-        org.bukkit.World bukkitWorld = location.getWorld();
+        World bukkitWorld = location.getWorld();
 
         if (bukkitWorld == null)
             return;
@@ -326,7 +325,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void playGeneratorSound(Location location) {
-        org.bukkit.World bukkitWorld = location.getWorld();
+        World bukkitWorld = location.getWorld();
 
         if (bukkitWorld == null)
             return;
@@ -345,7 +344,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void playPlaceSound(Location location) {
-        org.bukkit.World bukkitWorld = location.getWorld();
+        World bukkitWorld = location.getWorld();
 
         if (bukkitWorld == null)
             return;
@@ -359,12 +358,12 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public int getMinHeight(org.bukkit.World world) {
+    public int getMinHeight(World world) {
         return world.getMinHeight();
     }
 
     @Override
-    public void removeAntiXray(org.bukkit.World bukkitWorld) {
+    public void removeAntiXray(World bukkitWorld) {
         ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
         if (CHUNK_PACKET_BLOCK_CONTROLLER.isValid())
             CHUNK_PACKET_BLOCK_CONTROLLER.set(serverLevel, ChunkPacketBlockController.NO_OPERATION_INSTANCE);

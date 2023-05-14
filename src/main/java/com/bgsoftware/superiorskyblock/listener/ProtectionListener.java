@@ -432,7 +432,7 @@ public class ProtectionListener implements Listener {
         flagsSet.remove(Flag.PREVENT_OUTSIDE_ISLANDS); // Disable check for prevent outside island being called twice
         if (preventInteraction(island, entityLocation, superiorPlayer, islandPrivilege, flagsSet)) {
             if (closeInventory) {
-                BukkitExecutor.sync(() -> {
+                BukkitExecutor.sync((bukkitRunnable) -> {
                     if (player.isOnline()) {
                         Inventory openInventory = player.getOpenInventory().getTopInventory();
                         if (openInventory != null && (openInventory.getType() == InventoryType.MERCHANT ||
@@ -613,7 +613,7 @@ public class ProtectionListener implements Listener {
                 if (hitBlock != null) {
                     ICachedBlock cachedBlock = plugin.getNMSWorld().cacheBlock(hitBlock);
                     hitBlock.setType(Material.AIR);
-                    BukkitExecutor.sync(() -> cachedBlock.setBlock(hitBlock.getLocation()), 1L);
+                    BukkitExecutor.sync((bukkitRunnable) -> cachedBlock.setBlock(hitBlock.getLocation()), 1L);
                 }
             }
         });

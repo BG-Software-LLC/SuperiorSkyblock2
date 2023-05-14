@@ -89,7 +89,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
     @Override
     public void loadData() {
-        BukkitExecutor.sync(() -> {
+        BukkitExecutor.sync((bukkitRunnable) -> {
             registerGeneralHooks();
             registerSpawnersProvider();
             registerStackedBlocksProvider();

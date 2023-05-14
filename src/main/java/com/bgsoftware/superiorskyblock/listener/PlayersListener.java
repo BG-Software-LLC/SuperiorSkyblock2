@@ -30,6 +30,7 @@ import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -154,7 +155,7 @@ public class PlayersListener implements Listener {
             teleportToSpawn.setValue(true);
         }
 
-        BukkitExecutor.sync(() -> {
+        BukkitExecutor.sync((bukkitRunnable) -> {
             if (!e.getPlayer().isOnline())
                 return;
 
@@ -287,7 +288,7 @@ public class PlayersListener implements Listener {
             Island toIsland = plugin.getGrid().getIslandAt(to);
 
             // Handle moving while in teleport warmup.
-            BukkitTask teleportTask = superiorPlayer.getTeleportTask();
+            ScheduledTask teleportTask = superiorPlayer.getTeleportTask();
             if (teleportTask != null) {
                 teleportTask.cancel();
                 superiorPlayer.setTeleportTask(null);
@@ -359,7 +360,7 @@ public class PlayersListener implements Listener {
 
         if (island != null && superiorPlayer.hasIslandFlyEnabled() && !e.getPlayer().getAllowFlight() &&
                 island.hasPermission(superiorPlayer, IslandPrivileges.FLY))
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync((bukkitRunnable) -> {
                 e.getPlayer().setAllowFlight(true);
                 e.getPlayer().setFlying(true);
             }, 1L);
@@ -471,9 +472,9 @@ public class PlayersListener implements Listener {
 
         if (equalIslands) {
             if (!equalWorlds) {
-                BukkitExecutor.sync(() -> plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland), 1L);
+                BukkitExecutor.sync((bukkitRunnable) -> plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland), 1L);
                 superiorPlayer.setImmunedToPortals(true);
-                BukkitExecutor.sync(() -> superiorPlayer.setImmunedToPortals(false), 100L);
+                BukkitExecutor.sync((bukkitRunnable) -> superiorPlayer.setImmunedToPortals(false), 100L);
             }
             return false;
         }
@@ -489,16 +490,16 @@ public class PlayersListener implements Listener {
             Message.ENTER_PVP_ISLAND.send(superiorPlayer);
             if (plugin.getSettings().isImmuneToPvPWhenTeleport()) {
                 superiorPlayer.setImmunedToPvP(true);
-                BukkitExecutor.sync(() -> superiorPlayer.setImmunedToPvP(false), 200L);
+                BukkitExecutor.sync((bukkitRunnable) -> superiorPlayer.setImmunedToPvP(false), 200L);
             }
         }
 
         superiorPlayer.setImmunedToPortals(true);
-        BukkitExecutor.sync(() -> superiorPlayer.setImmunedToPortals(false), 100L);
+        BukkitExecutor.sync((bukkitRunnable) -> superiorPlayer.setImmunedToPortals(false), 100L);
 
         Player player = superiorPlayer.asPlayer();
         if (player != null && (plugin.getSettings().getSpawn().isProtected() || !toIsland.isSpawn())) {
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync((bukkitRunnable) -> {
                 // Update player time and player weather with a delay.
                 // Fixes https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/1260
                 if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)) {
@@ -522,13 +523,13 @@ public class PlayersListener implements Listener {
         toIsland.applyEffects(superiorPlayer);
 
         if (superiorPlayer.hasIslandFlyEnabled() && !superiorPlayer.hasFlyGamemode()) {
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync((bukkitRunnable) -> {
                 if (player != null)
                     toIsland.updateIslandFly(superiorPlayer);
             }, 5L);
         }
 
-        BukkitExecutor.sync(() -> plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland), 1L);
+        BukkitExecutor.sync((bukkitRunnable) -> plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland), 1L);
 
         return false;
     }

@@ -69,7 +69,7 @@ public class CmdTeam implements ISuperiorCommand {
         if (island == null)
             return;
 
-        BukkitExecutor.async(() -> {
+        BukkitExecutor.async((runnableBukkit) -> {
             java.util.Locale locale = PlayerLocales.getLocale(sender);
             StringBuilder infoMessage = new StringBuilder();
 

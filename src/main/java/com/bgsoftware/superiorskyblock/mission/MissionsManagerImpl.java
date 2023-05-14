@@ -55,7 +55,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
         if (!BuiltinModules.MISSIONS.isEnabled())
             return;
 
-        BukkitExecutor.asyncTimer(this::saveMissionsData, 6000L); // Save missions data every 5 minutes
+        BukkitExecutor.asyncTimer((a) -> this.saveMissionsData(), 6000L); // Save missions data every 5 minutes
     }
 
     @Override
@@ -204,7 +204,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 
         if (Bukkit.isPrimaryThread()) {
-            BukkitExecutor.async(() -> rewardMission(mission, superiorPlayer, checkAutoReward, forceReward, result));
+            BukkitExecutor.async((runnableBukkit) -> rewardMission(mission, superiorPlayer, checkAutoReward, forceReward, result));
             return;
         }
 
@@ -289,11 +289,11 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                         .replaceAll("{2}", getIslandPlaceholder(missionsHolder))
                         .build();
                 toGive.setAmount(itemStack.getAmount());
-                BukkitExecutor.ensureMain(() -> superiorPlayer.runIfOnline(player ->
+                BukkitExecutor.sync((bukkitRunnable) -> superiorPlayer.runIfOnline(player ->
                         BukkitItems.addItem(toGive, player.getInventory(), player.getLocation())));
             }
 
-            BukkitExecutor.ensureMain(() -> {
+            BukkitExecutor.sync((bukkitRunnable) -> {
                 for (String command : event.getResult().getCommandRewards()) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
                             .replace("%mission%", mission.getName())
@@ -402,7 +402,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             return;
 
         // Convert the data in the data files as well
-        BukkitExecutor.async(() -> {
+        BukkitExecutor.async((runnableBukkit) -> {
             for (File file : dataFolder.listFiles()) {
                 synchronized (DATA_FOLDER_MUTEX) {
                     Files.replaceString(file, oldPlayer.getUniqueId() + "", newPlayer.getUniqueId() + "");

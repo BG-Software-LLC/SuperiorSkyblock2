@@ -67,7 +67,7 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
             recalculateEntities.setValue(true);
         }
 
-        BukkitExecutor.sync(() -> {
+        BukkitExecutor.sync((bukkitRunnable) -> {
             if (!chunk.isLoaded())
                 return;
 

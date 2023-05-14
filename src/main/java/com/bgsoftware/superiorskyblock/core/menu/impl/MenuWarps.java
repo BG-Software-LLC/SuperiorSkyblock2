@@ -76,7 +76,7 @@ public class MenuWarps extends AbstractPagedMenu<MenuWarps.View, MenuWarps.Args,
                     plugin.getSettings().getChargeOnWarp());
         }
 
-        BukkitExecutor.sync(() -> {
+        BukkitExecutor.sync((bukkitRunnable) -> {
             superiorPlayer.runIfOnline(player -> {
                 MenuView<?, ?> currentView = superiorPlayer.getOpenedView();
                 if (currentView == null) {

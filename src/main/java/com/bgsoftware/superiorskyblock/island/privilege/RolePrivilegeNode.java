@@ -19,7 +19,7 @@ public class RolePrivilegeNode extends PrivilegeNodeAbstract {
     public RolePrivilegeNode(PlayerRole playerRole, PrivilegeNodeAbstract previousNode, String permissions) {
         this.playerRole = (SPlayerRole) playerRole;
         this.previousNode = (RolePrivilegeNode) previousNode;
-        BukkitExecutor.sync(() -> setPermissions(permissions, playerRole != null), 1L);
+        BukkitExecutor.sync((bukkitRunnable) -> setPermissions(permissions, playerRole != null), 1L);
     }
 
     private RolePrivilegeNode(EnumerateMap<IslandPrivilege, PrivilegeStatus> privileges,

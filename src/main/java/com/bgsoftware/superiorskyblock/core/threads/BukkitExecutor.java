@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.threads;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -30,82 +31,61 @@ public class BukkitExecutor {
         databaseExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Database Thread").build());
     }
 
-    public static void ensureMain(Runnable runnable) {
+    public static void ensureMain(Consumer<ScheduledTask> runnable) {
         if (ensureNotShudown())
             return;
 
-        if (!syncBukkitCalls && !Bukkit.isPrimaryThread()) {
-            sync(runnable);
-        } else {
-            runnable.run();
-        }
+        sync(runnable);
     }
 
-    public static BukkitTask sync(Runnable runnable) {
+    public static ScheduledTask sync(Consumer<ScheduledTask> runnable) {
         return sync(runnable, 0);
     }
 
-    public static BukkitTask sync(Runnable runnable, long delay) {
+    public static ScheduledTask sync(Consumer<ScheduledTask> runnable, long delay) {
         if (ensureNotShudown())
             return null;
-
-        if (syncBukkitCalls) {
-            runnable.run();
-            return null;
-        } else {
-            return Bukkit.getScheduler().runTaskLater(plugin, runnable, delay);
-        }
+            // * 50 due to it being a ticket
+            return Bukkit.getAsyncScheduler().runDelayed(plugin, runnable, delay * 50, TimeUnit.MILLISECONDS);
     }
 
     public static void data(Runnable runnable) {
         if (ensureNotShudown())
             return;
 
-        if (syncDatabaseCalls) {
-            runnable.run();
-        } else {
-            databaseExecutor.execute(runnable);
-        }
+        databaseExecutor.execute(runnable);
     }
 
     public static boolean isDataThread() {
         return syncDatabaseCalls || Thread.currentThread().getName().equals("SuperiorSkyblock Database Thread");
     }
 
-    public static void async(Runnable runnable) {
+    public static void async(Consumer<ScheduledTask> runnable) {
         if (ensureNotShudown())
             return;
 
-        if (syncBukkitCalls) {
-            runnable.run();
-        } else {
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
-        }
+        Bukkit.getAsyncScheduler().runNow(plugin, runnable);
     }
 
-    public static void async(Runnable runnable, long delay) {
+    public static void async(Consumer<ScheduledTask> runnable, long delay) {
         if (ensureNotShudown())
             return;
 
-        if (syncBukkitCalls) {
-            runnable.run();
-        } else {
-            Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, delay);
-        }
+        Bukkit.getAsyncScheduler().runDelayed(plugin, runnable, delay * 50, TimeUnit.MILLISECONDS);
     }
 
-    public static void asyncTimer(Runnable runnable, long delay) {
+    public static void asyncTimer(Consumer<ScheduledTask> runnable, long delay) {
         if (ensureNotShudown())
             return;
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, delay, delay);
+        Bukkit.getAsyncScheduler().runAtFixedRate(plugin, runnable, delay, delay * 50, TimeUnit.MILLISECONDS);
     }
 
-    public static void timer(Runnable runnable, long delay) {
+    public static void timer(Consumer<ScheduledTask> runnable, long delay) {
         if (ensureNotShudown())
             return;
 
-        Bukkit.getScheduler().runTaskTimer(plugin, runnable, delay, delay);
+        Bukkit.getAsyncScheduler().runAtFixedRate(plugin, runnable, delay, delay * 50, TimeUnit.MILLISECONDS);
     }
 
     public static NestedTask<Void> createTask() {
@@ -166,7 +146,7 @@ public class BukkitExecutor {
             if (syncBukkitCalls) {
                 nestedTask.value.complete(function.apply(value.join()));
             } else {
-                value.whenComplete((value, ex) -> BukkitExecutor.ensureMain(() -> nestedTask.value.complete(function.apply(value))));
+                value.whenComplete((value, ex) -> BukkitExecutor.ensureMain((a) -> nestedTask.value.complete(function.apply(value))));
             }
             return nestedTask;
         }
@@ -177,7 +157,7 @@ public class BukkitExecutor {
                 consumer.accept(value.join());
                 nestedTask.value.complete(null);
             } else {
-                value.whenComplete((value, ex) -> BukkitExecutor.ensureMain(() -> {
+                value.whenComplete((value, ex) -> BukkitExecutor.ensureMain((a) -> {
                     consumer.accept(value);
                     nestedTask.value.complete(null);
                 }));
@@ -190,7 +170,7 @@ public class BukkitExecutor {
             if (syncBukkitCalls) {
                 nestedTask.value.complete(function.apply(value.join()));
             } else {
-                value.whenComplete((value, ex) -> BukkitExecutor.async(() -> nestedTask.value.complete(function.apply(value))));
+                value.whenComplete((value, ex) -> BukkitExecutor.async((a) -> nestedTask.value.complete(function.apply(value))));
             }
             return nestedTask;
         }
@@ -201,7 +181,7 @@ public class BukkitExecutor {
                 consumer.accept(value.join());
                 nestedTask.value.complete(null);
             } else {
-                value.whenComplete((value, ex) -> BukkitExecutor.async(() -> {
+                value.whenComplete((value, ex) -> BukkitExecutor.async((a) -> {
                     consumer.accept(value);
                     nestedTask.value.complete(null);
                 }));

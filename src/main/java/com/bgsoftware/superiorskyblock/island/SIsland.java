@@ -71,6 +71,7 @@ import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -132,7 +133,7 @@ public class SIsland implements Island {
     private final IslandCalculationAlgorithm calculationAlgorithm;
     private final IslandBlocksTrackerAlgorithm blocksTracker;
     private final IslandEntitiesTrackerAlgorithm entitiesTracker;
-    private final Synchronized<BukkitTask> bankInterestTask = Synchronized.of(null);
+    private ScheduledTask bankInterestTask = null;
     private final DirtyChunksContainer dirtyChunksContainer;
     /*
      * Island Identifiers
@@ -469,7 +470,7 @@ public class SIsland implements Island {
         superiorPlayer.addInvite(this);
 
         //Revoke the invite after 5 minutes
-        BukkitExecutor.sync(() -> revokeInvite(superiorPlayer), 6000L);
+        BukkitExecutor.sync((bukkitRunnable) -> revokeInvite(superiorPlayer), 6000L);
     }
 
     @Override
@@ -1513,7 +1514,7 @@ public class SIsland implements Island {
         if (Bukkit.isPrimaryThread()) {
             calcIslandWorthInternal(asker, callback);
         } else {
-            BukkitExecutor.sync(() -> calcIslandWorthInternal(asker, callback));
+            BukkitExecutor.sync((bukkitRunnable) -> calcIslandWorthInternal(asker, callback));
         }
     }
 
@@ -1928,11 +1929,9 @@ public class SIsland implements Island {
 
         if (BuiltinModules.BANK.bankInterestEnabled) {
             long ticksToNextInterest = BuiltinModules.BANK.bankInterestInterval * 20L;
-            this.bankInterestTask.set(bankInterestTask -> {
-                if (bankInterestTask != null)
-                    bankInterestTask.cancel();
-                return BukkitExecutor.sync(() -> giveInterest(true), ticksToNextInterest);
-            });
+            this.bankInterestTask = BukkitExecutor.sync((bukkitRunnable) -> giveInterest(true), ticksToNextInterest);
+            if (bankInterestTask != null)
+                bankInterestTask.cancel();
         }
 
         this.lastInterest = lastInterest;
@@ -2670,7 +2669,7 @@ public class SIsland implements Island {
         if (level == Value.getRaw(oldPotionLevel, -1))
             return;
 
-        BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
+        BukkitExecutor.sync((bukkitRunnable) -> getAllPlayersInside().forEach(superiorPlayer -> {
             Player player = superiorPlayer.asPlayer();
             assert player != null;
             if (oldPotionLevel != null && oldPotionLevel.get() > level)
@@ -2692,7 +2691,7 @@ public class SIsland implements Island {
         if (oldEffectLevel == null)
             return;
 
-        BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
+        BukkitExecutor.sync((bukkitRunnable) -> getAllPlayersInside().forEach(superiorPlayer -> {
             Player player = superiorPlayer.asPlayer();
             if (player != null)
                 player.removePotionEffect(type);
@@ -2972,7 +2971,7 @@ public class SIsland implements Island {
                 !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
             Message.TELEPORT_WARMUP.send(superiorPlayer, Formatters.TIME_FORMATTER.format(
                     Duration.ofMillis(plugin.getSettings().getWarpsWarmup()), superiorPlayer.getUserLocale()));
-            superiorPlayer.setTeleportTask(BukkitExecutor.sync(() ->
+            superiorPlayer.setTeleportTask(BukkitExecutor.sync((bukkitRunnable) ->
                     warpPlayerWithoutWarmup(superiorPlayer, islandWarp), plugin.getSettings().getWarpsWarmup() / 50));
         } else {
             warpPlayerWithoutWarmup(superiorPlayer, islandWarp);
@@ -3806,7 +3805,7 @@ public class SIsland implements Island {
         BigDecimal newLevel = getIslandLevel();
 
         if (oldLevel.compareTo(newLevel) != 0 || oldWorth.compareTo(newWorth) != 0) {
-            BukkitExecutor.async(() -> plugin.getEventsBus().callIslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel), 0L);
+            BukkitExecutor.async((runnableBukkit) -> plugin.getEventsBus().callIslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel), 0L);
         }
 
         if (++blocksUpdateCounter >= Bukkit.getOnlinePlayers().size() * 10) {
@@ -4004,11 +4003,7 @@ public class SIsland implements Island {
             if (ticksToNextInterest <= 0) {
                 giveInterest(true);
             } else {
-                this.bankInterestTask.set(bankInterestTask -> {
-                    if (bankInterestTask != null)
-                        bankInterestTask.cancel();
-                    return BukkitExecutor.sync(() -> giveInterest(true), ticksToNextInterest);
-                });
+                this.bankInterestTask = BukkitExecutor.sync((bukkitRunnable) -> giveInterest(true), ticksToNextInterest);
             }
         }
     }

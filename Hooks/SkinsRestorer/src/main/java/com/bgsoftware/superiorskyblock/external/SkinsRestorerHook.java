@@ -21,13 +21,13 @@ public class SkinsRestorerHook {
 
     private static void setSkinTexture(SuperiorPlayer superiorPlayer) {
         if (Bukkit.isPrimaryThread()) {
-            BukkitExecutor.async(() -> setSkinTexture(superiorPlayer));
+            BukkitExecutor.async((runnableBukkit) -> setSkinTexture(superiorPlayer));
             return;
         }
 
         Property property = getSkin(superiorPlayer);
         if (property != null)
-            BukkitExecutor.sync(() -> plugin.getNMSPlayers().setSkinTexture(superiorPlayer, property));
+            BukkitExecutor.sync((bukkitRunnable) -> plugin.getNMSPlayers().setSkinTexture(superiorPlayer, property));
     }
 
     public static Property getSkin(SuperiorPlayer superiorPlayer) {

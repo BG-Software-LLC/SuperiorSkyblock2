@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.nms.v1194.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -128,13 +129,8 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
         ChunkData chunkData = this.chunks.computeIfAbsent(chunkPos.toLong(), ChunkData::new);
 
-        if (plugin.getSettings().isLightsUpdate() && blockState.getLightEmission() > 0) {
-            if (isStarLightInterface) {
-                this.lightenChunks.add(chunkPos);
-            } else {
-                chunkData.lights.add(blockPos);
-            }
-        }
+        if (plugin.getSettings().isLightsUpdate() && !isStarLightInterface && blockState.getLightEmission() > 0)
+            chunkData.lights.add(blockPos);
 
         LevelChunkSection levelChunkSection = chunkData.chunkSections[serverLevel.getSectionIndex(blockPos.getY())];
 
@@ -161,7 +157,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     @Override
     public void applyBlocks(Chunk bukkitChunk) {
-        LevelChunk levelChunk = ((CraftChunk) bukkitChunk).getHandle();
+        LevelChunk levelChunk = NMSUtils.getCraftChunkHandle((CraftChunk) bukkitChunk);
         ChunkPos chunkPos = levelChunk.getPos();
 
         long chunkKey = chunkPos.toLong();
@@ -179,11 +175,15 @@ public class WorldEditSessionImpl implements WorldEditSession {
             levelChunk.setHeightmap(type, heightmap.getRawData());
         }));
 
-        if (plugin.getSettings().isLightsUpdate() && !isStarLightInterface && !chunkData.lights.isEmpty()) {
-            ThreadedLevelLightEngine threadedLevelLightEngine = serverLevel.getChunkSource().getLightEngine();
-            chunkData.lights.forEach(threadedLevelLightEngine::checkBlock);
-            // Queues chunk light for this chunk.
-            threadedLevelLightEngine.lightChunk(levelChunk, false);
+        if (plugin.getSettings().isLightsUpdate()) {
+            if (isStarLightInterface) {
+                this.lightenChunks.add(chunkPos);
+            } else {
+                ThreadedLevelLightEngine threadedLevelLightEngine = serverLevel.getChunkSource().getLightEngine();
+                chunkData.lights.forEach(threadedLevelLightEngine::checkBlock);
+                // Queues chunk light for this chunk.
+                threadedLevelLightEngine.lightChunk(levelChunk, false);
+            }
         }
 
         levelChunk.setUnsaved(true);
@@ -225,6 +225,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
             threadedLevelLightEngine.relight(lightenChunks, chunkCallback -> {
             }, completeCallback -> {
             });
+            this.lightenChunks.clear();
         }
 
     }

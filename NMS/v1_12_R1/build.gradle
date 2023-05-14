@@ -1,7 +1,12 @@
 group 'NMS:v1_12_R1'
 
+repositories {
+    maven { url "https://papermc.io/repo/repository/maven-public/"}
+}
+
 dependencies {
     compileOnly "org.spigotmc:v1_12_R1-Paper:latest"
+    compileOnly 'dev.folia:folia-api:1.19.4-R0.1-SNAPSHOT'
     compileOnly project(":API")
     compileOnly rootProject
 }

@@ -52,7 +52,7 @@ public class ProtectionModule_Dev999 {
         }
 
         void register() {
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync((bukkitRunnable) -> {
                 if (OLD_REGISTER_MODULE.isValid()) {
                     OLD_REGISTER_MODULE.invoke(Slimefun.getProtectionManager(), Bukkit.getServer(), plugin.getName(),
                             (Function<Plugin, ProtectionModule>) pl -> this);

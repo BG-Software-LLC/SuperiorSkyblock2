@@ -194,7 +194,7 @@ public class ItemBuilder {
 
     public ItemBuilder setUnbreakable() {
         if (itemMeta != null)
-            itemMeta.spigot().setUnbreakable(true);
+            itemMeta.setUnbreakable(true);
         return this;
     }
 

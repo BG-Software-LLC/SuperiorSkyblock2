@@ -52,6 +52,7 @@ subprojects {
 
 repositories {
     mavenCentral()
+    maven { url "https://papermc.io/repo/repository/maven-public/"}
 }
 
 dependencies {
@@ -68,8 +69,10 @@ dependencies {
     implementation 'org.bstats:bstats-bukkit:3.0.0'
 
     // Spigot jars
+    compileOnly 'dev.folia:folia-api:1.19.4-R0.1-SNAPSHOT'
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
+    // can always add back the one i just replaced
 }
 
 jar {

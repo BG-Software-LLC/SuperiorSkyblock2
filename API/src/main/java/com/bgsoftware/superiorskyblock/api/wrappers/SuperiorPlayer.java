@@ -11,12 +11,12 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -557,7 +557,7 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * Get the current active teleport task of the player.
      */
     @Nullable
-    BukkitTask getTeleportTask();
+    ScheduledTask getTeleportTask();
 
     /**
      * Set a teleportation task for the player.
@@ -565,7 +565,7 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      *
      * @param teleportTask The teleport task to set.
      */
-    void setTeleportTask(@Nullable BukkitTask teleportTask);
+    void setTeleportTask(@Nullable ScheduledTask teleportTask);
 
     /**
      * Whether the player is immuned to portals or not.

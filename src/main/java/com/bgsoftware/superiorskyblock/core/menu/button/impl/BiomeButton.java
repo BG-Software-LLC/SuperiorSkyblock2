@@ -84,7 +84,7 @@ public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
         menuView.getIsland().setBiome(event.getResult());
         Message.CHANGED_BIOME.send(inventoryViewer, event.getResult().name().toLowerCase(Locale.ENGLISH));
 
-        BukkitExecutor.sync(menuView::closeView, 1L);
+        BukkitExecutor.sync((a) -> menuView.closeView(), 1L);
     }
 
     @Override

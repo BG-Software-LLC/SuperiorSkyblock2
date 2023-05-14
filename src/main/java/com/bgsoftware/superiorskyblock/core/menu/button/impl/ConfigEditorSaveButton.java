@@ -26,10 +26,10 @@ public class ConfigEditorSaveButton extends AbstractMenuViewButton<MenuConfigEdi
     @Override
     public void onButtonClick(InventoryClickEvent clickEvent) {
         Player player = (Player) clickEvent.getWhoClicked();
-        BukkitExecutor.async(() -> {
+        BukkitExecutor.async((runnableBukkit) -> {
             Menus.MENU_CONFIG_EDITOR.saveConfig(config -> plugin.setSettings(new SettingsManagerImpl(plugin)));
             player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Saved configuration successfully.");
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync((bukkitRunnable) -> {
                 getView().setPreviousMove(false);
                 getView().closeView();
             });

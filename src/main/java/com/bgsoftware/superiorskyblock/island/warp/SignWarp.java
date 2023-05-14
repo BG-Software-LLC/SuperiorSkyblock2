@@ -39,7 +39,7 @@ public class SignWarp {
 
             // Detected warp sign
             signBlock.setType(Material.AIR);
-            signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(Material.SIGN));
+            signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(Material.OAK_SIGN));
 
             Message.DELETE_WARP_SIGN_BROKE.send(commandSender);
         }

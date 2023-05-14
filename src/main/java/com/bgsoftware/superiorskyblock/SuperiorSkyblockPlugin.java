@@ -288,7 +288,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 Log.warn("Increase the value to for better experience (Default: 29999984)");
             }
 
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync((a) -> {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
                     superiorPlayer.updateLastTimeStatus();
@@ -547,7 +547,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             playersHandler.loadData();
             gridHandler.loadData();
         } else {
-            BukkitExecutor.sync(gridHandler::updateSpawn, 1L);
+            BukkitExecutor.sync((t) -> gridHandler.updateSpawn(), 1L);
             gridHandler.syncUpgrades();
         }
 
@@ -566,7 +566,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             modulesHandler.reloadModules(ModuleLoadTime.AFTER_MODULE_DATA_LOAD);
         }
 
-        BukkitExecutor.sync(() -> {
+        BukkitExecutor.sync((a) -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
                 Island island = gridHandler.getIslandAt(player.getLocation());
