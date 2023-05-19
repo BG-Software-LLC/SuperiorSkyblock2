@@ -42,4 +42,9 @@ public class DelegateIslandEntitiesTrackerAlgorithm implements IslandEntitiesTra
         this.handle.recalculateEntityCounts();
     }
 
+    @Override
+    public boolean canRecalculateEntityCounts() {
+        return this.handle.canRecalculateEntityCounts();
+    }
+
 }

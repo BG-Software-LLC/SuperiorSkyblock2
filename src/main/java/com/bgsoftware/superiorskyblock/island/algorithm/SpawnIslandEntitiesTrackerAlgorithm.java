@@ -47,4 +47,9 @@ public class SpawnIslandEntitiesTrackerAlgorithm implements IslandEntitiesTracke
         // Do nothing.
     }
 
+    @Override
+    public boolean canRecalculateEntityCounts() {
+        return false;
+    }
+
 }

@@ -82,6 +82,10 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
             if (!pendingLoadedChunksForIsland.remove(chunk) || !chunk.isLoaded())
                 return;
 
+            // If we cannot recalculate entities at this moment, we want to track entities normally.
+            if (!island.getEntitiesTracker().canRecalculateEntityCounts())
+                recalculateEntities.setValue(false);
+
             for (Entity entity : chunk.getEntities()) {
                 // We want to delete old holograms of stacked blocks + count entities for the chunk
                 if (entity instanceof ArmorStand && isHologram((ArmorStand) entity) &&

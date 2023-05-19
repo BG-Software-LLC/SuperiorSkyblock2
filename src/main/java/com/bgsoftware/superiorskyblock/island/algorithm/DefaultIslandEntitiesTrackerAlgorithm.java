@@ -102,18 +102,13 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
     @Override
     public void recalculateEntityCounts() {
-        if (beingRecalculated)
-            return;
-
-        long currentTime = System.currentTimeMillis();
-
-        if (currentTime - lastCalculateTime <= CALCULATE_DELAY)
+        if (beingRecalculated || !canRecalculateEntityCounts())
             return;
 
         this.beingRecalculated = true;
 
         try {
-            this.lastCalculateTime = currentTime;
+            this.lastCalculateTime = System.currentTimeMillis();
 
             clearEntityCounts();
 
@@ -148,6 +143,12 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
         } finally {
             beingRecalculated = false;
         }
+    }
+
+    @Override
+    public boolean canRecalculateEntityCounts() {
+        long currentTime = System.currentTimeMillis();
+        return currentTime - lastCalculateTime > CALCULATE_DELAY;
     }
 
     private boolean canTrackEntity(Key key) {
