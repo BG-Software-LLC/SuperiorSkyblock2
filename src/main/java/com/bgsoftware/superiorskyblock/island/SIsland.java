@@ -2749,17 +2749,13 @@ public class SIsland implements Island {
         if (!BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class))
             return;
 
-        Player player = superiorPlayer.asPlayer();
-        if (player != null) {
-            getPotionEffects().forEach((potionEffectType, level) -> player.addPotionEffect(
-                    new PotionEffect(potionEffectType, Integer.MAX_VALUE, level - 1), true));
-        }
+        applyEffectsNoUpgradeCheck(superiorPlayer);
     }
 
     @Override
     public void applyEffects() {
         if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class))
-            getAllPlayersInside().forEach(this::applyEffects);
+            getAllPlayersInside().forEach(this::applyEffectsNoUpgradeCheck);
     }
 
     @Override
@@ -3725,6 +3721,14 @@ public class SIsland implements Island {
 
     private boolean hasGiveInterestFailed() {
         return this.giveInterestFailed;
+    }
+
+    private void applyEffectsNoUpgradeCheck(SuperiorPlayer superiorPlayer) {
+        Player player = superiorPlayer.asPlayer();
+        if (player != null) {
+            getPotionEffects().forEach((potionEffectType, level) -> player.addPotionEffect(
+                    new PotionEffect(potionEffectType, Integer.MAX_VALUE, level - 1), true));
+        }
     }
 
     private void removeEffectsNoUpgradeCheck(SuperiorPlayer superiorPlayer) {
