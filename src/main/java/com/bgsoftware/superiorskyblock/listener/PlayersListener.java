@@ -133,8 +133,6 @@ public class PlayersListener implements Listener {
             superiorPlayer.updateName();
         }
 
-        superiorPlayer.updateLastTimeStatus();
-
         // Handling player join
         if (superiorPlayer.isShownAsOnline())
             notifyPlayerJoin(superiorPlayer);
@@ -179,12 +177,15 @@ public class PlayersListener implements Listener {
     }
 
     public void notifyPlayerJoin(SuperiorPlayer superiorPlayer) {
+        superiorPlayer.updateLastTimeStatus();
+
         Island island = superiorPlayer.getIsland();
-        if (island != null) {
-            IslandUtils.sendMessage(island, Message.PLAYER_JOIN_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
-            island.updateLastTime();
-            island.setCurrentlyActive(true);
-        }
+        if (island == null)
+            return;
+
+        IslandUtils.sendMessage(island, Message.PLAYER_JOIN_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
+        island.updateLastTime();
+        island.setCurrentlyActive(true);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -203,8 +204,6 @@ public class PlayersListener implements Listener {
                 }
             }
         }
-
-        superiorPlayer.updateLastTimeStatus();
 
         // Handling player quit
         if (superiorPlayer.isShownAsOnline())
@@ -246,6 +245,8 @@ public class PlayersListener implements Listener {
     }
 
     public void notifyPlayerQuit(SuperiorPlayer superiorPlayer) {
+        superiorPlayer.updateLastTimeStatus();
+
         Island island = superiorPlayer.getIsland();
 
         if (island == null)
