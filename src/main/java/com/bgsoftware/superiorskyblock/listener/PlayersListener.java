@@ -513,8 +513,6 @@ public class PlayersListener implements Listener {
             }, 1L);
         }
 
-        toIsland.applyEffects(superiorPlayer);
-
         if (superiorPlayer.hasIslandFlyEnabled() && !superiorPlayer.hasFlyGamemode()) {
             BukkitExecutor.sync(() -> {
                 if (player != null)
@@ -522,7 +520,10 @@ public class PlayersListener implements Listener {
             }, 5L);
         }
 
-        BukkitExecutor.sync(() -> plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland), 1L);
+        BukkitExecutor.sync(() -> {
+            toIsland.applyEffects(superiorPlayer);
+            plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland);
+        }, 1L);
 
         return false;
     }
