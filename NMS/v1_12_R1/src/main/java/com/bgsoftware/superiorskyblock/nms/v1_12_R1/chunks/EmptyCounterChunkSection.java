@@ -58,6 +58,10 @@ public class EmptyCounterChunkSection extends ChunkSection {
 
     @Override
     public boolean a() {
+        return this.isEmpty();
+    }
+
+    public boolean isEmpty() {
         return nonEmptyBlockCount == 0;
     }
 

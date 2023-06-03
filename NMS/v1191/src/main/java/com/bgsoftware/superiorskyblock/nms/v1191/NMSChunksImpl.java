@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1191;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -70,6 +71,9 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class NMSChunksImpl implements NMSChunks {
+
+    private static final boolean hasStatesIterator = new ReflectMethod<>(PalettedContainer.class,
+            "forEachLocation", PalettedContainer.CountConsumer.class).isValid();
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -420,37 +424,51 @@ public class NMSChunksImpl implements NMSChunks {
         Set<Location> spawnersLocations = new HashSet<>();
 
         for (LevelChunkSection levelChunkSection : chunkSections) {
-            if (levelChunkSection != null) {
-                for (BlockPos blockPos : BlockPos.betweenClosed(0, 0, 0, 15, 15, 15)) {
+            if (levelChunkSection != null && !levelChunkSection.hasOnlyAir()) {
+                if (hasStatesIterator) {
+                    levelChunkSection.getStates().forEachLocation((blockState, locationKey) -> {
+                        int x = locationKey & 0xF;
+                        int y = (locationKey >> 4) & 0xF;
+                        int z = (locationKey >> 8) & 0xF;
+                        calculateChunkInternal(blockState, x, y, z, chunkPosition, levelChunkSection, blockCounts, spawnersLocations);
+                    });
+                } else for (BlockPos blockPos : BlockPos.betweenClosed(0, 0, 0, 15, 15, 15)) {
                     BlockState blockState = levelChunkSection.getBlockState(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-                    Block block = blockState.getBlock();
-
-                    if (block == Blocks.AIR)
-                        continue;
-
-                    Location location = new Location(chunkPosition.getWorld(),
-                            (chunkPosition.getX() << 4) + blockPos.getX(),
-                            levelChunkSection.bottomBlockY() + blockPos.getY(),
-                            (chunkPosition.getZ() << 4) + blockPos.getZ());
-
-                    int blockAmount = 1;
-
-                    if (NMSUtils.isDoubleBlock(block, blockState)) {
-                        blockAmount = 2;
-                        blockState = blockState.setValue(SlabBlock.TYPE, SlabType.BOTTOM);
-                    }
-
-                    Material type = CraftMagicNumbers.getMaterial(blockState.getBlock());
-                    Key blockKey = KeyImpl.of(type.name() + "", "0", location);
-                    blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
-                    if (type == Material.SPAWNER) {
-                        spawnersLocations.add(location);
-                    }
+                    calculateChunkInternal(blockState, blockPos.getX(), blockPos.getY(), blockPos.getZ(), chunkPosition,
+                            levelChunkSection, blockCounts, spawnersLocations);
                 }
             }
         }
 
         return new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations);
+    }
+
+    private static void calculateChunkInternal(BlockState blockState, int x, int y, int z, ChunkPosition chunkPosition,
+                                               LevelChunkSection levelChunkSection, KeyMap<Integer> blockCounts,
+                                               Set<Location> spawnersLocations) {
+        Block block = blockState.getBlock();
+
+        if (block == Blocks.AIR)
+            return;
+
+        Location location = new Location(chunkPosition.getWorld(),
+                (chunkPosition.getX() << 4) + x,
+                levelChunkSection.bottomBlockY() + y,
+                (chunkPosition.getZ() << 4) + z);
+
+        int blockAmount = 1;
+
+        if (NMSUtils.isDoubleBlock(block, blockState)) {
+            blockAmount = 2;
+            blockState = blockState.setValue(SlabBlock.TYPE, SlabType.BOTTOM);
+        }
+
+        Material type = CraftMagicNumbers.getMaterial(blockState.getBlock());
+        Key blockKey = KeyImpl.of(type.name() + "", "0", location);
+        blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
+        if (type == Material.SPAWNER) {
+            spawnersLocations.add(location);
+        }
     }
 
     private static void removeEntities(ChunkAccess chunk) {

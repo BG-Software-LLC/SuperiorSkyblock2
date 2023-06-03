@@ -305,7 +305,7 @@ public class NMSChunksImpl implements NMSChunks {
         Set<Location> spawnersLocations = new HashSet<>();
 
         for (ChunkSection chunkSection : chunkSections) {
-            if (chunkSection != null) {
+            if (chunkSection != null && !chunkSection.c()) {
                 for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
                     IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
                     if (blockData.getBlock() != Blocks.AIR) {

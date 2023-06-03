@@ -142,6 +142,10 @@ public class NMSChunksImpl implements NMSChunks {
         }, null);
     }
 
+    private static boolean isChunkSectionEmpty(ChunkSection chunkSection) {
+        return chunkSection instanceof EmptyCounterChunkSection && ((EmptyCounterChunkSection) chunkSection).isEmpty();
+    }
+
     @Override
     public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
                                                                     Map<ChunkPosition, CalculatedChunk> unloadedChunksCache) {
@@ -176,7 +180,7 @@ public class NMSChunksImpl implements NMSChunks {
             Set<Location> spawnersLocations = new HashSet<>();
 
             for (ChunkSection chunkSection : chunk.getSections()) {
-                if (chunkSection != null && chunkSection != Chunk.a) {
+                if (chunkSection != null && chunkSection != Chunk.a && !isChunkSectionEmpty(chunkSection)) {
                     for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
                         IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
                         Block block = blockData.getBlock();
