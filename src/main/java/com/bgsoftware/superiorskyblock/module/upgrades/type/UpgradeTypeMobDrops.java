@@ -84,11 +84,11 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
 
             double mobDropsMultiplier = island.getMobDropsMultiplier();
 
-            if (mobDropsMultiplier > 1) {
+            if (mobDropsMultiplier != 1 && mobDropsMultiplier > 0) {
                 for (ItemStack itemStack : new LinkedList<>(e.getDrops())) {
                     if (itemStack != null && !BukkitEntities.isEquipment(e.getEntity(), itemStack) &&
                             !plugin.getNMSTags().getNBTTag(itemStack).containsKey("WildChests")) {
-                        int newAmount = (int) (itemStack.getAmount() * mobDropsMultiplier);
+                        int newAmount = (int) Math.floor(itemStack.getAmount() * mobDropsMultiplier);
 
                         if (Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {
                             itemStack.setAmount(newAmount);
