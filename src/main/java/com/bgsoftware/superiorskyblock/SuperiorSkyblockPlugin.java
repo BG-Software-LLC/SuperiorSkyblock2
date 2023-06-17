@@ -403,7 +403,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                     new Pair<>(3117, "v1191"),
                     new Pair<>(3120, "v1192"),
                     new Pair<>(3218, "v1193"),
-                    new Pair<>(3337, "v1194")
+                    new Pair<>(3337, "v1194"),
+                    new Pair<>(3465, "v1201")
             );
 
             for (Pair<Integer, String> versionData : versions) {
