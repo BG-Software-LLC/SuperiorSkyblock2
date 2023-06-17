@@ -429,8 +429,8 @@ public class NMSChunksImpl implements NMSChunks {
                 if (hasStatesIterator) {
                     levelChunkSection.getStates().forEachLocation((blockState, locationKey) -> {
                         int x = locationKey & 0xF;
-                        int y = (locationKey >> 4) & 0xF;
-                        int z = (locationKey >> 8) & 0xF;
+                        int y = (locationKey >> 8) & 0xF;
+                        int z = (locationKey >> 4) & 0xF;
                         calculateChunkInternal(blockState, x, y, z, chunkPosition, levelChunkSection, blockCounts, spawnersLocations);
                     });
                 } else for (BlockPos blockPos : BlockPos.betweenClosed(0, 0, 0, 15, 15, 15)) {
