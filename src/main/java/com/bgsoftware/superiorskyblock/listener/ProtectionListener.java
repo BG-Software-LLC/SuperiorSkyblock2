@@ -43,6 +43,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -235,6 +236,22 @@ public class ProtectionListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBucketFill(PlayerBucketFillEvent e) {
         if (preventBlockPlace(e.getBlockClicked(), e.getPlayer(), Flag.SEND_MESSAGES, Flag.PREVENT_OUTSIDE_ISLANDS))
+            e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onBucketDispense(BlockDispenseEvent e) {
+        Material itemType = e.getItem().getType();
+
+        if (!(itemType == Material.BUCKET || itemType == Material.WATER_BUCKET || itemType == Material.LAVA_BUCKET))
+            return;
+
+        Location dispenseBlockLocation = new Location(e.getBlock().getWorld(), e.getVelocity().getBlockX(),
+                e.getVelocity().getBlockY(), e.getVelocity().getBlockZ());
+
+        Island island = plugin.getGrid().getIslandAt(dispenseBlockLocation);
+
+        if (island != null && !island.isInsideRange(dispenseBlockLocation))
             e.setCancelled(true);
     }
 
