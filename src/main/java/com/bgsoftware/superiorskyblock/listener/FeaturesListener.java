@@ -10,9 +10,9 @@ import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -88,8 +88,10 @@ public class FeaturesListener implements Listener {
                 e.getItem().getType() != Material.BUCKET || e.getClickedBlock().getType() != Material.OBSIDIAN)
             return;
 
-
         if (plugin.getStackedBlocks().getStackedBlockAmount(e.getClickedBlock()) != 1)
+            return;
+
+        if (!plugin.getGrid().isIslandsWorld(e.getClickedBlock().getWorld()))
             return;
 
         if (this.protectionListener.get().preventBlockBreak(e.getClickedBlock(), e.getPlayer(),
