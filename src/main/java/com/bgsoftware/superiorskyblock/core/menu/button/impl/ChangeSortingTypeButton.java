@@ -13,8 +13,10 @@ import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuTopIslands;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ChangeSortingTypeButton extends AbstractMenuViewButton<MenuTopIslands.View> {
 
@@ -74,11 +76,11 @@ public class ChangeSortingTypeButton extends AbstractMenuViewButton<MenuTopIslan
 
         private final SortingType sortingType;
 
-        Template(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
-                 String requiredPermission, GameSound lackPermissionSound, SortingType sortingType) {
+        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
+                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, SortingType sortingType) {
             super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
                     ChangeSortingTypeButton.class, ChangeSortingTypeButton::new);
-            this.sortingType = sortingType;
+            this.sortingType = Objects.requireNonNull(sortingType, "sortingType cannot be null");
         }
 
     }

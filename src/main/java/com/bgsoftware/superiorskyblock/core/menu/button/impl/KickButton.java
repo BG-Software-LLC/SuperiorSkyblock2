@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmKick;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -55,8 +56,8 @@ public class KickButton extends AbstractMenuViewButton<MenuConfirmKick.View> {
 
         private final boolean kickPlayer;
 
-        Template(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
-                 String requiredPermission, GameSound lackPermissionSound, boolean kickPlayer) {
+        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
+                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, boolean kickPlayer) {
             super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
                     KickButton.class, KickButton::new);
             this.kickPlayer = kickPlayer;

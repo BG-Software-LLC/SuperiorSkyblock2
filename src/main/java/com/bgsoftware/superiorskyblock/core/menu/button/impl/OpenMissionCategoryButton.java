@@ -10,8 +10,10 @@ import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class OpenMissionCategoryButton extends AbstractMenuViewButton<BaseMenuView> {
 
@@ -50,11 +52,11 @@ public class OpenMissionCategoryButton extends AbstractMenuViewButton<BaseMenuVi
 
         private final MissionCategory missionCategory;
 
-        Template(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
-                 String requiredPermission, GameSound lackPermissionSound, MissionCategory missionCategory) {
+        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
+                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, MissionCategory missionCategory) {
             super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
                     OpenMissionCategoryButton.class, OpenMissionCategoryButton::new);
-            this.missionCategory = missionCategory;
+            this.missionCategory = Objects.requireNonNull(missionCategory, "missionCategory cannot be null");
         }
 
     }

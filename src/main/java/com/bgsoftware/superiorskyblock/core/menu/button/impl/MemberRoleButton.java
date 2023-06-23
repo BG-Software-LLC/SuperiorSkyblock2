@@ -11,8 +11,10 @@ import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.PlayerMenuView;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class MemberRoleButton extends AbstractMenuViewButton<PlayerMenuView> {
 
@@ -60,11 +62,11 @@ public class MemberRoleButton extends AbstractMenuViewButton<PlayerMenuView> {
 
         private final PlayerRole playerRole;
 
-        Template(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
-                 String requiredPermission, GameSound lackPermissionSound, PlayerRole playerRole) {
+        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
+                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, PlayerRole playerRole) {
             super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
                     MemberRoleButton.class, MemberRoleButton::new);
-            this.playerRole = playerRole;
+            this.playerRole = Objects.requireNonNull(playerRole, "playerRole cannot be null");
         }
 
     }

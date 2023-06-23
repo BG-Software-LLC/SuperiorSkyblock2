@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreation.View> {
 
@@ -36,7 +37,7 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
         String requiredPermission = getTemplate().getRequiredPermission();
         return (requiredPermission == null || inventoryViewer.hasPermission(requiredPermission) ?
-                getTemplate().getButtonTemplateItem() : getTemplate().lackPermissionItem).build(inventoryViewer);
+                getTemplate().getAccessItem() : getTemplate().lackPermissionItem).build(inventoryViewer);
     }
 
     @Override
@@ -117,6 +118,7 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
 
     public static class Template extends MenuTemplateButtonImpl<MenuIslandCreation.View> {
 
+        @Nullable
         private final GameSound accessSound;
         private final List<String> accessCommands;
         private final TemplateItem lackPermissionItem;
@@ -127,21 +129,26 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
         private final boolean isOffset;
         private final Schematic schematic;
 
-        Template(String requiredPermission, GameSound lackPermissionSound, GameSound accessSound,
-                 List<String> accessCommands, TemplateItem lackPermissionItem, List<String> lackPermissionCommands,
-                 Biome biome, BigDecimal bonusWorth, BigDecimal bonusLevel, boolean isOffset, TemplateItem accessItem,
-                 Schematic schematic) {
-            super(accessItem, null, null, requiredPermission, lackPermissionSound,
-                    IslandCreationButton.class, IslandCreationButton::new);
+        Template(@Nullable String requiredPermission, @Nullable GameSound lackPermissionSound,
+                 @Nullable GameSound accessSound, @Nullable List<String> accessCommands,
+                 @Nullable TemplateItem lackPermissionItem, @Nullable List<String> lackPermissionCommands,
+                 Biome biome, @Nullable BigDecimal bonusWorth, @Nullable BigDecimal bonusLevel, boolean isOffset,
+                 @Nullable TemplateItem accessItem, Schematic schematic) {
+            super(accessItem == null ? TemplateItem.AIR : accessItem, null, null, requiredPermission,
+                    lackPermissionSound, IslandCreationButton.class, IslandCreationButton::new);
             this.accessSound = accessSound;
             this.accessCommands = accessCommands == null ? Collections.emptyList() : accessCommands;
-            this.lackPermissionItem = lackPermissionItem;
+            this.lackPermissionItem = lackPermissionItem == null ? TemplateItem.AIR : lackPermissionItem;
             this.lackPermissionCommands = lackPermissionCommands == null ? Collections.emptyList() : lackPermissionCommands;
-            this.biome = biome;
-            this.bonusWorth = bonusWorth;
-            this.bonusLevel = bonusLevel;
+            this.biome = Objects.requireNonNull(biome, "biome cannot be null");
+            this.bonusWorth = bonusWorth == null ? BigDecimal.ZERO : bonusWorth;
+            this.bonusLevel = bonusLevel == null ? BigDecimal.ZERO : bonusLevel;
             this.isOffset = isOffset;
-            this.schematic = schematic;
+            this.schematic = Objects.requireNonNull(schematic, "schematic cannot be null");
+        }
+
+        public TemplateItem getAccessItem() {
+            return super.getButtonTemplateItem();
         }
 
         @Nullable

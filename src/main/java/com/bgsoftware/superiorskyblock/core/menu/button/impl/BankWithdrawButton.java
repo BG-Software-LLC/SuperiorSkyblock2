@@ -12,8 +12,10 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.IslandMenuView;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
 public class BankWithdrawButton extends AbstractMenuViewButton<IslandMenuView> {
@@ -77,19 +79,22 @@ public class BankWithdrawButton extends AbstractMenuViewButton<IslandMenuView> {
 
     public static class Template extends MenuTemplateButtonImpl<IslandMenuView> {
 
+        @Nullable
         private final GameSound successSound;
+        @Nullable
         private final GameSound failSound;
         private final BigDecimal withdrawValue;
         private final List<String> withdrawCommands;
 
-        Template(TemplateItem buttonItem, List<String> commands, String requiredPermission, GameSound lackPermissionSound,
-                 GameSound successSound, GameSound failSound, double withdrawValue, List<String> withdrawCommands) {
+        Template(@Nullable TemplateItem buttonItem, @Nullable List<String> commands, @Nullable String requiredPermission,
+                 @Nullable GameSound lackPermissionSound, @Nullable GameSound successSound,
+                 @Nullable GameSound failSound, double withdrawValue, @Nullable List<String> withdrawCommands) {
             super(buttonItem, null, commands, requiredPermission, lackPermissionSound,
                     BankWithdrawButton.class, BankWithdrawButton::new);
             this.successSound = successSound;
             this.failSound = failSound;
             this.withdrawValue = BigDecimal.valueOf(withdrawValue / 100D);
-            this.withdrawCommands = withdrawCommands;
+            this.withdrawCommands = withdrawCommands == null ? Collections.emptyList() : withdrawCommands;
         }
 
     }

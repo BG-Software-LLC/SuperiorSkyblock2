@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -74,8 +75,8 @@ public class DisbandButton extends AbstractMenuViewButton<IslandMenuView> {
 
         private final boolean disbandIsland;
 
-        Template(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
-                 String requiredPermission, GameSound lackPermissionSound, boolean disbandIsland) {
+        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
+                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, boolean disbandIsland) {
             super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
                     DisbandButton.class, DisbandButton::new);
             this.disbandIsland = disbandIsland;

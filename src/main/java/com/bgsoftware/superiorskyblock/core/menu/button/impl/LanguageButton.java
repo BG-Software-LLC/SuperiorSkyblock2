@@ -11,9 +11,11 @@ import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class LanguageButton extends AbstractMenuViewButton<BaseMenuView> {
 
@@ -62,11 +64,11 @@ public class LanguageButton extends AbstractMenuViewButton<BaseMenuView> {
 
         private final Locale language;
 
-        Template(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
-                 String requiredPermission, GameSound lackPermissionSound, Locale language) {
+        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
+                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, Locale language) {
             super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
                     LanguageButton.class, LanguageButton::new);
-            this.language = language;
+            this.language = Objects.requireNonNull(language, "language cannot be null");
         }
 
     }

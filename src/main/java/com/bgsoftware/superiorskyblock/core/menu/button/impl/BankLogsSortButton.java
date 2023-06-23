@@ -9,9 +9,11 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuBankLogs;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 public class BankLogsSortButton extends AbstractMenuViewButton<MenuBankLogs.View> {
 
@@ -73,11 +75,11 @@ public class BankLogsSortButton extends AbstractMenuViewButton<MenuBankLogs.View
 
         private final SortType sortType;
 
-        Template(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
-                 String requiredPermission, GameSound lackPermissionSound, SortType sortType) {
+        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
+                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, SortType sortType) {
             super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
                     BankLogsSortButton.class, BankLogsSortButton::new);
-            this.sortType = sortType;
+            this.sortType = Objects.requireNonNull(sortType, "sortType cannot be null");
         }
 
     }

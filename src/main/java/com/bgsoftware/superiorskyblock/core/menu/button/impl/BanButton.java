@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmBan;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -55,8 +56,8 @@ public class BanButton extends AbstractMenuViewButton<MenuConfirmBan.View> {
 
         private final boolean banPlayer;
 
-        Template(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
-                 String requiredPermission, GameSound lackPermissionSound, boolean banPlayer) {
+        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
+                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, boolean banPlayer) {
             super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
                     BanButton.class, BanButton::new);
             this.banPlayer = banPlayer;

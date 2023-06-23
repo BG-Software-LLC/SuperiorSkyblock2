@@ -11,8 +11,10 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class IconEditLoreButton<E> extends AbstractMenuViewButton<AbstractIconProviderMenu.View<E>> {
 
@@ -65,11 +67,11 @@ public class IconEditLoreButton<E> extends AbstractMenuViewButton<AbstractIconPr
 
         private final Message newLoreMessage;
 
-        Template(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
-                 String requiredPermission, GameSound lackPermissionSound, Message newLoreMessage) {
+        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
+                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, Message newLoreMessage) {
             super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
                     IconEditLoreButton.class, IconEditLoreButton::new);
-            this.newLoreMessage = newLoreMessage;
+            this.newLoreMessage = Objects.requireNonNull(newLoreMessage, "newLoreMessage cannot be null");
         }
 
     }

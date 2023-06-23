@@ -12,8 +12,10 @@ import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.menu.view.PlayerMenuView;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class MemberManageButton extends AbstractMenuViewButton<PlayerMenuView> {
 
@@ -103,11 +105,11 @@ public class MemberManageButton extends AbstractMenuViewButton<PlayerMenuView> {
 
         private final ManageAction manageAction;
 
-        Template(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
-                 String requiredPermission, GameSound lackPermissionSound, ManageAction manageAction) {
+        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
+                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, ManageAction manageAction) {
             super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
                     MemberManageButton.class, MemberManageButton::new);
-            this.manageAction = manageAction;
+            this.manageAction = Objects.requireNonNull(manageAction, "manageAction cannot be null");
         }
 
     }

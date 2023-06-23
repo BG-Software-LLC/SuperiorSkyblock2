@@ -23,8 +23,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
 
@@ -138,22 +140,25 @@ public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
 
     public static class Template extends MenuTemplateButtonImpl<IslandMenuView> {
 
+        @Nullable
         private final GameSound accessSound;
         private final List<String> accessCommands;
+        @Nullable
         private final TemplateItem lackPermissionItem;
         private final List<String> lackPermissionCommands;
         private final Biome biome;
 
-        Template(TemplateItem buttonItem, String requiredPermission, GameSound lackPermissionSound,
-                 GameSound accessSound, List<String> accessCommands, TemplateItem lackPermissionItem,
-                 List<String> lackPermissionCommands, Biome biome) {
+        Template(@Nullable TemplateItem buttonItem, @Nullable String requiredPermission,
+                 @Nullable GameSound lackPermissionSound, @Nullable GameSound accessSound,
+                 @Nullable List<String> accessCommands, @Nullable TemplateItem lackPermissionItem,
+                 @Nullable List<String> lackPermissionCommands, Biome biome) {
             super(buttonItem, null, null, requiredPermission, lackPermissionSound,
                     BiomeButton.class, BiomeButton::new);
             this.accessSound = accessSound;
-            this.accessCommands = accessCommands;
+            this.accessCommands = accessCommands == null ? Collections.emptyList() : accessCommands;
             this.lackPermissionItem = lackPermissionItem;
-            this.lackPermissionCommands = lackPermissionCommands;
-            this.biome = biome;
+            this.lackPermissionCommands = lackPermissionCommands == null ? Collections.emptyList() : lackPermissionCommands;
+            this.biome = Objects.requireNonNull(biome, "biome cannot be null");
         }
 
     }

@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.IslandMenuView;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -71,12 +72,15 @@ public class BankDepositButton extends AbstractMenuViewButton<IslandMenuView> {
 
     public static class Template extends MenuTemplateButtonImpl<IslandMenuView> {
 
+        @Nullable
         private final GameSound successSound;
+        @Nullable
         private final GameSound failSound;
         private final BigDecimal depositPercentage;
 
-        Template(TemplateItem buttonItem, List<String> commands, String requiredPermission,
-                 GameSound lackPermissionSound, GameSound successSound, GameSound failSound, double depositPercentage) {
+        Template(@Nullable TemplateItem buttonItem, @Nullable List<String> commands, @Nullable String requiredPermission,
+                 @Nullable GameSound lackPermissionSound, @Nullable GameSound successSound,
+                 @Nullable GameSound failSound, double depositPercentage) {
             super(buttonItem, null, commands, requiredPermission, lackPermissionSound,
                     BankDepositButton.class, BankDepositButton::new);
             this.successSound = successSound;

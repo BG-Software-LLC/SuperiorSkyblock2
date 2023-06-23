@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -83,11 +84,13 @@ public class BankCustomWithdrawButton extends AbstractMenuViewButton<IslandMenuV
 
     public static class Template extends MenuTemplateButtonImpl<IslandMenuView> {
 
+        @Nullable
         private final GameSound successSound;
+        @Nullable
         private final GameSound failSound;
 
-        Template(TemplateItem buttonItem, List<String> commands, String requiredPermission,
-                 GameSound lackPermissionSound, GameSound successSound, GameSound failSound) {
+        Template(@Nullable TemplateItem buttonItem, @Nullable List<String> commands, @Nullable String requiredPermission,
+                 @Nullable GameSound lackPermissionSound, @Nullable GameSound successSound, @Nullable GameSound failSound) {
             super(buttonItem, null, commands, requiredPermission, lackPermissionSound,
                     BankCustomWithdrawButton.class, BankCustomWithdrawButton::new);
             this.successSound = successSound;

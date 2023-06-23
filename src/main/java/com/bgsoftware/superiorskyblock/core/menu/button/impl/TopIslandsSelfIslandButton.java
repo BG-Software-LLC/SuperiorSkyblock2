@@ -209,19 +209,21 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
 
         private final TemplateItem islandItem;
         private final TemplateItem noIslandItem;
+        @Nullable
         private final GameSound islandSound;
+        @Nullable
         private final GameSound noIslandSound;
         private final List<String> islandCommands;
         private final List<String> noIslandCommands;
 
-        Template(String requiredPermission, GameSound lackPermissionSound,
-                 TemplateItem islandItem, GameSound islandSound, List<String> islandCommands,
-                 TemplateItem noIslandItem, GameSound noIslandSound,
-                 List<String> noIslandCommands) {
+        Template(@Nullable String requiredPermission, @Nullable GameSound lackPermissionSound,
+                 @Nullable TemplateItem islandItem, @Nullable GameSound islandSound, @Nullable List<String> islandCommands,
+                 @Nullable TemplateItem noIslandItem, @Nullable GameSound noIslandSound,
+                 @Nullable List<String> noIslandCommands) {
             super(null, null, null, requiredPermission, lackPermissionSound,
                     TopIslandsSelfIslandButton.class, TopIslandsSelfIslandButton::new);
-            this.islandItem = islandItem;
-            this.noIslandItem = noIslandItem;
+            this.islandItem = islandItem == null ? TemplateItem.AIR : islandItem;
+            this.noIslandItem = noIslandItem == null ? TemplateItem.AIR : noIslandItem;
             this.islandSound = islandSound;
             this.islandCommands = islandCommands == null ? Collections.emptyList() : islandCommands;
             this.noIslandSound = noIslandSound;

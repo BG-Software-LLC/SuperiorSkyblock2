@@ -146,6 +146,7 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
                     } catch (IllegalArgumentException error) {
                         Log.warnFromFile("island-creation.yml", "Invalid biome name for item ",
                                 itemSectionName, ": ", biomeName);
+                        continue;
                     }
                 }
 
@@ -155,8 +156,6 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
                         buttonBuilder.setBonusWorth(BigDecimal.valueOf((double) bonusWorth));
                     } else if (bonusWorth instanceof String) {
                         buttonBuilder.setBonusWorth(new BigDecimal((String) bonusWorth));
-                    } else {
-                        buttonBuilder.setBonusWorth(BigDecimal.ZERO);
                     }
                 }
 
@@ -166,8 +165,6 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
                         buttonBuilder.setBonusLevel(BigDecimal.valueOf((double) bonusLevel));
                     } else if (bonusLevel instanceof String) {
                         buttonBuilder.setBonusLevel(new BigDecimal((String) bonusLevel));
-                    } else {
-                        buttonBuilder.setBonusLevel(BigDecimal.ZERO);
                     }
                 }
 

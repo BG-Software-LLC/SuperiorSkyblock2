@@ -11,8 +11,10 @@ import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class BorderColorButton extends AbstractMenuViewButton<BaseMenuView> {
 
@@ -51,11 +53,11 @@ public class BorderColorButton extends AbstractMenuViewButton<BaseMenuView> {
 
         private final BorderColor borderColor;
 
-        Template(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
-                 String requiredPermission, GameSound lackPermissionSound, BorderColor borderColor) {
+        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
+                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, BorderColor borderColor) {
             super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
                     BorderColorButton.class, BorderColorButton::new);
-            this.borderColor = borderColor;
+            this.borderColor = Objects.requireNonNull(borderColor, "borderColor cannot be null");
         }
 
     }

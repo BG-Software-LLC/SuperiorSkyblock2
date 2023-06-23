@@ -11,8 +11,10 @@ import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class BorderColorToggleButton extends AbstractMenuViewButton<BaseMenuView> {
 
@@ -64,12 +66,13 @@ public class BorderColorToggleButton extends AbstractMenuViewButton<BaseMenuView
         private final TemplateItem enabledItem;
         private final TemplateItem disabledItem;
 
-        Template(GameSound clickSound, List<String> commands, String requiredPermission, GameSound lackPermissionSound,
-                 TemplateItem enabledItem, TemplateItem disabledItem) {
+        Template(@Nullable GameSound clickSound, @Nullable List<String> commands, @Nullable String requiredPermission,
+                 @Nullable GameSound lackPermissionSound, @Nullable TemplateItem enabledItem,
+                 @Nullable TemplateItem disabledItem) {
             super(null, clickSound, commands, requiredPermission, lackPermissionSound,
                     BorderColorToggleButton.class, BorderColorToggleButton::new);
-            this.enabledItem = enabledItem;
-            this.disabledItem = disabledItem;
+            this.enabledItem = enabledItem == null ? TemplateItem.AIR : enabledItem;
+            this.disabledItem = disabledItem == null ? TemplateItem.AIR : disabledItem;
         }
 
     }

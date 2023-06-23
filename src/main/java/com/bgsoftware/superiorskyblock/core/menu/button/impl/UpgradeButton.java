@@ -18,7 +18,9 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 
 public class UpgradeButton extends AbstractMenuViewButton<IslandMenuView> {
 
@@ -94,11 +96,11 @@ public class UpgradeButton extends AbstractMenuViewButton<IslandMenuView> {
 
         private final Upgrade upgrade;
 
-        Template(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
-                 String requiredPermission, GameSound lackPermissionSound, Upgrade upgrade) {
+        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
+                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, Upgrade upgrade) {
             super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
                     UpgradeButton.class, UpgradeButton::new);
-            this.upgrade = upgrade;
+            this.upgrade = Objects.requireNonNull(upgrade, "upgrade cannot be null");
         }
 
     }
