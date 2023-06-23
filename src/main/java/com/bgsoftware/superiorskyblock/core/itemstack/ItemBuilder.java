@@ -77,7 +77,7 @@ public class ItemBuilder {
 
     public ItemBuilder asSkullOf(String textureValue) {
         if (itemStack.getType() == Materials.PLAYER_HEAD.toBukkitType())
-            this.textureValue = textureValue;
+            this.textureValue = ItemSkulls.parseTexture(textureValue);
         return this;
     }
 
