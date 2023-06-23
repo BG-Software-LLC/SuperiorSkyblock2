@@ -90,10 +90,10 @@ items:
       - '&6&l* &e&lWorth: &f${1}'
       - '&6&l* &e&lLevel: &f${2}'
   'H':
-    block: SPAWNER:PIG_ZOMBIE
+    block: SPAWNER:ZOMBIFIED_PIGLIN
     type: PLAYER_HEAD
-    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzRlOWM2ZTk4NTgyZmZkOGZmOGZlYjMzMjJjZDE4NDljNDNmYjE2YjE1OGFiYjExY2E3YjQyZWRhNzc0M2ViIn19fQ=='
-    name: '&e&l[!] &7Zombie Pigman Spawner'
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2VhYmFlY2M1ZmFlNWE4YTQ5Yzg4NjNmZjQ4MzFhYWEyODQxOThmMWEyMzk4ODkwYzc2NWUwYThkZTE4ZGE4YyJ9fX0='
+    name: '&e&l[!] &7Zombified Piglin Spawner'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
       - '&6&l* &e&lWorth: &f${1}'
