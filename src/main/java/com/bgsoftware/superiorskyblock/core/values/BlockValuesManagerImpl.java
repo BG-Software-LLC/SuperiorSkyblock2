@@ -112,8 +112,10 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
 
         if (plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
             BigDecimal price = plugin.getProviders().getPricesProvider().getPrice(key);
-            Log.debugResult(Debug.GET_WORTH, "Return Price", price);
-            return price;
+            if (price.compareTo(BigDecimal.ZERO) >= 0) {
+                Log.debugResult(Debug.GET_WORTH, "Return Price", price);
+                return price;
+            }
         }
 
         BigDecimal value = blockWorthValues.getBlockValue(key);
