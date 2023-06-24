@@ -43,6 +43,7 @@ import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.ticks.ProtoChunkTicks;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -53,6 +54,7 @@ import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage;
 import org.bukkit.generator.ChunkGenerator;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -207,11 +209,12 @@ public class WorldEditSessionImpl implements WorldEditSession {
                 blockEntityCompound.putInt("z", blockPos.getZ());
 
                 Component[] signLines = new Component[4];
+                Arrays.fill(signLines, Component.empty());
                 boolean hasAnySignLines = false;
                 // We try to convert old text sign lines
                 for (int i = 1; i <= 4; ++i) {
                     if (blockEntityCompound.contains("SSB.Text" + i)) {
-                        String signLine = blockEntityCompound.getString("Text" + i);
+                        String signLine = blockEntityCompound.getString("SSB.Text" + i);
                         if (!Text.isBlank(signLine)) {
                             signLines[i - 1] = CraftChatMessage.fromString(signLine)[0];
                             hasAnySignLines = true;
