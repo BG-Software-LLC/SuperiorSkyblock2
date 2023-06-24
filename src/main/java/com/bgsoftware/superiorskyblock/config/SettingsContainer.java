@@ -462,7 +462,7 @@ public class SettingsContainer {
                 }
             }
         }
-        defaultSignLines = config.getStringList("default-signs");
+        defaultSignLines = Formatters.formatList(config.getStringList("default-signs"), Formatters.COLOR_FORMATTER);
         eventCommands = new HashMap<>();
         if (config.contains("event-commands")) {
             for (String eventName : config.getConfigurationSection("event-commands").getKeys(false)) {
