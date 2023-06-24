@@ -9,9 +9,11 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.GlowEnchantment;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.itemstack.MinecraftNamesMapper;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
@@ -39,11 +41,19 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class MenuParserImpl implements MenuParser {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final MenuParserImpl INSTANCE = new MenuParserImpl();
+    private static final LazyReference<MinecraftNamesMapper> NAMES_MAPPER = new LazyReference<MinecraftNamesMapper>() {
+        @Override
+        protected MinecraftNamesMapper create() {
+            return new MinecraftNamesMapper();
+        }
+    };
 
     public static MenuParserImpl getInstance() {
         return INSTANCE;
@@ -58,7 +68,7 @@ public class MenuParserImpl implements MenuParser {
         RegularMenuLayoutImpl.Builder<V> menuLayoutBuilder = new RegularMenuLayoutImpl.Builder<>();
 
         menuLayoutBuilder.setTitle(Formatters.COLOR_FORMATTER.format(cfg.getString("title", "")));
-        menuLayoutBuilder.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
+        menuLayoutBuilder.setInventoryType(getMinecraftEnum(InventoryType.class, cfg.getString("type", "CHEST")));
 
         MenuPatternSlots menuPatternSlots = new MenuPatternSlots();
         List<String> pattern = cfg.getStringList("pattern");
@@ -99,7 +109,7 @@ public class MenuParserImpl implements MenuParser {
         PagedMenuLayoutImpl.Builder<V, E> menuLayoutBuilder = new PagedMenuLayoutImpl.Builder<>();
 
         menuLayoutBuilder.setTitle(Formatters.COLOR_FORMATTER.format(cfg.getString("title", "")));
-        menuLayoutBuilder.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
+        menuLayoutBuilder.setInventoryType(getMinecraftEnum(InventoryType.class, cfg.getString("type", "CHEST")));
 
         MenuPatternSlots menuPatternSlots = new MenuPatternSlots();
         List<String> pattern = cfg.getStringList("pattern");
@@ -204,7 +214,7 @@ public class MenuParserImpl implements MenuParser {
         Sound sound;
 
         try {
-            sound = Sound.valueOf(soundType);
+            sound = getMinecraftEnum(Sound.class, soundType);
         } catch (Exception ignored) {
             return null;
         }
@@ -279,8 +289,20 @@ public class MenuParserImpl implements MenuParser {
             short data;
 
             try {
-                type = Material.valueOf(section.getString("type"));
-                data = (short) section.getInt("data");
+                String materialType = section.getString("type");
+                materialType = MinecraftNamesMapper.getMinecraftName(materialType)
+                        .flatMap(minecraftKey -> NAMES_MAPPER.get().getMappedName(Material.class, minecraftKey))
+                        .orElse(materialType);
+                if (materialType.contains(":")) {
+                    String[] materialSections = materialType.toUpperCase(Locale.ENGLISH).split(":");
+                    if (materialSections.length < 2)
+                        throw new IllegalArgumentException();
+                    type = Material.valueOf(materialSections[0]);
+                    data = Short.parseShort(materialSections[1]);
+                } else {
+                    type = Material.valueOf(materialType.toUpperCase(Locale.ENGLISH));
+                    data = (short) section.getInt("data");
+                }
             } catch (IllegalArgumentException error) {
                 throw new MenuParseException("Couldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & data sections!");
             }
@@ -301,8 +323,8 @@ public class MenuParserImpl implements MenuParser {
                 Enchantment enchantment;
 
                 try {
-                    enchantment = Enchantment.getByName(_enchantment);
-                } catch (Exception ex) {
+                    enchantment = getMinecraftEnum(Enchantment.class, _enchantment, Enchantment::getByName);
+                } catch (IllegalArgumentException ex) {
                     Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
                             ".enchants.", _enchantment, " into an enchantment, skipping...");
                     continue;
@@ -332,9 +354,11 @@ public class MenuParserImpl implements MenuParser {
         if (section.contains("effects")) {
             ConfigurationSection effectsSection = section.getConfigurationSection("effects");
             for (String _effect : effectsSection.getKeys(false)) {
-                PotionEffectType potionEffectType = PotionEffectType.getByName(_effect);
+                PotionEffectType potionEffectType;
 
-                if (potionEffectType == null) {
+                try {
+                    potionEffectType = getMinecraftEnum(PotionEffectType.class, _effect, PotionEffectType::getByName);
+                } catch (IllegalArgumentException error) {
                     Log.warnFromFile(fileName, "Couldn't convert ", effectsSection.getCurrentPath(),
                             ".", _effect, " into a potion effect, skipping...");
                     continue;
@@ -356,7 +380,7 @@ public class MenuParserImpl implements MenuParser {
         if (section.contains("entity")) {
             String entity = section.getString("entity");
             try {
-                itemBuilder.withEntityType(EntityType.valueOf(entity.toUpperCase(Locale.ENGLISH)));
+                itemBuilder.withEntityType(getMinecraftEnum(EntityType.class, entity));
             } catch (IllegalArgumentException ex) {
                 Log.warnFromFile(fileName, "Couldn't convert ", entity, " into an entity type, skipping...");
             }
@@ -383,6 +407,20 @@ public class MenuParserImpl implements MenuParser {
 
     public List<Integer> parseButtonSlots(ConfigurationSection section, String key, MenuPatternSlots menuPatternSlots) {
         return !section.contains(key) ? Collections.emptyList() : menuPatternSlots.getSlots(section.getString(key));
+    }
+
+    private static <E extends Enum<E>> E getMinecraftEnum(Class<E> type, String name) throws IllegalArgumentException {
+        return MinecraftNamesMapper.getMinecraftName(name)
+                .flatMap(minecraftKey -> NAMES_MAPPER.get().mapName(type, minecraftKey))
+                .orElseGet(() -> Enum.valueOf(type, name.toUpperCase(Locale.ENGLISH)));
+    }
+
+    private static <T> T getMinecraftEnum(Class<T> type, String name, Function<String, T> enumCreator) throws IllegalArgumentException {
+        String mappedName = MinecraftNamesMapper.getMinecraftName(name)
+                .flatMap(minecraftKey -> NAMES_MAPPER.get().getMappedName(type, minecraftKey))
+                .orElse(name);
+        return Optional.ofNullable(enumCreator.apply(mappedName.toUpperCase(Locale.ENGLISH)))
+                .orElseThrow(() -> new IllegalArgumentException("No enum constant " + type.getCanonicalName() + "." + name));
     }
 
     public interface IMenuConverter {
