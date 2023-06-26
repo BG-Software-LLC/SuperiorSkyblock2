@@ -1,7 +1,8 @@
 package com.bgsoftware.superiorskyblock.external;
 
-import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.events.IslandChunkResetEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -19,23 +20,22 @@ import io.github.thebusybiscuit.slimefun4.api.events.AndroidMineEvent;
 import io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent;
 import io.github.thebusybiscuit.slimefun4.implementation.SlimefunPlugin;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
-import me.mrCookieSlime.Slimefun.cscorelib2.config.Config;
 import me.mrCookieSlime.Slimefun.cscorelib2.protection.ProtectableAction;
 import me.mrCookieSlime.Slimefun.cscorelib2.protection.ProtectionModule;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Map;
-
 @SuppressWarnings("unused")
 public class SlimefunHook {
 
-    private static final ReflectField<Map<Location, Config>> BLOCK_STORAGE_STORAGE = new ReflectField<>(BlockStorage.class, Map.class, "storage");
+    private static final ReflectMethod<Void> BLOCK_STORAGE_CLEAR_ALL_BLOCK_INFO_AT_CHUNK_METHOD = new ReflectMethod<>(
+            BlockStorage.class, "clearAllBlockInfoAtChunk", World.class, int.class, int.class, boolean.class);
 
     private static SuperiorSkyblockPlugin plugin;
 
@@ -61,6 +61,8 @@ public class SlimefunHook {
         if (isClassLoaded("io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent"))
             plugin.getServer().getPluginManager().registerEvents(new AutoPlacerPlaceListener(), plugin);
 
+        if (BLOCK_STORAGE_CLEAR_ALL_BLOCK_INFO_AT_CHUNK_METHOD.isValid())
+            plugin.getServer().getPluginManager().registerEvents(new ChunkWipeListener(), plugin);
     }
 
     private static boolean isClassLoaded(String clazz) {
@@ -129,6 +131,15 @@ public class SlimefunHook {
             blockChangesListener.get().onBlockPlace(KeyImpl.of(e.getBlock()), e.getBlock().getLocation(),
                     plugin.getNMSWorld().getDefaultAmount(e.getBlock()), null,
                     BlockChangesListener.Flag.DIRTY_CHUNK, BlockChangesListener.Flag.SAVE_BLOCK_COUNT);
+        }
+
+    }
+
+    private static class ChunkWipeListener implements Listener {
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onChunkWipe(IslandChunkResetEvent e) {
+            BLOCK_STORAGE_CLEAR_ALL_BLOCK_INFO_AT_CHUNK_METHOD.invoke(null, e.getWorld(), e.getChunkX(), e.getChunkZ(), true);
         }
 
     }
