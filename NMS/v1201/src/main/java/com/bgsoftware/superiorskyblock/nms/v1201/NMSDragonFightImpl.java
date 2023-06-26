@@ -32,9 +32,8 @@ public class NMSDragonFightImpl implements NMSDragonFight {
             EntityType.class, EntityType.EntityFactory.class, Modifier.PRIVATE | Modifier.FINAL, 1)
             .removeFinal();
 
-    private static final ReflectField<EndDragonFight> WORLD_DRAGON_BATTLE = new ReflectField<EndDragonFight>(
-            ServerLevel.class, EndDragonFight.class, Modifier.PRIVATE | Modifier.FINAL, 1)
-            .removeFinal();
+    private static final ReflectField<EndDragonFight> WORLD_DRAGON_BATTLE = new ReflectField<>(
+            ServerLevel.class, EndDragonFight.class, Modifier.PRIVATE, 1);
 
     private static final ReflectField<LoadingCache<Long, List<SpikeFeature.EndSpike>>> SPIKE_CACHE = new ReflectField<LoadingCache<Long, List<SpikeFeature.EndSpike>>>(
             SpikeFeature.class, LoadingCache.class, Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL, 1)

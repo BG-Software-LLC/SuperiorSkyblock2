@@ -40,9 +40,12 @@ public class IslandEndDragonFight extends EndDragonFight {
             EnderDragon.class, EndDragonFight.class, Modifier.PRIVATE | Modifier.FINAL, 1)
             .removeFinal();
     private static final ReflectField<Boolean> SCAN_FOR_LEGACY_PORTALS = new ReflectField<>(
-            EndDragonFight.class, boolean.class, Modifier.PRIVATE, 3);
+            EndDragonFight.class, boolean.class, Modifier.PRIVATE, 4);
     private static final ReflectField<Boolean> WAS_DRAGON_KILLED = new ReflectField<>(
             EndDragonFight.class, boolean.class, Modifier.PRIVATE, 1);
+
+    private static final ReflectField<Integer> TICKS_SINCE_LAST_PLAYER_SCAN = new ReflectField<>(
+            EndDragonFight.class, int.class, Modifier.PRIVATE, 4);
     private static final ReflectField<Vec3> LANDING_TARGET_POSITION = new ReflectField<>(
             DragonLandingPhase.class, Vec3.class, Modifier.PRIVATE, 1);
 
@@ -80,6 +83,8 @@ public class IslandEndDragonFight extends EndDragonFight {
         SCAN_FOR_LEGACY_PORTALS.set(this, false);
         WAS_DRAGON_KILLED.set(this, false);
         DRAGON_BATTLE.set(this.entityEnderDragon, this);
+
+        TICKS_SINCE_LAST_PLAYER_SCAN.set(this, Integer.MIN_VALUE);
     }
 
     @Override
@@ -96,6 +101,7 @@ public class IslandEndDragonFight extends EndDragonFight {
         if (++currentTick >= 20) {
             updateBattlePlayers();
             currentTick = 0;
+            TICKS_SINCE_LAST_PLAYER_SCAN.set(this, Integer.MIN_VALUE);
         }
     }
 
