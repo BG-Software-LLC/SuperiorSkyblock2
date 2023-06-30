@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.algorithms.PaperGlowEnchantment;
 import com.bgsoftware.superiorskyblock.nms.algorithms.SpigotGlowEnchantment;
@@ -10,13 +9,15 @@ import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityBrewing;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityDispenser;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityFurnace;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityHopper;
+import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.KeyBlocksCache;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
+import net.minecraft.server.v1_16_R3.EntityFallingBlock;
+import net.minecraft.server.v1_16_R3.EntityMinecartAbstract;
 import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.IInventory;
 import net.minecraft.server.v1_16_R3.IRegistry;
-import net.minecraft.server.v1_16_R3.MinecraftServer;
 import net.minecraft.server.v1_16_R3.World;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,12 +25,13 @@ import org.bukkit.Material;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftFallingBlock;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMinecart;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Minecart;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -102,18 +104,22 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public Key getBlockKey(int combinedId) {
-        Material material = CraftMagicNumbers.getMaterial(Block.getByCombinedId(combinedId).getBlock());
-        return KeyImpl.of(material, (byte) 0);
+        Block block = Block.getByCombinedId(combinedId).getBlock();
+        return KeyBlocksCache.getBlockKey(block);
     }
 
     @Override
-    public Key getMinecartBlock(Minecart minecart) {
-        return KeyImpl.of(minecart.getDisplayBlockData().getMaterial(), (byte) 0);
+    public Key getMinecartBlock(org.bukkit.entity.Minecart bukkitMinecart) {
+        EntityMinecartAbstract minecart = ((CraftMinecart) bukkitMinecart).getHandle();
+        Block block = minecart.getDisplayBlock().getBlock();
+        return KeyBlocksCache.getBlockKey(block);
     }
 
     @Override
-    public Key getFallingBlockType(FallingBlock fallingBlock) {
-        return KeyImpl.of(fallingBlock.getBlockData().getMaterial(), (byte) 0);
+    public Key getFallingBlockType(FallingBlock bukkitFallingBlock) {
+        EntityFallingBlock fallingBlock = ((CraftFallingBlock) bukkitFallingBlock).getHandle();
+        Block block = fallingBlock.getBlock().getBlock();
+        return KeyBlocksCache.getBlockKey(block);
     }
 
     @Override

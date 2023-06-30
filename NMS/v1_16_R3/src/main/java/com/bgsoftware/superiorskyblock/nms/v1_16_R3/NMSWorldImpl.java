@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.nms.algorithms.NMSCachedBlock;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.spawners.TileEntityMobSpawnerNotifier;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.BlockStatesMapper;
+import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.WorldEditSessionImpl;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
@@ -52,7 +53,6 @@ import net.minecraft.server.v1_16_R3.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
@@ -84,10 +84,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
-        IBlockData blockData = ((CraftBlockData) chunkSnapshot.getBlockData(x, y, z)).getState();
-        Material type = chunkSnapshot.getBlockType(x, y, z);
-        short data = (short) (Block.getCombinedId(blockData) >> 12 & 15);
-
+        Block block = ((CraftBlockData) chunkSnapshot.getBlockData(x, y, z)).getState().getBlock();
         Location location = new Location(
                 Bukkit.getWorld(chunkSnapshot.getWorldName()),
                 (chunkSnapshot.getX() << 4) + x,
@@ -95,7 +92,9 @@ public class NMSWorldImpl implements NMSWorld {
                 (chunkSnapshot.getZ() << 4) + z
         );
 
-        return KeyImpl.of(KeyImpl.of(type, data), location);
+        Key rawBlockKey = KeyBlocksCache.getBlockKey(block);
+
+        return KeyImpl.of(rawBlockKey, location);
     }
 
     @Override

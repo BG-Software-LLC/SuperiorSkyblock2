@@ -13,9 +13,11 @@ import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.spawners.MobSpawnerAbstractNotifier;
+import com.bgsoftware.superiorskyblock.nms.v1_8_R3.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.world.WorldEditSessionImpl;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockDoubleStep;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Chunk;
@@ -37,7 +39,6 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.block.CraftSign;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -65,8 +66,9 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     @SuppressWarnings("deprecation")
     public Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
-        Material type = Material.getMaterial(chunkSnapshot.getBlockTypeId(x, y, z));
-        short data = (short) chunkSnapshot.getBlockData(x, y, z);
+        int blockId = chunkSnapshot.getBlockTypeId(x, y, z);
+        int blockData = chunkSnapshot.getBlockData(x, y, z);
+        int combinedId = blockId + (blockData << 12);
 
         Location location = new Location(
                 Bukkit.getWorld(chunkSnapshot.getWorldName()),
@@ -75,7 +77,9 @@ public class NMSWorldImpl implements NMSWorld {
                 (chunkSnapshot.getZ() << 4) + z
         );
 
-        return KeyImpl.of(KeyImpl.of(type, data), location);
+        Key rawBlockKey = KeyBlocksCache.getBlockKey(Block.getByCombinedId(combinedId));
+
+        return KeyImpl.of(rawBlockKey, location);
     }
 
     @Override
@@ -156,7 +160,7 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public Object getBlockData(Block block) {
+    public Object getBlockData(org.bukkit.block.Block block) {
         // Doesn't exist
         return null;
     }
@@ -211,7 +215,7 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public boolean isWaterLogged(Block block) {
+    public boolean isWaterLogged(org.bukkit.block.Block block) {
         Material blockType = block.getType();
         return blockType == Material.WATER || blockType == Material.STATIONARY_WATER;
     }

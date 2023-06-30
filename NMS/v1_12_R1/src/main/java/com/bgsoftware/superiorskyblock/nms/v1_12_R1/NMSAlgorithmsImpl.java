@@ -2,11 +2,14 @@ package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.algorithms.GlowEnchantment;
+import com.bgsoftware.superiorskyblock.nms.v1_12_R1.world.KeyBlocksCache;
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockPosition;
+import net.minecraft.server.v1_12_R1.EntityFallingBlock;
+import net.minecraft.server.v1_12_R1.EntityMinecartAbstract;
 import net.minecraft.server.v1_12_R1.IBlockData;
 import net.minecraft.server.v1_12_R1.IChatBaseComponent;
 import net.minecraft.server.v1_12_R1.Item;
@@ -19,17 +22,19 @@ import org.bukkit.Material;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftFallingBlock;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftMinecart;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_12_R1.util.CraftChatMessage;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Minecart;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
+
+import java.util.Optional;
 
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
@@ -69,24 +74,20 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public Key getBlockKey(int combinedId) {
-        //noinspection deprecation
-        Material material = Material.getMaterial(combinedId & 4095);
-        byte data = (byte) (combinedId >> 12 & 15);
-        return KeyImpl.of(material, data);
+        IBlockData blockData = Block.getByCombinedId(combinedId);
+        return KeyBlocksCache.getBlockKey(blockData);
     }
 
     @Override
-    public Key getMinecartBlock(Minecart minecart) {
-        MaterialData materialData = minecart.getDisplayBlock();
-        //noinspection deprecation
-        return KeyImpl.of(materialData.getItemType(), materialData.getData());
+    public Key getMinecartBlock(org.bukkit.entity.Minecart bukkitMinecart) {
+        EntityMinecartAbstract minecart = ((CraftMinecart) bukkitMinecart).getHandle();
+        return KeyBlocksCache.getBlockKey(minecart.getDisplayBlock());
     }
 
-
     @Override
-    public Key getFallingBlockType(FallingBlock fallingBlock) {
-        //noinspection deprecation
-        return KeyImpl.of(fallingBlock.getMaterial(), fallingBlock.getBlockData());
+    public Key getFallingBlockType(FallingBlock bukkitFallingBlock) {
+        EntityFallingBlock fallingBlock = ((CraftFallingBlock) bukkitFallingBlock).getHandle();
+        return Optional.ofNullable(fallingBlock.getBlock()).map(KeyBlocksCache::getBlockKey).orElse(ConstantKeys.AIR);
     }
 
     @Override
