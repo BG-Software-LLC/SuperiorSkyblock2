@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v117.chunks.CropsBlockEntity;
+import com.bgsoftware.superiorskyblock.nms.v117.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -44,14 +45,12 @@ import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.phys.AABB;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_17_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.generator.CustomChunkGenerator;
-import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 
@@ -81,6 +80,7 @@ public class NMSChunksImpl implements NMSChunks {
 
     public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+        KeyBlocksCache.cacheAllBlocks();
     }
 
     @Override
@@ -358,10 +358,10 @@ public class NMSChunksImpl implements NMSChunks {
             blockState = blockState.setValue(SlabBlock.TYPE, SlabType.BOTTOM);
         }
 
-        Material type = CraftMagicNumbers.getMaterial(blockState.getBlock());
-        Key blockKey = KeyImpl.of(type.name() + "", "0", location);
+        Key rawBlockKey = KeyBlocksCache.getBlockKey(blockState.getBlock());
+        Key blockKey = KeyImpl.of(rawBlockKey, location);
         blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
-        if (type == Material.SPAWNER) {
+        if (block == Blocks.SPAWNER) {
             spawnersLocations.add(location);
         }
     }

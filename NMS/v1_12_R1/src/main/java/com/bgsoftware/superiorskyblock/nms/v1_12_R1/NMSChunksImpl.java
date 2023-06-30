@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.chunks.EmptyCounterChunkSection;
+import com.bgsoftware.superiorskyblock.nms.v1_12_R1.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.Block;
@@ -32,7 +33,6 @@ import net.minecraft.server.v1_12_R1.PlayerConnection;
 import net.minecraft.server.v1_12_R1.TileEntity;
 import net.minecraft.server.v1_12_R1.WorldServer;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
@@ -40,7 +40,6 @@ import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.generator.CustomChunkGenerator;
-import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_12_R1.util.UnsafeList;
 import org.bukkit.entity.Player;
 
@@ -60,6 +59,7 @@ public class NMSChunksImpl implements NMSChunks {
 
     public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+        KeyBlocksCache.cacheAllBlocks();
     }
 
     private static void removeEntities(Chunk chunk) {
@@ -198,14 +198,12 @@ public class NMSChunksImpl implements NMSChunks {
                                 blockData = Block.REGISTRY.get(new MinecraftKey(blockKey.getKey()
                                                 .replace("double_", ""))).getBlockData()
                                         .set(BlockDoubleStepAbstract.VARIANT, blockData.get(BlockDoubleStepAbstract.VARIANT));
-                                block = blockData.getBlock();
                             }
 
-                            Material type = CraftMagicNumbers.getMaterial(block);
-                            byte data = (byte) block.toLegacyData(blockData);
-                            Key blockKey = KeyImpl.of(type, data, location);
+                            Key rawBlockKey = KeyBlocksCache.getBlockKey(blockData);
+                            Key blockKey = KeyImpl.of(rawBlockKey, location);
                             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
-                            if (type == Material.MOB_SPAWNER) {
+                            if (block == Blocks.MOB_SPAWNER) {
                                 spawnersLocations.add(location);
                             }
                         }

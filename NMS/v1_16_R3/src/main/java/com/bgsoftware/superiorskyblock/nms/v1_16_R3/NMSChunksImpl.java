@@ -13,9 +13,11 @@ import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.chunks.CropsTickingTileEntity;
+import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.server.v1_16_R3.BiomeBase;
 import net.minecraft.server.v1_16_R3.BiomeStorage;
+import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.BlockPropertySlabType;
 import net.minecraft.server.v1_16_R3.BlockStepAbstract;
@@ -40,14 +42,12 @@ import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldServer;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.generator.CustomChunkGenerator;
-import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_16_R3.util.UnsafeList;
 import org.bukkit.entity.Player;
 
@@ -73,6 +73,7 @@ public class NMSChunksImpl implements NMSChunks {
 
     public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+        KeyBlocksCache.cacheAllBlocks();
     }
 
     @Override
@@ -308,7 +309,8 @@ public class NMSChunksImpl implements NMSChunks {
             if (chunkSection != null && !chunkSection.c()) {
                 for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
                     IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
-                    if (blockData.getBlock() != Blocks.AIR) {
+                    Block block = blockData.getBlock();
+                    if (block != Blocks.AIR) {
                         Location location = new Location(chunkPosition.getWorld(),
                                 (chunkPosition.getX() << 4) + bp.getX(),
                                 chunkSection.getYPosition() + bp.getY(),
@@ -322,10 +324,10 @@ public class NMSChunksImpl implements NMSChunks {
                             blockData = blockData.set(BlockStepAbstract.a, BlockPropertySlabType.BOTTOM);
                         }
 
-                        Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
-                        Key blockKey = KeyImpl.of(type.name() + "", "0", location);
+                        Key rawBlockKey = KeyBlocksCache.getBlockKey(blockData.getBlock());
+                        Key blockKey = KeyImpl.of(rawBlockKey, location);
                         blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
-                        if (type == Material.SPAWNER) {
+                        if (block == Blocks.SPAWNER) {
                             spawnersLocations.add(location);
                         }
                     }

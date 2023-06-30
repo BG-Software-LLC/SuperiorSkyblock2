@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.chunks.CropsTickingTileEntity;
+import com.bgsoftware.superiorskyblock.nms.v1_8_R3.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockDoubleStep;
@@ -26,14 +27,12 @@ import net.minecraft.server.v1_8_R3.MinecraftKey;
 import net.minecraft.server.v1_8_R3.TileEntity;
 import net.minecraft.server.v1_8_R3.WorldServer;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_8_R3.generator.CustomChunkGenerator;
-import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_8_R3.util.UnsafeList;
 import org.bukkit.entity.Player;
 
@@ -53,6 +52,7 @@ public class NMSChunksImpl implements NMSChunks {
 
     public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+        KeyBlocksCache.cacheAllBlocks();
     }
 
     @Override
@@ -158,14 +158,12 @@ public class NMSChunksImpl implements NMSChunks {
                                 blockData = Block.REGISTRY.get(new MinecraftKey(blockKey.a()
                                                 .replace("double_", ""))).getBlockData()
                                         .set(BlockDoubleStepAbstract.VARIANT, blockData.get(BlockDoubleStepAbstract.VARIANT));
-                                block = blockData.getBlock();
                             }
 
-                            Material type = CraftMagicNumbers.getMaterial(block);
-                            byte data = (byte) block.toLegacyData(blockData);
-                            Key blockKey = KeyImpl.of(type, data, location);
+                            Key rawBlockKey = KeyBlocksCache.getBlockKey(blockData);
+                            Key blockKey = KeyImpl.of(rawBlockKey, location);
                             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
-                            if (type == Material.MOB_SPAWNER) {
+                            if (block == Blocks.MOB_SPAWNER) {
                                 spawnersLocations.add(location);
                             }
                         }
