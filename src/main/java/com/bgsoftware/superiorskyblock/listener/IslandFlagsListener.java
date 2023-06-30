@@ -13,7 +13,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Chicken;
-import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -21,9 +20,6 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TNTPrimed;
-import org.bukkit.entity.Wither;
-import org.bukkit.entity.WitherSkull;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -163,24 +159,34 @@ public class IslandFlagsListener implements Listener {
     }
 
     public boolean preventEntityExplosion(Entity source, Location explodeLocation) {
-        IslandFlag islandFlag = null;
+        IslandFlag islandFlag;
 
-        if (source instanceof Creeper) {
-            islandFlag = IslandFlags.CREEPER_EXPLOSION;
-        } else if (source instanceof TNTPrimed) {
-            islandFlag = IslandFlags.TNT_EXPLOSION;
-        } else if (source instanceof Wither || source instanceof WitherSkull) {
-            islandFlag = IslandFlags.WITHER_EXPLOSION;
-        } else if (source instanceof Fireball) {
-            ProjectileSource projectileSource = originalFireballsDamager.get(source.getUniqueId());
-            if (projectileSource == null)
-                projectileSource = ((Fireball) source).getShooter();
-            if (projectileSource instanceof Ghast) {
-                islandFlag = IslandFlags.GHAST_FIREBALL;
+        switch (source.getType()) {
+            case CREEPER:
+                islandFlag = IslandFlags.CREEPER_EXPLOSION;
+                break;
+            case PRIMED_TNT:
+            case MINECART_TNT:
+                islandFlag = IslandFlags.TNT_EXPLOSION;
+                break;
+            case WITHER:
+            case WITHER_SKULL:
+                islandFlag = IslandFlags.WITHER_EXPLOSION;
+                break;
+            case FIREBALL: {
+                ProjectileSource projectileSource = originalFireballsDamager.get(source.getUniqueId());
+                if (projectileSource == null)
+                    projectileSource = ((Fireball) source).getShooter();
+                if (projectileSource instanceof Ghast) {
+                    islandFlag = IslandFlags.GHAST_FIREBALL;
+                    break;
+                }
             }
+            default:
+                return false;
         }
 
-        return islandFlag != null && preventAction(explodeLocation, islandFlag);
+        return preventAction(explodeLocation, islandFlag);
     }
 
     /* GENERAL EVENTS */
