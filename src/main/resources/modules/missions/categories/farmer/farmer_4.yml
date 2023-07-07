@@ -30,11 +30,11 @@ required-missions:
 required-plants:
   '1':
     types:
-      - 'CARROTS'
+      - 'CARROT'
     amount: 64
   '2':
     types:
-      - 'POTATOES'
+      - 'POTATO'
     amount: 64
   '3':
     types:
@@ -42,7 +42,7 @@ required-plants:
     amount: 64
   '4':
     types:
-      - 'BEETROOTS'
+      - 'BEETROOT'
     amount: 64
   '5':
     types:

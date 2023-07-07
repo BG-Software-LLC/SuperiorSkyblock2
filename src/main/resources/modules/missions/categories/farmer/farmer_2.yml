@@ -35,7 +35,7 @@ required-missions:
 required-plants:
   '1':
     types:
-      - 'BEETROOTS'
+      - 'BEETROOT'
     amount: 10
   '2':
     types:

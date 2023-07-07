@@ -34,11 +34,11 @@ rewards:
 required-plants:
   '1':
     types:
-      - 'CARROTS'
+      - 'CARROT'
     amount: 10
   '2':
     types:
-      - 'POTATOES'
+      - 'POTATO'
     amount: 10
   '3':
     types:
