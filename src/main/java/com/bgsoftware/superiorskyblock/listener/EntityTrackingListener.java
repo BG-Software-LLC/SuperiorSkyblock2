@@ -58,15 +58,13 @@ public class EntityTrackingListener implements Listener {
     /* ENTITY DESPAWNING */
 
     public void onEntityDespawn(Entity entity) {
-        if (!BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class))
+        if (!BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class) ||
+                BukkitEntities.canBypassEntityLimit(entity) || !BukkitEntities.canHaveLimit(entity.getType()))
             return;
 
         Island island = plugin.getGrid().getIslandAt(entity.getLocation());
 
         if (island == null)
-            return;
-
-        if (!BukkitEntities.canHaveLimit(entity.getType()))
             return;
 
         island.getEntitiesTracker().untrackEntity(KeyImpl.of(entity), 1);
