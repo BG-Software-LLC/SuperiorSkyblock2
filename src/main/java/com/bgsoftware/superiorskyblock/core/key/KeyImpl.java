@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.key;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Location;
@@ -26,13 +27,17 @@ public class KeyImpl implements Key {
 
     private final String globalKey;
     private final String subKey;
-    private final int cachedHash;
+    private final LazyReference<Integer> cachedHash = new LazyReference<Integer>() {
+        @Override
+        protected Integer create() {
+            return hashCodeInternal();
+        }
+    };
     private boolean apiKey = false;
 
     private KeyImpl(String globalKey, String subKey) {
         this.globalKey = globalKey.toUpperCase(Locale.ENGLISH);
         this.subKey = subKey.toUpperCase(Locale.ENGLISH);
-        this.cachedHash = hashCodeInternal();
     }
 
     public static Key of(EntityType entityType) {
@@ -125,7 +130,7 @@ public class KeyImpl implements Key {
     @Override
     @SuppressWarnings("all")
     public boolean equals(Object obj) {
-        return obj instanceof Key && this.cachedHash == obj.hashCode() &&
+        return obj instanceof Key && hashCode() == obj.hashCode() &&
                 this.globalKey.equals(((Key) obj).getGlobalKey()) && this.subKey.equals(((Key) obj).getSubKey());
     }
 
@@ -136,7 +141,7 @@ public class KeyImpl implements Key {
 
     @Override
     public int hashCode() {
-        return this.cachedHash;
+        return this.cachedHash.get();
     }
 
     private int hashCodeInternal() {
