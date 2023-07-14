@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.core.key;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -26,11 +26,13 @@ public class KeyImpl implements Key {
 
     private final String globalKey;
     private final String subKey;
+    private final int cachedHash;
     private boolean apiKey = false;
 
     private KeyImpl(String globalKey, String subKey) {
         this.globalKey = globalKey.toUpperCase(Locale.ENGLISH);
         this.subKey = subKey.toUpperCase(Locale.ENGLISH);
+        this.cachedHash = hashCodeInternal();
     }
 
     public static Key of(EntityType entityType) {
@@ -123,12 +125,22 @@ public class KeyImpl implements Key {
     @Override
     @SuppressWarnings("all")
     public boolean equals(Object obj) {
-        return obj instanceof Key && toString().equals(obj.toString());
+        return obj instanceof Key && this.cachedHash == obj.hashCode() &&
+                this.globalKey.equals(((Key) obj).getGlobalKey()) && this.subKey.equals(((Key) obj).getSubKey());
     }
 
     @Override
     public String toString() {
         return subKey.isEmpty() ? globalKey : globalKey + ":" + subKey;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.cachedHash;
+    }
+
+    private int hashCodeInternal() {
+        return toString().hashCode();
     }
 
 }
