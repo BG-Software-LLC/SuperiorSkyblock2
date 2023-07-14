@@ -26,8 +26,6 @@ items:
     type: SKULL_ITEM
     data: 3
     name: '&e{0}'
-    lore:
-      - '&eRole: &7{1}'
   '%':
     type: PAPER
     name: '{0}Previous Page'
