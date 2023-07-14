@@ -27,12 +27,20 @@ public class KeyImpl implements Key {
 
     private final String globalKey;
     private final String subKey;
+
     private final LazyReference<Integer> cachedHash = new LazyReference<Integer>() {
         @Override
         protected Integer create() {
             return hashCodeInternal();
         }
     };
+    private final LazyReference<String> cachedString = new LazyReference<String>() {
+        @Override
+        protected String create() {
+            return toStringInternal();
+        }
+    };
+
     private boolean apiKey = false;
 
     private KeyImpl(String globalKey, String subKey) {
@@ -136,6 +144,10 @@ public class KeyImpl implements Key {
 
     @Override
     public String toString() {
+        return this.cachedString.get();
+    }
+
+    private String toStringInternal() {
         return subKey.isEmpty() ? globalKey : globalKey + ":" + subKey;
     }
 
