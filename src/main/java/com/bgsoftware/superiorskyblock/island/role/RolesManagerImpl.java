@@ -41,7 +41,7 @@ public class RolesManagerImpl extends Manager implements RolesManager {
             throw new ManagerLoadException("Missing \"coop\" section for island roles", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
 
         SPlayerRole guestsRole = loadRole(guestSection, GUEST_ROLE_INDEX, null);
-        SPlayerRole previousRole = loadRole(coopSection, COOP_ROLE_INDEX, guestsRole);
+        SPlayerRole coopRole = loadRole(coopSection, COOP_ROLE_INDEX, guestsRole);
 
         ConfigurationSection laddersSection = rolesSection.getConfigurationSection("ladder");
 
@@ -53,6 +53,7 @@ public class RolesManagerImpl extends Manager implements RolesManager {
             rolesByWeight.add(laddersSection.getConfigurationSection(roleSectionName));
         rolesByWeight.sort(Comparator.comparingInt(o -> o.getInt("weight", -1)));
 
+        SPlayerRole previousRole = coopRole;
         for (ConfigurationSection roleSection : rolesByWeight)
             previousRole = loadRole(roleSection, previousRole.getWeight() + 1, previousRole);
     }

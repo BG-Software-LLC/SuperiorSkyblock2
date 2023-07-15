@@ -22,18 +22,17 @@ public class SPlayerRole implements PlayerRole {
     private final RolePrivilegeNode defaultPermissions;
 
     public SPlayerRole(String name, @Nullable String displayName, int id, int weight, List<String> defaultPermissions,
-                       SPlayerRole previousRole) {
+                       @Nullable SPlayerRole previousRole) {
         this.name = name;
         this.displayName = displayName == null ? name : displayName;
         this.id = id;
         this.weight = weight;
 
-        StringBuilder permissions = new StringBuilder();
-        defaultPermissions.forEach(perm -> permissions.append(";").append(perm));
+        String permissions = defaultPermissions.isEmpty() ? null : String.join(";", defaultPermissions);
 
         this.defaultPermissions = new RolePrivilegeNode(null,
                 previousRole == null ? RolePrivilegeNode.EmptyRolePermissionNode.INSTANCE : previousRole.defaultPermissions,
-                permissions.length() == 0 ? "" : permissions.substring(1));
+                permissions);
     }
 
     public static PlayerRole defaultRole() {

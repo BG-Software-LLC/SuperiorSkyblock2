@@ -187,7 +187,7 @@ public class CmdAdminShow implements IAdminIslandCommand {
         }
 
         // Island coop limit
-        if (!Message.ISLAND_INFO_ADMIN_COOP_LIMIT.isEmpty(locale)) {
+        if (plugin.getSettings().isCoopMembers() && !Message.ISLAND_INFO_ADMIN_COOP_LIMIT.isEmpty(locale)) {
             infoMessage.append(Message.ISLAND_INFO_ADMIN_COOP_LIMIT.getMessage(locale, island.getCoopLimit()));
             if (island.getCoopLimitRaw() != island.getCoopLimit())
                 infoMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));

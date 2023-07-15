@@ -18,8 +18,10 @@ public class PlayerCommandsMap extends CommandsMap {
         registerCommand(new CmdBorder(), false);
         registerCommand(new CmdChest(), false);
         registerCommand(new CmdClose(), false);
-        registerCommand(new CmdCoop(), false);
-        registerCommand(new CmdCoops(), false);
+        if (plugin.getSettings().isCoopMembers()) {
+            registerCommand(new CmdCoop(), false);
+            registerCommand(new CmdCoops(), false);
+        }
         registerCommand(new CmdCounts(), false);
         registerCommand(new CmdCreate(), false);
         registerCommand(new CmdDelWarp(), false);
@@ -55,7 +57,8 @@ public class PlayerCommandsMap extends CommandsMap {
         registerCommand(new CmdToggle(), false);
         registerCommand(new CmdTop(), false);
         registerCommand(new CmdTransfer(), false);
-        registerCommand(new CmdUncoop(), false);
+        if (plugin.getSettings().isCoopMembers())
+            registerCommand(new CmdUncoop(), false);
         registerCommand(new CmdValue(), false);
         registerCommand(new CmdValues(), false);
         registerCommand(new CmdVisit(), false);

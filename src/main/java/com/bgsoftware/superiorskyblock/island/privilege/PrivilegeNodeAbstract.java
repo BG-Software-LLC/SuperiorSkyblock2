@@ -2,10 +2,12 @@ package com.bgsoftware.superiorskyblock.island.privilege;
 
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 @SuppressWarnings("WeakerAccess")
@@ -21,24 +23,25 @@ public abstract class PrivilegeNodeAbstract implements PermissionNode {
         this.privileges = new EnumerateMap<>(privileges);
     }
 
-    protected void setPermissions(String permissions, boolean checkDefaults) {
-        if (!permissions.isEmpty()) {
-            String[] permission = permissions.split(";");
-            for (String perm : permission) {
-                String[] permissionSections = perm.split(":");
-                try {
-                    IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permissionSections[0]);
-                    if (permissionSections.length == 2) {
-                        privileges.put(islandPrivilege, PrivilegeStatus.of(permissionSections[1]));
-                    } else {
-                        if (!checkDefaults || !isDefault(islandPrivilege))
-                            privileges.put(islandPrivilege, PrivilegeStatus.ENABLED);
-                    }
-                } catch (NullPointerException ignored) {
-                    // Ignored - invalid privilege.
-                } catch (Exception error) {
-                    Log.error(error, "An unexpected error while loading permissions for '", perm, "':");
+    protected void setPermissions(@Nullable String permissions, boolean checkDefaults) {
+        if (Text.isBlank(permissions))
+            return;
+
+        String[] permission = permissions.split(";");
+        for (String perm : permission) {
+            String[] permissionSections = perm.split(":");
+            try {
+                IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permissionSections[0]);
+                if (permissionSections.length == 2) {
+                    privileges.put(islandPrivilege, PrivilegeStatus.of(permissionSections[1]));
+                } else {
+                    if (!checkDefaults || !isDefault(islandPrivilege))
+                        privileges.put(islandPrivilege, PrivilegeStatus.ENABLED);
                 }
+            } catch (NullPointerException ignored) {
+                // Ignored - invalid privilege.
+            } catch (Exception error) {
+                Log.error(error, "An unexpected error while loading permissions for '", perm, "':");
             }
         }
     }

@@ -20,7 +20,7 @@ public abstract class CommandsMap {
     private final Map<String, SuperiorCommand> subCommands = new LinkedHashMap<>();
     private final Map<String, SuperiorCommand> aliasesToCommand = new HashMap<>();
 
-    private final SuperiorSkyblockPlugin plugin;
+    protected final SuperiorSkyblockPlugin plugin;
 
     protected CommandsMap(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;

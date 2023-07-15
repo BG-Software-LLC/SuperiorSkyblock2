@@ -1,32 +1,44 @@
 package com.bgsoftware.superiorskyblock.island.privilege;
 
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
-import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.google.common.base.Preconditions;
 
+import javax.annotation.Nullable;
+import java.util.LinkedList;
+import java.util.List;
+
 public class RolePrivilegeNode extends PrivilegeNodeAbstract {
 
+    @Nullable
     private final SPlayerRole playerRole;
-    private final RolePrivilegeNode previousNode;
+    private final List<RolePrivilegeNode> linkedNodes = new LinkedList<>();
 
-    public RolePrivilegeNode(PlayerRole playerRole, PrivilegeNodeAbstract previousNode) {
-        this(playerRole, previousNode, "");
+    public RolePrivilegeNode(@Nullable SPlayerRole playerRole, @Nullable RolePrivilegeNode linkedNode) {
+        this(playerRole, linkedNode, null);
     }
 
-    public RolePrivilegeNode(PlayerRole playerRole, PrivilegeNodeAbstract previousNode, String permissions) {
-        this.playerRole = (SPlayerRole) playerRole;
-        this.previousNode = (RolePrivilegeNode) previousNode;
-        BukkitExecutor.sync(() -> setPermissions(permissions, playerRole != null), 1L);
+    public RolePrivilegeNode(@Nullable SPlayerRole playerRole, @Nullable RolePrivilegeNode linkedNode, @Nullable String permissions) {
+        this.playerRole = playerRole;
+        if (linkedNode != null)
+            this.linkedNodes.add(linkedNode);
+        if (!Text.isBlank(permissions))
+            BukkitExecutor.sync(() -> setPermissions(permissions, playerRole != null), 1L);
     }
 
     private RolePrivilegeNode(EnumerateMap<IslandPrivilege, PrivilegeStatus> privileges,
-                              SPlayerRole playerRole, RolePrivilegeNode previousNode) {
+                              @Nullable SPlayerRole playerRole, List<RolePrivilegeNode> linkedNodes) {
         super(privileges);
         this.playerRole = playerRole;
-        this.previousNode = previousNode != null ? (RolePrivilegeNode) previousNode.clone() : null;
+        for (RolePrivilegeNode linkedNode : linkedNodes)
+            this.linkedNodes.add(linkedNode.clone());
+    }
+
+    public void linkNode(RolePrivilegeNode otherNode) {
+        this.linkedNodes.add(otherNode);
     }
 
     @Override
@@ -39,10 +51,12 @@ public class RolePrivilegeNode extends PrivilegeNodeAbstract {
             return status == PrivilegeStatus.ENABLED;
         }
 
-        status = previousNode == null ? PrivilegeStatus.DEFAULT : previousNode.getStatus(islandPrivilege);
+        for (RolePrivilegeNode linkedNode : this.linkedNodes) {
+            status = linkedNode.getStatus(islandPrivilege);
 
-        if (status != PrivilegeStatus.DEFAULT) {
-            return status == PrivilegeStatus.ENABLED;
+            if (status != PrivilegeStatus.DEFAULT) {
+                return status == PrivilegeStatus.ENABLED;
+            }
         }
 
         return playerRole != null && playerRole.getDefaultPermissions().hasPermission(islandPrivilege);
@@ -55,8 +69,8 @@ public class RolePrivilegeNode extends PrivilegeNodeAbstract {
     }
 
     @Override
-    public PrivilegeNodeAbstract clone() {
-        return new RolePrivilegeNode(privileges, playerRole, previousNode);
+    public RolePrivilegeNode clone() {
+        return new RolePrivilegeNode(privileges, playerRole, linkedNodes);
     }
 
     @Override
@@ -65,8 +79,10 @@ public class RolePrivilegeNode extends PrivilegeNodeAbstract {
             return playerRole.getDefaultPermissions().isDefault(islandPrivilege);
         }
 
-        if (previousNode != null && previousNode.isDefault(islandPrivilege))
-            return true;
+        for (RolePrivilegeNode linkedNode : this.linkedNodes) {
+            if (linkedNode.isDefault(islandPrivilege))
+                return true;
+        }
 
         return privileges.containsKey(islandPrivilege);
     }
@@ -82,8 +98,8 @@ public class RolePrivilegeNode extends PrivilegeNodeAbstract {
             super.setPermission(permission, value);
         }
 
-        if (previousNode != null)
-            previousNode.setPermission(permission, false, false);
+        for (RolePrivilegeNode linkedNode : this.linkedNodes)
+            linkedNode.setPermission(permission, false, false);
     }
 
     @Override

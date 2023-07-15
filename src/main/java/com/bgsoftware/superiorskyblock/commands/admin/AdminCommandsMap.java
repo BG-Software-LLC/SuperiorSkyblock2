@@ -14,7 +14,8 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminAdd(), false);
         registerCommand(new CmdAdminAddBlockLimit(), false);
         registerCommand(new CmdAdminAddBonus(), false);
-        registerCommand(new CmdAdminAddCoopLimit(), false);
+        if (plugin.getSettings().isCoopMembers())
+            registerCommand(new CmdAdminAddCoopLimit(), false);
         registerCommand(new CmdAdminAddDisbands(), false);
         registerCommand(new CmdAdminAddEntityLimit(), false);
         registerCommand(new CmdAdminAddSize(), false);
@@ -53,7 +54,8 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminSetBlockLimit(), false);
         registerCommand(new CmdAdminSetBonus(), false);
         registerCommand(new CmdAdminSetChestRow(), false);
-        registerCommand(new CmdAdminSetCoopLimit(), false);
+        if (plugin.getSettings().isCoopMembers())
+            registerCommand(new CmdAdminSetCoopLimit(), false);
         registerCommand(new CmdAdminSetDisbands(), false);
         registerCommand(new CmdAdminSetEntityLimit(), false);
         registerCommand(new CmdAdminSetLeader(), false);

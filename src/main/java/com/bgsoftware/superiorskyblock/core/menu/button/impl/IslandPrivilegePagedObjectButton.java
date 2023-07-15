@@ -86,11 +86,21 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
         if (clickEvent.getClick().isLeftClick()) {
             newRole = SPlayerRole.of(currentRole.getWeight() - 1);
 
+            if (!plugin.getSettings().isCoopMembers() && newRole == SPlayerRole.coopRole()) {
+                assert newRole != null;
+                newRole = SPlayerRole.of(newRole.getWeight() - 1);
+            }
+
             if (newRole == null)
                 newRole = clickedPlayer.getPlayerRole();
         } else {
             if (clickedPlayer.getPlayerRole().isHigherThan(currentRole)) {
                 newRole = SPlayerRole.of(currentRole.getWeight() + 1);
+            }
+
+            if (!plugin.getSettings().isCoopMembers() && newRole == SPlayerRole.coopRole()) {
+                assert newRole != null;
+                newRole = SPlayerRole.of(newRole.getWeight() + 1);
             }
 
             if (newRole == null)
@@ -172,6 +182,9 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
             PlayerRole currentRole;
 
             for (int i = -2; (currentRole = SPlayerRole.of(i)) != null; i++) {
+                if (!plugin.getSettings().isCoopMembers() && currentRole == SPlayerRole.coopRole())
+                    continue;
+
                 if (i < roleWeight) {
                     roleString.add(Menus.MENU_ISLAND_PRIVILEGES.getNoRolePermission().replace("{}", currentRole + ""));
                 } else if (i == roleWeight) {

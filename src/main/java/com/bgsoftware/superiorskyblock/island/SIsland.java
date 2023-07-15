@@ -1334,7 +1334,12 @@ public class SIsland implements Island {
             return playerRole;
 
         return plugin.getRoles().getRoles().stream()
-                .filter(_playerRole -> ((SPlayerRole) _playerRole).getDefaultPermissions().hasPermission(islandPrivilege))
+                .filter(_playerRole -> {
+                    if (!plugin.getSettings().isCoopMembers() && _playerRole == SPlayerRole.coopRole())
+                        return false;
+
+                    return ((SPlayerRole) _playerRole).getDefaultPermissions().hasPermission(islandPrivilege);
+                })
                 .min(Comparator.comparingInt(PlayerRole::getWeight)).orElse(SPlayerRole.lastRole());
     }
 
