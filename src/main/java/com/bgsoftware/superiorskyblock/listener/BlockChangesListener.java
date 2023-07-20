@@ -49,6 +49,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.material.Directional;
 import org.bukkit.material.Dispenser;
 import org.bukkit.material.MaterialData;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -353,6 +354,7 @@ public class BlockChangesListener implements Listener {
         if (e.getVehicle() instanceof Minecart) {
             Key blockKey = plugin.getNMSAlgorithms().getMinecartBlock((Minecart) e.getVehicle());
             onBlockBreak(blockKey, e.getVehicle().getLocation(), 1, Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
+            e.getVehicle().setMetadata("SSB-VehicleDestory", new FixedMetadataValue(plugin, true));
         }
     }
 

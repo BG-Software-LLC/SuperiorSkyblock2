@@ -2,11 +2,15 @@ package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -19,9 +23,11 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 public class EntityTrackingListener implements Listener {
 
     private final SuperiorSkyblockPlugin plugin;
+    private final Singleton<BlockChangesListener> blockChangesListener;
 
     public EntityTrackingListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+        this.blockChangesListener = plugin.getListener(BlockChangesListener.class);
         this.registerDeathListener();
     }
 
@@ -68,6 +74,19 @@ public class EntityTrackingListener implements Listener {
             return;
 
         island.getEntitiesTracker().untrackEntity(KeyImpl.of(entity), 1);
+
+        if (!(entity instanceof Vehicle))
+            return;
+
+        if (entity.hasMetadata("SSB-VehicleDestory")) {
+            entity.removeMetadata("SSB-VehicleDestory", plugin);
+            return;
+        }
+
+        // Vehicle was not registered by VehicleDestroyEvent; We want to register its block break
+        Key blockKey = plugin.getNMSAlgorithms().getMinecartBlock((Minecart) entity);
+        this.blockChangesListener.get().onBlockBreak(blockKey, entity.getLocation(), 1,
+                BlockChangesListener.Flag.DIRTY_CHUNK, BlockChangesListener.Flag.SAVE_BLOCK_COUNT);
     }
 
     /* INTERNAL */
