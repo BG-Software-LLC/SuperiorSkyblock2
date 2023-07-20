@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class ChunkPosition {
@@ -16,6 +17,8 @@ public class ChunkPosition {
     private final int z;
 
     private long pairedXZ = -1;
+    @Nullable
+    private World cachedBukkitWorld;
 
     private ChunkPosition(WorldInfo worldInfo, int x, int z) {
         this.worldInfo = worldInfo;
@@ -24,19 +27,22 @@ public class ChunkPosition {
     }
 
     public static ChunkPosition of(Block block) {
-        return of(WorldInfo.of(block.getWorld()), block.getX() >> 4, block.getZ() >> 4);
+        World world = block.getWorld();
+        return of(WorldInfo.of(world), block.getX() >> 4, block.getZ() >> 4).withBukkitWorld(world);
     }
 
     public static ChunkPosition of(Location location) {
-        return of(WorldInfo.of(location.getWorld()), location.getBlockX() >> 4, location.getBlockZ() >> 4);
+        World world = location.getWorld();
+        return of(WorldInfo.of(world), location.getBlockX() >> 4, location.getBlockZ() >> 4).withBukkitWorld(world);
     }
 
     public static ChunkPosition of(Chunk chunk) {
-        return of(WorldInfo.of(chunk.getWorld()), chunk.getX(), chunk.getZ());
+        World world = chunk.getWorld();
+        return of(WorldInfo.of(world), chunk.getX(), chunk.getZ()).withBukkitWorld(world);
     }
 
     public static ChunkPosition of(World world, int x, int z) {
-        return of(WorldInfo.of(world), x, z);
+        return of(WorldInfo.of(world), x, z).withBukkitWorld(world);
     }
 
     public static ChunkPosition of(WorldInfo worldInfo, int x, int z) {
@@ -44,7 +50,7 @@ public class ChunkPosition {
     }
 
     public World getWorld() {
-        return Bukkit.getWorld(getWorldName());
+        return this.cachedBukkitWorld == null ? (this.cachedBukkitWorld = Bukkit.getWorld(getWorldName())) : this.cachedBukkitWorld;
     }
 
     public WorldInfo getWorldsInfo() {
@@ -93,6 +99,11 @@ public class ChunkPosition {
     @Override
     public String toString() {
         return worldInfo.getName() + ", " + x + ", " + z;
+    }
+
+    private ChunkPosition withBukkitWorld(World world) {
+        this.cachedBukkitWorld = world;
+        return this;
     }
 
 }
