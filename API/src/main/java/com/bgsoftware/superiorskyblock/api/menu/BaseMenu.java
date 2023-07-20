@@ -85,7 +85,9 @@ public abstract class BaseMenu<V extends MenuView<V, A>, A extends ViewArgs> imp
 
     @Override
     public void refreshViews() {
-        openedMenuViews.forEach(V::refreshView);
+        synchronized (openedMenuViews) {
+            openedMenuViews.forEach(V::refreshView);
+        }
     }
 
     @Override
@@ -95,7 +97,9 @@ public abstract class BaseMenu<V extends MenuView<V, A>, A extends ViewArgs> imp
 
     @Override
     public void closeViews() {
-        openedMenuViews.forEach(V::closeView);
+        synchronized (openedMenuViews) {
+            openedMenuViews.forEach(V::closeView);
+        }
     }
 
     @Override
@@ -104,18 +108,24 @@ public abstract class BaseMenu<V extends MenuView<V, A>, A extends ViewArgs> imp
     }
 
     public void addView(V view) {
-        openedMenuViews.add(view);
+        synchronized (openedMenuViews) {
+            openedMenuViews.add(view);
+        }
     }
 
     public void removeView(V view) {
-        openedMenuViews.remove(view);
+        synchronized (openedMenuViews) {
+            openedMenuViews.remove(view);
+        }
     }
 
     protected final void filterViews(Predicate<V> viewFilter, Consumer<V> onMatch) {
-        openedMenuViews.forEach(view -> {
-            if (viewFilter.test(view))
-                onMatch.accept(view);
-        });
+        synchronized (openedMenuViews) {
+            openedMenuViews.forEach(view -> {
+                if (viewFilter.test(view))
+                    onMatch.accept(view);
+            });
+        }
     }
 
     @Override
