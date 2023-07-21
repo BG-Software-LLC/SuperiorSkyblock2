@@ -75,7 +75,7 @@ public class EntityTrackingListener implements Listener {
 
         island.getEntitiesTracker().untrackEntity(KeyImpl.of(entity), 1);
 
-        if (!(entity instanceof Vehicle))
+        if (!(entity instanceof Minecart))
             return;
 
         if (entity.hasMetadata("SSB-VehicleDestory")) {
