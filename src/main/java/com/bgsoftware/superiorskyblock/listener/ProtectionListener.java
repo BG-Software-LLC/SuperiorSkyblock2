@@ -206,6 +206,8 @@ public class ProtectionListener implements Listener {
         } else if (TURTLE_EGG != null && blockType == TURTLE_EGG) {
             islandPrivilege = e.getAction() == Action.PHYSICAL ? IslandPrivileges.TURTLE_EGG_TRAMPING : IslandPrivileges.BUILD;
         } else if (SWEET_BERRY_BUSH != null && blockType == SWEET_BERRY_BUSH && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if (Materials.BONE_MEAL.toBukkitItem().isSimilar(e.getItem()))
+                return; // Fertilize is checked elsewhere
             islandPrivilege = IslandPrivileges.FARM_TRAMPING;
         } else if (stackedBlockAmount > 1) {
             islandPrivilege = IslandPrivileges.BREAK;
