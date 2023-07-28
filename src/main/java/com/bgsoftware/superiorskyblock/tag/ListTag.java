@@ -119,6 +119,10 @@ public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
         return value.iterator();
     }
 
+    public int size() {
+        return this.value.size();
+    }
+
     @Override
     public String toString() {
         StringBuilder bldr = new StringBuilder();

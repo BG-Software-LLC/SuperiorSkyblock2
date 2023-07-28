@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.core.serialization.impl;
 
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.core.serialization.ISerializer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.tag.ListTag;
+import com.bgsoftware.superiorskyblock.tag.Tag;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +17,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class InventorySerializer implements ISerializer<ItemStack[], String> {
 
@@ -41,12 +45,37 @@ public class InventorySerializer implements ISerializer<ItemStack[], String> {
         DataOutputStream dataOutput = new DataOutputStream(outputStream);
 
         CompoundTag compoundTag = new CompoundTag();
-        compoundTag.setInt("Length", serializable.length);
 
-        for (int i = 0; i < serializable.length; i++) {
-            if (serializable[i] != null && serializable[i].getType() != Material.AIR)
-                compoundTag.setTag(i + "", Serializers.ITEM_STACK_TO_TAG_SERIALIZER.serialize(serializable[i]));
+        List<ItemStack> serializedItems = new ArrayList<>(serializable.length);
+        byte[] slots = new byte[serializable.length * 2];
+
+        for (int i = 0; i < serializable.length; ++i) {
+            ItemStack itemStack = serializable[i];
+            int itemIndex = i * 2;
+
+            if (itemStack == null || itemStack.getType() == Material.AIR) {
+                slots[itemIndex] = -1;
+                slots[itemIndex + 1] = 0;
+            } else {
+                ItemStack serializedItem = getSerializedItem(itemStack);
+                int similarItemIndex = serializedItems.indexOf(serializedItem);
+                if (similarItemIndex == -1) {
+                    slots[itemIndex] = (byte) serializedItems.size();
+                    serializedItems.add(serializedItem);
+                } else {
+                    slots[itemIndex] = (byte) similarItemIndex;
+                }
+
+                slots[itemIndex + 1] = (byte) itemStack.getAmount();
+            }
         }
+
+        ListTag items = new ListTag(CompoundTag.class, Collections.emptyList());
+        for (ItemStack itemStack : serializedItems)
+            items.addTag(Serializers.ITEM_STACK_TO_TAG_SERIALIZER.serialize(itemStack));
+
+        compoundTag.setTag("Items", items);
+        compoundTag.setByteArray("Slots", slots);
 
         try {
             compoundTag.write(dataOutput);
@@ -56,7 +85,7 @@ public class InventorySerializer implements ISerializer<ItemStack[], String> {
             return "";
         }
 
-        return new BigInteger(1, outputStream.toByteArray()).toString(32);
+        return outputStream.toString();
     }
 
     @Override
@@ -64,25 +93,73 @@ public class InventorySerializer implements ISerializer<ItemStack[], String> {
         if (Text.isBlank(deserializable))
             return EMPTY_CONTENTS;
 
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(new BigInteger(deserializable, 32).toByteArray());
+        return deserialize(deserializable.getBytes(), true);
+    }
+
+    private static ItemStack[] deserialize(byte[] deserializable, boolean tryAgain) {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(deserializable);
         CompoundTag compoundTag;
 
         try {
             compoundTag = (CompoundTag) Tag.fromStream(new DataInputStream(inputStream), 0);
         } catch (Exception error) {
-            Log.entering("ENTER", deserializable);
+            if (tryAgain)
+                return deserialize(new BigInteger(new String(deserializable), 32).toByteArray(), false);
+
+            Log.entering("ENTER", new String(deserializable));
             Log.error(error, "An unexpected error occurred while deserializing inventory:");
             return EMPTY_CONTENTS;
         }
 
-        ItemStack[] contents = new ItemStack[compoundTag.getInt("Length")];
+        ItemStack[] contents;
 
-        for (int i = 0; i < contents.length; i++) {
-            CompoundTag itemCompound = compoundTag.getCompound(i + "");
-            if (itemCompound != null)
-                contents[i] = Serializers.ITEM_STACK_TO_TAG_SERIALIZER.deserialize(itemCompound);
+        if (compoundTag.containsKey("Length")) {
+            contents = new ItemStack[compoundTag.getInt("Length")];
+
+            for (int i = 0; i < contents.length; i++) {
+                CompoundTag itemCompound = compoundTag.getCompound(i + "");
+                if (itemCompound != null)
+                    contents[i] = Serializers.ITEM_STACK_TO_TAG_SERIALIZER.deserialize(itemCompound);
+            }
+        } else {
+            byte[] slots = compoundTag.getByteArray("Slots");
+            ListTag items = compoundTag.getList("Items");
+            ItemStack[] serializedItems = new ItemStack[items.size()];
+
+            contents = new ItemStack[slots.length / 2];
+
+            for (int i = 0; i < slots.length; i += 2) {
+                int itemIndex = slots[i];
+
+                if (itemIndex == -1 || itemIndex >= serializedItems.length)
+                    continue;
+
+                int itemAmount = slots[i + 1];
+
+                if (serializedItems[itemIndex] == null) {
+                    Tag<?> itemTag = items.getValue().get(itemIndex);
+                    if (itemTag instanceof CompoundTag) {
+                        serializedItems[itemIndex] = Serializers.ITEM_STACK_TO_TAG_SERIALIZER.deserialize((CompoundTag) itemTag);
+                    } else {
+                        serializedItems[itemIndex] = new ItemStack(Material.AIR);
+                    }
+                }
+
+                ItemStack contentItem = serializedItems[itemIndex].clone();
+                contentItem.setAmount(itemAmount);
+
+                contents[i / 2] = contentItem;
+            }
+
         }
 
         return contents;
     }
+
+    private static ItemStack getSerializedItem(ItemStack itemStack) {
+        ItemStack serializedItem = itemStack.clone();
+        serializedItem.setAmount(1);
+        return serializedItem;
+    }
+
 }
