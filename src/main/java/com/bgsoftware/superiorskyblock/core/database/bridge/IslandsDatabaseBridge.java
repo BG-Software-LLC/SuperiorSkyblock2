@@ -582,7 +582,7 @@ public class IslandsDatabaseBridge {
 
     public static void removePersistentDataContainer(Island island) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge ->
-                databaseBridge.deleteObject("players_custom_data", createFilter("island", island)));
+                databaseBridge.deleteObject("island_custom_data", createFilter("island", island)));
     }
 
     public static void insertIsland(Island island, List<ChunkPosition> dirtyChunks) {
