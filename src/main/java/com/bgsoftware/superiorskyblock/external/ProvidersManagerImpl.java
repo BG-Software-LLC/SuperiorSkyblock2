@@ -388,13 +388,13 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             registerHook("JetsMinionsHook");
 
         if (canRegisterHook("SkinsRestorer")) {
-            try {
-                // Detection of old version
-                Class.forName("skinsrestorer.shared.storage.SkinStorage");
-                registerHook("SkinsRestorerHook");
-            } catch (ClassNotFoundException error) {
-                // New version was detected
+            String version = Bukkit.getPluginManager().getPlugin("SkinsRestorer").getDescription().getVersion();
+            if (version.startsWith("14")) {
                 registerHook("SkinsRestorer14Hook");
+            } else if (version.startsWith("15")) {
+                registerHook("SkinsRestorer15Hook");
+            } else {
+                registerHook("SkinsRestorerHook");
             }
         }
 
