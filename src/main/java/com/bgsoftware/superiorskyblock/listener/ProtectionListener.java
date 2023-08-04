@@ -95,6 +95,7 @@ public class ProtectionListener implements Listener {
     private static final EntityType AXOLOTL_TYPE = getSafeEntityType("AXOLOTL");
     @Nullable
     private static final Material CHORUS_FLOWER = Materials.getMaterialSafe("CHORUS_FLOWER");
+    private static final int MAX_PICKUP_DISTANCE = 1;
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -264,7 +265,7 @@ public class ProtectionListener implements Listener {
 
         EnumSet<Flag> flagsSet = flags.length == 0 ? EnumSet.noneOf(Flag.class) : EnumSet.copyOf(Arrays.asList(flags));
 
-        if (preventInteraction(island, blockLocation, superiorPlayer, IslandPrivileges.BUILD, flagsSet))
+        if (preventInteraction(island, blockLocation, superiorPlayer, IslandPrivileges.BUILD, 0, flagsSet))
             return true;
 
         if (island != null && island.isBeingRecalculated()) {
@@ -288,12 +289,12 @@ public class ProtectionListener implements Listener {
 
         Location blockLocation = block.getLocation();
 
-        if (preventInteraction(island, blockLocation, superiorPlayer, islandPrivilege, flagsSet))
+        if (preventInteraction(island, blockLocation, superiorPlayer, islandPrivilege, 0, flagsSet))
             return true;
 
         if (plugin.getSettings().getValuableBlocks().contains(KeyImpl.of(block))) {
             flagsSet.remove(Flag.PREVENT_OUTSIDE_ISLANDS);
-            return preventInteraction(island, blockLocation, superiorPlayer, IslandPrivileges.VALUABLE_BREAK, flagsSet);
+            return preventInteraction(island, blockLocation, superiorPlayer, IslandPrivileges.VALUABLE_BREAK, 0, flagsSet);
         }
 
         if (island != null && island.isBeingRecalculated()) {
@@ -440,7 +441,7 @@ public class ProtectionListener implements Listener {
 
         Location entityLocation = rightClicked.getLocation();
 
-        if (preventInteraction(island, entityLocation, superiorPlayer, flagsSet))
+        if (preventInteraction(island, entityLocation, superiorPlayer, 0, flagsSet))
             return true;
 
         ItemStack usedItem = player.getItemInHand();
@@ -478,7 +479,7 @@ public class ProtectionListener implements Listener {
         }
 
         flagsSet.remove(Flag.PREVENT_OUTSIDE_ISLANDS); // Disable check for prevent outside island being called twice
-        if (preventInteraction(island, entityLocation, superiorPlayer, islandPrivilege, flagsSet)) {
+        if (preventInteraction(island, entityLocation, superiorPlayer, islandPrivilege, 0, flagsSet)) {
             if (closeInventory) {
                 BukkitExecutor.sync(() -> {
                     if (player.isOnline()) {
@@ -574,7 +575,8 @@ public class ProtectionListener implements Listener {
         Location blockLocation = new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
         Island island = plugin.getGrid().getIslandAt(location);
-        return preventInteraction(island, blockLocation, superiorPlayer, IslandPrivileges.PICKUP_DROPS, flags);
+        return preventInteraction(island, blockLocation, superiorPlayer, IslandPrivileges.PICKUP_DROPS,
+                MAX_PICKUP_DISTANCE, flags);
     }
 
     /* PROJECTILE INTERACTS */
@@ -671,14 +673,19 @@ public class ProtectionListener implements Listener {
 
     private boolean preventInteraction(@Nullable Island island, Location location, SuperiorPlayer superiorPlayer,
                                        IslandPrivilege islandPrivilege, Flag... flags) {
-        return preventInteraction(island, location, superiorPlayer, islandPrivilege,
+        return preventInteraction(island, location, superiorPlayer, islandPrivilege, 0, flags);
+    }
+
+    private boolean preventInteraction(@Nullable Island island, Location location, SuperiorPlayer superiorPlayer,
+                                       IslandPrivilege islandPrivilege, int extraRadius, Flag... flags) {
+        return preventInteraction(island, location, superiorPlayer, islandPrivilege, extraRadius,
                 flags.length == 0 ? EnumSet.noneOf(Flag.class) : EnumSet.copyOf(Arrays.asList(flags)));
     }
 
     private boolean preventInteraction(@Nullable Island island, Location location, SuperiorPlayer superiorPlayer,
-                                       IslandPrivilege islandPrivilege, EnumSet<Flag> flagsSet) {
+                                       IslandPrivilege islandPrivilege, int extraRadius, EnumSet<Flag> flagsSet) {
         if (flagsSet.contains(Flag.PREVENT_OUTSIDE_ISLANDS) &&
-                preventInteraction(island, location, superiorPlayer, flagsSet))
+                preventInteraction(island, location, superiorPlayer, extraRadius, flagsSet))
             return true;
 
         boolean sendMessages = flagsSet.contains(Flag.SEND_MESSAGES);
@@ -693,12 +700,17 @@ public class ProtectionListener implements Listener {
     }
 
     private boolean preventInteraction(@Nullable Island island, Location location, SuperiorPlayer superiorPlayer, Flag... flags) {
-        return preventInteraction(island, location, superiorPlayer,
+        return preventInteraction(island, location, superiorPlayer, 0, flags);
+    }
+
+    private boolean preventInteraction(@Nullable Island island, Location location, SuperiorPlayer superiorPlayer,
+                                       int extraRadius, Flag... flags) {
+        return preventInteraction(island, location, superiorPlayer, extraRadius,
                 flags.length == 0 ? EnumSet.noneOf(Flag.class) : EnumSet.copyOf(Arrays.asList(flags)));
     }
 
     private boolean preventInteraction(@Nullable Island island, Location location, SuperiorPlayer superiorPlayer,
-                                       EnumSet<Flag> flagsSet) {
+                                       int extraRadius, EnumSet<Flag> flagsSet) {
         if (superiorPlayer.hasBypassModeEnabled())
             return false;
 
