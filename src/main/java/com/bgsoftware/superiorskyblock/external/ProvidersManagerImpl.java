@@ -452,7 +452,11 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             }
         } else if (canRegisterHook("UltimateStacker") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("UltimateStacker"))) {
-            spawnersProvider = createInstance("spawners.SpawnersProvider_UltimateStacker");
+            if (Bukkit.getPluginManager().getPlugin("UltimateStacker").getDescription().getVersion().startsWith("3")) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_UltimateStacker");
+            } else {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_UltimateStacker3");
+            }
             listenToSpawnerChanges = false;
         } else if (canRegisterHook("RoseStacker") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("RoseStacker"))) {

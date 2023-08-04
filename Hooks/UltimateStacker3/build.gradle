@@ -1,0 +1,13 @@
+group 'Hooks:UltimateStacker3'
+
+dependencies {
+    compileOnly 'com.craftaro:UltimateStacker:3.0.0'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_ultimatestacker') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_ultimatestacker").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}
