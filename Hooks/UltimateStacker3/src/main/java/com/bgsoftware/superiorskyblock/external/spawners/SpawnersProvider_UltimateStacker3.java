@@ -1,16 +1,13 @@
 package com.bgsoftware.superiorskyblock.external.spawners;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.craftaro.ultimatestacker.api.UltimateStackerApi;
 import com.craftaro.ultimatestacker.api.events.spawner.SpawnerBreakEvent;
 import com.craftaro.ultimatestacker.api.events.spawner.SpawnerPlaceEvent;
@@ -20,9 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 
-@SuppressWarnings("unused")
 public class SpawnersProvider_UltimateStacker3 implements SpawnersProviderItemMetaSpawnerType {
 
     private static boolean registered = false;
