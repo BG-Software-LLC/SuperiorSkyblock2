@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
-import com.bgsoftware.superiorskyblock.service.bossbar.EmptyBossBar;
-import com.bgsoftware.superiorskyblock.player.PlayerLocales;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
+import com.bgsoftware.superiorskyblock.service.bossbar.EmptyBossBar;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.minecraft.server.v1_8_R3.Entity;
@@ -112,9 +112,9 @@ public class NMSPlayersImpl implements NMSPlayers {
     }
 
     @Override
-    public boolean wasThrownByPlayer(org.bukkit.entity.Item item, Player player) {
+    public boolean wasThrownByPlayer(org.bukkit.entity.Item item, SuperiorPlayer superiorPlayer) {
         Entity entity = ((CraftItem) item).getHandle();
-        return entity instanceof EntityItem && player.getName().equals(((EntityItem) entity).n());
+        return entity instanceof EntityItem && superiorPlayer.getName().equals(((EntityItem) entity).n());
     }
 
     @Nullable

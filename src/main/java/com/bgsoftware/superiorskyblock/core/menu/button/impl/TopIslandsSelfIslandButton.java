@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersServ
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
@@ -29,6 +30,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIslands.View> {
+
+    private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
+        @Override
+        protected PlaceholdersService create() {
+            return plugin.getServices().getService(PlaceholdersService.class);
+        }
+    };
 
     private TopIslandsSelfIslandButton(MenuTemplateButton<MenuTopIslands.View> templateButton, MenuTopIslands.View menuView) {
         super(templateButton, menuView);
@@ -128,8 +136,6 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
                     if (members.size() == 0) {
                         lore.add(memberFormat.replace("{}", "None"));
                     } else {
-                        PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
-
                         if (plugin.getSettings().getTopIslandMembersSorting() != TopIslandMembersSorting.NAMES)
                             members.sort(plugin.getSettings().getTopIslandMembersSorting().getComparator());
 
@@ -138,7 +144,7 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
                                     Message.ISLAND_TOP_STATUS_ONLINE.getMessage(inventoryViewer.getUserLocale()) :
                                     Message.ISLAND_TOP_STATUS_OFFLINE.getMessage(inventoryViewer.getUserLocale());
 
-                            lore.add(placeholdersService.parsePlaceholders(member.asOfflinePlayer(), memberFormat
+                            lore.add(placeholdersService.get().parsePlaceholders(member.asOfflinePlayer(), memberFormat
                                     .replace("{}", member.getName())
                                     .replace("{0}", member.getName())
                                     .replace("{1}", onlineMessage == null ? "" : onlineMessage)

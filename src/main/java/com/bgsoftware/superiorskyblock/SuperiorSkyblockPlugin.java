@@ -5,7 +5,6 @@ import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
@@ -73,11 +72,6 @@ import com.bgsoftware.superiorskyblock.player.PlayersManagerImpl;
 import com.bgsoftware.superiorskyblock.player.container.DefaultPlayersContainer;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
 import com.bgsoftware.superiorskyblock.service.ServicesHandler;
-import com.bgsoftware.superiorskyblock.service.bossbar.BossBarsServiceImpl;
-import com.bgsoftware.superiorskyblock.service.dragon.DragonBattleServiceImpl;
-import com.bgsoftware.superiorskyblock.service.hologram.HologramsServiceImpl;
-import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
-import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
@@ -150,14 +144,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
     private boolean shouldEnable = true;
 
-//    public static void log(String message) {
-//        message = Formatters.COLOR_FORMATTER.format(message);
-//        if (message.contains(ChatColor.COLOR_CHAR + ""))
-//            Bukkit.getConsoleSender().sendMessage(ChatColor.getLastColors(message.substring(0, 2)) + "[" + plugin.getDescription().getName() + "] " + message);
-//        else
-//            plugin.getLogger().info(message);
-//    }
-
     public static SuperiorSkyblockPlugin getPlugin() {
         return plugin;
     }
@@ -195,11 +181,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             Log.error("The TopIslandMembersSorting was already initialized. This can be caused by a reload or another plugin initializing it.");
         }
 
-        this.servicesHandler.registerPlaceholdersService(new PlaceholdersServiceImpl());
-        this.servicesHandler.registerHologramsService(new HologramsServiceImpl(this));
-        this.servicesHandler.registerEnderDragonService(new DragonBattleServiceImpl(this));
-        this.servicesHandler.registerBossBarsService(new BossBarsServiceImpl(this));
-        this.servicesHandler.registerMessagesService(new MessagesServiceImpl());
+        this.servicesHandler.loadDefaultServices(this);
     }
 
     @Override

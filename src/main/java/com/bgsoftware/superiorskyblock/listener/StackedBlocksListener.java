@@ -7,14 +7,17 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.service.protection.InteractionResult;
+import com.bgsoftware.superiorskyblock.api.service.protection.ProtectionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.StackedBlocksDepositMenu;
+import com.bgsoftware.superiorskyblock.service.protection.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.Bukkit;
@@ -69,11 +72,15 @@ public class StackedBlocksListener implements Listener {
 
 
     private final SuperiorSkyblockPlugin plugin;
-    private final Singleton<ProtectionListener> protectionListener;
+    private final LazyReference<ProtectionManagerService> protectionManager = new LazyReference<ProtectionManagerService>() {
+        @Override
+        protected ProtectionManagerService create() {
+            return plugin.getServices().getService(ProtectionManagerService.class);
+        }
+    };
 
     public StackedBlocksListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        this.protectionListener = plugin.getListener(ProtectionListener.class);
         this.registerPhysicsListener();
         this.registerSpongeListener();
     }
@@ -142,9 +149,12 @@ public class StackedBlocksListener implements Listener {
         if (plugin.getSettings().getStackedBlocks().getDepositMenu().isEnabled() && e.getPlayer().isSneaking()) {
             StackedBlocksDepositMenu depositMenu = new StackedBlocksDepositMenu(e.getClickedBlock().getLocation());
             e.getPlayer().openInventory(depositMenu.getInventory());
-        } else if (protectionListener.get().preventBlockBreak(e.getClickedBlock(), e.getPlayer(), ProtectionListener.Flag.SEND_MESSAGES) ||
-                tryUnstack(e.getPlayer(), e.getClickedBlock()).shouldCancelOriginalEvent()) {
-            e.setCancelled(true);
+        } else {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+            InteractionResult interactionResult = this.protectionManager.get().handleBlockBreak(superiorPlayer, e.getClickedBlock());
+            if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true) ||
+                    tryUnstack(e.getPlayer(), e.getClickedBlock()).shouldCancelOriginalEvent())
+                e.setCancelled(true);
         }
     }
 

@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import org.bukkit.Bukkit;
 
 import java.math.BigDecimal;
@@ -13,16 +14,20 @@ import java.util.List;
 public class PlaceholdersUpgradeCost extends UpgradeCostAbstract {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
+        @Override
+        protected PlaceholdersService create() {
+            return plugin.getServices().getService(PlaceholdersService.class);
+        }
+    };
 
     private final String placeholder;
     private final List<String> withdrawCommands;
-    private final PlaceholdersService placeholdersService;
 
     public PlaceholdersUpgradeCost(BigDecimal cost, String placeholder, List<String> withdrawCommands) {
         super(cost, "placeholders");
         this.placeholder = placeholder;
         this.withdrawCommands = Collections.unmodifiableList(withdrawCommands);
-        this.placeholdersService = plugin.getServices().getPlaceholdersService();
     }
 
     @Override
@@ -30,7 +35,7 @@ public class PlaceholdersUpgradeCost extends UpgradeCostAbstract {
         BigDecimal currentBalance = BigDecimal.ZERO;
 
         try {
-            currentBalance = new BigDecimal(placeholdersService.parsePlaceholders(superiorPlayer.asOfflinePlayer(), placeholder));
+            currentBalance = new BigDecimal(placeholdersService.get().parsePlaceholders(superiorPlayer.asOfflinePlayer(), placeholder));
         } catch (Exception ignored) {
         }
 

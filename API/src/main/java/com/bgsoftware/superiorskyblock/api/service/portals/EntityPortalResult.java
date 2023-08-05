@@ -1,0 +1,16 @@
+package com.bgsoftware.superiorskyblock.api.service.portals;
+
+public enum EntityPortalResult {
+
+    PLAYER_IMMUNED_TO_PORTAL,
+    PORTAL_NOT_IN_ISLAND,
+    DESTINATION_ISLAND_NOT_PERMITTED,
+    DESTINATION_NOT_ISLAND_WORLD,
+    DESTINATION_WORLD_DISABLED,
+    WORLD_NOT_UNLOCKED,
+    PENDING_TELEPORT,
+    PORTAL_EVENT_CANCELLED,
+    INVALID_SCHEMATIC,
+    SUCCEED
+
+}

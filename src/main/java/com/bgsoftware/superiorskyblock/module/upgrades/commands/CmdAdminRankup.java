@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -22,6 +23,14 @@ import java.util.Collections;
 import java.util.List;
 
 public class CmdAdminRankup implements IAdminIslandCommand {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
+        @Override
+        protected PlaceholdersService create() {
+            return plugin.getServices().getService(PlaceholdersService.class);
+        }
+    };
 
     @Override
     public List<String> getAliases() {
@@ -84,12 +93,11 @@ public class CmdAdminRankup implements IAdminIslandCommand {
                     playerSender, island, upgrade, currentLevel, nextLevel, IslandUpgradeEvent.Cause.PLAYER_RANKUP);
 
             if (!event.isCancelled()) {
-                PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
                 SuperiorPlayer owner = island.getOwner();
 
                 for (String command : event.getResult().getCommands()) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                            placeholdersService.parsePlaceholders(owner.asOfflinePlayer(), command
+                            placeholdersService.get().parsePlaceholders(owner.asOfflinePlayer(), command
                                     .replace("%player%", owner.getName())
                                     .replace("%leader%", owner.getName()))
                     );

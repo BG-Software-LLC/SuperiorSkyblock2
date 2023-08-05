@@ -21,8 +21,10 @@ import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IWorldsListener;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -79,6 +81,13 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private ChunksProvider chunksProvider = new ChunksProvider_Default();
     private MenusProvider menusProvider;
     private boolean listenToSpawnerChanges = true;
+
+    private final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
+        @Override
+        protected PlaceholdersService create() {
+            return plugin.getServices().getService(PlaceholdersService.class);
+        }
+    };
 
     private final List<ISkinsListener> skinsListeners = new LinkedList<>();
     private final List<IStackedBlocksListener> stackedBlocksListeners = new LinkedList<>();
@@ -567,7 +576,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             placeholdersProvider.ifPresent(placeholdersProviders::add);
         }
 
-        ((PlaceholdersServiceImpl) plugin.getServices().getPlaceholdersService()).register(placeholdersProviders);
+        ((PlaceholdersServiceImpl) this.placeholdersService.get()).register(placeholdersProviders);
     }
 
     private void registerChunksProvider() {

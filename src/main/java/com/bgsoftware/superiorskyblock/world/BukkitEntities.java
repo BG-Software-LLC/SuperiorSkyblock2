@@ -211,6 +211,18 @@ public class BukkitEntities {
                 return entityType == EntityType.ITEM_FRAME;
             }
         },
+        VEHICLE(IslandPrivileges.MINECART_DAMAGE, IslandPrivileges.MINECART_PLACE) {
+
+            private final EnumSet<EntityType> VEHICLE_TYPES = createEntityTypesSet(entityType -> {
+                Class<? extends Entity> entityClass = entityType.getEntityClass();
+                return entityClass != null && Vehicle.class.isAssignableFrom(entityClass);
+            });
+
+            @Override
+            boolean isFromCategory(EntityType entityType) {
+                return VEHICLE_TYPES.contains(entityType);
+            }
+        },
         UNKNOWN(IslandPrivileges.BREAK, IslandPrivileges.BUILD) {
             @Override
             boolean isFromCategory(EntityType entityType) {

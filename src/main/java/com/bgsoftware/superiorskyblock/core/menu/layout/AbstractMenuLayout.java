@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.DummyButton;
@@ -18,7 +19,6 @@ import org.bukkit.inventory.InventoryHolder;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 public abstract class AbstractMenuLayout<V extends MenuView<V, ?>> implements MenuLayout<V> {
 
@@ -35,6 +35,12 @@ public abstract class AbstractMenuLayout<V extends MenuView<V, ?>> implements Me
             .removeFinal();
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
+        @Override
+        protected PlaceholdersService create() {
+            return plugin.getServices().getService(PlaceholdersService.class);
+        }
+    };
 
     protected final String title;
     protected final InventoryType inventoryType;
@@ -63,9 +69,7 @@ public abstract class AbstractMenuLayout<V extends MenuView<V, ?>> implements Me
 
     @Override
     public final Inventory buildInventory(V menuView) {
-        PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
-
-        String title = placeholdersService.parsePlaceholders(menuView.getInventoryViewer().asOfflinePlayer(),
+        String title = placeholdersService.get().parsePlaceholders(menuView.getInventoryViewer().asOfflinePlayer(),
                 menuView instanceof AbstractMenuView ? ((AbstractMenuView<?, ?>) menuView).replaceTitle(this.title) : this.title);
 
         Inventory inventory = createInventory(menuView, title);

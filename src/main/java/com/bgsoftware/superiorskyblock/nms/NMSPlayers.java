@@ -24,7 +24,7 @@ public interface NMSPlayers {
 
     void sendTitle(Player player, String title, String subtitle, int fadeIn, int duration, int fadeOut);
 
-    boolean wasThrownByPlayer(Item item, Player player);
+    boolean wasThrownByPlayer(Item item, SuperiorPlayer superiorPlayer);
 
     @Nullable
     Locale getPlayerLocale(Player player);

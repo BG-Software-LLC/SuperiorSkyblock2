@@ -1,71 +1,55 @@
 package com.bgsoftware.superiorskyblock.service;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBarsService;
-import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
-import com.bgsoftware.superiorskyblock.api.service.hologram.HologramsService;
-import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
-import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
+import com.bgsoftware.superiorskyblock.service.bossbar.BossBarsServiceImpl;
+import com.bgsoftware.superiorskyblock.service.dragon.DragonBattleServiceImpl;
+import com.bgsoftware.superiorskyblock.service.hologram.HologramsServiceImpl;
+import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
+import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
+import com.bgsoftware.superiorskyblock.service.portals.PortalsManagerServiceImpl;
+import com.bgsoftware.superiorskyblock.service.protection.ProtectionManagerServiceImpl;
+import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
 
+import java.util.IdentityHashMap;
+import java.util.Map;
+
 public class ServicesHandler {
 
-    private final SuperiorSkyblockPlugin plugin;
+    private final Map<Class<?>, IService> services = new IdentityHashMap<>();
 
-    private PlaceholdersService placeholdersService;
-    private HologramsService hologramsService;
-    private DragonBattleService dragonBattleService;
-    private BossBarsService bossBarsService;
-    private MessagesService messagesService;
+    private final SuperiorSkyblockPlugin plugin;
 
     public ServicesHandler(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
     }
 
-    public void registerPlaceholdersService(PlaceholdersService placeholdersService) {
-        this.placeholdersService = placeholdersService;
-        Bukkit.getServicesManager().register(PlaceholdersService.class, placeholdersService, plugin, ServicePriority.Normal);
+    public <T> T getService(Class<T> serviceClass) {
+        Object service = services.get(serviceClass);
+        if (service == null)
+            throw new RuntimeException("Tried to get service of invalid class: " + serviceClass);
+
+        return serviceClass.cast(service);
     }
 
-    public void registerHologramsService(HologramsService hologramsService) {
-        this.hologramsService = hologramsService;
-        Bukkit.getServicesManager().register(HologramsService.class, hologramsService, plugin, ServicePriority.Normal);
+    public void loadDefaultServices(SuperiorSkyblockPlugin plugin) {
+        registerService(new PlaceholdersServiceImpl());
+        registerService(new HologramsServiceImpl(plugin));
+        registerService(new DragonBattleServiceImpl(plugin));
+        registerService(new BossBarsServiceImpl(plugin));
+        registerService(new MessagesServiceImpl());
+        registerService(new PortalsManagerServiceImpl(plugin));
+        registerService(new ProtectionManagerServiceImpl(plugin));
     }
 
-    public void registerEnderDragonService(DragonBattleService dragonBattleService) {
-        this.dragonBattleService = dragonBattleService;
-        Bukkit.getServicesManager().register(DragonBattleService.class, dragonBattleService, plugin, ServicePriority.Normal);
-    }
+    private <T extends IService> void registerService(T serviceImpl) {
+        Class apiClass = serviceImpl.getAPIClass();
 
-    public void registerBossBarsService(BossBarsService bossBarsService) {
-        this.bossBarsService = bossBarsService;
-        Bukkit.getServicesManager().register(BossBarsService.class, bossBarsService, plugin, ServicePriority.Normal);
-    }
+        Preconditions.checkArgument(!services.containsKey(apiClass), "Service for class " + apiClass + " already exists.");
 
-    public void registerMessagesService(MessagesService messagesService) {
-        this.messagesService = messagesService;
-        Bukkit.getServicesManager().register(MessagesService.class, messagesService, plugin, ServicePriority.Normal);
-    }
-
-    public PlaceholdersService getPlaceholdersService() {
-        return placeholdersService;
-    }
-
-    public HologramsService getHologramsService() {
-        return hologramsService;
-    }
-
-    public DragonBattleService getDragonBattleService() {
-        return dragonBattleService;
-    }
-
-    public BossBarsService getBossBarsService() {
-        return bossBarsService;
-    }
-
-    public MessagesService getMessagesService() {
-        return messagesService;
+        services.put(apiClass, serviceImpl);
+        Bukkit.getServicesManager().register(apiClass, serviceImpl, plugin, ServicePriority.Normal);
     }
 
 }

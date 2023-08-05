@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
+import com.bgsoftware.superiorskyblock.service.IService;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
@@ -34,8 +35,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@SuppressWarnings("WeakerAccess")
-public class PlaceholdersServiceImpl implements PlaceholdersService {
+public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -218,6 +218,11 @@ public class PlaceholdersServiceImpl implements PlaceholdersService {
     private final List<PlaceholdersProvider> placeholdersProviders = new LinkedList<>();
 
     public PlaceholdersServiceImpl() {
+    }
+
+    @Override
+    public Class<?> getAPIClass() {
+        return PlaceholdersService.class;
     }
 
     public void register(List<PlaceholdersProvider> placeholdersProviders) {

@@ -1,0 +1,37 @@
+package com.bgsoftware.superiorskyblock.service.protection;
+
+import com.bgsoftware.superiorskyblock.api.service.protection.InteractionResult;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+
+import javax.annotation.Nullable;
+
+public class ProtectionHelper {
+
+    private ProtectionHelper() {
+
+    }
+
+    public static boolean preventInteractionInternal(InteractionResult interactionResult,
+                                                     @Nullable SuperiorPlayer superiorPlayer, boolean sendMessages) {
+        switch (interactionResult) {
+            case ISLAND_RECALCULATE:
+                if (sendMessages && superiorPlayer != null)
+                    Message.ISLAND_BEING_CALCULATED.send(superiorPlayer);
+                return true;
+            case MISSING_PRIVILEGE:
+                if (sendMessages && superiorPlayer != null)
+                    Message.PROTECTION.send(superiorPlayer);
+                return true;
+            case OUTSIDE_ISLAND:
+                if (sendMessages && superiorPlayer != null)
+                    Message.BUILD_OUTSIDE_ISLAND.send(superiorPlayer);
+                return true;
+            case SUCCESS:
+                return false;
+        }
+
+        throw new IllegalStateException("No handling for result " + interactionResult);
+    }
+
+}

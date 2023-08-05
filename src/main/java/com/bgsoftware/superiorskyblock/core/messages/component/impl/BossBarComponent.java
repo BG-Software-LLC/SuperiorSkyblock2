@@ -3,9 +3,11 @@ package com.bgsoftware.superiorskyblock.core.messages.component.impl;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
+import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBarsService;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
-import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import org.apache.logging.log4j.util.Strings;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,6 +17,12 @@ import javax.annotation.Nullable;
 public class BossBarComponent implements IMessageComponent {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final LazyReference<BossBarsService> bossBarsService = new LazyReference<BossBarsService>() {
+        @Override
+        protected BossBarsService create() {
+            return plugin.getServices().getService(BossBarsService.class);
+        }
+    };
 
     private final String message;
     private final BossBar.Color color;
@@ -44,7 +52,7 @@ public class BossBarComponent implements IMessageComponent {
     public void sendMessage(CommandSender sender, Object... args) {
         if (sender instanceof Player) {
             Message.replaceArgs(this.message, args).ifPresent(message -> {
-                plugin.getServices().getBossBarsService().createBossBar((Player) sender, message, this.color, this.ticksToRun);
+                bossBarsService.get().createBossBar((Player) sender, message, this.color, this.ticksToRun);
             });
         }
     }
