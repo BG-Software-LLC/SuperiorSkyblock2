@@ -57,6 +57,12 @@ public class PortalsListener implements Listener {
         if (superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
+        World.Environment targetDestination = getTargetWorld(e.getFrom(), e.getCause());
+        if (targetDestination == World.Environment.NETHER && !plugin.getSettings().getWorlds().getNether().isEnabled())
+            return;
+        if (targetDestination == World.Environment.THE_END && !plugin.getSettings().getWorlds().getEnd().isEnabled())
+            return;
+
         if (preventPlayerPortal(e.getPlayer(), e.getFrom(), e.getCause(), false)) {
             e.setCancelled(true);
             return;
