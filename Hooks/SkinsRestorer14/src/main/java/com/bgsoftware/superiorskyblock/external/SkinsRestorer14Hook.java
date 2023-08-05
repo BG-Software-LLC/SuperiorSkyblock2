@@ -25,33 +25,7 @@ public class SkinsRestorer14Hook {
 
     private static SuperiorSkyblockPlugin plugin;
 
-    private static boolean localMode;
-
-    public static void register(SuperiorSkyblockPlugin plugin) {
-        SkinsRestorer14Hook.plugin = plugin;
-
-        localMode = checkForLocalMode();
-
-        if (localMode) {
-            plugin.getProviders().registerSkinsListener(SkinsRestorer14Hook::setSkinTexture);
-            plugin.getServer().getPluginManager().registerEvents(new SkinsListener(), plugin);
-        }
-    }
-
-    private static void setSkinTexture(SuperiorPlayer superiorPlayer) {
-        if (Bukkit.isPrimaryThread()) {
-            BukkitExecutor.async(() -> setSkinTexture(superiorPlayer));
-            return;
-        }
-
-        if (localMode) {
-            Property property = getSkin(superiorPlayer);
-            if (property != null)
-                BukkitExecutor.sync(() -> plugin.getNMSPlayers().setSkinTexture(superiorPlayer, property));
-        }
-    }
-
-    private static boolean checkForLocalMode() {
+    public static boolean isCompatible() {
         if (Config.MYSQL_ENABLED)
             return true;
 
@@ -71,6 +45,24 @@ public class SkinsRestorer14Hook {
         }
 
         return false;
+    }
+
+    public static void register(SuperiorSkyblockPlugin plugin) {
+        SkinsRestorer14Hook.plugin = plugin;
+
+        plugin.getProviders().registerSkinsListener(SkinsRestorer14Hook::setSkinTexture);
+        plugin.getServer().getPluginManager().registerEvents(new SkinsListener(), plugin);
+    }
+
+    private static void setSkinTexture(SuperiorPlayer superiorPlayer) {
+        if (Bukkit.isPrimaryThread()) {
+            BukkitExecutor.async(() -> setSkinTexture(superiorPlayer));
+            return;
+        }
+
+        Property property = getSkin(superiorPlayer);
+        if (property != null)
+            BukkitExecutor.sync(() -> plugin.getNMSPlayers().setSkinTexture(superiorPlayer, property));
     }
 
     private static Property getSkin(SuperiorPlayer superiorPlayer) {
