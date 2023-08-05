@@ -8,7 +8,7 @@ import org.bukkit.event.Listener;
 
 public class ChangeSkinHook implements Listener {
 
-    public static boolean isCompatible(SuperiorSkyblockPlugin plugin) {
+    public static boolean isCompatible() {
         try {
             Class.forName("com.github.games647.changeskin.bukkit.events.PlayerChangeSkinEvent");
             return true;
