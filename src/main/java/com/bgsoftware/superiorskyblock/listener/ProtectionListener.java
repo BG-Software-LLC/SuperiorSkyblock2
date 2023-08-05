@@ -728,7 +728,7 @@ public class ProtectionListener implements Listener {
             return false;
         }
 
-        if (!island.isInsideRange(location)) {
+        if (!island.isInsideRange(location, extraRadius)) {
             if (sendMessages)
                 Message.BUILD_OUTSIDE_ISLAND.send(superiorPlayer);
             return true;
