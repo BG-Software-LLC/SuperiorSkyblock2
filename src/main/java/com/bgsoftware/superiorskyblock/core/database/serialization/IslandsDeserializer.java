@@ -639,7 +639,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<ItemStack[]> contents = islandChests.getString("contents").map(Serializers.INVENTORY_SERIALIZER::deserialize);
+            Optional<ItemStack[]> contents = islandChests.getBlob("contents").map(Serializers.INVENTORY_SERIALIZER::deserialize);
             if (!contents.isPresent()) {
                 Log.warn("Cannot load island chest with invalid contents for ", uuid.get(), ", skipping...");
                 return;

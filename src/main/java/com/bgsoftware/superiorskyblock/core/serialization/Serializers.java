@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class Serializers {
 
-    public static final ISerializer<ItemStack[], String> INVENTORY_SERIALIZER = InventorySerializer.getInstance();
+    public static final ISerializer<ItemStack[], byte[]> INVENTORY_SERIALIZER = InventorySerializer.getInstance();
     public static final ISerializer<ItemStack, String> ITEM_STACK_SERIALIZER = ItemStackSerializer.getInstance();
     public static final ISerializer<ItemStack, CompoundTag> ITEM_STACK_TO_TAG_SERIALIZER = ItemStack2TagSerializer.getInstance();
     public static final ISerializer<Location, String> LOCATION_SPACED_SERIALIZER = new LocationSerializer(", ");

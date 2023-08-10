@@ -166,8 +166,10 @@ public class SQLDatabaseLoader extends MachineStateDatabaseLoader {
         SQLHelper.createTable("islands_chests",
                 new Pair<>("island", "UUID"),
                 new Pair<>("`index`", "INTEGER"),
-                new Pair<>("contents", "LONGTEXT")
+                new Pair<>("contents", "LONGBLOB")
         );
+
+        SQLHelper.modifyColumnType("islands_chests", "contents", "LONGBLOB");
 
         SQLHelper.createTable("islands_custom_data",
                 new Pair<>("island", "UUID PRIMARY KEY"),
