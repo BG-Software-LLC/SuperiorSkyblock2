@@ -5,16 +5,17 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandChunkResetEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.service.records.WorldRecordFlag;
+import com.bgsoftware.superiorskyblock.api.service.records.WorldRecordService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Singleton;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.external.slimefun.ProtectionModule_Dev999;
 import com.bgsoftware.superiorskyblock.external.slimefun.ProtectionModule_RC13;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.listener.BlockChangesListener;
 import com.bgsoftware.superiorskyblock.listener.StackedBlocksListener;
 import io.github.thebusybiscuit.slimefun4.api.events.AndroidMineEvent;
 import io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent;
@@ -34,17 +35,22 @@ import org.bukkit.plugin.Plugin;
 @SuppressWarnings("unused")
 public class SlimefunHook {
 
+    private static final WorldRecordFlag REGULAR_RECORD_FLAGS = WorldRecordFlag.SAVE_BLOCK_COUNT.and(WorldRecordFlag.DIRTY_CHUNK);
+
     private static final ReflectMethod<Void> BLOCK_STORAGE_CLEAR_ALL_BLOCK_INFO_AT_CHUNK_METHOD = new ReflectMethod<>(
             BlockStorage.class, "clearAllBlockInfoAtChunk", World.class, int.class, int.class, boolean.class);
 
+    private static final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {
+        @Override
+        protected WorldRecordService create() {
+            return plugin.getServices().getService(WorldRecordService.class);
+        }
+    };
     private static SuperiorSkyblockPlugin plugin;
-
-    private static Singleton<BlockChangesListener> blockChangesListener;
     private static Singleton<StackedBlocksListener> stackedBlocksListener;
 
     public static void register(SuperiorSkyblockPlugin plugin) {
         SlimefunHook.plugin = plugin;
-        blockChangesListener = plugin.getListener(BlockChangesListener.class);
         stackedBlocksListener = plugin.getListener(StackedBlocksListener.class);
 
         if (isClassLoaded("me.mrCookieSlime.Slimefun.SlimefunPlugin")) {
@@ -116,9 +122,7 @@ public class SlimefunHook {
             if (unstackResult.shouldCancelOriginalEvent()) {
                 e.setCancelled(true);
             } else {
-                blockChangesListener.get().onBlockBreak(Keys.of(e.getBlock()), e.getBlock().getLocation(),
-                        plugin.getNMSWorld().getDefaultAmount(e.getBlock()),
-                        BlockChangesListener.Flag.SAVE_BLOCK_COUNT, BlockChangesListener.Flag.DIRTY_CHUNK);
+                worldRecordService.get().recordBlockBreak(e.getBlock(), REGULAR_RECORD_FLAGS);
             }
         }
 
@@ -128,9 +132,7 @@ public class SlimefunHook {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onAutoPlacerPlaceBlock(BlockPlacerPlaceEvent e) {
-            blockChangesListener.get().onBlockPlace(Keys.of(e.getBlock()), e.getBlock().getLocation(),
-                    plugin.getNMSWorld().getDefaultAmount(e.getBlock()), null,
-                    BlockChangesListener.Flag.DIRTY_CHUNK, BlockChangesListener.Flag.SAVE_BLOCK_COUNT);
+            worldRecordService.get().recordBlockPlace(e.getBlock(), 1, null, REGULAR_RECORD_FLAGS);
         }
 
     }

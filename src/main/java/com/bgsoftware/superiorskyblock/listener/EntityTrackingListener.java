@@ -3,7 +3,9 @@ package com.bgsoftware.superiorskyblock.listener;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.core.Singleton;
+import com.bgsoftware.superiorskyblock.api.service.records.WorldRecordFlag;
+import com.bgsoftware.superiorskyblock.api.service.records.WorldRecordService;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
@@ -21,12 +23,18 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 
 public class EntityTrackingListener implements Listener {
 
+    private static final WorldRecordFlag REGULAR_RECORD_FLAGS = WorldRecordFlag.SAVE_BLOCK_COUNT.and(WorldRecordFlag.DIRTY_CHUNK);
+
+    private final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {
+        @Override
+        protected WorldRecordService create() {
+            return plugin.getServices().getService(WorldRecordService.class);
+        }
+    };
     private final SuperiorSkyblockPlugin plugin;
-    private final Singleton<BlockChangesListener> blockChangesListener;
 
     public EntityTrackingListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        this.blockChangesListener = plugin.getListener(BlockChangesListener.class);
         this.registerDeathListener();
     }
 
@@ -84,8 +92,7 @@ public class EntityTrackingListener implements Listener {
 
         // Vehicle was not registered by VehicleDestroyEvent; We want to register its block break
         Key blockKey = plugin.getNMSAlgorithms().getMinecartBlock((Minecart) entity);
-        this.blockChangesListener.get().onBlockBreak(blockKey, entity.getLocation(), 1,
-                BlockChangesListener.Flag.DIRTY_CHUNK, BlockChangesListener.Flag.SAVE_BLOCK_COUNT);
+        this.worldRecordService.get().recordBlockBreak(blockKey, entity.getLocation(), 1, REGULAR_RECORD_FLAGS);
     }
 
     /* INTERNAL */

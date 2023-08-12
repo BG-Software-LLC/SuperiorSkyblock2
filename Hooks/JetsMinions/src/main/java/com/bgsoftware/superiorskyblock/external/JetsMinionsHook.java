@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.external;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.service.records.WorldRecordFlag;
+import com.bgsoftware.superiorskyblock.api.service.records.WorldRecordService;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Singleton;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.listener.BlockChangesListener;
 import com.bgsoftware.superiorskyblock.listener.StackedBlocksListener;
 import me.jet315.minions.events.MinerBlockBreakEvent;
 import org.bukkit.Bukkit;
@@ -16,15 +17,21 @@ import org.bukkit.event.Listener;
 @SuppressWarnings("unused")
 public class JetsMinionsHook implements Listener {
 
+    private static final WorldRecordFlag REGULAR_RECORD_FLAGS = WorldRecordFlag.SAVE_BLOCK_COUNT.and(WorldRecordFlag.DIRTY_CHUNK);
+
+    private final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {
+        @Override
+        protected WorldRecordService create() {
+            return plugin.getServices().getService(WorldRecordService.class);
+        }
+    };
     private final SuperiorSkyblockPlugin plugin;
 
     private final Singleton<StackedBlocksListener> stackedBlocksListener;
-    private final Singleton<BlockChangesListener> blockChangesListener;
 
     private JetsMinionsHook(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         this.stackedBlocksListener = plugin.getListener(StackedBlocksListener.class);
-        this.blockChangesListener = plugin.getListener(BlockChangesListener.class);
     }
 
     public static void register(SuperiorSkyblockPlugin plugin) {
@@ -40,9 +47,7 @@ public class JetsMinionsHook implements Listener {
         if (unstackResult.shouldCancelOriginalEvent()) {
             e.setCancelled(true);
         } else {
-            blockChangesListener.get().onBlockBreak(Keys.of(e.getBlock()), e.getBlock().getLocation(),
-                    plugin.getNMSWorld().getDefaultAmount(e.getBlock()),
-                    BlockChangesListener.Flag.DIRTY_CHUNK, BlockChangesListener.Flag.SAVE_BLOCK_COUNT);
+            this.worldRecordService.get().recordBlockBreak(e.getBlock(), REGULAR_RECORD_FLAGS);
         }
     }
 
