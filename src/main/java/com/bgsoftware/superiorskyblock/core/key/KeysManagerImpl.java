@@ -37,6 +37,12 @@ public class KeysManagerImpl extends Manager implements KeysManager {
     }
 
     @Override
+    public Key getEntityTypeKey(String entityTypeName) {
+        Preconditions.checkNotNull(entityTypeName, "entityTypeName parameter cannot be null.");
+        return ((BaseKey<? extends Key>) Keys.ofEntityType(entityTypeName)).markAPIKey();
+    }
+
+    @Override
     public Key getKey(Entity entity) {
         Preconditions.checkNotNull(entity, "entity parameter cannot be null.");
         return ((BaseKey<? extends Key>) Keys.of(entity)).markAPIKey();
@@ -64,6 +70,30 @@ public class KeysManagerImpl extends Manager implements KeysManager {
     public Key getKey(Material material, short data) {
         Preconditions.checkNotNull(material, "material parameter cannot be null.");
         return ((BaseKey<? extends Key>) Keys.of(material, data)).markAPIKey();
+    }
+
+    @Override
+    public Key getKey(Material material) {
+        Preconditions.checkNotNull(material, "material parameter cannot be null.");
+        return ((BaseKey<? extends Key>) Keys.of(material)).markAPIKey();
+    }
+
+    @Override
+    public Key getMaterialAndDataKey(String type) {
+        Preconditions.checkNotNull(type, "type parameter cannot be null.");
+        return ((BaseKey<? extends Key>) Keys.ofMaterialAndData(type)).markAPIKey();
+    }
+
+    @Override
+    public Key getSpawnerKey(EntityType entityType) {
+        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
+        return ((BaseKey<? extends Key>) Keys.ofSpawner(entityType)).markAPIKey();
+    }
+
+    @Override
+    public Key getSpawnerKey(String entityTypeName) {
+        Preconditions.checkNotNull(entityTypeName, "entityTypeName parameter cannot be null.");
+        return ((BaseKey<? extends Key>) Keys.ofSpawner(entityTypeName)).markAPIKey();
     }
 
     @Override

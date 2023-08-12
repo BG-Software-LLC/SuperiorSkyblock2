@@ -51,7 +51,7 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
                 public Key getCustomKey(Location location) {
                     return systemManager.isStackedBarrel(location) ?
                             Key.of(systemManager.getStackedBarrel(location).getBarrelItem(1)) :
-                            Key.of("CAULDRON");
+                            Key.ofMaterialAndData("CAULDRON");
                 }
 
                 @Override

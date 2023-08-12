@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -77,7 +76,7 @@ public class SpawnersProvider_EpicSpawners7 implements SpawnersProvider {
 
             SpawnerData spawnerData = e.getSpawner().getFirstStack().getSpawnerData();
 
-            Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getIdentifyingName());
+            Key spawnerKey = Key.ofSpawner(e.getSpawner().getIdentifyingName());
             int increaseAmount = e.getSpawner().getFirstStack().getStackSize();
 
             if (spawnerData.isCustom()) {
@@ -109,7 +108,7 @@ public class SpawnersProvider_EpicSpawners7 implements SpawnersProvider {
             if (island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getIdentifyingName());
+            Key blockKey = Key.ofSpawner(e.getSpawner().getIdentifyingName());
 
             int increaseAmount = e.getStackSize() - e.getOldStackSize();
 
@@ -130,7 +129,7 @@ public class SpawnersProvider_EpicSpawners7 implements SpawnersProvider {
             if (island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getIdentifyingName());
+            Key blockKey = Key.ofSpawner(e.getSpawner().getIdentifyingName());
 
             island.handleBlockBreak(blockKey, e.getSpawner().getFirstStack().getStackSize());
         }

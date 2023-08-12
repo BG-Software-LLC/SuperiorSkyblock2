@@ -477,7 +477,7 @@ public class BlockChangesListener implements Listener {
                 return;
 
             int blockCount = plugin.getNMSWorld().getDefaultAmount(e.getBlock());
-            onBlockBreak(Key.of(e.getBlock()), e.getBlock().getLocation(), blockCount,
+            onBlockBreak(Keys.of(e.getBlock()), e.getBlock().getLocation(), blockCount,
                     Flag.HANDLE_NEARBY_BLOCKS, Flag.DIRTY_CHUNK);
         }
 

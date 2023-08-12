@@ -74,7 +74,7 @@ public class SpawnersProvider_EpicSpawners6 implements SpawnersProvider_AutoDete
 
             SpawnerData spawnerData = e.getSpawner().getFirstStack().getSpawnerData();
 
-            Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getIdentifyingName());
+            Key spawnerKey = Key.ofSpawner(e.getSpawner().getIdentifyingName());
             int increaseAmount = e.getSpawner().getFirstStack().getStackSize();
 
             if (spawnerData.isCustom()) {
@@ -106,7 +106,7 @@ public class SpawnersProvider_EpicSpawners6 implements SpawnersProvider_AutoDete
             if (island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getIdentifyingName());
+            Key blockKey = Key.ofSpawner(e.getSpawner().getIdentifyingName());
 
             int increaseAmount = e.getStackSize() - e.getOldStackSize();
 
@@ -127,7 +127,7 @@ public class SpawnersProvider_EpicSpawners6 implements SpawnersProvider_AutoDete
             if (island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getIdentifyingName());
+            Key blockKey = Key.ofSpawner(e.getSpawner().getIdentifyingName());
 
             island.handleBlockBreak(blockKey, e.getSpawner().getFirstStack().getStackSize());
         }

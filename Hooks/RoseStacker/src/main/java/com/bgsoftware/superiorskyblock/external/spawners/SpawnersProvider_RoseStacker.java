@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import dev.rosewood.rosestacker.api.RoseStackerAPI;
@@ -70,7 +69,7 @@ public class SpawnersProvider_RoseStacker implements SpawnersProvider_AutoDetect
             Island island = plugin.getGrid().getIslandAt(location);
             if (island != null) {
                 EntityType spawnerType = e.getStack().getSpawner().getSpawnedType();
-                Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + "", spawnerType + "");
+                Key spawnerKey = Key.ofSpawner(spawnerType);
                 island.handleBlockPlace(spawnerKey, e.getIncreaseAmount());
             }
         }
@@ -81,7 +80,7 @@ public class SpawnersProvider_RoseStacker implements SpawnersProvider_AutoDetect
             Island island = plugin.getGrid().getIslandAt(location);
             if (island != null) {
                 EntityType spawnerType = e.getStack().getSpawner().getSpawnedType();
-                Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + "", spawnerType + "");
+                Key spawnerKey = Key.ofSpawner(spawnerType);
                 island.handleBlockBreak(spawnerKey, e.getDecreaseAmount());
             }
         }
