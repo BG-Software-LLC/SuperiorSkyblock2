@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.service.protection.ProtectionManagerS
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.service.IService;
@@ -101,7 +101,7 @@ public class ProtectionManagerServiceImpl implements ProtectionManagerService, I
         if (island == null)
             return InteractionResult.SUCCESS;
 
-        if (plugin.getSettings().getValuableBlocks().contains(KeyImpl.of(block)))
+        if (plugin.getSettings().getValuableBlocks().contains(Keys.of(block)))
             return handleInteractionInternal(superiorPlayer, blockLocation, island, IslandPrivileges.VALUABLE_BREAK,
                     0, false, false);
 
