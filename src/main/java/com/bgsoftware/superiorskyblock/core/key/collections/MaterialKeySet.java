@@ -93,7 +93,7 @@ public class MaterialKeySet extends AbstractSet<Key> implements KeySet {
         } else if (key instanceof CustomKey) {
             exists = this.customInnerSet.getIfPresent().map(s -> s.contains(key)).orElse(false);
         } else {
-            exists = false;
+            return false;
         }
 
         if (!tryGlobal || exists)
