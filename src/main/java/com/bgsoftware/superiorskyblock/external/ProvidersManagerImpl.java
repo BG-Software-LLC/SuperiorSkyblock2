@@ -26,7 +26,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Manager;
-import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.external.async.AsyncProvider;
@@ -300,7 +300,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     }
 
     public Key getSpawnerKey(ItemStack itemStack) {
-        return Key.of(Materials.SPAWNER.toBukkitType() + "", spawnersProvider.getSpawnerType(itemStack) + "");
+        return Keys.ofSpawner(spawnersProvider.getSpawnerType(itemStack));
     }
 
     public boolean hasSnapshotsSupport() {

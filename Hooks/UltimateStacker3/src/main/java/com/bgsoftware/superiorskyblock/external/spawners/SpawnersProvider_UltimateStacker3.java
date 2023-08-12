@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -55,7 +54,7 @@ public class SpawnersProvider_UltimateStacker3 implements SpawnersProviderItemMe
             if (island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawnerType().name());
+            Key blockKey = Key.ofSpawner(e.getSpawnerType());
             int increaseAmount = e.getAmount();
 
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {

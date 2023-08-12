@@ -25,6 +25,13 @@ public interface KeysManager {
     Key getKey(EntityType entityType);
 
     /**
+     * Get the key of an entity type.
+     *
+     * @param entityTypeName The name of the entity type to create key for.
+     */
+    Key getEntityTypeKey(String entityTypeName);
+
+    /**
      * Get the key of an entity.
      *
      * @param entity The entity to check.
@@ -59,6 +66,34 @@ public interface KeysManager {
      * @param data     The data to check.
      */
     Key getKey(Material material, short data);
+
+    /**
+     * Get the key of a material.
+     *
+     * @param material The material to create key for.
+     */
+    Key getKey(Material material);
+
+    /**
+     * Get the key of a material and data, split by ':' (optionally).
+     *
+     * @param type The combined material-data pair to create key for.
+     */
+    Key getMaterialAndDataKey(String type);
+
+    /**
+     * Get the key of a spawner block with specific entity type.
+     *
+     * @param entityType The entity type of the spawner to create key for.
+     */
+    Key getSpawnerKey(EntityType entityType);
+
+    /**
+     * Get the key of a spawner block with specific entity type.
+     *
+     * @param entityTypeName The name of the entity type of the spawner to create key for.
+     */
+    Key getSpawnerKey(String entityTypeName);
 
     /**
      * Get the key of a string.
