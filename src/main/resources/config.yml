@@ -52,13 +52,13 @@ default-values:
   # This limit can be expanded by using the /is admin setblocklimit command.
   # You can find a list of materials here: https://bg-software.com/materials/
   block-limits:
-    - 'HOPPER:8'
+    HOPPER: 8
 
   # Set the default entity limits of islands.
   # This limit can be expanded by using the /is admin setentitylimit command.
   # You can find a list of entities here: https://bg-software.com/entities/
   entity-limits:
-    - 'MINECART:4'
+    MINECART: 4
 
   # The amount of warps an island can have
   # This limit can be expanded by using the /is admin setwarpslimit command.
@@ -93,8 +93,8 @@ default-values:
   # You can find a list of materials here: https://bg-software.com/materials/
   generator:
     normal:
-      - COBBLESTONE:95
-      - COAL_ORE:5
+      COBBLESTONE: 95
+      COAL_ORE: 5
 
   # A list of default role limits for new islands.
   # Example: '1:5' will set the limit of the role with the id 1 (Moderator by default) to 5.
@@ -126,7 +126,7 @@ stacked-blocks:
 
   # Set limits to stacked blocks.
   limits:
-    - 'EXAMPLE_BLOCK:5'
+    EXAMPLE_BLOCK: 5
 
   # Should blocks get added directly into the player's inventory?
   auto-collect: false
