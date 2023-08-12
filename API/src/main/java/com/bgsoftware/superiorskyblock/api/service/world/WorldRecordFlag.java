@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.api.service.records;
+package com.bgsoftware.superiorskyblock.api.service.world;
 
 public class WorldRecordFlag {
 

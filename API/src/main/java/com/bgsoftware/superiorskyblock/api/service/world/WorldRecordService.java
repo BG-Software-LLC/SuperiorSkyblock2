@@ -1,10 +1,12 @@
-package com.bgsoftware.superiorskyblock.api.service.records;
+package com.bgsoftware.superiorskyblock.api.service.world;
 
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 
 import javax.annotation.Nullable;
 
@@ -23,5 +25,13 @@ public interface WorldRecordService {
     RecordResult recordBlockBreak(Key blockKey, Location blockLocation, int blockCount, WorldRecordFlag recordFlag);
 
     RecordResult recordMultiBlocksBreak(KeyMap<Integer> blockCounts, Location location, WorldRecordFlag recordFlag);
+
+    RecordResult recordEntitySpawn(Entity entity);
+
+    RecordResult recordEntitySpawn(EntityType entityType, Location location);
+
+    RecordResult recordEntityDespawn(Entity entity);
+
+    RecordResult recordEntityDespawn(EntityType entityType, Location location);
 
 }

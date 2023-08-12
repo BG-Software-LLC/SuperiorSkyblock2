@@ -2,13 +2,13 @@ package com.bgsoftware.superiorskyblock.world.event;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Mutable;
-import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandCalculationAlgorithm;
-import com.bgsoftware.superiorskyblock.listener.EntityTrackingListener;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
@@ -28,13 +28,17 @@ import java.util.UUID;
 @Deprecated
 public class WorldEventsManagerImpl implements WorldEventsManager {
 
+    private final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {
+        @Override
+        protected WorldRecordService create() {
+            return plugin.getServices().getService(WorldRecordService.class);
+        }
+    };
     private final SuperiorSkyblockPlugin plugin;
-    private final Singleton<EntityTrackingListener> entityTrackingListener;
     private final Map<UUID, Set<Chunk>> pendingLoadedChunks = new HashMap<>();
 
     public WorldEventsManagerImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        this.entityTrackingListener = plugin.getListener(EntityTrackingListener.class);
     }
 
     private static boolean isHologram(ArmorStand armorStand) {
@@ -96,7 +100,7 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
                 // We simulate the spawning of the entities in the newly loaded chunk.
                 // We do it only if we do not need to recalculate the entities.
                 if (entityLimitsEnabled && !recalculateEntities.getValue()) {
-                    entityTrackingListener.get().onEntitySpawn(entity);
+                    this.worldRecordService.get().recordEntitySpawn(entity);
                 }
             }
 
@@ -133,7 +137,7 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
         if (!island.isSpawn() && !plugin.getNMSChunks().isChunkEmpty(chunk))
             island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
 
-        Arrays.stream(chunk.getEntities()).forEach(entityTrackingListener.get()::onEntityDespawn);
+        Arrays.stream(chunk.getEntities()).forEach(this.worldRecordService.get()::recordEntityDespawn);
     }
 
 }

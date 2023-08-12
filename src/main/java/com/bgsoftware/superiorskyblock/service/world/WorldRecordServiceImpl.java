@@ -4,27 +4,34 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.api.service.records.RecordResult;
-import com.bgsoftware.superiorskyblock.api.service.records.WorldRecordFlag;
-import com.bgsoftware.superiorskyblock.api.service.records.WorldRecordService;
+import com.bgsoftware.superiorskyblock.api.service.world.RecordResult;
+import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlag;
+import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
 import com.bgsoftware.superiorskyblock.service.IService;
+import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Minecart;
 
 import javax.annotation.Nullable;
 import java.util.EnumMap;
 
 public class WorldRecordServiceImpl implements WorldRecordService, IService {
 
+    private static final WorldRecordFlag REGULAR_RECORD_FLAGS = WorldRecordFlag.SAVE_BLOCK_COUNT.and(WorldRecordFlag.DIRTY_CHUNK);
     private static final BlockFace[] NEARBY_BLOCKS = new BlockFace[]{
             BlockFace.UP, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH, BlockFace.EAST
     };
@@ -88,6 +95,37 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
         return RecordResult.SUCCESS;
     }
 
+    private void recordBlockPlaceInternal(Island island, Key blockKey, Location blockLocation, int blockCount,
+                                          @Nullable BlockState oldBlockState, WorldRecordFlag recordFlag) {
+        if (oldBlockState != null && oldBlockState.getType() != Material.AIR) {
+            Material blockStateType = oldBlockState.getType();
+            Key oldBlockKey;
+            int oldBlockCount = 1;
+
+            if (Materials.isLava(blockStateType)) {
+                oldBlockKey = ConstantKeys.LAVA;
+            } else if (Materials.isWater(blockStateType)) {
+                oldBlockKey = ConstantKeys.WATER;
+            } else {
+                oldBlockKey = Keys.of(oldBlockState);
+                oldBlockCount = plugin.getNMSWorld().getDefaultAmount(oldBlockState.getBlock());
+            }
+
+            recordBlockBreakInternal(island, oldBlockKey, blockLocation, oldBlockCount, recordFlag);
+        }
+
+        if (blockKey.equals(ConstantKeys.END_PORTAL_FRAME_WITH_EYE))
+            recordBlockBreakInternal(island, ConstantKeys.END_PORTAL_FRAME, blockLocation, 1, recordFlag);
+
+        if (plugin.getProviders().shouldListenToSpawnerChanges() || !(blockKey instanceof SpawnerKey))
+            island.handleBlockPlace(blockKey, blockCount, recordFlag.has(WorldRecordFlag.SAVE_BLOCK_COUNT));
+
+        if (recordFlag.has(WorldRecordFlag.DIRTY_CHUNK)) {
+            island.markChunkDirty(blockLocation.getWorld(), blockLocation.getBlockX() >> 4,
+                    blockLocation.getBlockZ() >> 4, true);
+        }
+    }
+
     @Override
     public RecordResult recordBlockBreak(Block block, WorldRecordFlag recordFlag) {
         Preconditions.checkNotNull(block, "block cannot be null");
@@ -120,38 +158,27 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
 
     @Override
     public RecordResult recordMultiBlocksBreak(KeyMap<Integer> blockCounts, Location location, WorldRecordFlag recordFlag) {
-        return null;
-    }
+        Preconditions.checkNotNull(blockCounts, "blockCounts cannot be null");
+        Preconditions.checkNotNull(location, "location cannot be null");
+        Preconditions.checkNotNull(recordFlag, "recordFlag cannot be null");
+        Preconditions.checkArgument(location.getWorld() != null, "location's world cannot be null");
 
-    private void recordBlockPlaceInternal(Island island, Key blockKey, Location blockLocation, int blockCount,
-                                          @Nullable BlockState oldBlockState, WorldRecordFlag recordFlag) {
-        if (oldBlockState != null && oldBlockState.getType() != Material.AIR) {
-            Material blockStateType = oldBlockState.getType();
-            Key oldBlockKey;
-            int oldBlockCount = 1;
+        if (blockCounts.isEmpty())
+            return RecordResult.SUCCESS;
 
-            if (Materials.isLava(blockStateType)) {
-                oldBlockKey = ConstantKeys.LAVA;
-            } else if (Materials.isWater(blockStateType)) {
-                oldBlockKey = ConstantKeys.WATER;
-            } else {
-                oldBlockKey = Keys.of(oldBlockState);
-                oldBlockCount = plugin.getNMSWorld().getDefaultAmount(oldBlockState.getBlock());
-            }
+        Island island = plugin.getGrid().getIslandAt(location);
+        if (island == null)
+            return RecordResult.NOT_IN_ISLAND;
 
-            recordBlockBreakInternal(island, oldBlockKey, blockLocation, oldBlockCount, recordFlag);
-        }
-
-        if (blockKey.equals(ConstantKeys.END_PORTAL_FRAME_WITH_EYE))
-            recordBlockBreakInternal(island, ConstantKeys.END_PORTAL_FRAME, blockLocation, 1, recordFlag);
-
-        if (plugin.getProviders().shouldListenToSpawnerChanges() || !(blockKey instanceof SpawnerKey))
-            island.handleBlockPlace(blockKey, blockCount, recordFlag.has(WorldRecordFlag.SAVE_BLOCK_COUNT));
+        boolean saveBlockCounts = recordFlag.has(WorldRecordFlag.SAVE_BLOCK_COUNT);
+        blockCounts.forEach((blockKey, blockCount) -> island.handleBlockBreak(blockKey, blockCount, saveBlockCounts));
 
         if (recordFlag.has(WorldRecordFlag.DIRTY_CHUNK)) {
-            island.markChunkDirty(blockLocation.getWorld(), blockLocation.getBlockX() >> 4,
-                    blockLocation.getBlockZ() >> 4, true);
+            island.markChunkDirty(location.getWorld(), location.getBlockX() >> 4,
+                    location.getBlockZ() >> 4, true);
         }
+
+        return RecordResult.SUCCESS;
     }
 
     private void recordBlockBreakInternal(Island island, Key blockKey, Location blockLocation, int blockCount,
@@ -195,6 +222,88 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
                 }
             }, 2L);
         }
+    }
+
+    @Override
+    public RecordResult recordEntitySpawn(Entity entity) {
+        Preconditions.checkNotNull(entity, "entity parameter cannot be null");
+
+        if (BukkitEntities.canBypassEntityLimit(entity))
+            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+
+        return recordEntitySpawnInternal(entity.getType(), entity.getLocation());
+    }
+
+    @Override
+    public RecordResult recordEntitySpawn(EntityType entityType, Location location) {
+        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null");
+        Preconditions.checkNotNull(location, "location parameter cannot be null");
+        Preconditions.checkArgument(location.getWorld() != null, "location's world parameter cannot be null");
+
+        return recordEntitySpawnInternal(entityType, location);
+    }
+
+    private RecordResult recordEntitySpawnInternal(EntityType entityType, Location location) {
+        if (!BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class) ||
+                !BukkitEntities.canHaveLimit(entityType))
+            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+
+        Island island = plugin.getGrid().getIslandAt(location);
+
+        if (island == null)
+            return RecordResult.NOT_IN_ISLAND;
+
+        island.getEntitiesTracker().trackEntity(Keys.of(entityType), 1);
+
+        return RecordResult.SUCCESS;
+    }
+
+    @Override
+    public RecordResult recordEntityDespawn(Entity entity) {
+        Preconditions.checkNotNull(entity, "entity parameter cannot be null");
+
+        if (BukkitEntities.canBypassEntityLimit(entity))
+            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+
+        RecordResult recordResult = recordEntityDespawnInternal(entity.getType(), entity.getLocation());
+        if (recordResult != RecordResult.SUCCESS)
+            return recordResult;
+
+        if (entity instanceof Minecart) {
+            if (entity.hasMetadata("SSB-VehicleDestory")) {
+                entity.removeMetadata("SSB-VehicleDestory", plugin);
+            } else {
+                // Vehicle was not registered by VehicleDestroyEvent; We want to register its block break
+                Key blockKey = plugin.getNMSAlgorithms().getMinecartBlock((Minecart) entity);
+                recordBlockBreak(blockKey, entity.getLocation(), 1, REGULAR_RECORD_FLAGS);
+            }
+        }
+
+        return RecordResult.SUCCESS;
+    }
+
+    @Override
+    public RecordResult recordEntityDespawn(EntityType entityType, Location location) {
+        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null");
+        Preconditions.checkNotNull(location, "location parameter cannot be null");
+        Preconditions.checkArgument(location.getWorld() != null, "location's world parameter cannot be null");
+
+        return recordEntityDespawnInternal(entityType, location);
+    }
+
+    private RecordResult recordEntityDespawnInternal(EntityType entityType, Location location) {
+        if (!BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class) ||
+                !BukkitEntities.canHaveLimit(entityType))
+            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+
+        Island island = plugin.getGrid().getIslandAt(location);
+
+        if (island == null)
+            return RecordResult.NOT_IN_ISLAND;
+
+        island.getEntitiesTracker().untrackEntity(Keys.of(entityType), 1);
+
+        return RecordResult.SUCCESS;
     }
 
 }

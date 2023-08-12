@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.external;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.service.records.WorldRecordFlag;
-import com.bgsoftware.superiorskyblock.api.service.records.WorldRecordService;
+import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlag;
+import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
