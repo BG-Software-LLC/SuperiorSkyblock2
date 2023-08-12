@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.core.serialization.impl;
 
-import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.ISerializer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
@@ -22,9 +21,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class InventorySerializer implements ISerializer<ItemStack[], String> {
+public class InventorySerializer implements ISerializer<ItemStack[], byte[]> {
 
     private static final ItemStack[] EMPTY_CONTENTS = new ItemStack[0];
+    private static final byte[] EMPTY_SERIALIZED_DATA = new byte[0];
 
     private static final InventorySerializer INSTANCE = new InventorySerializer();
 
@@ -37,9 +37,9 @@ public class InventorySerializer implements ISerializer<ItemStack[], String> {
 
     @NotNull
     @Override
-    public String serialize(@Nullable ItemStack[] serializable) {
+    public byte[] serialize(@Nullable ItemStack[] serializable) {
         if (serializable == null || serializable.length == 0)
-            return "";
+            return EMPTY_SERIALIZED_DATA;
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         DataOutputStream dataOutput = new DataOutputStream(outputStream);
@@ -82,18 +82,18 @@ public class InventorySerializer implements ISerializer<ItemStack[], String> {
         } catch (Exception error) {
             Log.entering("ENTER", Arrays.asList(serializable));
             Log.error(error, "An unexpected error occurred while serializing inventory:");
-            return "";
+            return EMPTY_SERIALIZED_DATA;
         }
 
-        return outputStream.toString();
+        return outputStream.toByteArray();
     }
 
     @Override
-    public ItemStack[] deserialize(@Nullable String deserializable) {
-        if (Text.isBlank(deserializable))
+    public ItemStack[] deserialize(@Nullable byte[] deserializable) {
+        if (deserializable == null || deserializable.length == 0)
             return EMPTY_CONTENTS;
 
-        return deserialize(deserializable.getBytes(), true);
+        return deserialize(deserializable, true);
     }
 
     private static ItemStack[] deserialize(byte[] deserializable, boolean tryAgain) {

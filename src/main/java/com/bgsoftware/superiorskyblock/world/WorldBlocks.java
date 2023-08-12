@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.world;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Material;
@@ -29,7 +29,7 @@ public class WorldBlocks {
         if (feetBlock.getType().isSolid() || headBlock.getType().isSolid())
             return false;
 
-        return plugin.getSettings().getSafeBlocks().contains(KeyImpl.of(block));
+        return plugin.getSettings().getSafeBlocks().contains(Keys.of(block));
     }
 
     public static boolean isSafeBlock(ChunkSnapshot chunkSnapshot, int x, int y, int z) {

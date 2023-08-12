@@ -7,9 +7,11 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1201.chunks.CropsBlockEntity;
@@ -63,12 +65,10 @@ import org.bukkit.generator.ChunkGenerator;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class NMSChunksImpl implements NMSChunks {
@@ -421,8 +421,8 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, Level level, LevelChunkSection[] chunkSections) {
-        KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
-        Set<Location> spawnersLocations = new HashSet<>();
+        KeyMap<Counter> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        List<Location> spawnersLocations = new LinkedList<>();
 
         for (int i = 0; i < chunkSections.length; ++i) {
             LevelChunkSection levelChunkSection = chunkSections[i];
@@ -447,8 +447,8 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     private static void calculateChunkInternal(BlockState blockState, int x, int y, int z, ChunkPosition chunkPosition,
-                                               int sectionBottomY, KeyMap<Integer> blockCounts,
-                                               Set<Location> spawnersLocations) {
+                                               int sectionBottomY, KeyMap<Counter> blockCounts,
+                                               List<Location> spawnersLocations) {
         Block block = blockState.getBlock();
 
         if (block == Blocks.AIR)
@@ -466,9 +466,8 @@ public class NMSChunksImpl implements NMSChunks {
             blockState = blockState.setValue(SlabBlock.TYPE, SlabType.BOTTOM);
         }
 
-        Key rawBlockKey = KeyBlocksCache.getBlockKey(blockState.getBlock());
-        Key blockKey = KeyImpl.of(rawBlockKey, location);
-        blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
+        Key blockKey = Keys.of(KeyBlocksCache.getBlockKey(blockState.getBlock()), location);
+        blockCounts.computeIfAbsent(blockKey, b -> new Counter(0)).inc(blockAmount);
         if (block == Blocks.SPAWNER) {
             spawnersLocations.add(location);
         }

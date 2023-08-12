@@ -7,9 +7,10 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.Manager;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.core.key.KeySetImpl;
+import com.bgsoftware.superiorskyblock.core.key.BaseKey;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.collections.MaterialKeySet;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.values.container.BlockValuesContainer;
@@ -52,9 +53,9 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
 
     private static final Bindings bindings = createBindings();
 
-    private static final KeyMap<CustomKeyParser> customKeyParsers = KeyMapImpl.createHashMap();
-    private static final KeySet valuesMenuBlocks = KeySetImpl.createHashSet();
-    private static final KeySet customBlockKeys = KeySetImpl.createHashSet();
+    private static final KeyMap<CustomKeyParser> customKeyParsers = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+    private static final KeySet valuesMenuBlocks = MaterialKeySet.createHashSet();
+    private static final KeySet customBlockKeys = MaterialKeySet.createHashSet();
 
     private final BlockValuesContainer blockWorthValues;
     private final BlockValuesContainer blockLevels;
@@ -159,7 +160,7 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
     public Key getBlockKey(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        if (((KeyImpl) key).isAPIKey() || isValuesMenu(key)) {
+        if (((BaseKey<?>) key).isAPIKey() || isValuesMenu(key)) {
             return getValuesKey(key);
         } else if (customBlockKeys.contains(key)) {
             return customBlockKeys.getKey(key);

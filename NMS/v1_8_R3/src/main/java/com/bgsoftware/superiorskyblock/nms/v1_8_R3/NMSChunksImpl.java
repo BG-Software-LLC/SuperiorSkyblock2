@@ -6,9 +6,11 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.world.KeyBlocksCache;
@@ -38,12 +40,10 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class NMSChunksImpl implements NMSChunks {
@@ -136,8 +136,8 @@ public class NMSChunksImpl implements NMSChunks {
         }, (chunk, isLoaded) -> {
             ChunkPosition chunkPosition = ChunkPosition.of(worldServer.getWorld(), chunk.locX, chunk.locZ);
 
-            KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
-            Set<Location> spawnersLocations = new HashSet<>();
+            KeyMap<Counter> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+            List<Location> spawnersLocations = new LinkedList<>();
 
             for (ChunkSection chunkSection : chunk.getSections()) {
                 if (chunkSection != null && !chunkSection.a()) {
@@ -160,9 +160,8 @@ public class NMSChunksImpl implements NMSChunks {
                                         .set(BlockDoubleStepAbstract.VARIANT, blockData.get(BlockDoubleStepAbstract.VARIANT));
                             }
 
-                            Key rawBlockKey = KeyBlocksCache.getBlockKey(blockData);
-                            Key blockKey = KeyImpl.of(rawBlockKey, location);
-                            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
+                            Key blockKey = Keys.of(KeyBlocksCache.getBlockKey(blockData), location);
+                            blockCounts.computeIfAbsent(blockKey, b -> new Counter(0)).inc(blockAmount);
                             if (block == Blocks.MOB_SPAWNER) {
                                 spawnersLocations.add(location);
                             }

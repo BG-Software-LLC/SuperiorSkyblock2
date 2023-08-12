@@ -33,70 +33,77 @@ public class KeysManagerImpl extends Manager implements KeysManager {
     @Override
     public Key getKey(EntityType entityType) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
-        return ((KeyImpl) KeyImpl.of(entityType)).markAPIKey();
+        return ((BaseKey<? extends Key>) Keys.of(entityType)).markAPIKey();
     }
 
     @Override
     public Key getKey(Entity entity) {
         Preconditions.checkNotNull(entity, "entity parameter cannot be null.");
-        return ((KeyImpl) KeyImpl.of(entity)).markAPIKey();
+        return ((BaseKey<? extends Key>) Keys.of(entity)).markAPIKey();
     }
 
     @Override
     public Key getKey(Block block) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        return ((KeyImpl) KeyImpl.of(block)).markAPIKey();
+        return ((BaseKey<? extends Key>) Keys.of(block)).markAPIKey();
     }
 
     @Override
     public Key getKey(BlockState blockState) {
         Preconditions.checkNotNull(blockState, "blockState parameter cannot be null.");
-        return ((KeyImpl) KeyImpl.of(blockState)).markAPIKey();
+        return ((BaseKey<? extends Key>) Keys.of(blockState)).markAPIKey();
     }
 
     @Override
     public Key getKey(ItemStack itemStack) {
         Preconditions.checkNotNull(itemStack, "material parameter cannot be null.");
-        return ((KeyImpl) KeyImpl.of(itemStack)).markAPIKey();
+        return ((BaseKey<? extends Key>) Keys.of(itemStack)).markAPIKey();
     }
 
     @Override
     public Key getKey(Material material, short data) {
         Preconditions.checkNotNull(material, "material parameter cannot be null.");
-        return ((KeyImpl) KeyImpl.of(material, data)).markAPIKey();
+        return ((BaseKey<? extends Key>) Keys.of(material, data)).markAPIKey();
     }
 
     @Override
     public Key getKey(String key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return ((KeyImpl) KeyImpl.of(key)).markAPIKey();
+        String[] keySections = key.split(":");
+        return ((BaseKey<? extends Key>) Keys.of(keySections[0], keySections.length >= 2 ? keySections[1] : null)).markAPIKey();
     }
 
     @Override
     public Key getKey(String globalKey, String subKey) {
         Preconditions.checkNotNull(globalKey, "globalKey parameter cannot be null.");
         Preconditions.checkNotNull(subKey, "subKey parameter cannot be null.");
-        return ((KeyImpl) KeyImpl.of(globalKey, subKey)).markAPIKey();
+        return ((BaseKey<? extends Key>) Keys.of(globalKey, subKey)).markAPIKey();
     }
 
     @Override
     public KeySet createKeySet(Supplier<Set<String>> setCreator) {
-        return KeySetImpl.create(setCreator);
+        return KeySets.createSet(KeyIndicator.CUSTOM, setCreator::get);
     }
 
     @Override
     public KeySet createKeySet(Supplier<Set<String>> setCreator, Collection<Key> collection) {
-        return collection instanceof KeySet ? (KeySet) collection : KeySetImpl.create(setCreator, collection);
+        if (collection instanceof KeySet) return (KeySet) collection;
+        KeySet keySet = KeySets.createSet(KeyIndicator.CUSTOM, setCreator::get);
+        keySet.addAll(collection);
+        return keySet;
     }
 
     @Override
     public <V> KeyMap<V> createKeyMap(Supplier<Map<String, V>> mapCreator) {
-        return KeyMapImpl.create(mapCreator);
+        return KeyMaps.createMap(KeyIndicator.CUSTOM, mapCreator::get);
     }
 
     @Override
     public <V> KeyMap<V> createKeyMap(Supplier<Map<String, V>> mapCreator, Map<Key, V> map) {
-        return map instanceof KeyMap ? (KeyMap<V>) map : KeyMapImpl.create(mapCreator, map);
+        if (map instanceof KeyMap) return (KeyMap<V>) map;
+        KeyMap<V> keyMap = KeyMaps.createMap(KeyIndicator.CUSTOM, mapCreator::get);
+        keyMap.putAll(map);
+        return keyMap;
     }
 
 }

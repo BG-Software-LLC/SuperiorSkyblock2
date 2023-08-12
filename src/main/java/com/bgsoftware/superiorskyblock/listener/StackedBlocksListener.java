@@ -15,7 +15,8 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.BaseKey;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.service.protection.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
@@ -172,7 +173,7 @@ public class StackedBlocksListener implements Listener {
 
         for (Block block : blockList) {
             // Check if block is stackable
-            if (!plugin.getSettings().getStackedBlocks().getWhitelisted().contains(KeyImpl.of(block)))
+            if (!plugin.getSettings().getStackedBlocks().getWhitelisted().contains(Keys.of(block)))
                 continue;
 
             int amount = plugin.getStackedBlocks().getStackedBlockAmount(block);
@@ -246,12 +247,12 @@ public class StackedBlocksListener implements Listener {
 
         KeySet whitelist = (KeySet) plugin.getSettings().getStackedBlocks().getWhitelisted();
 
-        Key againstBlockKey = whitelist.getKey(KeyImpl.of(againstBlock));
+        Key againstBlockKey = whitelist.getKey(Keys.of(againstBlock));
 
         if (!whitelist.contains(againstBlockKey))
             return false;
 
-        Key placeItemBlockKey = whitelist.getKey(KeyImpl.of(placeItem));
+        Key placeItemBlockKey = whitelist.getKey(Keys.of(placeItem));
 
         if (!Objects.equals(againstBlockKey, placeItemBlockKey))
             return false;
@@ -276,7 +277,7 @@ public class StackedBlocksListener implements Listener {
         Key blockKey = plugin.getStackedBlocks().getStackedBlockKey(stackedBlock);
 
         if (blockKey == null)
-            blockKey = KeyImpl.of(stackedBlock.getBlock());
+            blockKey = Keys.of(stackedBlock.getBlock());
 
         int blockLimit = plugin.getSettings().getStackedBlocks().getLimits().getOrDefault(blockKey, Integer.MAX_VALUE);
 
@@ -309,7 +310,7 @@ public class StackedBlocksListener implements Listener {
                 amount = islandBlockLimit.subtract(islandBlockCount).intValue();
             } else {
                 //Getting the global key values.
-                Key globalKey = KeyImpl.of(blockKey.getGlobalKey());
+                Key globalKey = ((BaseKey<?>) blockKey).toGlobalKey();
                 islandBlockLimit = BigInteger.valueOf(island.getExactBlockLimit(globalKey));
                 islandBlockCount = island.getBlockCountAsBigInteger(globalKey);
                 if (islandBlockLimit.compareTo(BigInteger.ZERO) >= 0 &&
@@ -361,7 +362,7 @@ public class StackedBlocksListener implements Listener {
 
         if (!stackedBlockSuccess) {
             if (island != null)
-                island.handleBlockBreak(KeyImpl.of(block), blockAmount - 1);
+                island.handleBlockBreak(Keys.of(block), blockAmount - 1);
             leftAmount = 0;
             amount = 1;
         }
@@ -378,7 +379,7 @@ public class StackedBlocksListener implements Listener {
         }
 
         if (island != null) {
-            island.handleBlockBreak(KeyImpl.of(blockItem), amount);
+            island.handleBlockBreak(Keys.of(blockItem), amount);
         }
 
         // If the amount of the stack is less than 0, it should be air.

@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Singleton;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.external.slimefun.ProtectionModule_Dev999;
@@ -116,7 +116,7 @@ public class SlimefunHook {
             if (unstackResult.shouldCancelOriginalEvent()) {
                 e.setCancelled(true);
             } else {
-                blockChangesListener.get().onBlockBreak(KeyImpl.of(e.getBlock()), e.getBlock().getLocation(),
+                blockChangesListener.get().onBlockBreak(Keys.of(e.getBlock()), e.getBlock().getLocation(),
                         plugin.getNMSWorld().getDefaultAmount(e.getBlock()),
                         BlockChangesListener.Flag.SAVE_BLOCK_COUNT, BlockChangesListener.Flag.DIRTY_CHUNK);
             }
@@ -128,7 +128,7 @@ public class SlimefunHook {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onAutoPlacerPlaceBlock(BlockPlacerPlaceEvent e) {
-            blockChangesListener.get().onBlockPlace(KeyImpl.of(e.getBlock()), e.getBlock().getLocation(),
+            blockChangesListener.get().onBlockPlace(Keys.of(e.getBlock()), e.getBlock().getLocation(),
                     plugin.getNMSWorld().getDefaultAmount(e.getBlock()), null,
                     BlockChangesListener.Flag.DIRTY_CHUNK, BlockChangesListener.Flag.SAVE_BLOCK_COUNT);
         }

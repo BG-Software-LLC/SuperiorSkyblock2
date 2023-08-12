@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.world;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import org.bukkit.Material;
 import org.bukkit.entity.AbstractHorse;
@@ -125,9 +125,8 @@ public class BukkitEntities {
     }
 
     public static Key getLimitEntityType(Entity entity) {
-        Key key = KeyImpl.of(entity.getType());
-        return key.getGlobalKey().contains("MINECART") ?
-                KeyImpl.of("MINECART" + (key.getSubKey().isEmpty() ? "" : ":" + key.getSubKey())) : key;
+        // TODO - Is this really necessary?
+        return Keys.of(entity.getType());
     }
 
     public static boolean canHaveLimit(EntityType entityType) {

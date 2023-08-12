@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -44,7 +45,7 @@ public class EconomyProvider_Vault implements EconomyProvider {
         EconomyResponse economyResponse = econ.depositPlayer(offlinePlayer, amount);
         double moneyInTransaction = Precision.round(getMoneyInBank(offlinePlayer) - moneyBeforeDeposit, 3);
 
-        String errorMessage = moneyInTransaction == amount ? economyResponse.errorMessage :
+        String errorMessage = moneyInTransaction == amount ? getErrorMessageFromResponse(economyResponse) :
                 moneyInTransaction == 0 ? "You have exceed the limit of your bank" : "";
 
         return new EconomyResult(errorMessage, moneyInTransaction);
@@ -58,7 +59,7 @@ public class EconomyProvider_Vault implements EconomyProvider {
         EconomyResponse economyResponse = econ.withdrawPlayer(offlinePlayer, amount);
         double moneyInTransaction = Precision.round(moneyBeforeWithdraw - getMoneyInBank(offlinePlayer), 3);
 
-        String errorMessage = moneyInTransaction == amount ? economyResponse.errorMessage :
+        String errorMessage = moneyInTransaction == amount ? getErrorMessageFromResponse(economyResponse) :
                 moneyInTransaction == 0 ? "Couldn't process the transaction" : "";
 
         return new EconomyResult(errorMessage, moneyInTransaction);
@@ -69,6 +70,11 @@ public class EconomyProvider_Vault implements EconomyProvider {
             econ.createPlayerAccount(offlinePlayer);
 
         return Precision.round(econ.getBalance(offlinePlayer), 3);
+    }
+
+    @Nullable
+    private static String getErrorMessageFromResponse(EconomyResponse economyResponse) {
+        return economyResponse.transactionSuccess() ? null : economyResponse.errorMessage;
     }
 
 }

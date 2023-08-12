@@ -9,7 +9,8 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCounts;
@@ -167,15 +168,9 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
         String convertedItem = BLOCKS_TO_ITEMS.get(blockKey.getGlobalKey());
 
         if (convertedItem != null) {
-            String[] item = convertedItem.split(":");
-            String itemType = item[0];
-            try {
-                //Checking if the material is valid
-                Material.valueOf(itemType);
-                String subKey = item.length == 2 ? item[1] : "";
-                blockKey = KeyImpl.of(item[0], subKey);
-            } catch (Throwable ignored) {
-            }
+            Key tempBlockType = Keys.ofMaterialAndData(convertedItem);
+            if (tempBlockType instanceof MaterialKey)
+                blockKey = tempBlockType;
         }
 
         Material blockMaterial;

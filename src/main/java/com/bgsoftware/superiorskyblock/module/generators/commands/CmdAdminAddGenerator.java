@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -70,7 +70,7 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Key material = KeyImpl.of(args[3]);
+        Key material = Keys.ofMaterialAndData(args[3]);
         boolean percentage = args[4].endsWith("%");
 
         if (percentage)

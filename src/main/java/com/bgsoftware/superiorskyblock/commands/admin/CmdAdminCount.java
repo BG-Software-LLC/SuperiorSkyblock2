@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
@@ -143,7 +143,7 @@ public class CmdAdminCount implements IAdminIslandCommand {
             if (material == null)
                 return;
 
-            BigInteger blockCount = island.getBlockCountAsBigInteger(KeyImpl.of(materialName));
+            BigInteger blockCount = island.getBlockCountAsBigInteger(Keys.ofMaterialAndData(materialName));
 
             if (blockCount.compareTo(BigInteger.ONE) > 0)
                 materialName = materialName + "s";

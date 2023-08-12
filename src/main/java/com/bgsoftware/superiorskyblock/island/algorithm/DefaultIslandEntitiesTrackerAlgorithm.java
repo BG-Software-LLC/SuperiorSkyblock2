@@ -4,7 +4,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
@@ -19,7 +20,7 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
     private static final long CALCULATE_DELAY = TimeUnit.MINUTES.toMillis(5);
 
-    private final KeyMap<Integer> entityCounts = KeyMapImpl.createConcurrentHashMap();
+    private final KeyMap<Integer> entityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
 
     private final Island island;
 
@@ -112,7 +113,7 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
             clearEntityCounts();
 
-            KeyMap<Integer> recalculatedEntityCounts = KeyMapImpl.createConcurrentHashMap();
+            KeyMap<Integer> recalculatedEntityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
 
             island.getLoadedChunks(true, true).forEach(chunk -> {
                 for (Entity entity : chunk.getEntities()) {

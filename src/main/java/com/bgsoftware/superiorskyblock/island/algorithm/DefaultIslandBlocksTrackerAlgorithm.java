@@ -5,8 +5,9 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.key.BaseKey;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
@@ -20,7 +21,7 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final KeyMap<BigInteger> blockCounts = KeyMapImpl.createConcurrentHashMap();
+    private final KeyMap<BigInteger> blockCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
 
     private final Island island;
     private boolean loadingDataMode = false;
@@ -93,7 +94,7 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
             removeCounts(valueKey, amount);
 
             Key limitKey = island.getBlockLimitKey(valueKey);
-            Key globalKey = KeyImpl.of(valueKey.getGlobalKey());
+            Key globalKey = ((BaseKey<?>) valueKey).toGlobalKey();
             boolean limitCount = false;
 
             if (!limitKey.equals(valueKey)) {
@@ -152,7 +153,7 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
             return;
 
         Key limitKey = island.getBlockLimitKey(valueKey);
-        Key globalKey = KeyImpl.of(valueKey.getGlobalKey());
+        Key globalKey = ((BaseKey<?>) valueKey).toGlobalKey();
         boolean limitCount = false;
 
         if (!limitKey.equals(valueKey)) {

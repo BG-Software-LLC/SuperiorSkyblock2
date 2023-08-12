@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.core.Mutable;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -63,7 +63,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            Key blockKey = KeyImpl.of(e.getBlock());
+            Key blockKey = Keys.of(e.getBlock());
 
             if (island.hasReachedBlockLimit(blockKey)) {
                 e.setCancelled(true);
@@ -136,7 +136,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
                     break;
                 case "COMMAND_MINECART":
                 case "COMMAND_BLOCK_MINECART":
-                    key = ServerVersion.isAtLeast(ServerVersion.v1_13) ? ConstantKeys.COMMAND_BLOCK : ConstantKeys.COMMAND;
+                    key = ConstantKeys.COMMAND_BLOCK;
                     break;
                 case "EXPLOSIVE_MINECART":
                 case "TNT_MINECART":
@@ -168,7 +168,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            Key blockKey = KeyImpl.of(e.getBucket().name().replace("_BUCKET", ""));
+            Key blockKey = Keys.ofMaterialAndData(e.getBucket().name().replace("_BUCKET", ""));
 
             if (island.hasReachedBlockLimit(blockKey)) {
                 e.setCancelled(true);
@@ -183,7 +183,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            Key blockKey = KeyImpl.of(e.getNewState());
+            Key blockKey = Keys.of(e.getNewState());
 
             if (island.hasReachedBlockLimit(blockKey))
                 e.setCancelled(true);
@@ -196,7 +196,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            e.getBlocks().removeIf(blockState -> island.hasReachedBlockLimit(KeyImpl.of(blockState)));
+            e.getBlocks().removeIf(blockState -> island.hasReachedBlockLimit(Keys.of(blockState)));
         }
 
     }

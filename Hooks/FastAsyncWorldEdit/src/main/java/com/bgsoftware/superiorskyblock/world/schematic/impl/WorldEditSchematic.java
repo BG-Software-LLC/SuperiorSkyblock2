@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
@@ -132,12 +132,12 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
         if (ADAPT.isValid() && GET_BLOCK_TYPE.isValid() && GET_INTERNAL_ID.isValid()) {
             Material material = ADAPT.invoke(null, GET_BLOCK_TYPE.invoke(baseBlock));
             int data = GET_INTERNAL_ID.invokeWithDef(baseBlock, 0);
-            key = KeyImpl.of(material, (byte) data);
+            key = Keys.of(material, (byte) data);
         } else {
             int id = GET_ID.invoke(baseBlock);
             int data = GET_DATA.invoke(baseBlock);
             //noinspection deprecation
-            key = KeyImpl.of(Material.getMaterial(id), (byte) data);
+            key = Keys.of(Material.getMaterial(id), (byte) data);
         }
 
         cachedCounts.put(key, cachedCounts.getRaw(key, 0) + 1);

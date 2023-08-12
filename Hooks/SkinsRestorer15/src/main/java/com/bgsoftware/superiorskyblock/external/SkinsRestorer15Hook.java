@@ -19,6 +19,15 @@ public class SkinsRestorer15Hook {
     private static SuperiorSkyblockPlugin plugin;
     private static SkinsRestorer skinsRestorer;
 
+    public static boolean isCompatible() {
+        try {
+            SkinsRestorer skinsRestorer = SkinsRestorerProvider.get();
+            return skinsRestorer != null;
+        } catch (IllegalStateException error) {
+            return false;
+        }
+    }
+
     public static void register(SuperiorSkyblockPlugin plugin) {
         SkinsRestorer15Hook.plugin = plugin;
         skinsRestorer = SkinsRestorerProvider.get();

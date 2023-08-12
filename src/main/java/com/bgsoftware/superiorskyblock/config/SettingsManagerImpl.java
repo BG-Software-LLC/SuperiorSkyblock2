@@ -38,6 +38,12 @@ import java.util.Set;
 @SuppressWarnings("WeakerAccess")
 public class SettingsManagerImpl extends Manager implements SettingsManager {
 
+    private static final String[] IGNORED_SECTIONS = new String[]{
+            "config.yml", "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases",
+            "preview-islands", "default-values.block-limits", "default-values.entity-limits",
+            "default-values.role-limits", "stacked-blocks.limits", "default-values.generator"
+    };
+
     private final SettingsContainer container;
     private final Database database;
     private final DefaultValues defaultValues;
@@ -65,8 +71,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         convertInteractables(plugin, cfg);
 
         try {
-            cfg.syncWithConfig(file, plugin.getResource("config.yml"), "config.yml",
-                    "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "preview-islands");
+            cfg.syncWithConfig(file, plugin.getResource("config.yml"), IGNORED_SECTIONS);
         } catch (Exception error) {
             Log.error(error, file, "An unexpected error occurred while loading config file:");
         }
