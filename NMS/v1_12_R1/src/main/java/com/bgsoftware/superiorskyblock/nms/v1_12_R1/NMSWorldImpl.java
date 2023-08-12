@@ -5,10 +5,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
-import com.bgsoftware.superiorskyblock.listener.SignsListener;
+import com.bgsoftware.superiorskyblock.island.signs.IslandSigns;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.generator.IslandsGeneratorImpl;
@@ -57,11 +56,9 @@ public class NMSWorldImpl implements NMSWorld {
             TileEntityMobSpawner.class, MobSpawnerAbstract.class, Modifier.PRIVATE | Modifier.FINAL, 1).removeFinal();
 
     private final SuperiorSkyblockPlugin plugin;
-    private final Singleton<SignsListener> signsListener;
 
     public NMSWorldImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        this.signsListener = plugin.getListener(SignsListener.class);
     }
 
     @Override
@@ -243,10 +240,12 @@ public class NMSWorldImpl implements NMSWorld {
 
             IChatBaseComponent[] newLines;
 
-            if (signsListener.get().shouldReplaceSignLines(island.getOwner(), island, location, strippedLines, false))
+            IslandSigns.Result result = IslandSigns.handleSignPlace(island.getOwner(), location, strippedLines, false);
+            if (result.isCancelEvent()) {
                 newLines = CraftSign.sanitizeLines(strippedLines);
-            else
+            } else {
                 newLines = CraftSign.sanitizeLines(lines);
+            }
 
             System.arraycopy(newLines, 0, tileEntitySign.lines, 0, 4);
         }
