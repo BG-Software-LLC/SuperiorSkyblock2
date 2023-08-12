@@ -4,8 +4,8 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
-import com.bgsoftware.superiorskyblock.api.service.protection.InteractionResult;
-import com.bgsoftware.superiorskyblock.api.service.protection.ProtectionManagerService;
+import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
+import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
@@ -14,7 +14,7 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
-import com.bgsoftware.superiorskyblock.service.protection.ProtectionHelper;
+import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Bukkit;
@@ -77,10 +77,10 @@ public class ProtectionListener implements Listener {
     private static final Material CHORUS_FLOWER = Materials.getMaterialSafe("CHORUS_FLOWER");
 
     private final SuperiorSkyblockPlugin plugin;
-    private final LazyReference<ProtectionManagerService> protectionManager = new LazyReference<ProtectionManagerService>() {
+    private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
         @Override
-        protected ProtectionManagerService create() {
-            return plugin.getServices().getService(ProtectionManagerService.class);
+        protected RegionManagerService create() {
+            return plugin.getServices().getService(RegionManagerService.class);
         }
     };
 

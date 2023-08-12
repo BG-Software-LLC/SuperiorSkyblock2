@@ -2,17 +2,16 @@ package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
-import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandRestrictMoveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
+import com.bgsoftware.superiorskyblock.api.service.region.MoveResult;
+import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.Mutable;
-import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -22,7 +21,6 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
-import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
@@ -33,7 +31,6 @@ import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.WeatherType;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -54,10 +51,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -69,14 +63,16 @@ public class PlayersListener implements Listener {
 
     private final Collection<UUID> noFallDamage = AutoRemovalCollection.newHashSet(1, TimeUnit.SECONDS);
 
+    private final LazyReference<RegionManagerService> regionManagerService = new LazyReference<RegionManagerService>() {
+        @Override
+        protected RegionManagerService create() {
+            return plugin.getServices().getService(RegionManagerService.class);
+        }
+    };
     private final SuperiorSkyblockPlugin plugin;
-    private final Singleton<IslandPreviewListener> islandPreviewListener;
-    private final Singleton<IslandOutsideListener> islandOutsideListener;
 
     public PlayersListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        this.islandPreviewListener = plugin.getListener(IslandPreviewListener.class);
-        this.islandOutsideListener = plugin.getListener(IslandOutsideListener.class);
     }
 
     /* PLAYER NOTIFIERS */
@@ -139,9 +135,11 @@ public class PlayersListener implements Listener {
 
         Mutable<Boolean> teleportToSpawn = new Mutable<>(false);
 
-        Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
-        if (island != null && preventPlayerEnterIsland(superiorPlayer, null, null,
-                e.getPlayer().getLocation(), island, IslandEnterEvent.EnterCause.PLAYER_JOIN)) {
+        Location playerLocation = e.getPlayer().getLocation();
+        Island island = plugin.getGrid().getIslandAt(playerLocation);
+
+        MoveResult moveResult = this.regionManagerService.get().handlePlayerJoin(superiorPlayer, playerLocation);
+        if (moveResult != MoveResult.SUCCESS) {
             teleportToSpawn.setValue(true);
         }
 
@@ -223,13 +221,7 @@ public class PlayersListener implements Listener {
             }
         }
 
-        Location playerLocation = e.getPlayer().getLocation();
-        Island islandAtLocation = plugin.getGrid().getIslandAt(playerLocation);
-        if (islandAtLocation != null) {
-            islandAtLocation.setPlayerInside(superiorPlayer, false);
-            onPlayerLeaveIsland(superiorPlayer, playerLocation, islandAtLocation, null, null,
-                    IslandLeaveEvent.LeaveCause.PLAYER_QUIT);
-        }
+        this.regionManagerService.get().handlePlayerQuit(superiorPlayer, e.getPlayer().getLocation());
 
         // Remove all player chat-listeners
         PlayerChat.remove(e.getPlayer());
@@ -277,31 +269,10 @@ public class PlayersListener implements Listener {
             if (superiorPlayer instanceof SuperiorNPCPlayer)
                 return;
 
-            Island fromIsland = plugin.getGrid().getIslandAt(from);
-            Island toIsland = plugin.getGrid().getIslandAt(to);
-
-            // Handle moving while in teleport warmup.
-            BukkitTask teleportTask = superiorPlayer.getTeleportTask();
-            if (teleportTask != null) {
-                teleportTask.cancel();
-                superiorPlayer.setTeleportTask(null);
-                Message.TELEPORT_WARMUP_CANCEL.send(superiorPlayer);
-            }
-
-            // Handle moving while in island preview mode
-            islandPreviewListener.get().onPlayerMove(superiorPlayer, to);
-
-            if (toIsland != null && preventPlayerEnterIsland(superiorPlayer, from, fromIsland, to, toIsland,
-                    IslandEnterEvent.EnterCause.PLAYER_MOVE)) {
+            MoveResult moveResult = this.regionManagerService.get().handlePlayerMove(superiorPlayer, from, to);
+            if (moveResult != MoveResult.SUCCESS) {
                 e.setCancelled(true);
                 return;
-            } else if (fromIsland != null && preventPlayerLeaveIsland(superiorPlayer, from, fromIsland, to, toIsland,
-                    IslandLeaveEvent.LeaveCause.PLAYER_MOVE)) {
-                e.setCancelled(true);
-                return;
-            } else {
-                // Handle moving outside of islands
-                islandOutsideListener.get().onPlayerMove(superiorPlayer, to, fromIsland, toIsland);
             }
         }
 
@@ -334,16 +305,9 @@ public class PlayersListener implements Listener {
         if (superiorPlayer == null || superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
-        Island fromIsland = plugin.getGrid().getIslandAt(e.getFrom());
-        Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
-
-        if (toIsland != null && preventPlayerEnterIsland(superiorPlayer, e.getFrom(), fromIsland, e.getTo(), toIsland,
-                IslandEnterEvent.EnterCause.PLAYER_TELEPORT)) {
+        MoveResult moveResult = this.regionManagerService.get().handlePlayerTeleport(superiorPlayer, e.getFrom(), e.getTo());
+        if (moveResult != MoveResult.SUCCESS)
             e.setCancelled(true);
-        } else if (fromIsland != null && preventPlayerLeaveIsland(superiorPlayer, e.getFrom(), fromIsland, e.getTo(), toIsland,
-                IslandLeaveEvent.LeaveCause.PLAYER_TELEPORT)) {
-            e.setCancelled(true);
-        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -357,175 +321,6 @@ public class PlayersListener implements Listener {
                 e.getPlayer().setAllowFlight(true);
                 e.getPlayer().setFlying(true);
             }, 1L);
-    }
-
-    public void onPlayerLeaveIsland(SuperiorPlayer superiorPlayer,
-                                    @NotNull Location from,
-                                    @NotNull Island fromIsland,
-                                    @Nullable Location to,
-                                    @Nullable Island toIsland,
-                                    IslandLeaveEvent.LeaveCause leaveCause) {
-        /* Alias for preventPlayerLeaveIsland */
-        this.preventPlayerLeaveIsland(superiorPlayer, from, fromIsland, to, toIsland, leaveCause);
-    }
-
-    public boolean preventPlayerLeaveIsland(SuperiorPlayer superiorPlayer,
-                                            @NotNull Location from,
-                                            @NotNull Island fromIsland,
-                                            @Nullable Location to,
-                                            @Nullable Island toIsland,
-                                            IslandLeaveEvent.LeaveCause leaveCause) {
-        boolean equalWorlds = to != null && from.getWorld().equals(to.getWorld());
-        boolean equalIslands = fromIsland.equals(toIsland);
-        boolean fromInsideRange = fromIsland.isInsideRange(from);
-        boolean toInsideRange = to != null && toIsland != null && toIsland.isInsideRange(to);
-
-        //Checking for the stop leaving feature.
-        if (plugin.getSettings().isStopLeaving() && fromInsideRange && !toInsideRange &&
-                !superiorPlayer.hasBypassModeEnabled() && !fromIsland.isSpawn() && equalWorlds) {
-            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_ISLAND_TO_OUTSIDE);
-            superiorPlayer.setLeavingFlag(true);
-            return true;
-        }
-
-        // Handling the leave protected event
-        if (fromInsideRange && (!equalIslands || !toInsideRange)) {
-            if (!plugin.getEventsBus().callIslandLeaveProtectedEvent(superiorPlayer, fromIsland, leaveCause, to)) {
-                plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_PROTECTED_EVENT_CANCELLED);
-                return true;
-            }
-        }
-
-        if (equalIslands)
-            return false;
-
-        if (!plugin.getEventsBus().callIslandLeaveEvent(superiorPlayer, fromIsland, leaveCause, to)) {
-            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_EVENT_CANCELLED);
-            return true;
-        }
-
-        fromIsland.setPlayerInside(superiorPlayer, false);
-
-        Player player = superiorPlayer.asPlayer();
-        if (player != null) {
-            player.resetPlayerTime();
-            player.resetPlayerWeather();
-            fromIsland.removeEffects(superiorPlayer);
-
-            if (superiorPlayer.hasIslandFlyEnabled() && (toIsland == null || toIsland.isSpawn()) && !superiorPlayer.hasFlyGamemode()) {
-                player.setAllowFlight(false);
-                player.setFlying(false);
-                Message.ISLAND_FLY_DISABLED.send(player);
-            }
-        }
-
-        if (toIsland == null)
-            plugin.getNMSWorld().setWorldBorder(superiorPlayer, null);
-
-        return false;
-    }
-
-    public boolean preventPlayerEnterIsland(SuperiorPlayer superiorPlayer,
-                                            @Nullable Location fromLocation,
-                                            @Nullable Island fromIsland,
-                                            @NotNull Location toLocation,
-                                            @NotNull Island toIsland,
-                                            IslandEnterEvent.EnterCause enterCause) {
-        // This can happen after the leave event is cancelled.
-        if (superiorPlayer.isLeavingFlag()) {
-            superiorPlayer.setLeavingFlag(false);
-            return false;
-        }
-
-        // Checking if the player is banned from the island.
-        if (toIsland.isBanned(superiorPlayer) && !superiorPlayer.hasBypassModeEnabled() &&
-                !superiorPlayer.hasPermissionWithoutOP("superior.admin.ban.bypass")) {
-            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.BANNED_FROM_ISLAND);
-            Message.BANNED_FROM_ISLAND.send(superiorPlayer);
-            return true;
-        }
-
-        // Checking if the player is locked to visitors.
-        if (toIsland.isLocked() && !toIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)) {
-            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LOCKED_ISLAND);
-            Message.NO_CLOSE_BYPASS.send(superiorPlayer);
-            return true;
-        }
-
-        boolean equalIslands = toIsland.equals(fromIsland);
-        boolean toInsideRange = toIsland.isInsideRange(toLocation);
-        boolean fromInsideRange = fromLocation != null && fromIsland != null && fromIsland.isInsideRange(fromLocation);
-        boolean equalWorlds = fromLocation != null && toLocation.getWorld().equals(fromLocation.getWorld());
-
-        if (toInsideRange && (!equalIslands || !fromInsideRange) &&
-                !plugin.getEventsBus().callIslandEnterProtectedEvent(superiorPlayer, toIsland, enterCause)) {
-            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.ENTER_PROTECTED_EVENT_CANCELLED);
-            return true;
-        }
-
-        if (equalIslands) {
-            if (!equalWorlds) {
-                BukkitExecutor.sync(() -> plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland), 1L);
-                superiorPlayer.setImmunedToPortals(true);
-                BukkitExecutor.sync(() -> superiorPlayer.setImmunedToPortals(false), 100L);
-            }
-            return false;
-        }
-
-        if (!plugin.getEventsBus().callIslandEnterEvent(superiorPlayer, toIsland, enterCause)) {
-            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.ENTER_EVENT_CANCELLED);
-            return true;
-        }
-
-        toIsland.setPlayerInside(superiorPlayer, true);
-
-        if (!toIsland.isMember(superiorPlayer) && toIsland.hasSettingsEnabled(IslandFlags.PVP)) {
-            Message.ENTER_PVP_ISLAND.send(superiorPlayer);
-            if (plugin.getSettings().isImmuneToPvPWhenTeleport()) {
-                superiorPlayer.setImmunedToPvP(true);
-                BukkitExecutor.sync(() -> superiorPlayer.setImmunedToPvP(false), 200L);
-            }
-        }
-
-        superiorPlayer.setImmunedToPortals(true);
-        BukkitExecutor.sync(() -> superiorPlayer.setImmunedToPortals(false), 100L);
-
-        Player player = superiorPlayer.asPlayer();
-        if (player != null && (plugin.getSettings().getSpawn().isProtected() || !toIsland.isSpawn())) {
-            BukkitExecutor.sync(() -> {
-                // Update player time and player weather with a delay.
-                // Fixes https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/1260
-                if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)) {
-                    player.setPlayerTime(0, false);
-                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_DAY)) {
-                    player.setPlayerTime(6000, false);
-                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_NIGHT)) {
-                    player.setPlayerTime(14000, false);
-                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_NIGHT)) {
-                    player.setPlayerTime(18000, false);
-                }
-
-                if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_SHINY)) {
-                    player.setPlayerWeather(WeatherType.CLEAR);
-                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_RAIN)) {
-                    player.setPlayerWeather(WeatherType.DOWNFALL);
-                }
-            }, 1L);
-        }
-
-        if (superiorPlayer.hasIslandFlyEnabled() && !superiorPlayer.hasFlyGamemode()) {
-            BukkitExecutor.sync(() -> {
-                if (player != null)
-                    toIsland.updateIslandFly(superiorPlayer);
-            }, 5L);
-        }
-
-        BukkitExecutor.sync(() -> {
-            toIsland.applyEffects(superiorPlayer);
-            plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland);
-        }, 1L);
-
-        return false;
     }
 
     /* PVP */

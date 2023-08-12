@@ -4,13 +4,13 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.api.service.protection.InteractionResult;
-import com.bgsoftware.superiorskyblock.api.service.protection.ProtectionManagerService;
+import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
+import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.service.protection.ProtectionHelper;
+import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.google.common.base.Preconditions;
 import dev.rosewood.rosestacker.api.RoseStackerAPI;
 import dev.rosewood.rosestacker.event.BlockStackEvent;
@@ -34,10 +34,10 @@ public class StackedBlocksProvider_RoseStacker implements StackedBlocksProvider_
     private static boolean registered = false;
 
     private final SuperiorSkyblockPlugin plugin;
-    private final LazyReference<ProtectionManagerService> protectionManager = new LazyReference<ProtectionManagerService>() {
+    private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
         @Override
-        protected ProtectionManagerService create() {
-            return plugin.getServices().getService(ProtectionManagerService.class);
+        protected RegionManagerService create() {
+            return plugin.getServices().getService(RegionManagerService.class);
         }
     };
 

@@ -7,8 +7,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.api.service.protection.InteractionResult;
-import com.bgsoftware.superiorskyblock.api.service.protection.ProtectionManagerService;
+import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
+import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
@@ -18,7 +18,7 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.StackedBlocksDepositMenu;
-import com.bgsoftware.superiorskyblock.service.protection.ProtectionHelper;
+import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.Bukkit;
@@ -73,10 +73,10 @@ public class StackedBlocksListener implements Listener {
 
 
     private final SuperiorSkyblockPlugin plugin;
-    private final LazyReference<ProtectionManagerService> protectionManager = new LazyReference<ProtectionManagerService>() {
+    private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
         @Override
-        protected ProtectionManagerService create() {
-            return plugin.getServices().getService(ProtectionManagerService.class);
+        protected RegionManagerService create() {
+            return plugin.getServices().getService(RegionManagerService.class);
         }
     };
 

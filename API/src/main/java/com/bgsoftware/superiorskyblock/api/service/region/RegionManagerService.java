@@ -1,20 +1,17 @@
-package com.bgsoftware.superiorskyblock.api.service.protection;
+package com.bgsoftware.superiorskyblock.api.service.region;
 
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 
-public interface ProtectionManagerService {
+public interface RegionManagerService {
 
     InteractionResult handleBlockPlace(SuperiorPlayer superiorPlayer, Block block);
 
@@ -40,5 +37,17 @@ public interface ProtectionManagerService {
     InteractionResult handlePlayerEnderPearl(SuperiorPlayer superiorPlayer, Location destination);
 
     InteractionResult handleCustomInteraction(SuperiorPlayer superiorPlayer, Location location, IslandPrivilege islandPrivilege);
+
+    MoveResult handlePlayerMove(SuperiorPlayer superiorPlayer, Location from, Location to);
+
+    MoveResult handlePlayerTeleport(SuperiorPlayer superiorPlayer, Location from, Location to);
+
+    MoveResult handlePlayerJoin(SuperiorPlayer superiorPlayer);
+
+    MoveResult handlePlayerJoin(SuperiorPlayer superiorPlayer, Location location);
+
+    MoveResult handlePlayerQuit(SuperiorPlayer superiorPlayer);
+
+    MoveResult handlePlayerQuit(SuperiorPlayer superiorPlayer, Location location);
 
 }

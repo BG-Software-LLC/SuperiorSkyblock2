@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.service.hologram.HologramsServiceImpl;
 import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import com.bgsoftware.superiorskyblock.service.portals.PortalsManagerServiceImpl;
-import com.bgsoftware.superiorskyblock.service.protection.ProtectionManagerServiceImpl;
+import com.bgsoftware.superiorskyblock.service.region.RegionManagerServiceImpl;
 import com.bgsoftware.superiorskyblock.service.world.WorldRecordServiceImpl;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -41,7 +41,7 @@ public class ServicesHandler {
         registerService(new BossBarsServiceImpl(plugin));
         registerService(new MessagesServiceImpl());
         registerService(new PortalsManagerServiceImpl(plugin));
-        registerService(new ProtectionManagerServiceImpl(plugin));
+        registerService(new RegionManagerServiceImpl(plugin));
         registerService(new WorldRecordServiceImpl(plugin));
     }
 

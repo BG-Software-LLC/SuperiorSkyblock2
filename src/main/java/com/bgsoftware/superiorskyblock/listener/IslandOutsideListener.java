@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,7 +13,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
-import org.jetbrains.annotations.Nullable;
 
 public class IslandOutsideListener implements Listener {
 
@@ -80,21 +78,6 @@ public class IslandOutsideListener implements Listener {
                 e.getVehicle().setPassenger(null);
                 EntityTeleports.teleport(passenger, e.getFrom());
             }
-        }
-    }
-
-    public void onPlayerMove(SuperiorPlayer superiorPlayer, Location to,
-                             @Nullable Island fromIsland, @Nullable Island toIsland) {
-        if (!plugin.getSettings().isStopLeaving())
-            return;
-
-        World playerWorld = superiorPlayer.getWorld();
-
-        if (playerWorld != null && !superiorPlayer.hasBypassModeEnabled() &&
-                plugin.getGrid().isIslandsWorld(playerWorld) && playerWorld.equals(to.getWorld()) &&
-                (fromIsland == null || toIsland == null || toIsland.equals(fromIsland)) &&
-                (fromIsland == null || !fromIsland.isInsideRange(to, 1))) {
-            superiorPlayer.teleport(fromIsland == null ? plugin.getGrid().getSpawnIsland() : fromIsland);
         }
     }
 

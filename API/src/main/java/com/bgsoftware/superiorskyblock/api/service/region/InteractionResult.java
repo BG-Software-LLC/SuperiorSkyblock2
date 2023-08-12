@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.api.service.protection;
+package com.bgsoftware.superiorskyblock.api.service.region;
 
 public enum InteractionResult {
 

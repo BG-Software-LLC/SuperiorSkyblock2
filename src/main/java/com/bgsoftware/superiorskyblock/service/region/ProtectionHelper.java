@@ -1,6 +1,6 @@
-package com.bgsoftware.superiorskyblock.service.protection;
+package com.bgsoftware.superiorskyblock.service.region;
 
-import com.bgsoftware.superiorskyblock.api.service.protection.InteractionResult;
+import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 

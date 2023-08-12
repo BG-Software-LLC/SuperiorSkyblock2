@@ -9,13 +9,13 @@ import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.service.protection.InteractionResult;
-import com.bgsoftware.superiorskyblock.api.service.protection.ProtectionManagerService;
+import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
+import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.service.protection.ProtectionHelper;
+import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -38,10 +38,10 @@ public class FeaturesListener implements Listener {
     private final Map<Class<? extends Event>, EventMethods> CACHED_EVENT_METHODS = new HashMap<>();
 
     private final SuperiorSkyblockPlugin plugin;
-    private final LazyReference<ProtectionManagerService> protectionManager = new LazyReference<ProtectionManagerService>() {
+    private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
         @Override
-        protected ProtectionManagerService create() {
-            return plugin.getServices().getService(ProtectionManagerService.class);
+        protected RegionManagerService create() {
+            return plugin.getServices().getService(RegionManagerService.class);
         }
     };
 
