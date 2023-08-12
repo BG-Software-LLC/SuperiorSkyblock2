@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
+import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.service.region.MoveResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
@@ -12,10 +13,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.Mutable;
-import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -52,16 +51,11 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.InventoryHolder;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public class PlayersListener implements Listener {
-
-    private final Collection<UUID> noFallDamage = AutoRemovalCollection.newHashSet(1, TimeUnit.SECONDS);
 
     private final LazyReference<RegionManagerService> regionManagerService = new LazyReference<RegionManagerService>() {
         @Override
@@ -262,39 +256,25 @@ public class PlayersListener implements Listener {
         Location from = e.getFrom();
         Location to = e.getTo();
 
-        // Check if player moved a block.
-        if (from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()) {
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        boolean movedFullBlock = from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ() ||
+                from.getBlockY() != to.getBlockY();
 
-            if (superiorPlayer instanceof SuperiorNPCPlayer)
-                return;
+        if (!movedFullBlock)
+            return;
 
-            MoveResult moveResult = this.regionManagerService.get().handlePlayerMove(superiorPlayer, from, to);
-            if (moveResult != MoveResult.SUCCESS) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+
+        if (superiorPlayer instanceof SuperiorNPCPlayer || superiorPlayer.getPlayerStatus() == PlayerStatus.VOID_TELEPORT)
+            return;
+
+        MoveResult moveResult = this.regionManagerService.get().handlePlayerMove(superiorPlayer, from, to);
+        switch (moveResult) {
+            case VOID_TELEPORT:
+            case SUCCESS:
+                break;
+            default:
                 e.setCancelled(true);
-                return;
-            }
-        }
-
-        // Check for falling out of the void
-        if (from.getBlockY() != to.getBlockY() && to.getBlockY() <= plugin.getNMSWorld().getMinHeight(to.getWorld()) - 5) {
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-
-            Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
-
-            if (island == null || (island.isVisitor(superiorPlayer, false) ?
-                    !plugin.getSettings().getVoidTeleport().isVisitors() : !plugin.getSettings().getVoidTeleport().isMembers()))
-                return;
-
-            Log.debug(Debug.VOID_TELEPORT, superiorPlayer.getName());
-
-            noFallDamage.add(e.getPlayer().getUniqueId());
-            superiorPlayer.teleport(island, result -> {
-                if (!result) {
-                    Message.TELEPORTED_FAILED.send(superiorPlayer);
-                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-                }
-            });
+                break;
         }
     }
 
@@ -502,7 +482,11 @@ public class PlayersListener implements Listener {
 
     @EventHandler
     private void onPlayerFall(EntityDamageEvent e) {
-        if (e.getEntity() instanceof Player && e.getCause() == EntityDamageEvent.DamageCause.FALL && noFallDamage.contains(e.getEntity().getUniqueId()))
+        if (e.getCause() != EntityDamageEvent.DamageCause.FALL || !(e.getEntity() instanceof Player))
+            return;
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getEntity());
+        if (superiorPlayer.getPlayerStatus() == PlayerStatus.VOID_TELEPORT)
             e.setCancelled(true);
     }
 

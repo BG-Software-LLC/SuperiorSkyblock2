@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.service.portals.EntityPortalResult;
 import com.bgsoftware.superiorskyblock.api.service.portals.PortalsManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -90,12 +91,12 @@ public class PortalsListener implements Listener {
                         plugin.getPlayers().getSuperiorPlayer((Player) e.getEntity()) : null;
 
                 if (teleportedPlayer != null)
-                    teleportedPlayer.setLeavingFlag(true);
+                    teleportedPlayer.setPlayerStatus(PlayerStatus.LEAVING_ISLAND);
 
                 BukkitExecutor.sync(() -> {
                     EntityTeleports.teleportUntilSuccess(e.getEntity(), island.getIslandHome(World.Environment.NORMAL), 5, () -> {
-                        if (teleportedPlayer != null)
-                            teleportedPlayer.setLeavingFlag(false);
+                        if (teleportedPlayer != null && teleportedPlayer.getPlayerStatus() == PlayerStatus.LEAVING_ISLAND)
+                            teleportedPlayer.setPlayerStatus(PlayerStatus.NONE);
                     });
                 }, 5L);
             }

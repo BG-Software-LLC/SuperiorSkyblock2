@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandRestrictMoveEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.MoveResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
@@ -14,6 +15,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
@@ -396,36 +399,62 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(from, "from cannot be null");
         Preconditions.checkNotNull(to, "to cannot be null");
 
-        // Handle moving while in teleport warmup.
-        BukkitTask teleportTask = superiorPlayer.getTeleportTask();
-        if (teleportTask != null) {
-            teleportTask.cancel();
-            superiorPlayer.setTeleportTask(null);
-            Message.TELEPORT_WARMUP_CANCEL.send(superiorPlayer);
+        if (from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()) {
+            // Handle moving while in teleport warmup.
+            BukkitTask teleportTask = superiorPlayer.getTeleportTask();
+            if (teleportTask != null) {
+                teleportTask.cancel();
+                superiorPlayer.setTeleportTask(null);
+                Message.TELEPORT_WARMUP_CANCEL.send(superiorPlayer);
+            }
+
+            //Checking for out of distance from preview location.
+            IslandPreview islandPreview = plugin.getGrid().getIslandPreview(superiorPlayer);
+            if (islandPreview != null && (!islandPreview.getLocation().getWorld().equals(to.getWorld()) ||
+                    islandPreview.getLocation().distanceSquared(to) > 10000)) {
+                islandPreview.handleEscape();
+                return MoveResult.ISLAND_PREVIEW_MOVED_TOO_FAR;
+            }
+
+            MoveResult moveResult;
+
+            Island toIsland = plugin.getGrid().getIslandAt(to);
+            if (toIsland != null) {
+                moveResult = handlePlayerEnterIslandInternal(superiorPlayer, toIsland, from, to, IslandEnterEvent.EnterCause.PLAYER_MOVE);
+                if (moveResult != MoveResult.SUCCESS)
+                    return moveResult;
+            }
+
+            Island fromIsland = plugin.getGrid().getIslandAt(from);
+            if (fromIsland != null) {
+                moveResult = handlePlayerLeaveIslandInternal(superiorPlayer, fromIsland, from, to, IslandLeaveEvent.LeaveCause.PLAYER_MOVE);
+                if (moveResult != MoveResult.SUCCESS)
+                    return moveResult;
+            }
         }
 
-        //Checking for out of distance from preview location.
-        IslandPreview islandPreview = plugin.getGrid().getIslandPreview(superiorPlayer);
-        if (islandPreview != null && (!islandPreview.getLocation().getWorld().equals(to.getWorld()) ||
-                islandPreview.getLocation().distanceSquared(to) > 10000)) {
-            islandPreview.handleEscape();
-            return MoveResult.ISLAND_PREVIEW_MOVED_TOO_FAR;
-        }
+        if (from.getBlockY() != to.getBlockY() && to.getBlockY() <= plugin.getNMSWorld().getMinHeight(to.getWorld()) - 5) {
+            Island island = plugin.getGrid().getIslandAt(from);
 
-        MoveResult moveResult;
+            if (island == null || (island.isVisitor(superiorPlayer, false) ?
+                    !plugin.getSettings().getVoidTeleport().isVisitors() : !plugin.getSettings().getVoidTeleport().isMembers()))
+                return MoveResult.SUCCESS;
 
-        Island toIsland = plugin.getGrid().getIslandAt(to);
-        if (toIsland != null) {
-            moveResult = handlePlayerEnterIslandInternal(superiorPlayer, toIsland, from, to, IslandEnterEvent.EnterCause.PLAYER_MOVE);
-            if (moveResult != MoveResult.SUCCESS)
-                return moveResult;
-        }
+            Log.debug(Debug.VOID_TELEPORT, superiorPlayer.getName());
 
-        Island fromIsland = plugin.getGrid().getIslandAt(from);
-        if (fromIsland != null) {
-            moveResult = handlePlayerLeaveIslandInternal(superiorPlayer, fromIsland, from, to, IslandLeaveEvent.LeaveCause.PLAYER_MOVE);
-            if (moveResult != MoveResult.SUCCESS)
-                return moveResult;
+            superiorPlayer.setPlayerStatus(PlayerStatus.VOID_TELEPORT);
+
+            superiorPlayer.teleport(island, result -> {
+                if (!result) {
+                    Message.TELEPORTED_FAILED.send(superiorPlayer);
+                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                }
+
+                if (superiorPlayer.getPlayerStatus() == PlayerStatus.VOID_TELEPORT)
+                    superiorPlayer.setPlayerStatus(PlayerStatus.NONE);
+            });
+
+            return MoveResult.VOID_TELEPORT;
         }
 
         return MoveResult.SUCCESS;
@@ -511,8 +540,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                                                        @Nullable Location from, Location to,
                                                        IslandEnterEvent.EnterCause enterCause) {
         // This can happen after the leave event is cancelled.
-        if (superiorPlayer.isLeavingFlag()) {
-            superiorPlayer.setLeavingFlag(false);
+        if (superiorPlayer.getPlayerStatus() == PlayerStatus.LEAVING_ISLAND) {
+            superiorPlayer.setPlayerStatus(PlayerStatus.NONE);
             return MoveResult.SUCCESS;
         }
 
@@ -547,8 +576,11 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         if (equalIslands) {
             if (!equalWorlds) {
                 BukkitExecutor.sync(() -> plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland), 1L);
-                superiorPlayer.setImmunedToPortals(true);
-                BukkitExecutor.sync(() -> superiorPlayer.setImmunedToPortals(false), 100L);
+                superiorPlayer.setPlayerStatus(PlayerStatus.PORTALS_IMMUNED);
+                BukkitExecutor.sync(() -> {
+                    if (superiorPlayer.getPlayerStatus() == PlayerStatus.PORTALS_IMMUNED)
+                        superiorPlayer.setPlayerStatus(PlayerStatus.NONE);
+                }, 100L);
             }
 
             return MoveResult.SUCCESS;
@@ -564,13 +596,19 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         if (!toIsland.isMember(superiorPlayer) && toIsland.hasSettingsEnabled(IslandFlags.PVP)) {
             Message.ENTER_PVP_ISLAND.send(superiorPlayer);
             if (plugin.getSettings().isImmuneToPvPWhenTeleport()) {
-                superiorPlayer.setImmunedToPvP(true);
-                BukkitExecutor.sync(() -> superiorPlayer.setImmunedToPvP(false), 200L);
+                superiorPlayer.setPlayerStatus(PlayerStatus.PVP_IMMUNED);
+                BukkitExecutor.sync(() -> {
+                    if (superiorPlayer.getPlayerStatus() == PlayerStatus.PVP_IMMUNED)
+                        superiorPlayer.setPlayerStatus(PlayerStatus.NONE);
+                }, 200L);
             }
         }
 
-        superiorPlayer.setImmunedToPortals(true);
-        BukkitExecutor.sync(() -> superiorPlayer.setImmunedToPortals(false), 100L);
+        superiorPlayer.setPlayerStatus(PlayerStatus.PORTALS_IMMUNED);
+        BukkitExecutor.sync(() -> {
+            if (superiorPlayer.getPlayerStatus() == PlayerStatus.PORTALS_IMMUNED)
+                superiorPlayer.setPlayerStatus(PlayerStatus.NONE);
+        }, 100L);
 
         Player player = superiorPlayer.asPlayer();
         if (player != null && (plugin.getSettings().getSpawn().isProtected() || !toIsland.isSpawn())) {
@@ -624,7 +662,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         if (plugin.getSettings().isStopLeaving() && fromInsideRange && !toInsideRange &&
                 !superiorPlayer.hasBypassModeEnabled() && !fromIsland.isSpawn() && equalWorlds) {
             plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_ISLAND_TO_OUTSIDE);
-            superiorPlayer.setLeavingFlag(true);
+            superiorPlayer.setPlayerStatus(PlayerStatus.LEAVING_ISLAND);
             return MoveResult.LEAVE_ISLAND_TO_OUTSIDE;
         }
 

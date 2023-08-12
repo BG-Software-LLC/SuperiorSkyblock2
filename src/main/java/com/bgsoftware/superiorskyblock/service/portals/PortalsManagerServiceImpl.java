@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeLevelBonusEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeWorthBonusEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.service.portals.EntityPortalResult;
@@ -95,7 +96,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         if (targetDestination == World.Environment.THE_END && !plugin.getSettings().getWorlds().getEnd().isEnabled())
             return EntityPortalResult.DESTINATION_WORLD_DISABLED;
 
-        if (!ignoreImmunedPortalsStatus && superiorPlayer.isImmunedToPortals())
+        if (!ignoreImmunedPortalsStatus && superiorPlayer.getPlayerStatus() == PlayerStatus.PORTALS_IMMUNED)
             return EntityPortalResult.PLAYER_IMMUNED_TO_PORTAL;
 
         EntityPortalResult portalResult = entityPortalResultSupplier.get();
