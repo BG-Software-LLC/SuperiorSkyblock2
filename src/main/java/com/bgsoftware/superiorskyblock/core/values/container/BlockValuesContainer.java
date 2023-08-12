@@ -3,16 +3,15 @@ package com.bgsoftware.superiorskyblock.core.values.container;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 
 import java.math.BigDecimal;
-import java.util.Map;
 import java.util.function.BiConsumer;
 
 public abstract class BlockValuesContainer {
 
-    private final KeyMap<BigDecimal> valuesMap = KeyMapImpl.createHashMap();
+    private final KeyMap<BigDecimal> valuesMap = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
 
     public abstract void loadDefaultValues(SuperiorSkyblockPlugin plugin);
 

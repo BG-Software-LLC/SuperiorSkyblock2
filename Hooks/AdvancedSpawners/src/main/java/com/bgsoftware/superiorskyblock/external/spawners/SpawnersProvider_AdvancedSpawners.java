@@ -3,8 +3,7 @@ package com.bgsoftware.superiorskyblock.external.spawners;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.Materials;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import gcspawners.ASAPI;
@@ -58,7 +57,7 @@ public class SpawnersProvider_AdvancedSpawners implements SpawnersProvider_AutoD
 
             if (island != null)
                 island.handleBlockPlace(
-                        KeyImpl.of(Materials.SPAWNER.toBukkitType() + "", e.getEntityType()),
+                        Keys.ofSpawner(e.getEntityType()),
                         e.getCountPlaced());
         }
 
@@ -67,7 +66,7 @@ public class SpawnersProvider_AdvancedSpawners implements SpawnersProvider_AutoD
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
             if (island != null)
                 island.handleBlockBreak(
-                        KeyImpl.of(Materials.SPAWNER.toBukkitType() + "", e.getEntityType()),
+                        Keys.ofSpawner(e.getEntityType()),
                         e.getCountBroken());
         }
 

@@ -12,7 +12,7 @@ import com.bgsoftware.superiorskyblock.api.service.placeholders.PlayerPlaceholde
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
@@ -319,16 +319,16 @@ public class PlaceholdersServiceImpl implements PlaceholdersService {
                 } else if ((matcher = COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
                     return Optional.of(Formatters.NUMBER_FORMATTER.format(island
-                            .getBlockCountAsBigInteger(KeyImpl.of(keyName))));
+                            .getBlockCountAsBigInteger(Keys.ofMaterialAndData(keyName))));
                 } else if ((matcher = BLOCK_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
-                    return Optional.of(island.getBlockLimit(KeyImpl.of(keyName)) + "");
+                    return Optional.of(island.getBlockLimit(Keys.ofMaterialAndData(keyName)) + "");
                 } else if ((matcher = ENTITY_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
-                    return Optional.of(island.getEntityLimit(KeyImpl.of(keyName)) + "");
+                    return Optional.of(island.getEntityLimit(Keys.ofEntityType(keyName)) + "");
                 } else if ((matcher = ENTITY_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
-                    return Optional.of(Formatters.NUMBER_FORMATTER.format(island.getEntitiesTracker().getEntityCount(KeyImpl.of(keyName))));
+                    return Optional.of(Formatters.NUMBER_FORMATTER.format(island.getEntitiesTracker().getEntityCount(Keys.ofEntityType(keyName))));
                 } else if ((matcher = MEMBER_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
                     return handleMembersPlaceholder(island, matcher.group(1));
                 } else if ((matcher = VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {

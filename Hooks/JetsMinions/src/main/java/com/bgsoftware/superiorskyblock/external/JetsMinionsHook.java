@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.external;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.Singleton;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.listener.BlockChangesListener;
@@ -40,7 +40,7 @@ public class JetsMinionsHook implements Listener {
         if (unstackResult.shouldCancelOriginalEvent()) {
             e.setCancelled(true);
         } else {
-            blockChangesListener.get().onBlockBreak(KeyImpl.of(e.getBlock()), e.getBlock().getLocation(),
+            blockChangesListener.get().onBlockBreak(Keys.of(e.getBlock()), e.getBlock().getLocation(),
                     plugin.getNMSWorld().getDefaultAmount(e.getBlock()),
                     BlockChangesListener.Flag.DIRTY_CHUNK, BlockChangesListener.Flag.SAVE_BLOCK_COUNT);
         }

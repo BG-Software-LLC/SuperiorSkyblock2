@@ -9,8 +9,9 @@ import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
@@ -47,7 +48,6 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.material.Directional;
-import org.bukkit.material.Dispenser;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.Nullable;
@@ -91,22 +91,22 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onBlockPlace(BlockPlaceEvent e) {
-        onBlockPlace(KeyImpl.of(e.getBlock()), e.getBlock().getLocation(), 1, e.getBlockReplacedState(),
+        onBlockPlace(Keys.of(e.getBlock()), e.getBlock().getLocation(), 1, e.getBlockReplacedState(),
                 Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onBucketEmpty(PlayerBucketEmptyEvent e) {
-        Key blockKey = KeyImpl.of(e.getBucket().name().replace("_BUCKET", ""));
+        Key blockKey = Keys.ofMaterialAndData(e.getBucket().name().replace("_BUCKET", ""));
         onBlockPlace(blockKey, e.getBlockClicked().getLocation(), 1, null,
                 Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onStructureGrow(StructureGrowEvent e) {
-        KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
+        KeyMap<Integer> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
         e.getBlocks().forEach(blockState -> {
-            Key blockKey = KeyImpl.of(blockState);
+            Key blockKey = Keys.of(blockState);
             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
         });
         onMultiBlockPlace(blockCounts, e.getLocation(), Flag.DIRTY_CHUNK);
@@ -114,7 +114,7 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onBlockGrow(BlockGrowEvent e) {
-        onBlockPlace(KeyImpl.of(e.getNewState()), e.getBlock().getLocation(), 1, null,
+        onBlockPlace(Keys.of(e.getNewState()), e.getBlock().getLocation(), 1, null,
                 Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
     }
 
@@ -122,7 +122,7 @@ public class BlockChangesListener implements Listener {
     private void onBlockFrom(BlockFormEvent e) {
         Location location = e.getNewState().getLocation();
         // Do not save block counts
-        onBlockBreak(KeyImpl.of(e.getBlock()), location, 1, Flag.DIRTY_CHUNK);
+        onBlockBreak(Keys.of(e.getBlock()), location, 1, Flag.DIRTY_CHUNK);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -179,8 +179,7 @@ public class BlockChangesListener implements Listener {
                 break;
             case "COMMAND_MINECART":
             case "COMMAND_BLOCK_MINECART":
-                blockKey = ServerVersion.isAtLeast(ServerVersion.v1_13) ?
-                        ConstantKeys.COMMAND_BLOCK : ConstantKeys.COMMAND;
+                blockKey = ConstantKeys.COMMAND_BLOCK;
                 break;
             case "EXPLOSIVE_MINECART":
             case "TNT_MINECART":
@@ -207,9 +206,9 @@ public class BlockChangesListener implements Listener {
 
         if (ServerVersion.isLegacy()) {
             // noinspection deprecated
-            blockKey = KeyImpl.of(e.getTo(), e.getData());
+            blockKey = Keys.of(e.getTo(), e.getData());
         } else {
-            blockKey = KeyImpl.of(e.getTo(), (byte) 0);
+            blockKey = Keys.of(e.getTo(), (byte) 0);
         }
 
         onBlockPlace(blockKey, e.getBlock().getLocation(), 1, e.getBlock().getState(), Flag.SAVE_BLOCK_COUNT);
@@ -234,7 +233,7 @@ public class BlockChangesListener implements Listener {
             } else if (Materials.isWater(blockStateType)) {
                 oldBlockKey = ConstantKeys.WATER;
             } else {
-                oldBlockKey = KeyImpl.of(oldBlockState);
+                oldBlockKey = Keys.of(oldBlockState);
                 oldBlockCount = plugin.getNMSWorld().getDefaultAmount(oldBlockState.getBlock());
             }
 
@@ -272,7 +271,7 @@ public class BlockChangesListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onBlockBreak(BlockBreakEvent e) {
         int blockCount = plugin.getNMSWorld().getDefaultAmount(e.getBlock());
-        onBlockBreak(KeyImpl.of(e.getBlock()), e.getBlock().getLocation(), blockCount,
+        onBlockBreak(Keys.of(e.getBlock()), e.getBlock().getLocation(), blockCount,
                 Flag.HANDLE_NEARBY_BLOCKS, Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
     }
 
@@ -289,7 +288,7 @@ public class BlockChangesListener implements Listener {
     private void onBucketFill(PlayerBucketFillEvent e) {
         boolean isWaterLogged = plugin.getNMSWorld().isWaterLogged(e.getBlockClicked());
         if (e.getBlockClicked().isLiquid() || isWaterLogged) {
-            Key blockKey = isWaterLogged ? ConstantKeys.WATER : KeyImpl.of(e.getBlockClicked());
+            Key blockKey = isWaterLogged ? ConstantKeys.WATER : Keys.of(e.getBlockClicked());
             onBlockBreak(blockKey, e.getBlockClicked().getLocation(), 1,
                     Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
         }
@@ -320,7 +319,7 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onLeavesDecay(LeavesDecayEvent e) {
-        onBlockBreak(KeyImpl.of(e.getBlock()), e.getBlock().getLocation(), 1,
+        onBlockBreak(Keys.of(e.getBlock()), e.getBlock().getLocation(), 1,
                 Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
     }
 
@@ -328,20 +327,20 @@ public class BlockChangesListener implements Listener {
     private void onBlockFromTo(BlockFromToEvent e) {
         if (e.getToBlock().getType() != Material.AIR) {
             // Do not save block counts
-            onBlockBreak(KeyImpl.of(e.getToBlock()), e.getToBlock().getLocation(), 1, Flag.DIRTY_CHUNK);
+            onBlockBreak(Keys.of(e.getToBlock()), e.getToBlock().getLocation(), 1, Flag.DIRTY_CHUNK);
         } else {
             BukkitExecutor.sync(() -> {
                 // Do not save block counts
-                onBlockPlace(KeyImpl.of(e.getToBlock()), e.getToBlock().getLocation(), 1, null, Flag.DIRTY_CHUNK);
+                onBlockPlace(Keys.of(e.getToBlock()), e.getToBlock().getLocation(), 1, null, Flag.DIRTY_CHUNK);
             });
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onEntityExplode(EntityExplodeEvent e) {
-        KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
+        KeyMap<Integer> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
         e.blockList().forEach(block -> {
-            Key blockKey = KeyImpl.of(block);
+            Key blockKey = Keys.of(block);
             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
         });
         if (e.getEntity() instanceof TNTPrimed)
@@ -393,7 +392,7 @@ public class BlockChangesListener implements Listener {
                 for (BlockFace nearbyFace : NEARBY_BLOCKS) {
                     Block nearbyBlock = block.getRelative(nearbyFace);
                     if (!nearbyBlock.getType().isSolid()) {
-                        Key nearbyBlockKey = KeyImpl.of(nearbyBlock);
+                        Key nearbyBlockKey = Keys.of(nearbyBlock);
                         if (!nearbyBlockKey.getGlobalKey().equals("AIR"))
                             nearbyBlocks.put(nearbyFace, nearbyBlockKey);
                     }
@@ -409,7 +408,7 @@ public class BlockChangesListener implements Listener {
                 }
                 if (handleNearbyBlocks) {
                     for (BlockFace nearbyFace : NEARBY_BLOCKS) {
-                        Key nearbyBlock = KeyImpl.of(block.getRelative(nearbyFace));
+                        Key nearbyBlock = Keys.of(block.getRelative(nearbyFace));
                         Key oldNearbyBlock = nearbyBlocks.getOrDefault(nearbyFace, ConstantKeys.AIR);
                         if (oldNearbyBlock != ConstantKeys.AIR && !nearbyBlock.equals(oldNearbyBlock)) {
                             island.handleBlockBreak(oldNearbyBlock, 1);

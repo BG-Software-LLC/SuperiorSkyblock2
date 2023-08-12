@@ -12,8 +12,9 @@ import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.key.KeySetImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.KeySets;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
@@ -62,7 +63,7 @@ public class MenuIslandValues extends AbstractMenu<MenuIslandValues.View, Island
         YamlConfiguration cfg = menuParseResult.getConfig();
         MenuLayout.Builder<View> patternBuilder = menuParseResult.getLayoutBuilder();
 
-        KeySet keysToUpdate = KeySetImpl.createHashSet();
+        KeySet keysToUpdate = KeySets.createHashSet(KeyIndicator.MATERIAL);
 
         if (cfg.isConfigurationSection("items")) {
             for (String itemsSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
@@ -73,7 +74,7 @@ public class MenuIslandValues extends AbstractMenu<MenuIslandValues.View, Island
                 if (block == null)
                     continue;
 
-                Key blockKey = KeyImpl.of(block);
+                Key blockKey = Keys.ofMaterialAndData(block);
                 keysToUpdate.add(blockKey);
 
                 patternBuilder.mapButtons(menuPatternSlots.getSlots(itemsSectionName), new ValuesButton.Builder(blockKey));

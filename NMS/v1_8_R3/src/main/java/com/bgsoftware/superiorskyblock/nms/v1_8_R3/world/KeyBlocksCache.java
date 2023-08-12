@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_8_R3.world;
 
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.IBlockData;
 import org.bukkit.Material;
@@ -23,7 +23,7 @@ public class KeyBlocksCache {
             Block block = blockData.getBlock();
             Material blockType = CraftMagicNumbers.getMaterial(block);
             byte data = (byte) block.toLegacyData(blockData);
-            return KeyImpl.of(blockType, data);
+            return Keys.of(blockType, data);
         });
     }
 

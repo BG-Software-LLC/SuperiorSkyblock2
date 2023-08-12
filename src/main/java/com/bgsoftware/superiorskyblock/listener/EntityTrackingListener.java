@@ -4,13 +4,12 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.Singleton;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -58,7 +57,7 @@ public class EntityTrackingListener implements Listener {
         if (island == null)
             return;
 
-        island.getEntitiesTracker().trackEntity(KeyImpl.of(entity), 1);
+        island.getEntitiesTracker().trackEntity(Keys.of(entity), 1);
     }
 
     /* ENTITY DESPAWNING */
@@ -73,7 +72,7 @@ public class EntityTrackingListener implements Listener {
         if (island == null)
             return;
 
-        island.getEntitiesTracker().untrackEntity(KeyImpl.of(entity), 1);
+        island.getEntitiesTracker().untrackEntity(Keys.of(entity), 1);
 
         if (!(entity instanceof Minecart))
             return;

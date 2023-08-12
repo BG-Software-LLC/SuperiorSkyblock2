@@ -6,13 +6,13 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.IslandChestAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.IslandWarpAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.PlayerAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.WarpCategoryAttributes;
+import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.core.Text;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
@@ -78,7 +78,7 @@ public class EmptyParameterGuardDeserializer implements IDeserializer {
 
     @Override
     public KeyMap<Integer> deserializeBlockLimits(String blocks) {
-        return checkParam(blocks, KeyMapImpl::createEmptyMap);
+        return checkParam(blocks, KeyMaps::createEmptyMap);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class EmptyParameterGuardDeserializer implements IDeserializer {
 
     @Override
     public KeyMap<Integer> deserializeEntityLimits(String entities) {
-        return checkParam(entities, KeyMapImpl::createEmptyMap);
+        return checkParam(entities, KeyMaps::createEmptyMap);
     }
 
     @Override

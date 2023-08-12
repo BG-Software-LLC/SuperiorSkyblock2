@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1201.world;
 
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 import org.bukkit.Material;
@@ -21,7 +21,7 @@ public class KeyBlocksCache {
     public static Key getBlockKey(Block block) {
         return BLOCK_TO_KEY.computeIfAbsent(block, unused -> {
             Material blockType = CraftMagicNumbers.getMaterial(block);
-            return KeyImpl.of(blockType.name() + "", "0");
+            return Keys.of(blockType, (short) 0);
         });
     }
 

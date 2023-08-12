@@ -12,8 +12,9 @@ import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.Island
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.IslandWarpAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.PlayerAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.WarpCategoryAttributes;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.google.gson.Gson;
@@ -175,12 +176,12 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public KeyMap<Integer> deserializeBlockLimits(String blocks) {
-        KeyMap<Integer> blockLimits = KeyMapImpl.createHashMap();
+        KeyMap<Integer> blockLimits = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
 
         JsonArray blockLimitsArray = gson.fromJson(blocks, JsonArray.class);
         blockLimitsArray.forEach(blockLimitElement -> {
             JsonObject blockLimitObject = blockLimitElement.getAsJsonObject();
-            Key blockKey = KeyImpl.of(blockLimitObject.get("id").getAsString());
+            Key blockKey = Keys.ofMaterialAndData(blockLimitObject.get("id").getAsString());
             int limit = blockLimitObject.get("limit").getAsInt();
             blockLimits.put(blockKey, limit);
         });
@@ -233,9 +234,9 @@ public class JsonDeserializer implements IDeserializer {
                 int i = World.Environment.valueOf(generatorWorldObject.get("env").getAsString()).ordinal();
                 generatorWorldObject.getAsJsonArray("rates").forEach(generatorElement -> {
                     JsonObject generatorObject = generatorElement.getAsJsonObject();
-                    Key blockKey = KeyImpl.of(generatorObject.get("id").getAsString());
+                    Key blockKey = Keys.ofMaterialAndData(generatorObject.get("id").getAsString());
                     int rate = generatorObject.get("rate").getAsInt();
-                    (cobbleGenerator[i] = KeyMapImpl.createHashMap()).put(blockKey, rate);
+                    (cobbleGenerator[i] = KeyMaps.createHashMap(KeyIndicator.MATERIAL)).put(blockKey, rate);
                 });
             } catch (Exception ignored) {
             }
@@ -263,12 +264,12 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public KeyMap<Integer> deserializeEntityLimits(String entities) {
-        KeyMap<Integer> entityLimits = KeyMapImpl.createHashMap();
+        KeyMap<Integer> entityLimits = KeyMaps.createIdentityHashMap(KeyIndicator.ENTITY_TYPE);
 
         JsonArray entityLimitsArray = gson.fromJson(entities, JsonArray.class);
         entityLimitsArray.forEach(entityLimitElement -> {
             JsonObject entityLimitObject = entityLimitElement.getAsJsonObject();
-            Key entity = KeyImpl.of(entityLimitObject.get("id").getAsString());
+            Key entity = Keys.ofEntityType(entityLimitObject.get("id").getAsString());
             int limit = entityLimitObject.get("limit").getAsInt();
             entityLimits.put(entity, limit);
         });

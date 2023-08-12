@@ -6,9 +6,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.external.WildStackerSnapshotsContainer;
@@ -72,7 +71,7 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
             if (island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getSpawnedType() + "");
+            Key blockKey = Keys.ofSpawner(e.getSpawner().getSpawnedType());
             int increaseAmount = e.getSpawner().getStackAmount();
 
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
@@ -90,7 +89,7 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
             if (island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getSpawnedType() + "");
+            Key blockKey = Keys.ofSpawner(e.getSpawner().getSpawnedType());
             int increaseAmount = e.getTarget().getStackAmount();
 
             if (increaseAmount < 0) {
@@ -106,7 +105,7 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
         public void onSpawnerUnstack(SpawnerUnstackEvent e) {
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
             if (island != null)
-                island.handleBlockBreak(KeyImpl.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getSpawnedType() + ""), e.getAmount());
+                island.handleBlockBreak(Keys.ofSpawner(e.getSpawner().getSpawnedType()), e.getAmount());
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -116,7 +115,7 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
             if (island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getSpawnedType() + "");
+            Key blockKey = Keys.ofSpawner(e.getSpawner().getSpawnedType());
             int increaseAmount = e.getIncreaseAmount();
 
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {

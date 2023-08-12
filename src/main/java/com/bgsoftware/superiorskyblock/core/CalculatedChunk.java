@@ -3,15 +3,15 @@ package com.bgsoftware.superiorskyblock.core;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import org.bukkit.Location;
 
-import java.util.Set;
+import java.util.List;
 
 public class CalculatedChunk {
 
     private final ChunkPosition chunkPosition;
-    private final KeyMap<Integer> blockCounts;
-    private final Set<Location> spawners;
+    private final KeyMap<Counter> blockCounts;
+    private final List<Location> spawners;
 
-    public CalculatedChunk(ChunkPosition chunkPosition, KeyMap<Integer> blockCounts, Set<Location> spawners) {
+    public CalculatedChunk(ChunkPosition chunkPosition, KeyMap<Counter> blockCounts, List<Location> spawners) {
         this.chunkPosition = chunkPosition;
         this.blockCounts = blockCounts;
         this.spawners = spawners;
@@ -21,11 +21,11 @@ public class CalculatedChunk {
         return chunkPosition;
     }
 
-    public KeyMap<Integer> getBlockCounts() {
+    public KeyMap<Counter> getBlockCounts() {
         return blockCounts;
     }
 
-    public Set<Location> getSpawners() {
+    public List<Location> getSpawners() {
         return spawners;
     }
 

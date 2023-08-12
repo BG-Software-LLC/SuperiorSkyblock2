@@ -613,7 +613,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
                 Constructor<?> constructor = clazz.getConstructor(SuperiorSkyblockPlugin.class);
                 // noinspection unchecked
                 return Optional.of((T) constructor.newInstance(plugin));
-            } catch (Exception error) {
+            } catch (NoSuchMethodException error) {
                 // noinspection unchecked
                 return Optional.of((T) clazz.newInstance());
             }

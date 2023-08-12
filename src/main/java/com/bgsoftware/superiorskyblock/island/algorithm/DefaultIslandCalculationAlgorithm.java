@@ -8,11 +8,12 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
-import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
@@ -81,8 +82,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
                 Log.debugResult(Debug.CHUNK_CALCULATION, "Chunk Finished", calculatedChunk.getPosition());
 
                 // We want to remove spawners from the chunkInfo, as it will be used later
-                calculatedChunk.getBlockCounts().removeIf(key ->
-                        key.getGlobalKey().equals(ConstantKeys.MOB_SPAWNER.getGlobalKey()));
+                calculatedChunk.getBlockCounts().removeIf(key -> key instanceof SpawnerKey);
 
                 blockCounts.addCounts(calculatedChunk.getBlockCounts());
 
@@ -93,7 +93,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
                     if (spawnerInfo.getValue() == null) {
                         spawnersToCheck.add(new SpawnerInfo(location, spawnerInfo.getKey()));
                     } else {
-                        Key spawnerKey = KeyImpl.of(Materials.SPAWNER.toBukkitType().name() + "", spawnerInfo.getValue(), location);
+                        Key spawnerKey = Keys.ofSpawner(spawnerInfo.getValue(), location);
                         blockCounts.addCounts(spawnerKey, spawnerInfo.getKey());
                     }
                 }
@@ -123,8 +123,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
             for (SpawnerInfo spawnerInfo : spawnersToCheck) {
                 try {
                     CreatureSpawner creatureSpawner = (CreatureSpawner) spawnerInfo.location.getBlock().getState();
-                    blockKey = KeyImpl.of(Materials.SPAWNER.toBukkitType().name() + "",
-                            creatureSpawner.getSpawnedType() + "", spawnerInfo.location);
+                    blockKey = Keys.ofSpawner(creatureSpawner.getSpawnedType(), spawnerInfo.location);
                     blockCount = spawnerInfo.spawnerCount;
 
                     if (blockCount <= 0) {
@@ -136,7 +135,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
                             entityType = creatureSpawner.getSpawnedType().name();
 
                         blockCount = spawnersProviderInfo.getKey();
-                        blockKey = KeyImpl.of(Materials.SPAWNER.toBukkitType().name() + "", entityType, spawnerInfo.location);
+                        blockKey = Keys.ofSpawner(entityType, spawnerInfo.location);
                     }
 
                     blockCounts.addCounts(blockKey, blockCount);
@@ -164,7 +163,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
 
     private static class BlockCountsTracker implements IslandCalculationResult {
 
-        private final KeyMap<BigInteger> blockCounts = KeyMapImpl.createConcurrentHashMap();
+        private final KeyMap<BigInteger> blockCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
 
         @Override
         public Map<Key, BigInteger> getBlockCounts() {
@@ -175,8 +174,8 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
             blockCounts.put(blockKey, blockCounts.getRaw(blockKey, BigInteger.ZERO).add(BigInteger.valueOf(amount)));
         }
 
-        public void addCounts(KeyMap<Integer> other) {
-            other.forEach(this::addCounts);
+        public void addCounts(KeyMap<Counter> other) {
+            other.forEach((key, counter) -> addCounts(key, counter.get()));
         }
     }
 

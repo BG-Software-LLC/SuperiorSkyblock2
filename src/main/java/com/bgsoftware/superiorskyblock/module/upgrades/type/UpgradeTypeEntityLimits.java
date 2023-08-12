@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.core.LocationKey;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
@@ -72,7 +72,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            island.hasReachedEntityLimit(KeyImpl.of(e.getEntity())).whenComplete((result, ex) -> {
+            island.hasReachedEntityLimit(Keys.of(e.getEntity())).whenComplete((result, ex) -> {
                 if (result) {
                     e.setCancelled(true);
                 }
@@ -89,7 +89,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            island.hasReachedEntityLimit(KeyImpl.of(e.getEntity())).whenComplete((result, ex) -> {
+            island.hasReachedEntityLimit(Keys.of(e.getEntity())).whenComplete((result, ex) -> {
                 if (result) {
                     e.setCancelled(true);
                 }
@@ -134,7 +134,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
             UUID placedVehicle = vehiclesOwners.remove(new LocationKey(e.getVehicle().getLocation()));
 
-            island.hasReachedEntityLimit(KeyImpl.of(e.getVehicle())).whenComplete((result, ex) -> {
+            island.hasReachedEntityLimit(Keys.of(e.getVehicle())).whenComplete((result, ex) -> {
                 if (result) {
                     BukkitExecutor.sync(() -> {
                         removeEntity(e.getVehicle());

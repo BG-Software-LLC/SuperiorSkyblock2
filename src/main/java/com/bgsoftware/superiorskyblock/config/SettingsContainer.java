@@ -17,9 +17,10 @@ import com.bgsoftware.superiorskyblock.core.formatting.impl.DateFormatter;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.NumberFormatter;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.core.key.KeySetImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.KeySets;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
@@ -45,6 +46,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 public class SettingsContainer {
@@ -232,35 +234,23 @@ public class SettingsContainer {
         islandCommand = config.getString("island-command", "island,is,islands");
         maxIslandSize = config.getInt("max-island-size", 200);
         defaultIslandSize = config.getInt("default-values.island-size", 20);
-        defaultBlockLimits = KeyMapImpl.createHashMap();
-        for (String line : config.getStringList("default-values.block-limits")) {
-            String[] sections = line.split(":");
-
-            if (sections.length < 2) {
-                Log.warnFromFile("config.yml", "Cannot parse block limit '", line, "', skipping...");
-                continue;
-            }
-
-            String gloablKey = sections[0];
-            String subKey = sections.length == 2 ? "" : sections[1];
-            String limit = sections.length == 2 ? sections[1] : sections[2];
-            Key key = KeyImpl.of(gloablKey, subKey);
-            defaultBlockLimits.put(key, Integer.parseInt(limit));
-            plugin.getBlockValues().addCustomBlockKey(key);
-        }
-        defaultEntityLimits = KeyMapImpl.createHashMap();
+        defaultBlockLimits = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        config.getStringList("default-values.block-limits").forEach(line -> {
+            loadMaterialKeyFromLine(line, (key, limit) -> {
+                defaultBlockLimits.put(key, Integer.parseInt(limit));
+                plugin.getBlockValues().addCustomBlockKey(key);
+            });
+        });
+        defaultEntityLimits = KeyMaps.createIdentityHashMap(KeyIndicator.ENTITY_TYPE);
         for (String line : config.getStringList("default-values.entity-limits")) {
             String[] sections = line.split(":");
 
-            if (sections.length < 2) {
+            if (sections.length != 2) {
                 Log.warnFromFile("config.yml", "Cannot parse entity limit '", line, "', skipping...");
                 continue;
             }
 
-            String gloablKey = sections[0];
-            String subKey = sections.length == 2 ? "" : sections[1];
-            String limit = sections.length == 2 ? sections[1] : sections[2];
-            defaultEntityLimits.put(KeyImpl.of(gloablKey, subKey), Integer.parseInt(limit));
+            defaultEntityLimits.put(Keys.ofEntityType(sections[0]), Integer.parseInt(sections[1]));
         }
         defaultTeamLimit = config.getInt("default-values.team-limit", 4);
         defaultWarpsLimit = config.getInt("default-values.warps-limit", 3);
@@ -281,20 +271,11 @@ public class SettingsContainer {
         worldBordersEnabled = config.getBoolean("world-borders", true);
         stackedBlocksEnabled = config.getBoolean("stacked-blocks.enabled", true);
         stackedBlocksDisabledWorlds = config.getStringList("stacked-blocks.disabled-worlds");
-        whitelistedStackedBlocks = KeySetImpl.createHashSet(config.getStringList("stacked-blocks.whitelisted")
-                .stream().map(KeyImpl::of).collect(Collectors.toList()));
+        whitelistedStackedBlocks = KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("stacked-blocks.whitelisted"));
         stackedBlocksName = Formatters.COLOR_FORMATTER.format(config.getString("stacked-blocks.custom-name"));
-        stackedBlocksLimits = KeyMapImpl.createHashMap();
+        stackedBlocksLimits = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
         config.getStringList("stacked-blocks.limits").forEach(line -> {
-            String[] sections = line.split(":");
-            try {
-                if (sections.length == 2)
-                    stackedBlocksLimits.put(KeyImpl.of(sections[0], ""), Integer.parseInt(sections[1]));
-                else if (sections.length == 3)
-                    stackedBlocksLimits.put(KeyImpl.of(sections[0], sections[1]), Integer.parseInt(sections[2]));
-            } catch (Exception error) {
-                Log.error(error, "An unexpected error occurred while parsing stacked block limit for '", line, "':");
-            }
+            loadMaterialKeyFromLine(line, (key, limit) -> stackedBlocksLimits.put(key, Integer.parseInt(limit)));
         });
         stackedBlocksAutoPickup = config.getBoolean("stacked-blocks.auto-collect", false);
         stackedBlocksMenuEnabled = config.getBoolean("stacked-blocks.deposit-menu.enabled", true);
@@ -506,8 +487,7 @@ public class SettingsContainer {
                 commandAliases.put(label.toLowerCase(Locale.ENGLISH), config.getStringList("command-aliases." + label));
             }
         }
-        valuableBlocks = KeySetImpl.createHashSet(config.getStringList("valuable-blocks").stream()
-                .map(KeyImpl::of).collect(Collectors.toSet()));
+        valuableBlocks = KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("valuable-blocks"));
         islandPreviewLocations = new HashMap<>();
         if (config.isConfigurationSection("preview-islands")) {
             for (String schematic : config.getConfigurationSection("preview-islands").getKeys(false)) {
@@ -586,20 +566,29 @@ public class SettingsContainer {
             }
         }
 
-        return KeySetImpl.createHashSet(safeBlocks.stream()
-                .map(KeyImpl::of)
-                .collect(Collectors.toSet()));
+        return KeySets.createHashSet(KeyIndicator.MATERIAL, safeBlocks);
     }
 
     private void loadGenerator(List<String> lines, int index) {
-        defaultGenerator[index] = KeyMapImpl.createHashMap();
-        for (String line : lines) {
-            String[] sections = line.toUpperCase(Locale.ENGLISH).split(":");
-            String globalKey = sections[0];
-            String subKey = sections.length == 2 ? "" : sections[1];
-            String percentage = sections.length == 2 ? sections[1] : sections[2];
-            defaultGenerator[index].put(KeyImpl.of(globalKey, subKey), Integer.parseInt(percentage));
-        }
+        defaultGenerator[index] = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        lines.forEach(line -> {
+            loadMaterialKeyFromLine(line, (key, percentage) ->
+                    defaultGenerator[index].put(key, Integer.parseInt(percentage)));
+        });
+    }
+
+    private static void loadMaterialKeyFromLine(String line, BiConsumer<Key, String> consumer) {
+        String[] sections = line.toUpperCase(Locale.ENGLISH).split(":");
+
+        if (sections.length < 2)
+            return;
+
+        String materialName = sections[0];
+        String data = sections.length == 2 ? null : sections[1];
+        String extra = sections.length == 3 ? sections[2] : sections[1];
+
+        Key key = Keys.ofMaterialAndData(materialName, data);
+        consumer.accept(key, extra);
     }
 
 }

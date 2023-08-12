@@ -40,8 +40,11 @@ import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridg
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.key.BaseKey;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -158,8 +161,8 @@ public class SIsland implements Island {
     private final Map<PlayerRole, Value<Integer>> roleLimits = new ConcurrentHashMap<>();
     private final Synchronized<EnumMap<World.Environment, KeyMap<Value<Integer>>>> cobbleGeneratorValues = Synchronized.of(new EnumMap<>(World.Environment.class));
     private final Map<PotionEffectType, Value<Integer>> islandEffects = new ConcurrentHashMap<>();
-    private final KeyMap<Value<Integer>> blockLimits = KeyMapImpl.createConcurrentHashMap();
-    private final KeyMap<Value<Integer>> entityLimits = KeyMapImpl.createConcurrentHashMap();
+    private final KeyMap<Value<Integer>> blockLimits = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
+    private final KeyMap<Value<Integer>> entityLimits = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
     /*
      * Island Player-Trackers
      */
@@ -1970,19 +1973,19 @@ public class SIsland implements Island {
     @Override
     public void handleBlockPlace(Block block) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        handleBlockPlace(KeyImpl.of(block), 1);
+        handleBlockPlace(Keys.of(block), 1);
     }
 
     @Override
     public void handleBlockPlace(Block block, int amount) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        handleBlockPlace(KeyImpl.of(block), amount, true);
+        handleBlockPlace(Keys.of(block), amount, true);
     }
 
     @Override
     public void handleBlockPlace(Block block, int amount, boolean save) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        handleBlockPlace(KeyImpl.of(block), amount, save);
+        handleBlockPlace(Keys.of(block), amount, save);
     }
 
     /*
@@ -2064,7 +2067,7 @@ public class SIsland implements Island {
     @Override
     public void handleBlockBreak(Block block) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        handleBlockBreak(KeyImpl.of(block), 1);
+        handleBlockBreak(Keys.of(block), 1);
     }
 
     @Override
@@ -2076,7 +2079,7 @@ public class SIsland implements Island {
     @Override
     public void handleBlockBreak(Block block, int amount, boolean save) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        handleBlockBreak(KeyImpl.of(block), amount, save);
+        handleBlockBreak(Keys.of(block), amount, save);
     }
 
     @Override
@@ -2524,7 +2527,7 @@ public class SIsland implements Island {
         }
 
         //Getting the global key values.
-        key = KeyImpl.of(key.getGlobalKey(), "");
+        key = ((BaseKey<?>) key).toGlobalKey();
         blockLimit = getBlockLimit(key);
 
         return blockLimit >= 0 && getBlockCountAsBigInteger(key)
@@ -2534,7 +2537,7 @@ public class SIsland implements Island {
     @Override
     public int getEntityLimit(EntityType entityType) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
-        return getEntityLimit(KeyImpl.of(entityType));
+        return getEntityLimit(Keys.of(entityType));
     }
 
     @Override
@@ -2572,7 +2575,7 @@ public class SIsland implements Island {
     @Override
     public void setEntityLimit(EntityType entityType, int limit) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
-        setEntityLimit(KeyImpl.of(entityType), limit);
+        setEntityLimit(Keys.of(entityType), limit);
     }
 
     @Override
@@ -2594,7 +2597,7 @@ public class SIsland implements Island {
     @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
-        return hasReachedEntityLimit(KeyImpl.of(entityType));
+        return hasReachedEntityLimit(Keys.of(entityType));
     }
 
     @Override
@@ -2606,7 +2609,7 @@ public class SIsland implements Island {
     @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, int amount) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
-        return hasReachedEntityLimit(KeyImpl.of(entityType), amount);
+        return hasReachedEntityLimit(Keys.of(entityType), amount);
     }
 
     @Override
@@ -3288,7 +3291,7 @@ public class SIsland implements Island {
         Log.debug(Debug.SET_GENERATOR_PERCENTAGE, owner.getName(), key, percentage, environment, caller, callEvent);
 
         KeyMap<Value<Integer>> worldGeneratorRates = this.cobbleGeneratorValues.writeAndGet(cobbleGeneratorValues ->
-                cobbleGeneratorValues.computeIfAbsent(environment, e -> KeyMapImpl.createConcurrentHashMap()));
+                cobbleGeneratorValues.computeIfAbsent(environment, e -> KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL)));
 
         Preconditions.checkArgument(percentage >= 0 && percentage <= 100, "Percentage must be between 0 and 100 - got " + percentage + ".");
 
@@ -3298,7 +3301,7 @@ public class SIsland implements Island {
 
             removeGeneratorAmount(key, environment);
         } else if (percentage == 100) {
-            KeyMap<Value<Integer>> cobbleGeneratorValuesOriginal = KeyMapImpl.createConcurrentHashMap(worldGeneratorRates);
+            KeyMap<Value<Integer>> cobbleGeneratorValuesOriginal = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL, worldGeneratorRates);
             worldGeneratorRates.clear();
 
             int generatorRate = 1;
@@ -3358,7 +3361,7 @@ public class SIsland implements Island {
     public Map<String, Integer> getGeneratorPercentages(World.Environment environment) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         return getGeneratorAmounts(environment).keySet().stream().collect(Collectors.toMap(key -> key,
-                key -> getGeneratorAmount(KeyImpl.of(key), environment)));
+                key -> getGeneratorAmount(Keys.ofMaterialAndData(key), environment)));
     }
 
     @Override
@@ -3371,7 +3374,7 @@ public class SIsland implements Island {
         Log.debug(Debug.SET_GENERATOR_RATE, owner.getName(), key, amount, environment);
 
         KeyMap<Value<Integer>> worldGeneratorRates = this.cobbleGeneratorValues.writeAndGet(cobbleGeneratorValues ->
-                cobbleGeneratorValues.computeIfAbsent(environment, e -> KeyMapImpl.createConcurrentHashMap()));
+                cobbleGeneratorValues.computeIfAbsent(environment, e -> KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL)));
 
         Value<Integer> oldGeneratorRate = worldGeneratorRates.put(key, Value.fixed(amount));
 
@@ -3510,24 +3513,24 @@ public class SIsland implements Island {
 
         Map<String, Integer> generatorAmounts = getGeneratorAmounts(environment);
 
-        String newState = "COBBLESTONE";
+        Key newStateKey = ConstantKeys.COBBLESTONE;
 
         if (totalGeneratorAmounts == 1) {
-            newState = generatorAmounts.keySet().iterator().next();
+            newStateKey = Keys.ofMaterialAndData(generatorAmounts.keySet().iterator().next());
         } else {
             int generatedIndex = ThreadLocalRandom.current().nextInt(totalGeneratorAmounts);
             int currentIndex = 0;
             for (Map.Entry<String, Integer> entry : generatorAmounts.entrySet()) {
                 currentIndex += entry.getValue();
                 if (generatedIndex < currentIndex) {
-                    newState = entry.getKey();
+                    newStateKey = Keys.ofMaterialAndData(entry.getKey());
                     break;
                 }
             }
         }
 
         EventResult<EventsBus.GenerateBlockResult> eventResult = plugin.getEventsBus().callIslandGenerateBlockEvent(
-                this, location, KeyImpl.of(newState));
+                this, location, newStateKey);
 
         if (eventResult.isCancelled()) {
             Log.debugResult(Debug.GENERATE_BLOCK, "Return Event Cancelled", "null");
@@ -4291,7 +4294,7 @@ public class SIsland implements Island {
                         if (currentValue == null || ((overrideCustom || currentValue instanceof SyncedValue) &&
                                 currentValue.get() < rate.get())) {
                             if (worldGeneratorRates == null) {
-                                worldGeneratorRates = KeyMapImpl.createConcurrentHashMap();
+                                worldGeneratorRates = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
                                 cobbleGeneratorValues.put(environment, worldGeneratorRates);
                             }
 

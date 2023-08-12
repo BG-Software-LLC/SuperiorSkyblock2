@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.listener.SignsListener;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
@@ -45,7 +45,6 @@ import net.minecraft.world.level.lighting.LevelLightEngine;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
@@ -91,9 +90,7 @@ public class NMSWorldImpl implements NMSWorld {
                 (chunkSnapshot.getZ() << 4) + z
         );
 
-        Key rawBlockKey = KeyBlocksCache.getBlockKey(block);
-
-        return KeyImpl.of(rawBlockKey, location);
+        return Keys.of(KeyBlocksCache.getBlockKey(block), location);
     }
 
     @Override
