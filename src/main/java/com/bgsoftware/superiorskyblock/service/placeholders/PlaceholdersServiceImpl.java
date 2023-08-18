@@ -182,6 +182,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService {
                     .put("bank_limit", (island, superiorPlayer) -> Formatters.NUMBER_FORMATTER.format(island.getBankLimit()))
                     .put("bank_limit_format", (island, superiorPlayer) ->
                             Formatters.FANCY_NUMBER_FORMATTER.format(island.getBankLimit(), superiorPlayer.getUserLocale()))
+                    .put("uuid", (island, superiorPlayer) -> island.getUniqueId() + "")
                     .build();
 
     private static final Map<SortingType, BiFunction<Island, SuperiorPlayer, String>> TOP_VALUE_FORMAT_FUNCTIONS =
