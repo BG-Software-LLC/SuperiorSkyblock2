@@ -2,9 +2,8 @@ package com.bgsoftware.superiorskyblock.external.vanish;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.VanishProvider;
-import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.listener.PlayersListener;
+import com.bgsoftware.superiorskyblock.island.notifications.IslandNotifications;
 import com.earth2me.essentials.Essentials;
 import net.ess3.api.events.VanishStatusChangeEvent;
 import org.bukkit.Bukkit;
@@ -20,12 +19,10 @@ public class VanishProvider_Essentials implements VanishProvider, Listener {
 
     private final SuperiorSkyblockPlugin plugin;
     private final Essentials instance;
-    private final Singleton<PlayersListener> playersListener;
 
     public VanishProvider_Essentials(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         this.instance = JavaPlugin.getPlugin(Essentials.class);
-        this.playersListener = plugin.getListener(PlayersListener.class);
 
         if (!alreadyEnabled) {
             alreadyEnabled = true;
@@ -44,9 +41,9 @@ public class VanishProvider_Essentials implements VanishProvider, Listener {
     public void onPlayerVanish(VanishStatusChangeEvent e) {
         Player affectedPlayer = e.getAffected() == null ? e.getController().getBase() : e.getAffected().getBase();
         if (e.getValue()) {
-            this.playersListener.get().notifyPlayerQuit(plugin.getPlayers().getSuperiorPlayer(affectedPlayer));
+            IslandNotifications.notifyPlayerQuit(plugin.getPlayers().getSuperiorPlayer(affectedPlayer));
         } else {
-            this.playersListener.get().notifyPlayerJoin(plugin.getPlayers().getSuperiorPlayer(affectedPlayer));
+            IslandNotifications.notifyPlayerJoin(plugin.getPlayers().getSuperiorPlayer(affectedPlayer));
         }
     }
 

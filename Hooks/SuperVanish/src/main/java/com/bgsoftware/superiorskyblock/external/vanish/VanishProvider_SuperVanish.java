@@ -2,9 +2,8 @@ package com.bgsoftware.superiorskyblock.external.vanish;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.VanishProvider;
-import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.listener.PlayersListener;
+import com.bgsoftware.superiorskyblock.island.notifications.IslandNotifications;
 import de.myzelyam.api.vanish.PlayerVanishStateChangeEvent;
 import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;
@@ -18,11 +17,9 @@ public class VanishProvider_SuperVanish implements VanishProvider, Listener {
     private static boolean alreadyEnabled = false;
 
     private final SuperiorSkyblockPlugin plugin;
-    private final Singleton<PlayersListener> playersListener;
 
     public VanishProvider_SuperVanish(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        this.playersListener = plugin.getListener(PlayersListener.class);
 
         if (!alreadyEnabled) {
             alreadyEnabled = true;
@@ -40,9 +37,9 @@ public class VanishProvider_SuperVanish implements VanishProvider, Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerVanish(PlayerVanishStateChangeEvent e) {
         if (e.isVanishing()) {
-            this.playersListener.get().notifyPlayerQuit(plugin.getPlayers().getSuperiorPlayer(e.getUUID()));
+            IslandNotifications.notifyPlayerQuit(plugin.getPlayers().getSuperiorPlayer(e.getUUID()));
         } else {
-            this.playersListener.get().notifyPlayerJoin(plugin.getPlayers().getSuperiorPlayer(e.getUUID()));
+            IslandNotifications.notifyPlayerJoin(plugin.getPlayers().getSuperiorPlayer(e.getUUID()));
         }
     }
 

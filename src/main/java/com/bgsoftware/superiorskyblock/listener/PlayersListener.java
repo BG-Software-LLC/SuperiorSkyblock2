@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
+import com.bgsoftware.superiorskyblock.island.notifications.IslandNotifications;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
@@ -125,7 +126,7 @@ public class PlayersListener implements Listener {
 
         // Handling player join
         if (superiorPlayer.isShownAsOnline())
-            notifyPlayerJoin(superiorPlayer);
+            IslandNotifications.notifyPlayerJoin(superiorPlayer);
 
         Mutable<Boolean> teleportToSpawn = new Mutable<>(false);
 
@@ -168,18 +169,6 @@ public class PlayersListener implements Listener {
         }, 5L);
     }
 
-    public void notifyPlayerJoin(SuperiorPlayer superiorPlayer) {
-        superiorPlayer.updateLastTimeStatus();
-
-        Island island = superiorPlayer.getIsland();
-        if (island == null)
-            return;
-
-        IslandUtils.sendMessage(island, Message.PLAYER_JOIN_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
-        island.updateLastTime();
-        island.setCurrentlyActive(true);
-    }
-
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onPlayerQuit(PlayerQuitEvent e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
@@ -199,7 +188,7 @@ public class PlayersListener implements Listener {
 
         // Handling player quit
         if (superiorPlayer.isShownAsOnline())
-            notifyPlayerQuit(superiorPlayer);
+            IslandNotifications.notifyPlayerQuit(superiorPlayer);
 
         // Remove coop players
         Island island = superiorPlayer.getIsland();
@@ -224,28 +213,9 @@ public class PlayersListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onPlayerGameModeChange(PlayerGameModeChangeEvent e) {
         if (e.getNewGameMode() == GameMode.SPECTATOR) {
-            notifyPlayerQuit(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
+            IslandNotifications.notifyPlayerQuit(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
         } else if (e.getPlayer().getGameMode() == GameMode.SPECTATOR) {
-            notifyPlayerJoin(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
-        }
-    }
-
-    public void notifyPlayerQuit(SuperiorPlayer superiorPlayer) {
-        superiorPlayer.updateLastTimeStatus();
-
-        Island island = superiorPlayer.getIsland();
-
-        if (island == null)
-            return;
-
-        IslandUtils.sendMessage(island, Message.PLAYER_QUIT_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
-
-        boolean anyOnline = island.getIslandMembers(true).stream().anyMatch(islandMember ->
-                islandMember != superiorPlayer && islandMember.isOnline());
-
-        if (!anyOnline) {
-            island.setLastTimeUpdate(System.currentTimeMillis() / 1000);
-            island.setCurrentlyActive(false);
+            IslandNotifications.notifyPlayerJoin(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
         }
     }
 
