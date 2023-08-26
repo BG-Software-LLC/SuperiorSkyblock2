@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 public class BukkitItems {
@@ -49,44 +50,6 @@ public class BukkitItems {
         }
     }
 
-    public static boolean removeItemFromHand(ItemStack itemStack, Event event, Player player) {
-        ReflectMethod<EquipmentSlot> reflectMethod = null;
-
-        if (event instanceof BlockPlaceEvent) {
-            reflectMethod = GET_HAND_BLOCK_PLACE;
-        } else if (event instanceof PlayerInteractEvent) {
-            reflectMethod = GET_HAND_PLAYER_INTERACT;
-        }
-
-        if (reflectMethod == null || !reflectMethod.isValid())
-            return false;
-
-        EquipmentSlot equipmentSlot = reflectMethod.invoke(event);
-
-        if (equipmentSlot == EquipmentSlot.HAND) {
-            ItemStack mainHand = player.getInventory().getItemInHand();
-            if (mainHand.isSimilar(itemStack)) {
-                mainHand.setAmount(mainHand.getAmount() - itemStack.getAmount());
-                player.getInventory().setItemInHand(mainHand);
-                return true;
-            }
-        } else if (equipmentSlot.name().equals("OFF_HAND")) {
-            ItemStack offHand = GET_ITEM_IN_OFF_HAND.invoke(player.getInventory());
-            if (offHand.isSimilar(itemStack)) {
-                offHand.setAmount(offHand.getAmount() - itemStack.getAmount());
-                SET_ITEM_IN_OFF_HAND.invoke(player.getInventory(), offHand);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public static void removeItem(ItemStack itemStack, Event event, Player player) {
-        if (!removeItemFromHand(itemStack, event, player))
-            player.getInventory().removeItem(itemStack);
-    }
-
     public static PlayerHand getHand(Event event) {
         ReflectMethod<EquipmentSlot> reflectMethod;
 
@@ -111,23 +74,12 @@ public class BukkitItems {
         return onlinePlayer.getItemInHand();
     }
 
-    public static void setItem(ItemStack itemStack, Event event, Player player) {
-        ReflectMethod<EquipmentSlot> reflectMethod = null;
-
-        if (event instanceof BlockPlaceEvent)
-            reflectMethod = GET_HAND_BLOCK_PLACE;
-        else if (event instanceof PlayerInteractEvent)
-            reflectMethod = GET_HAND_PLAYER_INTERACT;
-
-        if (reflectMethod != null && reflectMethod.isValid()) {
-            EquipmentSlot equipmentSlot = reflectMethod.invoke(event);
-            if (equipmentSlot != null && equipmentSlot.name().equals("OFF_HAND")) {
-                player.getInventory().setItem(40, itemStack);
-                return;
-            }
+    public static void setHandItem(Player player, PlayerHand playerHand, @Nullable ItemStack itemStack) {
+        if (playerHand == PlayerHand.MAIN_HAND) {
+            player.getInventory().setItemInHand(itemStack == null ? new ItemStack(Material.AIR) : itemStack);
+        } else if (playerHand == PlayerHand.OFF_HAND) {
+            SET_ITEM_IN_OFF_HAND.invoke(player.getInventory(), itemStack == null ? new ItemStack(Material.AIR) : itemStack);
         }
-
-        player.getInventory().setItemInHand(itemStack);
     }
 
     @SuppressWarnings("deprecation")

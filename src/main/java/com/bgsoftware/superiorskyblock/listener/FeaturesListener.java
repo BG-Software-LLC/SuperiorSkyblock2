@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
@@ -112,9 +113,12 @@ public class FeaturesListener implements Listener {
 
         e.setCancelled(true);
 
+
         ItemStack inHandItem = e.getItem().clone();
         inHandItem.setAmount(inHandItem.getAmount() - 1);
-        BukkitItems.setItem(inHandItem.getAmount() == 0 ? new ItemStack(Material.AIR) : inHandItem, e, e.getPlayer());
+
+        PlayerHand usedItem = BukkitItems.getHand(e);
+        BukkitItems.setHandItem(e.getPlayer(), usedItem, inHandItem.getAmount() == 0 ? null : inHandItem);
 
         BukkitItems.addItem(new ItemStack(Material.LAVA_BUCKET), e.getPlayer().getInventory(),
                 e.getPlayer().getLocation());
