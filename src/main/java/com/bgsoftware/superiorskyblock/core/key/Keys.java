@@ -109,7 +109,10 @@ public class Keys {
     public static Key ofMaterialAndData(String material, @Nullable String data) {
         try {
             Material blockType = Material.valueOf(material);
-            short blockData = Text.isBlank(data) ? 0 : Short.parseShort(data);
+            if (Text.isBlank(data)) {
+                return Keys.of(blockType);
+            }
+            short blockData = Short.parseShort(data);
             return Keys.of(blockType, blockData);
         } catch (Exception error) {
             return Keys.of(material, data);

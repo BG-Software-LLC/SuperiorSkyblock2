@@ -6,6 +6,8 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.key.types.EntityTypeKey;
+import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.google.common.base.Preconditions;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -99,6 +101,17 @@ public class KeysManagerImpl extends Manager implements KeysManager {
     @Override
     public Key getKey(String key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        // Due to backwards compatibility, we want to try and check if this is either a MaterialKey or EntityTypeKey.
+        Key materialKey = Key.ofMaterialAndData(key);
+        if (materialKey instanceof MaterialKey)
+            return materialKey;
+
+        Key entityTypeKey = Key.ofEntityType(key);
+        if (entityTypeKey instanceof EntityTypeKey)
+            return entityTypeKey;
+
+        // This key does not fit MaterialKey nor EntityTypeKey, therefore we'll create a CustomKey.
+
         String[] keySections = key.split(":");
         return ((BaseKey<? extends Key>) Keys.of(keySections[0], keySections.length >= 2 ? keySections[1] : null)).markAPIKey();
     }

@@ -13,11 +13,9 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.AbstractMap;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -193,7 +191,24 @@ public class MaterialKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V> 
 
     @Override
     public boolean removeIf(Predicate<Key> predicate) {
-        return size() != 0 && entrySet().removeIf(entry -> predicate.test(entry.getKey()));
+        if (isEmpty())
+            return false;
+
+        boolean removed = false;
+
+        {
+            Map<MaterialKey, V> innerMap = this.innerMap.getIfPresent().orElse(null);
+            if (innerMap != null)
+                removed |= innerMap.entrySet().removeIf(entry -> predicate.test(entry.getKey()));
+        }
+
+        {
+            Map<CustomKey, V> customInnerMap = this.customInnerMap.getIfPresent().orElse(null);
+            if (customInnerMap != null)
+                removed |= customInnerMap.entrySet().removeIf(entry -> predicate.test(entry.getKey()));
+        }
+
+        return removed;
     }
 
     @Override

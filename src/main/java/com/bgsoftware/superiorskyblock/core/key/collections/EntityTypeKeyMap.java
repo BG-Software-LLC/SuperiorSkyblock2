@@ -172,7 +172,24 @@ public class EntityTypeKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V
 
     @Override
     public boolean removeIf(Predicate<Key> predicate) {
-        return size() != 0 && entrySet().removeIf(entry -> predicate.test(entry.getKey()));
+        if (isEmpty())
+            return false;
+
+        boolean removed = false;
+
+        {
+            Map<EntityTypeKey, V> innerMap = this.innerMap.getIfPresent().orElse(null);
+            if (innerMap != null)
+                removed |= innerMap.entrySet().removeIf(entry -> predicate.test(entry.getKey()));
+        }
+
+        {
+            Map<CustomKey, V> customInnerMap = this.customInnerMap.getIfPresent().orElse(null);
+            if (customInnerMap != null)
+                removed |= customInnerMap.entrySet().removeIf(entry -> predicate.test(entry.getKey()));
+        }
+
+        return removed;
     }
 
     @Override
