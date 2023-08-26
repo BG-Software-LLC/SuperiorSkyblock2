@@ -145,12 +145,6 @@ public class IslandFlagsListener implements Listener {
             e.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    private void onEntityExplodeDamage(EntityDamageByEntityEvent e) {
-        if (preventEntityExplosion(e.getDamager(), e.getEntity().getLocation()))
-            e.setCancelled(true);
-    }
-
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onFireballDamage(EntityDamageByEntityEvent e) {
         if (e.getEntity() instanceof Fireball) {
