@@ -5,18 +5,19 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandChunkResetEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.service.stackedblocks.InteractionResult;
+import com.bgsoftware.superiorskyblock.api.service.stackedblocks.StackedBlocksInteractionService;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlag;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.external.slimefun.ProtectionModule_Dev999;
 import com.bgsoftware.superiorskyblock.external.slimefun.ProtectionModule_RC13;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.listener.StackedBlocksListener;
+import com.bgsoftware.superiorskyblock.service.stackedblocks.StackedBlocksServiceHelper;
 import io.github.thebusybiscuit.slimefun4.api.events.AndroidMineEvent;
 import io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent;
 import io.github.thebusybiscuit.slimefun4.implementation.SlimefunPlugin;
@@ -46,12 +47,16 @@ public class SlimefunHook {
             return plugin.getServices().getService(WorldRecordService.class);
         }
     };
+    private static final LazyReference<StackedBlocksInteractionService> stackedBlocksInteractionService = new LazyReference<StackedBlocksInteractionService>() {
+        @Override
+        protected StackedBlocksInteractionService create() {
+            return plugin.getServices().getService(StackedBlocksInteractionService.class);
+        }
+    };
     private static SuperiorSkyblockPlugin plugin;
-    private static Singleton<StackedBlocksListener> stackedBlocksListener;
 
     public static void register(SuperiorSkyblockPlugin plugin) {
         SlimefunHook.plugin = plugin;
-        stackedBlocksListener = plugin.getListener(StackedBlocksListener.class);
 
         if (isClassLoaded("me.mrCookieSlime.Slimefun.SlimefunPlugin")) {
             ProtectionModule_RC13.register(plugin, SlimefunHook::checkPermission);
@@ -117,9 +122,9 @@ public class SlimefunHook {
         public void onAndroidMiner(AndroidMineEvent e) {
             Log.debug(Debug.BLOCK_BREAK, e.getBlock().getLocation(), e.getBlock().getType());
 
-            StackedBlocksListener.UnstackResult unstackResult = stackedBlocksListener.get().tryUnstack(null, e.getBlock());
-
-            if (unstackResult.shouldCancelOriginalEvent()) {
+            InteractionResult interactionResult = stackedBlocksInteractionService.get()
+                    .handleStackedBlockBreak(e.getBlock(), null);
+            if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult)) {
                 e.setCancelled(true);
             } else {
                 worldRecordService.get().recordBlockBreak(e.getBlock(), REGULAR_RECORD_FLAGS);

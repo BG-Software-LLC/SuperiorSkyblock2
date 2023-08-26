@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import com.bgsoftware.superiorskyblock.service.portals.PortalsManagerServiceImpl;
 import com.bgsoftware.superiorskyblock.service.region.RegionManagerServiceImpl;
+import com.bgsoftware.superiorskyblock.service.stackedblocks.StackedBlocksInteractionServiceImpl;
 import com.bgsoftware.superiorskyblock.service.world.WorldRecordServiceImpl;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -42,6 +43,7 @@ public class ServicesHandler {
         registerService(new MessagesServiceImpl());
         registerService(new PortalsManagerServiceImpl(plugin));
         registerService(new RegionManagerServiceImpl(plugin));
+        registerService(new StackedBlocksInteractionServiceImpl(plugin));
         registerService(new WorldRecordServiceImpl(plugin));
     }
 

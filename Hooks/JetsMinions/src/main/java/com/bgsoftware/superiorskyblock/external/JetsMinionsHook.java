@@ -1,13 +1,14 @@
 package com.bgsoftware.superiorskyblock.external;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.service.stackedblocks.InteractionResult;
+import com.bgsoftware.superiorskyblock.api.service.stackedblocks.StackedBlocksInteractionService;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlag;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.listener.StackedBlocksListener;
+import com.bgsoftware.superiorskyblock.service.stackedblocks.StackedBlocksServiceHelper;
 import me.jet315.minions.events.MinerBlockBreakEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -25,13 +26,17 @@ public class JetsMinionsHook implements Listener {
             return plugin.getServices().getService(WorldRecordService.class);
         }
     };
-    private final SuperiorSkyblockPlugin plugin;
+    private final LazyReference<StackedBlocksInteractionService> stackedBlocksInteractionService = new LazyReference<StackedBlocksInteractionService>() {
+        @Override
+        protected StackedBlocksInteractionService create() {
+            return plugin.getServices().getService(StackedBlocksInteractionService.class);
+        }
+    };
 
-    private final Singleton<StackedBlocksListener> stackedBlocksListener;
+    private final SuperiorSkyblockPlugin plugin;
 
     private JetsMinionsHook(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        this.stackedBlocksListener = plugin.getListener(StackedBlocksListener.class);
     }
 
     public static void register(SuperiorSkyblockPlugin plugin) {
@@ -42,9 +47,9 @@ public class JetsMinionsHook implements Listener {
     public void onMinionBreak(MinerBlockBreakEvent e) {
         Log.debug(Debug.BLOCK_BREAK, e.getBlock().getType());
 
-        StackedBlocksListener.UnstackResult unstackResult = stackedBlocksListener.get().tryUnstack(null, e.getBlock());
-
-        if (unstackResult.shouldCancelOriginalEvent()) {
+        InteractionResult interactionResult = this.stackedBlocksInteractionService.get()
+                .handleStackedBlockBreak(e.getBlock(), null);
+        if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult)) {
             e.setCancelled(true);
         } else {
             this.worldRecordService.get().recordBlockBreak(e.getBlock(), REGULAR_RECORD_FLAGS);

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.world;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,6 +29,24 @@ public class BukkitItems {
 
     private BukkitItems() {
 
+    }
+
+    public static void removeHandItem(Player onlinePlayer, PlayerHand usedHand, int amount) {
+        PlayerInventory playerInventory = onlinePlayer.getInventory();
+
+        if (usedHand == PlayerHand.MAIN_HAND) {
+            ItemStack mainHand = playerInventory.getItemInHand();
+            if (mainHand != null) {
+                mainHand.setAmount(mainHand.getAmount() - amount);
+                playerInventory.setItemInHand(mainHand);
+            }
+        } else if (usedHand == PlayerHand.OFF_HAND) {
+            ItemStack offHand = GET_ITEM_IN_OFF_HAND.invoke(playerInventory);
+            if (offHand != null) {
+                offHand.setAmount(offHand.getAmount() - amount);
+                SET_ITEM_IN_OFF_HAND.invoke(playerInventory, offHand);
+            }
+        }
     }
 
     public static boolean removeItemFromHand(ItemStack itemStack, Event event, Player player) {
@@ -66,6 +85,30 @@ public class BukkitItems {
     public static void removeItem(ItemStack itemStack, Event event, Player player) {
         if (!removeItemFromHand(itemStack, event, player))
             player.getInventory().removeItem(itemStack);
+    }
+
+    public static PlayerHand getHand(Event event) {
+        ReflectMethod<EquipmentSlot> reflectMethod;
+
+        if (event instanceof BlockPlaceEvent) {
+            reflectMethod = GET_HAND_BLOCK_PLACE;
+        } else if (event instanceof PlayerInteractEvent) {
+            reflectMethod = GET_HAND_PLAYER_INTERACT;
+        } else {
+            throw new IllegalArgumentException("Cannot get hand of event: " + event.getClass());
+        }
+
+        EquipmentSlot equipmentSlot = reflectMethod.isValid() ? reflectMethod.invoke(event) : EquipmentSlot.HAND;
+
+        return PlayerHand.of(equipmentSlot);
+    }
+
+    public static ItemStack getHandItem(Player onlinePlayer, PlayerHand usedHand) {
+        if (usedHand == PlayerHand.OFF_HAND) {
+            return GET_ITEM_IN_OFF_HAND.invoke(onlinePlayer.getInventory());
+        }
+
+        return onlinePlayer.getItemInHand();
     }
 
     public static void setItem(ItemStack itemStack, Event event, Player player) {
