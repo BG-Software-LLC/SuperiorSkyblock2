@@ -144,12 +144,12 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
         if (island != null)
             island.handleBlockBreak(block, amountToBreak);
 
-        if (leftAmount <= 0)
-            block.setType(Material.AIR);
-
         ItemStack blockItem = ServerVersion.isLegacy() ?
                 block.getState().getData().toItemStack(amountToBreak) :
                 new ItemStack(block.getType(), amountToBreak);
+
+        if (leftAmount <= 0)
+            block.setType(Material.AIR);
 
         // Dropping the item
         if (onlinePlayer != null && plugin.getSettings().getStackedBlocks().isAutoCollect()) {
