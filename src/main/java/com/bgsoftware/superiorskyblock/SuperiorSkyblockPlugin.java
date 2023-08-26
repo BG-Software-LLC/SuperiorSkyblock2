@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.config.SettingsManagerImpl;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.database.DataManager;
 import com.bgsoftware.superiorskyblock.core.engine.EnginesFactory;
 import com.bgsoftware.superiorskyblock.core.engine.NashornEngineDownloader;
@@ -54,7 +53,6 @@ import com.bgsoftware.superiorskyblock.island.upgrade.container.DefaultUpgradesC
 import com.bgsoftware.superiorskyblock.island.upgrade.loaders.PlaceholdersUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.island.upgrade.loaders.VaultUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.listener.BukkitListeners;
-import com.bgsoftware.superiorskyblock.listener.ChunksListener;
 import com.bgsoftware.superiorskyblock.mission.MissionsManagerImpl;
 import com.bgsoftware.superiorskyblock.mission.container.DefaultMissionsContainer;
 import com.bgsoftware.superiorskyblock.module.ModulesManagerImpl;
@@ -73,13 +71,13 @@ import com.bgsoftware.superiorskyblock.player.container.DefaultPlayersContainer;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
 import com.bgsoftware.superiorskyblock.service.ServicesHandler;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
+import com.bgsoftware.superiorskyblock.world.event.WorldEventsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.UnsafeValues;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -125,6 +123,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     // This is to prevent it's fields to be non-finals.
     private SettingsManagerImpl settingsHandler = null;
     private IScriptEngine scriptEngine = EnginesFactory.createDefaultEngine();
+    @Nullable
+    @Deprecated
+    private WorldEventsManager worldEventsManager;
 
     private final EventsBus eventsBus = new EventsBus(this);
 
@@ -241,11 +242,11 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             }
 
             try {
-                bukkitListeners.register();
+                bukkitListeners.registerListeners();
             } catch (RuntimeException ex) {
                 shouldEnable = false;
                 ManagerLoadException handlerError = new ManagerLoadException("Cannot load plugin due to a missing event: " + ex.getMessage() + " - contact @Ome_R!",
-                        ManagerLoadException.ErrorLevel.CONTINUE);
+                        ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
                 Log.error(handlerError, "An error occurred while registering listeners:");
                 Bukkit.shutdown();
                 return;
@@ -652,13 +653,16 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     @Override
     @Deprecated
     public WorldEventsManager getWorldEventsManager() {
-        return getListener(ChunksListener.class).get().getWorldEventsManager();
+        if (this.worldEventsManager == null)
+            this.worldEventsManager = new WorldEventsManagerImpl(this);
+
+        return this.worldEventsManager;
     }
 
     @Override
     @Deprecated
     public void setWorldEventsManager(@Nullable WorldEventsManager worldEventsManager) {
-        getListener(ChunksListener.class).get().setWorldEventsManager(worldEventsManager);
+        this.worldEventsManager = worldEventsManager;
     }
 
     public EventsBus getEventsBus() {
@@ -712,10 +716,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
     public NMSWorld getNMSWorld() {
         return nmsWorld;
-    }
-
-    public <E extends Listener> Singleton<E> getListener(Class<E> listenerClass) {
-        return bukkitListeners.getListener(listenerClass);
     }
 
     public String getFileName() {
