@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -386,9 +387,9 @@ public class BlockChangesListener implements Listener {
 
         if (handleNearbyBlocks || dirtyChunk) {
             EnumMap<BlockFace, Key> nearbyBlocks = new EnumMap<>(BlockFace.class);
-            Block block = blockLocation.getBlock();
 
             if (handleNearbyBlocks) {
+                Block block = blockLocation.getBlock();
                 for (BlockFace nearbyFace : NEARBY_BLOCKS) {
                     Block nearbyBlock = block.getRelative(nearbyFace);
                     if (!nearbyBlock.getType().isSolid()) {
@@ -400,12 +401,22 @@ public class BlockChangesListener implements Listener {
             }
 
             BukkitExecutor.sync(() -> {
+                int chunkX = blockLocation.getBlockX() >> 4;
+                int chunkZ = blockLocation.getBlockZ() >> 4;
+                World world = blockLocation.getWorld();
+
+                // We really don't want to load the chunk if it is not loaded.
+                if (!world.isChunkLoaded(chunkX, chunkZ))
+                    return;
+
+                Block block = blockLocation.getBlock();
+
                 if (dirtyChunk) {
                     if (plugin.getNMSChunks().isChunkEmpty(block.getChunk())) {
-                        island.markChunkEmpty(block.getWorld(), block.getX() >> 4,
-                                block.getZ() >> 4, true);
+                        island.markChunkEmpty(world, chunkX, chunkZ, true);
                     }
                 }
+
                 if (handleNearbyBlocks) {
                     for (BlockFace nearbyFace : NEARBY_BLOCKS) {
                         Key nearbyBlock = Keys.of(block.getRelative(nearbyFace));
