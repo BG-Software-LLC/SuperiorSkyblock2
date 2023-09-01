@@ -153,7 +153,7 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
     }
 
     private boolean canTrackEntity(Key key) {
-        return island.getEntityLimit(key) != -1;
+        return island.getEntityLimit(key) != -1 || key.toString().contains("MINECART");
     }
 
 }
