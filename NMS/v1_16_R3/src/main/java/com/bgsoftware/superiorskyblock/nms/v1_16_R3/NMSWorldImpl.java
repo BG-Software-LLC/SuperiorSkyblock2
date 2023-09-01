@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.listener.SignsListener;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.nms.algorithms.NMSCachedBlock;
+import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.spawners.TileEntityMobSpawnerNotifier;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.BlockStatesMapper;
@@ -252,6 +253,12 @@ public class NMSWorldImpl implements NMSWorld {
         org.bukkit.block.data.BlockData blockData = block.getBlockData();
 
         return blockData instanceof Waterlogged && ((Waterlogged) blockData).isWaterlogged();
+    }
+
+    @Override
+    public PistonPushReaction getPistonReaction(org.bukkit.block.Block block) {
+        IBlockData blockData = ((CraftBlock) block).getNMS();
+        return PistonPushReaction.values()[blockData.getPushReaction().ordinal()];
     }
 
     @Override

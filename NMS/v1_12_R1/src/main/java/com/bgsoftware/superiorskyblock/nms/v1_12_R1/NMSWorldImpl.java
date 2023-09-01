@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.listener.SignsListener;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
+import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.spawners.MobSpawnerAbstractNotifier;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.world.KeyBlocksCache;
@@ -42,6 +43,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_12_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_12_R1.block.CraftSign;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -211,6 +213,14 @@ public class NMSWorldImpl implements NMSWorld {
     public boolean isWaterLogged(org.bukkit.block.Block block) {
         Material blockType = block.getType();
         return blockType == Material.WATER || blockType == Material.STATIONARY_WATER;
+    }
+
+    @Override
+    public PistonPushReaction getPistonReaction(org.bukkit.block.Block block) {
+        WorldServer worldServer = ((CraftWorld) block.getWorld()).getHandle();
+        BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
+        IBlockData blockData = worldServer.getType(blockPosition);
+        return PistonPushReaction.values()[blockData.o().ordinal()];
     }
 
     @Override

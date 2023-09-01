@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -308,11 +309,10 @@ public class BlockChangesListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    private void onDragonEggDrop(BlockPistonExtendEvent e) {
+    private void onPistonExtend(BlockPistonExtendEvent e) {
         for (Block block : e.getBlocks()) {
-            if (block.getType() == Material.DRAGON_EGG) {
-                onBlockBreak(ConstantKeys.DRAGON_EGG, block.getLocation(), 1,
-                        Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
+            if (plugin.getNMSWorld().getPistonReaction(block) == PistonPushReaction.DESTROY) {
+                onBlockBreak(Keys.of(block), block.getLocation(), 1, Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
             }
         }
     }
@@ -477,8 +477,7 @@ public class BlockChangesListener implements Listener {
                 return;
 
             int blockCount = plugin.getNMSWorld().getDefaultAmount(e.getBlock());
-            onBlockBreak(Keys.of(e.getBlock()), e.getBlock().getLocation(), blockCount,
-                    Flag.HANDLE_NEARBY_BLOCKS, Flag.DIRTY_CHUNK);
+            onBlockBreak(Keys.of(e.getBlock()), e.getBlock().getLocation(), blockCount, Flag.DIRTY_CHUNK);
         }
 
     }
