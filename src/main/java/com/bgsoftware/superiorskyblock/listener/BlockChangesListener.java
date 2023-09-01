@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -225,9 +226,9 @@ public class BlockChangesListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    private void onDragonEggDrop(BlockPistonExtendEvent e) {
+    private void onPistonExtend(BlockPistonExtendEvent e) {
         for (Block block : e.getBlocks()) {
-            if (block.getType() == Material.DRAGON_EGG) {
+            if (plugin.getNMSWorld().getPistonReaction(block) == PistonPushReaction.DESTROY) {
                 this.worldRecordService.get().recordBlockBreak(block, 1, REGULAR_RECORD_FLAGS);
             }
         }
@@ -346,14 +347,12 @@ public class BlockChangesListener implements Listener {
 
     private class BlockDestoryListener implements Listener {
 
-        private final WorldRecordFlag DESTROY_RECORD_FLAGS = WorldRecordFlag.HANDLE_NEARBY_BLOCKS.and(WorldRecordFlag.DIRTY_CHUNK);
-
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onBlockDestroy(com.destroystokyo.paper.event.block.BlockDestroyEvent e) {
             if (e.getNewState().getMaterial() != Material.AIR)
                 return;
 
-            worldRecordService.get().recordBlockBreak(e.getBlock(), DESTROY_RECORD_FLAGS);
+            worldRecordService.get().recordBlockBreak(e.getBlock(), WorldRecordFlag.DIRTY_CHUNK);
         }
 
     }

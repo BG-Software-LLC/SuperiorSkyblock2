@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import org.bukkit.ChunkSnapshot;
@@ -37,6 +38,8 @@ public interface NMSWorld {
     CompoundTag readTileEntity(Location location);
 
     boolean isWaterLogged(Block block);
+
+    PistonPushReaction getPistonReaction(Block block);
 
     int getDefaultAmount(Block block);
 
