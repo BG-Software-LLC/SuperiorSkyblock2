@@ -5,9 +5,12 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.event.EventHandler;
@@ -107,7 +110,16 @@ public class EntityTrackingListener implements Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         private void onEntityRemove(com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent e) {
-            onEntityDespawn(e.getEntity());
+            Location entityLocation = e.getEntity().getLocation();
+
+            BukkitExecutor.sync(() -> {
+                World world = entityLocation.getWorld();
+                int chunkX = entityLocation.getBlockX() >> 4;
+                int chunkZ = entityLocation.getBlockZ() >> 4;
+                // We don't want to track entities that are removed due to chunk being unloaded.
+                if (world.isChunkLoaded(chunkX, chunkZ))
+                    onEntityDespawn(e.getEntity());
+            }, 1L);
         }
 
     }
