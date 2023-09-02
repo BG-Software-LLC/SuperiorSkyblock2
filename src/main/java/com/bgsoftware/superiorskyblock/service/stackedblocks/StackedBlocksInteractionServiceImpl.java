@@ -192,9 +192,6 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
         if (!whitelist.contains(newBlockKey))
             return InteractionResult.STACKED_BLOCK_NOT_WHITELISTED;
 
-        if (!Objects.equals(whitelist.getKey(blockKey), whitelist.getKey(Keys.of(block))))
-            return InteractionResult.BLOCKS_NOT_SIMILAR;
-
         return InteractionResult.SUCCESS;
     }
 
