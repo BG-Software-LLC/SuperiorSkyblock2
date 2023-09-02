@@ -9,6 +9,7 @@ import org.bukkit.block.Block;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.Optional;
 
 public class ChunkPosition {
 
@@ -81,6 +82,12 @@ public class ChunkPosition {
                 location.getBlockX() >> 4 == x && location.getBlockZ() >> 4 == z;
     }
 
+    public int distanceSquared(ChunkPosition other) {
+        int deltaX = this.x - other.x;
+        int deltaZ = this.z - other.z;
+        return (deltaX * deltaX) + (deltaZ * deltaZ);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(worldInfo.getName(), x, z);
@@ -104,6 +111,12 @@ public class ChunkPosition {
     private ChunkPosition withBukkitWorld(World world) {
         this.cachedBukkitWorld = world;
         return this;
+    }
+
+    public static Optional<Chunk> getLoadedChunk(ChunkPosition chunkPosition) {
+        boolean isChunkLoaded = chunkPosition.getWorld().isChunkLoaded(chunkPosition.getX(), chunkPosition.getZ());
+        if (!isChunkLoaded) return Optional.empty();
+        return Optional.of(chunkPosition.getWorld().getChunkAt(chunkPosition.getX(), chunkPosition.getZ()));
     }
 
 }

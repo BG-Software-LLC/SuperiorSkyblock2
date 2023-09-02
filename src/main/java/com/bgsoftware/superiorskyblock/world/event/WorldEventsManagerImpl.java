@@ -96,12 +96,6 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
                         plugin.getStackedBlocks().getStackedBlockAmount(entity.getLocation().subtract(0, 1, 0)) > 1) {
                     entity.remove();
                 }
-
-                // We simulate the spawning of the entities in the newly loaded chunk.
-                // We do it only if we do not need to recalculate the entities.
-                if (entityLimitsEnabled && !recalculateEntities.getValue()) {
-                    this.worldRecordService.get().recordEntitySpawn(entity);
-                }
             }
 
             if (recalculateEntities.getValue()) {

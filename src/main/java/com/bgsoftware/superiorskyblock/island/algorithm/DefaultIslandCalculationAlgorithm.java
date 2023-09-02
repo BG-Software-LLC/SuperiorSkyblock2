@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -28,6 +29,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +40,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
 
     public static final Map<ChunkPosition, CalculatedChunk> CACHED_CALCULATED_CHUNKS = new ConcurrentHashMap<>();
 
+    private static final List<Pair<Key, Key>> MINECART_BLOCK_TYPES = createMinecartBlockTypes();
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final DefaultIslandCalculationAlgorithm INSTANCE = new DefaultIslandCalculationAlgorithm();
@@ -120,6 +123,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
             Key blockKey;
             int blockCount;
 
+            // Calculate spawner counts
             for (SpawnerInfo spawnerInfo : spawnersToCheck) {
                 try {
                     CreatureSpawner creatureSpawner = (CreatureSpawner) spawnerInfo.location.getBlock().getState();
@@ -144,12 +148,20 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
             }
             spawnersToCheck.clear();
 
+            // Calculate stacked block counts
             for (ChunkPosition chunkPosition : chunksToCheck) {
                 for (Pair<Key, Integer> pair : plugin.getProviders().getStackedBlocksProvider()
                         .getBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ())) {
                     blockCounts.addCounts(pair.getKey(), pair.getValue() - 1);
                 }
             }
+
+            // Calculate minecart block counts
+            MINECART_BLOCK_TYPES.forEach(minecartTypes -> {
+                int count = island.getEntitiesTracker().getEntityCount(minecartTypes.getKey());
+                if (count > 0)
+                    blockCounts.addCounts(minecartTypes.getValue(), count);
+            });
 
             chunksToCheck.clear();
 
@@ -159,6 +171,19 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
         });
 
         return result;
+    }
+
+    private static List<Pair<Key, Key>> createMinecartBlockTypes() {
+        List<Pair<Key, Key>> minecartBlockTypes = new LinkedList<>();
+
+        minecartBlockTypes.add(new Pair<>(ConstantKeys.ENTITY_MINECART_COMMAND, ConstantKeys.COMMAND_BLOCK));
+        minecartBlockTypes.add(new Pair<>(ConstantKeys.ENTITY_MINECART_CHEST, ConstantKeys.CHEST));
+        minecartBlockTypes.add(new Pair<>(ConstantKeys.ENTITY_MINECART_FURNACE, ConstantKeys.FURNACE));
+        minecartBlockTypes.add(new Pair<>(ConstantKeys.ENTITY_MINECART_TNT, ConstantKeys.TNT));
+        minecartBlockTypes.add(new Pair<>(ConstantKeys.ENTITY_MINECART_HOPPER, ConstantKeys.HOPPER));
+        minecartBlockTypes.add(new Pair<>(ConstantKeys.ENTITY_MINECART_MOB_SPAWNER, ConstantKeys.MOB_SPAWNER));
+
+        return Collections.unmodifiableList(minecartBlockTypes);
     }
 
     private static class BlockCountsTracker implements IslandCalculationResult {

@@ -3,6 +3,9 @@ package com.bgsoftware.superiorskyblock.listener;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -61,7 +64,16 @@ public class EntityTrackingListener implements Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         private void onEntityRemove(com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent e) {
-            worldRecordService.get().recordEntityDespawn(e.getEntity());
+            Location entityLocation = e.getEntity().getLocation();
+
+            BukkitExecutor.sync(() -> {
+                World world = entityLocation.getWorld();
+                int chunkX = entityLocation.getBlockX() >> 4;
+                int chunkZ = entityLocation.getBlockZ() >> 4;
+                // We don't want to track entities that are removed due to chunk being unloaded.
+                if (world.isChunkLoaded(chunkX, chunkZ))
+                    worldRecordService.get().recordEntityDespawn(e.getEntity());
+            }, 1L);
         }
 
     }

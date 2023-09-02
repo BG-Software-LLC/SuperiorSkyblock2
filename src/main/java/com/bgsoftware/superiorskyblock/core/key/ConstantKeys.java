@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.key;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 
 import java.util.Optional;
 
@@ -27,6 +28,13 @@ public class ConstantKeys {
     public static final Key COBBLESTONE = Keys.of(Material.COBBLESTONE);
     public static final Key CHORUS_FLOWER = Optional.ofNullable(Materials.getMaterialSafe("CHORUS_FLOWER"))
             .map(Keys::of).orElse(Keys.EMPTY);
+
+    public static final Key ENTITY_MINECART_COMMAND = Keys.of(EntityType.MINECART_COMMAND);
+    public static final Key ENTITY_MINECART_CHEST = Keys.of(EntityType.MINECART_CHEST);
+    public static final Key ENTITY_MINECART_FURNACE = Keys.of(EntityType.MINECART_FURNACE);
+    public static final Key ENTITY_MINECART_TNT = Keys.of(EntityType.MINECART_TNT);
+    public static final Key ENTITY_MINECART_HOPPER = Keys.of(EntityType.MINECART_HOPPER);
+    public static final Key ENTITY_MINECART_MOB_SPAWNER = Keys.of(EntityType.MINECART_MOB_SPAWNER);
 
     private ConstantKeys() {
 
