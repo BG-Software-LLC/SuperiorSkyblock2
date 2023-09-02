@@ -14,6 +14,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -79,22 +80,25 @@ public class SignsListener implements Listener {
         } else {
             for (BlockFace blockFace : BlockFace.values()) {
                 Block faceBlock = e.getBlock().getRelative(blockFace);
-                if (faceBlock.getState() instanceof Sign) {
+                BlockState blockState = faceBlock.getState();
+                if (blockState instanceof Sign) {
                     boolean isSign;
 
                     if (ServerVersion.isLegacy()) {
-                        org.bukkit.material.Sign sign = (org.bukkit.material.Sign) faceBlock.getState().getData();
+                        org.bukkit.material.Sign sign = (org.bukkit.material.Sign) blockState.getData();
                         isSign = sign.getAttachedFace().getOppositeFace() == blockFace;
                     } else {
                         Object blockData = plugin.getNMSWorld().getBlockData(faceBlock);
-                        if (blockData instanceof org.bukkit.block.data.type.Sign) {
-                            isSign = ((org.bukkit.block.data.type.Sign) blockData).getRotation().getOppositeFace() == blockFace;
-                        } else {
+                        if (blockData instanceof org.bukkit.block.data.Rotatable) {
+                            isSign = ((org.bukkit.block.data.Rotatable) blockData).getRotation().getOppositeFace() == blockFace;
+                        } else if (blockData instanceof org.bukkit.block.data.Directional) {
                             isSign = ((org.bukkit.block.data.Directional) blockData).getFacing().getOppositeFace() == blockFace;
+                        } else {
+                            throw new RuntimeException("Found sign that cannot be handled: " + blockData);
                         }
                     }
 
-                    if (isSign && preventSignBreak(e.getPlayer(), (Sign) faceBlock.getState()))
+                    if (isSign && preventSignBreak(e.getPlayer(), (Sign) blockState))
                         e.setCancelled(true);
                 }
             }
