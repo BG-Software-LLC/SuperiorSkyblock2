@@ -112,6 +112,9 @@ public class Keys {
             if (Text.isBlank(data)) {
                 return Keys.of(blockType);
             }
+            if (blockType == Materials.SPAWNER.toBukkitType()) {
+                return ofSpawner(data);
+            }
             short blockData = Short.parseShort(data);
             return Keys.of(blockType, blockData);
         } catch (Exception error) {
