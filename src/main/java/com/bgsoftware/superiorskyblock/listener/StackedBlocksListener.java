@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.Singleton;
@@ -58,14 +58,14 @@ public class StackedBlocksListener implements Listener {
     private static final ReflectMethod<EquipmentSlot> INTERACT_GET_HAND = new ReflectMethod<>(
             PlayerInteractEvent.class, "getHand");
     @Nullable
-    private static final Material COPPER_BLOCK = Materials.getMaterialSafe("COPPER_BLOCK");
-    private static final Material HONEYCOMB = Materials.getMaterialSafe("HONEYCOMB");
+    private static final Material COPPER_BLOCK = EnumHelper.getEnum(Material.class, "COPPER_BLOCK");
+    private static final Material HONEYCOMB = EnumHelper.getEnum(Material.class, "HONEYCOMB");
     private final Map<CreatureSpawnEvent.SpawnReason, List<BlockOffset>> ENTITY_TEMPLATE_OFFSETS = buildEntityTemplateOffsetsMap();
     @Nullable
-    private static final Material CAULDRON_ITEM = Materials.getMaterialSafe("CAULDRON_ITEM");
+    private static final Material CAULDRON_ITEM = EnumHelper.getEnum(Material.class, "CAULDRON_ITEM");
     @SuppressWarnings("unchecked")
     private static final Map<Material, Material> AGAINST_BLOCK_CHANGE_MATERIAL = buildImmutableMap(
-            new Pair<>(Materials.getMaterialSafe("GLOWING_REDSTONE_ORE"), Material.REDSTONE_ORE)
+            new Pair<>(EnumHelper.getEnum(Material.class, "GLOWING_REDSTONE_ORE"), Material.REDSTONE_ORE)
     );
 
 

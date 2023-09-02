@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -29,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -39,20 +41,24 @@ public class IslandUtils {
     private static final EnumMap<World.Environment, Biome> DEFAULT_WORLD_BIOMES = new EnumMap<>(World.Environment.class);
 
     static {
-        try {
-            DEFAULT_WORLD_BIOMES.put(World.Environment.NORMAL, Biome.valueOf(plugin.getSettings().getWorlds().getNormal().getBiome()));
-        } catch (IllegalArgumentException error) {
-            DEFAULT_WORLD_BIOMES.put(World.Environment.NORMAL, Biome.PLAINS);
+        {
+            Biome biome = Optional.ofNullable(EnumHelper.getEnum(Biome.class,
+                    plugin.getSettings().getWorlds().getNormal().getBiome())).orElse(Biome.PLAINS);
+            DEFAULT_WORLD_BIOMES.put(World.Environment.NORMAL, biome);
         }
-        try {
-            DEFAULT_WORLD_BIOMES.put(World.Environment.NETHER, Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome()));
-        } catch (IllegalArgumentException error) {
-            DEFAULT_WORLD_BIOMES.put(World.Environment.NETHER, getBiome("NETHER_WASTES", "NETHER", "HELL"));
+
+        {
+            Biome biome = Optional.ofNullable(EnumHelper.getEnum(Biome.class,
+                            plugin.getSettings().getWorlds().getNether().getBiome(), "NETHER_WASTES", "NETHER", "HELL"))
+                    .orElseThrow(IllegalArgumentException::new);
+            DEFAULT_WORLD_BIOMES.put(World.Environment.NETHER, biome);
         }
-        try {
-            DEFAULT_WORLD_BIOMES.put(World.Environment.THE_END, Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome()));
-        } catch (IllegalArgumentException error) {
-            DEFAULT_WORLD_BIOMES.put(World.Environment.THE_END, getBiome("THE_END", "SKY"));
+
+        {
+            Biome biome = Optional.ofNullable(EnumHelper.getEnum(Biome.class,
+                            plugin.getSettings().getWorlds().getEnd().getBiome(), "THE_END", "SKY"))
+                    .orElseThrow(IllegalArgumentException::new);
+            DEFAULT_WORLD_BIOMES.put(World.Environment.THE_END, biome);
         }
     }
 
@@ -218,7 +224,7 @@ public class IslandUtils {
     }
 
     public static void handleKickPlayer(SuperiorPlayer caller, String callerName, Island island, SuperiorPlayer target) {
-        if(!plugin.getEventsBus().callIslandKickEvent(caller, target, island))
+        if (!plugin.getEventsBus().callIslandKickEvent(caller, target, island))
             return;
 
         island.kickMember(target);
@@ -302,17 +308,6 @@ public class IslandUtils {
 
     public static List<Biome> getDefaultWorldBiomes() {
         return new SequentialListBuilder<Biome>().build(DEFAULT_WORLD_BIOMES.values());
-    }
-
-    private static Biome getBiome(String... biomeNames) {
-        for (String biomeName : biomeNames) {
-            try {
-                return Biome.valueOf(biomeName);
-            } catch (IllegalArgumentException ignored) {
-            }
-        }
-
-        throw new IllegalArgumentException();
     }
 
 }

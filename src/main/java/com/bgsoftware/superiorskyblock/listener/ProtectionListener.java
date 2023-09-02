@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -86,15 +87,15 @@ public class ProtectionListener implements Listener {
     private static final ReflectMethod<Block> PROJECTILE_HIT_EVENT_TARGET_BLOCK = new ReflectMethod<>(
             ProjectileHitEvent.class, "getHitBlock");
 
-    private static final Material FARMLAND = Materials.getMaterialSafe("FARMLAND", "SOIL");
+    private static final Material FARMLAND = EnumHelper.getEnum(Material.class, "FARMLAND", "SOIL");
     @Nullable
-    private static final Material TURTLE_EGG = Materials.getMaterialSafe("TURTLE_EGG");
+    private static final Material TURTLE_EGG = EnumHelper.getEnum(Material.class, "TURTLE_EGG");
     @Nullable
-    private static final Material SWEET_BERRY_BUSH = Materials.getMaterialSafe("SWEET_BERRY_BUSH");
+    private static final Material SWEET_BERRY_BUSH = EnumHelper.getEnum(Material.class, "SWEET_BERRY_BUSH");
     @Nullable
-    private static final EntityType AXOLOTL_TYPE = getSafeEntityType("AXOLOTL");
+    private static final Material CHORUS_FLOWER = EnumHelper.getEnum(Material.class, "CHORUS_FLOWER");
     @Nullable
-    private static final Material CHORUS_FLOWER = Materials.getMaterialSafe("CHORUS_FLOWER");
+    private static final EntityType AXOLOTL_TYPE = EnumHelper.getEnum(EntityType.class, "AXOLOTL");
     private static final int MAX_PICKUP_DISTANCE = 1;
 
     private final SuperiorSkyblockPlugin plugin;
@@ -793,15 +794,6 @@ public class ProtectionListener implements Listener {
                 e.setCancelled(true);
         }
 
-    }
-
-    @Nullable
-    private static EntityType getSafeEntityType(String entityType) {
-        try {
-            return EntityType.valueOf(entityType);
-        } catch (IllegalArgumentException error) {
-            return null;
-        }
     }
 
 }

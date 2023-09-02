@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
@@ -47,6 +48,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -502,13 +504,9 @@ public class SettingsContainer {
         recalcTaskTimeout = config.getLong("recalc-task-timeout");
         autoLanguageDetection = config.getBoolean("auto-language-detection", true);
         autoUncoopWhenAlone = config.getBoolean("auto-uncoop-when-alone", false);
-        TopIslandMembersSorting islandTopMembersSorting;
-        try {
-            islandTopMembersSorting = TopIslandMembersSorting.valueOf(config.getString("island-top-members-sorting").toUpperCase(Locale.ENGLISH));
-        } catch (IllegalArgumentException error) {
-            islandTopMembersSorting = TopIslandMembersSorting.NAMES;
-        }
-        this.islandTopMembersSorting = islandTopMembersSorting;
+        islandTopMembersSorting = Optional.ofNullable(EnumHelper.getEnum(TopIslandMembersSorting.class,
+                        config.getString("island-top-members-sorting").toUpperCase(Locale.ENGLISH)))
+                .orElse(TopIslandMembersSorting.NAMES);
         bossBarLimit = config.getInt("bossbar-limit", 1);
         deleteUnsafeWarps = config.getBoolean("delete-unsafe-warps", true);
         playerRespawnActions = new LinkedList<>();

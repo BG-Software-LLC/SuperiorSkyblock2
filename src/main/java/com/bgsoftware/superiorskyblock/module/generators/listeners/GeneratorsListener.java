@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.module.generators.listeners;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.module.generators.GeneratorsModule;
@@ -24,10 +24,10 @@ public class GeneratorsListener implements Listener {
     private static final BlockFace[] nearbyFaces = new BlockFace[]{
             BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.UP
     };
-    private static final Material BLUE_ICE_MATERIAL = Materials.getMaterialSafe("BLUE_ICE");
-    private static final Material SOUL_SOIL_MATERIAL = Materials.getMaterialSafe("SOUL_SOIL");
-    private static final Material BASALT_MATERIAL = Materials.getMaterialSafe("BASALT");
-    private static final Material LAVA_MATERIAL = Materials.getMaterialSafe("STATIONARY_LAVA", "LAVA");
+    private static final Material BLUE_ICE_MATERIAL = EnumHelper.getEnum(Material.class, "BLUE_ICE");
+    private static final Material SOUL_SOIL_MATERIAL = EnumHelper.getEnum(Material.class, "SOUL_SOIL");
+    private static final Material BASALT_MATERIAL = EnumHelper.getEnum(Material.class, "BASALT");
+    private static final Material LAVA_MATERIAL = EnumHelper.getEnum(Material.class, "STATIONARY_LAVA", "LAVA");
 
     private final SuperiorSkyblockPlugin plugin;
     private final GeneratorsModule module;

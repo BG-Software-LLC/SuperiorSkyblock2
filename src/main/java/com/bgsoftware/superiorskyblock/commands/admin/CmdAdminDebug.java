@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -68,10 +69,8 @@ public class CmdAdminDebug implements ISuperiorCommand {
                 Message.COMMAND_USAGE.send(sender, plugin.getCommands().getLabel() + " " + getUsage(PlayerLocales.getLocale(sender)));
                 return;
             }
-        } else try {
-            debugFilter = Debug.valueOf(args[2].toUpperCase(Locale.ENGLISH));
-        } catch (IllegalArgumentException error) {
-            debugFilter = null;
+        } else {
+            debugFilter = EnumHelper.getEnum(Debug.class, args[2].toUpperCase(Locale.ENGLISH));
         }
 
         boolean newDebugMode = debugFilter != null;

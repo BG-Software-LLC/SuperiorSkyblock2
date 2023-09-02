@@ -86,4 +86,8 @@ public class MaterialKey extends BaseKey<MaterialKey> {
         return this.toString().compareTo(other.toString());
     }
 
+    public Material getMaterial() {
+        return this.type;
+    }
+
 }
