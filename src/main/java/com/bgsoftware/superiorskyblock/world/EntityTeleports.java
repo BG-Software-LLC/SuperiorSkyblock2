@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.world;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandSetHomeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -13,19 +13,19 @@ import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.google.common.base.Preconditions;
-import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class EntityTeleports {
@@ -70,117 +70,146 @@ public class EntityTeleports {
         Preconditions.checkNotNull(homeLocation, "Cannot find a suitable home location for island " +
                 island.getUniqueId());
 
+        World islandsWorld = Objects.requireNonNull(plugin.getGrid().getIslandsWorld(island, environment), "world is null");
+        float rotationYaw = homeLocation.getYaw();
+        float rotationPitch = homeLocation.getPitch();
+
         Log.debug(Debug.FIND_SAFE_TELEPORT, island.getOwner().getName(), environment);
 
-        Block islandTeleportBlock = homeLocation.getBlock();
+        // We first check that the home location is safe. If it is, we can return.
+        {
+            Block homeLocationBlock = homeLocation.getBlock();
+            if (island.isSpawn() || WorldBlocks.isSafeBlock(homeLocationBlock)) {
+                Log.debugResult(Debug.FIND_SAFE_TELEPORT, "Result Location", homeLocation);
+                return CompletableFuture.completedFuture(homeLocation);
+            }
+        }
 
-        if (island.isSpawn()) {
-            Log.debugResult(Debug.FIND_SAFE_TELEPORT, "Result Location", homeLocation);
-            return CompletableFuture.completedFuture(homeLocation.add(0, 0.5, 0));
+        // In case it is not safe anymore, we check in the same location if the highest block is safe.
+        {
+            Block teleportLocationHighestBlock = islandsWorld.getHighestBlockAt(homeLocation).getRelative(BlockFace.UP);
+            if (WorldBlocks.isSafeBlock(teleportLocationHighestBlock)) {
+                return CompletableFuture.completedFuture(adjustLocationToHome(island,
+                        teleportLocationHighestBlock, rotationYaw, rotationPitch));
+            }
         }
 
         CompletableFuture<Location> result = new CompletableFuture<>();
 
-        findSafeSpot(island, islandTeleportBlock, homeLocation, 0, 0, (teleportResult, teleportLocation) -> {
-            if (teleportResult) {
-                result.complete(teleportLocation);
+        // The teleport location is not safe. We check for a safe spot in the center of the island.
+
+        Location islandCenterLocation = island.getCenter(environment);
+
+        if (!islandCenterLocation.equals(homeLocation)) {
+            ChunksProvider.loadChunk(ChunkPosition.of(islandCenterLocation), ChunkLoadReason.FIND_SAFE_SPOT, chunk -> {
+                {
+                    Block islandCenterBlock = islandCenterLocation.getBlock().getRelative(BlockFace.UP);
+                    if (WorldBlocks.isSafeBlock(islandCenterBlock)) {
+                        result.complete(adjustLocationToHome(island, islandCenterBlock, rotationYaw, rotationPitch));
+                        return;
+                    }
+                }
+
+                // The center is not safe, we check in the same location if the highest block is safe.
+                {
+                    Block islandCenterHighestBlock = islandsWorld.getHighestBlockAt(islandCenterLocation).getRelative(BlockFace.UP);
+                    if (WorldBlocks.isSafeBlock(islandCenterHighestBlock)) {
+                        result.complete(adjustLocationToHome(island, islandCenterHighestBlock, rotationYaw, rotationPitch));
+                        return;
+                    }
+                }
+
+                // The center is not safe; we look for a new spot on the island.
+                findNewSafeSpotOnIsland(island, islandsWorld, homeLocation, rotationYaw, rotationPitch, result);
+            });
+        } else {
+            findNewSafeSpotOnIsland(island, islandsWorld, homeLocation, rotationYaw, rotationPitch, result);
+        }
+
+        return result;
+    }
+
+    private static void findNewSafeSpotOnIsland(Island island, World islandsWorld, Location homeLocation,
+                                                float rotationYaw, float rotationPitch, CompletableFuture<Location> result) {
+        ChunkPosition homeChunk = ChunkPosition.of(homeLocation);
+
+        List<ChunkPosition> islandChunks = new ArrayList<>(IslandUtils.getChunkCoords(island,
+                WorldInfo.of(islandsWorld), true, true));
+        islandChunks.sort(Comparator.comparingInt(o -> o.distanceSquared(homeChunk)));
+
+        findSafeSpotInChunk(island, islandChunks, 0, islandsWorld, homeLocation, safeSpot -> {
+            if (safeSpot != null) {
+                result.complete(adjustLocationToHome(island, safeSpot.getBlock(), rotationYaw, rotationPitch));
+            } else {
+                result.complete(null);
+            }
+        });
+    }
+
+    private static void findSafeSpotInChunk(Island island, List<ChunkPosition> islandChunks, int index,
+                                            World islandsWorld, Location homeLocation, Consumer<Location> onResult) {
+        if (index >= islandChunks.size()) {
+            onResult.accept(null);
+            return;
+        }
+
+        ChunkPosition chunkPosition = islandChunks.get(index);
+
+        ChunksProvider.loadChunk(chunkPosition, ChunkLoadReason.FIND_SAFE_SPOT, null).whenComplete((chunk, err) -> {
+            ChunkSnapshot chunkSnapshot = chunk.getChunkSnapshot();
+
+            if (WorldBlocks.isChunkEmpty(island, chunkSnapshot)) {
+                findSafeSpotInChunk(island, islandChunks, index + 1, islandsWorld, homeLocation, onResult);
                 return;
             }
 
-            Block islandCenterBlock = island.getCenter(environment).getBlock();
-            float rotationYaw = homeLocation.getYaw();
-            float rotationPitch = homeLocation.getPitch();
+            BukkitExecutor.createTask().runAsync(v -> {
+                Location closestSafeSpot = null;
+                double closestSafeSpotDistance = 0;
 
-            findSafeSpot(island, islandCenterBlock, null, rotationYaw, rotationPitch, (centerTeleportResult, centerTeleportLocation) -> {
-                if (centerTeleportResult) {
-                    result.complete(centerTeleportLocation);
-                    return;
-                }
+                int worldBuildLimit = islandsWorld.getMaxHeight() - 1;
+                int worldMinLimit = plugin.getNMSWorld().getMinHeight(islandsWorld);
 
-                {
-                    Block teleportLocationHighestBlock = islandTeleportBlock.getWorld()
-                            .getHighestBlockAt(islandTeleportBlock.getLocation());
-                    if (WorldBlocks.isSafeBlock(teleportLocationHighestBlock)) {
-                        adjustLocationToHome(island, teleportLocationHighestBlock.getLocation(), rotationYaw, rotationPitch, result::complete);
-                        return;
-                    }
-                }
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
+                        int y = chunkSnapshot.getHighestBlockYAt(x, z);
 
-                {
-                    Block centerHighestBlock = islandCenterBlock.getWorld().getHighestBlockAt(islandCenterBlock.getLocation());
-                    if (WorldBlocks.isSafeBlock(centerHighestBlock)) {
-                        adjustLocationToHome(island, centerHighestBlock.getLocation(), rotationYaw, rotationPitch, result::complete);
-                        return;
-                    }
-                }
+                        if (y < worldMinLimit || y + 2 > worldBuildLimit)
+                            continue;
 
-                /*
-                 *   Finding a new block to teleport the player to.
-                 */
+                        int worldX = chunkSnapshot.getX() * 16 + x;
+                        int worldZ = chunkSnapshot.getZ() * 16 + z;
 
-                World world = island.getCenter(environment).getWorld();
-
-                List<CompletableFuture<ChunkSnapshot>> chunksToLoad = new SequentialListBuilder<CompletableFuture<ChunkSnapshot>>()
-                        .build(IslandUtils.getAllChunksAsync(island, world, true, true, ChunkLoadReason.FIND_SAFE_SPOT, null),
-                                future -> future.thenApply(Chunk::getChunkSnapshot));
-
-                World islandsWorld = plugin.getGrid().getIslandsWorld(island, environment);
-
-                BukkitExecutor.createTask().runAsync(v -> {
-                    List<Location> safeLocations = new LinkedList<>();
-
-                    for (CompletableFuture<ChunkSnapshot> chunkToLoad : chunksToLoad) {
-                        ChunkSnapshot chunkSnapshot;
-
-                        try {
-                            chunkSnapshot = chunkToLoad.get();
-                        } catch (Exception error) {
-                            Log.error(error, "An unexpected error occurred while loading chunk:");
+                        // In some versions, the ChunkSnapshot#getHighestBlockYAt seems to return
+                        // one block above the actual highest block. Therefore, the check is on the
+                        // returned block and the block below it.
+                        Location safeSpot;
+                        if (WorldBlocks.isSafeBlock(chunkSnapshot, x, y, z)) {
+                            safeSpot = new Location(islandsWorld, worldX, y + 1, worldZ);
+                        } else if (y - 1 >= worldMinLimit && WorldBlocks.isSafeBlock(chunkSnapshot, x, y - 1, z)) {
+                            safeSpot = new Location(islandsWorld, worldX, y, worldZ);
+                        } else {
                             continue;
                         }
 
-                        if (WorldBlocks.isChunkEmpty(island, chunkSnapshot))
-                            continue;
-
-                        int worldBuildLimit = islandsWorld.getMaxHeight() - 1;
-                        int worldMinLimit = plugin.getNMSWorld().getMinHeight(islandsWorld);
-
-                        for (int x = 0; x < 16; x++) {
-                            for (int z = 0; z < 16; z++) {
-                                int y = chunkSnapshot.getHighestBlockYAt(x, z);
-
-                                if (y < worldMinLimit || y + 2 > worldBuildLimit)
-                                    continue;
-
-                                int worldX = chunkSnapshot.getX() * 16 + x;
-                                int worldZ = chunkSnapshot.getZ() * 16 + z;
-
-                                // In some versions, the ChunkSnapshot#getHighestBlockYAt seems to return
-                                // one block above the actual highest block. Therefore, the check is on the
-                                // returned block and the block below it.
-                                if (WorldBlocks.isSafeBlock(chunkSnapshot, x, y, z)) {
-                                    safeLocations.add(new Location(islandsWorld, worldX, y, worldZ));
-                                } else if (y - 1 >= worldMinLimit && WorldBlocks.isSafeBlock(chunkSnapshot, x, y - 1, z)) {
-                                    safeLocations.add(new Location(islandsWorld, worldX, y - 1, worldZ));
-                                }
-                            }
+                        double distanceFromHome = safeSpot.distanceSquared(homeLocation);
+                        if (closestSafeSpot == null || distanceFromHome < closestSafeSpotDistance) {
+                            closestSafeSpotDistance = distanceFromHome;
+                            closestSafeSpot = safeSpot;
                         }
                     }
+                }
 
-                    return safeLocations.stream().min(Comparator.comparingDouble(loc ->
-                            loc.distanceSquared(homeLocation))).orElse(null);
-                }).runSync(location -> {
-                    if (location != null) {
-                        adjustLocationToHome(island, location, rotationYaw, rotationPitch, result::complete);
-                    } else {
-                        result.complete(null);
-                    }
-                });
-
+                return closestSafeSpot;
+            }).runSync(location -> {
+                if (location != null) {
+                    onResult.accept(location);
+                } else {
+                    findSafeSpotInChunk(island, islandChunks, index + 1, islandsWorld, homeLocation, onResult);
+                }
             });
-        });
 
-        return result;
+        });
     }
 
     private static void teleportEntity(Entity entity, Location location, @Nullable Consumer<Boolean> teleportResult) {
@@ -188,56 +217,27 @@ public class EntityTeleports {
         plugin.getProviders().getAsyncProvider().teleport(entity, location, teleportResult);
     }
 
-    private static void adjustLocationToHome(Island island, Location location, float yaw,
-                                             float pitch, Consumer<Location> result) {
-        Location homeLocation = location.add(0.5, 0, 0.5);
-        homeLocation.setYaw(yaw);
-        homeLocation.setPitch(pitch);
+    private static Location adjustLocationToHome(Island island, Block block, float yaw, float pitch) {
+        Location newHomeLocation;
 
-        Location locationResult = changeIslandHome(island, homeLocation).add(0, 1.5, 0);
+        {
+            Location location = block.getLocation().add(0.5, 0, 0.5);
+            location.setYaw(yaw);
+            location.setPitch(pitch);
+            EventResult<Location> eventResult = plugin.getEventsBus().callIslandSetHomeEvent(island, location,
+                    IslandSetHomeEvent.Reason.SAFE_HOME, null);
 
-        Log.debugResult(Debug.FIND_SAFE_TELEPORT, "Result Location", locationResult);
-
-        result.accept(locationResult);
-    }
-
-    private static void findSafeSpot(Island island, Block block, Location customLocation, float yaw, float pitch,
-                                     BiConsumer<Boolean, Location> teleportResult) {
-        ChunksProvider.loadChunk(ChunkPosition.of(block), ChunkLoadReason.ENTITY_TELEPORT, chunk -> {
-            if (!WorldBlocks.isSafeBlock(block)) {
-                if (teleportResult != null)
-                    teleportResult.accept(false, null);
-                return;
-            }
-
-            Location toTeleport;
-
-            if (customLocation != null) {
-                toTeleport = customLocation;
+            if (eventResult.isCancelled()) {
+                newHomeLocation = location;
             } else {
-                toTeleport = block.getLocation().add(0.5, 0, 0.5);
-                toTeleport.setYaw(yaw);
-                toTeleport.setPitch(pitch);
+                newHomeLocation = eventResult.getResult();
+                island.setIslandHome(newHomeLocation);
             }
-
-            toTeleport = changeIslandHome(island, toTeleport).add(0, 1.5, 0);
-
-            Log.debugResult(Debug.FIND_SAFE_TELEPORT, "Result Location", toTeleport);
-
-            if (teleportResult != null)
-                teleportResult.accept(true, toTeleport);
-        });
-    }
-
-    private static Location changeIslandHome(Island island, Location islandHome) {
-        EventResult<Location> eventResult = plugin.getEventsBus().callIslandSetHomeEvent(island, islandHome,
-                IslandSetHomeEvent.Reason.SAFE_HOME, null);
-        if (!eventResult.isCancelled()) {
-            island.setIslandHome(eventResult.getResult());
-            return eventResult.getResult();
         }
 
-        return islandHome;
+        Log.debugResult(Debug.FIND_SAFE_TELEPORT, "Result Location", newHomeLocation);
+
+        return newHomeLocation;
     }
 
 }
