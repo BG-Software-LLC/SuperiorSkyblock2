@@ -39,6 +39,14 @@ public class ChunksProvider {
 
         Log.debug(Debug.LOAD_CHUNK, chunkPosition, chunkLoadReason);
 
+        Chunk loadedChunk = ChunkPosition.getLoadedChunk(chunkPosition).orElse(null);
+        if (loadedChunk != null) {
+            processPendingChunkLoadRequest(loadedChunk, chunkPosition);
+            if (onLoadConsumer != null)
+                onLoadConsumer.accept(loadedChunk);
+            return CompletableFuture.completedFuture(loadedChunk);
+        }
+
         PendingChunkLoadRequest pendingRequest = pendingRequests.get(chunkPosition);
 
         if (pendingRequest != null) {
@@ -108,17 +116,21 @@ public class ChunksProvider {
         }
 
         private void finishLoad(Chunk chunk, long profiler) {
-            PendingChunkLoadRequest pendingRequest = pendingRequests.remove(chunkPosition);
-
             Profiler.end(profiler);
             Log.debug(Debug.LOAD_CHUNK, chunkPosition, chunkLoadReason);
-
-            if (pendingRequest != null) {
-                pendingRequest.callbacks.forEach(chunkConsumer -> chunkConsumer.accept(chunk));
-                pendingRequest.completableFuture.complete(chunk);
-            }
+            processPendingChunkLoadRequest(chunk, chunkPosition);
         }
 
+    }
+
+    private static void processPendingChunkLoadRequest(Chunk chunk, ChunkPosition chunkPosition) {
+        PendingChunkLoadRequest pendingRequest = pendingRequests.remove(chunkPosition);
+
+        if (pendingRequest == null)
+            return;
+
+        pendingRequest.callbacks.forEach(chunkConsumer -> chunkConsumer.accept(chunk));
+        pendingRequest.completableFuture.complete(chunk);
     }
 
     private static class PendingChunkLoadRequest {
