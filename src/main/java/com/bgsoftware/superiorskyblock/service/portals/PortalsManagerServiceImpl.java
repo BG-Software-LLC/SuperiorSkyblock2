@@ -59,7 +59,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
     @Override
     public EntityPortalResult handlePlayerPortal(SuperiorPlayer superiorPlayer, Location portalLocation,
                                                  PortalType portalType, Location destinationLocation,
-                                                 boolean ignoreImmunedPortalsStatus) {
+                                                 boolean checkImmunedPortalsStatus) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null.");
         Preconditions.checkNotNull(portalLocation, "portalLocation cannot be null.");
         Preconditions.checkNotNull(portalType, "portalType cannot be null.");
@@ -68,27 +68,28 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
         Preconditions.checkArgument(destinationLocation.getWorld() != null, "portalLocation's world cannot be null");
 
-        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, ignoreImmunedPortalsStatus,
+        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, checkImmunedPortalsStatus,
                 () -> simulateEntityPortal(superiorPlayer.asPlayer(), portalLocation, portalType, destinationLocation));
     }
 
     @Override
     public EntityPortalResult handlePlayerPortalFromIsland(SuperiorPlayer superiorPlayer, Island island,
                                                            Location portalLocation, PortalType portalType,
-                                                           boolean ignoreImmunedPortalsStatus) {
+                                                           boolean checkImmunedPortalsStatus) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null.");
         Preconditions.checkNotNull(island, "island cannot be null.");
         Preconditions.checkNotNull(portalLocation, "portalLocation cannot be null.");
         Preconditions.checkNotNull(portalType, "portalType cannot be null.");
         Preconditions.checkArgument(!(superiorPlayer instanceof SuperiorNPCPlayer), "superiorPlayer cannot be an NPC.");
         Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
+        Preconditions.checkArgument(island.isInside(portalLocation), "portalLocation is not inside the island.");
 
-        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, ignoreImmunedPortalsStatus,
+        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, checkImmunedPortalsStatus,
                 () -> simulateEntityPortalFromIsland(superiorPlayer.asPlayer(), island, portalLocation, portalType));
     }
 
     private EntityPortalResult handlePlayerPortalInternal(SuperiorPlayer superiorPlayer, Location portalLocation,
-                                                          PortalType portalType, boolean ignoreImmunedPortalsStatus,
+                                                          PortalType portalType, boolean checkImmunedPortalsStatus,
                                                           Supplier<EntityPortalResult> entityPortalResultSupplier) {
         World.Environment targetDestination = getTargetWorld(portalLocation, portalType);
         if (targetDestination == World.Environment.NETHER && !plugin.getSettings().getWorlds().getNether().isEnabled())
@@ -96,7 +97,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         if (targetDestination == World.Environment.THE_END && !plugin.getSettings().getWorlds().getEnd().isEnabled())
             return EntityPortalResult.DESTINATION_WORLD_DISABLED;
 
-        if (!ignoreImmunedPortalsStatus && superiorPlayer.getPlayerStatus() == PlayerStatus.PORTALS_IMMUNED)
+        if (checkImmunedPortalsStatus && superiorPlayer.getPlayerStatus() == PlayerStatus.PORTALS_IMMUNED)
             return EntityPortalResult.PLAYER_IMMUNED_TO_PORTAL;
 
         EntityPortalResult portalResult = entityPortalResultSupplier.get();
@@ -118,6 +119,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         Preconditions.checkNotNull(portalType, "portalType cannot be null.");
         Preconditions.checkArgument(!(entity instanceof HumanEntity), "entity cannot be a Player.");
         Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
+        Preconditions.checkArgument(island.isInside(portalLocation), "portalLocation is not inside the island.");
 
         return simulateEntityPortalFromIsland(entity, island, portalLocation, portalType);
     }
@@ -157,8 +159,9 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         }
 
         try {
+            // We want to prevent the players from being teleported in this time.
             if (generatingSchematicsIslands.contains(island.getUniqueId()))
-                return EntityPortalResult.PENDING_TELEPORT; // We want to prevent the players from being teleported in this time.
+                return EntityPortalResult.SCHEMATIC_GENERATING_COOLDOWN;
 
             String destinationEnvironmentName = originalDestination.name().toLowerCase(Locale.ENGLISH);
             String islandSchematic = island.getSchematicName();

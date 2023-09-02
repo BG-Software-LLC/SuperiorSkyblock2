@@ -50,13 +50,14 @@ public class PortalsListener implements Listener {
         PortalType portalType = (e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ? PortalType.NETHER : PortalType.ENDER;
 
         EntityPortalResult portalResult = this.portalsManager.get().handlePlayerPortal(superiorPlayer, e.getFrom(),
-                portalType, e.getTo(), false);
+                portalType, e.getTo(), true);
 
         switch (portalResult) {
             case DESTINATION_WORLD_DISABLED:
+            case PORTAL_NOT_IN_ISLAND:
                 return;
             case PLAYER_IMMUNED_TO_PORTAL:
-            case PENDING_TELEPORT:
+            case SCHEMATIC_GENERATING_COOLDOWN:
             case DESTINATION_NOT_ISLAND_WORLD:
             case PORTAL_EVENT_CANCELLED:
             case INVALID_SCHEMATIC:
@@ -65,8 +66,6 @@ public class PortalsListener implements Listener {
             case SUCCEED:
                 e.setCancelled(true);
                 return;
-            case PORTAL_NOT_IN_ISLAND:
-                break;
             default:
                 throw new IllegalStateException("No handling for result: " + portalResult);
         }
@@ -123,7 +122,7 @@ public class PortalsListener implements Listener {
 
         if (isPlayer) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getEntity());
-            this.portalsManager.get().handlePlayerPortalFromIsland(superiorPlayer, island, e.getLocation(), portalType, false);
+            this.portalsManager.get().handlePlayerPortalFromIsland(superiorPlayer, island, e.getLocation(), portalType, true);
         } else {
             this.portalsManager.get().handleEntityPortalFromIsland(e.getEntity(), island, e.getLocation(), portalType);
         }

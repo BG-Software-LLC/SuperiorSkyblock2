@@ -93,7 +93,7 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
             if (!island.wasSchematicGenerated(environment)) {
                 PortalType portalType = environment == World.Environment.NETHER ? PortalType.NETHER : PortalType.ENDER;
                 portalsManager.get().handlePlayerPortalFromIsland(superiorPlayer, island, superiorPlayer.getLocation(),
-                        portalType, true);
+                        portalType, false);
                 return;
             }
         }
