@@ -464,7 +464,9 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     public MoveResult handlePlayerTeleport(SuperiorPlayer superiorPlayer, Location from, Location to) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(from, "from cannot be null");
+        Preconditions.checkArgument(from.getWorld() != null, "from world cannot be null");
         Preconditions.checkNotNull(to, "to cannot be null");
+        Preconditions.checkArgument(to.getWorld() != null, "from world cannot be null");
 
         Island toIsland = plugin.getGrid().getIslandAt(to);
         if (toIsland != null) {
@@ -474,6 +476,23 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Island fromIsland = plugin.getGrid().getIslandAt(from);
         if (fromIsland != null) {
             return handlePlayerLeaveIslandInternal(superiorPlayer, fromIsland, from, to, IslandLeaveEvent.LeaveCause.PLAYER_TELEPORT);
+        }
+
+        return MoveResult.SUCCESS;
+    }
+
+    @Override
+    public MoveResult handlePlayerTeleportByPortal(SuperiorPlayer superiorPlayer, Location portalLocation, Location teleportLocation) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
+        Preconditions.checkNotNull(portalLocation, "portalLocation cannot be null");
+        Preconditions.checkNotNull(portalLocation.getWorld(), "portalLocation world cannot be null");
+        Preconditions.checkNotNull(teleportLocation, "teleportLocation cannot be null");
+        Preconditions.checkNotNull(teleportLocation.getWorld(), "teleportLocation world cannot be null");
+
+        Island island = plugin.getGrid().getIslandAt(teleportLocation);
+        if (island != null) {
+            return handlePlayerEnterIslandInternal(superiorPlayer, island, portalLocation, teleportLocation,
+                    IslandEnterEvent.EnterCause.PORTAL);
         }
 
         return MoveResult.SUCCESS;

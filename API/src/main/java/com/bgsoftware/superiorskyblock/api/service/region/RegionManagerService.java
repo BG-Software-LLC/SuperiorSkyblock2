@@ -42,6 +42,8 @@ public interface RegionManagerService {
 
     MoveResult handlePlayerTeleport(SuperiorPlayer superiorPlayer, Location from, Location to);
 
+    MoveResult handlePlayerTeleportByPortal(SuperiorPlayer superiorPlayer, Location portalLocation, Location teleportLocation);
+
     MoveResult handlePlayerJoin(SuperiorPlayer superiorPlayer);
 
     MoveResult handlePlayerJoin(SuperiorPlayer superiorPlayer, Location location);

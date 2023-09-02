@@ -9,6 +9,8 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.service.portals.EntityPortalResult;
 import com.bgsoftware.superiorskyblock.api.service.portals.PortalsManagerService;
+import com.bgsoftware.superiorskyblock.api.service.region.MoveResult;
+import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
@@ -42,6 +44,12 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         @Override
         protected DragonBattleService create() {
             return plugin.getServices().getService(DragonBattleService.class);
+        }
+    };
+    private final LazyReference<RegionManagerService> regionManagerService = new LazyReference<RegionManagerService>() {
+        @Override
+        protected RegionManagerService create() {
+            return plugin.getServices().getService(RegionManagerService.class);
         }
     };
 
@@ -128,22 +136,24 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                                                     Location destinationPortalLocation) {
         Island island = plugin.getGrid().getIslandAt(portalLocation);
 
-        if (island == null || !plugin.getGrid().isIslandsWorld(portalLocation.getWorld())) {
-            if (entity instanceof Player) {
-                // In case the portal is not in island world, we want to check if the player can enter the destination island.
-                Island toIsland = plugin.getGrid().getIslandAt(destinationPortalLocation);
-                SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(entity);
+        EntityPortalResult entityPortalResult = simulateEntityPortalFromIsland(entity, island, portalLocation, portalType);
+        if (entityPortalResult != EntityPortalResult.SUCCEED)
+            return entityPortalResult;
 
-//                if (toIsland != null && playersListener.get().preventPlayerEnterIsland(superiorPlayer, portalLocation, island, destinationPortalLocation, toIsland,
-//                        IslandEnterEvent.EnterCause.PORTAL)) {
-//                    return EntityPortalResult.DESTINATION_ISLAND_NOT_PERMITTED;
-//                }
-            }
+        if (!(entity instanceof Player))
+            return EntityPortalResult.SUCCEED;
 
-            return EntityPortalResult.PORTAL_NOT_IN_ISLAND;
-        }
+        Island toIsland = plugin.getGrid().getIslandAt(destinationPortalLocation);
+        if (toIsland == null)
+            return EntityPortalResult.SUCCEED;
 
-        return simulateEntityPortalFromIsland(entity, island, portalLocation, portalType);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(entity);
+        MoveResult moveResult = this.regionManagerService.get().handlePlayerTeleportByPortal(superiorPlayer,
+                portalLocation, destinationPortalLocation);
+        if (moveResult != MoveResult.SUCCESS)
+            return EntityPortalResult.DESTINATION_ISLAND_NOT_PERMITTED;
+
+        return EntityPortalResult.SUCCEED;
     }
 
     private EntityPortalResult simulateEntityPortalFromIsland(Entity entity, Island island, Location portalLocation,
