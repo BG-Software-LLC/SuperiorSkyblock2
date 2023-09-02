@@ -499,21 +499,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     }
 
     @Override
-    public MoveResult handlePlayerJoin(SuperiorPlayer superiorPlayer) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
-
-        Player player = superiorPlayer.asPlayer();
-        if (player == null)
-            return MoveResult.PLAYER_NOT_ONLINE;
-
-        Location playerLocation = player.getLocation();
-        Island island = plugin.getGrid().getIslandAt(playerLocation);
-
-        return island == null ? MoveResult.SUCCESS : handlePlayerEnterIslandInternal(superiorPlayer, island, null,
-                playerLocation, IslandEnterEvent.EnterCause.PLAYER_JOIN);
-    }
-
-    @Override
     public MoveResult handlePlayerJoin(SuperiorPlayer superiorPlayer, Location location) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(location, "location cannot be null");
@@ -523,24 +508,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         return island == null ? MoveResult.SUCCESS : handlePlayerEnterIslandInternal(superiorPlayer, island, null,
                 location, IslandEnterEvent.EnterCause.PLAYER_JOIN);
-    }
-
-    @Override
-    public MoveResult handlePlayerQuit(SuperiorPlayer superiorPlayer) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
-
-        Player player = superiorPlayer.asPlayer();
-        if (player == null)
-            return MoveResult.PLAYER_NOT_ONLINE;
-
-        Location playerLocation = player.getLocation();
-        Island island = plugin.getGrid().getIslandAt(playerLocation);
-
-        if (island == null)
-            return MoveResult.SUCCESS;
-
-        island.setPlayerInside(superiorPlayer, false);
-        return handlePlayerLeaveIslandInternal(superiorPlayer, island, playerLocation, null, IslandLeaveEvent.LeaveCause.PLAYER_QUIT);
     }
 
     @Override
