@@ -1,10 +1,13 @@
 package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
+import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBlockFlags;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
@@ -35,6 +38,7 @@ import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.WorldInfoImpl;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.persistence.EmptyPersistentDataContainer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -999,31 +1003,80 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public void handleBlockPlace(Block block, int amount) {
+    public BlockChangeResult handleBlockPlaceWithResult(Block block) {
+        return BlockChangeResult.SUCCESS;
+    }
+
+    @Override
+    public void handleBlockPlace(Key key) {
         // Do nothing.
     }
 
     @Override
-    public void handleBlockPlace(Block block, int amount, boolean save) {
+    public BlockChangeResult handleBlockPlaceWithResult(Key key) {
+        return BlockChangeResult.SPAWN_ISLAND;
+    }
+
+    @Override
+    public void handleBlockPlace(Block block, @Size int amount) {
         // Do nothing.
     }
 
     @Override
-    public void handleBlockPlace(Key key, int amount) {
+    public BlockChangeResult handleBlockPlaceWithResult(Block block, @Size int amount) {
+        return BlockChangeResult.SPAWN_ISLAND;
+    }
+
+    @Override
+    public void handleBlockPlace(Key key, @Size int amount) {
         // Do nothing.
     }
 
     @Override
-    public void handleBlockPlace(Key key, int amount, boolean save) {
+    public BlockChangeResult handleBlockPlaceWithResult(Key key, @Size int amount) {
+        return BlockChangeResult.SPAWN_ISLAND;
+    }
+
+    @Override
+    public void handleBlockPlace(Block block, @Size int amount, @IslandBlockFlags int flags) {
         // Do nothing.
     }
 
     @Override
+    public BlockChangeResult handleBlockPlaceWithResult(Block block, @Size int amount, int flags) {
+        return BlockChangeResult.SPAWN_ISLAND;
+    }
+
+    @Override
+    public void handleBlockPlace(Key key, @Size int amount, @IslandBlockFlags int flags) {
+        // Do nothing.
+    }
+
+    @Override
+    public BlockChangeResult handleBlockPlaceWithResult(Key key, @Size int amount, @IslandBlockFlags int flags) {
+        return BlockChangeResult.SPAWN_ISLAND;
+    }
+
+    @Override
+    @Deprecated
+    public void handleBlockPlace(Block block, @Size int amount, boolean save) {
+        // Do nothing.
+    }
+
+    @Override
+    @Deprecated
+    public void handleBlockPlace(Key key, @Size int amount, boolean save) {
+        // Do nothing.
+    }
+
+    @Override
+    @Deprecated
     public void handleBlockPlace(Key key, BigInteger amount, boolean save) {
         // Do nothing.
     }
 
     @Override
+    @Deprecated
     public void handleBlockPlace(Key key, BigInteger amount, boolean save, boolean updateLastTimeStatus) {
         // Do nothing.
     }
@@ -1034,33 +1087,116 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public Map<Key, BlockChangeResult> handleBlocksPlaceWithResult(Map<Key, Integer> blocks) {
+        return KeyMaps.createEmptyMap();
+    }
+
+    @Override
+    public void handleBlocksPlace(Map<Key, Integer> blocks, int flags) {
+        // Do nothing.
+    }
+
+    @Override
+    public Map<Key, BlockChangeResult> handleBlocksPlaceWithResult(Map<Key, Integer> blocks, int flags) {
+        return KeyMaps.createEmptyMap();
+    }
+
+    @Override
     public void handleBlockBreak(Block block) {
         // Do nothing.
     }
 
     @Override
-    public void handleBlockBreak(Block block, int amount) {
+    public BlockChangeResult handleBlockBreakWithResult(Block block) {
+        return BlockChangeResult.SPAWN_ISLAND;
+    }
+
+    @Override
+    public void handleBlockBreak(Key key) {
         // Do nothing.
     }
 
     @Override
-    public void handleBlockBreak(Block block, int amount, boolean save) {
+    public BlockChangeResult handleBlockBreakWithResult(Key key) {
+        return BlockChangeResult.SPAWN_ISLAND;
+    }
+
+    @Override
+    public void handleBlockBreak(Block block, @Size int amount) {
         // Do nothing.
     }
 
     @Override
-    public void handleBlockBreak(Key key, int amount) {
+    public BlockChangeResult handleBlockBreakWithResult(Block block, @Size int amount) {
+        return BlockChangeResult.SPAWN_ISLAND;
+    }
+
+    @Override
+    public void handleBlockBreak(Key key, @Size int amount) {
         // Do nothing.
     }
 
     @Override
-    public void handleBlockBreak(Key key, int amount, boolean save) {
+    public BlockChangeResult handleBlockBreakWithResult(Key key, @Size int amount) {
+        return BlockChangeResult.SPAWN_ISLAND;
+    }
+
+    @Override
+    public void handleBlockBreak(Block block, @Size int amount, @IslandBlockFlags int flags) {
         // Do nothing.
     }
 
     @Override
+    public BlockChangeResult handleBlockBreakWithResult(Block block, @Size int amount, int flags) {
+        return BlockChangeResult.SPAWN_ISLAND;
+    }
+
+    @Override
+    public void handleBlockBreak(Key key, @Size int amount, @IslandBlockFlags int flags) {
+        // Do nothing.
+    }
+
+    @Override
+    public BlockChangeResult handleBlockBreakWithResult(Key key, @Size int amount, int flags) {
+        return BlockChangeResult.SPAWN_ISLAND;
+    }
+
+    @Override
+    @Deprecated
+    public void handleBlockBreak(Block block, @Size int amount, boolean save) {
+        // Do nothing.
+    }
+
+    @Override
+    @Deprecated
+    public void handleBlockBreak(Key key, @Size int amount, boolean save) {
+        // Do nothing.
+    }
+
+    @Override
+    @Deprecated
     public void handleBlockBreak(Key key, BigInteger amount, boolean save) {
         // Do nothing.
+    }
+
+    @Override
+    public void handleBlocksBreak(Map<Key, Integer> blocks) {
+        // Do nothing.
+    }
+
+    @Override
+    public Map<Key, BlockChangeResult> handleBlocksBreakWithResult(Map<Key, Integer> blocks) {
+        return KeyMaps.createEmptyMap();
+    }
+
+    @Override
+    public void handleBlocksBreak(Map<Key, Integer> blocks, @IslandBlockFlags int flags) {
+        // Do nothing.
+    }
+
+    @Override
+    public Map<Key, BlockChangeResult> handleBlocksBreakWithResult(Map<Key, Integer> blocks, int flags) {
+        return KeyMaps.createEmptyMap();
     }
 
     @Override
@@ -1283,7 +1419,7 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public boolean hasReachedBlockLimit(Key key, int amount) {
+    public boolean hasReachedBlockLimit(Key key, @Size int amount) {
         return false;
     }
 
@@ -1333,12 +1469,12 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, int amount) {
+    public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, @Size int amount) {
         return CompletableFuture.completedFuture(false);
     }
 
     @Override
-    public CompletableFuture<Boolean> hasReachedEntityLimit(Key key, int amount) {
+    public CompletableFuture<Boolean> hasReachedEntityLimit(Key key, @Size int amount) {
         return CompletableFuture.completedFuture(false);
     }
 
@@ -1599,7 +1735,7 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public void setGeneratorAmount(Key key, int amount, World.Environment environment) {
+    public void setGeneratorAmount(Key key, @Size int amount, World.Environment environment) {
         // Do nothing.
     }
 

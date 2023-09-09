@@ -42,7 +42,7 @@ public class JetsMinionsHook implements Listener {
         } else {
             blockChangesListener.get().onBlockBreak(Keys.of(e.getBlock()), e.getBlock().getLocation(),
                     plugin.getNMSWorld().getDefaultAmount(e.getBlock()),
-                    BlockChangesListener.Flag.DIRTY_CHUNK, BlockChangesListener.Flag.SAVE_BLOCK_COUNT);
+                    BlockChangesListener.BlockTrackFlags.DIRTY_CHUNKS | BlockChangesListener.BlockTrackFlags.SAVE_BLOCK_COUNT);
         }
     }
 

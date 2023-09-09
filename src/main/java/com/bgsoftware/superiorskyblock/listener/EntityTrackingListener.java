@@ -88,7 +88,7 @@ public class EntityTrackingListener implements Listener {
         // Vehicle was not registered by VehicleDestroyEvent; We want to register its block break
         Key blockKey = plugin.getNMSAlgorithms().getMinecartBlock((Minecart) entity);
         this.blockChangesListener.get().onBlockBreak(blockKey, entity.getLocation(), 1,
-                BlockChangesListener.Flag.DIRTY_CHUNK, BlockChangesListener.Flag.SAVE_BLOCK_COUNT);
+                BlockChangesListener.BlockTrackFlags.DIRTY_CHUNKS | BlockChangesListener.BlockTrackFlags.SAVE_BLOCK_COUNT);
     }
 
     /* INTERNAL */

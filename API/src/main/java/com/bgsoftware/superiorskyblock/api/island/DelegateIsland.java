@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
@@ -909,41 +910,85 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public int compareTo(Island o) {
-        return this.handle.compareTo(o);
-    }
-
-    @Override
     public void handleBlockPlace(Block block) {
         this.handle.handleBlockPlace(block);
     }
 
     @Override
-    public void handleBlockPlace(Block block, int amount) {
+    public BlockChangeResult handleBlockPlaceWithResult(Block block) {
+        return this.handle.handleBlockPlaceWithResult(block);
+    }
+
+    @Override
+    public void handleBlockPlace(Key key) {
+        this.handle.handleBlockPlace(key);
+    }
+
+    @Override
+    public BlockChangeResult handleBlockPlaceWithResult(Key key) {
+        return this.handle.handleBlockPlaceWithResult(key);
+    }
+
+    @Override
+    public void handleBlockPlace(Block block, @Size int amount) {
         this.handle.handleBlockPlace(block, amount);
     }
 
     @Override
-    public void handleBlockPlace(Block block, int amount, boolean save) {
-        this.handle.handleBlockPlace(block, amount, save);
+    public BlockChangeResult handleBlockPlaceWithResult(Block block, @Size int amount) {
+        return this.handle.handleBlockPlaceWithResult(block, amount);
     }
 
     @Override
-    public void handleBlockPlace(Key key, int amount) {
+    public void handleBlockPlace(Key key, @Size int amount) {
         this.handle.handleBlockPlace(key, amount);
     }
 
     @Override
-    public void handleBlockPlace(Key key, int amount, boolean save) {
+    public BlockChangeResult handleBlockPlaceWithResult(Key key, @Size int amount) {
+        return this.handle.handleBlockPlaceWithResult(key, amount);
+    }
+
+    @Override
+    public void handleBlockPlace(Block block, @Size int amount, @IslandBlockFlags int flags) {
+        this.handle.handleBlockPlace(block, amount, flags);
+    }
+
+    @Override
+    public BlockChangeResult handleBlockPlaceWithResult(Block block, @Size int amount, @IslandBlockFlags int flags) {
+        return this.handle.handleBlockPlaceWithResult(block, amount, flags);
+    }
+
+    @Override
+    public void handleBlockPlace(Key key, @Size int amount, @IslandBlockFlags int flags) {
+        this.handle.handleBlockPlace(key, amount, flags);
+    }
+
+    @Override
+    public BlockChangeResult handleBlockPlaceWithResult(Key key, @Size int amount, @IslandBlockFlags int flags) {
+        return this.handle.handleBlockPlaceWithResult(key, amount, flags);
+    }
+
+    @Override
+    @Deprecated
+    public void handleBlockPlace(Block block, @Size int amount, boolean save) {
+        this.handle.handleBlockPlace(block, amount, save);
+    }
+
+    @Override
+    @Deprecated
+    public void handleBlockPlace(Key key, @Size int amount, boolean save) {
         this.handle.handleBlockPlace(key, amount, save);
     }
 
     @Override
+    @Deprecated
     public void handleBlockPlace(Key key, BigInteger amount, boolean save) {
         this.handle.handleBlockPlace(key, amount, save);
     }
 
     @Override
+    @Deprecated
     public void handleBlockPlace(Key key, BigInteger amount, boolean save, boolean updateLastTimeStatus) {
         this.handle.handleBlockPlace(key, amount, save, updateLastTimeStatus);
     }
@@ -954,33 +999,116 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public Map<Key, BlockChangeResult> handleBlocksPlaceWithResult(Map<Key, Integer> blocks) {
+        return this.handle.handleBlocksPlaceWithResult(blocks);
+    }
+
+    @Override
+    public void handleBlocksPlace(Map<Key, Integer> blocks, @IslandBlockFlags int flags) {
+        this.handle.handleBlocksPlace(blocks, flags);
+    }
+
+    @Override
+    public Map<Key, BlockChangeResult> handleBlocksPlaceWithResult(Map<Key, Integer> blocks, int flags) {
+        return this.handle.handleBlocksPlaceWithResult(blocks, flags);
+    }
+
+    @Override
     public void handleBlockBreak(Block block) {
         this.handle.handleBlockBreak(block);
     }
 
     @Override
-    public void handleBlockBreak(Block block, int amount) {
+    public BlockChangeResult handleBlockBreakWithResult(Block block) {
+        return this.handle.handleBlockBreakWithResult(block);
+    }
+
+    @Override
+    public void handleBlockBreak(Key key) {
+        this.handle.handleBlockBreak(key);
+    }
+
+    @Override
+    public BlockChangeResult handleBlockBreakWithResult(Key key) {
+        return this.handle.handleBlockBreakWithResult(key);
+    }
+
+    @Override
+    public void handleBlockBreak(Block block, @Size int amount) {
         this.handle.handleBlockBreak(block, amount);
     }
 
     @Override
-    public void handleBlockBreak(Block block, int amount, boolean save) {
-        this.handle.handleBlockBreak(block, amount, save);
+    public BlockChangeResult handleBlockBreakWithResult(Block block, @Size int amount) {
+        return this.handle.handleBlockBreakWithResult(block, amount);
     }
 
     @Override
-    public void handleBlockBreak(Key key, int amount) {
+    public void handleBlockBreak(Key key, @Size int amount) {
         this.handle.handleBlockBreak(key, amount);
     }
 
     @Override
-    public void handleBlockBreak(Key key, int amount, boolean save) {
+    public BlockChangeResult handleBlockBreakWithResult(Key key, @Size int amount) {
+        return this.handle.handleBlockBreakWithResult(key, amount);
+    }
+
+    @Override
+    public void handleBlockBreak(Block block, @Size int amount, @IslandBlockFlags int flags) {
+        this.handle.handleBlockBreak(block, amount, flags);
+    }
+
+    @Override
+    public BlockChangeResult handleBlockBreakWithResult(Block block, @Size int amount, @IslandBlockFlags int flags) {
+        return this.handle.handleBlockBreakWithResult(block, amount, flags);
+    }
+
+    @Override
+    public void handleBlockBreak(Key key, @Size int amount, @IslandBlockFlags int flags) {
+        this.handle.handleBlockBreak(key, amount, flags);
+    }
+
+    @Override
+    public BlockChangeResult handleBlockBreakWithResult(Key key, @Size int amount, @IslandBlockFlags int flags) {
+        return this.handle.handleBlockBreakWithResult(key, amount, flags);
+    }
+
+    @Override
+    @Deprecated
+    public void handleBlockBreak(Block block, @Size int amount, boolean save) {
+        this.handle.handleBlockBreak(block, amount, save);
+    }
+
+    @Override
+    @Deprecated
+    public void handleBlockBreak(Key key, @Size int amount, boolean save) {
         this.handle.handleBlockBreak(key, amount, save);
     }
 
     @Override
+    @Deprecated
     public void handleBlockBreak(Key key, BigInteger amount, boolean save) {
         this.handle.handleBlockBreak(key, amount, save);
+    }
+
+    @Override
+    public void handleBlocksBreak(Map<Key, Integer> blocks) {
+        this.handle.handleBlocksBreak(blocks);
+    }
+
+    @Override
+    public Map<Key, BlockChangeResult> handleBlocksBreakWithResult(Map<Key, Integer> blocks) {
+        return this.handle.handleBlocksBreakWithResult(blocks);
+    }
+
+    @Override
+    public void handleBlocksBreak(Map<Key, Integer> blocks, @IslandBlockFlags int flags) {
+        this.handle.handleBlocksBreak(blocks, flags);
+    }
+
+    @Override
+    public Map<Key, BlockChangeResult> handleBlocksBreakWithResult(Map<Key, Integer> blocks, @IslandBlockFlags int flags) {
+        return this.handle.handleBlocksBreakWithResult(blocks, flags);
     }
 
     @Override
@@ -1194,7 +1322,7 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public boolean hasReachedBlockLimit(Key key, int amount) {
+    public boolean hasReachedBlockLimit(Key key, @Size int amount) {
         return this.handle.hasReachedBlockLimit(key, amount);
     }
 
@@ -1244,12 +1372,12 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, int amount) {
+    public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, @Size int amount) {
         return this.handle.hasReachedEntityLimit(entityType, amount);
     }
 
     @Override
-    public CompletableFuture<Boolean> hasReachedEntityLimit(Key key, int amount) {
+    public CompletableFuture<Boolean> hasReachedEntityLimit(Key key, @Size int amount) {
         return this.handle.hasReachedEntityLimit(key, amount);
     }
 
@@ -1513,7 +1641,7 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public void setGeneratorAmount(Key key, int amount, World.Environment environment) {
+    public void setGeneratorAmount(Key key, @Size int amount, World.Environment environment) {
         this.handle.setGeneratorAmount(key, amount, environment);
     }
 
@@ -1604,5 +1732,9 @@ public class DelegateIsland implements Island {
         this.handle.setChestRows(index, rows);
     }
 
+    @Override
+    public int compareTo(Island o) {
+        return this.handle.compareTo(o);
+    }
 
 }

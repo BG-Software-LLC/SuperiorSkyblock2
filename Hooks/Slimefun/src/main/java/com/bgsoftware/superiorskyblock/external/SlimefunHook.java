@@ -118,7 +118,7 @@ public class SlimefunHook {
             } else {
                 blockChangesListener.get().onBlockBreak(Keys.of(e.getBlock()), e.getBlock().getLocation(),
                         plugin.getNMSWorld().getDefaultAmount(e.getBlock()),
-                        BlockChangesListener.Flag.SAVE_BLOCK_COUNT, BlockChangesListener.Flag.DIRTY_CHUNK);
+                        BlockChangesListener.BlockTrackFlags.DIRTY_CHUNKS | BlockChangesListener.BlockTrackFlags.SAVE_BLOCK_COUNT);
             }
         }
 
@@ -130,7 +130,7 @@ public class SlimefunHook {
         public void onAutoPlacerPlaceBlock(BlockPlacerPlaceEvent e) {
             blockChangesListener.get().onBlockPlace(Keys.of(e.getBlock()), e.getBlock().getLocation(),
                     plugin.getNMSWorld().getDefaultAmount(e.getBlock()), null,
-                    BlockChangesListener.Flag.DIRTY_CHUNK, BlockChangesListener.Flag.SAVE_BLOCK_COUNT);
+                    BlockChangesListener.BlockTrackFlags.DIRTY_CHUNKS | BlockChangesListener.BlockTrackFlags.SAVE_BLOCK_COUNT);
         }
 
     }

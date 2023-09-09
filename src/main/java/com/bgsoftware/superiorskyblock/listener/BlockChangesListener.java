@@ -1,9 +1,11 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.common.annotations.IntType;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBlockFlags;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
@@ -55,10 +57,8 @@ import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 
 public class BlockChangesListener implements Listener {
@@ -82,11 +82,12 @@ public class BlockChangesListener implements Listener {
         this.registerBlockDestroyListener();
     }
 
-    public enum Flag {
+    @IntType({BlockTrackFlags.DIRTY_CHUNKS, BlockTrackFlags.SAVE_BLOCK_COUNT, BlockTrackFlags.HANDLE_NEARBY_BLOCKS})
+    public @interface BlockTrackFlags {
 
-        DIRTY_CHUNK,
-        SAVE_BLOCK_COUNT,
-        HANDLE_NEARBY_BLOCKS
+        int DIRTY_CHUNKS = (1 << 0);
+        int SAVE_BLOCK_COUNT = (1 << 1);
+        int HANDLE_NEARBY_BLOCKS = (1 << 2);
 
     }
 
@@ -95,14 +96,14 @@ public class BlockChangesListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onBlockPlace(BlockPlaceEvent e) {
         onBlockPlace(Keys.of(e.getBlock()), e.getBlock().getLocation(), 1, e.getBlockReplacedState(),
-                Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
+                BlockTrackFlags.DIRTY_CHUNKS | BlockTrackFlags.SAVE_BLOCK_COUNT);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onBucketEmpty(PlayerBucketEmptyEvent e) {
         Key blockKey = Keys.ofMaterialAndData(e.getBucket().name().replace("_BUCKET", ""));
         onBlockPlace(blockKey, e.getBlockClicked().getLocation(), 1, null,
-                Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
+                BlockTrackFlags.DIRTY_CHUNKS | BlockTrackFlags.SAVE_BLOCK_COUNT);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -112,20 +113,21 @@ public class BlockChangesListener implements Listener {
             Key blockKey = Keys.of(blockState);
             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
         });
-        onMultiBlockPlace(blockCounts, e.getLocation(), Flag.DIRTY_CHUNK);
+        onMultiBlockPlace(blockCounts, e.getLocation(),
+                BlockTrackFlags.DIRTY_CHUNKS | BlockTrackFlags.SAVE_BLOCK_COUNT);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onBlockGrow(BlockGrowEvent e) {
         onBlockPlace(Keys.of(e.getNewState()), e.getBlock().getLocation(), 1, null,
-                Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
+                BlockTrackFlags.DIRTY_CHUNKS | BlockTrackFlags.SAVE_BLOCK_COUNT);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onBlockFrom(BlockFormEvent e) {
         Location location = e.getNewState().getLocation();
         // Do not save block counts
-        onBlockBreak(Keys.of(e.getBlock()), location, 1, Flag.DIRTY_CHUNK);
+        onBlockBreak(Keys.of(e.getBlock()), location, 1, BlockTrackFlags.DIRTY_CHUNKS);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -200,7 +202,8 @@ public class BlockChangesListener implements Listener {
                 return;
         }
 
-        onBlockPlace(blockKey, location, 1, null, Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
+        onBlockPlace(blockKey, location, 1, null,
+                BlockTrackFlags.DIRTY_CHUNKS | BlockTrackFlags.SAVE_BLOCK_COUNT);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -214,17 +217,19 @@ public class BlockChangesListener implements Listener {
             blockKey = Keys.of(e.getTo(), (byte) 0);
         }
 
-        onBlockPlace(blockKey, e.getBlock().getLocation(), 1, e.getBlock().getState(), Flag.SAVE_BLOCK_COUNT);
+        onBlockPlace(blockKey, e.getBlock().getLocation(), 1, e.getBlock().getState(),
+                BlockTrackFlags.SAVE_BLOCK_COUNT);
     }
 
     public void onBlockPlace(Key blockKey, Location blockLocation, int blockCount,
-                             @Nullable BlockState oldBlockState, Flag... flags) {
+                             @Nullable BlockState oldBlockState, @BlockTrackFlags int flags) {
         Island island = plugin.getGrid().getIslandAt(blockLocation);
 
         if (island == null)
             return;
 
-        EnumSet<Flag> flagsSet = flags.length == 0 ? EnumSet.noneOf(Flag.class) : EnumSet.copyOf(Arrays.asList(flags));
+        boolean saveBlockCounts = (flags & BlockTrackFlags.SAVE_BLOCK_COUNT) != 0;
+        boolean dirtyChunks = (flags & BlockTrackFlags.DIRTY_CHUNKS) != 0;
 
         if (oldBlockState != null && oldBlockState.getType() != Material.AIR) {
             Material blockStateType = oldBlockState.getType();
@@ -240,32 +245,43 @@ public class BlockChangesListener implements Listener {
                 oldBlockCount = plugin.getNMSWorld().getDefaultAmount(oldBlockState.getBlock());
             }
 
-            internalBlockBreak(island, oldBlockKey, blockLocation, oldBlockCount, flagsSet);
+            internalBlockBreak(island, oldBlockKey, blockLocation, oldBlockCount, flags);
         }
 
         if (blockKey.equals(ConstantKeys.END_PORTAL_FRAME_WITH_EYE))
-            internalBlockBreak(island, ConstantKeys.END_PORTAL_FRAME, blockLocation, 1, flagsSet);
+            internalBlockBreak(island, ConstantKeys.END_PORTAL_FRAME, blockLocation, 1, flags);
 
-        if (!blockKey.getGlobalKey().contains("SPAWNER") || plugin.getProviders().shouldListenToSpawnerChanges())
-            island.handleBlockPlace(blockKey, blockCount, flagsSet.contains(Flag.SAVE_BLOCK_COUNT));
+        if (!blockKey.getGlobalKey().contains("SPAWNER") || plugin.getProviders().shouldListenToSpawnerChanges()) {
+            int blockPlaceFlags = IslandBlockFlags.UPDATE_LAST_TIME_STATUS;
+            if (saveBlockCounts) blockPlaceFlags |= IslandBlockFlags.SAVE_BLOCK_COUNTS;
+            island.handleBlockPlace(blockKey, blockCount, blockPlaceFlags);
+        }
 
-        if (flagsSet.contains(Flag.DIRTY_CHUNK)) {
+        if (dirtyChunks) {
             island.markChunkDirty(blockLocation.getWorld(), blockLocation.getBlockX() >> 4,
                     blockLocation.getBlockZ() >> 4, true);
         }
     }
 
-    public void onMultiBlockPlace(KeyMap<Integer> blockCounts, Location location, Flag... flags) {
-        if (!blockCounts.isEmpty()) {
-            Island island = plugin.getGrid().getIslandAt(location);
-            if (island != null) {
-                island.handleBlocksPlace(blockCounts);
-                EnumSet<Flag> flagsSet = flags.length == 0 ? EnumSet.noneOf(Flag.class) : EnumSet.copyOf(Arrays.asList(flags));
-                if (flagsSet.contains(Flag.DIRTY_CHUNK)) {
-                    island.markChunkDirty(location.getWorld(), location.getBlockX() >> 4,
-                            location.getBlockZ() >> 4, true);
-                }
-            }
+    public void onMultiBlockPlace(KeyMap<Integer> blockCounts, Location location, @BlockTrackFlags int flags) {
+        if (blockCounts.isEmpty())
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(location);
+        if (island == null)
+            return;
+
+        boolean dirtyChunks = (flags & BlockTrackFlags.DIRTY_CHUNKS) != 0;
+        boolean saveBlockCounts = (flags & BlockTrackFlags.SAVE_BLOCK_COUNT) != 0;
+
+        int blockPlaceFlags = IslandBlockFlags.UPDATE_LAST_TIME_STATUS |
+                (saveBlockCounts ? IslandBlockFlags.SAVE_BLOCK_COUNTS : 0);
+
+        island.handleBlocksPlace(blockCounts, blockPlaceFlags);
+
+        if (dirtyChunks) {
+            island.markChunkDirty(location.getWorld(), location.getBlockX() >> 4,
+                    location.getBlockZ() >> 4, true);
         }
     }
 
@@ -275,7 +291,7 @@ public class BlockChangesListener implements Listener {
     private void onBlockBreak(BlockBreakEvent e) {
         int blockCount = plugin.getNMSWorld().getDefaultAmount(e.getBlock());
         onBlockBreak(Keys.of(e.getBlock()), e.getBlock().getLocation(), blockCount,
-                Flag.HANDLE_NEARBY_BLOCKS, Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
+                BlockTrackFlags.HANDLE_NEARBY_BLOCKS | BlockTrackFlags.DIRTY_CHUNKS | BlockTrackFlags.SAVE_BLOCK_COUNT);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -283,7 +299,7 @@ public class BlockChangesListener implements Listener {
         if (e.getEntity() instanceof FallingBlock) {
             Key blockKey = plugin.getNMSAlgorithms().getFallingBlockType((FallingBlock) e.getEntity());
             onBlockBreak(blockKey, e.getEntity().getLocation(), 1,
-                    Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
+                    BlockTrackFlags.DIRTY_CHUNKS | BlockTrackFlags.SAVE_BLOCK_COUNT);
         }
     }
 
@@ -293,7 +309,7 @@ public class BlockChangesListener implements Listener {
         if (e.getBlockClicked().isLiquid() || isWaterLogged) {
             Key blockKey = isWaterLogged ? ConstantKeys.WATER : Keys.of(e.getBlockClicked());
             onBlockBreak(blockKey, e.getBlockClicked().getLocation(), 1,
-                    Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
+                    BlockTrackFlags.DIRTY_CHUNKS | BlockTrackFlags.SAVE_BLOCK_COUNT);
         }
     }
 
@@ -303,7 +319,8 @@ public class BlockChangesListener implements Listener {
             for (Entity nearby : e.getEntity().getNearbyEntities(2, 2, 2)) {
                 if (nearby instanceof FallingBlock) {
                     Key blockKey = plugin.getNMSAlgorithms().getFallingBlockType((FallingBlock) nearby);
-                    onBlockBreak(blockKey, nearby.getLocation(), 1, Flag.SAVE_BLOCK_COUNT);
+                    onBlockBreak(blockKey, nearby.getLocation(), 1,
+                            BlockTrackFlags.DIRTY_CHUNKS | BlockTrackFlags.SAVE_BLOCK_COUNT);
                     return;
                 }
             }
@@ -314,7 +331,8 @@ public class BlockChangesListener implements Listener {
     private void onPistonExtend(BlockPistonExtendEvent e) {
         for (Block block : e.getBlocks()) {
             if (plugin.getNMSWorld().getPistonReaction(block) == PistonPushReaction.DESTROY) {
-                onBlockBreak(Keys.of(block), block.getLocation(), 1, Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
+                onBlockBreak(Keys.of(block), block.getLocation(), 1,
+                        BlockTrackFlags.DIRTY_CHUNKS | BlockTrackFlags.SAVE_BLOCK_COUNT);
             }
         }
     }
@@ -322,18 +340,20 @@ public class BlockChangesListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onLeavesDecay(LeavesDecayEvent e) {
         onBlockBreak(Keys.of(e.getBlock()), e.getBlock().getLocation(), 1,
-                Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
+                BlockTrackFlags.DIRTY_CHUNKS | BlockTrackFlags.SAVE_BLOCK_COUNT);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onBlockFromTo(BlockFromToEvent e) {
         if (e.getToBlock().getType() != Material.AIR) {
             // Do not save block counts
-            onBlockBreak(Keys.of(e.getToBlock()), e.getToBlock().getLocation(), 1, Flag.DIRTY_CHUNK);
+            onBlockBreak(Keys.of(e.getToBlock()), e.getToBlock().getLocation(), 1,
+                    BlockTrackFlags.DIRTY_CHUNKS);
         } else {
             BukkitExecutor.sync(() -> {
                 // Do not save block counts
-                onBlockPlace(Keys.of(e.getToBlock()), e.getToBlock().getLocation(), 1, null, Flag.DIRTY_CHUNK);
+                onBlockPlace(Keys.of(e.getToBlock()), e.getToBlock().getLocation(), 1, null,
+                        BlockTrackFlags.DIRTY_CHUNKS);
             });
         }
     }
@@ -345,16 +365,21 @@ public class BlockChangesListener implements Listener {
             Key blockKey = Keys.of(block);
             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
         });
+
         if (e.getEntity() instanceof TNTPrimed)
             blockCounts.put(ConstantKeys.TNT, blockCounts.getOrDefault(ConstantKeys.TNT, 0) + 1);
-        onMultiBlockBreak(blockCounts, e.getLocation(), Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
+
+        onMultiBlockBreak(blockCounts, e.getLocation(), BlockTrackFlags.DIRTY_CHUNKS | BlockTrackFlags.SAVE_BLOCK_COUNT);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onMinecartBreak(VehicleDestroyEvent e) {
         if (e.getVehicle() instanceof Minecart) {
             Key blockKey = plugin.getNMSAlgorithms().getMinecartBlock((Minecart) e.getVehicle());
-            onBlockBreak(blockKey, e.getVehicle().getLocation(), 1, Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
+
+            onBlockBreak(blockKey, e.getVehicle().getLocation(), 1,
+                    BlockTrackFlags.DIRTY_CHUNKS | BlockTrackFlags.SAVE_BLOCK_COUNT);
+
             e.getVehicle().setMetadata("SSB-VehicleDestory", new FixedMetadataValue(plugin, true));
         }
     }
@@ -365,28 +390,34 @@ public class BlockChangesListener implements Listener {
             BukkitEntities.getPlayerSource(e.getEntity()).ifPresent(shooter -> {
                 Block hitBlock = PROJECTILE_HIT_EVENT_TARGET_BLOCK.invoke(e);
                 if (hitBlock != null && hitBlock.getType() == CHORUS_FLOWER) {
-                    onBlockBreak(ConstantKeys.CHORUS_FLOWER, hitBlock.getLocation(), 1, Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
+                    onBlockBreak(ConstantKeys.CHORUS_FLOWER, hitBlock.getLocation(), 1,
+                            BlockTrackFlags.DIRTY_CHUNKS | BlockTrackFlags.SAVE_BLOCK_COUNT);
                 }
             });
         }
     }
 
-    public void onBlockBreak(Key blockKey, Location blockLocation, int blockCount, Flag... flags) {
+    public void onBlockBreak(Key blockKey, Location blockLocation, int blockCount, @BlockTrackFlags int flags) {
         Island island = plugin.getGrid().getIslandAt(blockLocation);
         if (island != null) {
-            EnumSet<Flag> flagsSet = flags.length == 0 ? EnumSet.noneOf(Flag.class) : EnumSet.copyOf(Arrays.asList(flags));
-            internalBlockBreak(island, blockKey, blockLocation, blockCount, flagsSet);
+            internalBlockBreak(island, blockKey, blockLocation, blockCount, flags);
         }
     }
 
-    private void internalBlockBreak(Island island, Key blockKey, Location blockLocation, int blockCount, EnumSet<Flag> flags) {
-        if (!blockKey.getGlobalKey().contains("SPAWNER") || plugin.getProviders().shouldListenToSpawnerChanges())
-            island.handleBlockBreak(blockKey, blockCount, flags.contains(Flag.SAVE_BLOCK_COUNT));
+    private void internalBlockBreak(Island island, Key blockKey, Location blockLocation, int blockCount,
+                                    @BlockTrackFlags int flags) {
+        boolean handleNearbyBlocks = (flags & BlockTrackFlags.HANDLE_NEARBY_BLOCKS) != 0;
+        boolean dirtyChunks = (flags & BlockTrackFlags.DIRTY_CHUNKS) != 0;
+        boolean saveBlockCounts = (flags & BlockTrackFlags.SAVE_BLOCK_COUNT) != 0;
 
-        boolean handleNearbyBlocks = flags.contains(Flag.HANDLE_NEARBY_BLOCKS);
-        boolean dirtyChunk = flags.contains(Flag.DIRTY_CHUNK);
+        int handleBlockBreakFlag = IslandBlockFlags.UPDATE_LAST_TIME_STATUS |
+                (saveBlockCounts ? IslandBlockFlags.SAVE_BLOCK_COUNTS : 0);
 
-        if (handleNearbyBlocks || dirtyChunk) {
+        if (!blockKey.getGlobalKey().contains("SPAWNER") || plugin.getProviders().shouldListenToSpawnerChanges()) {
+            island.handleBlockBreak(blockKey, blockCount, handleBlockBreakFlag);
+        }
+
+        if (handleNearbyBlocks || dirtyChunks) {
             EnumMap<BlockFace, Key> nearbyBlocks = new EnumMap<>(BlockFace.class);
 
             if (handleNearbyBlocks) {
@@ -412,7 +443,7 @@ public class BlockChangesListener implements Listener {
 
                 Block block = blockLocation.getBlock();
 
-                if (dirtyChunk) {
+                if (dirtyChunks) {
                     if (plugin.getNMSChunks().isChunkEmpty(block.getChunk())) {
                         island.markChunkEmpty(world, chunkX, chunkZ, true);
                     }
@@ -423,7 +454,7 @@ public class BlockChangesListener implements Listener {
                         Key nearbyBlock = Keys.of(block.getRelative(nearbyFace));
                         Key oldNearbyBlock = nearbyBlocks.getOrDefault(nearbyFace, ConstantKeys.AIR);
                         if (oldNearbyBlock != ConstantKeys.AIR && !nearbyBlock.equals(oldNearbyBlock)) {
-                            island.handleBlockBreak(oldNearbyBlock, 1);
+                            island.handleBlockBreak(oldNearbyBlock, 1, handleBlockBreakFlag);
                         }
                     }
                 }
@@ -431,18 +462,25 @@ public class BlockChangesListener implements Listener {
         }
     }
 
-    public void onMultiBlockBreak(KeyMap<Integer> blockCounts, Location location, Flag... flags) {
-        if (!blockCounts.isEmpty()) {
-            Island island = plugin.getGrid().getIslandAt(location);
-            if (island != null) {
-                EnumSet<Flag> flagsSet = flags.length == 0 ? EnumSet.noneOf(Flag.class) : EnumSet.copyOf(Arrays.asList(flags));
-                boolean saveBlockCounts = flagsSet.contains(Flag.SAVE_BLOCK_COUNT);
-                blockCounts.forEach((blockKey, blockCount) -> island.handleBlockBreak(blockKey, blockCount, saveBlockCounts));
-                if (flagsSet.contains(Flag.DIRTY_CHUNK)) {
-                    island.markChunkDirty(location.getWorld(), location.getBlockX() >> 4,
-                            location.getBlockZ() >> 4, true);
-                }
-            }
+    public void onMultiBlockBreak(KeyMap<Integer> blockCounts, Location location, @BlockTrackFlags int flags) {
+        if (blockCounts.isEmpty())
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(location);
+        if (island == null)
+            return;
+
+        boolean dirtyChunks = (flags & BlockTrackFlags.DIRTY_CHUNKS) != 0;
+        boolean saveBlockCounts = (flags & BlockTrackFlags.SAVE_BLOCK_COUNT) != 0;
+
+        int blockBreakFlags = IslandBlockFlags.UPDATE_LAST_TIME_STATUS |
+                (saveBlockCounts ? IslandBlockFlags.SAVE_BLOCK_COUNTS : 0);
+
+        island.handleBlocksBreak(blockCounts, blockBreakFlags);
+
+        if (dirtyChunks && plugin.getNMSChunks().isChunkEmpty(location.getChunk())) {
+            island.markChunkEmpty(location.getWorld(), location.getBlockX() >> 4,
+                    location.getBlockZ() >> 4, true);
         }
     }
 
@@ -475,7 +513,8 @@ public class BlockChangesListener implements Listener {
             if (alreadySpongeAbosrbCalled.contains(location))
                 return;
 
-            onBlockPlace(ConstantKeys.WET_SPONGE, location, 1, e.getBlock().getState(), Flag.SAVE_BLOCK_COUNT);
+            onBlockPlace(ConstantKeys.WET_SPONGE, location, 1, e.getBlock().getState(),
+                    BlockTrackFlags.SAVE_BLOCK_COUNT);
             alreadySpongeAbosrbCalled.add(location);
         }
 
@@ -489,7 +528,7 @@ public class BlockChangesListener implements Listener {
                 return;
 
             int blockCount = plugin.getNMSWorld().getDefaultAmount(e.getBlock());
-            onBlockBreak(Keys.of(e.getBlock()), e.getBlock().getLocation(), blockCount, Flag.DIRTY_CHUNK);
+            onBlockBreak(Keys.of(e.getBlock()), e.getBlock().getLocation(), blockCount, BlockTrackFlags.DIRTY_CHUNKS);
         }
 
     }

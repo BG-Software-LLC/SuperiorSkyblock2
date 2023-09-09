@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
@@ -1146,53 +1147,146 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Handle a placement of a block.
+     * This will save the block counts and update the last time status of the island.
      *
      * @param block The block that was placed.
      */
     void handleBlockPlace(Block block);
 
     /**
+     * Handle a placement of a block.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param block The block that was placed.
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockPlaceWithResult(Block block);
+
+    /**
+     * Handle a placement of a block's key.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param key The block's key that was placed.
+     */
+    void handleBlockPlace(Key key);
+
+    /**
+     * Handle a placement of a block's key.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param key The block's key that was placed.
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockPlaceWithResult(Key key);
+
+    /**
      * Handle a placement of a block with a specific amount.
+     * This will save the block counts and update the last time status of the island.
      *
      * @param block  The block that was placed.
      * @param amount The amount of the block.
      */
-    void handleBlockPlace(Block block, int amount);
+    void handleBlockPlace(Block block, @Size int amount);
+
+    /**
+     * Handle a placement of a block with a specific amount.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param block  The block that was placed.
+     * @param amount The amount of the block.
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockPlaceWithResult(Block block, @Size int amount);
+
+    /**
+     * Handle a placement of a block's key with a specific amount.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param key    The block's key that was placed.
+     * @param amount The amount of the block.
+     */
+    void handleBlockPlace(Key key, @Size int amount);
+
+    /**
+     * Handle a placement of a block's key with a specific amount.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param key    The block's key that was placed.
+     * @param amount The amount of the block.
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockPlaceWithResult(Key key, @Size int amount);
 
     /**
      * Handle a placement of a block with a specific amount.
      *
      * @param block  The block that was placed.
      * @param amount The amount of the block.
-     * @param save   Whether the block counts should be saved into database.
+     * @param flags  See {@link IslandBlockFlags}
      */
-    void handleBlockPlace(Block block, int amount, boolean save);
+    void handleBlockPlace(Block block, @Size int amount, @IslandBlockFlags int flags);
+
+    /**
+     * Handle a placement of a block with a specific amount.
+     *
+     * @param block  The block that was placed.
+     * @param amount The amount of the block.
+     * @param flags  See {@link IslandBlockFlags}
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockPlaceWithResult(Block block, @Size int amount, @IslandBlockFlags int flags);
 
     /**
      * Handle a placement of a block's key with a specific amount.
      *
      * @param key    The block's key that was placed.
      * @param amount The amount of the block.
+     * @param flags  See {@link IslandBlockFlags}
      */
-    void handleBlockPlace(Key key, int amount);
+    void handleBlockPlace(Key key, @Size int amount, @IslandBlockFlags int flags);
 
     /**
      * Handle a placement of a block's key with a specific amount.
      *
      * @param key    The block's key that was placed.
      * @param amount The amount of the block.
+     * @param flags  See {@link IslandBlockFlags}
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockPlaceWithResult(Key key, @Size int amount, @IslandBlockFlags int flags);
+
+    /**
+     * Handle a placement of a block with a specific amount.
+     * This will update the last time status of the island.
+     *
+     * @param block  The block that was placed.
+     * @param amount The amount of the block.
      * @param save   Whether the block counts should be saved into database.
      */
-    void handleBlockPlace(Key key, int amount, boolean save);
+    @Deprecated
+    void handleBlockPlace(Block block, @Size int amount, boolean save);
 
     /**
      * Handle a placement of a block's key with a specific amount.
+     * This will update the last time status of the island.
      *
      * @param key    The block's key that was placed.
      * @param amount The amount of the block.
      * @param save   Whether the block counts should be saved into database.
      */
-    void handleBlockPlace(Key key, BigInteger amount, boolean save);
+    @Deprecated
+    void handleBlockPlace(Key key, @Size int amount, boolean save);
+
+    /**
+     * Handle a placement of a block's key with a specific amount.
+     * This will update the last time status of the island.
+     *
+     * @param key    The block's key that was placed.
+     * @param amount The amount of the block.
+     * @param save   Whether the block counts should be saved into database.
+     */
+    @Deprecated
+    void handleBlockPlace(Key key, @Size BigInteger amount, boolean save);
 
     /**
      * Handle a placement of a block's key with a specific amount.
@@ -1202,64 +1296,217 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param save                 Whether the block counts should be saved into database.
      * @param updateLastTimeStatus Whether to update last time island was updated or not.
      */
-    void handleBlockPlace(Key key, BigInteger amount, boolean save, boolean updateLastTimeStatus);
+    @Deprecated
+    void handleBlockPlace(Key key, @Size BigInteger amount, boolean save, boolean updateLastTimeStatus);
 
     /**
      * Handle placements of many blocks in one time.
+     * This will save the block counts and update the last time status of the island.
      *
      * @param blocks All the blocks to place.
      */
     void handleBlocksPlace(Map<Key, Integer> blocks);
 
     /**
+     * Handle placements of many blocks in one time.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param blocks All the blocks to place.
+     * @return Results per block key. Only non-successful results will be returned.
+     */
+    Map<Key, BlockChangeResult> handleBlocksPlaceWithResult(Map<Key, Integer> blocks);
+
+    /**
+     * Handle placements of many blocks in one time.
+     *
+     * @param blocks All the blocks to place.
+     * @param flags  See {@link IslandBlockFlags}
+     */
+    void handleBlocksPlace(Map<Key, Integer> blocks, @IslandBlockFlags int flags);
+
+    /**
+     * Handle placements of many blocks in one time.
+     *
+     * @param blocks All the blocks to place.
+     * @param flags  See {@link IslandBlockFlags}
+     * @return Results per block key. Only non-successful results will be returned.
+     */
+    Map<Key, BlockChangeResult> handleBlocksPlaceWithResult(Map<Key, Integer> blocks, @IslandBlockFlags int flags);
+
+    /**
      * Handle a break of a block.
+     * This will save the block counts and update the last time status of the island.
      *
      * @param block The block that was broken.
      */
     void handleBlockBreak(Block block);
 
     /**
+     * Handle a break of a block.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param block The block that was broken.
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockBreakWithResult(Block block);
+
+    /**
+     * Handle a break of a block's key.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param key The block's key that was broken.
+     */
+    void handleBlockBreak(Key key);
+
+    /**
+     * Handle a break of a block's key.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param key The block's key that was broken.
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockBreakWithResult(Key key);
+
+    /**
      * Handle a break of a block with a specific amount.
+     * This will save the block counts and update the last time status of the island.
      *
      * @param block  The block that was broken.
      * @param amount The amount of the block.
      */
-    void handleBlockBreak(Block block, int amount);
+    void handleBlockBreak(Block block, @Size int amount);
+
+    /**
+     * Handle a break of a block with a specific amount.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param block  The block that was broken.
+     * @param amount The amount of the block.
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockBreakWithResult(Block block, @Size int amount);
+
+    /**
+     * Handle a break of a block's key with a specific amount.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param key    The block's key that was broken.
+     * @param amount The amount of the block.
+     */
+    void handleBlockBreak(Key key, @Size int amount);
+
+    /**
+     * Handle a break of a block's key with a specific amount.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param key    The block's key that was broken.
+     * @param amount The amount of the block.
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockBreakWithResult(Key key, @Size int amount);
 
     /**
      * Handle a break of a block with a specific amount.
      *
      * @param block  The block that was broken.
      * @param amount The amount of the block.
-     * @param save   Whether the block counts should be saved into the database.
+     * @param flags  See {@link IslandBlockFlags}
      */
-    void handleBlockBreak(Block block, int amount, boolean save);
+    void handleBlockBreak(Block block, @Size int amount, @IslandBlockFlags int flags);
+
+    /**
+     * Handle a break of a block with a specific amount.
+     *
+     * @param block  The block that was broken.
+     * @param amount The amount of the block.
+     * @param flags  See {@link IslandBlockFlags}
+     */
+    BlockChangeResult handleBlockBreakWithResult(Block block, @Size int amount, @IslandBlockFlags int flags);
 
     /**
      * Handle a break of a block's key with a specific amount.
      *
      * @param key    The block's key that was broken.
      * @param amount The amount of the block.
+     * @param flags  See {@link IslandBlockFlags}
      */
-    void handleBlockBreak(Key key, int amount);
+    void handleBlockBreak(Key key, @Size int amount, @IslandBlockFlags int flags);
+
+    /**
+     * Handle a break of a block's key with a specific amount.
+     *
+     * @param key    The block's key that was broken.
+     * @param amount The amount of the block.
+     * @param flags  See {@link IslandBlockFlags}
+     */
+    BlockChangeResult handleBlockBreakWithResult(Key key, @Size int amount, @IslandBlockFlags int flags);
 
     /**
      * Handle a break of a block with a specific amount.
+     * This will update the last time status of the island.
+     *
+     * @param block  The block that was broken.
+     * @param amount The amount of the block.
+     * @param save   Whether the block counts should be saved into the database.
+     */
+    @Deprecated
+    void handleBlockBreak(Block block, @Size int amount, boolean save);
+
+    /**
+     * Handle a break of a block with a specific amount.
+     * This will update the last time status of the island.
      *
      * @param key    The block's key that was broken.
      * @param amount The amount of the block.
      * @param save   Whether the block counts should be saved into the database.
      */
-    void handleBlockBreak(Key key, int amount, boolean save);
+    @Deprecated
+    void handleBlockBreak(Key key, @Size int amount, boolean save);
 
     /**
      * Handle a break of a block with a specific amount.
+     * This will update the last time status of the island.
      *
      * @param key    The block's key that was broken.
      * @param amount The amount of the block.
      * @param save   Whether the block counts should be saved into the database.
      */
-    void handleBlockBreak(Key key, BigInteger amount, boolean save);
+    @Deprecated
+    void handleBlockBreak(Key key, @Size BigInteger amount, boolean save);
+
+    /**
+     * Handle break of many blocks in one time.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param blocks All the blocks to break.
+     */
+    void handleBlocksBreak(Map<Key, Integer> blocks);
+
+    /**
+     * Handle break of many blocks in one time.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param blocks All the blocks to break.
+     * @return Results per block key. Only non-successful results will be returned.
+     */
+    Map<Key, BlockChangeResult> handleBlocksBreakWithResult(Map<Key, Integer> blocks);
+
+    /**
+     * Handle break of many blocks in one time.
+     *
+     * @param blocks All the blocks to break.
+     * @param flags  See {@link IslandBlockFlags}
+     */
+    void handleBlocksBreak(Map<Key, Integer> blocks, @IslandBlockFlags int flags);
+
+    /**
+     * Handle break of many blocks in one time.
+     *
+     * @param blocks All the blocks to break.
+     * @param flags  See {@link IslandBlockFlags}
+     * @return Results per block key. Only non-successful results will be returned.
+     */
+    Map<Key, BlockChangeResult> handleBlocksBreakWithResult(Map<Key, Integer> blocks, @IslandBlockFlags int flags);
 
     /**
      * Check whether a chunk has blocks inside it.
@@ -2005,7 +2252,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     /**
      * Set an amount for a specific key in a specific world.
      */
-    void setGeneratorAmount(Key key, int amount, World.Environment environment);
+    void setGeneratorAmount(Key key, @Size int amount, World.Environment environment);
 
     /**
      * Remove a rate for a specific key in a specific world.
