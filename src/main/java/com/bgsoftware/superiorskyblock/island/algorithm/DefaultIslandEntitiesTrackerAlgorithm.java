@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.island.algorithm;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
@@ -115,7 +116,7 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
             KeyMap<Integer> recalculatedEntityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
 
-            island.getLoadedChunks(true, true).forEach(chunk -> {
+            island.getLoadedChunks(IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS).forEach(chunk -> {
                 for (Entity entity : chunk.getEntities()) {
                     if (BukkitEntities.canBypassEntityLimit(entity))
                         continue;

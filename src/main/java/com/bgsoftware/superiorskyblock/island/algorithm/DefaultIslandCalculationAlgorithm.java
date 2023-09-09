@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.island.algorithm;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
@@ -61,11 +62,11 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
         Log.debug(Debug.CHUNK_CALCULATION, island.getOwner().getName());
 
         if (!plugin.getProviders().hasSnapshotsSupport()) {
-            IslandUtils.getChunkCoords(island, true, true).values().forEach(worldChunks ->
-                    chunksToLoad.add(plugin.getNMSChunks().calculateChunks(worldChunks, CACHED_CALCULATED_CHUNKS)));
+            IslandUtils.getChunkCoords(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS).values()
+                    .forEach(worldChunks -> chunksToLoad.add(plugin.getNMSChunks().calculateChunks(worldChunks, CACHED_CALCULATED_CHUNKS)));
         } else {
-            IslandUtils.getAllChunksAsync(island, true, true, ChunkLoadReason.BLOCKS_RECALCULATE,
-                    plugin.getProviders()::takeSnapshots).forEach(completableFuture -> {
+            IslandUtils.getAllChunksAsync(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS,
+                    ChunkLoadReason.BLOCKS_RECALCULATE, plugin.getProviders()::takeSnapshots).forEach(completableFuture -> {
                 CompletableFuture<List<CalculatedChunk>> calculateCompletable = new CompletableFuture<>();
                 completableFuture.whenComplete((chunk, ex) -> plugin.getNMSChunks()
                         .calculateChunks(Collections.singletonList(ChunkPosition.of(chunk)), CACHED_CALCULATED_CHUNKS).whenComplete(

@@ -400,29 +400,50 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get all the chunks of the island from all the environments.
+     * Similar to {@link #getAllChunks(int)} with 0 as flags parameter.
      */
     List<Chunk> getAllChunks();
 
     /**
      * Get all the chunks of the island from all the environments.
      *
-     * @param onlyProtected Whether only chunks inside the protected area should be returned.
+     * @param flags See {@link IslandChunkFlags}
      */
-    List<Chunk> getAllChunks(boolean onlyProtected);
+    List<Chunk> getAllChunks(@IslandChunkFlags int flags);
 
     /**
      * Get all the chunks of the island.
+     * Similar to {@link #getAllChunks(org.bukkit.World.Environment, int)} with 0 as flags parameter.
      *
      * @param environment The environment to get the chunks from.
      */
     List<Chunk> getAllChunks(World.Environment environment);
 
     /**
+     * Get all the chunks of the island.
+     *
+     * @param environment The environment to get the chunks from.
+     * @param flags       See {@link IslandChunkFlags}
+     */
+    List<Chunk> getAllChunks(World.Environment environment, @IslandChunkFlags int flags);
+
+    /**
+     * Get all the chunks of the island from all the environments.
+     *
+     * @param onlyProtected Whether only chunks inside the protected area should be returned.
+     * @deprecated See {@link #getAllChunks(int)}
+     */
+    @Deprecated
+    List<Chunk> getAllChunks(boolean onlyProtected);
+
+    /**
      * Get all the chunks of the island, including empty ones.
      *
      * @param environment   The environment to get the chunks from.
      * @param onlyProtected Whether only chunks inside the protected area should be returned.
+     * @deprecated See {@link #getAllChunks(World.Environment, int)}
      */
+    @Deprecated
     List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected);
 
     /**
@@ -431,15 +452,48 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param environment   The environment to get the chunks from.
      * @param onlyProtected Whether only chunks inside the protected area should be returned.
      * @param noEmptyChunks Should empty chunks be loaded or not?
+     * @deprecated See {@link #getAllChunks(World.Environment, int)}
      */
+    @Deprecated
     List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks);
+
+    /**
+     * Get all the loaded chunks of the island.
+     * Similar to {@link #getLoadedChunks(int)} with 0 as flags parameter.
+     */
+    List<Chunk> getLoadedChunks();
+
+    /**
+     * Get all the loaded chunks of the island.
+     *
+     * @param flags See {@link IslandChunkFlags}
+     */
+    List<Chunk> getLoadedChunks(@IslandChunkFlags int flags);
+
+    /**
+     * Get all the loaded chunks of the island.
+     * Similar to {@link #getLoadedChunks(World.Environment, int)} with 0 as flags parameter.
+     *
+     * @param environment The environment to get the chunks from.
+     */
+    List<Chunk> getLoadedChunks(World.Environment environment);
+
+    /**
+     * Get all the loaded chunks of the island.
+     *
+     * @param environment The environment to get the chunks from.
+     * @param flags       See {@link IslandChunkFlags}
+     */
+    List<Chunk> getLoadedChunks(World.Environment environment, @IslandChunkFlags int flags);
 
     /**
      * Get all the loaded chunks of the island.
      *
      * @param onlyProtected Whether only chunks inside the protected area should be returned.
      * @param noEmptyChunks Should empty chunks be loaded or not?
+     * @deprecated See {@link #getLoadedChunks(int)}
      */
+    @Deprecated
     List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks);
 
     /**
@@ -448,8 +502,45 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param environment   The environment to get the chunks from.
      * @param onlyProtected Whether only chunks inside the protected area should be returned.
      * @param noEmptyChunks Should empty chunks be loaded or not?
+     * @deprecated See {@link #getLoadedChunks(World.Environment, int)}
      */
+    @Deprecated
     List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks);
+
+    /**
+     * Get all the chunks of the island asynchronized, including empty chunks.
+     * Similar to {@link #getAllChunksAsync(World.Environment, int, Consumer)}, with 0 as flags parameter.
+     *
+     * @param environment The environment to get the chunks from.
+     */
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment);
+
+    /**
+     * Get all the chunks of the island asynchronized, including empty chunks.
+     *
+     * @param environment The environment to get the chunks from.
+     * @param flags       See {@link IslandChunkFlags}
+     */
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, @IslandChunkFlags int flags);
+
+    /**
+     * Get all the chunks of the island asynchronized, including empty chunks.
+     * Similar to {@link #getAllChunksAsync(World.Environment, int, Consumer)}, with 0 as flags parameter.
+     *
+     * @param environment The environment to get the chunks from.
+     * @param onChunkLoad A consumer that will be ran when the chunk is loaded. Can be null.
+     */
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, @Nullable Consumer<Chunk> onChunkLoad);
+
+    /**
+     * Get all the chunks of the island asynchronized, including empty chunks.
+     *
+     * @param environment The environment to get the chunks from.
+     * @param flags       See {@link IslandChunkFlags}
+     * @param onChunkLoad A consumer that will be ran when the chunk is loaded. Can be null.
+     */
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, @IslandChunkFlags int flags,
+                                                     @Nullable Consumer<Chunk> onChunkLoad);
 
     /**
      * Get all the chunks of the island asynchronized, including empty chunks.
@@ -457,8 +548,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param environment   The environment to get the chunks from.
      * @param onlyProtected Whether only chunks inside the protected area should be returned.
      * @param onChunkLoad   A consumer that will be ran when the chunk is loaded. Can be null.
+     * @deprecated See {@link #getAllChunksAsync(World.Environment, int, Consumer)}
      */
-    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, @Nullable Consumer<Chunk> onChunkLoad);
+    @Deprecated
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected,
+                                                     @Nullable Consumer<Chunk> onChunkLoad);
 
     /**
      * Get all the chunks of the island asynchronized.
@@ -467,15 +561,81 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param onlyProtected Whether only chunks inside the protected area should be returned.
      * @param noEmptyChunks Should empty chunks be loaded or not?
      * @param onChunkLoad   A consumer that will be ran when the chunk is loaded. Can be null.
+     * @deprecated See {@link #getAllChunksAsync(World.Environment, int, Consumer)}
      */
+    @Deprecated
     List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, @Nullable Consumer<Chunk> onChunkLoad);
+
+    /**
+     * Reset all the chunks of the island from all the worlds (will make all chunks empty).
+     * Similar to {@link #resetChunks(int)}, with 0 as flags parameter.
+     */
+    void resetChunks();
+
+    /**
+     * Reset all the chunks of the island from all the worlds (will make all chunks empty).
+     * Similar to {@link #resetChunks(int, Runnable)}, with 0 as flags parameter.
+     *
+     * @param onFinish Callback runnable.
+     */
+    void resetChunks(@Nullable Runnable onFinish);
+
+    /**
+     * Reset all the chunks of the island (will make all chunks empty).
+     * Similar to {@link #resetChunks(World.Environment, int)}, with 0 as flags parameter.
+     *
+     * @param environment The environment to reset chunks in.
+     */
+    void resetChunks(World.Environment environment);
+
+    /**
+     * Reset all the chunks of the island (will make all chunks empty).
+     *
+     * @param environment The environment to reset chunks in.
+     * @param onFinish    Callback runnable.
+     */
+    void resetChunks(World.Environment environment, @Nullable Runnable onFinish);
+
+    /**
+     * Reset all the chunks of the island from all the worlds (will make all chunks empty).
+     *
+     * @param flags See {@link IslandChunkFlags}
+     */
+    void resetChunks(@IslandChunkFlags int flags);
+
+    /**
+     * Reset all the chunks of the island from all the worlds (will make all chunks empty).
+     *
+     * @param flags    See {@link IslandChunkFlags}
+     * @param onFinish Callback runnable.
+     */
+    void resetChunks(@IslandChunkFlags int flags, @Nullable Runnable onFinish);
+
+    /**
+     * Reset all the chunks of the island (will make all chunks empty).
+     *
+     * @param environment The environment to reset chunks in.
+     * @param flags       See {@link IslandChunkFlags}
+     */
+    void resetChunks(World.Environment environment, @IslandChunkFlags int flags);
+
+    /**
+     * Reset all the chunks of the island (will make all chunks empty).
+     *
+     * @param environment The environment to reset chunks in.
+     * @param flags       See {@link IslandChunkFlags}
+     * @param onFinish    Callback runnable.
+     */
+    void resetChunks(World.Environment environment, @IslandChunkFlags int flags, @Nullable Runnable onFinish);
 
     /**
      * Reset all the chunks of the island (will make all chunks empty).
      *
      * @param environment   The environment to reset chunks in.
      * @param onlyProtected Whether only chunks inside the protected area should be reset.
+     * @deprecated See {@link #resetChunks(World.Environment, int)}
      */
+    @Deprecated
     void resetChunks(World.Environment environment, boolean onlyProtected);
 
     /**
@@ -484,14 +644,18 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param environment   The environment to reset chunks in.
      * @param onlyProtected Whether only chunks inside the protected area should be reset.
      * @param onFinish      Callback runnable.
+     * @deprecated See {@link #resetChunks(World.Environment, int, Runnable)}
      */
+    @Deprecated
     void resetChunks(World.Environment environment, boolean onlyProtected, @Nullable Runnable onFinish);
 
     /**
      * Reset all the chunks of the island from all the worlds (will make all chunks empty).
      *
      * @param onlyProtected Whether only chunks inside the protected area should be reset.
+     * @deprecated See {@link #resetChunks(int)}
      */
+    @Deprecated
     void resetChunks(boolean onlyProtected);
 
     /**
@@ -499,7 +663,9 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      *
      * @param onlyProtected Whether only chunks inside the protected area should be reset.
      * @param onFinish      Callback runnable.
+     * @deprecated See {@link #resetChunks(int, Runnable)}
      */
+    @Deprecated
     void resetChunks(boolean onlyProtected, @Nullable Runnable onFinish);
 
     /**

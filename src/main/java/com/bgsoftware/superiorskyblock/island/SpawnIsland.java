@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
+import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
@@ -400,26 +401,25 @@ public class SpawnIsland implements Island {
 
     @Override
     public List<Chunk> getAllChunks() {
-        return getAllChunks(false);
+        return getAllChunks(0);
     }
 
     @Override
-    public List<Chunk> getAllChunks(boolean onlyProtected) {
-        return getAllChunks(plugin.getSettings().getWorlds().getDefaultWorld(), onlyProtected);
+    public List<Chunk> getAllChunks(@IslandChunkFlags int flags) {
+        return getAllChunks(plugin.getSettings().getWorlds().getDefaultWorld(), flags);
     }
 
     @Override
+    @Deprecated
     public List<Chunk> getAllChunks(World.Environment environment) {
-        return getAllChunks(environment, false);
+        return getAllChunks(environment, 0);
     }
 
     @Override
-    public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
-        return getAllChunks(environment, onlyProtected, false);
-    }
+    public List<Chunk> getAllChunks(World.Environment environment, @IslandChunkFlags int flags) {
+        boolean onlyProtected = (flags & IslandChunkFlags.ONLY_PROTECTED) != 0;
+        boolean noEmptyChunks = (flags & IslandChunkFlags.NO_EMPTY_CHUNKS) != 0;
 
-    @Override
-    public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         Location min = onlyProtected ? getMinimumProtected() : getMinimum();
         Location max = onlyProtected ? getMaximumProtected() : getMaximum();
         Chunk minChunk = min.getChunk();
@@ -439,12 +439,46 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks) {
-        return getLoadedChunks(plugin.getSettings().getWorlds().getDefaultWorld(), onlyProtected, noEmptyChunks);
+    @Deprecated
+    public List<Chunk> getAllChunks(boolean onlyProtected) {
+        return getAllChunks(onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0);
     }
 
     @Override
-    public List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
+    @Deprecated
+    public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
+        return getAllChunks(environment, onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0);
+    }
+
+    @Override
+    @Deprecated
+    public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
+        int flags = 0;
+        if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
+        if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
+        return getAllChunks(environment, flags);
+    }
+
+    @Override
+    public List<Chunk> getLoadedChunks() {
+        return getLoadedChunks(0);
+    }
+
+    @Override
+    public List<Chunk> getLoadedChunks(@IslandChunkFlags int flags) {
+        return getLoadedChunks(plugin.getSettings().getWorlds().getDefaultWorld(), flags);
+    }
+
+    @Override
+    public List<Chunk> getLoadedChunks(World.Environment environment) {
+        return getLoadedChunks(environment, 0);
+    }
+
+    @Override
+    public List<Chunk> getLoadedChunks(World.Environment environment, @IslandChunkFlags int flags) {
+        boolean onlyProtected = (flags & IslandChunkFlags.ONLY_PROTECTED) != 0;
+        boolean noEmptyChunks = (flags & IslandChunkFlags.NO_EMPTY_CHUNKS) != 0;
+
         Location min = onlyProtected ? getMinimumProtected() : getMinimum();
         Location max = onlyProtected ? getMaximumProtected() : getMaximum();
 
@@ -463,32 +497,121 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, Consumer<Chunk> onChunkLoad) {
-        return getAllChunksAsync(environment, onlyProtected, false, onChunkLoad);
+    public List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks) {
+        int flags = 0;
+        if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
+        if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
+        return getLoadedChunks(flags);
     }
 
     @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, Consumer<Chunk> onChunkLoad) {
-        return IslandUtils.getAllChunksAsync(this, center.getWorld(), onlyProtected, noEmptyChunks, ChunkLoadReason.API_REQUEST, onChunkLoad);
+    public List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
+        int flags = 0;
+        if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
+        if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
+        return getLoadedChunks(environment, flags);
     }
 
     @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment) {
+        return getAllChunksAsync(environment, 0);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, @IslandChunkFlags int flags) {
+        return getAllChunksAsync(environment, flags, null);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment,
+                                                            @Nullable Consumer<Chunk> onChunkLoad) {
+        return getAllChunksAsync(environment, 0, onChunkLoad);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment,
+                                                            @IslandChunkFlags int flags,
+                                                            @Nullable Consumer<Chunk> onChunkLoad) {
+        return IslandUtils.getAllChunksAsync(this, center.getWorld(), flags, ChunkLoadReason.API_REQUEST, onChunkLoad);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected,
+                                                            @Nullable Consumer<Chunk> onChunkLoad) {
+        return getAllChunksAsync(environment, onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0, onChunkLoad);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment,
+                                                            boolean onlyProtected, boolean noEmptyChunks,
+                                                            @Nullable Consumer<Chunk> onChunkLoad) {
+        int flags = 0;
+        if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
+        if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
+        return getAllChunksAsync(environment, flags, onChunkLoad);
+    }
+
+    @Override
+    public void resetChunks() {
+        // Do nothing.
+    }
+
+    @Override
+    public void resetChunks(@Nullable Runnable onFinish) {
+        // Do nothing.
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment) {
+        // Do nothing.
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment, @Nullable Runnable onFinish) {
+        // Do nothing.
+    }
+
+    @Override
+    public void resetChunks(@IslandChunkFlags int flags) {
+        // Do nothing.
+    }
+
+    @Override
+    public void resetChunks(@IslandChunkFlags int flags, @Nullable Runnable onFinish) {
+        // Do nothing.
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment, @IslandChunkFlags int flags) {
+        // Do nothing.
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment, @IslandChunkFlags int flags, @Nullable Runnable onFinish) {
+        // Do nothing.
+    }
+
+    @Override
+    @Deprecated
     public void resetChunks(World.Environment environment, boolean onlyProtected) {
         // Do nothing.
     }
 
     @Override
-    public void resetChunks(World.Environment environment, boolean onlyProtected, Runnable onFinish) {
+    @Deprecated
+    public void resetChunks(World.Environment environment, boolean onlyProtected, @Nullable Runnable onFinish) {
         // Do nothing.
     }
 
     @Override
+    @Deprecated
     public void resetChunks(boolean onlyProtected) {
         // Do nothing.
     }
 
     @Override
-    public void resetChunks(boolean onlyProtected, Runnable onFinish) {
+    @Deprecated
+    public void resetChunks(boolean onlyProtected, @Nullable Runnable onFinish) {
         // Do nothing.
     }
 

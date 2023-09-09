@@ -324,8 +324,8 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public List<Chunk> getAllChunks(boolean onlyProtected) {
-        return this.handle.getAllChunks(onlyProtected);
+    public List<Chunk> getAllChunks(@IslandChunkFlags int flags) {
+        return this.handle.getAllChunks(flags);
     }
 
     @Override
@@ -334,51 +334,155 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public List<Chunk> getAllChunks(World.Environment environment, @IslandChunkFlags int flags) {
+        return this.handle.getAllChunks(environment, flags);
+    }
+
+    @Override
+    @Deprecated
+    public List<Chunk> getAllChunks(boolean onlyProtected) {
+        return this.handle.getAllChunks(onlyProtected);
+    }
+
+    @Override
+    @Deprecated
     public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
         return this.handle.getAllChunks(environment, onlyProtected);
     }
 
     @Override
+    @Deprecated
     public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         return this.handle.getAllChunks(environment, onlyProtected, noEmptyChunks);
     }
 
     @Override
+    public List<Chunk> getLoadedChunks() {
+        return this.handle.getLoadedChunks();
+    }
+
+    @Override
+    public List<Chunk> getLoadedChunks(@IslandChunkFlags int flags) {
+        return this.handle.getLoadedChunks(flags);
+    }
+
+    @Override
+    public List<Chunk> getLoadedChunks(World.Environment environment) {
+        return this.handle.getLoadedChunks(environment);
+    }
+
+    @Override
+    public List<Chunk> getLoadedChunks(World.Environment environment, @IslandChunkFlags int flags) {
+        return this.handle.getLoadedChunks(environment, flags);
+    }
+
+    @Override
+    @Deprecated
     public List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks) {
         return this.handle.getLoadedChunks(onlyProtected, noEmptyChunks);
     }
 
     @Override
+    @Deprecated
     public List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         return this.handle.getLoadedChunks(environment, onlyProtected, noEmptyChunks);
     }
 
     @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment) {
+        return getAllChunksAsync(environment, 0);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, int flags) {
+        return getAllChunksAsync(environment, flags, null);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment,
+                                                            @Nullable Consumer<Chunk> onChunkLoad) {
+        return this.handle.getAllChunksAsync(environment, onChunkLoad);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment,
+                                                            @IslandChunkFlags int flags,
+                                                            @Nullable Consumer<Chunk> onChunkLoad) {
+        return this.handle.getAllChunksAsync(environment, flags, onChunkLoad);
+    }
+
+    @Override
+    @Deprecated
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, @Nullable Consumer<Chunk> onChunkLoad) {
         return this.handle.getAllChunksAsync(environment, onlyProtected, onChunkLoad);
     }
 
     @Override
+    @Deprecated
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, @Nullable Consumer<Chunk> onChunkLoad) {
         return this.handle.getAllChunksAsync(environment, onlyProtected, noEmptyChunks, onChunkLoad);
     }
 
     @Override
+    public void resetChunks() {
+        this.handle.resetChunks();
+    }
+
+    @Override
+    public void resetChunks(@Nullable Runnable onFinish) {
+        this.handle.resetChunks(onFinish);
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment) {
+        this.handle.resetChunks(environment);
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment, @Nullable Runnable onFinish) {
+        this.handle.resetChunks(environment, onFinish);
+    }
+
+    @Override
+    public void resetChunks(@IslandChunkFlags int flags) {
+        this.handle.resetChunks(flags);
+    }
+
+    @Override
+    public void resetChunks(@IslandChunkFlags int flags, @Nullable Runnable onFinish) {
+        this.handle.resetChunks(flags, onFinish);
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment, @IslandChunkFlags int flags) {
+        this.handle.resetChunks(environment, flags);
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment, @IslandChunkFlags int flags, @Nullable Runnable onFinish) {
+        this.handle.resetChunks(environment, flags, onFinish);
+    }
+
+    @Override
+    @Deprecated
     public void resetChunks(World.Environment environment, boolean onlyProtected) {
         this.handle.resetChunks(environment, onlyProtected);
     }
 
     @Override
+    @Deprecated
     public void resetChunks(World.Environment environment, boolean onlyProtected, @Nullable Runnable onFinish) {
         this.handle.resetChunks(environment, onlyProtected, onFinish);
     }
 
     @Override
+    @Deprecated
     public void resetChunks(boolean onlyProtected) {
         this.handle.resetChunks(onlyProtected);
     }
 
     @Override
+    @Deprecated
     public void resetChunks(boolean onlyProtected, @Nullable Runnable onFinish) {
         this.handle.resetChunks(onlyProtected, onFinish);
     }
@@ -685,8 +789,18 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public void completeMission(Mission<?> mission) {
+        this.handle.completeMission(mission);
+    }
+
+    @Override
     public void setCurrentlyActive(boolean active) {
         this.handle.setCurrentlyActive(active);
+    }
+
+    @Override
+    public void resetMission(Mission<?> mission) {
+        this.handle.resetMission(mission);
     }
 
     @Override
@@ -695,8 +809,18 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public boolean hasCompletedMission(Mission<?> mission) {
+        return this.handle.hasCompletedMission(mission);
+    }
+
+    @Override
     public long getLastTimeUpdate() {
         return this.handle.getLastTimeUpdate();
+    }
+
+    @Override
+    public boolean canCompleteMissionAgain(Mission<?> mission) {
+        return this.handle.canCompleteMissionAgain(mission);
     }
 
     @Override
@@ -705,8 +829,18 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getAmountMissionCompleted(Mission<?> mission) {
+        return this.handle.getAmountMissionCompleted(mission);
+    }
+
+    @Override
     public IslandBank getIslandBank() {
         return this.handle.getIslandBank();
+    }
+
+    @Override
+    public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
+        this.handle.setAmountMissionCompleted(mission, finishCount);
     }
 
     @Override
@@ -715,8 +849,18 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public List<Mission<?>> getCompletedMissions() {
+        return this.handle.getCompletedMissions();
+    }
+
+    @Override
     public void setBankLimit(BigDecimal bankLimit) {
         this.handle.setBankLimit(bankLimit);
+    }
+
+    @Override
+    public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
+        return this.handle.getCompletedMissionsWithAmounts();
     }
 
     @Override
@@ -725,8 +869,18 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public DatabaseBridge getDatabaseBridge() {
+        return this.handle.getDatabaseBridge();
+    }
+
+    @Override
     public boolean giveInterest(boolean checkOnlineOwner) {
         return this.handle.giveInterest(checkOnlineOwner);
+    }
+
+    @Override
+    public PersistentDataContainer getPersistentDataContainer() {
+        return this.handle.getPersistentDataContainer();
     }
 
     @Override
@@ -735,13 +889,28 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public boolean isPersistentDataContainerEmpty() {
+        return this.handle.isPersistentDataContainerEmpty();
+    }
+
+    @Override
     public void setLastInterestTime(long lastInterest) {
         this.handle.setLastInterestTime(lastInterest);
     }
 
     @Override
+    public void savePersistentDataContainer() {
+        this.handle.savePersistentDataContainer();
+    }
+
+    @Override
     public long getNextInterest() {
         return this.handle.getNextInterest();
+    }
+
+    @Override
+    public int compareTo(Island o) {
+        return this.handle.compareTo(o);
     }
 
     @Override
@@ -1435,68 +1604,5 @@ public class DelegateIsland implements Island {
         this.handle.setChestRows(index, rows);
     }
 
-    @Override
-    public void completeMission(Mission<?> mission) {
-        this.handle.completeMission(mission);
-    }
 
-    @Override
-    public void resetMission(Mission<?> mission) {
-        this.handle.resetMission(mission);
-    }
-
-    @Override
-    public boolean hasCompletedMission(Mission<?> mission) {
-        return this.handle.hasCompletedMission(mission);
-    }
-
-    @Override
-    public boolean canCompleteMissionAgain(Mission<?> mission) {
-        return this.handle.canCompleteMissionAgain(mission);
-    }
-
-    @Override
-    public int getAmountMissionCompleted(Mission<?> mission) {
-        return this.handle.getAmountMissionCompleted(mission);
-    }
-
-    @Override
-    public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
-        this.handle.setAmountMissionCompleted(mission, finishCount);
-    }
-
-    @Override
-    public List<Mission<?>> getCompletedMissions() {
-        return this.handle.getCompletedMissions();
-    }
-
-    @Override
-    public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
-        return this.handle.getCompletedMissionsWithAmounts();
-    }
-
-    @Override
-    public DatabaseBridge getDatabaseBridge() {
-        return this.handle.getDatabaseBridge();
-    }
-
-    @Override
-    public PersistentDataContainer getPersistentDataContainer() {
-        return this.handle.getPersistentDataContainer();
-    }
-
-    @Override
-    public boolean isPersistentDataContainerEmpty() {
-        return this.handle.isPersistentDataContainerEmpty();
-    }
-
-    @Override
-    public void savePersistentDataContainer() {
-        this.handle.savePersistentDataContainer();
-    }
-
-    @Override
-    public int compareTo(Island o) {
-        return this.handle.compareTo(o);
-    }
 }

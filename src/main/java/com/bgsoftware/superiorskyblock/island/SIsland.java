@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
+import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
@@ -952,16 +953,16 @@ public class SIsland implements Island {
 
     @Override
     public List<Chunk> getAllChunks() {
-        return getAllChunks(false);
+        return getAllChunks(0);
     }
 
     @Override
-    public List<Chunk> getAllChunks(boolean onlyProtected) {
+    public List<Chunk> getAllChunks(int flags) {
         List<Chunk> chunks = new LinkedList<>();
 
         for (World.Environment environment : World.Environment.values()) {
             try {
-                chunks.addAll(getAllChunks(environment, onlyProtected));
+                chunks.addAll(getAllChunks(environment, flags));
             } catch (NullPointerException ignored) {
             }
         }
@@ -971,29 +972,51 @@ public class SIsland implements Island {
 
     @Override
     public List<Chunk> getAllChunks(World.Environment environment) {
-        return getAllChunks(environment, false);
+        return getAllChunks(environment, 0);
     }
 
     @Override
-    public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
-        return getAllChunks(environment, onlyProtected, false);
-    }
+    public List<Chunk> getAllChunks(World.Environment environment, @IslandChunkFlags int flags) {
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null");
 
-    @Override
-    public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         World world = getCenter(environment).getWorld();
-        return new SequentialListBuilder<Chunk>().build(IslandUtils.getChunkCoords(
-                        this, WorldInfo.of(world), onlyProtected, noEmptyChunks),
+        return new SequentialListBuilder<Chunk>().build(IslandUtils.getChunkCoords(this, WorldInfo.of(world), flags),
                 chunkPosition -> world.getChunkAt(chunkPosition.getX(), chunkPosition.getZ()));
     }
 
     @Override
-    public List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks) {
+    @Deprecated
+    public List<Chunk> getAllChunks(boolean onlyProtected) {
+        return getAllChunks(onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0);
+    }
+
+    @Override
+    @Deprecated
+    public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
+        return getAllChunks(environment, onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0);
+    }
+
+    @Override
+    @Deprecated
+    public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
+        int flags = 0;
+        if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
+        if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
+        return getAllChunks(environment, flags);
+    }
+
+    @Override
+    public List<Chunk> getLoadedChunks() {
+        return getLoadedChunks(0);
+    }
+
+    @Override
+    public List<Chunk> getLoadedChunks(@IslandChunkFlags int flags) {
         List<Chunk> chunks = new LinkedList<>();
 
         for (World.Environment environment : World.Environment.values()) {
             try {
-                chunks.addAll(getLoadedChunks(environment, onlyProtected, noEmptyChunks));
+                chunks.addAll(getLoadedChunks(environment, flags));
             } catch (NullPointerException ignored) {
             }
         }
@@ -1002,35 +1025,133 @@ public class SIsland implements Island {
     }
 
     @Override
-    public List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
-        World world = getCenter(environment).getWorld();
-        return new SequentialListBuilder<Chunk>().filter(Objects::nonNull)
-                .build(IslandUtils.getChunkCoords(this, WorldInfo.of(world), onlyProtected, noEmptyChunks),
-                        plugin.getNMSChunks()::getChunkIfLoaded);
+    public List<Chunk> getLoadedChunks(World.Environment environment) {
+        return getLoadedChunks(environment, 0);
     }
 
     @Override
+    public List<Chunk> getLoadedChunks(World.Environment environment, @IslandChunkFlags int flags) {
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null");
+
+        World world = getCenter(environment).getWorld();
+        return new SequentialListBuilder<Chunk>().filter(Objects::nonNull).build(
+                IslandUtils.getChunkCoords(this, WorldInfo.of(world), flags), plugin.getNMSChunks()::getChunkIfLoaded);
+    }
+
+    @Override
+    @Deprecated
+    public List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks) {
+        int flags = 0;
+        if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
+        if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
+        return getLoadedChunks(flags);
+    }
+
+    @Override
+    @Deprecated
+    public List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
+        int flags = 0;
+        if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
+        if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
+        return getLoadedChunks(environment, flags);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment) {
+        return getAllChunksAsync(environment, 0);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, @IslandChunkFlags int flags) {
+        return getAllChunksAsync(environment, flags, null);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment,
+                                                            @Nullable Consumer<Chunk> onChunkLoad) {
+        return getAllChunksAsync(environment, 0, onChunkLoad);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, int flags,
+                                                            @Nullable Consumer<Chunk> onChunkLoad) {
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null");
+
+        World world = getCenter(environment).getWorld();
+        return IslandUtils.getAllChunksAsync(this, world, flags, ChunkLoadReason.API_REQUEST, onChunkLoad);
+    }
+
+    @Override
+    @Deprecated
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected,
                                                             @Nullable Consumer<Chunk> onChunkLoad) {
-        return getAllChunksAsync(environment, onlyProtected, false, onChunkLoad);
+        return getAllChunksAsync(environment, onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0, onChunkLoad);
     }
 
     @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected,
-                                                            boolean noEmptyChunks, @Nullable Consumer<Chunk> onChunkLoad) {
+    @Deprecated
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment,
+                                                            boolean onlyProtected, boolean noEmptyChunks,
+                                                            @Nullable Consumer<Chunk> onChunkLoad) {
+        int flags = 0;
+        if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
+        if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
+        return getAllChunksAsync(environment, flags, onChunkLoad);
+    }
+
+    @Override
+    public void resetChunks() {
+        resetChunks((Runnable) null);
+    }
+
+    @Override
+    public void resetChunks(@Nullable Runnable onFinish) {
+        resetChunks(0, onFinish);
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment) {
+        resetChunks(environment, 0);
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment, @Nullable Runnable onFinish) {
+        resetChunks(environment, 0, onFinish);
+    }
+
+    @Override
+    public void resetChunks(@IslandChunkFlags int flags) {
+        resetChunks(flags, null);
+    }
+
+    @Override
+    public void resetChunks(@IslandChunkFlags int flags, @Nullable Runnable onFinish) {
+        LinkedList<List<ChunkPosition>> worldsChunks = new LinkedList<>(
+                IslandUtils.getChunkCoords(this, flags | IslandChunkFlags.NO_EMPTY_CHUNKS).values());
+
+
+        if (worldsChunks.isEmpty()) {
+            if (onFinish != null)
+                onFinish.run();
+            return;
+        }
+
+        for (List<ChunkPosition> chunkPositions : worldsChunks)
+            IslandUtils.deleteChunks(this, chunkPositions, chunkPositions == worldsChunks.getLast() ? onFinish : null);
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment, @IslandChunkFlags int flags) {
+        resetChunks(environment, flags, null);
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment, @IslandChunkFlags int flags, @Nullable Runnable onFinish) {
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null");
+
         World world = getCenter(environment).getWorld();
-        return IslandUtils.getAllChunksAsync(this, world, onlyProtected, noEmptyChunks, ChunkLoadReason.API_REQUEST, onChunkLoad);
-    }
-
-    @Override
-    public void resetChunks(World.Environment environment, boolean onlyProtected) {
-        resetChunks(environment, onlyProtected, null);
-    }
-
-    @Override
-    public void resetChunks(World.Environment environment, boolean onlyProtected, @Nullable Runnable onFinish) {
-        World world = getCenter(environment).getWorld();
-        List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(world), onlyProtected, true);
+        List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this,
+                WorldInfo.of(world), flags | IslandChunkFlags.NO_EMPTY_CHUNKS);
 
         if (chunkPositions.isEmpty()) {
             if (onFinish != null)
@@ -1042,24 +1163,27 @@ public class SIsland implements Island {
     }
 
     @Override
-    public void resetChunks(boolean onlyProtected) {
-        resetChunks(onlyProtected, null);
+    @Deprecated
+    public void resetChunks(World.Environment environment, boolean onlyProtected) {
+        resetChunks(environment, onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0);
     }
 
     @Override
+    @Deprecated
+    public void resetChunks(World.Environment environment, boolean onlyProtected, @Nullable Runnable onFinish) {
+        resetChunks(environment, onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0, onFinish);
+    }
+
+    @Override
+    @Deprecated
+    public void resetChunks(boolean onlyProtected) {
+        resetChunks(onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0);
+    }
+
+    @Override
+    @Deprecated
     public void resetChunks(boolean onlyProtected, @Nullable Runnable onFinish) {
-        LinkedList<List<ChunkPosition>> worldsChunks = new LinkedList<>(
-                IslandUtils.getChunkCoords(this, onlyProtected, true).values());
-
-
-        if (worldsChunks.isEmpty()) {
-            if (onFinish != null)
-                onFinish.run();
-            return;
-        }
-
-        for (List<ChunkPosition> chunkPositions : worldsChunks)
-            IslandUtils.deleteChunks(this, chunkPositions, chunkPositions == worldsChunks.getLast() ? onFinish : null);
+        resetChunks(onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0, onFinish);
     }
 
     @Override
@@ -1439,7 +1563,7 @@ public class SIsland implements Island {
 
         plugin.getMissions().getAllMissions().forEach(this::resetMission);
 
-        resetChunks(true, () -> Profiler.end(profilerId));
+        resetChunks(IslandChunkFlags.ONLY_PROTECTED, () -> Profiler.end(profilerId));
 
         plugin.getGrid().deleteIsland(this);
 
@@ -1581,7 +1705,7 @@ public class SIsland implements Island {
 
         if (cropGrowthEnabled) {
             // First, we want to remove all the current crop tile entities
-            getLoadedChunks(true, false).forEach(chunk ->
+            getLoadedChunks(IslandChunkFlags.ONLY_PROTECTED).forEach(chunk ->
                     plugin.getNMSChunks().startTickingChunk(this, chunk, true));
         }
 
@@ -1589,7 +1713,7 @@ public class SIsland implements Island {
 
         if (cropGrowthEnabled) {
             // Now, we want to update the tile entities again
-            getLoadedChunks(true, false).forEach(chunk ->
+            getLoadedChunks(IslandChunkFlags.ONLY_PROTECTED).forEach(chunk ->
                     plugin.getNMSChunks().startTickingChunk(this, chunk, false));
         }
 
@@ -1688,26 +1812,26 @@ public class SIsland implements Island {
 
         {
             World normalWorld = getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld();
-            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(normalWorld), false, false);
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(normalWorld), 0);
             plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
         }
 
         if (plugin.getProviders().getWorldsProvider().isNetherEnabled() && wasSchematicGenerated(World.Environment.NETHER)) {
             World netherWorld = getCenter(World.Environment.NETHER).getWorld();
             Biome netherBiome = IslandUtils.getDefaultWorldBiome(World.Environment.NETHER);
-            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(netherWorld), false, false);
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(netherWorld), 0);
             plugin.getNMSChunks().setBiome(chunkPositions, netherBiome, playersToUpdate);
         }
 
         if (plugin.getProviders().getWorldsProvider().isEndEnabled() && wasSchematicGenerated(World.Environment.THE_END)) {
             World endWorld = getCenter(World.Environment.THE_END).getWorld();
             Biome endBiome = IslandUtils.getDefaultWorldBiome(World.Environment.THE_END);
-            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(endWorld), false, false);
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(endWorld), 0);
             plugin.getNMSChunks().setBiome(chunkPositions, endBiome, playersToUpdate);
         }
 
         for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
-            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(registeredWorld), false, false);
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(registeredWorld), 0);
             plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
         }
     }
@@ -4365,8 +4489,8 @@ public class SIsland implements Island {
             return;
 
         double newCropGrowthMultiplier = newCropGrowth - 1;
-        IslandUtils.getChunkCoords(this, true, true).values().forEach(chunkPositions ->
-                plugin.getNMSChunks().updateCropsTicker(chunkPositions, newCropGrowthMultiplier));
+        IslandUtils.getChunkCoords(this, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS)
+                .values().forEach(chunkPositions -> plugin.getNMSChunks().updateCropsTicker(chunkPositions, newCropGrowthMultiplier));
     }
 
     public static class UniqueVisitor {
