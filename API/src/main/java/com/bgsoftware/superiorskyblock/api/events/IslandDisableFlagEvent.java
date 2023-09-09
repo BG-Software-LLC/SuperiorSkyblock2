@@ -1,11 +1,10 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.event.Cancellable;
-
-import javax.annotation.Nullable;
 
 /**
  * IslandDisableFlagEvent is called when a flag is disabling for an island.

@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.core.logging;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
-import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.logging.Level;
 

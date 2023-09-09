@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.messages;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
@@ -19,7 +20,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;

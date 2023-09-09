@@ -7,8 +7,6 @@ import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 
-import javax.annotation.Nullable;
-
 /**
  * IslandChangeWarpLocationEvent is called when the location of a warp was changed.
  */
@@ -29,7 +27,7 @@ public class IslandChangeWarpLocationEvent extends IslandEvent implements Cancel
      * @param islandWarp     The warp that its location was changed.
      * @param location       The new location of the warp.
      */
-    public IslandChangeWarpLocationEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, IslandWarp islandWarp, Location location) {
+    public IslandChangeWarpLocationEvent(SuperiorPlayer superiorPlayer, Island island, IslandWarp islandWarp, Location location) {
         super(island);
         this.superiorPlayer = superiorPlayer;
         this.islandWarp = islandWarp;

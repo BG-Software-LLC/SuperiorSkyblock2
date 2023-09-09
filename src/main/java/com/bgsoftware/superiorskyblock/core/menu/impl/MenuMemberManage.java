@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
@@ -12,13 +13,11 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.MemberManageButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
-import com.bgsoftware.superiorskyblock.core.menu.layout.RegularMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.PlayerMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.PlayerViewArgs;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Arrays;
 

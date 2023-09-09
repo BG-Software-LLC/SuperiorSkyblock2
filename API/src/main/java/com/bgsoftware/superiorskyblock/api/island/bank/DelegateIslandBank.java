@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.island.bank;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.List;
 

@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.island.upgrade.container;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 
 public interface UpgradesContainer {

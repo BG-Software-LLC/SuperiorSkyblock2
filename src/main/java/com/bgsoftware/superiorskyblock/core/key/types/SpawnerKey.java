@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.key.types;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.Materials;
@@ -9,8 +10,6 @@ import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.google.common.base.Objects;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
-
-import javax.annotation.Nullable;
 
 public class SpawnerKey extends MaterialKey {
 

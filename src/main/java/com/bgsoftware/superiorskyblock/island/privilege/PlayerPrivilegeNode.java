@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.privilege;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -7,8 +8,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.google.common.base.Preconditions;
-
-import javax.annotation.Nullable;
 
 public class PlayerPrivilegeNode extends PrivilegeNodeAbstract {
 

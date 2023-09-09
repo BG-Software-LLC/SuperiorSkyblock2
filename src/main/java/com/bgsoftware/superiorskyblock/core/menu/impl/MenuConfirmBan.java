@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
@@ -14,8 +15,6 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.BanButton;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.configuration.file.YamlConfiguration;
-
-import javax.annotation.Nullable;
 
 public class MenuConfirmBan extends AbstractMenu<MenuConfirmBan.View, MenuConfirmBan.Args> {
 

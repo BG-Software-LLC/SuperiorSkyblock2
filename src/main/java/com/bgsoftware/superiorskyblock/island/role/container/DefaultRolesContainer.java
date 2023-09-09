@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.island.role.container;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.HashMap;

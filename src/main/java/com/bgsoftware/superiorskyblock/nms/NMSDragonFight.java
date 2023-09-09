@@ -1,12 +1,11 @@
 package com.bgsoftware.superiorskyblock.nms;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Player;
-
-import javax.annotation.Nullable;
 
 public interface NMSDragonFight {
 

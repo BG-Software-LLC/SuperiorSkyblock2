@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.player;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
@@ -36,8 +37,6 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.scheduler.BukkitTask;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -159,7 +158,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void setTextureValue(@Nonnull String textureValue) {
+    public void setTextureValue(String textureValue) {
         Preconditions.checkNotNull(textureValue, "textureValue parameter cannot be null.");
 
         Log.debug(Debug.SET_TEXTURE_VALUE, getName(), textureValue);

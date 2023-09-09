@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.key.types;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
@@ -7,7 +8,6 @@ import com.google.common.base.Preconditions;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
-import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.Objects;
 

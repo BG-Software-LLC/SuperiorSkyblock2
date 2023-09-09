@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.database.sql.session;
 
-import javax.annotation.Nullable;
+import com.bgsoftware.common.annotations.Nullable;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.function.Consumer;

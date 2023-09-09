@@ -1,10 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.service.dragon;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import org.bukkit.World;
 import org.bukkit.entity.EnderDragon;
-
-import javax.annotation.Nullable;
 
 public interface DragonBattleService {
 

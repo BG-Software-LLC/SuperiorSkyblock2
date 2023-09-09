@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.role;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.RolesManager;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -9,7 +10,6 @@ import com.bgsoftware.superiorskyblock.island.role.container.RolesContainer;
 import com.google.common.base.Preconditions;
 import org.bukkit.configuration.ConfigurationSection;
 
-import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;

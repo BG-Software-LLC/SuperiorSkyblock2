@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.api.menu.view;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.google.common.base.Preconditions;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public abstract class BasePagedMenuView<V extends MenuView<V, A>, A extends ViewArgs, E> extends BaseMenuView<V, A> implements PagedMenuView<V, A, E> {

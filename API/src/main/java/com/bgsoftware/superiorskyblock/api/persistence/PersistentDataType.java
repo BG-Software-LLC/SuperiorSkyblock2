@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.api.persistence;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.google.common.base.Preconditions;
 
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.UUID;
 

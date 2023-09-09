@@ -1,12 +1,11 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.event.Cancellable;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
 
 /**
  * IslandChangeWarpCategoryIconEvent is called when the icon of a warp-category was changed.

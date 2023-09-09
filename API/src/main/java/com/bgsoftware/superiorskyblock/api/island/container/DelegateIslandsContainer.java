@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.api.island.container;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import org.bukkit.Location;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 

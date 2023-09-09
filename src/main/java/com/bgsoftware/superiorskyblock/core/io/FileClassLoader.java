@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.io;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.google.common.io.ByteStreams;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;

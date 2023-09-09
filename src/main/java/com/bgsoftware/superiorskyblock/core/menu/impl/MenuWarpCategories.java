@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
@@ -19,7 +20,6 @@ import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.View, IslandViewArgs, WarpCategory> {

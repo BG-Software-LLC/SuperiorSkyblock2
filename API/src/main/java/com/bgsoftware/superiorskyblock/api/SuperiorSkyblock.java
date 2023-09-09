@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
@@ -18,8 +19,6 @@ import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
 import org.bukkit.plugin.Plugin;
-
-import javax.annotation.Nullable;
 
 public interface SuperiorSkyblock extends Plugin {
 

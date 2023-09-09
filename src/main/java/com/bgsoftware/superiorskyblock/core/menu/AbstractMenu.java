@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.BaseMenu;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuViewButton;
@@ -15,7 +16,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends ViewArgs> extends BaseMenu<V, A> {

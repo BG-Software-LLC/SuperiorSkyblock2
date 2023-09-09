@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.serialization.impl;
 
+import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.serialization.ISerializer;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -9,9 +11,7 @@ import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 

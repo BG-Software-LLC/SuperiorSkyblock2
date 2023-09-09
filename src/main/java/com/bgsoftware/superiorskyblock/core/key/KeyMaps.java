@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.core.key;
 
+import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.key.collections.EntityTypeKeyMap;
 import com.bgsoftware.superiorskyblock.core.key.collections.LazyLoadedKeyMap;
 import com.bgsoftware.superiorskyblock.core.key.collections.MaterialKeyMap;
-import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;

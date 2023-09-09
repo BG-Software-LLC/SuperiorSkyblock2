@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.core.database.bridge;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.function.Consumer;
 

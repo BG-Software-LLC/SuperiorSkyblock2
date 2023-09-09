@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.module;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.handlers.ModulesManager;
@@ -7,15 +8,14 @@ import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.Either;
 import com.bgsoftware.superiorskyblock.core.Manager;
-import com.bgsoftware.superiorskyblock.core.io.JarFiles;
 import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
+import com.bgsoftware.superiorskyblock.core.io.JarFiles;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.module.container.ModulesContainer;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;

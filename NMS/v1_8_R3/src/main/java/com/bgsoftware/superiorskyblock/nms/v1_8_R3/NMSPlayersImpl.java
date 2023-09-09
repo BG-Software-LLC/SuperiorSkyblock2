@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
-import com.bgsoftware.superiorskyblock.service.bossbar.EmptyBossBar;
-import com.bgsoftware.superiorskyblock.player.PlayerLocales;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
+import com.bgsoftware.superiorskyblock.service.bossbar.EmptyBossBar;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.minecraft.server.v1_8_R3.Entity;
@@ -27,7 +28,6 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.Optional;
 

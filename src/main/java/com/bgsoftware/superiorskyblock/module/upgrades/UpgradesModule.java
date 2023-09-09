@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.upgrades;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
@@ -35,7 +36,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffectType;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.EnumMap;

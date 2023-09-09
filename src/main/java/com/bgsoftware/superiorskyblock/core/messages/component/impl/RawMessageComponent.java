@@ -1,12 +1,11 @@
 package com.bgsoftware.superiorskyblock.core.messages.component.impl;
 
-import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
 import org.bukkit.command.CommandSender;
-
-import javax.annotation.Nullable;
 
 public class RawMessageComponent implements IMessageComponent {
 

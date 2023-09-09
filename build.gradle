@@ -25,7 +25,8 @@ allprojects {
     }
 
     dependencies {
-        compileOnly "com.bgsoftware.common.reflection:ReflectionUtils:1.0.2"
+        compileOnly 'com.bgsoftware.common.reflection:ReflectionUtils:1.0.2'
+        compileOnly 'com.bgsoftware.common.annotations:Annotations:b1'
     }
 
     task checkDebug() {

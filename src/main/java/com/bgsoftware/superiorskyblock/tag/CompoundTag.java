@@ -32,10 +32,10 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.tag;
 
+import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -51,7 +51,6 @@ import java.util.Set;
  *
  * @author Graham Edgecombe
  */
-@SuppressWarnings("unused")
 public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Tag<?>> {
 
     /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagCompound");

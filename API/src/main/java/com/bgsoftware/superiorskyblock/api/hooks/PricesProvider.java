@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.api.hooks;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.concurrent.CompletableFuture;
 

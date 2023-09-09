@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.nms.v1192.dragon;
 
+import com.bgsoftware.common.annotations.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.dimension.end.EndDragonFight;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;

@@ -1,11 +1,10 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.google.common.base.Preconditions;
 import org.bukkit.event.Cancellable;
-
-import javax.annotation.Nullable;
 
 /**
  * IslandChangeCoopLimitEvent is called when the coop-limit of the island is changed.

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.world.schematic.impl;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.core.SchematicBlockData;
@@ -15,7 +16,6 @@ import org.bukkit.SkullType;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;

@@ -1,13 +1,12 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.PortalType;
 import org.bukkit.World;
 import org.bukkit.event.Cancellable;
-
-import javax.annotation.Nullable;
 
 /**
  * IslandEnterPortalEvent is called when a player enters a portal on an island.
@@ -17,6 +16,7 @@ public class IslandEnterPortalEvent extends IslandEvent implements Cancellable {
     private final SuperiorPlayer superiorPlayer;
     private final PortalType portalType;
     private World.Environment destination;
+    @Nullable
     private Schematic schematic;
     private boolean ignoreInvalidSchematic;
 

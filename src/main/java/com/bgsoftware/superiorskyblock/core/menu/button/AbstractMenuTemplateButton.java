@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.button;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuViewButton;
@@ -9,8 +10,6 @@ import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.external.prices;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.shopsbridge.IShopsBridge;
 import com.bgsoftware.common.shopsbridge.ShopsProvider;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -13,7 +14,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;

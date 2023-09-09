@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.key.collections;
 
+import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
@@ -7,9 +9,7 @@ import com.bgsoftware.superiorskyblock.core.key.types.CustomKey;
 import com.bgsoftware.superiorskyblock.core.key.types.EntityTypeKey;
 import com.bgsoftware.superiorskyblock.core.key.types.LazyKey;
 import com.google.common.collect.Sets;
-import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.IdentityHashMap;

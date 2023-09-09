@@ -1,12 +1,11 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.google.common.base.Preconditions;
 import org.bukkit.event.Cancellable;
 import org.bukkit.potion.PotionEffectType;
-
-import javax.annotation.Nullable;
 
 /**
  * IslandChangeEffectLevelEvent is called when an effect of an island is changed.

@@ -1,10 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.menu.view;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.inventory.Inventory;
-
-import javax.annotation.Nullable;
 
 public abstract class BaseMenuView<V extends MenuView<V, A>, A extends ViewArgs> implements MenuView<V, A> {
 

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.persistence;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataType;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -7,7 +8,6 @@ import com.bgsoftware.superiorskyblock.tag.PersistentDataTagSerialized;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.google.common.base.Preconditions;
 
-import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;

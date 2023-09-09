@@ -1,10 +1,9 @@
 package com.bgsoftware.superiorskyblock.module.container;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.module.ModuleData;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Collection;
 

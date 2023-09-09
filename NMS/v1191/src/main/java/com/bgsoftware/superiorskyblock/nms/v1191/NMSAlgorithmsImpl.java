@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1191;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
@@ -39,7 +40,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
-import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.function.BiFunction;
 

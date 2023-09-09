@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.api.modules;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import org.bukkit.event.Listener;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
 import java.util.logging.Logger;

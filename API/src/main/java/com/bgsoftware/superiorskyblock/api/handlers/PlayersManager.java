@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.player.container.PlayersContainer;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,7 +18,7 @@ public interface PlayersManager {
      * @return The player with that name.
      */
     @Nullable
-    SuperiorPlayer getSuperiorPlayer(@Nullable String name);
+    SuperiorPlayer getSuperiorPlayer(String name);
 
     /**
      * Get a player by a player.

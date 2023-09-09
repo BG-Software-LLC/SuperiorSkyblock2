@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.island.warp;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -10,7 +9,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 

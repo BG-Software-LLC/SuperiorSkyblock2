@@ -1,10 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.menu.button;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
 
 /**
  * Similar to {@link MenuTemplateButton}, but used for buttons in page-based menus.

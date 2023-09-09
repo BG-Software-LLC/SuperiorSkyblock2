@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.factory.BanksFactory;
 import com.bgsoftware.superiorskyblock.api.factory.DatabaseBridgeFactory;
@@ -16,7 +17,6 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.UUID;
 

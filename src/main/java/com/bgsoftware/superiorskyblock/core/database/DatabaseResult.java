@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.core.database;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;

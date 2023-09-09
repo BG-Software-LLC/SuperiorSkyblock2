@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
@@ -12,7 +13,6 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.CoopsPagedObjectBut
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class MenuCoops extends AbstractPagedMenu<MenuCoops.View, IslandViewArgs, SuperiorPlayer> {

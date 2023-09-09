@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.api.hooks;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 
 public interface EconomyProvider {
@@ -34,6 +34,7 @@ public interface EconomyProvider {
 
     class EconomyResult {
 
+        @Nullable
         private final String errorMessage;
         private final double transactionMoney;
 
@@ -45,7 +46,7 @@ public interface EconomyProvider {
             this("", transactionMoney);
         }
 
-        public EconomyResult(String errorMessage, double transactionMoney) {
+        public EconomyResult(@Nullable String errorMessage, double transactionMoney) {
             this.errorMessage = errorMessage;
             this.transactionMoney = transactionMoney;
         }

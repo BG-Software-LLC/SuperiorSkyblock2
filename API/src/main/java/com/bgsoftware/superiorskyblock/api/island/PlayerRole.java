@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
-import javax.annotation.Nullable;
+import com.bgsoftware.common.annotations.Nullable;
 
 public interface PlayerRole {
 

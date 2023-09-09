@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core;
 
-import javax.annotation.Nullable;
+import com.bgsoftware.common.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.List;
 

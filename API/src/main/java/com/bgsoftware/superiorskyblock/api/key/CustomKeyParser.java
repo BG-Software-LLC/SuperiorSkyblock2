@@ -1,10 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.key;
 
+import com.bgsoftware.common.annotations.Nullable;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
 
 public interface CustomKeyParser {
 

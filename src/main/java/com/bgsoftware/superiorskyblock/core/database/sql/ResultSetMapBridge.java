@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.database.sql;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.annotations.Nullable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

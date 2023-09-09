@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.core.collections;
 
+import com.bgsoftware.common.annotations.NotNull;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;

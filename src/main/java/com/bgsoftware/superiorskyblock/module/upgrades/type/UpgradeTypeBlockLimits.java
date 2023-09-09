@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.type;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -29,7 +30,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 

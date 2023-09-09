@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 
 public interface BlockValuesManager {

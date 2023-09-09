@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
@@ -25,7 +26,6 @@ import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
-import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashMap;

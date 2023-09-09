@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.menu;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuViewButton;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
@@ -10,7 +11,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 

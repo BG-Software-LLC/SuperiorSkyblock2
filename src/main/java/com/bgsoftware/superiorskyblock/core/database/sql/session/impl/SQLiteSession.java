@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.database.sql.session.impl;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
@@ -8,7 +9,6 @@ import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;

@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.world.schematic.container;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public interface SchematicsContainer {
