@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,8 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
-
-import javax.annotation.Nullable;
 
 public interface NMSAlgorithms {
 

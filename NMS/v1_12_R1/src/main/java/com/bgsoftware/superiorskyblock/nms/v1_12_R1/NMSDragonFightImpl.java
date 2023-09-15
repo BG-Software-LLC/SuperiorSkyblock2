@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
@@ -20,10 +21,8 @@ import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Modifier;
 
-@SuppressWarnings({"unused"})
 public class NMSDragonFightImpl implements NMSDragonFight {
 
     private static final ReflectField<EnderDragonBattle> WORLD_DRAGON_BATTLE = new ReflectField<>(

@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import org.bukkit.command.CommandSender;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public interface CommandsManager {

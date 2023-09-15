@@ -1,8 +1,10 @@
 package com.bgsoftware.superiorskyblock.world;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandSetHomeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
@@ -20,7 +22,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -134,7 +135,7 @@ public class EntityTeleports {
         ChunkPosition homeChunk = ChunkPosition.of(homeLocation);
 
         List<ChunkPosition> islandChunks = new ArrayList<>(IslandUtils.getChunkCoords(island,
-                WorldInfo.of(islandsWorld), true, true));
+                WorldInfo.of(islandsWorld), IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS));
         islandChunks.sort(Comparator.comparingInt(o -> o.distanceSquared(homeChunk)));
 
         findSafeSpotInChunk(island, islandChunks, 0, islandsWorld, homeLocation, safeSpot -> {

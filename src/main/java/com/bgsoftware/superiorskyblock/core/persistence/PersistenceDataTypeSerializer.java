@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.persistence;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataType;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataTypeContext;
 import com.bgsoftware.superiorskyblock.tag.BigDecimalTag;
@@ -19,7 +20,6 @@ import com.bgsoftware.superiorskyblock.tag.UUIDTag;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;

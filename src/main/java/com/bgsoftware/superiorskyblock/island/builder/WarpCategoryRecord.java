@@ -1,8 +1,7 @@
 package com.bgsoftware.superiorskyblock.island.builder;
 
+import com.bgsoftware.common.annotations.Nullable;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
 
 public class WarpCategoryRecord {
 

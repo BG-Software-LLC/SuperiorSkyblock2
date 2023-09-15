@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_12_R1.spawners;
 
+import com.bgsoftware.common.annotations.Nullable;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.MinecraftKey;
 import net.minecraft.server.v1_12_R1.MobSpawnerAbstract;
@@ -7,7 +8,6 @@ import net.minecraft.server.v1_12_R1.MobSpawnerData;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.World;
 
-import javax.annotation.Nullable;
 import java.util.function.IntFunction;
 
 public class MobSpawnerAbstractNotifier extends MobSpawnerAbstract {

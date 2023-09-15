@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl.internal;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
@@ -25,7 +26,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;

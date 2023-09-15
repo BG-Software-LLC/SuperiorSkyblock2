@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.api.schematic;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import org.bukkit.Location;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.function.Consumer;
 

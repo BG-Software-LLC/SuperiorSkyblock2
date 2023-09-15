@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -7,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
@@ -65,7 +67,6 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
 public class ProtectionListener implements Listener {
 
@@ -74,7 +75,7 @@ public class ProtectionListener implements Listener {
     private static final ReflectMethod<Block> PROJECTILE_HIT_EVENT_TARGET_BLOCK = new ReflectMethod<>(
             ProjectileHitEvent.class, "getHitBlock");
     @Nullable
-    private static final Material CHORUS_FLOWER = Materials.getMaterialSafe("CHORUS_FLOWER");
+    private static final Material CHORUS_FLOWER = EnumHelper.getEnum(Material.class, "CHORUS_FLOWER");
 
     private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {

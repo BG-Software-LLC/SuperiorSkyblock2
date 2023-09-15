@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
@@ -32,7 +34,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -400,29 +401,50 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get all the chunks of the island from all the environments.
+     * Similar to {@link #getAllChunks(int)} with 0 as flags parameter.
      */
     List<Chunk> getAllChunks();
 
     /**
      * Get all the chunks of the island from all the environments.
      *
-     * @param onlyProtected Whether only chunks inside the protected area should be returned.
+     * @param flags See {@link IslandChunkFlags}
      */
-    List<Chunk> getAllChunks(boolean onlyProtected);
+    List<Chunk> getAllChunks(@IslandChunkFlags int flags);
 
     /**
      * Get all the chunks of the island.
+     * Similar to {@link #getAllChunks(org.bukkit.World.Environment, int)} with 0 as flags parameter.
      *
      * @param environment The environment to get the chunks from.
      */
     List<Chunk> getAllChunks(World.Environment environment);
 
     /**
+     * Get all the chunks of the island.
+     *
+     * @param environment The environment to get the chunks from.
+     * @param flags       See {@link IslandChunkFlags}
+     */
+    List<Chunk> getAllChunks(World.Environment environment, @IslandChunkFlags int flags);
+
+    /**
+     * Get all the chunks of the island from all the environments.
+     *
+     * @param onlyProtected Whether only chunks inside the protected area should be returned.
+     * @deprecated See {@link #getAllChunks(int)}
+     */
+    @Deprecated
+    List<Chunk> getAllChunks(boolean onlyProtected);
+
+    /**
      * Get all the chunks of the island, including empty ones.
      *
      * @param environment   The environment to get the chunks from.
      * @param onlyProtected Whether only chunks inside the protected area should be returned.
+     * @deprecated See {@link #getAllChunks(World.Environment, int)}
      */
+    @Deprecated
     List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected);
 
     /**
@@ -431,15 +453,48 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param environment   The environment to get the chunks from.
      * @param onlyProtected Whether only chunks inside the protected area should be returned.
      * @param noEmptyChunks Should empty chunks be loaded or not?
+     * @deprecated See {@link #getAllChunks(World.Environment, int)}
      */
+    @Deprecated
     List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks);
+
+    /**
+     * Get all the loaded chunks of the island.
+     * Similar to {@link #getLoadedChunks(int)} with 0 as flags parameter.
+     */
+    List<Chunk> getLoadedChunks();
+
+    /**
+     * Get all the loaded chunks of the island.
+     *
+     * @param flags See {@link IslandChunkFlags}
+     */
+    List<Chunk> getLoadedChunks(@IslandChunkFlags int flags);
+
+    /**
+     * Get all the loaded chunks of the island.
+     * Similar to {@link #getLoadedChunks(World.Environment, int)} with 0 as flags parameter.
+     *
+     * @param environment The environment to get the chunks from.
+     */
+    List<Chunk> getLoadedChunks(World.Environment environment);
+
+    /**
+     * Get all the loaded chunks of the island.
+     *
+     * @param environment The environment to get the chunks from.
+     * @param flags       See {@link IslandChunkFlags}
+     */
+    List<Chunk> getLoadedChunks(World.Environment environment, @IslandChunkFlags int flags);
 
     /**
      * Get all the loaded chunks of the island.
      *
      * @param onlyProtected Whether only chunks inside the protected area should be returned.
      * @param noEmptyChunks Should empty chunks be loaded or not?
+     * @deprecated See {@link #getLoadedChunks(int)}
      */
+    @Deprecated
     List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks);
 
     /**
@@ -448,8 +503,45 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param environment   The environment to get the chunks from.
      * @param onlyProtected Whether only chunks inside the protected area should be returned.
      * @param noEmptyChunks Should empty chunks be loaded or not?
+     * @deprecated See {@link #getLoadedChunks(World.Environment, int)}
      */
+    @Deprecated
     List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks);
+
+    /**
+     * Get all the chunks of the island asynchronized, including empty chunks.
+     * Similar to {@link #getAllChunksAsync(World.Environment, int, Consumer)}, with 0 as flags parameter.
+     *
+     * @param environment The environment to get the chunks from.
+     */
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment);
+
+    /**
+     * Get all the chunks of the island asynchronized, including empty chunks.
+     *
+     * @param environment The environment to get the chunks from.
+     * @param flags       See {@link IslandChunkFlags}
+     */
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, @IslandChunkFlags int flags);
+
+    /**
+     * Get all the chunks of the island asynchronized, including empty chunks.
+     * Similar to {@link #getAllChunksAsync(World.Environment, int, Consumer)}, with 0 as flags parameter.
+     *
+     * @param environment The environment to get the chunks from.
+     * @param onChunkLoad A consumer that will be ran when the chunk is loaded. Can be null.
+     */
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, @Nullable Consumer<Chunk> onChunkLoad);
+
+    /**
+     * Get all the chunks of the island asynchronized, including empty chunks.
+     *
+     * @param environment The environment to get the chunks from.
+     * @param flags       See {@link IslandChunkFlags}
+     * @param onChunkLoad A consumer that will be ran when the chunk is loaded. Can be null.
+     */
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, @IslandChunkFlags int flags,
+                                                     @Nullable Consumer<Chunk> onChunkLoad);
 
     /**
      * Get all the chunks of the island asynchronized, including empty chunks.
@@ -457,8 +549,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param environment   The environment to get the chunks from.
      * @param onlyProtected Whether only chunks inside the protected area should be returned.
      * @param onChunkLoad   A consumer that will be ran when the chunk is loaded. Can be null.
+     * @deprecated See {@link #getAllChunksAsync(World.Environment, int, Consumer)}
      */
-    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, @Nullable Consumer<Chunk> onChunkLoad);
+    @Deprecated
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected,
+                                                     @Nullable Consumer<Chunk> onChunkLoad);
 
     /**
      * Get all the chunks of the island asynchronized.
@@ -467,15 +562,81 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param onlyProtected Whether only chunks inside the protected area should be returned.
      * @param noEmptyChunks Should empty chunks be loaded or not?
      * @param onChunkLoad   A consumer that will be ran when the chunk is loaded. Can be null.
+     * @deprecated See {@link #getAllChunksAsync(World.Environment, int, Consumer)}
      */
+    @Deprecated
     List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, @Nullable Consumer<Chunk> onChunkLoad);
+
+    /**
+     * Reset all the chunks of the island from all the worlds (will make all chunks empty).
+     * Similar to {@link #resetChunks(int)}, with 0 as flags parameter.
+     */
+    void resetChunks();
+
+    /**
+     * Reset all the chunks of the island from all the worlds (will make all chunks empty).
+     * Similar to {@link #resetChunks(int, Runnable)}, with 0 as flags parameter.
+     *
+     * @param onFinish Callback runnable.
+     */
+    void resetChunks(@Nullable Runnable onFinish);
+
+    /**
+     * Reset all the chunks of the island (will make all chunks empty).
+     * Similar to {@link #resetChunks(World.Environment, int)}, with 0 as flags parameter.
+     *
+     * @param environment The environment to reset chunks in.
+     */
+    void resetChunks(World.Environment environment);
+
+    /**
+     * Reset all the chunks of the island (will make all chunks empty).
+     *
+     * @param environment The environment to reset chunks in.
+     * @param onFinish    Callback runnable.
+     */
+    void resetChunks(World.Environment environment, @Nullable Runnable onFinish);
+
+    /**
+     * Reset all the chunks of the island from all the worlds (will make all chunks empty).
+     *
+     * @param flags See {@link IslandChunkFlags}
+     */
+    void resetChunks(@IslandChunkFlags int flags);
+
+    /**
+     * Reset all the chunks of the island from all the worlds (will make all chunks empty).
+     *
+     * @param flags    See {@link IslandChunkFlags}
+     * @param onFinish Callback runnable.
+     */
+    void resetChunks(@IslandChunkFlags int flags, @Nullable Runnable onFinish);
+
+    /**
+     * Reset all the chunks of the island (will make all chunks empty).
+     *
+     * @param environment The environment to reset chunks in.
+     * @param flags       See {@link IslandChunkFlags}
+     */
+    void resetChunks(World.Environment environment, @IslandChunkFlags int flags);
+
+    /**
+     * Reset all the chunks of the island (will make all chunks empty).
+     *
+     * @param environment The environment to reset chunks in.
+     * @param flags       See {@link IslandChunkFlags}
+     * @param onFinish    Callback runnable.
+     */
+    void resetChunks(World.Environment environment, @IslandChunkFlags int flags, @Nullable Runnable onFinish);
 
     /**
      * Reset all the chunks of the island (will make all chunks empty).
      *
      * @param environment   The environment to reset chunks in.
      * @param onlyProtected Whether only chunks inside the protected area should be reset.
+     * @deprecated See {@link #resetChunks(World.Environment, int)}
      */
+    @Deprecated
     void resetChunks(World.Environment environment, boolean onlyProtected);
 
     /**
@@ -484,14 +645,18 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param environment   The environment to reset chunks in.
      * @param onlyProtected Whether only chunks inside the protected area should be reset.
      * @param onFinish      Callback runnable.
+     * @deprecated See {@link #resetChunks(World.Environment, int, Runnable)}
      */
+    @Deprecated
     void resetChunks(World.Environment environment, boolean onlyProtected, @Nullable Runnable onFinish);
 
     /**
      * Reset all the chunks of the island from all the worlds (will make all chunks empty).
      *
      * @param onlyProtected Whether only chunks inside the protected area should be reset.
+     * @deprecated See {@link #resetChunks(int)}
      */
+    @Deprecated
     void resetChunks(boolean onlyProtected);
 
     /**
@@ -499,7 +664,9 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      *
      * @param onlyProtected Whether only chunks inside the protected area should be reset.
      * @param onFinish      Callback runnable.
+     * @deprecated See {@link #resetChunks(int, Runnable)}
      */
+    @Deprecated
     void resetChunks(boolean onlyProtected, @Nullable Runnable onFinish);
 
     /**
@@ -980,53 +1147,146 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Handle a placement of a block.
+     * This will save the block counts and update the last time status of the island.
      *
      * @param block The block that was placed.
      */
     void handleBlockPlace(Block block);
 
     /**
+     * Handle a placement of a block.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param block The block that was placed.
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockPlaceWithResult(Block block);
+
+    /**
+     * Handle a placement of a block's key.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param key The block's key that was placed.
+     */
+    void handleBlockPlace(Key key);
+
+    /**
+     * Handle a placement of a block's key.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param key The block's key that was placed.
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockPlaceWithResult(Key key);
+
+    /**
      * Handle a placement of a block with a specific amount.
+     * This will save the block counts and update the last time status of the island.
      *
      * @param block  The block that was placed.
      * @param amount The amount of the block.
      */
-    void handleBlockPlace(Block block, int amount);
+    void handleBlockPlace(Block block, @Size int amount);
+
+    /**
+     * Handle a placement of a block with a specific amount.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param block  The block that was placed.
+     * @param amount The amount of the block.
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockPlaceWithResult(Block block, @Size int amount);
+
+    /**
+     * Handle a placement of a block's key with a specific amount.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param key    The block's key that was placed.
+     * @param amount The amount of the block.
+     */
+    void handleBlockPlace(Key key, @Size int amount);
+
+    /**
+     * Handle a placement of a block's key with a specific amount.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param key    The block's key that was placed.
+     * @param amount The amount of the block.
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockPlaceWithResult(Key key, @Size int amount);
 
     /**
      * Handle a placement of a block with a specific amount.
      *
      * @param block  The block that was placed.
      * @param amount The amount of the block.
-     * @param save   Whether the block counts should be saved into database.
+     * @param flags  See {@link IslandBlockFlags}
      */
-    void handleBlockPlace(Block block, int amount, boolean save);
+    void handleBlockPlace(Block block, @Size int amount, @IslandBlockFlags int flags);
+
+    /**
+     * Handle a placement of a block with a specific amount.
+     *
+     * @param block  The block that was placed.
+     * @param amount The amount of the block.
+     * @param flags  See {@link IslandBlockFlags}
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockPlaceWithResult(Block block, @Size int amount, @IslandBlockFlags int flags);
 
     /**
      * Handle a placement of a block's key with a specific amount.
      *
      * @param key    The block's key that was placed.
      * @param amount The amount of the block.
+     * @param flags  See {@link IslandBlockFlags}
      */
-    void handleBlockPlace(Key key, int amount);
+    void handleBlockPlace(Key key, @Size int amount, @IslandBlockFlags int flags);
 
     /**
      * Handle a placement of a block's key with a specific amount.
      *
      * @param key    The block's key that was placed.
      * @param amount The amount of the block.
+     * @param flags  See {@link IslandBlockFlags}
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockPlaceWithResult(Key key, @Size int amount, @IslandBlockFlags int flags);
+
+    /**
+     * Handle a placement of a block with a specific amount.
+     * This will update the last time status of the island.
+     *
+     * @param block  The block that was placed.
+     * @param amount The amount of the block.
      * @param save   Whether the block counts should be saved into database.
      */
-    void handleBlockPlace(Key key, int amount, boolean save);
+    @Deprecated
+    void handleBlockPlace(Block block, @Size int amount, boolean save);
 
     /**
      * Handle a placement of a block's key with a specific amount.
+     * This will update the last time status of the island.
      *
      * @param key    The block's key that was placed.
      * @param amount The amount of the block.
      * @param save   Whether the block counts should be saved into database.
      */
-    void handleBlockPlace(Key key, BigInteger amount, boolean save);
+    @Deprecated
+    void handleBlockPlace(Key key, @Size int amount, boolean save);
+
+    /**
+     * Handle a placement of a block's key with a specific amount.
+     * This will update the last time status of the island.
+     *
+     * @param key    The block's key that was placed.
+     * @param amount The amount of the block.
+     * @param save   Whether the block counts should be saved into database.
+     */
+    @Deprecated
+    void handleBlockPlace(Key key, @Size BigInteger amount, boolean save);
 
     /**
      * Handle a placement of a block's key with a specific amount.
@@ -1036,64 +1296,217 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param save                 Whether the block counts should be saved into database.
      * @param updateLastTimeStatus Whether to update last time island was updated or not.
      */
-    void handleBlockPlace(Key key, BigInteger amount, boolean save, boolean updateLastTimeStatus);
+    @Deprecated
+    void handleBlockPlace(Key key, @Size BigInteger amount, boolean save, boolean updateLastTimeStatus);
 
     /**
      * Handle placements of many blocks in one time.
+     * This will save the block counts and update the last time status of the island.
      *
      * @param blocks All the blocks to place.
      */
     void handleBlocksPlace(Map<Key, Integer> blocks);
 
     /**
+     * Handle placements of many blocks in one time.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param blocks All the blocks to place.
+     * @return Results per block key. Only non-successful results will be returned.
+     */
+    Map<Key, BlockChangeResult> handleBlocksPlaceWithResult(Map<Key, Integer> blocks);
+
+    /**
+     * Handle placements of many blocks in one time.
+     *
+     * @param blocks All the blocks to place.
+     * @param flags  See {@link IslandBlockFlags}
+     */
+    void handleBlocksPlace(Map<Key, Integer> blocks, @IslandBlockFlags int flags);
+
+    /**
+     * Handle placements of many blocks in one time.
+     *
+     * @param blocks All the blocks to place.
+     * @param flags  See {@link IslandBlockFlags}
+     * @return Results per block key. Only non-successful results will be returned.
+     */
+    Map<Key, BlockChangeResult> handleBlocksPlaceWithResult(Map<Key, Integer> blocks, @IslandBlockFlags int flags);
+
+    /**
      * Handle a break of a block.
+     * This will save the block counts and update the last time status of the island.
      *
      * @param block The block that was broken.
      */
     void handleBlockBreak(Block block);
 
     /**
+     * Handle a break of a block.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param block The block that was broken.
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockBreakWithResult(Block block);
+
+    /**
+     * Handle a break of a block's key.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param key The block's key that was broken.
+     */
+    void handleBlockBreak(Key key);
+
+    /**
+     * Handle a break of a block's key.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param key The block's key that was broken.
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockBreakWithResult(Key key);
+
+    /**
      * Handle a break of a block with a specific amount.
+     * This will save the block counts and update the last time status of the island.
      *
      * @param block  The block that was broken.
      * @param amount The amount of the block.
      */
-    void handleBlockBreak(Block block, int amount);
+    void handleBlockBreak(Block block, @Size int amount);
+
+    /**
+     * Handle a break of a block with a specific amount.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param block  The block that was broken.
+     * @param amount The amount of the block.
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockBreakWithResult(Block block, @Size int amount);
+
+    /**
+     * Handle a break of a block's key with a specific amount.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param key    The block's key that was broken.
+     * @param amount The amount of the block.
+     */
+    void handleBlockBreak(Key key, @Size int amount);
+
+    /**
+     * Handle a break of a block's key with a specific amount.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param key    The block's key that was broken.
+     * @param amount The amount of the block.
+     * @return The result of the block place.
+     */
+    BlockChangeResult handleBlockBreakWithResult(Key key, @Size int amount);
 
     /**
      * Handle a break of a block with a specific amount.
      *
      * @param block  The block that was broken.
      * @param amount The amount of the block.
-     * @param save   Whether the block counts should be saved into the database.
+     * @param flags  See {@link IslandBlockFlags}
      */
-    void handleBlockBreak(Block block, int amount, boolean save);
+    void handleBlockBreak(Block block, @Size int amount, @IslandBlockFlags int flags);
+
+    /**
+     * Handle a break of a block with a specific amount.
+     *
+     * @param block  The block that was broken.
+     * @param amount The amount of the block.
+     * @param flags  See {@link IslandBlockFlags}
+     */
+    BlockChangeResult handleBlockBreakWithResult(Block block, @Size int amount, @IslandBlockFlags int flags);
 
     /**
      * Handle a break of a block's key with a specific amount.
      *
      * @param key    The block's key that was broken.
      * @param amount The amount of the block.
+     * @param flags  See {@link IslandBlockFlags}
      */
-    void handleBlockBreak(Key key, int amount);
+    void handleBlockBreak(Key key, @Size int amount, @IslandBlockFlags int flags);
+
+    /**
+     * Handle a break of a block's key with a specific amount.
+     *
+     * @param key    The block's key that was broken.
+     * @param amount The amount of the block.
+     * @param flags  See {@link IslandBlockFlags}
+     */
+    BlockChangeResult handleBlockBreakWithResult(Key key, @Size int amount, @IslandBlockFlags int flags);
 
     /**
      * Handle a break of a block with a specific amount.
+     * This will update the last time status of the island.
+     *
+     * @param block  The block that was broken.
+     * @param amount The amount of the block.
+     * @param save   Whether the block counts should be saved into the database.
+     */
+    @Deprecated
+    void handleBlockBreak(Block block, @Size int amount, boolean save);
+
+    /**
+     * Handle a break of a block with a specific amount.
+     * This will update the last time status of the island.
      *
      * @param key    The block's key that was broken.
      * @param amount The amount of the block.
      * @param save   Whether the block counts should be saved into the database.
      */
-    void handleBlockBreak(Key key, int amount, boolean save);
+    @Deprecated
+    void handleBlockBreak(Key key, @Size int amount, boolean save);
 
     /**
      * Handle a break of a block with a specific amount.
+     * This will update the last time status of the island.
      *
      * @param key    The block's key that was broken.
      * @param amount The amount of the block.
      * @param save   Whether the block counts should be saved into the database.
      */
-    void handleBlockBreak(Key key, BigInteger amount, boolean save);
+    @Deprecated
+    void handleBlockBreak(Key key, @Size BigInteger amount, boolean save);
+
+    /**
+     * Handle break of many blocks in one time.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param blocks All the blocks to break.
+     */
+    void handleBlocksBreak(Map<Key, Integer> blocks);
+
+    /**
+     * Handle break of many blocks in one time.
+     * This will save the block counts and update the last time status of the island.
+     *
+     * @param blocks All the blocks to break.
+     * @return Results per block key. Only non-successful results will be returned.
+     */
+    Map<Key, BlockChangeResult> handleBlocksBreakWithResult(Map<Key, Integer> blocks);
+
+    /**
+     * Handle break of many blocks in one time.
+     *
+     * @param blocks All the blocks to break.
+     * @param flags  See {@link IslandBlockFlags}
+     */
+    void handleBlocksBreak(Map<Key, Integer> blocks, @IslandBlockFlags int flags);
+
+    /**
+     * Handle break of many blocks in one time.
+     *
+     * @param blocks All the blocks to break.
+     * @param flags  See {@link IslandBlockFlags}
+     * @return Results per block key. Only non-successful results will be returned.
+     */
+    Map<Key, BlockChangeResult> handleBlocksBreakWithResult(Map<Key, Integer> blocks, @IslandBlockFlags int flags);
 
     /**
      * Check whether a chunk has blocks inside it.
@@ -1839,7 +2252,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     /**
      * Set an amount for a specific key in a specific world.
      */
-    void setGeneratorAmount(Key key, int amount, World.Environment environment);
+    void setGeneratorAmount(Key key, @Size int amount, World.Environment environment);
 
     /**
      * Remove a rate for a specific key in a specific world.

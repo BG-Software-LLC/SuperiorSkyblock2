@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.view;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.BaseMenuView;
@@ -19,7 +20,6 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 
 public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewArgs> extends BaseMenuView<V, A> {

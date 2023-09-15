@@ -1,10 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.event.Cancellable;
-
-import javax.annotation.Nullable;
 
 /**
  * IslandRemoveRatingEvent is called when a rating of a player is removed from an island.

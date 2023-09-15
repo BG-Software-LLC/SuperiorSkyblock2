@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.values;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
@@ -20,7 +21,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import javax.script.Bindings;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;

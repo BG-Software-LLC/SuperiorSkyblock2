@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.core;
 
+import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class SchematicBlockData implements Comparable<SchematicBlockData> {
 

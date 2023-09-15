@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -8,7 +9,6 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import javax.annotation.Nullable;
 
 /**
  * MissionResetEvent is called when a mission is reset.

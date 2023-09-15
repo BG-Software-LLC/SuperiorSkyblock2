@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.core;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -54,23 +53,6 @@ public enum Materials {
 
     public ItemStack toBukkitItem(int amount) {
         return ServerVersion.isLegacy() ? new ItemStack(toBukkitType(), amount, bukkitData) : new ItemStack(toBukkitType(), amount);
-    }
-
-    @Nullable
-    public static Material getMaterialSafe(String material) {
-        try {
-            return Material.valueOf(material);
-        } catch (IllegalArgumentException error) {
-            return null;
-        }
-    }
-
-    public static Material getMaterialSafe(String material, String defaultMaterial) {
-        try {
-            return Material.valueOf(material);
-        } catch (IllegalArgumentException error) {
-            return Material.valueOf(defaultMaterial);
-        }
     }
 
     public static boolean isSlab(Material material) {

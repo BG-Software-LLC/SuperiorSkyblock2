@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_12_R1.dragon;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -34,7 +35,6 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.LinkedList;

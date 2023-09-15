@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
@@ -28,7 +29,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;

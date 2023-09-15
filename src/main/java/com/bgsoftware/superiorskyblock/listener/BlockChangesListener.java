@@ -1,12 +1,17 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.common.annotations.IntType;
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBlockFlags;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlag;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
@@ -52,9 +57,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.concurrent.TimeUnit;
 
 public class BlockChangesListener implements Listener {
@@ -64,7 +69,7 @@ public class BlockChangesListener implements Listener {
     private static final ReflectMethod<Block> PROJECTILE_HIT_EVENT_TARGET_BLOCK = new ReflectMethod<>(
             ProjectileHitEvent.class, "getHitBlock");
     @Nullable
-    private static final Material CHORUS_FLOWER = Materials.getMaterialSafe("CHORUS_FLOWER");
+    private static final Material CHORUS_FLOWER = EnumHelper.getEnum(Material.class, "CHORUS_FLOWER");
 
     private static final WorldRecordFlag REGULAR_RECORD_FLAGS = WorldRecordFlag.SAVE_BLOCK_COUNT.and(WorldRecordFlag.DIRTY_CHUNK);
     private static final WorldRecordFlag ALL_RECORD_FLAGS = REGULAR_RECORD_FLAGS.and(WorldRecordFlag.HANDLE_NEARBY_BLOCKS);
@@ -81,6 +86,15 @@ public class BlockChangesListener implements Listener {
         this.plugin = plugin;
         this.registerSpongeListener();
         this.registerBlockDestroyListener();
+    }
+
+    @IntType({BlockTrackFlags.DIRTY_CHUNKS, BlockTrackFlags.SAVE_BLOCK_COUNT, BlockTrackFlags.HANDLE_NEARBY_BLOCKS})
+    public @interface BlockTrackFlags {
+
+        int DIRTY_CHUNKS = (1 << 0);
+        int SAVE_BLOCK_COUNT = (1 << 1);
+        int HANDLE_NEARBY_BLOCKS = (1 << 2);
+
     }
 
     /* BLOCK PLACES */
@@ -260,6 +274,7 @@ public class BlockChangesListener implements Listener {
             Key blockKey = Keys.of(block);
             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
         });
+
         if (e.getEntity() instanceof TNTPrimed)
             blockCounts.put(ConstantKeys.TNT, blockCounts.getOrDefault(ConstantKeys.TNT, 0) + 1);
 

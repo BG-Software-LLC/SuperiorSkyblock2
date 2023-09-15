@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.service.placeholders;
 
+import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
@@ -19,9 +21,7 @@ import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.OfflinePlayer;
-import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;

@@ -1,9 +1,8 @@
 package com.bgsoftware.superiorskyblock.api.menu;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
-
-import javax.annotation.Nullable;
 
 /**
  * @deprecated See {@link MenuView}

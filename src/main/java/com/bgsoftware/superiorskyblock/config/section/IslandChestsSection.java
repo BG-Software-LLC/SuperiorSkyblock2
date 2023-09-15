@@ -1,29 +1,23 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
-import com.bgsoftware.superiorskyblock.config.SettingsContainer;
+import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 
-public class IslandChestsSection implements SettingsManager.IslandChests {
-
-    private final SettingsContainer container;
-
-    public IslandChestsSection(SettingsContainer container) {
-        this.container = container;
-    }
+public class IslandChestsSection extends SettingsContainerHolder implements SettingsManager.IslandChests {
 
     @Override
     public String getChestTitle() {
-        return this.container.islandChestTitle;
+        return getContainer().islandChestTitle;
     }
 
     @Override
     public int getDefaultPages() {
-        return this.container.islandChestsDefaultPage;
+        return getContainer().islandChestsDefaultPage;
     }
 
     @Override
     public int getDefaultSize() {
-        return this.container.islandChestsDefaultSize;
+        return getContainer().islandChestsDefaultSize;
     }
 
 }

@@ -1,16 +1,15 @@
 package com.bgsoftware.superiorskyblock.island.role;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.island.privilege.RolePrivilegeNode;
 import com.google.common.base.Preconditions;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-@SuppressWarnings("WeakerAccess")
 public class SPlayerRole implements PlayerRole {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();

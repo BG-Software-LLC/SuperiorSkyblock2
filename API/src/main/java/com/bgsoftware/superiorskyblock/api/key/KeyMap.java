@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.api.key;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

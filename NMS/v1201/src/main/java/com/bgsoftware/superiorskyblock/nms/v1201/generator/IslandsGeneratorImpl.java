@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1201.generator;
 
+import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
@@ -10,7 +11,6 @@ import org.bukkit.block.Biome;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.WorldInfo;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;

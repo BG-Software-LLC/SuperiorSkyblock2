@@ -1,8 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.serialization;
 
-import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nullable;
+import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.annotations.Nullable;
 
 public interface ISerializer<S, D> {
 

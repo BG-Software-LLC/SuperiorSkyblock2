@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.player;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
@@ -23,8 +24,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -56,7 +55,7 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void setTextureValue(@Nonnull String textureValue) {
+    public void setTextureValue(String textureValue) {
         // Do nothing.
     }
 

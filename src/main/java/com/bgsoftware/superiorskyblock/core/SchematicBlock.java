@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -7,7 +8,6 @@ import com.bgsoftware.superiorskyblock.tag.ListTag;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.inventory.InventoryType;
-import org.jetbrains.annotations.Nullable;
 
 public class SchematicBlock {
 

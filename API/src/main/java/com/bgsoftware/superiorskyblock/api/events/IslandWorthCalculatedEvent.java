@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 
 /**
@@ -13,6 +13,7 @@ public class IslandWorthCalculatedEvent extends IslandEvent {
 
     private final BigDecimal level;
     private final BigDecimal worth;
+    @Nullable
     private final SuperiorPlayer player;
 
     /**
@@ -23,7 +24,7 @@ public class IslandWorthCalculatedEvent extends IslandEvent {
      * @param level  The new level of the island.
      * @param worth  The new worth value of the island.
      */
-    public IslandWorthCalculatedEvent(Island island, SuperiorPlayer player, BigDecimal level, BigDecimal worth) {
+    public IslandWorthCalculatedEvent(Island island, @Nullable SuperiorPlayer player, BigDecimal level, BigDecimal worth) {
         super(island);
         this.player = player;
         this.level = level;

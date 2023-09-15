@@ -1,16 +1,16 @@
 package com.bgsoftware.superiorskyblock.core.messages.component.impl;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
-import com.bgsoftware.superiorskyblock.core.Text;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
 
 public class ComplexMessageComponent implements IMessageComponent {
 

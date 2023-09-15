@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.privilege;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.core.Text;
@@ -7,10 +8,8 @@ import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 
-@SuppressWarnings("WeakerAccess")
 public abstract class PrivilegeNodeAbstract implements PermissionNode {
 
     protected final EnumerateMap<IslandPrivilege, PrivilegeStatus> privileges;

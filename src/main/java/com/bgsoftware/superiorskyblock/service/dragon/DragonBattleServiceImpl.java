@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.service.dragon;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleResetResult;
@@ -9,8 +10,6 @@ import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EnderDragon;
-
-import javax.annotation.Nullable;
 
 public class DragonBattleServiceImpl implements DragonBattleService, IService {
 

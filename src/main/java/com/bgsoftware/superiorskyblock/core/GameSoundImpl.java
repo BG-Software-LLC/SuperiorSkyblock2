@@ -1,11 +1,10 @@
 package com.bgsoftware.superiorskyblock.core;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import org.bukkit.Sound;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-
-import javax.annotation.Nullable;
 
 public class GameSoundImpl implements GameSound {
 

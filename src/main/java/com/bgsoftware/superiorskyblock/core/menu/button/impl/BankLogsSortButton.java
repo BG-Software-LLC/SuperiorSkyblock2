@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
@@ -9,7 +10,6 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuBankLogs;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;

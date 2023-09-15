@@ -1,12 +1,11 @@
 package com.bgsoftware.superiorskyblock.core.serialization.impl;
 
+import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
-import com.bgsoftware.superiorskyblock.core.serialization.ISerializer;
 import com.bgsoftware.superiorskyblock.core.Text;
-import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nullable;
+import com.bgsoftware.superiorskyblock.core.serialization.ISerializer;
 
 public class OffsetSerializer implements ISerializer<BlockOffset, String> {
 

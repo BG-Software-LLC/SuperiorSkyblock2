@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
@@ -18,7 +19,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.lang.reflect.Constructor;

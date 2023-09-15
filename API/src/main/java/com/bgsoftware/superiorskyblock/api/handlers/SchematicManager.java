@@ -1,14 +1,13 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
-@SuppressWarnings("unused")
 public interface SchematicManager {
 
     /**

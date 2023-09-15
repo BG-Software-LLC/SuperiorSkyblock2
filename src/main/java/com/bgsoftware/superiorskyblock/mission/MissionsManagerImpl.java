@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.mission;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -31,7 +32,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;

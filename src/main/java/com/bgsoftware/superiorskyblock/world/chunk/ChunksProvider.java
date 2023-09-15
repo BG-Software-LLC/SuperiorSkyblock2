@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.world.chunk;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.executors.IWorker;
 import com.bgsoftware.common.executors.WorkerExecutor;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -10,7 +11,6 @@ import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
 import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import org.bukkit.Chunk;
 
-import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;

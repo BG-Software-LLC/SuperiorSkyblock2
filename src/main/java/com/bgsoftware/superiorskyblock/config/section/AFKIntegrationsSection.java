@@ -1,24 +1,18 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
-import com.bgsoftware.superiorskyblock.config.SettingsContainer;
+import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 
-public class AFKIntegrationsSection implements SettingsManager.AFKIntegrations {
-
-    private final SettingsContainer container;
-
-    public AFKIntegrationsSection(SettingsContainer container) {
-        this.container = container;
-    }
+public class AFKIntegrationsSection extends SettingsContainerHolder implements SettingsManager.AFKIntegrations {
 
     @Override
     public boolean isDisableRedstone() {
-        return this.container.disableRedstoneAFK;
+        return getContainer().disableRedstoneAFK;
     }
 
     @Override
     public boolean isDisableSpawning() {
-        return this.container.disableSpawningAFK;
+        return getContainer().disableSpawningAFK;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.persistence;
 
-import javax.annotation.Nullable;
+import com.bgsoftware.common.annotations.Nullable;
+
 import java.util.function.BiConsumer;
 
 public class DelegatePersistentDataContainer implements PersistentDataContainer {

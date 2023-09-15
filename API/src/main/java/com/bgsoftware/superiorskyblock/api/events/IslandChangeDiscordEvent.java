@@ -5,8 +5,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.google.common.base.Preconditions;
 import org.bukkit.event.Cancellable;
 
-import javax.annotation.Nullable;
-
 /**
  * IslandChangeDiscordEvent is called when the discord of the island is changed.
  */

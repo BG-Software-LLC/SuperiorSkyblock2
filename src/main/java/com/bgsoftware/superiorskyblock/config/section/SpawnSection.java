@@ -1,51 +1,45 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
-import com.bgsoftware.superiorskyblock.config.SettingsContainer;
+import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 
 import java.util.List;
 
-public class SpawnSection implements SettingsManager.Spawn {
-
-    private final SettingsContainer container;
-
-    public SpawnSection(SettingsContainer container) {
-        this.container = container;
-    }
+public class SpawnSection extends SettingsContainerHolder implements SettingsManager.Spawn {
 
     @Override
     public String getLocation() {
-        return this.container.spawnLocation;
+        return getContainer().spawnLocation;
     }
 
     @Override
     public boolean isProtected() {
-        return this.container.spawnProtection;
+        return getContainer().spawnProtection;
     }
 
     @Override
     public List<String> getSettings() {
-        return this.container.spawnSettings;
+        return getContainer().spawnSettings;
     }
 
     @Override
     public List<String> getPermissions() {
-        return this.container.spawnPermissions;
+        return getContainer().spawnPermissions;
     }
 
     @Override
     public boolean isWorldBorder() {
-        return this.container.spawnWorldBorder;
+        return getContainer().spawnWorldBorder;
     }
 
     @Override
     public int getSize() {
-        return this.container.spawnSize;
+        return getContainer().spawnSize;
     }
 
     @Override
     public boolean isPlayersDamage() {
-        return this.container.spawnDamage;
+        return getContainer().spawnDamage;
     }
 
 }

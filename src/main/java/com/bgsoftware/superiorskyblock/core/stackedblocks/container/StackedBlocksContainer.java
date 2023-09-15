@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.core.stackedblocks.container;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.stackedblocks.StackedBlock;
 import org.bukkit.Location;
 
-import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
 public interface StackedBlocksContainer {

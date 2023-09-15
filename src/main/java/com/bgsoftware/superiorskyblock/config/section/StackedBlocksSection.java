@@ -2,49 +2,43 @@ package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.config.SettingsContainer;
+import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class StackedBlocksSection implements SettingsManager.StackedBlocks {
-
-    private final SettingsContainer container;
+public class StackedBlocksSection extends SettingsContainerHolder implements SettingsManager.StackedBlocks {
     private final DepositMenu depositMenu = new DepositMenuSection();
-
-    public StackedBlocksSection(SettingsContainer container) {
-        this.container = container;
-    }
 
     @Override
     public boolean isEnabled() {
-        return this.container.stackedBlocksEnabled;
+        return getContainer().stackedBlocksEnabled;
     }
 
     @Override
     public String getCustomName() {
-        return this.container.stackedBlocksName;
+        return getContainer().stackedBlocksName;
     }
 
     @Override
     public List<String> getDisabledWorlds() {
-        return this.container.stackedBlocksDisabledWorlds;
+        return getContainer().stackedBlocksDisabledWorlds;
     }
 
     @Override
     public Set<Key> getWhitelisted() {
-        return this.container.whitelistedStackedBlocks;
+        return getContainer().whitelistedStackedBlocks;
     }
 
     @Override
     public Map<Key, Integer> getLimits() {
-        return this.container.stackedBlocksLimits;
+        return getContainer().stackedBlocksLimits;
     }
 
     @Override
     public boolean isAutoCollect() {
-        return this.container.stackedBlocksAutoPickup;
+        return getContainer().stackedBlocksAutoPickup;
     }
 
     @Override
@@ -56,12 +50,12 @@ public class StackedBlocksSection implements SettingsManager.StackedBlocks {
 
         @Override
         public boolean isEnabled() {
-            return container.stackedBlocksMenuEnabled;
+            return getContainer().stackedBlocksMenuEnabled;
         }
 
         @Override
         public String getTitle() {
-            return container.stackedBlocksMenuTitle;
+            return getContainer().stackedBlocksMenuTitle;
         }
 
     }

@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.core.menu;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.parser.MenuParser;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class MenuParseResult<V extends MenuView<V, ?>> implements MenuParser.ParseResult<V> {

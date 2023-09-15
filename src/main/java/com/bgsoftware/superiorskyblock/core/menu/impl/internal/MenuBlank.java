@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl.internal;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
@@ -16,7 +17,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 
 public class MenuBlank extends AbstractMenu<BaseMenuView, EmptyViewArgs> {

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.database.cache;
 
-import javax.annotation.Nullable;
+import com.bgsoftware.common.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;

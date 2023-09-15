@@ -1,51 +1,45 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
-import com.bgsoftware.superiorskyblock.config.SettingsContainer;
+import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 
 import java.util.List;
 
-public class IslandNamesSection implements SettingsManager.IslandNames {
-
-    private final SettingsContainer container;
-
-    public IslandNamesSection(SettingsContainer container) {
-        this.container = container;
-    }
+public class IslandNamesSection extends SettingsContainerHolder implements SettingsManager.IslandNames {
 
     @Override
     public boolean isRequiredForCreation() {
-        return this.container.islandNamesRequiredForCreation;
+        return getContainer().islandNamesRequiredForCreation;
     }
 
     @Override
     public int getMaxLength() {
-        return this.container.islandNamesMaxLength;
+        return getContainer().islandNamesMaxLength;
     }
 
     @Override
     public int getMinLength() {
-        return this.container.islandNamesMinLength;
+        return getContainer().islandNamesMinLength;
     }
 
     @Override
     public List<String> getFilteredNames() {
-        return this.container.filteredIslandNames;
+        return getContainer().filteredIslandNames;
     }
 
     @Override
     public boolean isColorSupport() {
-        return this.container.islandNamesColorSupport;
+        return getContainer().islandNamesColorSupport;
     }
 
     @Override
     public boolean isIslandTop() {
-        return this.container.islandNamesIslandTop;
+        return getContainer().islandNamesIslandTop;
     }
 
     @Override
     public boolean isPreventPlayerNames() {
-        return this.container.islandNamesPreventPlayerNames;
+        return getContainer().islandNamesPreventPlayerNames;
     }
 
 }

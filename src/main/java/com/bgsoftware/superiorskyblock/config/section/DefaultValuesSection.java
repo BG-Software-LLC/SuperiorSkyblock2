@@ -2,77 +2,71 @@ package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.config.SettingsContainer;
+import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
-public class DefaultValuesSection implements SettingsManager.DefaultValues {
-
-    private final SettingsContainer container;
-
-    public DefaultValuesSection(SettingsContainer container) {
-        this.container = container;
-    }
+public class DefaultValuesSection extends SettingsContainerHolder implements SettingsManager.DefaultValues {
 
     @Override
     public int getIslandSize() {
-        return this.container.defaultIslandSize;
+        return getContainer().defaultIslandSize;
     }
 
     @Override
     public Map<Key, Integer> getBlockLimits() {
-        return this.container.defaultBlockLimits;
+        return getContainer().defaultBlockLimits;
     }
 
     @Override
     public Map<Key, Integer> getEntityLimits() {
-        return this.container.defaultEntityLimits;
+        return getContainer().defaultEntityLimits;
     }
 
     @Override
     public int getWarpsLimit() {
-        return this.container.defaultWarpsLimit;
+        return getContainer().defaultWarpsLimit;
     }
 
     @Override
     public int getTeamLimit() {
-        return this.container.defaultTeamLimit;
+        return getContainer().defaultTeamLimit;
     }
 
     @Override
     public int getCoopLimit() {
-        return this.container.defaultCoopLimit;
+        return getContainer().defaultCoopLimit;
     }
 
     @Override
     public double getCropGrowth() {
-        return this.container.defaultCropGrowth;
+        return getContainer().defaultCropGrowth;
     }
 
     @Override
     public double getSpawnerRates() {
-        return this.container.defaultSpawnerRates;
+        return getContainer().defaultSpawnerRates;
     }
 
     @Override
     public double getMobDrops() {
-        return this.container.defaultMobDrops;
+        return getContainer().defaultMobDrops;
     }
 
     @Override
     public BigDecimal getBankLimit() {
-        return this.container.defaultBankLimit;
+        return getContainer().defaultBankLimit;
     }
 
     @Override
     public Map<Key, Integer>[] getGenerators() {
-        return this.container.defaultGenerator;
+        return getContainer().defaultGenerator;
     }
 
     @Override
     public Map<Integer, Integer> getRoleLimits() {
-        return this.container.defaultRoleLimits;
+        return getContainer().defaultRoleLimits;
     }
 
 }

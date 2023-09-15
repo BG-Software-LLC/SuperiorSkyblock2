@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;

@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
@@ -26,7 +28,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -324,8 +325,8 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public List<Chunk> getAllChunks(boolean onlyProtected) {
-        return this.handle.getAllChunks(onlyProtected);
+    public List<Chunk> getAllChunks(@IslandChunkFlags int flags) {
+        return this.handle.getAllChunks(flags);
     }
 
     @Override
@@ -334,51 +335,155 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public List<Chunk> getAllChunks(World.Environment environment, @IslandChunkFlags int flags) {
+        return this.handle.getAllChunks(environment, flags);
+    }
+
+    @Override
+    @Deprecated
+    public List<Chunk> getAllChunks(boolean onlyProtected) {
+        return this.handle.getAllChunks(onlyProtected);
+    }
+
+    @Override
+    @Deprecated
     public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
         return this.handle.getAllChunks(environment, onlyProtected);
     }
 
     @Override
+    @Deprecated
     public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         return this.handle.getAllChunks(environment, onlyProtected, noEmptyChunks);
     }
 
     @Override
+    public List<Chunk> getLoadedChunks() {
+        return this.handle.getLoadedChunks();
+    }
+
+    @Override
+    public List<Chunk> getLoadedChunks(@IslandChunkFlags int flags) {
+        return this.handle.getLoadedChunks(flags);
+    }
+
+    @Override
+    public List<Chunk> getLoadedChunks(World.Environment environment) {
+        return this.handle.getLoadedChunks(environment);
+    }
+
+    @Override
+    public List<Chunk> getLoadedChunks(World.Environment environment, @IslandChunkFlags int flags) {
+        return this.handle.getLoadedChunks(environment, flags);
+    }
+
+    @Override
+    @Deprecated
     public List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks) {
         return this.handle.getLoadedChunks(onlyProtected, noEmptyChunks);
     }
 
     @Override
+    @Deprecated
     public List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         return this.handle.getLoadedChunks(environment, onlyProtected, noEmptyChunks);
     }
 
     @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment) {
+        return getAllChunksAsync(environment, 0);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, int flags) {
+        return getAllChunksAsync(environment, flags, null);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment,
+                                                            @Nullable Consumer<Chunk> onChunkLoad) {
+        return this.handle.getAllChunksAsync(environment, onChunkLoad);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment,
+                                                            @IslandChunkFlags int flags,
+                                                            @Nullable Consumer<Chunk> onChunkLoad) {
+        return this.handle.getAllChunksAsync(environment, flags, onChunkLoad);
+    }
+
+    @Override
+    @Deprecated
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, @Nullable Consumer<Chunk> onChunkLoad) {
         return this.handle.getAllChunksAsync(environment, onlyProtected, onChunkLoad);
     }
 
     @Override
+    @Deprecated
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, @Nullable Consumer<Chunk> onChunkLoad) {
         return this.handle.getAllChunksAsync(environment, onlyProtected, noEmptyChunks, onChunkLoad);
     }
 
     @Override
+    public void resetChunks() {
+        this.handle.resetChunks();
+    }
+
+    @Override
+    public void resetChunks(@Nullable Runnable onFinish) {
+        this.handle.resetChunks(onFinish);
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment) {
+        this.handle.resetChunks(environment);
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment, @Nullable Runnable onFinish) {
+        this.handle.resetChunks(environment, onFinish);
+    }
+
+    @Override
+    public void resetChunks(@IslandChunkFlags int flags) {
+        this.handle.resetChunks(flags);
+    }
+
+    @Override
+    public void resetChunks(@IslandChunkFlags int flags, @Nullable Runnable onFinish) {
+        this.handle.resetChunks(flags, onFinish);
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment, @IslandChunkFlags int flags) {
+        this.handle.resetChunks(environment, flags);
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment, @IslandChunkFlags int flags, @Nullable Runnable onFinish) {
+        this.handle.resetChunks(environment, flags, onFinish);
+    }
+
+    @Override
+    @Deprecated
     public void resetChunks(World.Environment environment, boolean onlyProtected) {
         this.handle.resetChunks(environment, onlyProtected);
     }
 
     @Override
+    @Deprecated
     public void resetChunks(World.Environment environment, boolean onlyProtected, @Nullable Runnable onFinish) {
         this.handle.resetChunks(environment, onlyProtected, onFinish);
     }
 
     @Override
+    @Deprecated
     public void resetChunks(boolean onlyProtected) {
         this.handle.resetChunks(onlyProtected);
     }
 
     @Override
+    @Deprecated
     public void resetChunks(boolean onlyProtected, @Nullable Runnable onFinish) {
         this.handle.resetChunks(onlyProtected, onFinish);
     }
@@ -685,8 +790,18 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public void completeMission(Mission<?> mission) {
+        this.handle.completeMission(mission);
+    }
+
+    @Override
     public void setCurrentlyActive(boolean active) {
         this.handle.setCurrentlyActive(active);
+    }
+
+    @Override
+    public void resetMission(Mission<?> mission) {
+        this.handle.resetMission(mission);
     }
 
     @Override
@@ -695,8 +810,18 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public boolean hasCompletedMission(Mission<?> mission) {
+        return this.handle.hasCompletedMission(mission);
+    }
+
+    @Override
     public long getLastTimeUpdate() {
         return this.handle.getLastTimeUpdate();
+    }
+
+    @Override
+    public boolean canCompleteMissionAgain(Mission<?> mission) {
+        return this.handle.canCompleteMissionAgain(mission);
     }
 
     @Override
@@ -705,8 +830,18 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getAmountMissionCompleted(Mission<?> mission) {
+        return this.handle.getAmountMissionCompleted(mission);
+    }
+
+    @Override
     public IslandBank getIslandBank() {
         return this.handle.getIslandBank();
+    }
+
+    @Override
+    public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
+        this.handle.setAmountMissionCompleted(mission, finishCount);
     }
 
     @Override
@@ -715,8 +850,18 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public List<Mission<?>> getCompletedMissions() {
+        return this.handle.getCompletedMissions();
+    }
+
+    @Override
     public void setBankLimit(BigDecimal bankLimit) {
         this.handle.setBankLimit(bankLimit);
+    }
+
+    @Override
+    public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
+        return this.handle.getCompletedMissionsWithAmounts();
     }
 
     @Override
@@ -725,8 +870,18 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public DatabaseBridge getDatabaseBridge() {
+        return this.handle.getDatabaseBridge();
+    }
+
+    @Override
     public boolean giveInterest(boolean checkOnlineOwner) {
         return this.handle.giveInterest(checkOnlineOwner);
+    }
+
+    @Override
+    public PersistentDataContainer getPersistentDataContainer() {
+        return this.handle.getPersistentDataContainer();
     }
 
     @Override
@@ -735,8 +890,18 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public boolean isPersistentDataContainerEmpty() {
+        return this.handle.isPersistentDataContainerEmpty();
+    }
+
+    @Override
     public void setLastInterestTime(long lastInterest) {
         this.handle.setLastInterestTime(lastInterest);
+    }
+
+    @Override
+    public void savePersistentDataContainer() {
+        this.handle.savePersistentDataContainer();
     }
 
     @Override
@@ -750,31 +915,80 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public void handleBlockPlace(Block block, int amount) {
+    public BlockChangeResult handleBlockPlaceWithResult(Block block) {
+        return this.handle.handleBlockPlaceWithResult(block);
+    }
+
+    @Override
+    public void handleBlockPlace(Key key) {
+        this.handle.handleBlockPlace(key);
+    }
+
+    @Override
+    public BlockChangeResult handleBlockPlaceWithResult(Key key) {
+        return this.handle.handleBlockPlaceWithResult(key);
+    }
+
+    @Override
+    public void handleBlockPlace(Block block, @Size int amount) {
         this.handle.handleBlockPlace(block, amount);
     }
 
     @Override
-    public void handleBlockPlace(Block block, int amount, boolean save) {
-        this.handle.handleBlockPlace(block, amount, save);
+    public BlockChangeResult handleBlockPlaceWithResult(Block block, @Size int amount) {
+        return this.handle.handleBlockPlaceWithResult(block, amount);
     }
 
     @Override
-    public void handleBlockPlace(Key key, int amount) {
+    public void handleBlockPlace(Key key, @Size int amount) {
         this.handle.handleBlockPlace(key, amount);
     }
 
     @Override
-    public void handleBlockPlace(Key key, int amount, boolean save) {
+    public BlockChangeResult handleBlockPlaceWithResult(Key key, @Size int amount) {
+        return this.handle.handleBlockPlaceWithResult(key, amount);
+    }
+
+    @Override
+    public void handleBlockPlace(Block block, @Size int amount, @IslandBlockFlags int flags) {
+        this.handle.handleBlockPlace(block, amount, flags);
+    }
+
+    @Override
+    public BlockChangeResult handleBlockPlaceWithResult(Block block, @Size int amount, @IslandBlockFlags int flags) {
+        return this.handle.handleBlockPlaceWithResult(block, amount, flags);
+    }
+
+    @Override
+    public void handleBlockPlace(Key key, @Size int amount, @IslandBlockFlags int flags) {
+        this.handle.handleBlockPlace(key, amount, flags);
+    }
+
+    @Override
+    public BlockChangeResult handleBlockPlaceWithResult(Key key, @Size int amount, @IslandBlockFlags int flags) {
+        return this.handle.handleBlockPlaceWithResult(key, amount, flags);
+    }
+
+    @Override
+    @Deprecated
+    public void handleBlockPlace(Block block, @Size int amount, boolean save) {
+        this.handle.handleBlockPlace(block, amount, save);
+    }
+
+    @Override
+    @Deprecated
+    public void handleBlockPlace(Key key, @Size int amount, boolean save) {
         this.handle.handleBlockPlace(key, amount, save);
     }
 
     @Override
+    @Deprecated
     public void handleBlockPlace(Key key, BigInteger amount, boolean save) {
         this.handle.handleBlockPlace(key, amount, save);
     }
 
     @Override
+    @Deprecated
     public void handleBlockPlace(Key key, BigInteger amount, boolean save, boolean updateLastTimeStatus) {
         this.handle.handleBlockPlace(key, amount, save, updateLastTimeStatus);
     }
@@ -785,33 +999,116 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public Map<Key, BlockChangeResult> handleBlocksPlaceWithResult(Map<Key, Integer> blocks) {
+        return this.handle.handleBlocksPlaceWithResult(blocks);
+    }
+
+    @Override
+    public void handleBlocksPlace(Map<Key, Integer> blocks, @IslandBlockFlags int flags) {
+        this.handle.handleBlocksPlace(blocks, flags);
+    }
+
+    @Override
+    public Map<Key, BlockChangeResult> handleBlocksPlaceWithResult(Map<Key, Integer> blocks, int flags) {
+        return this.handle.handleBlocksPlaceWithResult(blocks, flags);
+    }
+
+    @Override
     public void handleBlockBreak(Block block) {
         this.handle.handleBlockBreak(block);
     }
 
     @Override
-    public void handleBlockBreak(Block block, int amount) {
+    public BlockChangeResult handleBlockBreakWithResult(Block block) {
+        return this.handle.handleBlockBreakWithResult(block);
+    }
+
+    @Override
+    public void handleBlockBreak(Key key) {
+        this.handle.handleBlockBreak(key);
+    }
+
+    @Override
+    public BlockChangeResult handleBlockBreakWithResult(Key key) {
+        return this.handle.handleBlockBreakWithResult(key);
+    }
+
+    @Override
+    public void handleBlockBreak(Block block, @Size int amount) {
         this.handle.handleBlockBreak(block, amount);
     }
 
     @Override
-    public void handleBlockBreak(Block block, int amount, boolean save) {
-        this.handle.handleBlockBreak(block, amount, save);
+    public BlockChangeResult handleBlockBreakWithResult(Block block, @Size int amount) {
+        return this.handle.handleBlockBreakWithResult(block, amount);
     }
 
     @Override
-    public void handleBlockBreak(Key key, int amount) {
+    public void handleBlockBreak(Key key, @Size int amount) {
         this.handle.handleBlockBreak(key, amount);
     }
 
     @Override
-    public void handleBlockBreak(Key key, int amount, boolean save) {
+    public BlockChangeResult handleBlockBreakWithResult(Key key, @Size int amount) {
+        return this.handle.handleBlockBreakWithResult(key, amount);
+    }
+
+    @Override
+    public void handleBlockBreak(Block block, @Size int amount, @IslandBlockFlags int flags) {
+        this.handle.handleBlockBreak(block, amount, flags);
+    }
+
+    @Override
+    public BlockChangeResult handleBlockBreakWithResult(Block block, @Size int amount, @IslandBlockFlags int flags) {
+        return this.handle.handleBlockBreakWithResult(block, amount, flags);
+    }
+
+    @Override
+    public void handleBlockBreak(Key key, @Size int amount, @IslandBlockFlags int flags) {
+        this.handle.handleBlockBreak(key, amount, flags);
+    }
+
+    @Override
+    public BlockChangeResult handleBlockBreakWithResult(Key key, @Size int amount, @IslandBlockFlags int flags) {
+        return this.handle.handleBlockBreakWithResult(key, amount, flags);
+    }
+
+    @Override
+    @Deprecated
+    public void handleBlockBreak(Block block, @Size int amount, boolean save) {
+        this.handle.handleBlockBreak(block, amount, save);
+    }
+
+    @Override
+    @Deprecated
+    public void handleBlockBreak(Key key, @Size int amount, boolean save) {
         this.handle.handleBlockBreak(key, amount, save);
     }
 
     @Override
+    @Deprecated
     public void handleBlockBreak(Key key, BigInteger amount, boolean save) {
         this.handle.handleBlockBreak(key, amount, save);
+    }
+
+    @Override
+    public void handleBlocksBreak(Map<Key, Integer> blocks) {
+        this.handle.handleBlocksBreak(blocks);
+    }
+
+    @Override
+    public Map<Key, BlockChangeResult> handleBlocksBreakWithResult(Map<Key, Integer> blocks) {
+        return this.handle.handleBlocksBreakWithResult(blocks);
+    }
+
+    @Override
+    public void handleBlocksBreak(Map<Key, Integer> blocks, @IslandBlockFlags int flags) {
+        this.handle.handleBlocksBreak(blocks, flags);
+    }
+
+    @Override
+    public Map<Key, BlockChangeResult> handleBlocksBreakWithResult(Map<Key, Integer> blocks, @IslandBlockFlags int flags) {
+        return this.handle.handleBlocksBreakWithResult(blocks, flags);
     }
 
     @Override
@@ -1025,7 +1322,7 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public boolean hasReachedBlockLimit(Key key, int amount) {
+    public boolean hasReachedBlockLimit(Key key, @Size int amount) {
         return this.handle.hasReachedBlockLimit(key, amount);
     }
 
@@ -1075,12 +1372,12 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, int amount) {
+    public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, @Size int amount) {
         return this.handle.hasReachedEntityLimit(entityType, amount);
     }
 
     @Override
-    public CompletableFuture<Boolean> hasReachedEntityLimit(Key key, int amount) {
+    public CompletableFuture<Boolean> hasReachedEntityLimit(Key key, @Size int amount) {
         return this.handle.hasReachedEntityLimit(key, amount);
     }
 
@@ -1344,7 +1641,7 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public void setGeneratorAmount(Key key, int amount, World.Environment environment) {
+    public void setGeneratorAmount(Key key, @Size int amount, World.Environment environment) {
         this.handle.setGeneratorAmount(key, amount, environment);
     }
 
@@ -1436,67 +1733,8 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public void completeMission(Mission<?> mission) {
-        this.handle.completeMission(mission);
-    }
-
-    @Override
-    public void resetMission(Mission<?> mission) {
-        this.handle.resetMission(mission);
-    }
-
-    @Override
-    public boolean hasCompletedMission(Mission<?> mission) {
-        return this.handle.hasCompletedMission(mission);
-    }
-
-    @Override
-    public boolean canCompleteMissionAgain(Mission<?> mission) {
-        return this.handle.canCompleteMissionAgain(mission);
-    }
-
-    @Override
-    public int getAmountMissionCompleted(Mission<?> mission) {
-        return this.handle.getAmountMissionCompleted(mission);
-    }
-
-    @Override
-    public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
-        this.handle.setAmountMissionCompleted(mission, finishCount);
-    }
-
-    @Override
-    public List<Mission<?>> getCompletedMissions() {
-        return this.handle.getCompletedMissions();
-    }
-
-    @Override
-    public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
-        return this.handle.getCompletedMissionsWithAmounts();
-    }
-
-    @Override
-    public DatabaseBridge getDatabaseBridge() {
-        return this.handle.getDatabaseBridge();
-    }
-
-    @Override
-    public PersistentDataContainer getPersistentDataContainer() {
-        return this.handle.getPersistentDataContainer();
-    }
-
-    @Override
-    public boolean isPersistentDataContainerEmpty() {
-        return this.handle.isPersistentDataContainerEmpty();
-    }
-
-    @Override
-    public void savePersistentDataContainer() {
-        this.handle.savePersistentDataContainer();
-    }
-
-    @Override
     public int compareTo(Island o) {
         return this.handle.compareTo(o);
     }
+
 }

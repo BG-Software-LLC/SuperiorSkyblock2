@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.world;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,7 +27,7 @@ public class BukkitItems {
     private static final ReflectMethod<ItemStack> GET_ITEM_IN_OFF_HAND = new ReflectMethod<>(PlayerInventory.class, "getItemInOffHand");
     private static final ReflectMethod<ItemStack> SET_ITEM_IN_OFF_HAND = new ReflectMethod<>(PlayerInventory.class, "setItemInOffHand", ItemStack.class);
 
-    private static final Material END_CRYSTAL_ITEM_TYPE = Materials.getMaterialSafe("END_CRYSTAL");
+    private static final Material END_CRYSTAL_ITEM_TYPE = EnumHelper.getEnum(Material.class, "END_CRYSTAL");
 
     private BukkitItems() {
 

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -12,8 +13,6 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.LeaveButton;
 import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
 import org.bukkit.configuration.file.YamlConfiguration;
-
-import javax.annotation.Nullable;
 
 public class MenuConfirmLeave extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
 

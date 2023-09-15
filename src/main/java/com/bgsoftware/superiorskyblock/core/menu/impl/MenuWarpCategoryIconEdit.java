@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
@@ -20,8 +21,6 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpCategoryIconEdi
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractIconProviderMenu;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.configuration.file.YamlConfiguration;
-
-import javax.annotation.Nullable;
 
 public class MenuWarpCategoryIconEdit extends AbstractMenu<AbstractIconProviderMenu.View<WarpCategory>, AbstractIconProviderMenu.Args<WarpCategory>> {
 

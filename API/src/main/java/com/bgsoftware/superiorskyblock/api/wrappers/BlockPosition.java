@@ -1,10 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.wrappers;
 
+import com.bgsoftware.common.annotations.Nullable;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-
-import javax.annotation.Nullable;
 
 /**
  * This object represents a position of a block in the world.

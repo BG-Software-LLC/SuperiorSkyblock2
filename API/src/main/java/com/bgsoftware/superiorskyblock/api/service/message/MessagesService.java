@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.service.message;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -7,7 +8,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import javax.annotation.Nullable;
 import java.util.Locale;
 
 public interface MessagesService {

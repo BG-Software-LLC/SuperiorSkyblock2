@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.container;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
@@ -7,7 +8,6 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.module.ModuleData;
 import com.google.common.base.Preconditions;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Arrays;

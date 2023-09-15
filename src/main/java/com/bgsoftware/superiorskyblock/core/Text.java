@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.core;
 
-import javax.annotation.Nullable;
+import com.bgsoftware.common.annotations.Nullable;
 
 public class Text {
 

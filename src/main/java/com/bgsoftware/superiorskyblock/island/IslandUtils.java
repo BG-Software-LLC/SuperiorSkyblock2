@@ -3,11 +3,13 @@ package com.bgsoftware.superiorskyblock.island;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -29,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -39,20 +42,24 @@ public class IslandUtils {
     private static final EnumMap<World.Environment, Biome> DEFAULT_WORLD_BIOMES = new EnumMap<>(World.Environment.class);
 
     static {
-        try {
-            DEFAULT_WORLD_BIOMES.put(World.Environment.NORMAL, Biome.valueOf(plugin.getSettings().getWorlds().getNormal().getBiome()));
-        } catch (IllegalArgumentException error) {
-            DEFAULT_WORLD_BIOMES.put(World.Environment.NORMAL, Biome.PLAINS);
+        {
+            Biome biome = Optional.ofNullable(EnumHelper.getEnum(Biome.class,
+                    plugin.getSettings().getWorlds().getNormal().getBiome())).orElse(Biome.PLAINS);
+            DEFAULT_WORLD_BIOMES.put(World.Environment.NORMAL, biome);
         }
-        try {
-            DEFAULT_WORLD_BIOMES.put(World.Environment.NETHER, Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome()));
-        } catch (IllegalArgumentException error) {
-            DEFAULT_WORLD_BIOMES.put(World.Environment.NETHER, getBiome("NETHER_WASTES", "NETHER", "HELL"));
+
+        {
+            Biome biome = Optional.ofNullable(EnumHelper.getEnum(Biome.class,
+                            plugin.getSettings().getWorlds().getNether().getBiome(), "NETHER_WASTES", "NETHER", "HELL"))
+                    .orElseThrow(IllegalArgumentException::new);
+            DEFAULT_WORLD_BIOMES.put(World.Environment.NETHER, biome);
         }
-        try {
-            DEFAULT_WORLD_BIOMES.put(World.Environment.THE_END, Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome()));
-        } catch (IllegalArgumentException error) {
-            DEFAULT_WORLD_BIOMES.put(World.Environment.THE_END, getBiome("THE_END", "SKY"));
+
+        {
+            Biome biome = Optional.ofNullable(EnumHelper.getEnum(Biome.class,
+                            plugin.getSettings().getWorlds().getEnd().getBiome(), "THE_END", "SKY"))
+                    .orElseThrow(IllegalArgumentException::new);
+            DEFAULT_WORLD_BIOMES.put(World.Environment.THE_END, biome);
         }
     }
 
@@ -60,8 +67,11 @@ public class IslandUtils {
 
     }
 
-    public static List<ChunkPosition> getChunkCoords(Island island, WorldInfo worldInfo, boolean onlyProtected, boolean noEmptyChunks) {
+    public static List<ChunkPosition> getChunkCoords(Island island, WorldInfo worldInfo, @IslandChunkFlags int flags) {
         List<ChunkPosition> chunkCoords = new LinkedList<>();
+
+        boolean onlyProtected = (flags & IslandChunkFlags.ONLY_PROTECTED) != 0;
+        boolean noEmptyChunks = (flags & IslandChunkFlags.NO_EMPTY_CHUNKS) != 0;
 
         Location min = onlyProtected ? island.getMinimumProtected() : island.getMinimum();
         Location max = onlyProtected ? island.getMaximumProtected() : island.getMaximum();
@@ -77,13 +87,13 @@ public class IslandUtils {
         return chunkCoords;
     }
 
-    public static Map<WorldInfo, List<ChunkPosition>> getChunkCoords(Island island, boolean onlyProtected, boolean noEmptyChunks) {
+    public static Map<WorldInfo, List<ChunkPosition>> getChunkCoords(Island island, @IslandChunkFlags int flags) {
         Map<WorldInfo, List<ChunkPosition>> chunkCoords = new HashMap<>();
 
         {
             if (plugin.getProviders().getWorldsProvider().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
                 WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, World.Environment.NORMAL);
-                List<ChunkPosition> chunkPositions = getChunkCoords(island, worldInfo, onlyProtected, noEmptyChunks);
+                List<ChunkPosition> chunkPositions = getChunkCoords(island, worldInfo, flags);
                 if (!chunkPositions.isEmpty())
                     chunkCoords.put(worldInfo, chunkPositions);
             }
@@ -91,21 +101,21 @@ public class IslandUtils {
 
         if (plugin.getProviders().getWorldsProvider().isNetherEnabled() && island.wasSchematicGenerated(World.Environment.NETHER)) {
             WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, World.Environment.NETHER);
-            List<ChunkPosition> chunkPositions = getChunkCoords(island, worldInfo, onlyProtected, noEmptyChunks);
+            List<ChunkPosition> chunkPositions = getChunkCoords(island, worldInfo, flags);
             if (!chunkPositions.isEmpty())
                 chunkCoords.put(worldInfo, chunkPositions);
         }
 
         if (plugin.getProviders().getWorldsProvider().isEndEnabled() && island.wasSchematicGenerated(World.Environment.THE_END)) {
             WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, World.Environment.THE_END);
-            List<ChunkPosition> chunkPositions = getChunkCoords(island, worldInfo, onlyProtected, noEmptyChunks);
+            List<ChunkPosition> chunkPositions = getChunkCoords(island, worldInfo, flags);
             if (!chunkPositions.isEmpty())
                 chunkCoords.put(worldInfo, chunkPositions);
         }
 
         for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
             WorldInfo worldInfo = WorldInfo.of(registeredWorld);
-            List<ChunkPosition> chunkPositions = getChunkCoords(island, worldInfo, onlyProtected, noEmptyChunks);
+            List<ChunkPosition> chunkPositions = getChunkCoords(island, worldInfo, flags);
             if (!chunkPositions.isEmpty())
                 chunkCoords.put(worldInfo, chunkPositions);
         }
@@ -113,21 +123,16 @@ public class IslandUtils {
         return chunkCoords;
     }
 
-    public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island,
-                                                                   World world,
-                                                                   boolean onlyProtected,
-                                                                   boolean noEmptyChunks,
+    public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island, World world, @IslandChunkFlags int flags,
                                                                    ChunkLoadReason chunkLoadReason,
                                                                    Consumer<Chunk> onChunkLoad) {
         return new SequentialListBuilder<CompletableFuture<Chunk>>()
                 .mutable()
-                .build(IslandUtils.getChunkCoords(island, WorldInfo.of(world), onlyProtected, noEmptyChunks), chunkPosition ->
+                .build(IslandUtils.getChunkCoords(island, WorldInfo.of(world), flags), chunkPosition ->
                         ChunksProvider.loadChunk(chunkPosition, chunkLoadReason, onChunkLoad));
     }
 
-    public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island,
-                                                                   boolean onlyProtected,
-                                                                   boolean noEmptyChunks,
+    public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island, @IslandChunkFlags int flags,
                                                                    ChunkLoadReason chunkLoadReason,
                                                                    Consumer<Chunk> onChunkLoad) {
         List<CompletableFuture<Chunk>> chunkCoords = new LinkedList<>();
@@ -135,22 +140,22 @@ public class IslandUtils {
         {
             if (plugin.getProviders().getWorldsProvider().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
                 World normalWorld = island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld();
-                chunkCoords.addAll(getAllChunksAsync(island, normalWorld, onlyProtected, noEmptyChunks, chunkLoadReason, onChunkLoad));
+                chunkCoords.addAll(getAllChunksAsync(island, normalWorld, flags, chunkLoadReason, onChunkLoad));
             }
         }
 
         if (plugin.getProviders().getWorldsProvider().isNetherEnabled() && island.wasSchematicGenerated(World.Environment.NETHER)) {
             World netherWorld = island.getCenter(World.Environment.NETHER).getWorld();
-            chunkCoords.addAll(getAllChunksAsync(island, netherWorld, onlyProtected, noEmptyChunks, chunkLoadReason, onChunkLoad));
+            chunkCoords.addAll(getAllChunksAsync(island, netherWorld, flags, chunkLoadReason, onChunkLoad));
         }
 
         if (plugin.getProviders().getWorldsProvider().isEndEnabled() && island.wasSchematicGenerated(World.Environment.THE_END)) {
             World endWorld = island.getCenter(World.Environment.THE_END).getWorld();
-            chunkCoords.addAll(getAllChunksAsync(island, endWorld, onlyProtected, noEmptyChunks, chunkLoadReason, onChunkLoad));
+            chunkCoords.addAll(getAllChunksAsync(island, endWorld, flags, chunkLoadReason, onChunkLoad));
         }
 
         for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
-            chunkCoords.addAll(getAllChunksAsync(island, registeredWorld, onlyProtected, noEmptyChunks, chunkLoadReason, onChunkLoad));
+            chunkCoords.addAll(getAllChunksAsync(island, registeredWorld, flags, chunkLoadReason, onChunkLoad));
         }
 
         return chunkCoords;
@@ -179,7 +184,7 @@ public class IslandUtils {
     }
 
     public static void resetChunksExcludedFromList(Island island, Collection<ChunkPosition> excludedChunkPositions) {
-        Map<WorldInfo, List<ChunkPosition>> chunksToDelete = IslandUtils.getChunkCoords(island, false, false);
+        Map<WorldInfo, List<ChunkPosition>> chunksToDelete = IslandUtils.getChunkCoords(island, 0);
         chunksToDelete.values().forEach(chunkPositions -> {
             List<ChunkPosition> clonedChunkPositions = new LinkedList<>(chunkPositions);
             clonedChunkPositions.removeAll(excludedChunkPositions);
@@ -218,7 +223,7 @@ public class IslandUtils {
     }
 
     public static void handleKickPlayer(SuperiorPlayer caller, String callerName, Island island, SuperiorPlayer target) {
-        if(!plugin.getEventsBus().callIslandKickEvent(caller, target, island))
+        if (!plugin.getEventsBus().callIslandKickEvent(caller, target, island))
             return;
 
         island.kickMember(target);
@@ -302,17 +307,6 @@ public class IslandUtils {
 
     public static List<Biome> getDefaultWorldBiomes() {
         return new SequentialListBuilder<Biome>().build(DEFAULT_WORLD_BIOMES.values());
-    }
-
-    private static Biome getBiome(String... biomeNames) {
-        for (String biomeName : biomeNames) {
-            try {
-                return Biome.valueOf(biomeName);
-            } catch (IllegalArgumentException ignored) {
-            }
-        }
-
-        throw new IllegalArgumentException();
     }
 
 }

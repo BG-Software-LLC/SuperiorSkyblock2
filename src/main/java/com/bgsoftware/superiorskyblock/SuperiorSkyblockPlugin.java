@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
@@ -81,7 +82,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -91,8 +91,8 @@ import java.util.Optional;
 public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
 
     private static SuperiorSkyblockPlugin plugin;
-    private final Updater updater = new Updater(this, "superiorskyblock2");
 
+    /* Managers */
     private final DataManager dataHandler = new DataManager(this);
     private final FactoriesManagerImpl factoriesHandler = new FactoriesManagerImpl();
     private final GridManagerImpl gridHandler = new GridManagerImpl(this,
@@ -119,18 +119,20 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     private final ModulesManagerImpl modulesHandler = new ModulesManagerImpl(this,
             new DefaultModulesContainer(this));
     private final ServicesHandler servicesHandler = new ServicesHandler(this);
-    // The only handler that is initialized is this one, therefore it's not final.
-    // This is to prevent it's fields to be non-finals.
-    private SettingsManagerImpl settingsHandler = null;
+    private final SettingsManagerImpl settingsHandler = new SettingsManagerImpl(this);
+
+    /* Global handlers */
+    private final Updater updater = new Updater(this, "superiorskyblock2");
+    private final EventsBus eventsBus = new EventsBus(this);
+    private final BukkitListeners bukkitListeners = new BukkitListeners(this);
     private IScriptEngine scriptEngine = EnginesFactory.createDefaultEngine();
     @Nullable
+    private ChunkGenerator worldGenerator = null;
+    @Nullable
     @Deprecated
-    private WorldEventsManager worldEventsManager;
+    private WorldEventsManager worldEventsManager = null;
 
-    private final EventsBus eventsBus = new EventsBus(this);
-
-    private final BukkitListeners bukkitListeners = new BukkitListeners(this);
-
+    /* NMS */
     private String nmsPackageVersion;
     private NMSAlgorithms nmsAlgorithms;
     private NMSChunks nmsChunks;
@@ -140,8 +142,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     private NMSPlayers nmsPlayers;
     private NMSTags nmsTags;
     private NMSWorld nmsWorld;
-
-    private ChunkGenerator worldGenerator = null;
 
     private boolean shouldEnable = true;
 
@@ -207,7 +207,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             GlowEnchantment.registerGlowEnchantment();
 
             try {
-                settingsHandler = new SettingsManagerImpl(this);
+                settingsHandler.loadData();
             } catch (ManagerLoadException ex) {
                 if (!ManagerLoadException.handle(ex)) {
                     shouldEnable = false;
@@ -503,7 +503,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
         if (!loadGrid) {
             modulesHandler.reloadModules(ModuleLoadTime.BEFORE_WORLD_CREATION);
-            settingsHandler = new SettingsManagerImpl(this);
+            settingsHandler.loadData();
             modulesHandler.reloadModules(ModuleLoadTime.NORMAL);
         } else {
             commandsHandler.loadData();
@@ -671,10 +671,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
     public ServicesHandler getServices() {
         return servicesHandler;
-    }
-
-    public void setSettings(SettingsManagerImpl settingsHandler) {
-        this.settingsHandler = settingsHandler;
     }
 
     public NMSAlgorithms getNMSAlgorithms() {

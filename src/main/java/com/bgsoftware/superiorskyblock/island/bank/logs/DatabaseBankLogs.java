@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.bank.logs;
 
+import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
@@ -9,7 +10,6 @@ import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 import java.util.List;

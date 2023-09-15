@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.api.data;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.function.Consumer;
 

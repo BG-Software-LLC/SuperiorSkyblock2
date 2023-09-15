@@ -1,13 +1,14 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.stackedblocks.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.stackedblocks.StackedBlocksInteractionService;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -34,7 +35,6 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -45,8 +45,8 @@ import java.util.Map;
 public class StackedBlocksListener implements Listener {
 
     @Nullable
-    private static final Material COPPER_BLOCK = Materials.getMaterialSafe("COPPER_BLOCK");
-    private static final Material HONEYCOMB = Materials.getMaterialSafe("HONEYCOMB");
+    private static final Material COPPER_BLOCK = EnumHelper.getEnum(Material.class, "COPPER_BLOCK");
+    private static final Material HONEYCOMB = EnumHelper.getEnum(Material.class, "HONEYCOMB");
     private final Map<CreatureSpawnEvent.SpawnReason, List<BlockOffset>> ENTITY_TEMPLATE_OFFSETS = buildEntityTemplateOffsetsMap();
 
     private final SuperiorSkyblockPlugin plugin;

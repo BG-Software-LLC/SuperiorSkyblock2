@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -11,7 +12,6 @@ import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Locale;

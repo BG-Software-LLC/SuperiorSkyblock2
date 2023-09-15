@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.MoveResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -58,13 +59,13 @@ import java.util.Optional;
 
 public class RegionManagerServiceImpl implements RegionManagerService, IService {
 
-    private static final Material FARMLAND = Materials.getMaterialSafe("FARMLAND", "SOIL");
+    private static final Material FARMLAND = EnumHelper.getEnum(Material.class, "FARMLAND", "SOIL");
     @Nullable
-    private static final Material TURTLE_EGG = Materials.getMaterialSafe("TURTLE_EGG");
+    private static final Material TURTLE_EGG = EnumHelper.getEnum(Material.class, "TURTLE_EGG");
     @Nullable
-    private static final Material SWEET_BERRY_BUSH = Materials.getMaterialSafe("SWEET_BERRY_BUSH");
+    private static final Material SWEET_BERRY_BUSH = EnumHelper.getEnum(Material.class, "SWEET_BERRY_BUSH");
     @Nullable
-    private static final Material LECTERN = Materials.getMaterialSafe("LECTERN");
+    private static final Material LECTERN = EnumHelper.getEnum(Material.class, "LECTERN");
     @Nullable
     private static final EntityType AXOLOTL_TYPE = getSafeEntityType("AXOLOTL");
     private static final int MAX_PICKUP_DISTANCE = 1;

@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.commands;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.google.common.base.Preconditions;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;

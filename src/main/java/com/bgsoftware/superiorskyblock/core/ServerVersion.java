@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core;
 import org.bukkit.Bukkit;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 public enum ServerVersion {
 
@@ -30,7 +31,7 @@ public enum ServerVersion {
         bukkitVersion = Bukkit.getBukkitVersion().split("-")[0];
         String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         String[] sections = version.split("_");
-        currentVersion = ServerVersion.getSafe(sections[0] + "_" + sections[1]);
+        currentVersion = Optional.ofNullable(EnumHelper.getEnum(ServerVersion.class, sections[0] + "_" + sections[1])).orElse(UNKONWN);
         legacy = isLessThan(ServerVersion.v1_13);
     }
 
@@ -38,14 +39,6 @@ public enum ServerVersion {
 
     ServerVersion(int code) {
         this.code = code;
-    }
-
-    public static ServerVersion getSafe(String value) {
-        try {
-            return valueOf(value);
-        } catch (IllegalArgumentException error) {
-            return UNKONWN;
-        }
     }
 
     public static boolean isAtLeast(ServerVersion serverVersion) {

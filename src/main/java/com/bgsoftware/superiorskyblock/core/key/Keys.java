@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.key;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
@@ -21,7 +22,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -111,6 +111,9 @@ public class Keys {
             Material blockType = Material.valueOf(material);
             if (Text.isBlank(data)) {
                 return Keys.of(blockType);
+            }
+            if (blockType == Materials.SPAWNER.toBukkitType()) {
+                return ofSpawner(data);
             }
             short blockData = Short.parseShort(data);
             return Keys.of(blockType, blockData);

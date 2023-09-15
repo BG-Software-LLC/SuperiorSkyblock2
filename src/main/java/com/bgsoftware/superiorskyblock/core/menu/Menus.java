@@ -41,8 +41,6 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuBlank;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuConfigEditor;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
 
-import javax.annotation.Nullable;
-
 public class Menus {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -132,7 +130,7 @@ public class Menus {
         MENU_WARPS = createMenu(MenuWarps.createInstance());
     }
 
-    private static <M extends AbstractMenu<V, A>, V extends AbstractMenuView<V, A>, A extends ViewArgs> M createMenu(@Nullable M menu) {
+    private static <M extends AbstractMenu<V, A>, V extends AbstractMenuView<V, A>, A extends ViewArgs> M createMenu(M menu) {
         if (menu == null)
             throw new IllegalStateException("Menu could not be initialized.");
 

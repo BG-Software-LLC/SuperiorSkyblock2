@@ -1,13 +1,12 @@
 package com.bgsoftware.superiorskyblock.core.serialization.impl;
 
+import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.ISerializer;
 import org.bukkit.Location;
-import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nullable;
 
 public class LocationSerializer implements ISerializer<Location, String> {
 

@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.api.service.placeholders;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
-import javax.annotation.Nullable;
 import java.util.function.Function;
 
 /**
@@ -17,8 +17,8 @@ public interface PlayerPlaceholderParser extends Function<SuperiorPlayer, String
      * @param superiorPlayer The player that requested the placeholder.
      * @return The parsed result.
      */
-    @Override
     @Nullable
+    @Override
     String apply(SuperiorPlayer superiorPlayer);
 
 }

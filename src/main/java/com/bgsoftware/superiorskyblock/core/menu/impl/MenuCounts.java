@@ -1,13 +1,15 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
@@ -16,7 +18,6 @@ import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.Material;
 
-import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.List;
@@ -26,8 +27,8 @@ import java.util.function.Function;
 public class MenuCounts extends AbstractPagedMenu<MenuCounts.View, IslandViewArgs, MenuCounts.BlockCount> {
 
     private static final Comparator<MenuCounts.BlockCount> BLOCK_COUNT_COMPARATOR = (o1, o2) -> {
-        Material firstMaterial = Materials.getMaterialSafe(o1.getBlockKey().getGlobalKey(), "BEDROCK");
-        Material secondMaterial = Materials.getMaterialSafe(o2.getBlockKey().getGlobalKey(), "BEDROCK");
+        Material firstMaterial = getMaterialFromKey(o1.getBlockKey());
+        Material secondMaterial = getMaterialFromKey(o2.getBlockKey());
         int compare = plugin.getNMSAlgorithms().compareMaterials(firstMaterial, secondMaterial);
         return compare != 0 ? compare : o1.getBlockKey().compareTo(o2.getBlockKey());
     };
@@ -72,6 +73,13 @@ public class MenuCounts extends AbstractPagedMenu<MenuCounts.View, IslandViewArg
                     .build(island.getBlockCountsAsBigInteger().entrySet(), BLOCK_COUNT_MAPPER);
         }
 
+    }
+
+    private static Material getMaterialFromKey(Key key) {
+        if (key instanceof MaterialKey)
+            return ((MaterialKey) key).getMaterial();
+
+        return EnumHelper.getEnum(Material.class, key.getGlobalKey(), "BEDROCK");
     }
 
     public static class BlockCount {

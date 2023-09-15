@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.upgrades;
 
-import javax.annotation.Nullable;
+import com.bgsoftware.common.annotations.Nullable;
+
 import java.util.List;
 
 public interface Upgrade {

@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.core;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.Location;
 
-import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class IslandPosition {

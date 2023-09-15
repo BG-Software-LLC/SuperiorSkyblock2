@@ -11,8 +11,8 @@ import com.bgsoftware.superiorskyblock.api.service.stackedblocks.InteractionResu
 import com.bgsoftware.superiorskyblock.api.service.stackedblocks.StackedBlocksInteractionService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Either;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
@@ -34,7 +34,6 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
-import java.util.Objects;
 
 public class StackedBlocksInteractionServiceImpl implements StackedBlocksInteractionService, IService {
 
@@ -266,7 +265,7 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
     private static KeyMap<Key> createBlockKeyTransformer() {
         KeyMap<Key> blockKeyTransformer = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
 
-        Material GLOWING_REDSTONE_ORE = Materials.getMaterialSafe("GLOWING_REDSTONE_ORE");
+        Material GLOWING_REDSTONE_ORE = EnumHelper.getEnum(Material.class, "GLOWING_REDSTONE_ORE");
         if (GLOWING_REDSTONE_ORE != null)
             blockKeyTransformer.put(Keys.of(GLOWING_REDSTONE_ORE), Keys.of(Material.REDSTONE_ORE));
 

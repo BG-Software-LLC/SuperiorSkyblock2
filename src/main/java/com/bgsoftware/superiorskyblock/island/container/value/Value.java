@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.container.value;
 
-import org.jetbrains.annotations.Nullable;
+import com.bgsoftware.common.annotations.Nullable;
 
 import java.util.function.Supplier;
 

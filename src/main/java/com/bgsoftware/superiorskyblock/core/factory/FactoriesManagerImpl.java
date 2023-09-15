@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.factory;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.factory.BanksFactory;
@@ -48,7 +49,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.World;
 
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.function.Supplier;

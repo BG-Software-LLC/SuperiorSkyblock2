@@ -1,11 +1,10 @@
 package com.bgsoftware.superiorskyblock.api.island.warps;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
 
 public interface IslandWarp {
 

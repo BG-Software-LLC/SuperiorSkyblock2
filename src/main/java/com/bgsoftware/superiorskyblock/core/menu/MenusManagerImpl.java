@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -30,7 +31,6 @@ import com.bgsoftware.superiorskyblock.core.menu.layout.PagedMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashMap;

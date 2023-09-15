@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -15,8 +16,6 @@ import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-
-import javax.annotation.Nullable;
 
 public class MenuPlayerLanguage extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
 

@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.core.database;
 
-import javax.annotation.Nullable;
+import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
+
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
@@ -109,16 +111,7 @@ public class DatabaseResult {
     }
 
     public <T extends Enum<T>> Optional<T> getEnum(String key, Class<T> enumType) {
-        Optional<String> value = getString(key);
-
-        if (!value.isPresent())
-            return Optional.empty();
-
-        try {
-            return Optional.of(Enum.valueOf(enumType, value.get()));
-        } catch (IllegalArgumentException error) {
-            return Optional.empty();
-        }
+        return getString(key).map(s -> EnumHelper.getEnum(enumType, s));
 
     }
 

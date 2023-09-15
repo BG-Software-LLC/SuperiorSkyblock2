@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v117.dragon;
 
+import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import net.minecraft.core.BlockPos;
@@ -10,7 +11,6 @@ import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.level.Level;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEnderDragon;
-import org.jetbrains.annotations.NotNull;
 
 public class IslandEntityEnderDragon extends EnderDragon {
 

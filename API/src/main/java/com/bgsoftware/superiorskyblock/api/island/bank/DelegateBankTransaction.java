@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.api.island.bank;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.UUID;
 

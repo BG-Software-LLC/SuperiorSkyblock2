@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
@@ -47,6 +48,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -377,7 +379,7 @@ public class SettingsContainer {
                     World.Environment environment = World.Environment.valueOf(env.toUpperCase(Locale.ENGLISH));
                     loadGenerator(config, "default-values.generator." + env, environment.ordinal());
                 } catch (Exception error) {
-                    Log.error(error, "An unexpected error occurred while loading default generator values for ", env + ":");
+                    Log.errorFromFile(error, "config.yml", "An unexpected error occurred while loading default generator values for ", env + ":");
                 }
             }
         } else {
@@ -428,11 +430,11 @@ public class SettingsContainer {
 
                             items.addTag(itemCompound);
                         } catch (Exception error) {
-                            Log.error(error, "An unexpected error occurred while loading container item for ", slot + ":");
+                            Log.errorFromFile(error, "config.yml", "An unexpected error occurred while loading container item for ", slot + ":");
                         }
                     }
                 } catch (IllegalArgumentException ex) {
-                    Log.warn("Invalid container type ", container + ", skipping...");
+                    Log.warnFromFile("config.yml", "Invalid container type ", container + ", skipping...");
                 }
             }
         }
@@ -488,7 +490,7 @@ public class SettingsContainer {
                     islandPreviewLocations.put(schematic.toLowerCase(Locale.ENGLISH), Serializers.LOCATION_SERIALIZER
                             .deserialize(config.getString("preview-islands." + schematic)));
                 } catch (Exception error) {
-                    Log.warn("Cannot deserialize island preview for ", schematic, ", skipping...");
+                    Log.warnFromFile("config.yml", "Cannot deserialize island preview for ", schematic, ", skipping...");
                 }
             }
         }
@@ -502,13 +504,9 @@ public class SettingsContainer {
         recalcTaskTimeout = config.getLong("recalc-task-timeout");
         autoLanguageDetection = config.getBoolean("auto-language-detection", true);
         autoUncoopWhenAlone = config.getBoolean("auto-uncoop-when-alone", false);
-        TopIslandMembersSorting islandTopMembersSorting;
-        try {
-            islandTopMembersSorting = TopIslandMembersSorting.valueOf(config.getString("island-top-members-sorting").toUpperCase(Locale.ENGLISH));
-        } catch (IllegalArgumentException error) {
-            islandTopMembersSorting = TopIslandMembersSorting.NAMES;
-        }
-        this.islandTopMembersSorting = islandTopMembersSorting;
+        islandTopMembersSorting = Optional.ofNullable(EnumHelper.getEnum(TopIslandMembersSorting.class,
+                        config.getString("island-top-members-sorting").toUpperCase(Locale.ENGLISH)))
+                .orElse(TopIslandMembersSorting.NAMES);
         bossBarLimit = config.getInt("bossbar-limit", 1);
         deleteUnsafeWarps = config.getBoolean("delete-unsafe-warps", true);
         playerRespawnActions = new LinkedList<>();
@@ -516,7 +514,7 @@ public class SettingsContainer {
             try {
                 playerRespawnActions.add(RespawnAction.getByName(respawnAction));
             } catch (NullPointerException error) {
-                Log.warn("Invalid respawn action ", respawnAction + ", skipping...");
+                Log.warnFromFile("config.yml", "Invalid respawn action ", respawnAction + ", skipping...");
             }
         });
         blockCountsSaveThreshold = BigInteger.valueOf(config.getInt("block-counts-save-threshold", 100));
@@ -555,7 +553,7 @@ public class SettingsContainer {
                 cfg.set("safe-blocks", safeBlocks);
                 cfg.save(file);
             } catch (IOException error) {
-                Log.error(error, "An unexpected error occurred while saving safe blocks into file:");
+                Log.errorFromFile(error, "config.yml", "An unexpected error occurred while saving safe blocks into file:");
             }
         }
 

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.wrappers;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
@@ -19,7 +20,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;

@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3.dragon;
 
+import com.bgsoftware.common.annotations.Nullable;
 import net.minecraft.server.v1_16_R3.EnderDragonBattle;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.WorldServer;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
