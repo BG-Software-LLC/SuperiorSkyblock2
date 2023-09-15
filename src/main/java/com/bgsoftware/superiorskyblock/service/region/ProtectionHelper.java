@@ -1,10 +1,9 @@
 package com.bgsoftware.superiorskyblock.service.region;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-
-import javax.annotation.Nullable;
 
 public class ProtectionHelper {
 

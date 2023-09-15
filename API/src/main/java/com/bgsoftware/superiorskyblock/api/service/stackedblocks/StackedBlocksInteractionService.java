@@ -1,11 +1,10 @@
 package com.bgsoftware.superiorskyblock.api.service.stackedblocks;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
 
 public interface StackedBlocksInteractionService {
 

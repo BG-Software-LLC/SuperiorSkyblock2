@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.core;
 
+import com.bgsoftware.common.annotations.Nullable;
 import org.bukkit.inventory.EquipmentSlot;
 
-import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 public enum PlayerHand {

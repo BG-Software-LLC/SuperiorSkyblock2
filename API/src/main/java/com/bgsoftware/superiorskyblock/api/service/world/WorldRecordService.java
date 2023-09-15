@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.service.world;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import org.bukkit.Location;
@@ -7,8 +8,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-
-import javax.annotation.Nullable;
 
 public interface WorldRecordService {
 
