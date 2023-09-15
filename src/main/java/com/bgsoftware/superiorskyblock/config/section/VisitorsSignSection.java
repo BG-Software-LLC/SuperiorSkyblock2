@@ -1,34 +1,28 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
-import com.bgsoftware.superiorskyblock.config.SettingsContainer;
+import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 
-public class VisitorsSignSection implements SettingsManager.VisitorsSign {
-
-    private final SettingsContainer container;
-
-    public VisitorsSignSection(SettingsContainer container) {
-        this.container = container;
-    }
+public class VisitorsSignSection extends SettingsContainerHolder implements SettingsManager.VisitorsSign {
 
     @Override
     public boolean isRequiredForVisit() {
-        return this.container.visitorsSignRequiredForVisit;
+        return getContainer().visitorsSignRequiredForVisit;
     }
 
     @Override
     public String getLine() {
-        return this.container.visitorsSignLine;
+        return getContainer().visitorsSignLine;
     }
 
     @Override
     public String getActive() {
-        return this.container.visitorsSignActive;
+        return getContainer().visitorsSignActive;
     }
 
     @Override
     public String getInactive() {
-        return this.container.visitorsSignInactive;
+        return getContainer().visitorsSignInactive;
     }
 
 }

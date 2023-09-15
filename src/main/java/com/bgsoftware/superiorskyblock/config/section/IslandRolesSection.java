@@ -1,20 +1,14 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
-import com.bgsoftware.superiorskyblock.config.SettingsContainer;
+import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 import org.bukkit.configuration.ConfigurationSection;
 
-public class IslandRolesSection implements SettingsManager.IslandRoles {
-
-    private final SettingsContainer container;
-
-    public IslandRolesSection(SettingsContainer container) {
-        this.container = container;
-    }
+public class IslandRolesSection extends SettingsContainerHolder implements SettingsManager.IslandRoles {
 
     @Override
     public ConfigurationSection getSection() {
-        return this.container.islandRolesSection;
+        return getContainer().islandRolesSection;
     }
 
 }

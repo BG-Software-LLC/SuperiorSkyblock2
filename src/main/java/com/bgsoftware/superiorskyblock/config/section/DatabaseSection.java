@@ -1,73 +1,67 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
-import com.bgsoftware.superiorskyblock.config.SettingsContainer;
+import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 
-public class DatabaseSection implements SettingsManager.Database {
-
-    private final SettingsContainer container;
-
-    public DatabaseSection(SettingsContainer container) {
-        this.container = container;
-    }
+public class DatabaseSection extends SettingsContainerHolder implements SettingsManager.Database {
 
     @Override
     public String getType() {
-        return this.container.databaseType;
+        return getContainer().databaseType;
     }
 
     @Override
     public boolean isBackup() {
-        return this.container.databaseBackup;
+        return getContainer().databaseBackup;
     }
 
     @Override
     public String getAddress() {
-        return this.container.databaseMySQLAddress;
+        return getContainer().databaseMySQLAddress;
     }
 
     @Override
     public int getPort() {
-        return this.container.databaseMySQLPort;
+        return getContainer().databaseMySQLPort;
     }
 
     @Override
     public String getDBName() {
-        return this.container.databaseMySQLDBName;
+        return getContainer().databaseMySQLDBName;
     }
 
     @Override
     public String getUsername() {
-        return this.container.databaseMySQLUsername;
+        return getContainer().databaseMySQLUsername;
     }
 
     @Override
     public String getPassword() {
-        return this.container.databaseMySQLPassword;
+        return getContainer().databaseMySQLPassword;
     }
 
     @Override
     public String getPrefix() {
-        return this.container.databaseMySQLPrefix;
+        return getContainer().databaseMySQLPrefix;
     }
 
     @Override
     public boolean hasSSL() {
-        return this.container.databaseMySQLSSL;
+        return getContainer().databaseMySQLSSL;
     }
 
     @Override
     public boolean hasPublicKeyRetrieval() {
-        return this.container.databaseMySQLPublicKeyRetrieval;
+        return getContainer().databaseMySQLPublicKeyRetrieval;
     }
 
     @Override
     public long getWaitTimeout() {
-        return this.container.databaseMySQLWaitTimeout;
+        return getContainer().databaseMySQLWaitTimeout;
     }
 
     @Override
     public long getMaxLifetime() {
-        return this.container.databaseMySQLMaxLifetime;
+        return getContainer().databaseMySQLMaxLifetime;
     }
 }

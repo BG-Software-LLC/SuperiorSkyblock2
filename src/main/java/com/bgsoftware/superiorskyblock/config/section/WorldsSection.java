@@ -2,33 +2,27 @@ package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
-import com.bgsoftware.superiorskyblock.config.SettingsContainer;
+import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 import org.bukkit.World;
 
-public class WorldsSection implements SettingsManager.Worlds {
-
-    private final SettingsContainer container;
+public class WorldsSection extends SettingsContainerHolder implements SettingsManager.Worlds {
     private final Normal normal = new NormalSection();
     private final Nether nether = new NetherSection();
     private final End end = new EndSection();
 
-    public WorldsSection(SettingsContainer container) {
-        this.container = container;
-    }
-
     @Override
     public World.Environment getDefaultWorld() {
-        return this.container.defaultWorldEnvironment;
+        return getContainer().defaultWorldEnvironment;
     }
 
     @Override
     public String getWorldName() {
-        return this.container.islandWorldName;
+        return getContainer().islandWorldName;
     }
 
     @Override
     public String getDefaultWorldName() {
-        return this.container.defaultWorldName;
+        return getContainer().defaultWorldName;
     }
 
     @Override
@@ -48,29 +42,29 @@ public class WorldsSection implements SettingsManager.Worlds {
 
     @Override
     public String getDifficulty() {
-        return this.container.worldsDifficulty;
+        return getContainer().worldsDifficulty;
     }
 
     private class NormalSection implements Normal {
 
         @Override
         public boolean isEnabled() {
-            return container.normalWorldEnabled;
+            return getContainer().normalWorldEnabled;
         }
 
         @Override
         public boolean isUnlocked() {
-            return container.normalWorldUnlocked;
+            return getContainer().normalWorldUnlocked;
         }
 
         @Override
         public boolean isSchematicOffset() {
-            return container.normalSchematicOffset;
+            return getContainer().normalSchematicOffset;
         }
 
         @Override
         public String getBiome() {
-            return container.normalBiome;
+            return getContainer().normalBiome;
         }
     }
 
@@ -78,27 +72,27 @@ public class WorldsSection implements SettingsManager.Worlds {
 
         @Override
         public boolean isEnabled() {
-            return container.netherWorldEnabled;
+            return getContainer().netherWorldEnabled;
         }
 
         @Override
         public boolean isUnlocked() {
-            return container.netherWorldUnlocked;
+            return getContainer().netherWorldUnlocked;
         }
 
         @Override
         public String getName() {
-            return container.netherWorldName;
+            return getContainer().netherWorldName;
         }
 
         @Override
         public boolean isSchematicOffset() {
-            return container.netherSchematicOffset;
+            return getContainer().netherSchematicOffset;
         }
 
         @Override
         public String getBiome() {
-            return container.netherBiome;
+            return getContainer().netherBiome;
         }
     }
 
@@ -106,37 +100,37 @@ public class WorldsSection implements SettingsManager.Worlds {
 
         @Override
         public boolean isEnabled() {
-            return container.endWorldEnabled;
+            return getContainer().endWorldEnabled;
         }
 
         @Override
         public boolean isUnlocked() {
-            return container.endWorldUnlocked;
+            return getContainer().endWorldUnlocked;
         }
 
         @Override
         public String getName() {
-            return container.endWorldName;
+            return getContainer().endWorldName;
         }
 
         @Override
         public boolean isSchematicOffset() {
-            return container.endSchematicOffset;
+            return getContainer().endSchematicOffset;
         }
 
         @Override
         public String getBiome() {
-            return container.endBiome;
+            return getContainer().endBiome;
         }
 
         @Override
         public boolean isDragonFight() {
-            return container.endDragonFightEnabled;
+            return getContainer().endDragonFightEnabled;
         }
 
         @Override
         public BlockOffset getPortalOffset() {
-            return container.endDragonFightPortalOffset;
+            return getContainer().endDragonFightPortalOffset;
         }
     }
 

@@ -1,25 +1,19 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
-import com.bgsoftware.superiorskyblock.config.SettingsContainer;
+import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import org.bukkit.event.inventory.InventoryType;
 
-public class DefaultContainersSection implements SettingsManager.DefaultContainers {
-
-    private final SettingsContainer container;
-
-    public DefaultContainersSection(SettingsContainer container) {
-        this.container = container;
-    }
+public class DefaultContainersSection extends SettingsContainerHolder implements SettingsManager.DefaultContainers {
 
     @Override
     public boolean isEnabled() {
-        return this.container.defaultContainersEnabled;
+        return getContainer().defaultContainersEnabled;
     }
 
     public ListTag getContents(InventoryType inventoryType) {
-        return this.container.defaultContainersContents.get(inventoryType);
+        return getContainer().defaultContainersContents.get(inventoryType);
     }
 
 }

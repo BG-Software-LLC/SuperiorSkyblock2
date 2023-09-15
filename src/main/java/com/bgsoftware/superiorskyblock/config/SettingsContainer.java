@@ -379,7 +379,7 @@ public class SettingsContainer {
                     World.Environment environment = World.Environment.valueOf(env.toUpperCase(Locale.ENGLISH));
                     loadGenerator(config, "default-values.generator." + env, environment.ordinal());
                 } catch (Exception error) {
-                    Log.error(error, "An unexpected error occurred while loading default generator values for ", env + ":");
+                    Log.errorFromFile(error, "config.yml", "An unexpected error occurred while loading default generator values for ", env + ":");
                 }
             }
         } else {
@@ -430,11 +430,11 @@ public class SettingsContainer {
 
                             items.addTag(itemCompound);
                         } catch (Exception error) {
-                            Log.error(error, "An unexpected error occurred while loading container item for ", slot + ":");
+                            Log.errorFromFile(error, "config.yml", "An unexpected error occurred while loading container item for ", slot + ":");
                         }
                     }
                 } catch (IllegalArgumentException ex) {
-                    Log.warn("Invalid container type ", container + ", skipping...");
+                    Log.warnFromFile("config.yml", "Invalid container type ", container + ", skipping...");
                 }
             }
         }
@@ -490,7 +490,7 @@ public class SettingsContainer {
                     islandPreviewLocations.put(schematic.toLowerCase(Locale.ENGLISH), Serializers.LOCATION_SERIALIZER
                             .deserialize(config.getString("preview-islands." + schematic)));
                 } catch (Exception error) {
-                    Log.warn("Cannot deserialize island preview for ", schematic, ", skipping...");
+                    Log.warnFromFile("config.yml", "Cannot deserialize island preview for ", schematic, ", skipping...");
                 }
             }
         }
@@ -514,7 +514,7 @@ public class SettingsContainer {
             try {
                 playerRespawnActions.add(RespawnAction.getByName(respawnAction));
             } catch (NullPointerException error) {
-                Log.warn("Invalid respawn action ", respawnAction + ", skipping...");
+                Log.warnFromFile("config.yml", "Invalid respawn action ", respawnAction + ", skipping...");
             }
         });
         blockCountsSaveThreshold = BigInteger.valueOf(config.getInt("block-counts-save-threshold", 100));
@@ -553,7 +553,7 @@ public class SettingsContainer {
                 cfg.set("safe-blocks", safeBlocks);
                 cfg.save(file);
             } catch (IOException error) {
-                Log.error(error, "An unexpected error occurred while saving safe blocks into file:");
+                Log.errorFromFile(error, "config.yml", "An unexpected error occurred while saving safe blocks into file:");
             }
         }
 

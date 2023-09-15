@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.config.section.AFKIntegrationsSection;
 import com.bgsoftware.superiorskyblock.config.section.DatabaseSection;
 import com.bgsoftware.superiorskyblock.config.section.DefaultContainersSection;
 import com.bgsoftware.superiorskyblock.config.section.DefaultValuesSection;
+import com.bgsoftware.superiorskyblock.config.section.GlobalSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandChestsSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandNamesSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandRolesSection;
@@ -44,23 +45,26 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
             "default-values.role-limits", "stacked-blocks.limits", "default-values.generator"
     };
 
-    private final SettingsContainer container;
-    private final Database database;
-    private final DefaultValues defaultValues;
-    private final StackedBlocks stackedBlocks;
-    private final IslandRoles islandRoles;
-    private final VisitorsSign visitorsSign;
-    private final Worlds worlds;
-    private final Spawn spawn;
-    private final VoidTeleport voidTeleport;
-    private final IslandNames islandNames;
-    private final AFKIntegrations afkIntegrations;
-    private final DefaultContainersSection defaultContainers;
-    private final IslandChests islandChests;
+    private final GlobalSection global = new GlobalSection();
+    private final DatabaseSection database = new DatabaseSection();
+    private final DefaultValuesSection defaultValues = new DefaultValuesSection();
+    private final StackedBlocksSection stackedBlocks = new StackedBlocksSection();
+    private final IslandRolesSection islandRoles = new IslandRolesSection();
+    private final VisitorsSignSection visitorsSign = new VisitorsSignSection();
+    private final WorldsSection worlds = new WorldsSection();
+    private final SpawnSection spawn = new SpawnSection();
+    private final VoidTeleportSection voidTeleport = new VoidTeleportSection();
+    private final IslandNamesSection islandNames = new IslandNamesSection();
+    private final AFKIntegrationsSection afkIntegrations = new AFKIntegrationsSection();
+    private final DefaultContainersSection defaultContainers = new DefaultContainersSection();
+    private final IslandChestsSection islandChests = new IslandChestsSection();
 
-    public SettingsManagerImpl(SuperiorSkyblockPlugin plugin) throws ManagerLoadException {
+    public SettingsManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
+    }
 
+    @Override
+    public void loadData() throws ManagerLoadException {
         File file = new File(plugin.getDataFolder(), "config.yml");
 
         if (!file.exists())
@@ -76,29 +80,12 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
             Log.error(error, file, "An unexpected error occurred while loading config file:");
         }
 
-        this.container = new SettingsContainer(plugin, cfg);
-        this.database = new DatabaseSection(this.container);
-        this.defaultValues = new DefaultValuesSection(this.container);
-        this.stackedBlocks = new StackedBlocksSection(this.container);
-        this.islandRoles = new IslandRolesSection(this.container);
-        this.visitorsSign = new VisitorsSignSection(this.container);
-        this.worlds = new WorldsSection(this.container);
-        this.spawn = new SpawnSection(this.container);
-        this.voidTeleport = new VoidTeleportSection(this.container);
-        this.islandNames = new IslandNamesSection(this.container);
-        this.afkIntegrations = new AFKIntegrationsSection(this.container);
-        this.defaultContainers = new DefaultContainersSection(this.container);
-        this.islandChests = new IslandChestsSection(this.container);
-    }
-
-    @Override
-    public void loadData() {
-        throw new UnsupportedOperationException("Not supported for SettingsHandler");
+        loadContainerFromConfig(cfg);
     }
 
     @Override
     public long getCalcInterval() {
-        return this.container.calcInterval;
+        return this.global.getCalcInterval();
     }
 
     @Override
@@ -108,12 +95,12 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public String getIslandCommand() {
-        return this.container.islandCommand;
+        return this.global.getIslandCommand();
     }
 
     @Override
     public int getMaxIslandSize() {
-        return this.container.maxIslandSize;
+        return this.global.getMaxIslandSize();
     }
 
     @Override
@@ -123,12 +110,12 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public int getIslandHeight() {
-        return this.container.islandsHeight;
+        return this.global.getIslandHeight();
     }
 
     @Override
     public boolean isWorldBorders() {
-        return this.container.worldBordersEnabled;
+        return this.global.isWorldBorders();
     }
 
     @Override
@@ -138,22 +125,22 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public String getIslandLevelFormula() {
-        return this.container.islandLevelFormula;
+        return this.global.getIslandLevelFormula();
     }
 
     @Override
     public boolean isRoundedIslandLevels() {
-        return this.container.roundedIslandLevel;
+        return this.global.isRoundedIslandLevels();
     }
 
     @Override
     public String getIslandTopOrder() {
-        return this.container.islandTopOrder;
+        return this.global.getIslandTopOrder();
     }
 
     @Override
     public boolean isCoopMembers() {
-        return this.container.coopMembers;
+        return this.global.isCoopMembers();
     }
 
     @Override
@@ -163,12 +150,12 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public String getSignWarpLine() {
-        return this.container.signWarpLine;
+        return this.global.getSignWarpLine();
     }
 
     @Override
     public List<String> getSignWarp() {
-        return this.container.signWarp;
+        return this.global.getSignWarp();
     }
 
     @Override
@@ -193,72 +180,72 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public List<String> getInteractables() {
-        return this.container.interactables;
+        return this.global.getInteractables();
     }
 
     @Override
     public Collection<Key> getSafeBlocks() {
-        return this.container.safeBlocks;
+        return this.global.getSafeBlocks();
     }
 
     @Override
     public boolean isVisitorsDamage() {
-        return this.container.visitorsDamage;
+        return this.global.isVisitorsDamage();
     }
 
     @Override
     public boolean isCoopDamage() {
-        return this.container.coopDamage;
+        return this.global.isCoopDamage();
     }
 
     @Override
     public int getDisbandCount() {
-        return this.container.disbandCount;
+        return this.global.getDisbandCount();
     }
 
     @Override
     public boolean isIslandTopIncludeLeader() {
-        return this.container.islandTopIncludeLeader;
+        return this.global.isIslandTopIncludeLeader();
     }
 
     @Override
     public Map<String, String> getDefaultPlaceholders() {
-        return this.container.defaultPlaceholders;
+        return this.global.getDefaultPlaceholders();
     }
 
     @Override
     public boolean isBanConfirm() {
-        return this.container.banConfirm;
+        return this.global.isBanConfirm();
     }
 
     @Override
     public boolean isDisbandConfirm() {
-        return this.container.disbandConfirm;
+        return this.global.isDisbandConfirm();
     }
 
     @Override
     public boolean isKickConfirm() {
-        return this.container.kickConfirm;
+        return this.global.isKickConfirm();
     }
 
     @Override
     public boolean isLeaveConfirm() {
-        return this.container.leaveConfirm;
+        return this.global.isLeaveConfirm();
     }
 
     @Override
     public String getSpawnersProvider() {
-        return this.container.spawnersProvider;
+        return this.global.getSpawnersProvider();
     }
 
     @Override
     public String getStackedBlocksProvider() {
-        return this.container.stackedBlocksProvider;
+        return this.global.getStackedBlocksProvider();
     }
 
     @Override
     public boolean isDisbandInventoryClear() {
-        return this.container.disbandInventoryClear;
+        return this.global.isDisbandInventoryClear();
     }
 
     @Override
@@ -268,32 +255,32 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public boolean isTeleportOnJoin() {
-        return this.container.teleportOnJoin;
+        return this.global.isTeleportOnJoin();
     }
 
     @Override
     public boolean isTeleportOnKick() {
-        return this.container.teleportOnKick;
+        return this.global.isTeleportOnKick();
     }
 
     @Override
     public boolean isClearOnJoin() {
-        return this.container.clearOnJoin;
+        return this.global.isClearOnJoin();
     }
 
     @Override
     public boolean isRateOwnIsland() {
-        return this.container.rateOwnIsland;
+        return this.global.isRateOwnIsland();
     }
 
     @Override
     public List<String> getDefaultSettings() {
-        return this.container.defaultSettings;
+        return this.global.getDefaultSettings();
     }
 
     @Override
     public boolean isDisableRedstoneOffline() {
-        return this.container.disableRedstoneOffline;
+        return this.global.isDisableRedstoneOffline();
     }
 
     @Override
@@ -303,42 +290,42 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public Map<String, Pair<Integer, String>> getCommandsCooldown() {
-        return this.container.commandsCooldown;
+        return this.global.getCommandsCooldown();
     }
 
     @Override
     public long getUpgradeCooldown() {
-        return this.container.upgradeCooldown;
+        return this.global.getUpgradeCooldown();
     }
 
     @Override
     public String getNumbersFormat() {
-        return this.container.numberFormat;
+        return this.global.getNumbersFormat();
     }
 
     @Override
     public String getDateFormat() {
-        return this.container.dateFormat;
+        return this.global.getDateFormat();
     }
 
     @Override
     public boolean isSkipOneItemMenus() {
-        return this.container.skipOneItemMenus;
+        return this.global.isSkipOneItemMenus();
     }
 
     @Override
     public boolean isTeleportOnPvPEnable() {
-        return this.container.teleportOnPVPEnable;
+        return this.global.isTeleportOnPvPEnable();
     }
 
     @Override
     public boolean isImmuneToPvPWhenTeleport() {
-        return this.container.immuneToPVPWhenTeleport;
+        return this.global.isImmuneToPvPWhenTeleport();
     }
 
     @Override
     public List<String> getBlockedVisitorsCommands() {
-        return this.container.blockedVisitorsCommands;
+        return this.global.getBlockedVisitorsCommands();
     }
 
     @Override
@@ -348,137 +335,137 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public List<String> getDefaultSign() {
-        return this.container.defaultSignLines;
+        return this.global.getDefaultSign();
     }
 
     @Override
     public Map<String, List<String>> getEventCommands() {
-        return this.container.eventCommands;
+        return this.global.getEventCommands();
     }
 
     @Override
     public long getWarpsWarmup() {
-        return this.container.warpsWarmup;
+        return this.global.getWarpsWarmup();
     }
 
     @Override
     public long getHomeWarmup() {
-        return this.container.homeWarmup;
+        return this.global.getHomeWarmup();
     }
 
     @Override
     public boolean isLiquidUpdate() {
-        return this.container.liquidUpdate;
+        return this.global.isLiquidUpdate();
     }
 
     @Override
     public boolean isLightsUpdate() {
-        return this.container.lightsUpdate;
+        return this.global.isLightsUpdate();
     }
 
     @Override
     public List<String> getPvPWorlds() {
-        return this.container.pvpWorlds;
+        return this.global.getPvPWorlds();
     }
 
     @Override
     public boolean isStopLeaving() {
-        return this.container.stopLeaving;
+        return this.global.isStopLeaving();
     }
 
     @Override
     public boolean isValuesMenu() {
-        return this.container.valuesMenu;
+        return this.global.isValuesMenu();
     }
 
     @Override
     public List<String> getCropsToGrow() {
-        return this.container.cropsToGrow;
+        return this.global.getCropsToGrow();
     }
 
     @Override
     public int getCropsInterval() {
-        return this.container.cropsInterval;
+        return this.global.getCropsInterval();
     }
 
     @Override
     public boolean isOnlyBackButton() {
-        return this.container.onlyBackButton;
+        return this.global.isOnlyBackButton();
     }
 
     @Override
     public boolean isBuildOutsideIsland() {
-        return this.container.buildOutsideIsland;
+        return this.global.isBuildOutsideIsland();
     }
 
     @Override
     public String getDefaultLanguage() {
-        return this.container.defaultLanguage;
+        return this.global.getDefaultLanguage();
     }
 
     @Override
     public boolean isDefaultWorldBorder() {
-        return this.container.defaultWorldBorder;
+        return this.global.isDefaultWorldBorder();
     }
 
     @Override
     public boolean isDefaultStackedBlocks() {
-        return this.container.defaultBlocksStacker;
+        return this.global.isDefaultStackedBlocks();
     }
 
     @Override
     public boolean isDefaultToggledPanel() {
-        return this.container.defaultToggledPanel;
+        return this.global.isDefaultToggledPanel();
     }
 
     @Override
     public boolean isDefaultIslandFly() {
-        return this.container.defaultIslandFly;
+        return this.global.isDefaultIslandFly();
     }
 
     @Override
     public String getDefaultBorderColor() {
-        return this.container.defaultBorderColor;
+        return this.global.getDefaultBorderColor();
     }
 
     @Override
     public boolean isObsidianToLava() {
-        return this.container.obsidianToLava;
+        return this.global.isObsidianToLava();
     }
 
     @Override
     public BlockValuesManager.SyncWorthStatus getSyncWorth() {
-        return this.container.syncWorth;
+        return this.global.getSyncWorth();
     }
 
     @Override
     public boolean isNegativeWorth() {
-        return this.container.negativeWorth;
+        return this.global.isNegativeWorth();
     }
 
     @Override
     public boolean isNegativeLevel() {
-        return this.container.negativeLevel;
+        return this.global.isNegativeLevel();
     }
 
     @Override
     public List<String> getDisabledEvents() {
-        return this.container.disabledEvents;
+        return this.global.getDisabledEvents();
     }
 
     @Override
     public List<String> getDisabledCommands() {
-        return this.container.disabledCommands;
+        return this.global.getDisabledCommands();
     }
 
     @Override
     public List<String> getDisabledHooks() {
-        return this.container.disabledHooks;
+        return this.global.getDisabledHooks();
     }
 
     @Override
     public boolean isSchematicNameArgument() {
-        return this.container.schematicNameArgument;
+        return this.global.isSchematicNameArgument();
     }
 
     @Override
@@ -488,92 +475,92 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public Map<String, List<String>> getCommandAliases() {
-        return this.container.commandAliases;
+        return this.global.getCommandAliases();
     }
 
     @Override
     public Set<Key> getValuableBlocks() {
-        return this.container.valuableBlocks;
+        return this.global.getValuableBlocks();
     }
 
     @Override
     public Map<String, Location> getPreviewIslands() {
-        return this.container.islandPreviewLocations;
+        return this.global.getPreviewIslands();
     }
 
     @Override
     public boolean isTabCompleteHideVanished() {
-        return this.container.tabCompleteHideVanished;
+        return this.global.isTabCompleteHideVanished();
     }
 
     @Override
     public boolean isDropsUpgradePlayersMultiply() {
-        return this.container.dropsUpgradePlayersMultiply;
+        return this.global.isDropsUpgradePlayersMultiply();
     }
 
     @Override
     public long getProtectedMessageDelay() {
-        return this.container.protectedMessageDelay;
+        return this.global.getProtectedMessageDelay();
     }
 
     @Override
     public boolean isWarpCategories() {
-        return this.container.warpCategories;
+        return this.global.isWarpCategories();
     }
 
     @Override
     public boolean isPhysicsListener() {
-        return this.container.physicsListener;
+        return this.global.isPhysicsListener();
     }
 
     @Override
     public double getChargeOnWarp() {
-        return this.container.chargeOnWarp;
+        return this.global.getChargeOnWarp();
     }
 
     @Override
     public boolean isPublicWarps() {
-        return this.container.publicWarps;
+        return this.global.isPublicWarps();
     }
 
     @Override
     public long getRecalcTaskTimeout() {
-        return this.container.recalcTaskTimeout;
+        return this.global.getRecalcTaskTimeout();
     }
 
     @Override
     public boolean isAutoLanguageDetection() {
-        return this.container.autoLanguageDetection;
+        return this.global.isAutoLanguageDetection();
     }
 
     @Override
     public boolean isAutoUncoopWhenAlone() {
-        return this.container.autoUncoopWhenAlone;
+        return this.global.isAutoUncoopWhenAlone();
     }
 
     @Override
     public TopIslandMembersSorting getTopIslandMembersSorting() {
-        return this.container.islandTopMembersSorting;
+        return this.global.getTopIslandMembersSorting();
     }
 
     @Override
     public int getBossbarLimit() {
-        return this.container.bossBarLimit;
+        return this.global.getBossbarLimit();
     }
 
     @Override
     public boolean getDeleteUnsafeWarps() {
-        return this.container.deleteUnsafeWarps;
+        return this.global.getDeleteUnsafeWarps();
     }
 
     @Override
     public List<RespawnAction> getPlayerRespawn() {
-        return this.container.playerRespawnActions;
+        return this.global.getPlayerRespawn();
     }
 
     @Override
     public BigInteger getBlockCountsSaveThreshold() {
-        return this.container.blockCountsSaveThreshold;
+        return this.global.getBlockCountsSaveThreshold();
     }
 
     public void updateValue(String path, Object value) throws IOException {
@@ -591,10 +578,27 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         cfg.save(file);
 
         try {
-            plugin.setSettings(new SettingsManagerImpl(plugin));
+            loadContainerFromConfig(cfg);
         } catch (ManagerLoadException ex) {
             ManagerLoadException.handle(ex);
         }
+    }
+
+    private void loadContainerFromConfig(YamlConfiguration cfg) throws ManagerLoadException {
+        SettingsContainer container = new SettingsContainer(plugin, cfg);
+        this.global.setContainer(container);
+        this.database.setContainer(container);
+        this.defaultValues.setContainer(container);
+        this.stackedBlocks.setContainer(container);
+        this.islandRoles.setContainer(container);
+        this.visitorsSign.setContainer(container);
+        this.worlds.setContainer(container);
+        this.spawn.setContainer(container);
+        this.voidTeleport.setContainer(container);
+        this.islandNames.setContainer(container);
+        this.afkIntegrations.setContainer(container);
+        this.defaultContainers.setContainer(container);
+        this.islandChests.setContainer(container);
     }
 
     private void convertData(YamlConfiguration cfg) {
