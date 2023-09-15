@@ -3,10 +3,11 @@ package com.bgsoftware.superiorskyblock.service.world;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBlockFlags;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.service.world.RecordResult;
-import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlag;
+import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
@@ -31,7 +32,8 @@ import java.util.EnumMap;
 
 public class WorldRecordServiceImpl implements WorldRecordService, IService {
 
-    private static final WorldRecordFlag REGULAR_RECORD_FLAGS = WorldRecordFlag.SAVE_BLOCK_COUNT.and(WorldRecordFlag.DIRTY_CHUNK);
+    @WorldRecordFlags
+    private static final int REGULAR_RECORD_FLAGS = WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS;
     private static final BlockFace[] NEARBY_BLOCKS = new BlockFace[]{
             BlockFace.UP, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH, BlockFace.EAST
     };
@@ -48,18 +50,17 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
     }
 
     @Override
-    public RecordResult recordBlockPlace(Block block, int blockCount, @Nullable BlockState oldBlockState, WorldRecordFlag recordFlag) {
+    public RecordResult recordBlockPlace(Block block, int blockCount, @Nullable BlockState oldBlockState,
+                                         @WorldRecordFlags int flags) {
         Preconditions.checkNotNull(block, "block cannot be null");
-        Preconditions.checkNotNull(recordFlag, "recordFlag cannot be null");
-        return recordBlockPlace(Keys.of(block), block.getLocation(), blockCount, oldBlockState, recordFlag);
+        return recordBlockPlace(Keys.of(block), block.getLocation(), blockCount, oldBlockState, flags);
     }
 
     @Override
     public RecordResult recordBlockPlace(Key blockKey, Location blockLocation, int blockCount,
-                                         @Nullable BlockState oldBlockState, WorldRecordFlag recordFlag) {
+                                         @Nullable BlockState oldBlockState, @WorldRecordFlags int flags) {
         Preconditions.checkNotNull(blockKey, "blockKey cannot be null");
         Preconditions.checkNotNull(blockLocation, "blockLocation cannot be null");
-        Preconditions.checkNotNull(recordFlag, "recordFlag cannot be null");
         Preconditions.checkArgument(blockLocation.getWorld() != null, "blockLocation's world cannot be null");
 
         Island island = plugin.getGrid().getIslandAt(blockLocation);
@@ -67,15 +68,15 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
         if (island == null)
             return RecordResult.NOT_IN_ISLAND;
 
-        recordBlockPlaceInternal(island, blockKey, blockLocation, blockCount, oldBlockState, recordFlag);
+        recordBlockPlaceInternal(island, blockKey, blockLocation, blockCount, oldBlockState, flags);
         return RecordResult.SUCCESS;
     }
 
     @Override
-    public RecordResult recordMultiBlocksPlace(KeyMap<Integer> blockCounts, Location location, WorldRecordFlag recordFlag) {
+    public RecordResult recordMultiBlocksPlace(KeyMap<Integer> blockCounts, Location location,
+                                               @WorldRecordFlags int flags) {
         Preconditions.checkNotNull(blockCounts, "blockCounts cannot be null");
         Preconditions.checkNotNull(location, "location cannot be null");
-        Preconditions.checkNotNull(recordFlag, "recordFlag cannot be null");
         Preconditions.checkArgument(location.getWorld() != null, "location's world cannot be null");
 
         if (blockCounts.isEmpty())
@@ -85,9 +86,14 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
         if (island == null)
             return RecordResult.NOT_IN_ISLAND;
 
-        island.handleBlocksPlace(blockCounts);
+        boolean saveBlockCounts = (flags & WorldRecordFlags.SAVE_BLOCK_COUNT) != 0;
+        boolean dirtyChunks = (flags & WorldRecordFlags.DIRTY_CHUNKS) != 0;
 
-        if (recordFlag.has(WorldRecordFlag.DIRTY_CHUNK)) {
+        int blockPlaceFlags = IslandBlockFlags.UPDATE_LAST_TIME_STATUS |
+                (saveBlockCounts ? IslandBlockFlags.SAVE_BLOCK_COUNTS : 0);
+        island.handleBlocksPlace(blockCounts, blockPlaceFlags);
+
+        if (dirtyChunks) {
             island.markChunkDirty(location.getWorld(), location.getBlockX() >> 4,
                     location.getBlockZ() >> 4, true);
         }
@@ -96,7 +102,10 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
     }
 
     private void recordBlockPlaceInternal(Island island, Key blockKey, Location blockLocation, int blockCount,
-                                          @Nullable BlockState oldBlockState, WorldRecordFlag recordFlag) {
+                                          @Nullable BlockState oldBlockState, @WorldRecordFlags int flags) {
+        boolean saveBlockCounts = (flags & WorldRecordFlags.SAVE_BLOCK_COUNT) != 0;
+        boolean dirtyChunks = (flags & WorldRecordFlags.DIRTY_CHUNKS) != 0;
+
         if (oldBlockState != null && oldBlockState.getType() != Material.AIR) {
             Material blockStateType = oldBlockState.getType();
             Key oldBlockKey;
@@ -111,40 +120,40 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
                 oldBlockCount = plugin.getNMSWorld().getDefaultAmount(oldBlockState.getBlock());
             }
 
-            recordBlockBreakInternal(island, oldBlockKey, blockLocation, oldBlockCount, recordFlag);
+            recordBlockBreakInternal(island, oldBlockKey, blockLocation, oldBlockCount, flags);
         }
 
         if (blockKey.equals(ConstantKeys.END_PORTAL_FRAME_WITH_EYE))
-            recordBlockBreakInternal(island, ConstantKeys.END_PORTAL_FRAME, blockLocation, 1, recordFlag);
+            recordBlockBreakInternal(island, ConstantKeys.END_PORTAL_FRAME, blockLocation, 1, flags);
 
-        if (plugin.getProviders().shouldListenToSpawnerChanges() || !(blockKey instanceof SpawnerKey))
-            island.handleBlockPlace(blockKey, blockCount, recordFlag.has(WorldRecordFlag.SAVE_BLOCK_COUNT));
+        if (plugin.getProviders().shouldListenToSpawnerChanges() || !(blockKey instanceof SpawnerKey)) {
+            int blockPlaceFlags = IslandBlockFlags.UPDATE_LAST_TIME_STATUS;
+            if (saveBlockCounts) blockPlaceFlags |= IslandBlockFlags.SAVE_BLOCK_COUNTS;
+            island.handleBlockPlace(blockKey, blockCount, blockPlaceFlags);
+        }
 
-        if (recordFlag.has(WorldRecordFlag.DIRTY_CHUNK)) {
+        if (dirtyChunks) {
             island.markChunkDirty(blockLocation.getWorld(), blockLocation.getBlockX() >> 4,
                     blockLocation.getBlockZ() >> 4, true);
         }
     }
 
     @Override
-    public RecordResult recordBlockBreak(Block block, WorldRecordFlag recordFlag) {
+    public RecordResult recordBlockBreak(Block block, @WorldRecordFlags int flags) {
         Preconditions.checkNotNull(block, "block cannot be null");
-        Preconditions.checkNotNull(recordFlag, "recordFlag cannot be null");
-        return recordBlockBreak(block, plugin.getNMSWorld().getDefaultAmount(block), recordFlag);
+        return recordBlockBreak(block, plugin.getNMSWorld().getDefaultAmount(block), flags);
     }
 
     @Override
-    public RecordResult recordBlockBreak(Block block, int blockCount, WorldRecordFlag recordFlag) {
+    public RecordResult recordBlockBreak(Block block, int blockCount, @WorldRecordFlags int flags) {
         Preconditions.checkNotNull(block, "block cannot be null");
-        Preconditions.checkNotNull(recordFlag, "recordFlag cannot be null");
-        return recordBlockBreak(Keys.of(block), block.getLocation(), blockCount, recordFlag);
+        return recordBlockBreak(Keys.of(block), block.getLocation(), blockCount, flags);
     }
 
     @Override
-    public RecordResult recordBlockBreak(Key blockKey, Location blockLocation, int blockCount, WorldRecordFlag recordFlag) {
+    public RecordResult recordBlockBreak(Key blockKey, Location blockLocation, int blockCount, @WorldRecordFlags int flags) {
         Preconditions.checkNotNull(blockKey, "blockKey cannot be null");
         Preconditions.checkNotNull(blockLocation, "blockLocation cannot be null");
-        Preconditions.checkNotNull(recordFlag, "recordFlag cannot be null");
         Preconditions.checkArgument(blockLocation.getWorld() != null, "blockLocation's world cannot be null");
 
         Island island = plugin.getGrid().getIslandAt(blockLocation);
@@ -152,15 +161,15 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
         if (island == null)
             return RecordResult.NOT_IN_ISLAND;
 
-        recordBlockBreakInternal(island, blockKey, blockLocation, blockCount, recordFlag);
+        recordBlockBreakInternal(island, blockKey, blockLocation, blockCount, flags);
         return RecordResult.SUCCESS;
     }
 
     @Override
-    public RecordResult recordMultiBlocksBreak(KeyMap<Integer> blockCounts, Location location, WorldRecordFlag recordFlag) {
+    public RecordResult recordMultiBlocksBreak(KeyMap<Integer> blockCounts, Location location,
+                                               @WorldRecordFlags int flags) {
         Preconditions.checkNotNull(blockCounts, "blockCounts cannot be null");
         Preconditions.checkNotNull(location, "location cannot be null");
-        Preconditions.checkNotNull(recordFlag, "recordFlag cannot be null");
         Preconditions.checkArgument(location.getWorld() != null, "location's world cannot be null");
 
         if (blockCounts.isEmpty())
@@ -170,11 +179,16 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
         if (island == null)
             return RecordResult.NOT_IN_ISLAND;
 
-        boolean saveBlockCounts = recordFlag.has(WorldRecordFlag.SAVE_BLOCK_COUNT);
-        blockCounts.forEach((blockKey, blockCount) -> island.handleBlockBreak(blockKey, blockCount, saveBlockCounts));
+        boolean saveBlockCounts = (flags & WorldRecordFlags.SAVE_BLOCK_COUNT) != 0;
+        boolean dirtyChunks = (flags & WorldRecordFlags.DIRTY_CHUNKS) != 0;
 
-        if (recordFlag.has(WorldRecordFlag.DIRTY_CHUNK)) {
-            island.markChunkDirty(location.getWorld(), location.getBlockX() >> 4,
+        int blockBreakFlags = IslandBlockFlags.UPDATE_LAST_TIME_STATUS |
+                (saveBlockCounts ? IslandBlockFlags.SAVE_BLOCK_COUNTS : 0);
+
+        island.handleBlocksBreak(blockCounts, blockBreakFlags);
+
+        if (dirtyChunks && plugin.getNMSChunks().isChunkEmpty(location.getChunk())) {
+            island.markChunkEmpty(location.getWorld(), location.getBlockX() >> 4,
                     location.getBlockZ() >> 4, true);
         }
 
@@ -182,14 +196,18 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
     }
 
     private void recordBlockBreakInternal(Island island, Key blockKey, Location blockLocation, int blockCount,
-                                          WorldRecordFlag recordFlag) {
+                                          @WorldRecordFlags int flags) {
+        boolean saveBlockCounts = (flags & WorldRecordFlags.SAVE_BLOCK_COUNT) != 0;
+        boolean dirtyChunks = (flags & WorldRecordFlags.DIRTY_CHUNKS) != 0;
+        boolean handleNearbyBlocks = (flags & WorldRecordFlags.HANDLE_NEARBY_BLOCKS) != 0;
+
+        int handleBlockBreakFlag = IslandBlockFlags.UPDATE_LAST_TIME_STATUS |
+                (saveBlockCounts ? IslandBlockFlags.SAVE_BLOCK_COUNTS : 0);
+
         if (plugin.getProviders().shouldListenToSpawnerChanges() || !(blockKey instanceof SpawnerKey))
-            island.handleBlockBreak(blockKey, blockCount, recordFlag.has(WorldRecordFlag.SAVE_BLOCK_COUNT));
+            island.handleBlockBreak(blockKey, blockCount, handleBlockBreakFlag);
 
-        boolean handleNearbyBlocks = recordFlag.has(WorldRecordFlag.HANDLE_NEARBY_BLOCKS);
-        boolean dirtyChunk = recordFlag.has(WorldRecordFlag.DIRTY_CHUNK);
-
-        if (handleNearbyBlocks || dirtyChunk) {
+        if (handleNearbyBlocks || dirtyChunks) {
             EnumMap<BlockFace, Key> nearbyBlocks = new EnumMap<>(BlockFace.class);
             Block block = blockLocation.getBlock();
 
@@ -205,7 +223,7 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
             }
 
             BukkitExecutor.sync(() -> {
-                if (dirtyChunk) {
+                if (dirtyChunks) {
                     if (plugin.getNMSChunks().isChunkEmpty(block.getChunk())) {
                         island.markChunkEmpty(block.getWorld(), block.getX() >> 4,
                                 block.getZ() >> 4, true);
@@ -216,7 +234,7 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
                         Key nearbyBlock = Keys.of(block.getRelative(nearbyFace));
                         Key oldNearbyBlock = nearbyBlocks.getOrDefault(nearbyFace, ConstantKeys.AIR);
                         if (oldNearbyBlock != ConstantKeys.AIR && !nearbyBlock.equals(oldNearbyBlock)) {
-                            island.handleBlockBreak(oldNearbyBlock, 1);
+                            island.handleBlockBreak(oldNearbyBlock, 1, handleBlockBreakFlag);
                         }
                     }
                 }

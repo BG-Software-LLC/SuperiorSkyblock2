@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.external;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.stackedblocks.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.stackedblocks.StackedBlocksInteractionService;
-import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlag;
+import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
@@ -15,10 +15,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-@SuppressWarnings("unused")
 public class JetsMinionsHook implements Listener {
 
-    private static final WorldRecordFlag REGULAR_RECORD_FLAGS = WorldRecordFlag.SAVE_BLOCK_COUNT.and(WorldRecordFlag.DIRTY_CHUNK);
+    @WorldRecordFlags
+    private static final int REGULAR_RECORD_FLAGS = WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS;
 
     private final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {
         @Override

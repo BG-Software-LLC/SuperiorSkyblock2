@@ -17,10 +17,11 @@ public interface WorldRecordService {
      * @param block         The block that was placed.
      * @param blockCount    The amount of blocks that were placed.
      * @param oldBlockState The state of the block before placing the new one.
-     * @param recordFlag    See {@link WorldRecordFlag}
+     * @param flags         See {@link WorldRecordFlags}
      * @return The result of recording the block placement.
      */
-    RecordResult recordBlockPlace(Block block, int blockCount, @Nullable BlockState oldBlockState, WorldRecordFlag recordFlag);
+    RecordResult recordBlockPlace(Block block, int blockCount, @Nullable BlockState oldBlockState,
+                                  @WorldRecordFlags int flags);
 
     /**
      * Record a block place.
@@ -29,39 +30,40 @@ public interface WorldRecordService {
      * @param blockLocation The location of the block.
      * @param blockCount    The amount of blocks that were placed.
      * @param oldBlockState The state of the block before placing the new one.
-     * @param recordFlag    See {@link WorldRecordFlag}
+     * @param flags         See {@link WorldRecordFlags}
      * @return The result of recording the block placement.
      */
-    RecordResult recordBlockPlace(Key blockKey, Location blockLocation, int blockCount, @Nullable BlockState oldBlockState, WorldRecordFlag recordFlag);
+    RecordResult recordBlockPlace(Key blockKey, Location blockLocation, int blockCount,
+                                  @Nullable BlockState oldBlockState, @WorldRecordFlags int flags);
 
     /**
      * Record multiple block placements.
      *
      * @param blockCounts KeyMap containing the counts of the blocks that were placed.
      * @param location    The location of where the blocks were placed at.
-     * @param recordFlag  See {@link WorldRecordFlag}
+     * @param flags       See {@link WorldRecordFlags}
      * @return The result of recording the block placements.
      */
-    RecordResult recordMultiBlocksPlace(KeyMap<Integer> blockCounts, Location location, WorldRecordFlag recordFlag);
+    RecordResult recordMultiBlocksPlace(KeyMap<Integer> blockCounts, Location location, @WorldRecordFlags int flags);
 
     /**
      * Record a block break.
      *
-     * @param block      The block that was broken
-     * @param recordFlag See {@link WorldRecordFlag}
+     * @param block The block that was broken
+     * @param flags See {@link WorldRecordFlags}
      * @return The result of recording the block break.
      */
-    RecordResult recordBlockBreak(Block block, WorldRecordFlag recordFlag);
+    RecordResult recordBlockBreak(Block block, @WorldRecordFlags int flags);
 
     /**
      * Record a block break.
      *
      * @param block      The block that was broken.
      * @param blockCount The amount of blocks that were broken.
-     * @param recordFlag See {@link WorldRecordFlag}
+     * @param flags      See {@link WorldRecordFlags}
      * @return The result of recording the block break.
      */
-    RecordResult recordBlockBreak(Block block, int blockCount, WorldRecordFlag recordFlag);
+    RecordResult recordBlockBreak(Block block, int blockCount, @WorldRecordFlags int flags);
 
     /**
      * Record a block break.
@@ -69,20 +71,20 @@ public interface WorldRecordService {
      * @param blockKey      The key of the block that was broken.
      * @param blockLocation The location of the block.
      * @param blockCount    The amount of blocks that were broken.
-     * @param recordFlag    See {@link WorldRecordFlag}
+     * @param flags         See {@link WorldRecordFlags}
      * @return The result of recording the block break.
      */
-    RecordResult recordBlockBreak(Key blockKey, Location blockLocation, int blockCount, WorldRecordFlag recordFlag);
+    RecordResult recordBlockBreak(Key blockKey, Location blockLocation, int blockCount, @WorldRecordFlags int flags);
 
     /**
      * Record multiple block breaks.
      *
      * @param blockCounts KeyMap containing the counts of the blocks that were broken.
      * @param location    The location of where the blocks were broken at.
-     * @param recordFlag  See {@link WorldRecordFlag}
+     * @param flags       See {@link WorldRecordFlags}
      * @return The result of recording the block breaks.
      */
-    RecordResult recordMultiBlocksBreak(KeyMap<Integer> blockCounts, Location location, WorldRecordFlag recordFlag);
+    RecordResult recordMultiBlocksBreak(KeyMap<Integer> blockCounts, Location location, @WorldRecordFlags int flags);
 
     /**
      * Record an entity spawning into the world.

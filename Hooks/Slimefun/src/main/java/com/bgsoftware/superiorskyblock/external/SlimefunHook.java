@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.service.stackedblocks.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.stackedblocks.StackedBlocksInteractionService;
-import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlag;
+import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
@@ -33,10 +33,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
-@SuppressWarnings("unused")
 public class SlimefunHook {
 
-    private static final WorldRecordFlag REGULAR_RECORD_FLAGS = WorldRecordFlag.SAVE_BLOCK_COUNT.and(WorldRecordFlag.DIRTY_CHUNK);
+    @WorldRecordFlags
+    private static final int REGULAR_RECORD_FLAGS = WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS;
 
     private static final ReflectMethod<Void> BLOCK_STORAGE_CLEAR_ALL_BLOCK_INFO_AT_CHUNK_METHOD = new ReflectMethod<>(
             BlockStorage.class, "clearAllBlockInfoAtChunk", World.class, int.class, int.class, boolean.class);

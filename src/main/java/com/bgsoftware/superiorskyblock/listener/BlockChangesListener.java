@@ -4,14 +4,12 @@ import com.bgsoftware.common.annotations.IntType;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandBlockFlags;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlag;
+import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
-import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
@@ -25,7 +23,6 @@ import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
@@ -59,7 +56,6 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.concurrent.TimeUnit;
 
 public class BlockChangesListener implements Listener {
@@ -71,8 +67,10 @@ public class BlockChangesListener implements Listener {
     @Nullable
     private static final Material CHORUS_FLOWER = EnumHelper.getEnum(Material.class, "CHORUS_FLOWER");
 
-    private static final WorldRecordFlag REGULAR_RECORD_FLAGS = WorldRecordFlag.SAVE_BLOCK_COUNT.and(WorldRecordFlag.DIRTY_CHUNK);
-    private static final WorldRecordFlag ALL_RECORD_FLAGS = REGULAR_RECORD_FLAGS.and(WorldRecordFlag.HANDLE_NEARBY_BLOCKS);
+    @WorldRecordFlags
+    private static final int REGULAR_RECORD_FLAGS = WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS;
+    @WorldRecordFlags
+    private static final int ALL_RECORD_FLAGS = REGULAR_RECORD_FLAGS | WorldRecordFlags.HANDLE_NEARBY_BLOCKS;
 
     private final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {
         @Override
@@ -118,7 +116,7 @@ public class BlockChangesListener implements Listener {
             Key blockKey = Keys.of(blockState);
             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
         });
-        this.worldRecordService.get().recordMultiBlocksPlace(blockCounts, e.getLocation(), WorldRecordFlag.DIRTY_CHUNK);
+        this.worldRecordService.get().recordMultiBlocksPlace(blockCounts, e.getLocation(), WorldRecordFlags.DIRTY_CHUNKS);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -131,7 +129,7 @@ public class BlockChangesListener implements Listener {
     private void onBlockFrom(BlockFormEvent e) {
         Location location = e.getNewState().getLocation();
         // Do not save block counts
-        this.worldRecordService.get().recordBlockBreak(Keys.of(e.getBlock()), location, 1, WorldRecordFlag.DIRTY_CHUNK);
+        this.worldRecordService.get().recordBlockBreak(Keys.of(e.getBlock()), location, 1, WorldRecordFlags.DIRTY_CHUNKS);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -197,7 +195,7 @@ public class BlockChangesListener implements Listener {
         }
 
         this.worldRecordService.get().recordBlockPlace(blockKey, e.getBlock().getLocation(), 1,
-                e.getBlock().getState(), WorldRecordFlag.SAVE_BLOCK_COUNT);
+                e.getBlock().getState(), WorldRecordFlags.SAVE_BLOCK_COUNT);
     }
 
     /* BLOCK BREAKS */
@@ -233,7 +231,7 @@ public class BlockChangesListener implements Listener {
                 if (nearby instanceof FallingBlock) {
                     Key blockKey = plugin.getNMSAlgorithms().getFallingBlockType((FallingBlock) nearby);
                     this.worldRecordService.get().recordBlockBreak(blockKey, nearby.getLocation(),
-                            1, WorldRecordFlag.SAVE_BLOCK_COUNT);
+                            1, WorldRecordFlags.SAVE_BLOCK_COUNT);
                     return;
                 }
             }
@@ -258,11 +256,11 @@ public class BlockChangesListener implements Listener {
     private void onBlockFromTo(BlockFromToEvent e) {
         if (e.getToBlock().getType() != Material.AIR) {
             // Do not save block counts
-            this.worldRecordService.get().recordBlockBreak(e.getToBlock(), 1, WorldRecordFlag.DIRTY_CHUNK);
+            this.worldRecordService.get().recordBlockBreak(e.getToBlock(), 1, WorldRecordFlags.DIRTY_CHUNKS);
         } else {
             BukkitExecutor.sync(() -> {
                 // Do not save block counts
-                this.worldRecordService.get().recordBlockPlace(e.getToBlock(), 1, null, WorldRecordFlag.DIRTY_CHUNK);
+                this.worldRecordService.get().recordBlockPlace(e.getToBlock(), 1, null, WorldRecordFlags.DIRTY_CHUNKS);
             });
         }
     }
@@ -355,7 +353,7 @@ public class BlockChangesListener implements Listener {
                 return;
 
             worldRecordService.get().recordBlockPlace(ConstantKeys.WET_SPONGE, location, 1,
-                    e.getBlock().getState(), WorldRecordFlag.SAVE_BLOCK_COUNT);
+                    e.getBlock().getState(), WorldRecordFlags.SAVE_BLOCK_COUNT);
             alreadySpongeAbosrbCalled.add(location);
         }
 
@@ -368,7 +366,7 @@ public class BlockChangesListener implements Listener {
             if (e.getNewState().getMaterial() != Material.AIR)
                 return;
 
-            worldRecordService.get().recordBlockBreak(e.getBlock(), WorldRecordFlag.DIRTY_CHUNK);
+            worldRecordService.get().recordBlockBreak(e.getBlock(), WorldRecordFlags.DIRTY_CHUNKS);
         }
 
     }
