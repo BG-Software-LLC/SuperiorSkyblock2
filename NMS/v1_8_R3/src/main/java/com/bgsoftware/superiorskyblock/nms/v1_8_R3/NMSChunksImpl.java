@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -66,14 +67,22 @@ public class NMSChunksImpl implements NMSChunks {
         WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
         byte biomeBase = (byte) CraftBlock.biomeToBiomeBase(biome).id;
 
-        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, null, (chunk, isLoaded) -> {
-            Arrays.fill(chunk.getBiomeIndex(), biomeBase);
-            chunk.e();
-        }, null);
+        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, new NMSUtils.ChunkCallback() {
+            @Override
+            public void onChunk(Chunk chunk, boolean isLoaded) {
+                Arrays.fill(chunk.getBiomeIndex(), biomeBase);
+                chunk.e();
+            }
+
+            @Override
+            public void onFinish() {
+                // Do nothing.
+            }
+        });
     }
 
     @Override
-    public void deleteChunks(Island island, List<ChunkPosition> chunkPositions, Runnable onFinish) {
+    public void deleteChunks(Island island, List<ChunkPosition> chunkPositions, @Nullable Runnable onFinish) {
         if (chunkPositions.isEmpty())
             return;
 
@@ -85,25 +94,34 @@ public class NMSChunksImpl implements NMSChunks {
 
         WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
 
-        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, onFinish, (chunk, isLoaded) -> {
-            Arrays.fill(chunk.getSections(), null);
+        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, new NMSUtils.ChunkCallback() {
+            @Override
+            public void onChunk(Chunk chunk, boolean isLoaded) {
+                Arrays.fill(chunk.getSections(), null);
 
-            removeEntities(chunk);
+                removeEntities(chunk);
 
-            for (Map.Entry<BlockPosition, TileEntity> tileEntityEntry : chunk.tileEntities.entrySet()) {
-                worldServer.tileEntityList.remove(tileEntityEntry.getValue());
-                try {
-                    // This field doesn't exist in Taco 1.8
-                    worldServer.h.remove(tileEntityEntry.getValue());
-                } catch (Throwable ignored) {
+                for (Map.Entry<BlockPosition, TileEntity> tileEntityEntry : chunk.tileEntities.entrySet()) {
+                    worldServer.tileEntityList.remove(tileEntityEntry.getValue());
+                    try {
+                        // This field doesn't exist in Taco 1.8
+                        worldServer.h.remove(tileEntityEntry.getValue());
+                    } catch (Throwable ignored) {
+                    }
+                    worldServer.capturedTileEntities.remove(tileEntityEntry.getKey());
                 }
-                worldServer.capturedTileEntities.remove(tileEntityEntry.getKey());
+
+                chunk.tileEntities.clear();
+
+                removeBlocks(chunk);
             }
 
-            chunk.tileEntities.clear();
-
-            removeBlocks(chunk);
-        }, null);
+            @Override
+            public void onFinish() {
+                if (onFinish != null)
+                    onFinish.run();
+            }
+        });
     }
 
     @Override
@@ -131,51 +149,57 @@ public class NMSChunksImpl implements NMSChunks {
 
         WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
 
-        NMSUtils.runActionOnChunks(worldServer, chunksCoords, false, () -> {
-            completableFuture.complete(allCalculatedChunks);
-        }, (chunk, isLoaded) -> {
-            ChunkPosition chunkPosition = ChunkPosition.of(worldServer.getWorld(), chunk.locX, chunk.locZ);
+        NMSUtils.runActionOnChunks(worldServer, chunksCoords, false, new NMSUtils.ChunkCallback() {
+            @Override
+            public void onChunk(Chunk chunk, boolean isLoaded) {
+                ChunkPosition chunkPosition = ChunkPosition.of(worldServer.getWorld(), chunk.locX, chunk.locZ);
 
-            KeyMap<Counter> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
-            List<Location> spawnersLocations = new LinkedList<>();
+                KeyMap<Counter> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+                List<Location> spawnersLocations = new LinkedList<>();
 
-            for (ChunkSection chunkSection : chunk.getSections()) {
-                if (chunkSection != null && !chunkSection.a()) {
-                    for (BlockPosition bp : BlockPosition.b(new BlockPosition(0, 0, 0), new BlockPosition(15, 15, 15))) {
-                        IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
-                        Block block = blockData.getBlock();
-                        if (block != Blocks.AIR) {
-                            Location location = new Location(worldServer.getWorld(),
-                                    (chunkPosition.getX() << 4) + bp.getX(),
-                                    chunkSection.getYPosition() + bp.getY(),
-                                    (chunkPosition.getZ() << 4) + bp.getZ());
-                            int blockAmount = 1;
+                for (ChunkSection chunkSection : chunk.getSections()) {
+                    if (chunkSection != null && !chunkSection.a()) {
+                        for (BlockPosition bp : BlockPosition.b(new BlockPosition(0, 0, 0), new BlockPosition(15, 15, 15))) {
+                            IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
+                            Block block = blockData.getBlock();
+                            if (block != Blocks.AIR) {
+                                Location location = new Location(worldServer.getWorld(),
+                                        (chunkPosition.getX() << 4) + bp.getX(),
+                                        chunkSection.getYPosition() + bp.getY(),
+                                        (chunkPosition.getZ() << 4) + bp.getZ());
+                                int blockAmount = 1;
 
-                            if (block instanceof BlockDoubleStep) {
-                                blockAmount = 2;
-                                // Converts the block data to a regular slab
-                                MinecraftKey blockKey = Block.REGISTRY.c(block);
-                                blockData = Block.REGISTRY.get(new MinecraftKey(blockKey.a()
-                                                .replace("double_", ""))).getBlockData()
-                                        .set(BlockDoubleStepAbstract.VARIANT, blockData.get(BlockDoubleStepAbstract.VARIANT));
-                            }
+                                if (block instanceof BlockDoubleStep) {
+                                    blockAmount = 2;
+                                    // Converts the block data to a regular slab
+                                    MinecraftKey blockKey = Block.REGISTRY.c(block);
+                                    blockData = Block.REGISTRY.get(new MinecraftKey(blockKey.a()
+                                                    .replace("double_", ""))).getBlockData()
+                                            .set(BlockDoubleStepAbstract.VARIANT, blockData.get(BlockDoubleStepAbstract.VARIANT));
+                                }
 
-                            Key blockKey = Keys.of(KeyBlocksCache.getBlockKey(blockData), location);
-                            blockCounts.computeIfAbsent(blockKey, b -> new Counter(0)).inc(blockAmount);
-                            if (block == Blocks.MOB_SPAWNER) {
-                                spawnersLocations.add(location);
+                                Key blockKey = Keys.of(KeyBlocksCache.getBlockKey(blockData), location);
+                                blockCounts.computeIfAbsent(blockKey, b -> new Counter(0)).inc(blockAmount);
+                                if (block == Blocks.MOB_SPAWNER) {
+                                    spawnersLocations.add(location);
+                                }
                             }
                         }
                     }
                 }
+
+                CalculatedChunk calculatedChunk = new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations);
+                allCalculatedChunks.add(calculatedChunk);
+
+                if (!isLoaded)
+                    unloadedChunksCache.put(chunkPosition, calculatedChunk);
             }
 
-            CalculatedChunk calculatedChunk = new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations);
-            allCalculatedChunks.add(calculatedChunk);
-
-            if (!isLoaded)
-                unloadedChunksCache.put(chunkPosition, calculatedChunk);
-        }, null);
+            @Override
+            public void onFinish() {
+                completableFuture.complete(allCalculatedChunks);
+            }
+        });
 
         return completableFuture;
     }

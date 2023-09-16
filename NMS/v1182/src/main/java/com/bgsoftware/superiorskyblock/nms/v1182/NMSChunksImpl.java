@@ -94,48 +94,59 @@ public class NMSChunksImpl implements NMSChunks {
 
         Holder<Biome> biome = CraftBlock.biomeToBiomeBase(biomesRegistry, bukkitBiome);
 
-        NMSUtils.runActionOnChunks(serverLevel, chunksCoords, true, null, chunkAccess -> {
-            ChunkPos chunkPos = chunkAccess.getPos();
+        NMSUtils.runActionOnChunks(serverLevel, chunksCoords, true, new NMSUtils.ChunkCallback() {
+            @Override
+            public void onLoadedChunk(LevelChunk levelChunk) {
+                ChunkPos chunkPos = levelChunk.getPos();
 
-            LevelChunkSection[] chunkSections = chunkAccess.getSections();
-            for (int i = 0; i < chunkSections.length; ++i) {
-                LevelChunkSection currentSection = chunkSections[i];
-                if (currentSection != null) {
-                    PalettedContainer<Holder<Biome>> biomesContainer = new PalettedContainer<>(biomesRegistry.asHolderIdMap(),
-                            biome, PalettedContainer.Strategy.SECTION_BIOMES);
-                    chunkSections[i] = new LevelChunkSection(currentSection.bottomBlockY() >> 4,
-                            currentSection.getStates(), biomesContainer);
+                LevelChunkSection[] chunkSections = levelChunk.getSections();
+                for (int i = 0; i < chunkSections.length; ++i) {
+                    LevelChunkSection currentSection = chunkSections[i];
+                    if (currentSection != null) {
+                        PalettedContainer<Holder<Biome>> biomesContainer = new PalettedContainer<>(biomesRegistry.asHolderIdMap(),
+                                biome, PalettedContainer.Strategy.SECTION_BIOMES);
+                        chunkSections[i] = new LevelChunkSection(currentSection.bottomBlockY() >> 4,
+                                currentSection.getStates(), biomesContainer);
+                    }
                 }
+
+                levelChunk.setUnsaved(true);
+
+                ClientboundForgetLevelChunkPacket forgetLevelChunkPacket = new ClientboundForgetLevelChunkPacket(chunkPos.x, chunkPos.z);
+                ClientboundLevelChunkWithLightPacket mapChunkPacket = new ClientboundLevelChunkWithLightPacket(
+                        (LevelChunk) levelChunk, serverLevel.getLightEngine(), null, null, true);
+
+                playersToUpdate.forEach(player -> {
+                    ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+                    serverPlayer.connection.send(forgetLevelChunkPacket);
+                    serverPlayer.connection.send(mapChunkPacket);
+                });
             }
 
-            chunkAccess.setUnsaved(true);
+            @Override
+            public void onUnloadedChunk(NMSUtils.UnloadedChunkCompound unloadedChunkCompound) {
+                Codec<PalettedContainer<Holder<Biome>>> biomesCodec = PalettedContainer.codec(
+                        biomesRegistry.asHolderIdMap(),
+                        biomesRegistry.holderByNameCodec(),
+                        PalettedContainer.Strategy.SECTION_BIOMES,
+                        biomesRegistry.getHolderOrThrow(Biomes.PLAINS)
+                );
+                PalettedContainer<Holder<Biome>> biomesContainer = new PalettedContainer<>(biomesRegistry.asHolderIdMap(),
+                        biome, PalettedContainer.Strategy.SECTION_BIOMES);
+                DataResult<Tag> dataResult = biomesCodec.encodeStart(NbtOps.INSTANCE, biomesContainer);
+                Tag biomesCompound = dataResult.getOrThrow(false, error -> {
+                });
 
-            ClientboundForgetLevelChunkPacket forgetLevelChunkPacket = new ClientboundForgetLevelChunkPacket(chunkPos.x, chunkPos.z);
-            ClientboundLevelChunkWithLightPacket mapChunkPacket = new ClientboundLevelChunkWithLightPacket(
-                    (LevelChunk) chunkAccess, serverLevel.getLightEngine(), null, null, true);
+                ListTag sectionsList = unloadedChunkCompound.getSections();
 
-            playersToUpdate.forEach(player -> {
-                ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-                serverPlayer.connection.send(forgetLevelChunkPacket);
-                serverPlayer.connection.send(mapChunkPacket);
-            });
-        }, unloadedChunkCompound -> {
-            Codec<PalettedContainer<Holder<Biome>>> biomesCodec = PalettedContainer.codec(
-                    biomesRegistry.asHolderIdMap(),
-                    biomesRegistry.holderByNameCodec(),
-                    PalettedContainer.Strategy.SECTION_BIOMES,
-                    biomesRegistry.getHolderOrThrow(Biomes.PLAINS)
-            );
-            PalettedContainer<Holder<Biome>> biomesContainer = new PalettedContainer<>(biomesRegistry.asHolderIdMap(),
-                    biome, PalettedContainer.Strategy.SECTION_BIOMES);
-            DataResult<Tag> dataResult = biomesCodec.encodeStart(NbtOps.INSTANCE, biomesContainer);
-            Tag biomesCompound = dataResult.getOrThrow(false, error -> {
-            });
+                for (int i = 0; i < sectionsList.size(); ++i)
+                    sectionsList.getCompound(i).put("biomes", biomesCompound);
+            }
 
-            ListTag sectionsList = unloadedChunkCompound.getSections();
-
-            for (int i = 0; i < sectionsList.size(); ++i)
-                sectionsList.getCompound(i).put("biomes", biomesCompound);
+            @Override
+            public void onFinish() {
+                // Do nothing.
+            }
         });
     }
 
@@ -152,105 +163,116 @@ public class NMSChunksImpl implements NMSChunks {
 
         ServerLevel serverLevel = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
 
-        NMSUtils.runActionOnChunks(serverLevel, chunksCoords, true, onFinish, chunkAccess -> {
-            Registry<Biome> biomesRegistry = serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
+        NMSUtils.runActionOnChunks(serverLevel, chunksCoords, true, new NMSUtils.ChunkCallback() {
+            @Override
+            public void onLoadedChunk(LevelChunk levelChunk) {
+                Registry<Biome> biomesRegistry = serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
 
-            LevelChunkSection[] chunkSections = chunkAccess.getSections();
-            for (int i = 0; i < chunkSections.length; ++i) {
-                chunkSections[i] = new LevelChunkSection(serverLevel.getSectionYFromSectionIndex(i), biomesRegistry);
+                LevelChunkSection[] chunkSections = levelChunk.getSections();
+                for (int i = 0; i < chunkSections.length; ++i) {
+                    chunkSections[i] = new LevelChunkSection(serverLevel.getSectionYFromSectionIndex(i), biomesRegistry);
+                }
+
+                removeEntities(levelChunk);
+
+                levelChunk.blockEntities.keySet().clear();
+
+                removeBlocks(levelChunk);
             }
 
-            removeEntities(chunkAccess);
+            @Override
+            public void onUnloadedChunk(NMSUtils.UnloadedChunkCompound unloadedChunkCompound) {
+                Codec<PalettedContainer<BlockState>> blocksCodec = PalettedContainer.codec(
+                        Block.BLOCK_STATE_REGISTRY,
+                        BlockState.CODEC,
+                        PalettedContainer.Strategy.SECTION_STATES,
+                        Blocks.AIR.defaultBlockState());
 
-            chunkAccess.blockEntities.keySet().clear();
+                ListTag tileEntities = new ListTag();
 
-            removeBlocks(chunkAccess);
-        }, unloadedChunkCompound -> {
-            Codec<PalettedContainer<BlockState>> blocksCodec = PalettedContainer.codec(
-                    Block.BLOCK_STATE_REGISTRY,
-                    BlockState.CODEC,
-                    PalettedContainer.Strategy.SECTION_STATES,
-                    Blocks.AIR.defaultBlockState());
+                unloadedChunkCompound.setEntities(new ListTag());
+                unloadedChunkCompound.setBlockEntities(tileEntities);
 
-            ListTag tileEntities = new ListTag();
+                if (serverLevel.generator instanceof IslandsGenerator) {
+                    PalettedContainer<BlockState> statesContainer = new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY,
+                            Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES);
+                    DataResult<Tag> dataResult = blocksCodec.encodeStart(NbtOps.INSTANCE, statesContainer);
+                    Tag blockStatesCompound = dataResult.getOrThrow(false, error -> {
+                    });
 
-            unloadedChunkCompound.setEntities(new ListTag());
-            unloadedChunkCompound.setBlockEntities(tileEntities);
+                    ListTag sectionsList = unloadedChunkCompound.getSections();
+                    for (int i = 0; i < sectionsList.size(); ++i)
+                        sectionsList.getCompound(i).put("block_states", blockStatesCompound);
+                } else {
+                    ProtoChunk protoChunk = NMSUtils.createProtoChunk(unloadedChunkCompound.getChunkPos(), serverLevel);
 
-            if (serverLevel.generator instanceof IslandsGenerator) {
-                PalettedContainer<BlockState> statesContainer = new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY,
-                        Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES);
-                DataResult<Tag> dataResult = blocksCodec.encodeStart(NbtOps.INSTANCE, statesContainer);
-                Tag blockStatesCompound = dataResult.getOrThrow(false, error -> {
-                });
+                    try {
+                        CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(serverLevel,
+                                serverLevel.getChunkSource().getGenerator(), serverLevel.generator);
 
-                ListTag sectionsList = unloadedChunkCompound.getSections();
-                for (int i = 0; i < sectionsList.size(); ++i)
-                    sectionsList.getCompound(i).put("block_states", blockStatesCompound);
-            } else {
-                ProtoChunk protoChunk = NMSUtils.createProtoChunk(unloadedChunkCompound.getChunkPos(), serverLevel);
+                        WorldGenRegion region = new WorldGenRegion(serverLevel, Collections.singletonList(protoChunk),
+                                ChunkStatus.SURFACE, 0);
 
-                try {
-                    CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(serverLevel,
-                            serverLevel.getChunkSource().getGenerator(), serverLevel.generator);
+                        customChunkGenerator.buildSurface(region,
+                                serverLevel.structureFeatureManager().forWorldGenRegion(region),
+                                protoChunk);
+                    } catch (Exception ignored) {
+                    }
 
-                    WorldGenRegion region = new WorldGenRegion(serverLevel, Collections.singletonList(protoChunk),
-                            ChunkStatus.SURFACE, 0);
+                    Registry<Biome> biomesRegistry = serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
+                    Codec<PalettedContainer<Holder<Biome>>> biomesCodec = PalettedContainer.codec(
+                            biomesRegistry.asHolderIdMap(),
+                            biomesRegistry.holderByNameCodec(),
+                            PalettedContainer.Strategy.SECTION_BIOMES,
+                            biomesRegistry.getHolderOrThrow(Biomes.PLAINS)
+                    );
 
-                    customChunkGenerator.buildSurface(region,
-                            serverLevel.structureFeatureManager().forWorldGenRegion(region),
-                            protoChunk);
-                } catch (Exception ignored) {
-                }
+                    LevelLightEngine lightEngine = serverLevel.getLightEngine();
+                    LevelChunkSection[] chunkSections = protoChunk.getSections();
 
-                Registry<Biome> biomesRegistry = serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
-                Codec<PalettedContainer<Holder<Biome>>> biomesCodec = PalettedContainer.codec(
-                        biomesRegistry.asHolderIdMap(),
-                        biomesRegistry.holderByNameCodec(),
-                        PalettedContainer.Strategy.SECTION_BIOMES,
-                        biomesRegistry.getHolderOrThrow(Biomes.PLAINS)
-                );
+                    ListTag sectionsList = new ListTag();
 
-                LevelLightEngine lightEngine = serverLevel.getLightEngine();
-                LevelChunkSection[] chunkSections = protoChunk.getSections();
+                    // Save blocks
+                    for (int i = lightEngine.getMinLightSection(); i < lightEngine.getMaxLightSection(); ++i) {
+                        int chunkSectionIndex = serverLevel.getSectionIndex(i);
 
-                ListTag sectionsList = new ListTag();
+                        CompoundTag sectionCompound = new CompoundTag();
 
-                // Save blocks
-                for (int i = lightEngine.getMinLightSection(); i < lightEngine.getMaxLightSection(); ++i) {
-                    int chunkSectionIndex = serverLevel.getSectionIndex(i);
+                        if (chunkSectionIndex >= 0 && chunkSectionIndex < chunkSections.length) {
+                            LevelChunkSection levelChunkSection = chunkSections[chunkSectionIndex];
 
-                    CompoundTag sectionCompound = new CompoundTag();
+                            {
+                                DataResult<Tag> dataResult = blocksCodec.encodeStart(NbtOps.INSTANCE, levelChunkSection.getStates());
+                                sectionCompound.put("block_states", dataResult.getOrThrow(false, error -> {
+                                }));
+                            }
 
-                    if (chunkSectionIndex >= 0 && chunkSectionIndex < chunkSections.length) {
-                        LevelChunkSection levelChunkSection = chunkSections[chunkSectionIndex];
-
-                        {
-                            DataResult<Tag> dataResult = blocksCodec.encodeStart(NbtOps.INSTANCE, levelChunkSection.getStates());
-                            sectionCompound.put("block_states", dataResult.getOrThrow(false, error -> {
-                            }));
+                            {
+                                DataResult<Tag> dataResult = biomesCodec.encodeStart(NbtOps.INSTANCE, levelChunkSection.getBiomes());
+                                sectionCompound.put("biomes", dataResult.getOrThrow(false, error -> {
+                                }));
+                            }
                         }
 
-                        {
-                            DataResult<Tag> dataResult = biomesCodec.encodeStart(NbtOps.INSTANCE, levelChunkSection.getBiomes());
-                            sectionCompound.put("biomes", dataResult.getOrThrow(false, error -> {
-                            }));
+                        if (!sectionCompound.isEmpty()) {
+                            sectionCompound.putByte("Y", (byte) i);
+                            sectionsList.add(sectionCompound);
                         }
                     }
 
-                    if (!sectionCompound.isEmpty()) {
-                        sectionCompound.putByte("Y", (byte) i);
-                        sectionsList.add(sectionCompound);
+                    for (BlockPos blockEntityPos : protoChunk.blockEntities.keySet()) {
+                        CompoundTag blockEntityCompound = protoChunk.getBlockEntityNbtForSaving(blockEntityPos);
+                        if (blockEntityCompound != null)
+                            tileEntities.add(blockEntityCompound);
                     }
-                }
 
-                for (BlockPos blockEntityPos : protoChunk.blockEntities.keySet()) {
-                    CompoundTag blockEntityCompound = protoChunk.getBlockEntityNbtForSaving(blockEntityPos);
-                    if (blockEntityCompound != null)
-                        tileEntities.add(blockEntityCompound);
+                    unloadedChunkCompound.setSections(sectionsList);
                 }
+            }
 
-                unloadedChunkCompound.setSections(sectionsList);
+            @Override
+            public void onFinish() {
+                // Do nothing.
             }
         });
     }
@@ -280,71 +302,80 @@ public class NMSChunksImpl implements NMSChunks {
 
         ServerLevel serverLevel = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
 
-        NMSUtils.runActionOnChunks(serverLevel, chunksCoords, false, () -> {
-            completableFuture.complete(allCalculatedChunks);
-        }, chunk -> {
-            ChunkPos chunkPos = chunk.getPos();
-            ChunkPosition chunkPosition = ChunkPosition.of(((LevelChunk) chunk).level.getWorld(), chunkPos.x, chunkPos.z);
-            allCalculatedChunks.add(calculateChunk(chunkPosition, chunk.getSections()));
-        }, unloadedChunkCompound -> {
-            Registry<Biome> biomesRegistry = serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
-
-            Codec<PalettedContainer<BlockState>> blocksCodec = PalettedContainer.codec(
-                    Block.BLOCK_STATE_REGISTRY,
-                    BlockState.CODEC,
-                    PalettedContainer.Strategy.SECTION_STATES,
-                    Blocks.AIR.defaultBlockState()
-            );
-            Codec<PalettedContainer<Holder<Biome>>> biomesCodec = PalettedContainer.codec(
-                    biomesRegistry.asHolderIdMap(),
-                    biomesRegistry.holderByNameCodec(),
-                    PalettedContainer.Strategy.SECTION_BIOMES,
-                    biomesRegistry.getHolderOrThrow(Biomes.PLAINS)
-            );
-
-            LevelChunkSection[] chunkSections = new LevelChunkSection[serverLevel.getSectionsCount()];
-
-            ListTag sectionsList = unloadedChunkCompound.getSections();
-            for (int i = 0; i < sectionsList.size(); ++i) {
-                CompoundTag sectionCompound = sectionsList.getCompound(i);
-                byte yPosition = sectionCompound.getByte("Y");
-                int sectionIndex = serverLevel.getSectionIndexFromSectionY(yPosition);
-
-                if (sectionIndex >= 0 && sectionIndex < chunkSections.length) {
-                    PalettedContainer<BlockState> blocksDataPalette;
-                    if (sectionCompound.contains("block_states", 10)) {
-                        DataResult<PalettedContainer<BlockState>> dataResult = blocksCodec.parse(NbtOps.INSTANCE,
-                                sectionCompound.getCompound("block_states")).promotePartial((sx) -> {
-                        });
-                        blocksDataPalette = dataResult.getOrThrow(false, error -> {
-                        });
-                    } else {
-                        blocksDataPalette = new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY,
-                                Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES);
-                    }
-
-                    PalettedContainer<Holder<Biome>> biomesDataPalette;
-                    if (sectionCompound.contains("biomes", 10)) {
-                        DataResult<PalettedContainer<Holder<Biome>>> dataResult = biomesCodec.parse(NbtOps.INSTANCE,
-                                sectionCompound.getCompound("biomes")).promotePartial((sx) -> {
-                        });
-                        biomesDataPalette = dataResult.getOrThrow(false, error -> {
-                        });
-                    } else {
-                        biomesDataPalette = new PalettedContainer<>(biomesRegistry.asHolderIdMap(),
-                                biomesRegistry.getHolderOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES);
-                    }
-
-                    chunkSections[sectionIndex] = new LevelChunkSection(yPosition, blocksDataPalette, biomesDataPalette);
-                }
-
+        NMSUtils.runActionOnChunks(serverLevel, chunksCoords, false, new NMSUtils.ChunkCallback() {
+            @Override
+            public void onLoadedChunk(LevelChunk levelChunk) {
+                ChunkPos chunkPos = levelChunk.getPos();
+                ChunkPosition chunkPosition = ChunkPosition.of(levelChunk.level.getWorld(), chunkPos.x, chunkPos.z);
+                allCalculatedChunks.add(calculateChunk(chunkPosition, levelChunk.getSections()));
             }
 
-            ChunkPos chunkPos = unloadedChunkCompound.getChunkPos();
-            ChunkPosition chunkPosition = ChunkPosition.of(serverLevel.getWorld(), chunkPos.x, chunkPos.z);
-            CalculatedChunk calculatedChunk = calculateChunk(chunkPosition, chunkSections);
-            allCalculatedChunks.add(calculatedChunk);
-            unloadedChunksCache.put(chunkPosition, calculatedChunk);
+            @Override
+            public void onUnloadedChunk(NMSUtils.UnloadedChunkCompound unloadedChunkCompound) {
+                Registry<Biome> biomesRegistry = serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
+
+                Codec<PalettedContainer<BlockState>> blocksCodec = PalettedContainer.codec(
+                        Block.BLOCK_STATE_REGISTRY,
+                        BlockState.CODEC,
+                        PalettedContainer.Strategy.SECTION_STATES,
+                        Blocks.AIR.defaultBlockState()
+                );
+                Codec<PalettedContainer<Holder<Biome>>> biomesCodec = PalettedContainer.codec(
+                        biomesRegistry.asHolderIdMap(),
+                        biomesRegistry.holderByNameCodec(),
+                        PalettedContainer.Strategy.SECTION_BIOMES,
+                        biomesRegistry.getHolderOrThrow(Biomes.PLAINS)
+                );
+
+                LevelChunkSection[] chunkSections = new LevelChunkSection[serverLevel.getSectionsCount()];
+
+                ListTag sectionsList = unloadedChunkCompound.getSections();
+                for (int i = 0; i < sectionsList.size(); ++i) {
+                    CompoundTag sectionCompound = sectionsList.getCompound(i);
+                    byte yPosition = sectionCompound.getByte("Y");
+                    int sectionIndex = serverLevel.getSectionIndexFromSectionY(yPosition);
+
+                    if (sectionIndex >= 0 && sectionIndex < chunkSections.length) {
+                        PalettedContainer<BlockState> blocksDataPalette;
+                        if (sectionCompound.contains("block_states", 10)) {
+                            DataResult<PalettedContainer<BlockState>> dataResult = blocksCodec.parse(NbtOps.INSTANCE,
+                                    sectionCompound.getCompound("block_states")).promotePartial((sx) -> {
+                            });
+                            blocksDataPalette = dataResult.getOrThrow(false, error -> {
+                            });
+                        } else {
+                            blocksDataPalette = new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY,
+                                    Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES);
+                        }
+
+                        PalettedContainer<Holder<Biome>> biomesDataPalette;
+                        if (sectionCompound.contains("biomes", 10)) {
+                            DataResult<PalettedContainer<Holder<Biome>>> dataResult = biomesCodec.parse(NbtOps.INSTANCE,
+                                    sectionCompound.getCompound("biomes")).promotePartial((sx) -> {
+                            });
+                            biomesDataPalette = dataResult.getOrThrow(false, error -> {
+                            });
+                        } else {
+                            biomesDataPalette = new PalettedContainer<>(biomesRegistry.asHolderIdMap(),
+                                    biomesRegistry.getHolderOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES);
+                        }
+
+                        chunkSections[sectionIndex] = new LevelChunkSection(yPosition, blocksDataPalette, biomesDataPalette);
+                    }
+
+                }
+
+                ChunkPos chunkPos = unloadedChunkCompound.getChunkPos();
+                ChunkPosition chunkPosition = ChunkPosition.of(serverLevel.getWorld(), chunkPos.x, chunkPos.z);
+                CalculatedChunk calculatedChunk = calculateChunk(chunkPosition, chunkSections);
+                allCalculatedChunks.add(calculatedChunk);
+                unloadedChunksCache.put(chunkPosition, calculatedChunk);
+            }
+
+            @Override
+            public void onFinish() {
+                completableFuture.complete(allCalculatedChunks);
+            }
         });
 
         return completableFuture;

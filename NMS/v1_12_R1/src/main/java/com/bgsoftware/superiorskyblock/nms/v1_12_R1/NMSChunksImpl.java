@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -98,23 +99,34 @@ public class NMSChunksImpl implements NMSChunks {
         WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
         byte biomeBase = (byte) BiomeBase.REGISTRY_ID.a(CraftBlock.biomeToBiomeBase(biome));
 
-        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, null, (chunk, isLoaded) -> {
-            Arrays.fill(chunk.getBiomeIndex(), biomeBase);
-            chunk.markDirty();
-        }, chunk -> {
-            PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(chunk.locX, chunk.locZ);
-            PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
+        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, new NMSUtils.ChunkCallback() {
+            @Override
+            public void onChunk(Chunk chunk, boolean isLoaded) {
+                Arrays.fill(chunk.getBiomeIndex(), biomeBase);
+                chunk.markDirty();
+            }
 
-            playersToUpdate.forEach(player -> {
-                PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
-                playerConnection.sendPacket(unloadChunkPacket);
-                playerConnection.sendPacket(mapChunkPacket);
-            });
+            @Override
+            public void onUpdateChunk(Chunk chunk) {
+                PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(chunk.locX, chunk.locZ);
+                PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
+
+                playersToUpdate.forEach(player -> {
+                    PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
+                    playerConnection.sendPacket(unloadChunkPacket);
+                    playerConnection.sendPacket(mapChunkPacket);
+                });
+            }
+
+            @Override
+            public void onFinish() {
+                // Do nothing.
+            }
         });
     }
 
     @Override
-    public void deleteChunks(Island island, List<ChunkPosition> chunkPositions, Runnable onFinish) {
+    public void deleteChunks(Island island, List<ChunkPosition> chunkPositions, @Nullable Runnable onFinish) {
         if (chunkPositions.isEmpty())
             return;
 
@@ -126,20 +138,34 @@ public class NMSChunksImpl implements NMSChunks {
 
         WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
 
-        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, onFinish, (chunk, isLoaded) -> {
-            Arrays.fill(chunk.getSections(), Chunk.a);
+        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, new NMSUtils.ChunkCallback() {
+            @Override
+            public void onChunk(Chunk chunk, boolean isLoaded) {
+                Arrays.fill(chunk.getSections(), Chunk.a);
 
-            removeEntities(chunk);
+                removeEntities(chunk);
 
-            for (Map.Entry<BlockPosition, TileEntity> tileEntityEntry : chunk.tileEntities.entrySet()) {
-                worldServer.tileEntityListTick.remove(tileEntityEntry.getValue());
-                worldServer.capturedTileEntities.remove(tileEntityEntry.getKey());
+                for (Map.Entry<BlockPosition, TileEntity> tileEntityEntry : chunk.tileEntities.entrySet()) {
+                    worldServer.tileEntityListTick.remove(tileEntityEntry.getValue());
+                    worldServer.capturedTileEntities.remove(tileEntityEntry.getKey());
+                }
+
+                chunk.tileEntities.clear();
+
+                removeBlocks(chunk);
             }
 
-            chunk.tileEntities.clear();
+            @Override
+            public void onUpdateChunk(Chunk chunk) {
+                // Do nothing.
+            }
 
-            removeBlocks(chunk);
-        }, null);
+            @Override
+            public void onFinish() {
+                if (onFinish != null)
+                    onFinish.run();
+            }
+        });
     }
 
     private static boolean isChunkSectionEmpty(ChunkSection chunkSection) {
@@ -171,50 +197,61 @@ public class NMSChunksImpl implements NMSChunks {
 
         WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
 
-        NMSUtils.runActionOnChunks(worldServer, chunksCoords, false, () -> {
-            completableFuture.complete(allCalculatedChunks);
-        }, (chunk, isLoaded) -> {
-            ChunkPosition chunkPosition = ChunkPosition.of(worldServer.getWorld(), chunk.locX, chunk.locZ);
+        NMSUtils.runActionOnChunks(worldServer, chunksCoords, false, new NMSUtils.ChunkCallback() {
+            @Override
+            public void onChunk(Chunk chunk, boolean isLoaded) {
+                ChunkPosition chunkPosition = ChunkPosition.of(worldServer.getWorld(), chunk.locX, chunk.locZ);
 
-            KeyMap<Counter> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
-            List<Location> spawnersLocations = new LinkedList<>();
+                KeyMap<Counter> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+                List<Location> spawnersLocations = new LinkedList<>();
 
-            for (ChunkSection chunkSection : chunk.getSections()) {
-                if (chunkSection != null && chunkSection != Chunk.a && !isChunkSectionEmpty(chunkSection)) {
-                    for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
-                        IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
-                        Block block = blockData.getBlock();
-                        if (block != Blocks.AIR) {
-                            Location location = new Location(worldServer.getWorld(),
-                                    (chunkPosition.getX() << 4) + bp.getX(),
-                                    chunkSection.getYPosition() + bp.getY(),
-                                    (chunkPosition.getZ() << 4) + bp.getZ());
-                            int blockAmount = 1;
+                for (ChunkSection chunkSection : chunk.getSections()) {
+                    if (chunkSection != null && chunkSection != Chunk.a && !isChunkSectionEmpty(chunkSection)) {
+                        for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
+                            IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
+                            Block block = blockData.getBlock();
+                            if (block != Blocks.AIR) {
+                                Location location = new Location(worldServer.getWorld(),
+                                        (chunkPosition.getX() << 4) + bp.getX(),
+                                        chunkSection.getYPosition() + bp.getY(),
+                                        (chunkPosition.getZ() << 4) + bp.getZ());
+                                int blockAmount = 1;
 
-                            if (block instanceof BlockDoubleStep) {
-                                blockAmount = 2;
-                                // Converts the block data to a regular slab
-                                MinecraftKey blockKey = Block.REGISTRY.b(block);
-                                blockData = Block.REGISTRY.get(new MinecraftKey(blockKey.getKey()
-                                                .replace("double_", ""))).getBlockData()
-                                        .set(BlockDoubleStepAbstract.VARIANT, blockData.get(BlockDoubleStepAbstract.VARIANT));
-                            }
+                                if (block instanceof BlockDoubleStep) {
+                                    blockAmount = 2;
+                                    // Converts the block data to a regular slab
+                                    MinecraftKey blockKey = Block.REGISTRY.b(block);
+                                    blockData = Block.REGISTRY.get(new MinecraftKey(blockKey.getKey()
+                                                    .replace("double_", ""))).getBlockData()
+                                            .set(BlockDoubleStepAbstract.VARIANT, blockData.get(BlockDoubleStepAbstract.VARIANT));
+                                }
 
-                            Key blockKey = Keys.of(KeyBlocksCache.getBlockKey(blockData), location);
-                            blockCounts.computeIfAbsent(blockKey, b -> new Counter(0)).inc(blockAmount);
-                            if (block == Blocks.MOB_SPAWNER) {
-                                spawnersLocations.add(location);
+                                Key blockKey = Keys.of(KeyBlocksCache.getBlockKey(blockData), location);
+                                blockCounts.computeIfAbsent(blockKey, b -> new Counter(0)).inc(blockAmount);
+                                if (block == Blocks.MOB_SPAWNER) {
+                                    spawnersLocations.add(location);
+                                }
                             }
                         }
                     }
                 }
+
+                CalculatedChunk calculatedChunk = new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations);
+                allCalculatedChunks.add(calculatedChunk);
+                if (!isLoaded)
+                    unloadedChunksCache.put(chunkPosition, calculatedChunk);
             }
 
-            CalculatedChunk calculatedChunk = new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations);
-            allCalculatedChunks.add(calculatedChunk);
-            if (!isLoaded)
-                unloadedChunksCache.put(chunkPosition, calculatedChunk);
-        }, null);
+            @Override
+            public void onUpdateChunk(Chunk chunk) {
+                // Do nothing.
+            }
+
+            @Override
+            public void onFinish() {
+                completableFuture.complete(allCalculatedChunks);
+            }
+        });
 
         return completableFuture;
     }

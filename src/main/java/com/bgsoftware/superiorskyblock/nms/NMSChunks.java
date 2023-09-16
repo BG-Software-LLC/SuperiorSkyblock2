@@ -18,7 +18,7 @@ public interface NMSChunks {
 
     void setBiome(List<ChunkPosition> chunkPositions, Biome biome, Collection<Player> playersToUpdate);
 
-    void deleteChunks(Island island, List<ChunkPosition> chunkPositions, Runnable onFinish);
+    void deleteChunks(Island island, List<ChunkPosition> chunkPositions, @Nullable Runnable onFinish);
 
     CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
                                                              Map<ChunkPosition, CalculatedChunk> unloadedChunksCache);

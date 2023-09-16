@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class NMSUtils {
 
@@ -54,8 +52,7 @@ public class NMSUtils {
     }
 
     public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
-                                         boolean saveChunks, Runnable onFinish, BiConsumer<Chunk, Boolean> chunkConsumer,
-                                         Consumer<Chunk> updateChunk) {
+                                         boolean saveChunks, ChunkCallback chunkCallback) {
         List<ChunkCoordIntPair> unloadedChunks = new LinkedList<>();
         List<Chunk> loadedChunks = new LinkedList<>();
 
@@ -71,21 +68,20 @@ public class NMSUtils {
 
         boolean hasUnloadedChunks = !unloadedChunks.isEmpty();
 
-        loadedChunks.forEach(loadedChunk -> chunkConsumer.accept(loadedChunk, true));
-
-        if (updateChunk != null)
-            loadedChunks.forEach(updateChunk);
+        loadedChunks.forEach(loadedChunk -> {
+            chunkCallback.onChunk(loadedChunk, true);
+            chunkCallback.onUpdateChunk(loadedChunk);
+        });
 
         if (hasUnloadedChunks) {
-            runActionOnUnloadedChunks(worldServer, unloadedChunks, saveChunks, chunkConsumer, onFinish);
-        } else if (onFinish != null) {
-            onFinish.run();
+            runActionOnUnloadedChunks(worldServer, unloadedChunks, saveChunks, chunkCallback);
+        } else {
+            chunkCallback.onFinish();
         }
     }
 
     public static void runActionOnUnloadedChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunks,
-                                                 boolean saveChunks, BiConsumer<Chunk, Boolean> chunkConsumer,
-                                                 Runnable onFinish) {
+                                                 boolean saveChunks, ChunkCallback chunkCallback) {
         IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(worldServer.getDataManager().getUUID(),
                 uuid -> CHUNK_LOADER.get(worldServer.getChunkProvider()));
 
@@ -101,7 +97,7 @@ public class NMSUtils {
                     Chunk loadedChunk = chunkLoader.a(worldServer, chunkCoords.x, chunkCoords.z);
 
                     if (loadedChunk != null) {
-                        chunkConsumer.accept(loadedChunk, false);
+                        chunkCallback.onChunk(loadedChunk, false);
 
                         if (saveChunks) {
                             if (SAVE_CHUNK.isValid())
@@ -116,8 +112,7 @@ public class NMSUtils {
                 }
             });
         }).runSync(v -> {
-            if (onFinish != null)
-                onFinish.run();
+            chunkCallback.onFinish();
 
             pendingTask.complete(null);
             PENDING_CHUNK_ACTIONS.remove(pendingTask);
@@ -191,6 +186,16 @@ public class NMSUtils {
         return blockPosition.getX() >= -30000000 && blockPosition.getZ() >= -30000000 &&
                 blockPosition.getX() < 30000000 && blockPosition.getZ() < 30000000 &&
                 blockPosition.getY() >= 0 && blockPosition.getY() < world.getHeight();
+    }
+
+    public interface ChunkCallback {
+
+        void onChunk(Chunk chunk, boolean isLoaded);
+
+        void onUpdateChunk(Chunk chunk);
+
+        void onFinish();
+
     }
 
 }
