@@ -113,14 +113,15 @@ public class KeysManagerImpl extends Manager implements KeysManager {
         // This key does not fit MaterialKey nor EntityTypeKey, therefore we'll create a CustomKey.
 
         String[] keySections = key.split(":");
-        return ((BaseKey<? extends Key>) Keys.of(keySections[0], keySections.length >= 2 ? keySections[1] : null)).markAPIKey();
+        Key customKey = Keys.of(keySections[0], keySections.length >= 2 ? keySections[1] : null, KeyIndicator.CUSTOM);
+        return ((BaseKey<? extends Key>) customKey).markAPIKey();
     }
 
     @Override
     public Key getKey(String globalKey, String subKey) {
         Preconditions.checkNotNull(globalKey, "globalKey parameter cannot be null.");
         Preconditions.checkNotNull(subKey, "subKey parameter cannot be null.");
-        return ((BaseKey<? extends Key>) Keys.of(globalKey, subKey)).markAPIKey();
+        return ((BaseKey<? extends Key>) Keys.of(globalKey, subKey, KeyIndicator.CUSTOM)).markAPIKey();
     }
 
     @Override
