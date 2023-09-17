@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
@@ -23,6 +24,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
+import java.util.Optional;
 
 public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.View, MenuCounts.BlockCount> {
 
@@ -161,47 +163,56 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
     @Override
     public ItemStack modifyViewItem(ItemStack buttonItem) {
         Key rawKey = pagedObject.getBlockKey();
-        Key blockKey = plugin.getBlockValues().convertKey(rawKey);
+        Pair<Key, ItemStack> customKeyItem = plugin.getBlockValues().convertCustomKeyItem(rawKey);
 
         BigDecimal amount = new BigDecimal(pagedObject.getAmount());
 
-        String convertedItem = BLOCKS_TO_ITEMS.get(blockKey.getGlobalKey());
-
-        if (convertedItem != null) {
-            Key tempBlockType = Keys.ofMaterialAndData(convertedItem);
-            if (tempBlockType instanceof MaterialKey)
-                blockKey = tempBlockType;
-        }
-
-        Material blockMaterial;
-        byte damage = 0;
-        String materialName = null;
-
-        try {
-            blockMaterial = Material.valueOf(blockKey.getGlobalKey());
-            if (!blockKey.getSubKey().isEmpty()) {
-                try {
-                    damage = Byte.parseByte(blockKey.getSubKey());
-                } catch (Throwable ignored) {
-                }
-            }
-        } catch (Exception ex) {
-            blockMaterial = Material.BEDROCK;
-            materialName = blockKey.getGlobalKey();
-        }
-
         ItemMeta currentMeta = buttonItem.getItemMeta();
         ItemBuilder itemBuilder;
-        String texture;
+        String materialName = null;
 
-        if (blockMaterial == Materials.SPAWNER.toBukkitType() && !blockKey.getSubKey().isEmpty() &&
-                !(texture = ItemSkulls.getTexture(blockKey.getSubKey())).isEmpty()) {
-            itemBuilder = new ItemBuilder(ItemSkulls.getPlayerHead(Materials.PLAYER_HEAD.toBukkitItem(), texture));
-            materialName = blockKey.getSubKey() + "_SPAWNER";
+        ItemStack customItem = customKeyItem.getValue();
+        if (customItem != null) {
+            itemBuilder = new ItemBuilder(customItem);
+            materialName = Optional.ofNullable(rawKey.getSubKey()).orElseGet(rawKey::toString);
         } else {
-            itemBuilder = new ItemBuilder(blockMaterial, damage);
-            if (materialName == null)
-                materialName = rawKey.getGlobalKey();
+            Key blockKey = customKeyItem.getKey();
+
+            String convertedItem = BLOCKS_TO_ITEMS.get(blockKey.getGlobalKey());
+
+            if (convertedItem != null) {
+                Key tempBlockType = Keys.ofMaterialAndData(convertedItem);
+                if (tempBlockType instanceof MaterialKey)
+                    blockKey = tempBlockType;
+            }
+
+            Material blockMaterial;
+            byte damage = 0;
+
+            try {
+                blockMaterial = Material.valueOf(blockKey.getGlobalKey());
+                if (!blockKey.getSubKey().isEmpty()) {
+                    try {
+                        damage = Byte.parseByte(blockKey.getSubKey());
+                    } catch (Throwable ignored) {
+                    }
+                }
+            } catch (Exception ex) {
+                blockMaterial = Material.BEDROCK;
+                materialName = blockKey.getGlobalKey();
+            }
+
+            String texture;
+
+            if (blockMaterial == Materials.SPAWNER.toBukkitType() && !blockKey.getSubKey().isEmpty() &&
+                    !(texture = ItemSkulls.getTexture(blockKey.getSubKey())).isEmpty()) {
+                itemBuilder = new ItemBuilder(ItemSkulls.getPlayerHead(Materials.PLAYER_HEAD.toBukkitItem(), texture));
+                materialName = blockKey.getSubKey() + "_SPAWNER";
+            } else {
+                itemBuilder = new ItemBuilder(blockMaterial, damage);
+                if (materialName == null)
+                    materialName = rawKey.getGlobalKey();
+            }
         }
 
         BigDecimal worthValue = plugin.getBlockValues().getBlockWorth(rawKey);

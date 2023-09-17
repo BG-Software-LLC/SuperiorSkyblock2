@@ -52,4 +52,4 @@ include 'NMS:v1_17'
 include 'NMS:v1_18'
 include 'NMS:v1_19'
 include 'NMS:v1_20_1'
-
+include 'Hooks:ItemsAdder'

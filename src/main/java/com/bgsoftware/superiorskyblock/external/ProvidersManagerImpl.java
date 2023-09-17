@@ -417,6 +417,9 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
         if (Bukkit.getPluginManager().isPluginEnabled("Oraxen"))
             registerHook("OraxenHook");
+
+        if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder"))
+            registerHook("ItemsAdderHook");
     }
 
     private void registerSpawnersProvider() {

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
@@ -252,13 +253,15 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
         return key == null ? original : key;
     }
 
-    public Key convertKey(Key original) {
+    @Nullable
+    public Pair<Key, ItemStack> convertCustomKeyItem(Key original) {
         for (Map.Entry<Key, CustomKeyParser> entry : customKeyParsers.entrySet()) {
-            if (entry.getValue().isCustomKey(original))
-                return entry.getKey();
+            if (entry.getValue().isCustomKey(original)) {
+                return new Pair<>(entry.getKey(), entry.getValue().getCustomKeyItem(original));
+            }
         }
 
-        return original;
+        return new Pair<>(original, null);
     }
 
     public BigDecimal convertValueToLevel(BigDecimal value) {
