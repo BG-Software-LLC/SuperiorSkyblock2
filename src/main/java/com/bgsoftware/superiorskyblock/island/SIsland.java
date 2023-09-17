@@ -4648,8 +4648,10 @@ public class SIsland implements Island {
 
                     KeyMap<Value<Integer>> worldGeneratorRates = cobbleGeneratorValues.get(environment);
 
-                    if (worldGeneratorRates != null && !upgradeLevelGeneratorRates.isEmpty())
-                        worldGeneratorRates.entrySet().removeIf(entry -> entry.getValue() instanceof SyncedValue);
+                    if (worldGeneratorRates != null && !upgradeLevelGeneratorRates.isEmpty()) {
+                        KeyMap<Value<Integer>> worldGeneratorRatesCopy = worldGeneratorRates;
+                        worldGeneratorRatesCopy.removeIf(key -> worldGeneratorRatesCopy.get(key) instanceof SyncedValue);
+                    }
 
                     for (Map.Entry<Key, Value<Integer>> entry : upgradeLevelGeneratorRates.entrySet()) {
                         Key block = entry.getKey();
