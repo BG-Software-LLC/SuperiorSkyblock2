@@ -95,7 +95,9 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onBlockPlace(BlockPlaceEvent e) {
-        onBlockPlace(Keys.of(e.getBlock()), e.getBlock().getLocation(), 1, e.getBlockReplacedState(),
+        boolean shouldAvoidReplacedState = e.getBlockReplacedState().equals(e.getBlock().getState());
+        onBlockPlace(Keys.of(e.getBlock()), e.getBlock().getLocation(), 1,
+                shouldAvoidReplacedState ? null : e.getBlockReplacedState(),
                 BlockTrackFlags.DIRTY_CHUNKS | BlockTrackFlags.SAVE_BLOCK_COUNT);
     }
 
