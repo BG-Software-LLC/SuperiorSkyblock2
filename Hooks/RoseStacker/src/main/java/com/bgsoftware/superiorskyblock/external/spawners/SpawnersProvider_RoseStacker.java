@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.external.spawners;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import dev.rosewood.rosestacker.api.RoseStackerAPI;
@@ -55,9 +55,9 @@ public class SpawnersProvider_RoseStacker implements SpawnersProvider_AutoDetect
     @Override
     public String getSpawnerType(ItemStack itemStack) {
         Preconditions.checkNotNull(itemStack, "itemStack parameter cannot be null.");
-        return GET_STACKED_ITEM_ENTITY_TYPE.isValid() ?
-                GET_STACKED_ITEM_ENTITY_TYPE.invoke(null, itemStack).name() :
-                ItemUtils.getStackedItemEntityType(itemStack).name();
+        EntityType entityType = GET_STACKED_ITEM_ENTITY_TYPE.isValid() ?
+                GET_STACKED_ITEM_ENTITY_TYPE.invoke(null, itemStack) : ItemUtils.getStackedItemEntityType(itemStack);
+        return entityType == null ? null : entityType.name();
     }
 
     @SuppressWarnings("unused")
@@ -68,9 +68,7 @@ public class SpawnersProvider_RoseStacker implements SpawnersProvider_AutoDetect
             Location location = e.getStack().getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
             if (island != null) {
-                EntityType spawnerType = e.getStack().getSpawner().getSpawnedType();
-                Key spawnerKey = Key.ofSpawner(spawnerType);
-                island.handleBlockPlace(spawnerKey, e.getIncreaseAmount());
+                island.handleBlockPlace(Keys.of(e.getStack().getBlock()), e.getIncreaseAmount());
             }
         }
 
@@ -79,9 +77,7 @@ public class SpawnersProvider_RoseStacker implements SpawnersProvider_AutoDetect
             Location location = e.getStack().getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
             if (island != null) {
-                EntityType spawnerType = e.getStack().getSpawner().getSpawnedType();
-                Key spawnerKey = Key.ofSpawner(spawnerType);
-                island.handleBlockBreak(spawnerKey, e.getDecreaseAmount());
+                island.handleBlockBreak(Keys.of(e.getStack().getBlock()), e.getDecreaseAmount());
             }
         }
 

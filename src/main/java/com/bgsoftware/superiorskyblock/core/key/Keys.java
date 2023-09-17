@@ -23,6 +23,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class Keys {
@@ -64,7 +65,7 @@ public class Keys {
         Key baseKey;
         if (blockType == Materials.SPAWNER.toBukkitType()) {
             CreatureSpawner creatureSpawner = (CreatureSpawner) block.getState();
-            baseKey = SpawnerKey.of(EntityTypeKey.of(creatureSpawner.getSpawnedType()));
+            baseKey = getSpawnerKeyFromCreatureSpawner(creatureSpawner);
         } else {
             short durability = block.getData();
             baseKey = MaterialKey.of(blockType, durability);
@@ -76,7 +77,7 @@ public class Keys {
     public static Key of(BlockState blockState) {
         Key baseKey;
         if (blockState instanceof CreatureSpawner) {
-            baseKey = SpawnerKey.of(EntityTypeKey.of(((CreatureSpawner) blockState).getSpawnedType()));
+            baseKey = getSpawnerKeyFromCreatureSpawner((CreatureSpawner) blockState);
         } else {
             baseKey = MaterialKey.of(blockState.getType(), blockState.getRawData());
         }
@@ -158,6 +159,12 @@ public class Keys {
 
     public static <T extends Key> Key of(Class<T> baseKeyClass, LazyReference<T> keyLoader) {
         return new LazyKey<>(baseKeyClass, keyLoader);
+    }
+
+    private static SpawnerKey getSpawnerKeyFromCreatureSpawner(CreatureSpawner creatureSpawner) {
+        EntityTypeKey entityTypeKey = Optional.ofNullable(creatureSpawner.getSpawnedType())
+                .map(EntityTypeKey::of).orElse(null);
+        return SpawnerKey.of(entityTypeKey);
     }
 
 }

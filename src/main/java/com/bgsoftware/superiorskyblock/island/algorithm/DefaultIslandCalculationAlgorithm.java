@@ -24,7 +24,6 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import org.bukkit.Location;
-import org.bukkit.block.CreatureSpawner;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -127,20 +126,19 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
             // Calculate spawner counts
             for (SpawnerInfo spawnerInfo : spawnersToCheck) {
                 try {
-                    CreatureSpawner creatureSpawner = (CreatureSpawner) spawnerInfo.location.getBlock().getState();
-                    blockKey = Keys.ofSpawner(creatureSpawner.getSpawnedType(), spawnerInfo.location);
+                    blockKey = Keys.of(spawnerInfo.location.getBlock());
                     blockCount = spawnerInfo.spawnerCount;
 
                     if (blockCount <= 0) {
                         Pair<Integer, String> spawnersProviderInfo = plugin.getProviders()
                                 .getSpawnersProvider().getSpawner(spawnerInfo.location);
 
-                        String entityType = spawnersProviderInfo.getValue();
-                        if (entityType == null)
-                            entityType = creatureSpawner.getSpawnedType().name();
-
                         blockCount = spawnersProviderInfo.getKey();
-                        blockKey = Keys.ofSpawner(entityType, spawnerInfo.location);
+
+                        String entityType = spawnersProviderInfo.getValue();
+                        if (entityType != null) {
+                            blockKey = Keys.ofSpawner(entityType, spawnerInfo.location);
+                        }
                     }
 
                     blockCounts.addCounts(blockKey, blockCount);
