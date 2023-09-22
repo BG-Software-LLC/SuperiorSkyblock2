@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedList;
@@ -22,8 +21,6 @@ public class SWarpCategory implements WarpCategory {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    public static final ItemStack DEFAULT_WARP_ICON = new ItemBuilder(Material.BOOK)
-            .withName("&6{0}").build();
 
     private final List<IslandWarp> islandWarps = new LinkedList<>();
     private final UUID islandUUID;
@@ -37,7 +34,7 @@ public class SWarpCategory implements WarpCategory {
         this.islandUUID = islandUUID;
         this.name = name;
         this.slot = slot;
-        this.icon = icon == null ? DEFAULT_WARP_ICON.clone() : icon;
+        this.icon = icon == null ? WarpIcons.DEFAULT_WARP_CATEGORY_ICON.build() : icon;
     }
 
     @Override
@@ -100,7 +97,7 @@ public class SWarpCategory implements WarpCategory {
     public void setIcon(@Nullable ItemStack icon) {
         Log.debug(Debug.SET_WARP_CATEGORY_ICON, getOwnerName(), this.name, icon);
 
-        this.icon = icon == null ? DEFAULT_WARP_ICON.clone() : icon.clone();
+        this.icon = icon == null ? WarpIcons.DEFAULT_WARP_CATEGORY_ICON.build() : icon.clone();
 
         IslandsDatabaseBridge.updateWarpCategoryIcon(getIsland(), this);
     }
