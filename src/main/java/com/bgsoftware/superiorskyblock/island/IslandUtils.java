@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
@@ -17,7 +18,6 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import org.bukkit.Chunk;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.event.inventory.InventoryType;
@@ -73,11 +73,11 @@ public class IslandUtils {
         boolean onlyProtected = (flags & IslandChunkFlags.ONLY_PROTECTED) != 0;
         boolean noEmptyChunks = (flags & IslandChunkFlags.NO_EMPTY_CHUNKS) != 0;
 
-        Location min = onlyProtected ? island.getMinimumProtected() : island.getMinimum();
-        Location max = onlyProtected ? island.getMaximumProtected() : island.getMaximum();
+        BlockPosition min = onlyProtected ? island.getMinimumProtectedPosition() : island.getMinimumPosition();
+        BlockPosition max = onlyProtected ? island.getMaximumProtectedPosition() : island.getMaximumPosition();
 
-        for (int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++) {
-            for (int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++) {
+        for (int x = min.getX() >> 4; x <= max.getX() >> 4; x++) {
+            for (int z = min.getZ() >> 4; z <= max.getZ() >> 4; z++) {
                 if (!noEmptyChunks || island.isChunkDirty(worldInfo.getName(), x, z)) {
                     chunkCoords.add(ChunkPosition.of(worldInfo, x, z));
                 }

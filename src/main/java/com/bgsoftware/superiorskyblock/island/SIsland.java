@@ -1036,9 +1036,10 @@ public class SIsland implements Island {
     public List<Chunk> getLoadedChunks(World.Environment environment, @IslandChunkFlags int flags) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null");
 
-        World world = getCenter(environment).getWorld();
+        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, environment);
+
         return new SequentialListBuilder<Chunk>().filter(Objects::nonNull).build(
-                IslandUtils.getChunkCoords(this, WorldInfo.of(world), flags), plugin.getNMSChunks()::getChunkIfLoaded);
+                IslandUtils.getChunkCoords(this, worldInfo, flags), plugin.getNMSChunks()::getChunkIfLoaded);
     }
 
     @Override
@@ -1152,9 +1153,10 @@ public class SIsland implements Island {
     public void resetChunks(World.Environment environment, @IslandChunkFlags int flags, @Nullable Runnable onFinish) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null");
 
-        World world = getCenter(environment).getWorld();
+        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, environment);
+
         List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this,
-                WorldInfo.of(world), flags | IslandChunkFlags.NO_EMPTY_CHUNKS);
+                worldInfo, flags | IslandChunkFlags.NO_EMPTY_CHUNKS);
 
         if (chunkPositions.isEmpty()) {
             if (onFinish != null)
@@ -1771,9 +1773,11 @@ public class SIsland implements Island {
                 if (task != null)
                     return task;
 
-                Location centerBlock = getCenter(plugin.getSettings().getWorlds().getDefaultWorld());
+                World.Environment defaultWorldEnvironment = plugin.getSettings().getWorlds().getDefaultWorld();
+                WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, defaultWorldEnvironment);
+                Location centerBlock = getCenter(defaultWorldEnvironment);
 
-                ChunkPosition centerChunkPosition = ChunkPosition.of(WorldInfo.of(centerBlock.getWorld()),
+                ChunkPosition centerChunkPosition = ChunkPosition.of(worldInfo,
                         centerBlock.getBlockX() >> 4, centerBlock.getBlockZ() >> 4);
 
                 return ChunksProvider.loadChunk(centerChunkPosition, ChunkLoadReason.BIOME_REQUEST, null)
@@ -1814,22 +1818,22 @@ public class SIsland implements Island {
                 .build(getAllPlayersInside(), SuperiorPlayer::asPlayer);
 
         {
-            World normalWorld = getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld();
-            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(normalWorld), 0);
+            WorldInfo normalWorld = plugin.getGrid().getIslandsWorldInfo(this, plugin.getSettings().getWorlds().getDefaultWorld());
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, normalWorld, 0);
             plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
         }
 
         if (plugin.getProviders().getWorldsProvider().isNetherEnabled() && wasSchematicGenerated(World.Environment.NETHER)) {
-            World netherWorld = getCenter(World.Environment.NETHER).getWorld();
+            WorldInfo netherWorld = plugin.getGrid().getIslandsWorldInfo(this, World.Environment.NETHER);
             Biome netherBiome = IslandUtils.getDefaultWorldBiome(World.Environment.NETHER);
-            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(netherWorld), 0);
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, netherWorld, 0);
             plugin.getNMSChunks().setBiome(chunkPositions, netherBiome, playersToUpdate);
         }
 
         if (plugin.getProviders().getWorldsProvider().isEndEnabled() && wasSchematicGenerated(World.Environment.THE_END)) {
-            World endWorld = getCenter(World.Environment.THE_END).getWorld();
+            WorldInfo endWorld = plugin.getGrid().getIslandsWorldInfo(this, World.Environment.THE_END);
             Biome endBiome = IslandUtils.getDefaultWorldBiome(World.Environment.THE_END);
-            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(endWorld), 0);
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, endWorld, 0);
             plugin.getNMSChunks().setBiome(chunkPositions, endBiome, playersToUpdate);
         }
 
