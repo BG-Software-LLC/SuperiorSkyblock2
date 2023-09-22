@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridg
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
@@ -17,8 +16,6 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Objects;
 
 public class SIslandWarp implements IslandWarp {
-
-    public static TemplateItem DEFAULT_WARP_ICON;
 
     private final WarpCategory warpCategory;
 

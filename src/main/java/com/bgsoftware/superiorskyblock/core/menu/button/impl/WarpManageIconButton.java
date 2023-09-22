@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpManage;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
-import com.bgsoftware.superiorskyblock.island.warp.SIslandWarp;
+import com.bgsoftware.superiorskyblock.island.warp.WarpIcons;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -24,7 +24,7 @@ public class WarpManageIconButton extends AbstractMenuViewButton<MenuWarpManage.
         IslandWarp islandWarp = menuView.getIslandWarp();
 
         ItemBuilder itemBuilder = islandWarp.getRawIcon() == null ?
-                SIslandWarp.DEFAULT_WARP_ICON.getBuilder() : new ItemBuilder(islandWarp.getRawIcon());
+                WarpIcons.DEFAULT_WARP_ICON.getBuilder() : new ItemBuilder(islandWarp.getRawIcon());
 
         ItemStack buttonItem = super.createViewItem();
 
