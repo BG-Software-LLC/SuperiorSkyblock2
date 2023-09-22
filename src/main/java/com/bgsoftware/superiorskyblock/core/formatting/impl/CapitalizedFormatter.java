@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.formatting.impl;
 
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.IFormatter;
 
 import java.util.Locale;
@@ -31,9 +32,11 @@ public class CapitalizedFormatter implements IFormatter<String> {
         value = value.replace(":", "_-_");
 
         for (String subKey : value.split("_")) {
-            formattedKey.append(" ")
-                    .append(subKey.substring(0, 1).toUpperCase(Locale.ENGLISH))
-                    .append(subKey.substring(1).toLowerCase(Locale.ENGLISH));
+            if (!Text.isBlank(subKey)) {
+                formattedKey.append(" ")
+                        .append(subKey.substring(0, 1).toUpperCase(Locale.ENGLISH))
+                        .append(subKey.substring(1).toLowerCase(Locale.ENGLISH));
+            }
         }
 
         return formattedKey.substring(1);

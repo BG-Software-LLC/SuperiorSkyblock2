@@ -27,6 +27,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.external.async.AsyncProvider;
@@ -300,7 +301,8 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     }
 
     public Key getSpawnerKey(ItemStack itemStack) {
-        return Keys.ofSpawner(spawnersProvider.getSpawnerType(itemStack));
+        String type = spawnersProvider.getSpawnerType(itemStack);
+        return type == null ? SpawnerKey.GLOBAL_KEY : Keys.ofSpawner(type);
     }
 
     public boolean hasSnapshotsSupport() {
@@ -424,6 +426,9 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
         if (Bukkit.getPluginManager().isPluginEnabled("Oraxen"))
             registerHook("OraxenHook");
+
+        if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder"))
+            registerHook("ItemsAdderHook");
     }
 
     private void registerSpawnersProvider() {

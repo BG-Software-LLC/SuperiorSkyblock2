@@ -28,8 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class NMSUtils {
 
@@ -45,8 +43,7 @@ public class NMSUtils {
     }
 
     public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
-                                         boolean saveChunks, Runnable onFinish, BiConsumer<Chunk, Boolean> chunkConsumer,
-                                         Consumer<Chunk> updateChunk) {
+                                         boolean saveChunks, ChunkCallback chunkCallback) {
         List<ChunkCoordIntPair> unloadedChunks = new LinkedList<>();
         List<Chunk> loadedChunks = new LinkedList<>();
 
@@ -62,21 +59,17 @@ public class NMSUtils {
 
         boolean hasUnloadedChunks = !unloadedChunks.isEmpty();
 
-        loadedChunks.forEach(loadedChunk -> chunkConsumer.accept(loadedChunk, true));
-
-        if (updateChunk != null)
-            loadedChunks.forEach(updateChunk);
+        loadedChunks.forEach(loadedChunk -> chunkCallback.onChunk(loadedChunk, true));
 
         if (hasUnloadedChunks) {
-            runActionOnUnloadedChunks(worldServer, unloadedChunks, saveChunks, chunkConsumer, onFinish);
-        } else if (onFinish != null) {
-            onFinish.run();
+            runActionOnUnloadedChunks(worldServer, unloadedChunks, saveChunks, chunkCallback);
+        } else {
+            chunkCallback.onFinish();
         }
     }
 
     public static void runActionOnUnloadedChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunks,
-                                                 boolean saveChunks, BiConsumer<Chunk, Boolean> chunkConsumer,
-                                                 Runnable onFinish) {
+                                                 boolean saveChunks, ChunkCallback chunkCallback) {
         IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(worldServer.getDataManager().getUUID(),
                 uuid -> CHUNK_LOADER.get(worldServer.chunkProviderServer));
 
@@ -88,10 +81,9 @@ public class NMSUtils {
             try {
                 Chunk loadedChunk = chunkLoader.a(worldServer, chunkCoords.x, chunkCoords.z);
 
-                if (loadedChunk != null)
-                    chunkConsumer.accept(loadedChunk, false);
-
                 if (loadedChunk != null) {
+                    chunkCallback.onChunk(loadedChunk, false);
+
                     if (saveChunks) {
                         try {
                             chunkLoader.a(worldServer, loadedChunk);
@@ -101,8 +93,7 @@ public class NMSUtils {
                     }
                 }
 
-                if (onFinish != null)
-                    onFinish.run();
+                chunkCallback.onFinish();
             } catch (Exception error) {
                 Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkCoords, ":");
             }
@@ -168,6 +159,14 @@ public class NMSUtils {
         return blockPosition.getX() >= -30000000 && blockPosition.getZ() >= -30000000 &&
                 blockPosition.getX() < 30000000 && blockPosition.getZ() < 30000000 &&
                 blockPosition.getY() >= 0 && blockPosition.getY() < world.getHeight();
+    }
+
+    public interface ChunkCallback {
+
+        void onChunk(Chunk chunk, boolean isLoaded);
+
+        void onFinish();
+
     }
 
 }

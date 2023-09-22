@@ -380,14 +380,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             List<Pair<Integer, String>> versions = Arrays.asList(
                     new Pair<>(2729, null),
-                    new Pair<>(2730, "v117"),
-                    new Pair<>(2975, "v1182"),
-                    new Pair<>(3105, "v119"),
-                    new Pair<>(3117, "v1191"),
-                    new Pair<>(3120, "v1192"),
-                    new Pair<>(3218, "v1193"),
-                    new Pair<>(3337, "v1194"),
-                    new Pair<>(3465, "v1201")
+                    new Pair<>(2730, "v1_17"),
+                    new Pair<>(2975, "v1_18"),
+                    new Pair<>(3337, "v1_19"),
+                    new Pair<>(3465, "v1_20_1")
             );
 
             for (Pair<Integer, String> versionData : versions) {

@@ -23,11 +23,12 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class Keys {
 
-    public static final Key EMPTY = CustomKey.of("", null);
+    public static final Key EMPTY = CustomKey.of("", null, KeyIndicator.CUSTOM);
 
     private static final Pattern KEY_SPLITTER_PATTERN = Pattern.compile("[:;]");
 
@@ -47,7 +48,7 @@ public class Keys {
         try {
             return EntityTypeKey.of(EntityType.valueOf(customType.toUpperCase(Locale.ENGLISH)));
         } catch (IllegalArgumentException error) {
-            return CustomKey.of(customType, null);
+            return CustomKey.of(customType, null, KeyIndicator.ENTITY_TYPE);
         }
     }
 
@@ -64,7 +65,7 @@ public class Keys {
         Key baseKey;
         if (blockType == Materials.SPAWNER.toBukkitType()) {
             CreatureSpawner creatureSpawner = (CreatureSpawner) block.getState();
-            baseKey = SpawnerKey.of(EntityTypeKey.of(creatureSpawner.getSpawnedType()));
+            baseKey = getSpawnerKeyFromCreatureSpawner(creatureSpawner);
         } else {
             short durability = block.getData();
             baseKey = MaterialKey.of(blockType, durability);
@@ -76,7 +77,7 @@ public class Keys {
     public static Key of(BlockState blockState) {
         Key baseKey;
         if (blockState instanceof CreatureSpawner) {
-            baseKey = SpawnerKey.of(EntityTypeKey.of(((CreatureSpawner) blockState).getSpawnedType()));
+            baseKey = getSpawnerKeyFromCreatureSpawner((CreatureSpawner) blockState);
         } else {
             baseKey = MaterialKey.of(blockState.getType(), blockState.getRawData());
         }
@@ -118,7 +119,7 @@ public class Keys {
             short blockData = Short.parseShort(data);
             return Keys.of(blockType, blockData);
         } catch (Exception error) {
-            return Keys.of(material, data);
+            return Keys.of(material, data, KeyIndicator.MATERIAL);
         }
     }
 
@@ -147,17 +148,23 @@ public class Keys {
 
     /* Custom keys */
 
-    public static Key of(String globalKey, @Nullable String subKey) {
-        return CustomKey.of(globalKey, subKey);
+    public static Key of(String globalKey, @Nullable String subKey, KeyIndicator keyType) {
+        return CustomKey.of(globalKey, subKey, keyType);
     }
 
     public static Key ofCustom(String key) {
         String[] sections = KEY_SPLITTER_PATTERN.split(key);
-        return of(sections[0], sections.length > 2 ? sections[1] : null);
+        return of(sections[0], sections.length > 2 ? sections[1] : null, KeyIndicator.CUSTOM);
     }
 
     public static <T extends Key> Key of(Class<T> baseKeyClass, LazyReference<T> keyLoader) {
         return new LazyKey<>(baseKeyClass, keyLoader);
+    }
+
+    private static SpawnerKey getSpawnerKeyFromCreatureSpawner(CreatureSpawner creatureSpawner) {
+        EntityTypeKey entityTypeKey = Optional.ofNullable(creatureSpawner.getSpawnedType())
+                .map(EntityTypeKey::of).orElse(null);
+        return SpawnerKey.of(entityTypeKey);
     }
 
 }

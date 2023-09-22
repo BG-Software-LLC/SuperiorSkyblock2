@@ -89,34 +89,45 @@ public class NMSChunksImpl implements NMSChunks {
         IRegistry<BiomeBase> biomeBaseRegistry = worldServer.r().b(IRegistry.ay);
         BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biomeBaseRegistry, biome);
 
-        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, null, chunk -> {
-            ChunkCoordIntPair chunkCoords = chunk.getPos();
-            BiomeBase[] biomeBases = BIOME_BASE_ARRAY.get(chunk.getBiomeIndex());
+        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, new NMSUtils.ChunkCallback() {
+            @Override
+            public void onLoadedChunk(Chunk chunk) {
+                ChunkCoordIntPair chunkCoords = chunk.getPos();
+                BiomeBase[] biomeBases = BIOME_BASE_ARRAY.get(chunk.getBiomeIndex());
 
-            if (biomeBases == null)
-                throw new RuntimeException("Error while receiving biome bases of chunk (" + chunkCoords.x + "," + chunkCoords.z + ").");
+                if (biomeBases == null)
+                    throw new RuntimeException("Error while receiving biome bases of chunk (" + chunkCoords.x + "," + chunkCoords.z + ").");
 
-            Arrays.fill(biomeBases, biomeBase);
-            chunk.markDirty();
+                Arrays.fill(biomeBases, biomeBase);
+                chunk.markDirty();
 
-            LightEngineThreaded lightEngineThreaded = (LightEngineThreaded) worldServer.e();
+                LightEngineThreaded lightEngineThreaded = (LightEngineThreaded) worldServer.e();
 
-            PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(chunkCoords.x, chunkCoords.z);
-            //noinspection deprecation
-            PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
+                PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(chunkCoords.x, chunkCoords.z);
+                //noinspection deprecation
+                PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
 
-            PacketPlayOutLightUpdate lightUpdatePacket = new PacketPlayOutLightUpdate(chunkCoords, lightEngineThreaded, true);
+                PacketPlayOutLightUpdate lightUpdatePacket = new PacketPlayOutLightUpdate(chunkCoords, lightEngineThreaded, true);
 
-            playersToUpdate.forEach(player -> {
-                PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
-                playerConnection.sendPacket(unloadChunkPacket);
-                playerConnection.sendPacket(lightUpdatePacket);
-                playerConnection.sendPacket(mapChunkPacket);
-            });
-        }, (chunkCoords, unloadedChunk) -> {
-            int[] biomes = unloadedChunk.hasKeyOfType("Biomes", 11) ? unloadedChunk.getIntArray("Biomes") : new int[256];
-            Arrays.fill(biomes, biomeBaseRegistry.a(biomeBase));
-            unloadedChunk.setIntArray("Biomes", biomes);
+                playersToUpdate.forEach(player -> {
+                    PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
+                    playerConnection.sendPacket(unloadChunkPacket);
+                    playerConnection.sendPacket(lightUpdatePacket);
+                    playerConnection.sendPacket(mapChunkPacket);
+                });
+            }
+
+            @Override
+            public void onUnloadedChunk(ChunkCoordIntPair chunkPos, NBTTagCompound unloadedChunk) {
+                int[] biomes = unloadedChunk.hasKeyOfType("Biomes", 11) ? unloadedChunk.getIntArray("Biomes") : new int[256];
+                Arrays.fill(biomes, biomeBaseRegistry.a(biomeBase));
+                unloadedChunk.setIntArray("Biomes", biomes);
+            }
+
+            @Override
+            public void onFinish() {
+                // Do nothing.
+            }
         });
     }
 
@@ -133,53 +144,65 @@ public class NMSChunksImpl implements NMSChunks {
 
         WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
 
-        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, onFinish, chunk -> {
-            Arrays.fill(chunk.getSections(), Chunk.a);
-            removeEntities(chunk);
+        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, new NMSUtils.ChunkCallback() {
+            @Override
+            public void onLoadedChunk(Chunk chunk) {
+                Arrays.fill(chunk.getSections(), Chunk.a);
+                removeEntities(chunk);
 
-            new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::removeTileEntity);
-            chunk.tileEntities.clear();
+                new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::removeTileEntity);
+                chunk.tileEntities.clear();
 
-            removeBlocks(chunk);
-        }, (chunkCoords, levelCompound) -> {
-            NBTTagList sectionsList = new NBTTagList();
-            NBTTagList tileEntities = new NBTTagList();
+                removeBlocks(chunk);
+            }
 
-            levelCompound.set("Sections", sectionsList);
-            levelCompound.set("TileEntities", tileEntities);
-            levelCompound.set("Entities", new NBTTagList());
+            @Override
+            public void onUnloadedChunk(ChunkCoordIntPair chunkPos, NBTTagCompound unloadedChunk) {
+                NBTTagList sectionsList = new NBTTagList();
+                NBTTagList tileEntities = new NBTTagList();
 
-            if (!(worldServer.generator instanceof IslandsGenerator)) {
-                ProtoChunk protoChunk = NMSUtils.createProtoChunk(chunkCoords, worldServer);
+                unloadedChunk.set("Sections", sectionsList);
+                unloadedChunk.set("TileEntities", tileEntities);
+                unloadedChunk.set("Entities", new NBTTagList());
 
-                try {
-                    CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(worldServer,
-                            worldServer.getChunkProvider().chunkGenerator, worldServer.generator);
-                    customChunkGenerator.buildBase(null, protoChunk);
-                } catch (Exception ignored) {
-                }
+                if (!(worldServer.generator instanceof IslandsGenerator)) {
+                    ProtoChunk protoChunk = NMSUtils.createProtoChunk(chunkPos, worldServer);
 
-                ChunkSection[] chunkSections = protoChunk.getSections();
+                    try {
+                        CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(worldServer,
+                                worldServer.getChunkProvider().chunkGenerator, worldServer.generator);
+                        customChunkGenerator.buildBase(null, protoChunk);
+                    } catch (Exception ignored) {
+                    }
 
-                for (int i = -1; i < 17; ++i) {
-                    int chunkSectionIndex = i;
-                    ChunkSection chunkSection = Arrays.stream(chunkSections).filter(_chunkPosition ->
-                                    _chunkPosition != null && _chunkPosition.getYPosition() >> 4 == chunkSectionIndex)
-                            .findFirst().orElse(Chunk.a);
+                    ChunkSection[] chunkSections = protoChunk.getSections();
 
-                    if (chunkSection != Chunk.a) {
-                        NBTTagCompound sectionCompound = new NBTTagCompound();
-                        sectionCompound.setByte("Y", (byte) (i & 255));
-                        chunkSection.getBlocks().a(sectionCompound, "Palette", "BlockStates");
-                        sectionsList.add(sectionCompound);
+                    for (int i = -1; i < 17; ++i) {
+                        int chunkSectionIndex = i;
+                        ChunkSection chunkSection = Arrays.stream(chunkSections).filter(_chunkPosition ->
+                                        _chunkPosition != null && _chunkPosition.getYPosition() >> 4 == chunkSectionIndex)
+                                .findFirst().orElse(Chunk.a);
+
+                        if (chunkSection != Chunk.a) {
+                            NBTTagCompound sectionCompound = new NBTTagCompound();
+                            sectionCompound.setByte("Y", (byte) (i & 255));
+                            chunkSection.getBlocks().a(sectionCompound, "Palette", "BlockStates");
+                            sectionsList.add(sectionCompound);
+                        }
+                    }
+
+                    for (BlockPosition tilePosition : protoChunk.c()) {
+                        NBTTagCompound tileCompound = protoChunk.i(tilePosition);
+                        if (tileCompound != null)
+                            tileEntities.add(tileCompound);
                     }
                 }
+            }
 
-                for (BlockPosition tilePosition : protoChunk.c()) {
-                    NBTTagCompound tileCompound = protoChunk.i(tilePosition);
-                    if (tileCompound != null)
-                        tileEntities.add(tileCompound);
-                }
+            @Override
+            public void onFinish() {
+                if (onFinish != null)
+                    onFinish.run();
             }
         });
     }
@@ -209,29 +232,38 @@ public class NMSChunksImpl implements NMSChunks {
 
         WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
 
-        NMSUtils.runActionOnChunks(worldServer, chunksCoords, false, () -> {
-            completableFuture.complete(allCalculatedChunks);
-        }, chunk -> {
-            ChunkPosition chunkPosition = ChunkPosition.of(chunk.getWorld().getWorld(), chunk.getPos().x, chunk.getPos().z);
-            allCalculatedChunks.add(calculateChunk(chunkPosition, chunk.getSections()));
-        }, (chunkCoords, unloadedChunk) -> {
-            NBTTagList sectionsList = unloadedChunk.getList("Sections", 10);
-            ChunkSection[] chunkSections = new ChunkSection[sectionsList.size()];
-
-            for (int i = 0; i < sectionsList.size(); ++i) {
-                NBTTagCompound sectionCompound = sectionsList.getCompound(i);
-                byte yPosition = sectionCompound.getByte("Y");
-                if (sectionCompound.hasKeyOfType("Palette", 9) && sectionCompound.hasKeyOfType("BlockStates", 12)) {
-                    //noinspection deprecation
-                    chunkSections[i] = new ChunkSection(yPosition << 4);
-                    chunkSections[i].getBlocks().a(sectionCompound.getList("Palette", 10), sectionCompound.getLongArray("BlockStates"));
-                }
+        NMSUtils.runActionOnChunks(worldServer, chunksCoords, false, new NMSUtils.ChunkCallback() {
+            @Override
+            public void onLoadedChunk(Chunk chunk) {
+                ChunkPosition chunkPosition = ChunkPosition.of(chunk.getWorld().getWorld(), chunk.getPos().x, chunk.getPos().z);
+                allCalculatedChunks.add(calculateChunk(chunkPosition, chunk.getSections()));
             }
 
-            ChunkPosition chunkPosition = ChunkPosition.of(worldServer.getWorld(), chunkCoords.x, chunkCoords.z);
-            CalculatedChunk calculatedChunk = calculateChunk(chunkPosition, chunkSections);
-            allCalculatedChunks.add(calculatedChunk);
-            unloadedChunksCache.put(chunkPosition, calculatedChunk);
+            @Override
+            public void onUnloadedChunk(ChunkCoordIntPair chunkPos, NBTTagCompound unloadedChunk) {
+                NBTTagList sectionsList = unloadedChunk.getList("Sections", 10);
+                ChunkSection[] chunkSections = new ChunkSection[sectionsList.size()];
+
+                for (int i = 0; i < sectionsList.size(); ++i) {
+                    NBTTagCompound sectionCompound = sectionsList.getCompound(i);
+                    byte yPosition = sectionCompound.getByte("Y");
+                    if (sectionCompound.hasKeyOfType("Palette", 9) && sectionCompound.hasKeyOfType("BlockStates", 12)) {
+                        //noinspection deprecation
+                        chunkSections[i] = new ChunkSection(yPosition << 4);
+                        chunkSections[i].getBlocks().a(sectionCompound.getList("Palette", 10), sectionCompound.getLongArray("BlockStates"));
+                    }
+                }
+
+                ChunkPosition chunkPosition = ChunkPosition.of(worldServer.getWorld(), chunkPos.x, chunkPos.z);
+                CalculatedChunk calculatedChunk = calculateChunk(chunkPosition, chunkSections);
+                allCalculatedChunks.add(calculatedChunk);
+                unloadedChunksCache.put(chunkPosition, calculatedChunk);
+            }
+
+            @Override
+            public void onFinish() {
+                completableFuture.complete(allCalculatedChunks);
+            }
         });
 
         return completableFuture;

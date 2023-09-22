@@ -99,7 +99,11 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onBlockPlace(BlockPlaceEvent e) {
-        this.worldRecordService.get().recordBlockPlace(e.getBlock(), 1, e.getBlockReplacedState(), REGULAR_RECORD_FLAGS);
+        boolean shouldAvoidReplacedState = e.getBlockReplacedState().equals(e.getBlock().getState());
+        this.worldRecordService.get().recordBlockPlace(Keys.of(e.getBlock()),
+                e.getBlock().getLocation(), 1,
+                shouldAvoidReplacedState ? null : e.getBlockReplacedState(),
+                REGULAR_RECORD_FLAGS);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

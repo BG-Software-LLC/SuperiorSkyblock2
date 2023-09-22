@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.google.common.base.Preconditions;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -16,11 +17,18 @@ public class CustomKey extends BaseKey<CustomKey> {
     private final String globalKey;
     private final String subKey;
 
-    public static CustomKey of(String globalKey, @Nullable String subKey) {
-        Preconditions.checkArgument(EnumHelper.getEnum(Material.class, globalKey) == null,
-                "CustomKey received a valid Material type: " + globalKey);
-        Preconditions.checkArgument(EnumHelper.getEnum(EntityType.class, globalKey) == null,
-                "CustomKey received a valid EntityType type: " + globalKey);
+    public static CustomKey of(String globalKey, @Nullable String subKey, KeyIndicator keyType) {
+        switch (keyType) {
+            case ENTITY_TYPE:
+                Preconditions.checkArgument(EnumHelper.getEnum(EntityType.class, globalKey) == null,
+                        "CustomKey received a valid EntityType type: " + globalKey);
+                break;
+            case MATERIAL:
+                Preconditions.checkArgument(EnumHelper.getEnum(Material.class, globalKey) == null,
+                        "CustomKey received a valid Material type: " + globalKey);
+                break;
+        }
+
         return new CustomKey(globalKey, subKey);
     }
 
@@ -37,7 +45,7 @@ public class CustomKey extends BaseKey<CustomKey> {
 
     @Override
     public CustomKey toGlobalKey() {
-        return this.subKey == null ? this : CustomKey.of(this.globalKey, null);
+        return this.subKey == null ? this : CustomKey.of(this.globalKey, null, KeyIndicator.CUSTOM);
     }
 
     @Override
