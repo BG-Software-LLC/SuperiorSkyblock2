@@ -95,7 +95,7 @@ public class StackedBlocksProvider_RoseStacker implements StackedBlocksProvider_
         public void onBlockStackProtection(BlockStackEvent e) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
             InteractionResult interactionResult = protectionManager.get().handleBlockPlace(superiorPlayer, e.getStack().getBlock());
-            if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
                 e.setCancelled(true);
         }
 
@@ -103,7 +103,7 @@ public class StackedBlocksProvider_RoseStacker implements StackedBlocksProvider_
         public void onBlockUnstackProtection(BlockUnstackEvent e) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
             InteractionResult interactionResult = protectionManager.get().handleBlockBreak(superiorPlayer, e.getStack().getBlock());
-            if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
                 e.setCancelled(true);
         }
 
@@ -119,7 +119,7 @@ public class StackedBlocksProvider_RoseStacker implements StackedBlocksProvider_
 
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
             InteractionResult interactionResult = protectionManager.get().handleBlockPlace(superiorPlayer, e.getClickedBlock());
-            if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
                 e.setCancelled(true);
         }
 

@@ -98,7 +98,7 @@ public class ProtectionListener implements Listener {
     public void onBlockPlace(BlockPlaceEvent e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handleBlockPlace(superiorPlayer, e.getBlock());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -110,7 +110,7 @@ public class ProtectionListener implements Listener {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handleBlockFertilize(superiorPlayer, e.getClickedBlock());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -123,7 +123,7 @@ public class ProtectionListener implements Listener {
         // The player right-clicked a block with a bed in his hand
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handleBlockPlace(superiorPlayer, e.getClickedBlock());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -140,7 +140,7 @@ public class ProtectionListener implements Listener {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handleBlockPlace(superiorPlayer, e.getClickedBlock());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -148,7 +148,7 @@ public class ProtectionListener implements Listener {
     public void onBlockBreak(BlockBreakEvent e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handleBlockBreak(superiorPlayer, e.getBlock());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -160,7 +160,7 @@ public class ProtectionListener implements Listener {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handleBlockInteract(superiorPlayer,
                 e.getClickedBlock(), e.getAction(), e.getItem());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -171,7 +171,7 @@ public class ProtectionListener implements Listener {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getEntity());
         InteractionResult interactionResult = this.protectionManager.get().handleBlockPlace(superiorPlayer, e.getBlock());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, false))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, false))
             e.setCancelled(true);
     }
 
@@ -179,7 +179,7 @@ public class ProtectionListener implements Listener {
     public void onBucketEmpty(PlayerBucketEmptyEvent e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handleBlockPlace(superiorPlayer, e.getBlockClicked());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -187,7 +187,7 @@ public class ProtectionListener implements Listener {
     public void onBucketFill(PlayerBucketFillEvent e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handleBlockPlace(superiorPlayer, e.getBlockClicked());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -214,7 +214,7 @@ public class ProtectionListener implements Listener {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handleEntityInteract(superiorPlayer,
                 e.getRightClicked(), e.getPlayer().getItemInHand());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -223,7 +223,7 @@ public class ProtectionListener implements Listener {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handleEntityInteract(superiorPlayer,
                 e.getRightClicked(), e.getPlayer().getItemInHand());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -235,7 +235,7 @@ public class ProtectionListener implements Listener {
         SuperiorPlayer damagerSource = BukkitEntities.getPlayerSource(e.getDamager())
                 .map(plugin.getPlayers()::getSuperiorPlayer).orElse(null);
         InteractionResult interactionResult = this.protectionManager.get().handleEntityDamage(e.getDamager(), e.getEntity());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, damagerSource, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, damagerSource, true))
             e.setCancelled(true);
     }
 
@@ -243,7 +243,7 @@ public class ProtectionListener implements Listener {
     public void onEntityShearing(PlayerShearEntityEvent e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handleEntityShear(superiorPlayer, e.getEntity());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -251,7 +251,7 @@ public class ProtectionListener implements Listener {
     public void onHangingBreak(HangingBreakByEntityEvent e) {
         BukkitEntities.getPlayerSource(e.getRemover()).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(removerPlayer -> {
             InteractionResult interactionResult = this.protectionManager.get().handleEntityInteract(removerPlayer, e.getEntity(), null);
-            if (ProtectionHelper.preventInteractionInternal(interactionResult, removerPlayer, true))
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, removerPlayer, true))
                 e.setCancelled(true);
         });
     }
@@ -260,7 +260,7 @@ public class ProtectionListener implements Listener {
     public void onHangingPlace(HangingPlaceEvent e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handleEntityInteract(superiorPlayer, e.getEntity(), null);
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -270,7 +270,7 @@ public class ProtectionListener implements Listener {
             return;
 
         InteractionResult interactionResult = this.protectionManager.get().handleEntityDamage(e.getTarget(), e.getEntity());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, null, false))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, null, false))
             e.setCancelled(true);
     }
 
@@ -285,7 +285,7 @@ public class ProtectionListener implements Listener {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getWhoClicked());
         InteractionResult interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer,
                 location, IslandPrivileges.VILLAGER_TRADING);
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, null, false)) {
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, null, false)) {
             e.setCancelled(true);
             e.getWhoClicked().closeInventory();
         }
@@ -295,7 +295,7 @@ public class ProtectionListener implements Listener {
     public void onPlayerLeash(PlayerLeashEntityEvent e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handleEntityLeash(superiorPlayer, e.getEntity());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -303,7 +303,7 @@ public class ProtectionListener implements Listener {
     public void onPlayerUnleash(PlayerUnleashEntityEvent e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handleEntityLeash(superiorPlayer, e.getEntity());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -316,7 +316,7 @@ public class ProtectionListener implements Listener {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getAttacker());
         InteractionResult interactionResult = this.protectionManager.get().handleEntityDamage(e.getAttacker(), e.getVehicle());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -329,7 +329,7 @@ public class ProtectionListener implements Listener {
         Location vehicleLocation = e.getVehicle().getLocation();
         InteractionResult interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer,
                 vehicleLocation, IslandPrivileges.MINECART_ENTER);
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -344,7 +344,7 @@ public class ProtectionListener implements Listener {
         Location minecartLocation = ((Minecart) inventoryHolder).getLocation();
         InteractionResult interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer,
                 minecartLocation, IslandPrivileges.MINECART_OPEN);
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -354,7 +354,7 @@ public class ProtectionListener implements Listener {
     public void onPlayerDropItem(PlayerDropItemEvent e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handlePlayerDropItem(superiorPlayer, e.getItemDrop());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -362,7 +362,7 @@ public class ProtectionListener implements Listener {
     public void onPlayerPickupItem(PlayerPickupItemEvent e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handlePlayerPickupItem(superiorPlayer, e.getItem());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
@@ -397,7 +397,7 @@ public class ProtectionListener implements Listener {
             IslandPrivilege islandPrivilege = e.getEntity() instanceof FishHook ? IslandPrivileges.FISH : IslandPrivileges.PICKUP_DROPS;
             Location entityLocation = e.getEntity().getLocation();
             InteractionResult interactionResult = this.protectionManager.get().handleCustomInteraction(fisherPlayer, entityLocation, islandPrivilege);
-            if (ProtectionHelper.preventInteractionInternal(interactionResult, fisherPlayer, true))
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, fisherPlayer, true))
                 e.setCancelled(true);
         });
     }
@@ -436,7 +436,7 @@ public class ProtectionListener implements Listener {
 
             InteractionResult interactionResult = this.protectionManager.get().handleCustomInteraction(shooterPlayer,
                     location, islandPrivilege);
-            if (ProtectionHelper.preventInteractionInternal(interactionResult, shooterPlayer, true)) {
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, shooterPlayer, true)) {
                 e.getEntity().remove();
                 if (hitBlock != null) {
                     ICachedBlock cachedBlock = plugin.getNMSWorld().cacheBlock(hitBlock);
@@ -477,7 +477,7 @@ public class ProtectionListener implements Listener {
         public void onPlayerItemPickup(PlayerAttemptPickupItemEvent e) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
             InteractionResult interactionResult = protectionManager.get().handlePlayerPickupItem(superiorPlayer, e.getItem());
-            if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
                 e.setCancelled(true);
         }
 
@@ -489,7 +489,7 @@ public class ProtectionListener implements Listener {
         public void onPlayerArrowPickup(PlayerPickupArrowEvent e) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
             InteractionResult interactionResult = protectionManager.get().handlePlayerPickupItem(superiorPlayer, e.getItem());
-            if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
                 e.setCancelled(true);
         }
 
@@ -502,7 +502,7 @@ public class ProtectionListener implements Listener {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
             InteractionResult interactionResult = protectionManager.get().handleBlockInteract(superiorPlayer,
                     e.getLectern().getBlock(), Action.RIGHT_CLICK_BLOCK, null);
-            if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
                 e.setCancelled(true);
         }
 

@@ -11,8 +11,8 @@ public class ProtectionHelper {
 
     }
 
-    public static boolean preventInteractionInternal(InteractionResult interactionResult,
-                                                     @Nullable SuperiorPlayer superiorPlayer, boolean sendMessages) {
+    public static boolean shouldPreventInteraction(InteractionResult interactionResult,
+                                                   @Nullable SuperiorPlayer superiorPlayer, boolean sendMessages) {
         switch (interactionResult) {
             case ISLAND_RECALCULATE:
                 if (sendMessages && superiorPlayer != null)

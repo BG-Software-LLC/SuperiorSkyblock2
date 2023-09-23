@@ -117,7 +117,7 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
         if (superiorPlayer != null && island != null) {
             com.bgsoftware.superiorskyblock.api.service.region.InteractionResult interactionResult =
                     this.regionManagerService.get().handleBlockBreak(superiorPlayer, block);
-            if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
                 return InteractionResult.STACKED_BLOCK_PROTECTED;
         }
 

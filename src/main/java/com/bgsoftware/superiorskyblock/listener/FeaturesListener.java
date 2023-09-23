@@ -104,7 +104,7 @@ public class FeaturesListener implements Listener {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handleBlockBreak(superiorPlayer, e.getClickedBlock());
-        if (ProtectionHelper.preventInteractionInternal(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
