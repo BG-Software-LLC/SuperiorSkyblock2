@@ -1,11 +1,9 @@
 package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -47,14 +45,6 @@ public class IslandPreviewListener implements Listener {
         if (e.getPlayer().getGameMode() == GameMode.SPECTATOR &&
                 plugin.getGrid().getIslandPreview(superiorPlayer) != null)
             e.setCancelled(true);
-    }
-
-    public void onPlayerMove(SuperiorPlayer superiorPlayer, Location to) {
-        //Checking for out of distance from preview location.
-        IslandPreview islandPreview = plugin.getGrid().getIslandPreview(superiorPlayer);
-        if (islandPreview != null && (!islandPreview.getLocation().getWorld().equals(to.getWorld()) ||
-                islandPreview.getLocation().distanceSquared(to) > 10000))
-            islandPreview.handleEscape();
     }
 
 }

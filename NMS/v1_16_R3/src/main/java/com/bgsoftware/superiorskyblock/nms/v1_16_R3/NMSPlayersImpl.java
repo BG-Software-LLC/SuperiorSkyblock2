@@ -12,8 +12,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.minecraft.server.v1_16_R3.Entity;
-import net.minecraft.server.v1_16_R3.EntityItem;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.MinecraftServer;
 import net.minecraft.server.v1_16_R3.PlayerInteractManager;
@@ -26,7 +24,6 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftItem;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -108,9 +105,8 @@ public class NMSPlayersImpl implements NMSPlayers {
     }
 
     @Override
-    public boolean wasThrownByPlayer(Item item, Player player) {
-        Entity entity = ((CraftItem) item).getHandle();
-        return entity instanceof EntityItem && player.getUniqueId().equals(((EntityItem) entity).getThrower());
+    public boolean wasThrownByPlayer(Item item, SuperiorPlayer superiorPlayer) {
+        return superiorPlayer.getUniqueId().equals(item.getThrower());
     }
 
     @Nullable

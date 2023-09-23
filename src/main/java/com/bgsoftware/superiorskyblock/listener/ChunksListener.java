@@ -3,11 +3,9 @@ package com.bgsoftware.superiorskyblock.listener;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.world.event.WorldEventsManagerImpl;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,22 +21,8 @@ public class ChunksListener implements Listener {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    @SuppressWarnings("deprecation")
-    private WorldEventsManager worldEventsManager;
-
     public ChunksListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        this.worldEventsManager = new WorldEventsManagerImpl(plugin);
-    }
-
-    @Deprecated
-    public void setWorldEventsManager(@Nullable WorldEventsManager worldEventsManager) {
-        this.worldEventsManager = worldEventsManager == null ? new WorldEventsManagerImpl(plugin) : worldEventsManager;
-    }
-
-    @Deprecated
-    public WorldEventsManager getWorldEventsManager() {
-        return worldEventsManager;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

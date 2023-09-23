@@ -14,10 +14,12 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
@@ -67,6 +69,13 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     private final Set<UUID> pendingCreationTasks = Sets.newHashSet();
     private final Set<UUID> customWorlds = Sets.newHashSet();
+
+    private final LazyReference<DragonBattleService> dragonBattleService = new LazyReference<DragonBattleService>() {
+        @Override
+        protected DragonBattleService create() {
+            return plugin.getServices().getService(DragonBattleService.class);
+        }
+    };
 
     private final IslandsPurger islandsPurger;
     private final IslandPreviews islandPreviews;
@@ -278,7 +287,7 @@ public class GridManagerImpl extends Manager implements GridManager {
                                         BukkitExecutor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, affectedChunks), 10L);
                                     if (plugin.getSettings().getWorlds().getDefaultWorld() == World.Environment.THE_END) {
                                         plugin.getNMSDragonFight().awardTheEndAchievement(player);
-                                        plugin.getServices().getDragonBattleService().resetEnderDragonBattle(island);
+                                        this.dragonBattleService.get().resetEnderDragonBattle(island);
                                     }
                                 }
                             });
@@ -411,7 +420,7 @@ public class GridManagerImpl extends Manager implements GridManager {
             BukkitExecutor.data(() -> IslandsDatabaseBridge.deleteIsland(island));
         }
 
-        plugin.getServices().getDragonBattleService().stopEnderDragonBattle(island);
+        this.dragonBattleService.get().stopEnderDragonBattle(island);
     }
 
     @Override

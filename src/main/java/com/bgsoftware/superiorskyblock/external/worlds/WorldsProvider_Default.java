@@ -3,7 +3,9 @@ package com.bgsoftware.superiorskyblock.external.worlds;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -25,6 +27,13 @@ public class WorldsProvider_Default implements WorldsProvider {
     private final EnumMap<World.Environment, World> islandWorlds = new EnumMap<>(World.Environment.class);
     private final SuperiorSkyblockPlugin plugin;
 
+    private final LazyReference<DragonBattleService> dragonBattleService = new LazyReference<DragonBattleService>() {
+        @Override
+        protected DragonBattleService create() {
+            return plugin.getServices().getService(DragonBattleService.class);
+        }
+    };
+
     public WorldsProvider_Default(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
     }
@@ -39,7 +48,7 @@ public class WorldsProvider_Default implements WorldsProvider {
         if (plugin.getSettings().getWorlds().getEnd().isEnabled()) {
             World endWorld = loadWorld(plugin.getSettings().getWorlds().getEnd().getName(), difficulty, World.Environment.THE_END);
             if (plugin.getSettings().getWorlds().getEnd().isDragonFight())
-                plugin.getServices().getDragonBattleService().prepareEndWorld(endWorld);
+                dragonBattleService.get().prepareEndWorld(endWorld);
         }
     }
 

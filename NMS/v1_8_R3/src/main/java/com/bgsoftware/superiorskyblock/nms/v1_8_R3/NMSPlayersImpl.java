@@ -112,9 +112,9 @@ public class NMSPlayersImpl implements NMSPlayers {
     }
 
     @Override
-    public boolean wasThrownByPlayer(org.bukkit.entity.Item item, Player player) {
+    public boolean wasThrownByPlayer(org.bukkit.entity.Item item, SuperiorPlayer superiorPlayer) {
         Entity entity = ((CraftItem) item).getHandle();
-        return entity instanceof EntityItem && player.getName().equals(((EntityItem) entity).n());
+        return entity instanceof EntityItem && superiorPlayer.getName().equals(((EntityItem) entity).n());
     }
 
     @Nullable

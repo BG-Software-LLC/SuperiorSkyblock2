@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessa
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.RawMessageComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.SoundComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.TitleComponent;
+import com.bgsoftware.superiorskyblock.service.IService;
 import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -25,10 +26,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
-public class MessagesServiceImpl implements MessagesService {
+public class MessagesServiceImpl implements MessagesService, IService {
 
     public MessagesServiceImpl() {
 
+    }
+
+    @Override
+    public Class<?> getAPIClass() {
+        return MessagesService.class;
     }
 
     @Nullable

@@ -15,8 +15,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,7 +22,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftItem;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -116,9 +113,8 @@ public class NMSPlayersImpl implements NMSPlayers {
     }
 
     @Override
-    public boolean wasThrownByPlayer(Item item, Player player) {
-        Entity entity = ((CraftItem) item).getHandle();
-        return entity instanceof ItemEntity itemEntity && player.getUniqueId().equals(itemEntity.thrower);
+    public boolean wasThrownByPlayer(Item item, SuperiorPlayer superiorPlayer) {
+        return superiorPlayer.getUniqueId().equals(item.getThrower());
     }
 
     @Nullable

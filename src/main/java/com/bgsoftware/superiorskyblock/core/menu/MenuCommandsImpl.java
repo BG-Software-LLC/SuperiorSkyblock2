@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.menu.MenuCommands;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.PlayerMenuView;
 import org.bukkit.Bukkit;
@@ -21,6 +22,12 @@ public class MenuCommandsImpl implements MenuCommands {
     private static final MenuCommandsImpl INSTANCE = new MenuCommandsImpl();
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
+        @Override
+        protected PlaceholdersService create() {
+            return plugin.getServices().getService(PlaceholdersService.class);
+        }
+    };
 
     private static final Pattern COMMAND_PATTERN_ARGS = Pattern.compile("\\[(.+)](.+)");
     private static final Pattern COMMAND_PATTERN = Pattern.compile("\\[(.+)]");
@@ -55,15 +62,13 @@ public class MenuCommandsImpl implements MenuCommands {
             setClickedCloseButton(menuView);
             clickEvent.getWhoClicked().closeInventory();
         } else {
-            PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
-
             SuperiorPlayer targetPlayer = menuView instanceof PlayerMenuView ?
                     ((PlayerMenuView) menuView).getSuperiorPlayer() : null;
 
             if (targetPlayer != null)
-                command = placeholdersService.parsePlaceholders(targetPlayer.asOfflinePlayer(), command);
+                command = placeholdersService.get().parsePlaceholders(targetPlayer.asOfflinePlayer(), command);
             else if (sender instanceof Player)
-                command = placeholdersService.parsePlaceholders((Player) sender, command);
+                command = placeholdersService.get().parsePlaceholders((Player) sender, command);
 
             Bukkit.dispatchCommand(sender instanceof Player || command.startsWith("PLAYER:") ? clickEvent.getWhoClicked() : Bukkit.getConsoleSender(),
                     command.replace("PLAYER:", "").replace("%player%", clickEvent.getWhoClicked().getName()));

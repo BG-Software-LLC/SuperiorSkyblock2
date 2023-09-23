@@ -9,10 +9,14 @@ import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
+import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.Singleton;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -35,11 +39,15 @@ public class FeaturesListener implements Listener {
     private final Map<Class<? extends Event>, EventMethods> CACHED_EVENT_METHODS = new HashMap<>();
 
     private final SuperiorSkyblockPlugin plugin;
-    private final Singleton<ProtectionListener> protectionListener;
+    private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
+        @Override
+        protected RegionManagerService create() {
+            return plugin.getServices().getService(RegionManagerService.class);
+        }
+    };
 
     public FeaturesListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        this.protectionListener = plugin.getListener(ProtectionListener.class);
     }
 
     /* EVENT COMMANDS */
@@ -94,20 +102,23 @@ public class FeaturesListener implements Listener {
         if (!plugin.getGrid().isIslandsWorld(e.getClickedBlock().getWorld()))
             return;
 
-        if (this.protectionListener.get().preventBlockBreak(e.getClickedBlock(), e.getPlayer(),
-                ProtectionListener.Flag.PREVENT_OUTSIDE_ISLANDS))
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        InteractionResult interactionResult = this.protectionManager.get().handleBlockBreak(superiorPlayer, e.getClickedBlock());
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
-
-        // Prevent outside island is set above.
-        assert island != null;
+        if (island == null)
+            return;
 
         e.setCancelled(true);
 
+
         ItemStack inHandItem = e.getItem().clone();
         inHandItem.setAmount(inHandItem.getAmount() - 1);
-        BukkitItems.setItem(inHandItem.getAmount() == 0 ? new ItemStack(Material.AIR) : inHandItem, e, e.getPlayer());
+
+        PlayerHand usedItem = BukkitItems.getHand(e);
+        BukkitItems.setHandItem(e.getPlayer(), usedItem, inHandItem.getAmount() == 0 ? null : inHandItem);
 
         BukkitItems.addItem(new ItemStack(Material.LAVA_BUCKET), e.getPlayer().getInventory(),
                 e.getPlayer().getLocation());

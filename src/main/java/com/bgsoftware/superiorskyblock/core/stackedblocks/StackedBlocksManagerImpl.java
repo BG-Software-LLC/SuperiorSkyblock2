@@ -118,7 +118,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
             stackedBlock.setBlockKey(blockKey);
             stackedBlock.setAmount(amount);
             // Must be called with delay in order to fix issue #632
-            BukkitExecutor.sync(() -> stackedBlock.updateName(plugin), 2L);
+            BukkitExecutor.sync(stackedBlock::updateName, 2L);
             StackedBlocksDatabaseBridge.saveStackedBlock(this, stackedBlock);
         } else {
             stackedBlock.removeHologram();
@@ -211,7 +211,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
 
         StackedBlock stackedBlock = this.stackedBlocksContainer.getStackedBlock(location);
         if (stackedBlock != null) {
-            stackedBlock.updateName(plugin);
+            stackedBlock.updateName();
             if (stackedBlock.getAmount() <= 1)
                 removeStackedBlock(location);
         }
@@ -221,7 +221,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     public void updateStackedBlockHolograms(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "chunk parameter cannot be null.");
         this.stackedBlocksContainer.forEach(ChunkPosition.of(chunk), stackedBlock -> {
-            stackedBlock.updateName(plugin);
+            stackedBlock.updateName();
             if (stackedBlock.getAmount() <= 1)
                 removeStackedBlock(stackedBlock.getLocation());
         });

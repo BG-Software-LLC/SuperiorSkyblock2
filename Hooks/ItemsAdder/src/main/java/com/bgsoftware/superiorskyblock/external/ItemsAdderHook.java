@@ -5,7 +5,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandGenerateBlockEvent;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.core.Singleton;
+import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
+import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -30,10 +32,17 @@ public class ItemsAdderHook {
     private static final Key BLOCK_ITEM_KEY = Keys.of(Material.PAPER);
     private static final Key BLOCK_KEY = Keys.of(Material.NOTE_BLOCK);
 
-    private static Singleton<BlockChangesListener> blockChangesListener;
+    private static final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {
+        @Override
+        protected WorldRecordService create() {
+            return plugin.getServices().getService(WorldRecordService.class);
+        }
+    };
+
+    private static SuperiorSkyblockPlugin plugin;
 
     public static void register(SuperiorSkyblockPlugin plugin) {
-        blockChangesListener = plugin.getListener(BlockChangesListener.class);
+        ItemsAdderHook.plugin = plugin;
         plugin.getBlockValues().registerKeyParser(new ItemsAdderKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
         plugin.getServer().getPluginManager().registerEvents(new ListenerImpl(), plugin);
     }
@@ -49,8 +58,8 @@ public class ItemsAdderHook {
             BlockState oldState = e.getBlockReplacedState();
 
             BukkitExecutor.sync(() -> {
-                blockChangesListener.get().onBlockPlace(Keys.of(e.getBlock()), e.getBlock().getLocation(), 1,
-                        oldState, BlockChangesListener.BlockTrackFlags.DIRTY_CHUNKS | BlockChangesListener.BlockTrackFlags.SAVE_BLOCK_COUNT);
+                worldRecordService.get().recordBlockPlace(Keys.of(e.getBlock()), e.getBlock().getLocation(), 1,
+                        oldState, WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS);
             }, 1L);
 
         }

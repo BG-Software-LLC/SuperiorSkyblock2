@@ -5,17 +5,23 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleResetResult;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
+import com.bgsoftware.superiorskyblock.service.IService;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EnderDragon;
 
-public class DragonBattleServiceImpl implements DragonBattleService {
+public class DragonBattleServiceImpl implements DragonBattleService, IService {
 
     private final SuperiorSkyblockPlugin plugin;
 
     public DragonBattleServiceImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @Override
+    public Class<?> getAPIClass() {
+        return DragonBattleService.class;
     }
 
     @Override

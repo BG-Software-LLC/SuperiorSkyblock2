@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
@@ -31,6 +32,12 @@ import java.util.List;
 public class ItemBuilder {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
+        @Override
+        protected PlaceholdersService create() {
+            return plugin.getServices().getService(PlaceholdersService.class);
+        }
+    };
 
     private ItemStack itemStack;
     @Nullable
@@ -244,16 +251,14 @@ public class ItemBuilder {
     public ItemStack build(SuperiorPlayer superiorPlayer) {
         OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
 
-        PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
-
         if (itemMeta != null) {
             if (itemMeta.hasDisplayName()) {
-                withName(placeholdersService.parsePlaceholders(offlinePlayer, itemMeta.getDisplayName()));
+                withName(placeholdersService.get().parsePlaceholders(offlinePlayer, itemMeta.getDisplayName()));
             }
 
             if (itemMeta.hasLore()) {
                 withLore(new SequentialListBuilder<String>()
-                        .build(itemMeta.getLore(), line -> placeholdersService.parsePlaceholders(offlinePlayer, line)));
+                        .build(itemMeta.getLore(), line -> placeholdersService.get().parsePlaceholders(offlinePlayer, line)));
             }
         }
 

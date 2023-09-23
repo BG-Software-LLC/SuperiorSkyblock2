@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
+import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -531,6 +532,7 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     /**
      * Whether the player is immuned to PvP or not.
      */
+    @Deprecated
     boolean isImmunedToPvP();
 
     /**
@@ -538,11 +540,13 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      *
      * @param immunedToPvP Whether or not the player should be immuned to PvP.
      */
+    @Deprecated
     void setImmunedToPvP(boolean immunedToPvP);
 
     /**
      * Whether the player has just left an island's area or not.
      */
+    @Deprecated
     boolean isLeavingFlag();
 
     /**
@@ -551,7 +555,23 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      *
      * @param leavingFlag Whether or not the island has left an island's area.
      */
+    @Deprecated
     void setLeavingFlag(boolean leavingFlag);
+
+    /**
+     * Whether the player is immuned to portals or not.
+     */
+    @Deprecated
+    boolean isImmunedToPortals();
+
+    /**
+     * Set whether or not the player is immuned to portals.
+     * If set to true, players will not be able to get teleported through portals.
+     *
+     * @param immuneToPortals Whether the player should be immuned or not.
+     */
+    @Deprecated
+    void setImmunedToPortals(boolean immuneToPortals);
 
     /**
      * Get the current active teleport task of the player.
@@ -568,17 +588,16 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     void setTeleportTask(@Nullable BukkitTask teleportTask);
 
     /**
-     * Whether the player is immuned to portals or not.
+     * Get the status of the player.
      */
-    boolean isImmunedToPortals();
+    PlayerStatus getPlayerStatus();
 
     /**
-     * Set whether or not the player is immuned to portals.
-     * If set to true, players will not be able to get teleported through portals.
+     * Set the status of the player.
      *
-     * @param immuneToPortals Whether the player should be immuned or not.
+     * @param playerStatus The new status of the player.
      */
-    void setImmunedToPortals(boolean immuneToPortals);
+    void setPlayerStatus(PlayerStatus playerStatus);
 
     /**
      * Merge another player into this object.

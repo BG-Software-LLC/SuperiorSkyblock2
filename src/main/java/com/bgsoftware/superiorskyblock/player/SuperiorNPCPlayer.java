@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
+import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
@@ -422,6 +423,17 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
         // Do nothing.
     }
 
+    @Nullable
+    @Override
+    public BukkitTask getTeleportTask() {
+        return null;
+    }
+
+    @Override
+    public void setTeleportTask(@Nullable BukkitTask teleportTask) {
+        // Do nothing.
+    }
+
     @Override
     public boolean isImmunedToPvP() {
         return false;
@@ -442,17 +454,6 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
         // Do nothing.
     }
 
-    @Nullable
-    @Override
-    public BukkitTask getTeleportTask() {
-        return null;
-    }
-
-    @Override
-    public void setTeleportTask(@Nullable BukkitTask teleportTask) {
-        // Do nothing.
-    }
-
     @Override
     public boolean isImmunedToPortals() {
         return false;
@@ -460,6 +461,16 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void setImmunedToPortals(boolean immuneToPortals) {
+        // Do nothing.
+    }
+
+    @Override
+    public PlayerStatus getPlayerStatus() {
+        return PlayerStatus.NONE;
+    }
+
+    @Override
+    public void setPlayerStatus(PlayerStatus playerStatus) {
         // Do nothing.
     }
 

@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -27,6 +28,14 @@ import java.util.Collections;
 import java.util.List;
 
 public class CmdRankup implements IPermissibleCommand {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
+        @Override
+        protected PlaceholdersService create() {
+            return plugin.getServices().getService(PlaceholdersService.class);
+        }
+    };
 
     @Override
     public List<String> getAliases() {
@@ -119,13 +128,11 @@ public class CmdRankup implements IPermissibleCommand {
                     hasNextLevel = false;
 
                 } else {
-                    PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
-
                     upgradeCost.withdrawCost(superiorPlayer);
 
                     for (String command : event.getResult().getCommands()) {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                                placeholdersService.parsePlaceholders(superiorPlayer.asOfflinePlayer(), command
+                                placeholdersService.get().parsePlaceholders(superiorPlayer.asOfflinePlayer(), command
                                         .replace("%player%", superiorPlayer.getName())
                                         .replace("%leader%", island.getOwner().getName()))
                         );

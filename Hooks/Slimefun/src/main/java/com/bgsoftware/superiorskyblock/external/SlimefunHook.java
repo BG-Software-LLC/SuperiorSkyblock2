@@ -5,17 +5,19 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandChunkResetEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.service.stackedblocks.InteractionResult;
+import com.bgsoftware.superiorskyblock.api.service.stackedblocks.StackedBlocksInteractionService;
+import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
+import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.Singleton;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.external.slimefun.ProtectionModule_Dev999;
 import com.bgsoftware.superiorskyblock.external.slimefun.ProtectionModule_RC13;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.listener.BlockChangesListener;
-import com.bgsoftware.superiorskyblock.listener.StackedBlocksListener;
+import com.bgsoftware.superiorskyblock.service.stackedblocks.StackedBlocksServiceHelper;
 import io.github.thebusybiscuit.slimefun4.api.events.AndroidMineEvent;
 import io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent;
 import io.github.thebusybiscuit.slimefun4.implementation.SlimefunPlugin;
@@ -31,21 +33,30 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
-@SuppressWarnings("unused")
 public class SlimefunHook {
+
+    @WorldRecordFlags
+    private static final int REGULAR_RECORD_FLAGS = WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS;
 
     private static final ReflectMethod<Void> BLOCK_STORAGE_CLEAR_ALL_BLOCK_INFO_AT_CHUNK_METHOD = new ReflectMethod<>(
             BlockStorage.class, "clearAllBlockInfoAtChunk", World.class, int.class, int.class, boolean.class);
 
+    private static final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {
+        @Override
+        protected WorldRecordService create() {
+            return plugin.getServices().getService(WorldRecordService.class);
+        }
+    };
+    private static final LazyReference<StackedBlocksInteractionService> stackedBlocksInteractionService = new LazyReference<StackedBlocksInteractionService>() {
+        @Override
+        protected StackedBlocksInteractionService create() {
+            return plugin.getServices().getService(StackedBlocksInteractionService.class);
+        }
+    };
     private static SuperiorSkyblockPlugin plugin;
-
-    private static Singleton<BlockChangesListener> blockChangesListener;
-    private static Singleton<StackedBlocksListener> stackedBlocksListener;
 
     public static void register(SuperiorSkyblockPlugin plugin) {
         SlimefunHook.plugin = plugin;
-        blockChangesListener = plugin.getListener(BlockChangesListener.class);
-        stackedBlocksListener = plugin.getListener(StackedBlocksListener.class);
 
         if (isClassLoaded("me.mrCookieSlime.Slimefun.SlimefunPlugin")) {
             ProtectionModule_RC13.register(plugin, SlimefunHook::checkPermission);
@@ -111,14 +122,12 @@ public class SlimefunHook {
         public void onAndroidMiner(AndroidMineEvent e) {
             Log.debug(Debug.BLOCK_BREAK, e.getBlock().getLocation(), e.getBlock().getType());
 
-            StackedBlocksListener.UnstackResult unstackResult = stackedBlocksListener.get().tryUnstack(null, e.getBlock());
-
-            if (unstackResult.shouldCancelOriginalEvent()) {
+            InteractionResult interactionResult = stackedBlocksInteractionService.get()
+                    .handleStackedBlockBreak(e.getBlock(), null);
+            if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult)) {
                 e.setCancelled(true);
             } else {
-                blockChangesListener.get().onBlockBreak(Keys.of(e.getBlock()), e.getBlock().getLocation(),
-                        plugin.getNMSWorld().getDefaultAmount(e.getBlock()),
-                        BlockChangesListener.BlockTrackFlags.DIRTY_CHUNKS | BlockChangesListener.BlockTrackFlags.SAVE_BLOCK_COUNT);
+                worldRecordService.get().recordBlockBreak(e.getBlock(), REGULAR_RECORD_FLAGS);
             }
         }
 
@@ -128,9 +137,7 @@ public class SlimefunHook {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onAutoPlacerPlaceBlock(BlockPlacerPlaceEvent e) {
-            blockChangesListener.get().onBlockPlace(Keys.of(e.getBlock()), e.getBlock().getLocation(),
-                    plugin.getNMSWorld().getDefaultAmount(e.getBlock()), null,
-                    BlockChangesListener.BlockTrackFlags.DIRTY_CHUNKS | BlockChangesListener.BlockTrackFlags.SAVE_BLOCK_COUNT);
+            worldRecordService.get().recordBlockPlace(e.getBlock(), 1, null, REGULAR_RECORD_FLAGS);
         }
 
     }

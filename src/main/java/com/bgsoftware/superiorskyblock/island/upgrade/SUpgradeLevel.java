@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
@@ -32,6 +33,12 @@ import java.util.stream.Collectors;
 public class SUpgradeLevel implements UpgradeLevel {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
+        @Override
+        protected PlaceholdersService create() {
+            return plugin.getServices().getService(PlaceholdersService.class);
+        }
+    };
 
     private final int level;
     private final UpgradeCost cost;
@@ -110,11 +117,10 @@ public class SUpgradeLevel implements UpgradeLevel {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 
         OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
-        PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
 
         if (offlinePlayer != null) {
             for (UpgradeRequirement requirement : requirements) {
-                String check = placeholdersService.parsePlaceholders(offlinePlayer, requirement.getPlaceholder());
+                String check = placeholdersService.get().parsePlaceholders(offlinePlayer, requirement.getPlaceholder());
                 try {
                     if (!Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + ""))
                         return requirement.getErrorMessage();

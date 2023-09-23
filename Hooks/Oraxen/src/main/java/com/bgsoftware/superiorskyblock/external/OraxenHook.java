@@ -7,10 +7,11 @@ import com.bgsoftware.superiorskyblock.api.events.IslandGenerateBlockEvent;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.Singleton;
+import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
+import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
-import com.bgsoftware.superiorskyblock.listener.BlockChangesListener;
 import io.th0rgal.oraxen.api.OraxenBlocks;
 import io.th0rgal.oraxen.api.OraxenItems;
 import io.th0rgal.oraxen.items.ItemBuilder;
@@ -70,10 +71,17 @@ public class OraxenHook {
         AVAILABLE_MECHANICS = Collections.unmodifiableList(availableMechanics);
     }
 
-    private static Singleton<BlockChangesListener> blockChangesListener;
+    private static final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {
+        @Override
+        protected WorldRecordService create() {
+            return plugin.getServices().getService(WorldRecordService.class);
+        }
+    };
+
+    private static SuperiorSkyblockPlugin plugin;
 
     public static void register(SuperiorSkyblockPlugin plugin) {
-        blockChangesListener = plugin.getListener(BlockChangesListener.class);
+        OraxenHook.plugin = plugin;
         plugin.getBlockValues().registerKeyParser(new OraxenKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
         plugin.getServer().getPluginManager().registerEvents(new GeneratorListener(), plugin);
     }
@@ -83,11 +91,10 @@ public class OraxenHook {
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onOraxenBlockBreak(BlockBreakEvent e) {
             Key blockKey = Keys.of(e.getBlock());
-            if (blockKey.getGlobalKey().equals(ORAXEN_PREFIX))
-                blockChangesListener.get().onBlockBreak(blockKey, e.getBlock().getLocation(), 1,
-                        BlockChangesListener.BlockTrackFlags.HANDLE_NEARBY_BLOCKS |
-                                BlockChangesListener.BlockTrackFlags.DIRTY_CHUNKS |
-                                BlockChangesListener.BlockTrackFlags.SAVE_BLOCK_COUNT);
+            if (blockKey.getGlobalKey().equals(ORAXEN_PREFIX)) {
+                worldRecordService.get().recordBlockBreak(blockKey, e.getBlock().getLocation(), 1,
+                        WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS | WorldRecordFlags.HANDLE_NEARBY_BLOCKS);
+            }
         }
 
         @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)

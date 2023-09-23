@@ -421,23 +421,39 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    @Deprecated
     public boolean isImmunedToPvP() {
         return this.handle.isImmunedToPvP();
     }
 
     @Override
+    @Deprecated
     public void setImmunedToPvP(boolean immunedToPvP) {
         this.handle.setImmunedToPvP(immunedToPvP);
     }
 
     @Override
+    @Deprecated
     public boolean isLeavingFlag() {
         return this.handle.isLeavingFlag();
     }
 
     @Override
+    @Deprecated
     public void setLeavingFlag(boolean leavingFlag) {
         this.handle.setLeavingFlag(leavingFlag);
+    }
+
+    @Override
+    @Deprecated
+    public boolean isImmunedToPortals() {
+        return this.handle.isImmunedToPortals();
+    }
+
+    @Override
+    @Deprecated
+    public void setImmunedToPortals(boolean immuneToPortals) {
+        this.handle.setImmunedToPortals(immuneToPortals);
     }
 
     @Nullable
@@ -452,13 +468,13 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public boolean isImmunedToPortals() {
-        return this.handle.isImmunedToPortals();
+    public PlayerStatus getPlayerStatus() {
+        return this.handle.getPlayerStatus();
     }
 
     @Override
-    public void setImmunedToPortals(boolean immuneToPortals) {
-        this.handle.setImmunedToPortals(immuneToPortals);
+    public void setPlayerStatus(PlayerStatus playerStatus) {
+        this.handle.setPlayerStatus(playerStatus);
     }
 
     @Override

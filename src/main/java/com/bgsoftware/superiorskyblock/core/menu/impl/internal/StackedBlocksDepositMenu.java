@@ -1,13 +1,15 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl.internal;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.core.Singleton;
-import com.bgsoftware.superiorskyblock.listener.StackedBlocksListener;
+import com.bgsoftware.superiorskyblock.api.service.stackedblocks.InteractionResult;
+import com.bgsoftware.superiorskyblock.api.service.stackedblocks.StackedBlocksInteractionService;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
+import org.bukkit.block.Block;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -17,7 +19,12 @@ import org.bukkit.inventory.ItemStack;
 public class StackedBlocksDepositMenu implements InventoryHolder {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final Singleton<StackedBlocksListener> stackedBlocksListener = plugin.getListener(StackedBlocksListener.class);
+    private static final LazyReference<StackedBlocksInteractionService> stackedBlocksInteractionService = new LazyReference<StackedBlocksInteractionService>() {
+        @Override
+        protected StackedBlocksInteractionService create() {
+            return plugin.getServices().getService(StackedBlocksInteractionService.class);
+        }
+    };
 
     private final Inventory inventory;
     private final Location stackedBlock;
@@ -52,7 +59,10 @@ public class StackedBlocksDepositMenu implements InventoryHolder {
         if (itemToDeposit == null || itemToDeposit.getType() == Material.AIR)
             return;
 
-        if (!stackedBlocksListener.get().canStackBlocks((Player) e.getWhoClicked(), itemToDeposit, stackedBlock.getBlock()))
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getWhoClicked());
+        InteractionResult interactionResult = stackedBlocksInteractionService.get().checkStackedBlockInteraction(
+                superiorPlayer, stackedBlock.getBlock(), itemToDeposit);
+        if (interactionResult != InteractionResult.SUCCESS)
             e.setCancelled(true);
     }
 
@@ -60,9 +70,14 @@ public class StackedBlocksDepositMenu implements InventoryHolder {
         int depositAmount = 0;
         ItemStack blockItem = null;
 
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        Block block = stackedBlock.getBlock();
+
         for (ItemStack itemStack : e.getInventory().getContents()) {
             if (itemStack != null && itemStack.getType() != Material.AIR) {
-                if (stackedBlocksListener.get().canStackBlocks((Player) e.getPlayer(), itemStack, stackedBlock.getBlock())) {
+                InteractionResult interactionResult = stackedBlocksInteractionService.get()
+                        .checkStackedBlockInteraction(superiorPlayer, block, itemStack);
+                if (interactionResult == InteractionResult.SUCCESS) {
                     depositAmount += itemStack.getAmount();
                     blockItem = itemStack;
                 } else {
@@ -72,19 +87,21 @@ public class StackedBlocksDepositMenu implements InventoryHolder {
         }
 
         if (depositAmount > 0) {
-            int DEPOSIT_AMOUNT = depositAmount;
-            ItemStack BLOCK_ITEM = blockItem;
-            boolean success = stackedBlocksListener.get().tryStack((Player) e.getPlayer(), depositAmount, stackedBlock, amount -> {
-                int leftOvers = DEPOSIT_AMOUNT - amount;
-                if (leftOvers > 0) {
-                    ItemStack toAddBack = BLOCK_ITEM.clone();
-                    toAddBack.setAmount(leftOvers);
-                    BukkitItems.addItem(toAddBack, e.getPlayer().getInventory(), stackedBlock);
-                }
-            });
-            if (success) {
+            int finalDepositAmount = depositAmount;
+            ItemStack finalBlockItem = blockItem;
+
+            InteractionResult interactionResult = stackedBlocksInteractionService.get().
+                    handleStackedBlockPlace(superiorPlayer, block, finalDepositAmount, amount -> {
+                        int leftOvers = finalDepositAmount - amount;
+                        if (leftOvers > 0) {
+                            ItemStack toAddBack = finalBlockItem.clone();
+                            toAddBack.setAmount(leftOvers);
+                            BukkitItems.addItem(toAddBack, e.getPlayer().getInventory(), stackedBlock);
+                        }
+                    });
+
+            if (interactionResult == InteractionResult.SUCCESS)
                 plugin.getNMSWorld().playPlaceSound(stackedBlock);
-            }
         }
     }
 
