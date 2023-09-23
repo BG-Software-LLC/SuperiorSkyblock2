@@ -79,9 +79,11 @@ public class SignsListener implements Listener {
                     }
 
                     if (isSign) {
-                        IslandSigns.Result result = IslandSigns.handleSignBreak(superiorPlayer, (Sign) faceBlock.getState());
-                        if (result.isCancelEvent())
+                        IslandSigns.Result result = IslandSigns.handleSignBreak(superiorPlayer, (Sign) blockState);
+                        if (result.isCancelEvent()) {
                             e.setCancelled(true);
+                            break;
+                        }
                     }
                 }
             }

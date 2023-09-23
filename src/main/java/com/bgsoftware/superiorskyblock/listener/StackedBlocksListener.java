@@ -92,11 +92,12 @@ public class StackedBlocksListener implements Listener {
 
         Block clickedBlock = e.getClickedBlock();
         Material clickedBlockType = clickedBlock.getType();
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         ItemStack inHand = e.getItem();
 
         if (clickedBlockType == Material.DRAGON_EGG) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+
             if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) > 1) {
                 e.setCancelled(true);
                 if (inHand == null)
