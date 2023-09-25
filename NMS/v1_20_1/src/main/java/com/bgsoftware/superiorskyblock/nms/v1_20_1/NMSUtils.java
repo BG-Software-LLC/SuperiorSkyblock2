@@ -19,6 +19,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.ChunkPos;
@@ -56,7 +57,8 @@ public class NMSUtils {
             ChunkHolder.class, 1, Packet.class, boolean.class);
     private static final ReflectField<Map<Long, ChunkHolder>> VISIBLE_CHUNKS = new ReflectField<>(
             ChunkMap.class, Map.class, Modifier.PUBLIC | Modifier.VOLATILE, 1);
-
+    private static final ReflectMethod<LevelChunk> CHUNK_CACHE_SERVER_GET_CHUNK_IF_CACHED = new ReflectMethod<>(
+            ServerChunkCache.class, "getChunkAtIfCachedImmediately", int.class, int.class);
     private static final ReflectMethod<LevelChunk> CRAFT_CHUNK_GET_HANDLE = new ReflectMethod<>(
             CraftChunk.class, LevelChunk.class, "getHandle");
 
@@ -107,19 +109,21 @@ public class NMSUtils {
                                                  boolean saveChunks, ChunkCallback chunkCallback) {
         ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
 
-        Iterator<ChunkPos> chunksIterator = chunks.iterator();
-        while (chunksIterator.hasNext()) {
-            ChunkPos chunkPos = chunksIterator.next();
-            LevelChunk cachedUnloadedChunk = serverLevel.getChunkSource().getChunkAtIfCachedImmediately(chunkPos.x, chunkPos.z);
-            if (cachedUnloadedChunk != null) {
-                chunkCallback.onLoadedChunk(cachedUnloadedChunk);
-                chunksIterator.remove();
+        if (CHUNK_CACHE_SERVER_GET_CHUNK_IF_CACHED.isValid()) {
+            Iterator<ChunkPos> chunksIterator = chunks.iterator();
+            while (chunksIterator.hasNext()) {
+                ChunkPos chunkPos = chunksIterator.next();
+                LevelChunk cachedUnloadedChunk = serverLevel.getChunkSource().getChunkAtIfCachedImmediately(chunkPos.x, chunkPos.z);
+                if (cachedUnloadedChunk != null) {
+                    chunkCallback.onLoadedChunk(cachedUnloadedChunk);
+                    chunksIterator.remove();
+                }
             }
-        }
 
-        if (chunks.isEmpty()) {
-            chunkCallback.onFinish();
-            return;
+            if (chunks.isEmpty()) {
+                chunkCallback.onFinish();
+                return;
+            }
         }
 
         CompletableFuture<Void> pendingTask = new CompletableFuture<>();

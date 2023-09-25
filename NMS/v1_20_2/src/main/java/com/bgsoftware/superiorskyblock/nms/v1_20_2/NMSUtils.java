@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.nms.v1_18;
+package com.bgsoftware.superiorskyblock.nms.v1_20_2;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.nms.v1_18.world.PropertiesMapper;
+import com.bgsoftware.superiorskyblock.nms.v1_20_2.world.PropertiesMapper;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
@@ -14,8 +14,7 @@ import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.google.common.base.Suppliers;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
-import net.minecraft.core.SectionPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ChunkHolder;
@@ -37,6 +36,7 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.levelgen.Heightmap;
+import org.bukkit.craftbukkit.v1_20_R2.CraftChunk;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -59,6 +59,8 @@ public class NMSUtils {
             ChunkMap.class, Map.class, Modifier.PUBLIC | Modifier.VOLATILE, 1);
     private static final ReflectMethod<LevelChunk> CHUNK_CACHE_SERVER_GET_CHUNK_IF_CACHED = new ReflectMethod<>(
             ServerChunkCache.class, "getChunkAtIfCachedImmediately", int.class, int.class);
+    private static final ReflectMethod<LevelChunk> CRAFT_CHUNK_GET_HANDLE = new ReflectMethod<>(
+            CraftChunk.class, LevelChunk.class, "getHandle");
 
     private static final List<CompletableFuture<Void>> PENDING_CHUNK_ACTIONS = new LinkedList<>();
 
@@ -132,7 +134,7 @@ public class NMSUtils {
 
             chunks.forEach(chunkCoords -> {
                 try {
-                    net.minecraft.nbt.CompoundTag chunkCompound = chunkMap.read(chunkCoords);
+                    net.minecraft.nbt.CompoundTag chunkCompound = chunkMap.read(chunkCoords).join().orElse(null);
 
                     if (chunkCompound == null)
                         return;
@@ -176,7 +178,7 @@ public class NMSUtils {
         return new ProtoChunk(chunkPos,
                 UpgradeData.EMPTY,
                 serverLevel,
-                serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY),
+                serverLevel.registryAccess().registryOrThrow(Registries.BIOME),
                 null);
     }
 
@@ -229,7 +231,7 @@ public class NMSUtils {
             }
         }
 
-        if ((blockState.getMaterial().isLiquid() && plugin.getSettings().isLiquidUpdate()) ||
+        if ((blockState.liquid() && plugin.getSettings().isLiquidUpdate()) ||
                 blockState.getBlock() instanceof BedBlock) {
             serverLevel.setBlock(blockPos, blockState, 3);
             return;
@@ -238,12 +240,6 @@ public class NMSUtils {
         int indexY = serverLevel.getSectionIndex(blockPos.getY());
 
         LevelChunkSection levelChunkSection = levelChunk.getSections()[indexY];
-
-        if (levelChunkSection == null) {
-            int yOffset = SectionPos.blockToSectionCoord(blockPos.getY());
-            //noinspection deprecation
-            levelChunkSection = levelChunk.getSections()[indexY] = new LevelChunkSection(yOffset, levelChunk.biomeRegistry);
-        }
 
         int blockX = blockPos.getX() & 15;
         int blockY = blockPos.getY();
@@ -283,6 +279,14 @@ public class NMSUtils {
     public static boolean isDoubleBlock(Block block, BlockState blockState) {
         return (block.defaultBlockState().is(BlockTags.SLABS) || block.defaultBlockState().is(BlockTags.WOODEN_SLABS)) &&
                 blockState.getValue(SlabBlock.TYPE) == SlabType.DOUBLE;
+    }
+
+    public static LevelChunk getCraftChunkHandle(CraftChunk craftChunk) {
+        if (CRAFT_CHUNK_GET_HANDLE.isValid())
+            return CRAFT_CHUNK_GET_HANDLE.invoke(craftChunk);
+
+        ServerLevel serverLevel = craftChunk.getCraftWorld().getHandle();
+        return serverLevel.getChunk(craftChunk.getX(), craftChunk.getZ());
     }
 
     public record UnloadedChunkCompound(net.minecraft.nbt.CompoundTag chunkCompound, ChunkPos chunkPos) {
