@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuConfigEditor;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -10,7 +10,7 @@ import org.bukkit.command.CommandSender;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminSettings implements ISuperiorCommand {
+public class CmdAdminSettings implements InternalSuperiorCommand {
 
     @Override
     public List<String> getAliases() {

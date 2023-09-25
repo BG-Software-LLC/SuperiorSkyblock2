@@ -1,14 +1,17 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalAdminSuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IntArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -18,7 +21,7 @@ import org.bukkit.command.CommandSender;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminAddEntityLimit implements IAdminIslandCommand {
+public class CmdAdminAddEntityLimit implements InternalAdminSuperiorCommand {
 
     @Override
     public List<String> getAliases() {
@@ -31,28 +34,17 @@ public class CmdAdminAddEntityLimit implements IAdminIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin addentitylimit <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_ENTITY.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_LIMIT.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_LIMIT.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 5;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 5;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArguments.required("entity", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_ENTITY))
+                .add(CommandArguments.required("limit", IntArgumentType.LIMIT, Message.COMMAND_ARGUMENT_LIMIT))
+                .build();
     }
 
     @Override
@@ -61,25 +53,20 @@ public class CmdAdminAddEntityLimit implements IAdminIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
-        return true;
-    }
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-    @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Key entityKey = Keys.ofEntityType(args[3]);
+        MultipleIslandsArgumentType.Result islandsResult = context.getRequiredArgument("islands", MultipleIslandsArgumentType.Result.class);
+        Key entityKey = Keys.ofEntityType(context.getRequiredArgument("entity", String.class));
+        int limit = context.getRequiredArgument("limit", int.class);
 
-        NumberArgument<Integer> arguments = CommandArguments.getLimit(sender, args[4]);
-
-        if (!arguments.isSucceed())
-            return;
-
-        int limit = arguments.getNumber();
+        List<Island> islands = islandsResult.getIslands();
+        SuperiorPlayer targetPlayer = islandsResult.getTargetPlayer();
 
         boolean anyIslandChanged = false;
 
         for (Island island : islands) {
-            EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeEntityLimitEvent(sender,
+            EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeEntityLimitEvent(dispatcher,
                     island, entityKey, island.getEntityLimit(entityKey) + limit);
             anyIslandChanged |= !eventResult.isCancelled();
             if (!eventResult.isCancelled())
@@ -90,16 +77,11 @@ public class CmdAdminAddEntityLimit implements IAdminIslandCommand {
             return;
 
         if (islands.size() > 1)
-            Message.CHANGED_ENTITY_LIMIT_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()));
+            Message.CHANGED_ENTITY_LIMIT_ALL.send(dispatcher, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()));
         else if (targetPlayer == null)
-            Message.CHANGED_ENTITY_LIMIT_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()), islands.get(0).getName());
+            Message.CHANGED_ENTITY_LIMIT_NAME.send(dispatcher, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()), islands.get(0).getName());
         else
-            Message.CHANGED_ENTITY_LIMIT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()), targetPlayer.getName());
-    }
-
-    @Override
-    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getEntitiesForLimit(args[3]) : Collections.emptyList();
+            Message.CHANGED_ENTITY_LIMIT.send(dispatcher, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()), targetPlayer.getName());
     }
 
 }

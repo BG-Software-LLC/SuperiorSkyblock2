@@ -1,21 +1,24 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.events.IslandJoinEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IslandArgumentType;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
-import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAccept implements ISuperiorCommand {
+public class CmdAccept implements InternalSuperiorCommand {
 
     @Override
     public List<String> getAliases() {
@@ -28,25 +31,15 @@ public class CmdAccept implements ISuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "accept [" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ACCEPT.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 1;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 2;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.optional("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
+                .build();
     }
 
     @Override
@@ -55,28 +48,22 @@ public class CmdAccept implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-
-        SuperiorPlayer targetPlayer;
-        Island island;
-
-        if (args.length == 1) {
-            List<Island> playerPendingInvites = superiorPlayer.getInvites();
-            island = playerPendingInvites.isEmpty() ? null : playerPendingInvites.get(0);
-            targetPlayer = null;
-        } else {
-            targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
-            island = targetPlayer == null ? plugin.getGrid().getIsland(args[1]) : targetPlayer.getIsland();
-        }
-
-        if (island == null || !island.isInvited(superiorPlayer)) {
-            Message.NO_ISLAND_INVITE.send(superiorPlayer);
-            return;
-        }
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
 
         if (superiorPlayer.getIsland() != null) {
             Message.JOIN_WHILE_IN_ISLAND.send(superiorPlayer);
+            return;
+        }
+
+        IslandArgumentType.Result result = context.getOptionalArgument("island", IslandArgumentType.Result.class).orElseGet(() -> {
+            List<Island> playerPendingInvites = superiorPlayer.getInvites();
+            return new IslandArgumentType.Result(playerPendingInvites.isEmpty() ? null : playerPendingInvites.get(0), null);
+        });
+
+        Island island = result.getIsland();
+        if (island == null || !island.isInvited(superiorPlayer)) {
+            Message.NO_ISLAND_INVITE.send(superiorPlayer);
             return;
         }
 
@@ -94,6 +81,7 @@ public class CmdAccept implements ISuperiorCommand {
         island.revokeInvite(superiorPlayer);
         island.addMember(superiorPlayer, SPlayerRole.defaultRole());
 
+        SuperiorPlayer targetPlayer = result.getTargetPlayer();
         if (targetPlayer == null)
             Message.JOINED_ISLAND_NAME.send(superiorPlayer, island.getName());
         else
@@ -103,14 +91,6 @@ public class CmdAccept implements ISuperiorCommand {
             superiorPlayer.teleport(island);
         if (plugin.getSettings().isClearOnJoin())
             plugin.getNMSPlayers().clearInventory(superiorPlayer.asPlayer());
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
-                plugin.getSettings().isTabCompleteHideVanished(), (onlinePlayer, onlineIsland) ->
-                        onlineIsland != null && onlineIsland.isInvited(superiorPlayer)) : Collections.emptyList();
     }
 
 }

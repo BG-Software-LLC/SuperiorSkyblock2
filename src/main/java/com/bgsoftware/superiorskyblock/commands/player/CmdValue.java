@@ -1,9 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -11,7 +16,6 @@ import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.CustomKey;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -19,7 +23,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdValue implements ISuperiorCommand {
+public class CmdValue implements InternalSuperiorCommand {
 
     @Override
     public List<String> getAliases() {
@@ -32,23 +36,15 @@ public class CmdValue implements ISuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "value [" + Message.COMMAND_ARGUMENT_MATERIAL.getMessage(locale) + "]";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_VALUE.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 1;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 2;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.optional("material", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_MATERIAL))
+                .build();
     }
 
     @Override
@@ -57,14 +53,17 @@ public class CmdValue implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+        Player player = (Player) context.getDispatcher();
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+
+        String materialName = context.getOptionalArgument("material", String.class).orElse(null);
 
         Key toCheck;
         String keyName = "";
 
-        if (args.length == 1) {
-            ItemStack inHand = ((Player) sender).getItemInHand();
+        if (materialName == null) {
+            ItemStack inHand = player.getItemInHand();
 
             if (inHand == null) {
                 inHand = new ItemStack(Material.AIR);
@@ -88,7 +87,7 @@ public class CmdValue implements ISuperiorCommand {
             }
 
         } else {
-            toCheck = Keys.ofMaterialAndData(args[1]);
+            toCheck = Keys.ofMaterialAndData(materialName);
         }
 
         if (keyName.isEmpty())
@@ -124,11 +123,6 @@ public class CmdValue implements ISuperiorCommand {
         }
 
         Message.CUSTOM.send(superiorPlayer, stringBuilder.toString(), false);
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return Collections.emptyList();
     }
 
 }

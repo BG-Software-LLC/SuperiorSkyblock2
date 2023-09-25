@@ -1,20 +1,22 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IslandArgumentType;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-public class CmdVisit implements ISuperiorCommand {
+public class CmdVisit implements InternalSuperiorCommand {
 
     @Override
     public List<String> getAliases() {
@@ -27,25 +29,15 @@ public class CmdVisit implements ISuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "visit <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_VISIT.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 2;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 2;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
+                .build();
     }
 
     @Override
@@ -54,45 +46,31 @@ public class CmdVisit implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        Island targetIsland = CommandArguments.getIsland(plugin, sender, args[1]).getIsland();
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
 
-        if (targetIsland == null)
-            return;
-
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+        Island targetIsland = context.getRequiredArgument("island", Island.class);
 
         Location visitLocation = plugin.getSettings().getVisitorsSign().isRequiredForVisit() ?
                 targetIsland.getVisitorsLocation(null /* unused */) :
                 targetIsland.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorld());
 
         if (visitLocation == null) {
-            Message.INVALID_VISIT_LOCATION.send(sender);
+            Message.INVALID_VISIT_LOCATION.send(superiorPlayer);
 
             if (!superiorPlayer.hasBypassModeEnabled())
                 return;
 
             visitLocation = targetIsland.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorld());
-            Message.INVALID_VISIT_LOCATION_BYPASS.send(sender);
+            Message.INVALID_VISIT_LOCATION_BYPASS.send(superiorPlayer);
         }
 
         if (targetIsland.isLocked() && !targetIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)) {
-            Message.NO_CLOSE_BYPASS.send(sender);
+            Message.NO_CLOSE_BYPASS.send(superiorPlayer);
             return;
         }
 
         superiorPlayer.teleport(visitLocation);
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
-                plugin.getSettings().isTabCompleteHideVanished(),
-                (onlinePlayer, onlineIsland) -> onlineIsland != null && (
-                        (!plugin.getSettings().getVisitorsSign().isRequiredForVisit() || onlineIsland.getVisitorsLocation(null /* unused */) != null) ||
-                                superiorPlayer.hasBypassModeEnabled()) && (!onlineIsland.isLocked() ||
-                        onlineIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS))) : Collections.emptyList();
     }
 
 }

@@ -1,15 +1,16 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminBypass implements ISuperiorCommand {
+public class CmdAdminBypass implements InternalSuperiorCommand {
 
     @Override
     public List<String> getAliases() {
@@ -22,23 +23,13 @@ public class CmdAdminBypass implements ISuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin bypass";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_BYPASS.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 2;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 2;
+    public List<CommandArgument<?>> getArguments() {
+        return Collections.emptyList();
     }
 
     @Override
@@ -47,8 +38,8 @@ public class CmdAdminBypass implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
 
         if (!plugin.getEventsBus().callPlayerToggleBypassEvent(superiorPlayer))
             return;
@@ -60,11 +51,6 @@ public class CmdAdminBypass implements ISuperiorCommand {
         }
 
         superiorPlayer.toggleBypassMode();
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return Collections.emptyList();
     }
 
 }

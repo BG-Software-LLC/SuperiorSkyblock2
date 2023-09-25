@@ -1,12 +1,15 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalAdminSuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IntArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -14,7 +17,7 @@ import org.bukkit.command.CommandSender;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminAddCoopLimit implements IAdminIslandCommand {
+public class CmdAdminAddCoopLimit implements InternalAdminSuperiorCommand {
 
     @Override
     public List<String> getAliases() {
@@ -27,27 +30,16 @@ public class CmdAdminAddCoopLimit implements IAdminIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin addcooplimit <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_LIMIT.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 4;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 4;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArguments.required("limit", IntArgumentType.LIMIT, Message.COMMAND_ARGUMENT_LIMIT))
+                .build();
     }
 
     @Override
@@ -56,23 +48,19 @@ public class CmdAdminAddCoopLimit implements IAdminIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
-        return true;
-    }
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-    @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        NumberArgument<Integer> arguments = CommandArguments.getLimit(sender, args[3]);
+        MultipleIslandsArgumentType.Result islandsResult = context.getRequiredArgument("islands", MultipleIslandsArgumentType.Result.class);
+        int limit = context.getRequiredArgument("limit", int.class);
 
-        if (!arguments.isSucceed())
-            return;
-
-        int limit = arguments.getNumber();
+        List<Island> islands = islandsResult.getIslands();
+        SuperiorPlayer targetPlayer = islandsResult.getTargetPlayer();
 
         boolean anyIslandChanged = false;
 
         for (Island island : islands) {
-            EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeCoopLimitEvent(sender,
+            EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeCoopLimitEvent(dispatcher,
                     island, island.getCoopLimit() + limit);
             anyIslandChanged |= !eventResult.isCancelled();
             if (!eventResult.isCancelled())
@@ -83,11 +71,11 @@ public class CmdAdminAddCoopLimit implements IAdminIslandCommand {
             return;
 
         if (islands.size() > 1)
-            Message.CHANGED_COOP_LIMIT_ALL.send(sender);
+            Message.CHANGED_COOP_LIMIT_ALL.send(dispatcher);
         else if (targetPlayer == null)
-            Message.CHANGED_COOP_LIMIT_NAME.send(sender, islands.get(0).getName());
+            Message.CHANGED_COOP_LIMIT_NAME.send(dispatcher, islands.get(0).getName());
         else
-            Message.CHANGED_COOP_LIMIT.send(sender, targetPlayer.getName());
+            Message.CHANGED_COOP_LIMIT.send(dispatcher, targetPlayer.getName());
     }
 
 }

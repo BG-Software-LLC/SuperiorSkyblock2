@@ -79,7 +79,7 @@ public abstract class CommandsMap {
     }
 
     private boolean isCommandEnabled(SuperiorCommand superiorCommand) {
-        return superiorCommand instanceof IAdminIslandCommand || superiorCommand.getAliases().stream()
+        return superiorCommand instanceof InternalIslandCommand || superiorCommand.getAliases().stream()
                 .noneMatch(plugin.getSettings().getDisabledCommands()::contains);
     }
 

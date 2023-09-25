@@ -1,25 +1,28 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IslandWarpArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.warp.SignWarp;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-public class CmdDelWarp implements IPermissibleCommand {
+public class CmdDelWarp implements InternalPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -32,23 +35,15 @@ public class CmdDelWarp implements IPermissibleCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "delwarp <" + Message.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + "...>";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_DEL_WARP.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 2;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return Integer.MAX_VALUE;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("warp-name", IslandWarpArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_WARP_NAME))
+                .build();
     }
 
     @Override
@@ -67,12 +62,12 @@ public class CmdDelWarp implements IPermissibleCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        Player player = superiorPlayer.asPlayer();
-        IslandWarp islandWarp = CommandArguments.getWarp(player, island, args, 1);
+    public void execute(SuperiorSkyblockPlugin plugin, IslandCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(dispatcher);
+        Island island = context.getIsland();
 
-        if (islandWarp == null)
-            return;
+        IslandWarp islandWarp = context.getRequiredArgument("warp-name", IslandWarp.class);
 
         if (!plugin.getEventsBus().callIslandDeleteWarpEvent(superiorPlayer, island, islandWarp))
             return;
@@ -81,13 +76,8 @@ public class CmdDelWarp implements IPermissibleCommand {
         Message.DELETE_WARP.send(superiorPlayer, islandWarp.getName());
 
         ChunksProvider.loadChunk(ChunkPosition.of(islandWarp.getLocation()), ChunkLoadReason.WARP_SIGN_BREAK, chunk -> {
-            SignWarp.trySignWarpBreak(islandWarp, player);
+            SignWarp.trySignWarpBreak(islandWarp, dispatcher);
         });
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        return args.length == 2 ? CommandTabCompletes.getIslandWarps(island, args[1]) : Collections.emptyList();
     }
 
 }

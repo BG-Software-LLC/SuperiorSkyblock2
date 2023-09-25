@@ -1,10 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalPermissibleCommand;
+import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -17,7 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdDisband implements IPermissibleCommand {
+public class CmdDisband implements InternalPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -30,23 +32,13 @@ public class CmdDisband implements IPermissibleCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "disband";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_DISBAND.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 1;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 1;
+    public List<CommandArgument<?>> getArguments() {
+        return Collections.emptyList();
     }
 
     @Override
@@ -65,7 +57,10 @@ public class CmdDisband implements IPermissibleCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+    public void execute(SuperiorSkyblockPlugin plugin, IslandCommandContext context) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
+        Island island = context.getIsland();
+
         if (!superiorPlayer.hasDisbands() && plugin.getSettings().getDisbandCount() > 0) {
             Message.NO_MORE_DISBANDS.send(superiorPlayer);
             return;
@@ -86,7 +81,6 @@ public class CmdDisband implements IPermissibleCommand {
             superiorPlayer.setDisbands(superiorPlayer.getDisbands() - 1);
             island.disbandIsland();
         }
-
     }
 
 }

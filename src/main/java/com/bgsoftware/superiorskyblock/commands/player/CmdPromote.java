@@ -1,20 +1,23 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 
 import java.util.Collections;
 import java.util.List;
 
-public class CmdPromote implements IPermissibleCommand {
+public class CmdPromote implements InternalPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -27,23 +30,15 @@ public class CmdPromote implements IPermissibleCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "promote <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_PROMOTE.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 2;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 2;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .build();
     }
 
     @Override
@@ -62,11 +57,11 @@ public class CmdPromote implements IPermissibleCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, superiorPlayer, args[1]);
+    public void execute(SuperiorSkyblockPlugin plugin, IslandCommandContext context) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
+        Island island = context.getIsland();
 
-        if (targetPlayer == null)
-            return;
+        SuperiorPlayer targetPlayer = context.getRequiredArgument("player", SuperiorPlayer.class);
 
         if (!island.isMember(targetPlayer)) {
             Message.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
@@ -111,16 +106,6 @@ public class CmdPromote implements IPermissibleCommand {
 
         Message.PROMOTED_MEMBER.send(superiorPlayer, targetPlayer.getName(), targetPlayer.getPlayerRole());
         Message.GOT_PROMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        return args.length != 2 ? Collections.emptyList() : CommandTabCompletes.getIslandMembers(island, args[1], islandMember -> {
-            PlayerRole playerRole = islandMember.getPlayerRole();
-            PlayerRole nextRole = playerRole.getNextRole();
-            return nextRole != null && !nextRole.isLastRole() && playerRole.isLessThan(superiorPlayer.getPlayerRole()) &&
-                    !nextRole.isHigherThan(superiorPlayer.getPlayerRole());
-        });
     }
 
 }

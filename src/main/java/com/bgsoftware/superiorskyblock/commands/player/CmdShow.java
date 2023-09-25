@@ -1,12 +1,15 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IslandArgumentType;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -14,6 +17,7 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CmdShow implements ISuperiorCommand {
+public class CmdShow implements InternalSuperiorCommand {
 
     @Override
     public List<String> getAliases() {
@@ -35,25 +39,15 @@ public class CmdShow implements ISuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "show [" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_SHOW.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 1;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 2;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.optional("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
+                .build();
     }
 
     @Override
@@ -62,14 +56,26 @@ public class CmdShow implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        Island island = args.length == 1 ? CommandArguments.getIslandWhereStanding(plugin, sender).getIsland() :
-                CommandArguments.getIsland(plugin, sender, args[1]).getIsland();
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-        if (island == null)
+        Island island = context.getOptionalArgument("island", Island.class).orElseGet(() -> {
+            if (!(dispatcher instanceof Player)) {
+                Message.CUSTOM.send(dispatcher, "&cYou must specify a player's name.", true);
+                return null;
+            }
+
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(dispatcher);
+            Island locationIsland = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
+            return locationIsland == null || locationIsland.isSpawn() ? superiorPlayer.getIsland() : locationIsland;
+        });
+
+        if (island == null) {
+            Message.INVALID_ISLAND.send(dispatcher);
             return;
+        }
 
-        java.util.Locale locale = PlayerLocales.getLocale(sender);
+        java.util.Locale locale = PlayerLocales.getLocale(dispatcher);
 
         StringBuilder infoMessage = new StringBuilder();
 
@@ -97,9 +103,9 @@ public class CmdShow implements ISuperiorCommand {
             infoMessage.append(Message.ISLAND_INFO_WORTH.getMessage(locale, island.getWorth())).append("\n");
         if (!Message.ISLAND_INFO_LEVEL.isEmpty(locale))
             infoMessage.append(Message.ISLAND_INFO_LEVEL.getMessage(locale, island.getIslandLevel())).append("\n");
-        if (!Message.ISLAND_INFO_DISCORD.isEmpty(locale) && island.hasPermission(sender, IslandPrivileges.DISCORD_SHOW))
+        if (!Message.ISLAND_INFO_DISCORD.isEmpty(locale) && island.hasPermission(dispatcher, IslandPrivileges.DISCORD_SHOW))
             infoMessage.append(Message.ISLAND_INFO_DISCORD.getMessage(locale, island.getDiscord())).append("\n");
-        if (!Message.ISLAND_INFO_PAYPAL.isEmpty(locale) && island.hasPermission(sender, IslandPrivileges.PAYPAL_SHOW))
+        if (!Message.ISLAND_INFO_PAYPAL.isEmpty(locale) && island.hasPermission(dispatcher, IslandPrivileges.PAYPAL_SHOW))
             infoMessage.append(Message.ISLAND_INFO_PAYPAL.getMessage(locale, island.getPaypal())).append("\n");
         if (!Message.ISLAND_INFO_VISITORS_COUNT.isEmpty(locale))
             infoMessage.append(Message.ISLAND_INFO_VISITORS_COUNT.getMessage(locale, island.getUniqueVisitorsWithTimes().size())).append("\n");
@@ -132,13 +138,7 @@ public class CmdShow implements ISuperiorCommand {
         if (!Message.ISLAND_INFO_FOOTER.isEmpty(locale))
             infoMessage.append(Message.ISLAND_INFO_FOOTER.getMessage(locale));
 
-        Message.CUSTOM.send(sender, infoMessage.toString(), false);
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 2 ? CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
-                plugin.getSettings().isTabCompleteHideVanished()) : Collections.emptyList();
+        Message.CUSTOM.send(dispatcher, infoMessage.toString(), false);
     }
 
 }

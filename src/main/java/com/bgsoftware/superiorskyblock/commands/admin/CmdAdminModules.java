@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class CmdAdminModules implements ISuperiorCommand {
+public class CmdAdminModules implements InternalSuperiorCommand {
 
     @Override
     public List<String> getAliases() {

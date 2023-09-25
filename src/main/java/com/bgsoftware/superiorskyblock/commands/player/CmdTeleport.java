@@ -1,22 +1,21 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import org.bukkit.command.CommandSender;
 
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdTeleport implements ISuperiorCommand {
+public class CmdTeleport implements InternalIslandCommand {
 
     @Override
     public List<String> getAliases() {
@@ -29,23 +28,13 @@ public class CmdTeleport implements ISuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "teleport";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_TELEPORT.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 1;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 1;
+    public List<CommandArgument<?>> getArguments() {
+        return Collections.emptyList();
     }
 
     @Override
@@ -54,15 +43,14 @@ public class CmdTeleport implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        IslandArgument arguments = CommandArguments.getSenderIsland(plugin, sender);
+    public boolean isSelfIsland() {
+        return true;
+    }
 
-        Island island = arguments.getIsland();
-
-        if (island == null)
-            return;
-
-        SuperiorPlayer superiorPlayer = arguments.getSuperiorPlayer();
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, IslandCommandContext context) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
+        Island island = context.getIsland();
 
         if (plugin.getSettings().getHomeWarmup() > 0 && !superiorPlayer.hasBypassModeEnabled() &&
                 !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
@@ -73,11 +61,7 @@ public class CmdTeleport implements ISuperiorCommand {
         } else {
             teleportToIsland(superiorPlayer, island);
         }
-    }
 
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return Collections.emptyList();
     }
 
     private void teleportToIsland(SuperiorPlayer superiorPlayer, Island island) {

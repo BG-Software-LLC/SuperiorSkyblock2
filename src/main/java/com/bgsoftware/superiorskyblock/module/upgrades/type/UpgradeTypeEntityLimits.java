@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.module.upgrades.type;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.LocationKey;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
@@ -54,7 +54,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
     }
 
     @Override
-    public List<ISuperiorCommand> getCommands() {
+    public List<InternalSuperiorCommand> getCommands() {
         return Collections.emptyList();
     }
 

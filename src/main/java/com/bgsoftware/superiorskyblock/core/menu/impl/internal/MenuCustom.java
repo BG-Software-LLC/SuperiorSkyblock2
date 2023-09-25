@@ -4,7 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
@@ -89,7 +89,7 @@ public class MenuCustom extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
 
     }
 
-    private class CustomMenuCommand implements ISuperiorCommand {
+    private class CustomMenuCommand implements InternalSuperiorCommand {
 
         private final CommandArgs args;
 

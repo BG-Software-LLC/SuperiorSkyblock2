@@ -1,6 +1,9 @@
 package com.bgsoftware.superiorskyblock.commands.arguments;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentType;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -428,6 +431,14 @@ public class CommandArguments {
         }
 
         return new NumberArgument<>(i, status);
+    }
+
+    public static <E> CommandArgument<E> required(String identifier, CommandArgumentType<E> argumentType, Message... displayNames) {
+        return plugin.getCommands().createArgument(identifier, argumentType, true, displayNames);
+    }
+
+    public static <E> CommandArgument<E> optional(String identifier, CommandArgumentType<E> argumentType, Message... displayNames) {
+        return plugin.getCommands().createArgument(identifier, argumentType, false, displayNames);
     }
 
 }

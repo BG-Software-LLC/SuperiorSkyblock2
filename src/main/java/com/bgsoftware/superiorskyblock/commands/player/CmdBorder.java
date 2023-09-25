@@ -1,20 +1,22 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.BorderColorArgumentType;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
-import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-public class CmdBorder implements ISuperiorCommand {
+public class CmdBorder implements InternalSuperiorCommand {
 
     @Override
     public List<String> getAliases() {
@@ -27,23 +29,15 @@ public class CmdBorder implements ISuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "border [" + Message.COMMAND_ARGUMENT_BORDER_COLOR.getMessage(locale) + "]";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_BORDER.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 1;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 2;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.optional("border-color", BorderColorArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_BORDER_COLOR))
+                .build();
     }
 
     @Override
@@ -52,25 +46,16 @@ public class CmdBorder implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
 
-        if (args.length != 2) {
+        BorderColor borderColor = context.getOptionalArgument("border-color", BorderColor.class).orElse(null);
+
+        if (borderColor == null) {
             plugin.getMenus().openBorderColor(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()));
-            return;
+        } else {
+            IslandUtils.handleBorderColorUpdate(superiorPlayer, borderColor);
         }
-
-        BorderColor borderColor = CommandArguments.getBorderColor(sender, args[1]);
-
-        if (borderColor == null)
-            return;
-
-        IslandUtils.handleBorderColorUpdate(superiorPlayer, borderColor);
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length != 2 ? Collections.emptyList() : CommandTabCompletes.getBorderColors(args[1]);
     }
 
 }

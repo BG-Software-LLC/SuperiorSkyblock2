@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentType;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -88,4 +90,5 @@ public interface CommandsManager {
      */
     void dispatchSubCommand(CommandSender sender, String subCommand, String args);
 
+    <E> CommandArgument<E> createArgument(String identifier, String displayName, CommandArgumentType<E> argumentType, boolean isRequired);
 }

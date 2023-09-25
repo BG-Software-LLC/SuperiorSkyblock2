@@ -1,19 +1,23 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalAdminSuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.BoolArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminCmdAll implements IAdminIslandCommand {
+public class CmdAdminCmdAll implements InternalAdminSuperiorCommand {
 
     @Override
     public List<String> getAliases() {
@@ -26,27 +30,17 @@ public class CmdAdminCmdAll implements IAdminIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin cmdall <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <online-filter[true/false]> <" +
-                Message.COMMAND_ARGUMENT_COMMAND.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_CMD_ALL.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 5;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return Integer.MAX_VALUE;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArgument.required("onlineFilter", "online-filter[true/false]", BoolArgumentType.INSTANCE))
+                .add(CommandArguments.required("command", StringArgumentType.MULTIPLE, Message.COMMAND_ARGUMENT_COMMAND))
+                .build();
     }
 
     @Override
@@ -55,26 +49,22 @@ public class CmdAdminCmdAll implements IAdminIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
-        return true;
-    }
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-    @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        String command = CommandArguments.buildLongString(args, 4, false);
-        boolean onlyOnline = Boolean.parseBoolean(args[3]);
+        MultipleIslandsArgumentType.Result islandsResult = context.getRequiredArgument("islands", MultipleIslandsArgumentType.Result.class);
+        boolean onlineFilter = context.getRequiredArgument("onlineFilter", boolean.class);
+        String command = context.getRequiredArgument("command", String.class);
 
-        islands.forEach(island -> island.executeCommand(command, onlyOnline));
+        List<Island> islands = islandsResult.getIslands();
+        SuperiorPlayer targetPlayer = islandsResult.getTargetPlayer();
+
+        islands.forEach(island -> island.executeCommand(command, onlineFilter));
 
         if (targetPlayer == null)
-            Message.GLOBAL_COMMAND_EXECUTED_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
+            Message.GLOBAL_COMMAND_EXECUTED_NAME.send(dispatcher, islands.size() == 1 ? islands.get(0).getName() : "all");
         else
-            Message.GLOBAL_COMMAND_EXECUTED.send(sender, targetPlayer.getName());
-    }
-
-    @Override
-    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getCustomComplete(args[3], "true", "false") : null;
+            Message.GLOBAL_COMMAND_EXECUTED.send(dispatcher, targetPlayer.getName());
     }
 
 }

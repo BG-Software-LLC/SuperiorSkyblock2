@@ -1,19 +1,22 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
-import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-public class CmdCreate implements ISuperiorCommand {
+public class CmdCreate implements InternalSuperiorCommand {
 
     private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -28,39 +31,21 @@ public class CmdCreate implements ISuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        StringBuilder usage = new StringBuilder("create");
-
-        if (plugin.getSettings().getIslandNames().isRequiredForCreation())
-            usage.append(" <").append(Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale)).append(">");
-
-        if (plugin.getSettings().isSchematicNameArgument())
-            usage.append(" [").append(Message.COMMAND_ARGUMENT_SCHEMATIC_NAME.getMessage(locale)).append("]");
-
-        return usage.toString();
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_CREATE.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return plugin.getSettings().getIslandNames().isRequiredForCreation() ? 2 : 1;
-    }
+    public List<CommandArgument<?>> getArguments() {
+        CommandArgumentsBuilder builder = new CommandArgumentsBuilder();
 
-    @Override
-    public int getMaxArgs() {
-        int args = 3;
+        if (plugin.getSettings().getIslandNames().isRequiredForCreation())
+            builder.add(CommandArguments.required("name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_ISLAND_NAME));
 
-        if (!plugin.getSettings().getIslandNames().isRequiredForCreation())
-            args--;
+        if (plugin.getSettings().isSchematicNameArgument())
+            builder.add(CommandArguments.optional("schematic-name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_SCHEMATIC_NAME));
 
-        if (!plugin.getSettings().isSchematicNameArgument())
-            args--;
-
-        return args;
+        return builder.build();
     }
 
     @Override
@@ -69,8 +54,8 @@ public class CmdCreate implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
 
         if (superiorPlayer.getIsland() != null) {
             Message.ALREADY_IN_ISLAND.send(superiorPlayer);
@@ -82,23 +67,20 @@ public class CmdCreate implements ISuperiorCommand {
             return;
         }
 
-        String islandName = "";
-        String schematicName = null;
-
-        if (plugin.getSettings().getIslandNames().isRequiredForCreation()) {
-            if (args.length >= 2) {
-                islandName = args[1];
-                if (!IslandNames.isValidName(sender, null, islandName))
-                    return;
-            }
+        String islandName;
+        try {
+            islandName = context.getRequiredArgument("name", String.class);
+            if (!IslandNames.isValidName(context.getDispatcher(), null, islandName))
+                return;
+        } catch (IllegalArgumentException error) {
+            islandName = "";
         }
 
-        if (plugin.getSettings().isSchematicNameArgument() &&
-                args.length == (plugin.getSettings().getIslandNames().isRequiredForCreation() ? 3 : 2)) {
-            schematicName = args[plugin.getSettings().getIslandNames().isRequiredForCreation() ? 2 : 1];
+        String schematicName = context.getOptionalArgument("schematic-name", String.class).orElse(null);
+        if (schematicName != null) {
             Schematic schematic = plugin.getSchematics().getSchematic(schematicName);
             if (schematic == null || schematicName.endsWith("_nether") || schematicName.endsWith("_the_end")) {
-                Message.INVALID_SCHEMATIC.send(sender, schematicName);
+                Message.INVALID_SCHEMATIC.send(context.getDispatcher(), schematicName);
                 return;
             }
         }
@@ -108,13 +90,6 @@ public class CmdCreate implements ISuperiorCommand {
         } else {
             Menus.MENU_ISLAND_CREATION.simulateClick(superiorPlayer, islandName, schematicName, false, superiorPlayer.getOpenedView());
         }
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        int argumentLength = plugin.getSettings().getIslandNames().isRequiredForCreation() ? 3 : 2;
-        return plugin.getSettings().isSchematicNameArgument() && args.length == argumentLength ?
-                CommandTabCompletes.getSchematics(plugin, args[argumentLength - 1]) : Collections.emptyList();
     }
 
 }

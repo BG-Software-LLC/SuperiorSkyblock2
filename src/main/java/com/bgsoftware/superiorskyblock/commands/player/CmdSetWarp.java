@@ -1,22 +1,27 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalPermissibleCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 
 import java.util.Collections;
 import java.util.List;
 
-public class CmdSetWarp implements IPermissibleCommand {
+public class CmdSetWarp implements InternalPermissibleCommand {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -31,29 +36,19 @@ public class CmdSetWarp implements IPermissibleCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        StringBuilder usage = new StringBuilder("setwarp <")
-                .append(Message.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale)).append(">");
-
-        if (plugin.getSettings().isWarpCategories())
-            usage.append(" [").append(Message.COMMAND_ARGUMENT_WARP_CATEGORY.getMessage(locale)).append("]");
-
-        return usage.toString();
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_SET_WARP.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 2;
-    }
+    public List<CommandArgument<?>> getArguments() {
+        CommandArgumentsBuilder builder = new CommandArgumentsBuilder()
+                .add(CommandArguments.required("island-warp-name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_WARP_NAME));
 
-    @Override
-    public int getMaxArgs() {
-        return plugin.getSettings().isWarpCategories() ? 3 : 2;
+        if (plugin.getSettings().isWarpCategories())
+            builder.add(CommandArguments.optional("warp-category-name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_WARP_CATEGORY));
+
+        return builder.build();
     }
 
     @Override
@@ -72,13 +67,16 @@ public class CmdSetWarp implements IPermissibleCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+    public void execute(SuperiorSkyblockPlugin plugin, IslandCommandContext context) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
+        Island island = context.getIsland();
+
         if (island.getIslandWarps().size() >= island.getWarpsLimit()) {
             Message.NO_MORE_WARPS.send(superiorPlayer);
             return;
         }
 
-        String warpName = args[1];
+        String warpName = context.getRequiredArgument("island-warp-name", String.class);
 
         if (warpName.isEmpty()) {
             Message.WARP_ILLEGAL_NAME.send(superiorPlayer);
@@ -100,11 +98,9 @@ public class CmdSetWarp implements IPermissibleCommand {
             return;
         }
 
-        String categoryName = null;
+        String categoryName = context.getOptionalArgument("warp-category-name", String.class).orElse(null);
 
-        if (args.length == 3) {
-            categoryName = args[2];
-
+        if (categoryName != null) {
             if (categoryName.isEmpty()) {
                 Message.WARP_CATEGORY_ILLEGAL_NAME.send(superiorPlayer);
                 return;

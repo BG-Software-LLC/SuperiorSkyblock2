@@ -1,24 +1,24 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IntArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.IntStream;
 
-public class CmdChest implements IPermissibleCommand {
+public class CmdChest implements InternalPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -31,23 +31,15 @@ public class CmdChest implements IPermissibleCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "chest [" + Message.COMMAND_ARGUMENT_PAGE.getMessage(locale) + "]";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_CHEST.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 1;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 2;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.optional("page", IntArgumentType.PAGE, Message.COMMAND_ARGUMENT_PAGE))
+                .build();
     }
 
     @Override
@@ -66,33 +58,25 @@ public class CmdChest implements IPermissibleCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        if (args.length == 2) {
-            NumberArgument<Integer> pageArguments = CommandArguments.getPage(superiorPlayer.asPlayer(), args[1]);
+    public void execute(SuperiorSkyblockPlugin plugin, IslandCommandContext context) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
+        Island island = context.getIsland();
 
-            if (!pageArguments.isSucceed())
-                return;
+        Integer page = context.getOptionalArgument("page", int.class).map(p -> p - 1).orElse(null);
 
-            int page = pageArguments.getNumber() - 1;
-            IslandChest[] islandChests = island.getChest();
-
-            if (page < 0 || page >= islandChests.length) {
-                Message.INVALID_PAGE.send(superiorPlayer, args[1]);
-                return;
-            }
-
-            islandChests[page].openChest(superiorPlayer);
-        } else {
+        if (page == null) {
             Menus.MENU_ISLAND_CHEST.openMenu(superiorPlayer, superiorPlayer.getOpenedView(), island);
+            return;
         }
-    }
 
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         IslandChest[] islandChests = island.getChest();
-        return args.length == 1 || islandChests.length == 0 ? Collections.emptyList() :
-                CommandTabCompletes.getCustomComplete(args[1], IntStream.range(1, islandChests.length + 1).boxed()
-                        .map(Object::toString).toArray(String[]::new));
+
+        if (page < 0 || page >= islandChests.length) {
+            Message.INVALID_PAGE.send(superiorPlayer, context.getInputArgument("page"));
+            return;
+        }
+
+        islandChests[page].openChest(superiorPlayer);
     }
 
 }

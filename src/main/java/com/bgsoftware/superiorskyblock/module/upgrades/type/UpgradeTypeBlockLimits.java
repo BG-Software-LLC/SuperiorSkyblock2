@@ -5,7 +5,7 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.Mutable;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
@@ -50,7 +50,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
     }
 
     @Override
-    public List<ISuperiorCommand> getCommands() {
+    public List<InternalSuperiorCommand> getCommands() {
         return Collections.emptyList();
     }
 
