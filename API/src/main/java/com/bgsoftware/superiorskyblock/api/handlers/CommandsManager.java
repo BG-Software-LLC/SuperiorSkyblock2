@@ -90,5 +90,6 @@ public interface CommandsManager {
      */
     void dispatchSubCommand(CommandSender sender, String subCommand, String args);
 
-    <E> CommandArgument<E> createArgument(String identifier, String displayName, CommandArgumentType<E> argumentType, boolean isRequired);
+    <E> CommandArgument<E> createArgument(String identifier, CommandArgumentType<E> argumentType, boolean isOptional,
+                                          Object... displayNameComponents);
 }

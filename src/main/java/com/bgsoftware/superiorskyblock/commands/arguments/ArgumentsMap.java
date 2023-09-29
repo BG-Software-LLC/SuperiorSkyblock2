@@ -7,6 +7,14 @@ public class ArgumentsMap {
 
     private final Map<String, Entry> arguments = new HashMap<>();
 
+    public void setArgument(String identifier, String input, Object value) {
+        Entry existing = this.arguments.get(identifier);
+        if (existing != null)
+            throw new IllegalArgumentException("Identifier already exists: " + identifier);
+
+        this.arguments.put(identifier, new Entry(value, input));
+    }
+
     public Object getArgumentValue(String identifier) {
         Entry entry = this.arguments.get(identifier);
         return entry == null ? null : entry.value;

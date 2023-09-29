@@ -1,22 +1,23 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandsCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IntArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandsCommandContext;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.IntStream;
 
-public class CmdAdminSetChestRow implements InternalIslandCommand {
+public class CmdAdminSetChestRow implements InternalIslandsCommand {
 
     @Override
     public List<String> getAliases() {
@@ -29,28 +30,17 @@ public class CmdAdminSetChestRow implements InternalIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin setchestrow <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_PAGE.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_ROWS.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_SET_CHEST_ROW.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 5;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 5;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArguments.required("page", IntArgumentType.PAGE, Message.COMMAND_ARGUMENT_PAGE))
+                .add(CommandArguments.required("rows", IntArgumentType.ROWS, Message.COMMAND_ARGUMENT_ROWS))
+                .build();
     }
 
     @Override
@@ -59,48 +49,23 @@ public class CmdAdminSetChestRow implements InternalIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
-        return true;
-    }
+    public void execute(SuperiorSkyblockPlugin plugin, IslandsCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-    @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        NumberArgument<Integer> pageArguments = CommandArguments.getPage(sender, args[3]);
-
-        if (!pageArguments.isSucceed())
-            return;
-
-        int page = pageArguments.getNumber();
-
-        NumberArgument<Integer> rowsArguments = CommandArguments.getRows(sender, args[4]);
-
-        if (!rowsArguments.isSucceed())
-            return;
-
-        int rows = rowsArguments.getNumber();
-
-        if (rows < 1 || rows > 6) {
-            Message.INVALID_ROWS.send(sender, args[4]);
-            return;
-        }
+        List<Island> islands = context.getIslands();
+        int page = context.getRequiredArgument("page", Integer.class);
+        int rows = context.getRequiredArgument("rows", Integer.class);
 
         BukkitExecutor.data(() -> islands.forEach(island -> island.setChestRows(page - 1, rows)));
 
-        if (islands.size() > 1)
-            Message.CHANGED_CHEST_SIZE_ALL.send(sender, page, rows);
-        else if (targetPlayer == null)
-            Message.CHANGED_CHEST_SIZE_NAME.send(sender, page, rows, islands.get(0).getName());
-        else
-            Message.CHANGED_CHEST_SIZE.send(sender, page, rows, targetPlayer.getName());
-    }
+        SuperiorPlayer targetPlayer = context.getTargetPlayer();
 
-    @Override
-    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 && island != null ?
-                CommandTabCompletes.getCustomComplete(args[3], IntStream.range(1, island.getChestSize() + 1)) :
-                args.length == 5 && island != null ?
-                        CommandTabCompletes.getCustomComplete(args[4], IntStream.range(1, 7)) :
-                        Collections.emptyList();
+        if (islands.size() > 1)
+            Message.CHANGED_CHEST_SIZE_ALL.send(dispatcher, page, rows);
+        else if (targetPlayer == null)
+            Message.CHANGED_CHEST_SIZE_NAME.send(dispatcher, page, rows, islands.get(0).getName());
+        else
+            Message.CHANGED_CHEST_SIZE.send(dispatcher, page, rows, targetPlayer.getName());
     }
 
 }

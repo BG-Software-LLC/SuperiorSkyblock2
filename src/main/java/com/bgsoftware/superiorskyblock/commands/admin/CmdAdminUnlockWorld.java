@@ -1,24 +1,24 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandsCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.BoolArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.EnumArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IslandArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandsCommandContext;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
-public class CmdAdminUnlockWorld implements InternalIslandCommand {
+public class CmdAdminUnlockWorld implements InternalIslandsCommand {
 
     @Override
     public List<String> getAliases() {
@@ -31,26 +31,19 @@ public class CmdAdminUnlockWorld implements InternalIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin unlockworld <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <nether/the_end/normal> <true/false>";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 5;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 5;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArguments.required("environment", EnumArgumentType.WORLD_ENVIRONMENT, "normal/nether/the_end"))
+                .add(CommandArguments.required("unlock", BoolArgumentType.INSTANCE, "true/false"))
+                .build();
     }
 
     @Override
@@ -59,28 +52,23 @@ public class CmdAdminUnlockWorld implements InternalIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
-        return true;
-    }
+    public void execute(SuperiorSkyblockPlugin plugin, IslandsCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-    @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        World.Environment environment = CommandArguments.getEnvironment(sender, args[3]);
-
-        if (environment == null)
-            return;
+        World.Environment environment = context.getRequiredArgument("environment", World.Environment.class);
 
         if (environment == plugin.getSettings().getWorlds().getDefaultWorld()) {
-            Message.INVALID_ENVIRONMENT.send(sender, args[3]);
+            Message.INVALID_ENVIRONMENT.send(dispatcher, context.getInputArgument("environment"));
             return;
         }
 
-        boolean enable = Boolean.parseBoolean(args[4]);
+        List<Island> islands = context.getIslands();
+        boolean unlock = context.getRequiredArgument("unlock", boolean.class);
 
         boolean anyWorldsChanged = false;
 
         for (Island island : islands) {
-            if (enable ? !plugin.getEventsBus().callIslandUnlockWorldEvent(island, environment) :
+            if (unlock ? !plugin.getEventsBus().callIslandUnlockWorldEvent(island, environment) :
                     !plugin.getEventsBus().callIslandLockWorldEvent(island, environment))
                 continue;
 
@@ -88,35 +76,19 @@ public class CmdAdminUnlockWorld implements InternalIslandCommand {
 
             switch (environment) {
                 case NORMAL:
-                    island.setNormalEnabled(enable);
+                    island.setNormalEnabled(unlock);
                     break;
                 case NETHER:
-                    island.setNetherEnabled(enable);
+                    island.setNetherEnabled(unlock);
                     break;
                 case THE_END:
-                    island.setEndEnabled(enable);
+                    island.setEndEnabled(unlock);
                     break;
             }
         }
 
         if (anyWorldsChanged)
-            Message.UNLOCK_WORLD_ANNOUNCEMENT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]));
-    }
-
-    @Override
-    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        if (args.length == 5)
-            return CommandTabCompletes.getCustomComplete(args[3], "true", "false");
-
-        if (args.length != 4)
-            return Collections.emptyList();
-
-        List<String> environments = new ArrayList<>();
-        for (World.Environment environment : World.Environment.values()) {
-            environments.add(environment.name().toLowerCase(Locale.ENGLISH));
-        }
-
-        return CommandTabCompletes.getCustomComplete(args[3], environments.toArray(new String[0]));
+            Message.UNLOCK_WORLD_ANNOUNCEMENT.send(dispatcher, Formatters.CAPITALIZED_FORMATTER.format(environment.name()));
     }
 
 }

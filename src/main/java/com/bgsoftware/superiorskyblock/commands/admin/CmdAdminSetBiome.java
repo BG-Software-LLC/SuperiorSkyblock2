@@ -1,22 +1,24 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandsCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.EnumArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandsCommandContext;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.block.Biome;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminSetBiome implements InternalIslandCommand {
+public class CmdAdminSetBiome implements InternalIslandsCommand {
 
     @Override
     public List<String> getAliases() {
@@ -29,27 +31,18 @@ public class CmdAdminSetBiome implements InternalIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin setbiome <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_BIOME.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_SET_BIOME.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 4;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 4;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArguments.required("biome", EnumArgumentType.BIOME, Message.COMMAND_ARGUMENT_BIOME))
+                .build();
     }
 
     @Override
@@ -58,30 +51,22 @@ public class CmdAdminSetBiome implements InternalIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
-        return true;
-    }
+    public void execute(SuperiorSkyblockPlugin plugin, IslandsCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-    @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Biome biome = CommandArguments.getBiome(sender, args[3]);
-
-        if (biome == null)
-            return;
+        List<Island> islands = context.getIslands();
+        Biome biome = context.getRequiredArgument("biome", Biome.class);
 
         islands.forEach(island -> island.setBiome(biome));
 
-        if (islands.size() > 1)
-            Message.CHANGED_BIOME_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(biome.name()));
-        else if (targetPlayer == null)
-            Message.CHANGED_BIOME_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(biome.name()), islands.get(0).getName());
-        else
-            Message.CHANGED_BIOME_OTHER.send(sender, Formatters.CAPITALIZED_FORMATTER.format(biome.name()), targetPlayer.getName());
-    }
+        SuperiorPlayer targetPlayer = context.getTargetPlayer();
 
-    @Override
-    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getBiomes(args[3]) : Collections.emptyList();
+        if (islands.size() > 1)
+            Message.CHANGED_BIOME_ALL.send(dispatcher, Formatters.CAPITALIZED_FORMATTER.format(biome.name()));
+        else if (targetPlayer == null)
+            Message.CHANGED_BIOME_NAME.send(dispatcher, Formatters.CAPITALIZED_FORMATTER.format(biome.name()), islands.get(0).getName());
+        else
+            Message.CHANGED_BIOME_OTHER.send(dispatcher, Formatters.CAPITALIZED_FORMATTER.format(biome.name()), targetPlayer.getName());
     }
 
 }

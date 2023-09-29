@@ -30,7 +30,9 @@ public class CmdVisitors implements InternalIslandCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments() {
+    public List<CommandArgument<?>> getArguments()
+
+    {
         return Collections.emptyList();
     }
 

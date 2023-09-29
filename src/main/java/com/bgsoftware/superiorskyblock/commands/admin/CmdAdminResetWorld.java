@@ -1,26 +1,26 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandsCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.EnumArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandsCommandContext;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
-public class CmdAdminResetWorld implements InternalIslandCommand {
+public class CmdAdminResetWorld implements InternalIslandsCommand {
 
     @Override
     public List<String> getAliases() {
@@ -33,26 +33,18 @@ public class CmdAdminResetWorld implements InternalIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin resetworld <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <normal/nether/the_end>";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_RESET_WORLD.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 4;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 4;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArgument.required("environment", "normal/nether/the_end", EnumArgumentType.WORLD_ENVIRONMENT))
+                .build();
     }
 
     @Override
@@ -61,21 +53,18 @@ public class CmdAdminResetWorld implements InternalIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
-        return true;
-    }
+    public void execute(SuperiorSkyblockPlugin plugin, IslandsCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-    @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        World.Environment environment = CommandArguments.getEnvironment(sender, args[3]);
-
-        if (environment == null)
-            return;
+        World.Environment environment = context.getRequiredArgument("environment", World.Environment.class);
+        String environmentName = context.getInputArgument("environment");
 
         if (environment == plugin.getSettings().getWorlds().getDefaultWorld()) {
-            Message.INVALID_ENVIRONMENT.send(sender, args[3]);
+            Message.INVALID_ENVIRONMENT.send(dispatcher, environmentName);
             return;
         }
+
+        List<Island> islands = context.getIslands();
 
         boolean anyIslandChanged = false;
 
@@ -90,7 +79,7 @@ public class CmdAdminResetWorld implements InternalIslandCommand {
                 return;
             }
 
-            if (!plugin.getEventsBus().callIslandWorldResetEvent(sender, island, environment))
+            if (!plugin.getEventsBus().callIslandWorldResetEvent(dispatcher, island, environment))
                 continue;
 
             anyIslandChanged = true;
@@ -112,41 +101,14 @@ public class CmdAdminResetWorld implements InternalIslandCommand {
         if (!anyIslandChanged)
             return;
 
+        SuperiorPlayer targetPlayer = context.getTargetPlayer();
+
         if (islands.size() > 1)
-            Message.RESET_WORLD_SUCCEED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]));
+            Message.RESET_WORLD_SUCCEED_ALL.send(dispatcher, Formatters.CAPITALIZED_FORMATTER.format(environmentName));
         else if (targetPlayer == null)
-            Message.RESET_WORLD_SUCCEED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]), islands.get(0).getName());
+            Message.RESET_WORLD_SUCCEED_NAME.send(dispatcher, Formatters.CAPITALIZED_FORMATTER.format(environmentName), islands.get(0).getName());
         else
-            Message.RESET_WORLD_SUCCEED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]), targetPlayer.getName());
-    }
-
-    @Override
-    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        if (args.length != 4)
-            return Collections.emptyList();
-
-        List<String> environments = new ArrayList<>();
-
-        for (World.Environment environment : World.Environment.values()) {
-            if (environment != plugin.getSettings().getWorlds().getDefaultWorld()) {
-                boolean addEnvironment = false;
-                switch (environment) {
-                    case NORMAL:
-                        addEnvironment = plugin.getProviders().getWorldsProvider().isNormalEnabled();
-                        break;
-                    case NETHER:
-                        addEnvironment = plugin.getProviders().getWorldsProvider().isNetherEnabled();
-                        break;
-                    case THE_END:
-                        addEnvironment = plugin.getProviders().getWorldsProvider().isEndEnabled();
-                        break;
-                }
-                if (addEnvironment)
-                    environments.add(environment.name().toLowerCase(Locale.ENGLISH));
-            }
-        }
-
-        return CommandTabCompletes.getCustomComplete(args[3], environments.toArray(new String[0]));
+            Message.RESET_WORLD_SUCCEED.send(dispatcher, Formatters.CAPITALIZED_FORMATTER.format(environmentName), targetPlayer.getName());
     }
 
 }

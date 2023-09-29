@@ -1,21 +1,23 @@
 package com.bgsoftware.superiorskyblock.module.bank.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdWithdraw implements InternalSuperiorCommand {
+public class CmdWithdraw implements InternalIslandCommand {
 
     @Override
     public List<String> getAliases() {
@@ -28,23 +30,15 @@ public class CmdWithdraw implements InternalSuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "withdraw <" + Message.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_WITHDRAW.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 2;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 2;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("amount", StringArgumentType.INSTANCE, "all", Message.COMMAND_ARGUMENT_AMOUNT))
+                .build();
     }
 
     @Override
@@ -53,32 +47,29 @@ public class CmdWithdraw implements InternalSuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        IslandArgument arguments = CommandArguments.getSenderIsland(plugin, sender);
+    public boolean isSelfIsland() {
+        return true;
+    }
 
-        Island island = arguments.getIsland();
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, IslandCommandContext context) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
 
-        if (island == null)
-            return;
+        Island island = context.getIsland();
+        String amountArgument = context.getRequiredArgument("amount", String.class);
 
-        SuperiorPlayer superiorPlayer = arguments.getSuperiorPlayer();
+        BigDecimal amount;
 
-        BigDecimal amount = BigDecimal.valueOf(-1);
-
-        if (args[1].equalsIgnoreCase("all") || args[1].equals("*")) {
+        if (amountArgument.equals("*") || amountArgument.equalsIgnoreCase("all")) {
             amount = island.getIslandBank().getBalance();
         } else try {
-            amount = new BigDecimal(args[1]);
+            amount = new BigDecimal(amountArgument);
         } catch (IllegalArgumentException ignored) {
+            amount = BigDecimal.valueOf(-1);
         }
 
         BankTransaction transaction = island.getIslandBank().withdrawMoney(superiorPlayer, amount, null);
         Menus.MENU_ISLAND_BANK.handleWithdraw(superiorPlayer, island, transaction, null, null, amount);
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return Collections.emptyList();
     }
 
 }

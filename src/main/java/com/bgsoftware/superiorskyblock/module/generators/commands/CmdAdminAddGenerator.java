@@ -1,14 +1,19 @@
 package com.bgsoftware.superiorskyblock.module.generators.commands;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandSyntaxException;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandsCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.EnumArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.PercentageArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandsCommandContext;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -20,7 +25,7 @@ import org.bukkit.entity.Player;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminAddGenerator implements InternalIslandCommand {
+public class CmdAdminAddGenerator implements InternalIslandsCommand {
 
     @Override
     public List<String> getAliases() {
@@ -33,29 +38,20 @@ public class CmdAdminAddGenerator implements InternalIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin addgenerator <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_MATERIAL.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_VALUE.getMessage(locale) + "> [" +
-                Message.COMMAND_ARGUMENT_WORLD.getMessage(locale) + "]";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 5;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 6;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArguments.required("material", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_MATERIAL))
+                .add(CommandArguments.required("value", PercentageArgumentType.AMOUNT, Message.COMMAND_ARGUMENT_VALUE))
+                .add(CommandArgument.optional("environment", "normal/nether/the_end", EnumArgumentType.WORLD_ENVIRONMENT))
+                .build();
     }
 
     @Override
@@ -64,81 +60,62 @@ public class CmdAdminAddGenerator implements InternalIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
-        return true;
-    }
+    public void execute(SuperiorSkyblockPlugin plugin, IslandsCommandContext context) throws CommandSyntaxException {
+        CommandSender dispatcher = context.getDispatcher();
 
-    @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Key material = Keys.ofMaterialAndData(args[3]);
-        boolean percentage = args[4].endsWith("%");
+        List<Island> islands = context.getIslands();
+        Key material = Keys.ofMaterialAndData(context.getRequiredArgument("material", String.class));
+        PercentageArgumentType.Result valueResult = context.getRequiredArgument("value", PercentageArgumentType.Result.class);
+        World.Environment environment = context.getOptionalArgument("environment", World.Environment.class)
+                .orElse(plugin.getSettings().getWorlds().getDefaultWorld());
 
-        if (percentage)
-            args[4] = args[4].substring(0, args[4].length() - 1);
+        boolean isPercentage = valueResult.isPercentage();
+        int amount = valueResult.getValue();
 
-        NumberArgument<Integer> arguments = CommandArguments.getAmount(sender, args[4]);
+        if (amount > 0) {
+            boolean anyIslandChanged = false;
 
-        if (!arguments.isSucceed())
-            return;
+            SuperiorPlayer superiorPlayer = dispatcher instanceof Player ? plugin.getPlayers().getSuperiorPlayer(dispatcher) : null;
 
-        int amount = arguments.getNumber();
-
-        if (amount == 0 || (percentage && (amount < 0 || amount > 100))) {
-            Message.INVALID_PERCENTAGE.send(sender);
-            return;
-        }
-
-        World.Environment environment = args.length == 5 ? plugin.getSettings().getWorlds().getDefaultWorld() :
-                CommandArguments.getEnvironment(sender, args[5]);
-
-        if (environment == null)
-            return;
-
-        boolean anyIslandChanged = false;
-
-        for (Island island : islands) {
-            if (percentage) {
-                int ratePercentage = Math.max(0, Math.min(100, island.getGeneratorPercentage(material, environment) + amount));
-                if (!island.setGeneratorPercentage(material, ratePercentage, environment,
-                        sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null, true)) {
-                    continue;
-                }
-            } else {
-                int generatorRate = island.getGeneratorAmount(material, environment) + amount;
-
-                if (generatorRate <= 0) {
-                    if (!plugin.getEventsBus().callIslandRemoveGeneratorRateEvent(sender, island, material, environment))
+            for (Island island : islands) {
+                if (isPercentage) {
+                    int ratePercentage = Math.max(0, Math.min(100, island.getGeneratorPercentage(material, environment) + amount));
+                    if (!island.setGeneratorPercentage(material, ratePercentage, environment, superiorPlayer, true)) {
                         continue;
-
-                    island.removeGeneratorAmount(material, environment);
+                    }
                 } else {
-                    EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeGeneratorRateEvent(sender,
-                            island, material, environment, island.getGeneratorAmount(material, environment) + amount);
+                    int generatorRate = island.getGeneratorAmount(material, environment) + amount;
 
-                    if (eventResult.isCancelled())
-                        continue;
+                    if (generatorRate <= 0) {
+                        if (!plugin.getEventsBus().callIslandRemoveGeneratorRateEvent(dispatcher, island, material, environment))
+                            continue;
 
-                    island.setGeneratorAmount(material, eventResult.getResult(), environment);
+                        island.removeGeneratorAmount(material, environment);
+                    } else {
+                        EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeGeneratorRateEvent(dispatcher,
+                                island, material, environment, island.getGeneratorAmount(material, environment) + amount);
+
+                        if (eventResult.isCancelled())
+                            continue;
+
+                        island.setGeneratorAmount(material, eventResult.getResult(), environment);
+                    }
                 }
+                anyIslandChanged = true;
             }
-            anyIslandChanged = true;
+
+            if (!anyIslandChanged)
+                return;
         }
 
-        if (!anyIslandChanged)
-            return;
+        SuperiorPlayer targetPlayer = context.getTargetPlayer();
 
         if (islands.size() != 1)
-            Message.GENERATOR_UPDATED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()));
+            Message.GENERATOR_UPDATED_ALL.send(dispatcher, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()));
         else if (targetPlayer == null)
-            Message.GENERATOR_UPDATED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), islands.get(0).getName());
+            Message.GENERATOR_UPDATED_NAME.send(dispatcher, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), islands.get(0).getName());
         else
-            Message.GENERATOR_UPDATED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), targetPlayer.getName());
-    }
-
-    @Override
-    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getMaterialsForGenerators(args[3]) :
-                args.length == 6 ? CommandTabCompletes.getEnvironments(args[5]) : Collections.emptyList();
+            Message.GENERATOR_UPDATED.send(dispatcher, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), targetPlayer.getName());
     }
 
 }

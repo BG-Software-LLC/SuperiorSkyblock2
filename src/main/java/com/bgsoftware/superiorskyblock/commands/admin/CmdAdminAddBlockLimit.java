@@ -1,17 +1,17 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.InternalAdminSuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandsCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.IntArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandsCommandContext;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -21,7 +21,7 @@ import org.bukkit.command.CommandSender;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminAddBlockLimit implements InternalAdminSuperiorCommand {
+public class CmdAdminAddBlockLimit implements InternalIslandsCommand {
 
     @Override
     public List<String> getAliases() {
@@ -53,15 +53,13 @@ public class CmdAdminAddBlockLimit implements InternalAdminSuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+    public void execute(SuperiorSkyblockPlugin plugin, IslandsCommandContext context) {
         CommandSender dispatcher = context.getDispatcher();
 
-        MultipleIslandsArgumentType.Result islandsResult = context.getRequiredArgument("islands", MultipleIslandsArgumentType.Result.class);
         Key key = Keys.ofMaterialAndData(context.getRequiredArgument("material", String.class));
-        int limit = context.getRequiredArgument("limit", int.class);
+        int limit = context.getRequiredArgument("limit", Integer.class);
 
-        List<Island> islands = islandsResult.getIslands();
-        SuperiorPlayer targetPlayer = islandsResult.getTargetPlayer();
+        List<Island> islands = context.getIslands();
 
         boolean anyIslandChanged = false;
 
@@ -75,6 +73,8 @@ public class CmdAdminAddBlockLimit implements InternalAdminSuperiorCommand {
 
         if (!anyIslandChanged)
             return;
+
+        SuperiorPlayer targetPlayer = context.getTargetPlayer();
 
         if (islands.size() > 1)
             Message.CHANGED_BLOCK_LIMIT_ALL.send(dispatcher, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()));

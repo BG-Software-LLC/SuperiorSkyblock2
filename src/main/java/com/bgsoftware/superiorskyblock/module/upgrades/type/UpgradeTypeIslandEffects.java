@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.module.upgrades.type;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddEffect;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetEffect;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
@@ -16,7 +16,7 @@ import java.util.List;
 
 public class UpgradeTypeIslandEffects implements IUpgradeType {
 
-    private static final List<InternalSuperiorCommand> commands = Arrays.asList(new CmdAdminAddEffect(),
+    private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddEffect(),
             new CmdAdminSetEffect());
 
     private final SuperiorSkyblockPlugin plugin;
@@ -31,7 +31,7 @@ public class UpgradeTypeIslandEffects implements IUpgradeType {
     }
 
     @Override
-    public List<InternalSuperiorCommand> getCommands() {
+    public List<ISuperiorCommand> getCommands() {
         return commands;
     }
 

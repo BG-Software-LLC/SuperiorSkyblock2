@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -10,9 +11,11 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.InternalPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.UpgradeArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
@@ -48,23 +51,15 @@ public class CmdRankup implements InternalPermissibleCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "rankup <" + Message.COMMAND_ARGUMENT_UPGRADE_NAME.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_RANKUP.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 2;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 2;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("upgrade", UpgradeArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_UPGRADE_NAME))
+                .build();
     }
 
     @Override
@@ -83,11 +78,11 @@ public class CmdRankup implements InternalPermissibleCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        Upgrade upgrade = CommandArguments.getUpgrade(plugin, superiorPlayer, args[1]);
+    public void execute(SuperiorSkyblockPlugin plugin, IslandCommandContext context) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
 
-        if (upgrade == null)
-            return;
+        Island island = context.getIsland();
+        Upgrade upgrade = context.getRequiredArgument("upgrade", Upgrade.class);
 
         UpgradeLevel currentLevel = island.getUpgradeLevel(upgrade);
         UpgradeLevel nextLevel = upgrade.getUpgradeLevel(currentLevel.getLevel() + 1);
@@ -148,11 +143,6 @@ public class CmdRankup implements InternalPermissibleCommand {
 
         if (sound != null)
             superiorPlayer.runIfOnline(player -> GameSoundImpl.playSound(player, sound));
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        return args.length == 2 ? CommandTabCompletes.getUpgrades(plugin, args[1]) : Collections.emptyList();
     }
 
 }

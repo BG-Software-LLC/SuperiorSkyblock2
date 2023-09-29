@@ -14,7 +14,7 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import java.util.Collections;
 import java.util.List;
 
-public class MultipleIslandsArgumentType implements CommandArgumentType<MultipleIslandsArgumentType.Result, CommandContext> {
+public class MultipleIslandsArgumentType implements CommandArgumentType<MultipleIslandsArgumentType.Result> {
 
     public static final MultipleIslandsArgumentType INCLUDE_PLAYERS = new MultipleIslandsArgumentType(true);
     public static final MultipleIslandsArgumentType NO_PLAYERS = new MultipleIslandsArgumentType(false);

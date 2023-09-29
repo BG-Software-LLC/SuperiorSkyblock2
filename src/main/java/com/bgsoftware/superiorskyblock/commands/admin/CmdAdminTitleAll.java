@@ -1,12 +1,16 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandsCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IntArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandsCommandContext;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -15,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class CmdAdminTitleAll implements InternalIslandCommand {
+public class CmdAdminTitleAll implements InternalIslandsCommand {
 
     @Override
     public List<String> getAliases() {
@@ -28,31 +32,20 @@ public class CmdAdminTitleAll implements InternalIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin titleall <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_TITLE_FADE_IN.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_TITLE_DURATION.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_TITLE_FADE_OUT.getMessage(locale) + "> " +
-                "-title [" + Message.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + "] " +
-                "-subtitle [" + Message.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + "]";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_TITLE_ALL.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 8;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return Integer.MAX_VALUE;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArguments.required("fade-in", IntArgumentType.INTERVAL, Message.COMMAND_ARGUMENT_TITLE_FADE_IN))
+                .add(CommandArguments.required("duration", IntArgumentType.INTERVAL, Message.COMMAND_ARGUMENT_TITLE_DURATION))
+                .add(CommandArguments.required("fade-out", IntArgumentType.INTERVAL, Message.COMMAND_ARGUMENT_TITLE_FADE_OUT))
+                .add(CommandArguments.required("message", StringArgumentType.MULTIPLE_COLORIZE, "-title"))
+                .add(CommandArguments.required("unused", StringArgumentType.MULTIPLE_COLORIZE, "-subtitle"))
+                .build();
     }
 
     @Override
@@ -61,45 +54,36 @@ public class CmdAdminTitleAll implements InternalIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
-        return true;
-    }
+    public void execute(SuperiorSkyblockPlugin plugin, IslandsCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-    @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        NumberArgument<Integer> fadeIn = CommandArguments.getInterval(sender, args[3]);
+        int fadeIn = context.getRequiredArgument("fade-in", Integer.class);
+        int duration = context.getRequiredArgument("duration", Integer.class);
+        int fadeOut = context.getRequiredArgument("fade-out", Integer.class);
 
-        if (!fadeIn.isSucceed())
-            return;
-
-        NumberArgument<Integer> duration = CommandArguments.getInterval(sender, args[4]);
-
-        if (!duration.isSucceed())
-            return;
-
-        NumberArgument<Integer> fadeOut = CommandArguments.getInterval(sender, args[5]);
-
-        if (!fadeOut.isSucceed())
-            return;
-
-        Map<String, String> parsedArguments = CommandArguments.parseArguments(args);
+        String message = context.getRequiredArgument("message", String.class);
+        Map<String, String> parsedArguments = CommandArguments.parseArguments(message.split(" "));
 
         String title = parsedArguments.get("title");
         String subtitle = parsedArguments.get("subtitle");
 
         if (title == null && subtitle == null) {
-            Message.INVALID_TITLE.send(sender);
+            Message.INVALID_TITLE.send(dispatcher);
             return;
         }
 
-        islands.forEach(island -> island.sendTitle(title == null ? null : Formatters.COLOR_FORMATTER.format(title),
-                subtitle == null ? null : Formatters.COLOR_FORMATTER.format(subtitle),
-                fadeIn.getNumber(), duration.getNumber(), fadeOut.getNumber()));
+        String formattedTitle = title == null ? null : Formatters.COLOR_FORMATTER.format(title);
+        String formattedSubtitle = subtitle == null ? null : Formatters.COLOR_FORMATTER.format(subtitle);
+
+        List<Island> islands = context.getIslands();
+        islands.forEach(island -> island.sendTitle(formattedTitle, formattedSubtitle, fadeIn, duration, fadeOut));
+
+        SuperiorPlayer targetPlayer = context.getTargetPlayer();
 
         if (targetPlayer == null)
-            Message.GLOBAL_TITLE_SENT_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
+            Message.GLOBAL_TITLE_SENT_NAME.send(dispatcher, islands.size() == 1 ? islands.get(0).getName() : "all");
         else
-            Message.GLOBAL_TITLE_SENT.send(sender, targetPlayer.getName());
+            Message.GLOBAL_TITLE_SENT.send(dispatcher, targetPlayer.getName());
     }
 
 }

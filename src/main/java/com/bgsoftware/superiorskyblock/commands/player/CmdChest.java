@@ -37,9 +37,7 @@ public class CmdChest implements InternalPermissibleCommand {
 
     @Override
     public List<CommandArgument<?>> getArguments() {
-        return new CommandArgumentsBuilder()
-                .add(CommandArguments.optional("page", IntArgumentType.PAGE, Message.COMMAND_ARGUMENT_PAGE))
-                .build();
+        return new CommandArgumentsBuilder().add(CommandArguments.optional("page", IntArgumentType.PAGE, Message.COMMAND_ARGUMENT_PAGE)).build();
     }
 
     @Override
@@ -62,7 +60,7 @@ public class CmdChest implements InternalPermissibleCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
         Island island = context.getIsland();
 
-        Integer page = context.getOptionalArgument("page", int.class).map(p -> p - 1).orElse(null);
+        Integer page = context.getOptionalArgument("page", Integer.class).map(p -> p - 1).orElse(null);
 
         if (page == null) {
             Menus.MENU_ISLAND_CHEST.openMenu(superiorPlayer, superiorPlayer.getOpenedView(), island);

@@ -1,16 +1,16 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.events.IslandJoinEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.InternalAdminSuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.IslandArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
@@ -19,7 +19,7 @@ import org.bukkit.command.CommandSender;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminAdd implements InternalAdminSuperiorCommand {
+public class CmdAdminAdd implements InternalIslandCommand {
 
     @Override
     public List<String> getAliases() {
@@ -50,7 +50,12 @@ public class CmdAdminAdd implements InternalAdminSuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+    public boolean isSelfIsland() {
+        return false;
+    }
+
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, IslandCommandContext context) {
         CommandSender dispatcher = context.getDispatcher();
 
         SuperiorPlayer targetPlayer = context.getRequiredArgument("player", SuperiorPlayer.class);
@@ -59,10 +64,7 @@ public class CmdAdminAdd implements InternalAdminSuperiorCommand {
             Message.PLAYER_ALREADY_IN_ISLAND.send(dispatcher);
             return;
         }
-
-        IslandArgumentType.Result islandResult = context.getRequiredArgument("island", IslandArgumentType.Result.class);
-
-        Island island = islandResult.getIsland();
+        Island island = context.getIsland();
 
         if (!plugin.getEventsBus().callIslandJoinEvent(targetPlayer, island, IslandJoinEvent.Cause.ADMIN))
             return;
@@ -72,7 +74,7 @@ public class CmdAdminAdd implements InternalAdminSuperiorCommand {
         island.revokeInvite(targetPlayer);
         island.addMember(targetPlayer, SPlayerRole.defaultRole());
 
-        SuperiorPlayer superiorPlayer = islandResult.getTargetPlayer();
+        SuperiorPlayer superiorPlayer = context.getTargetPlayer();
 
         if (superiorPlayer == null) {
             Message.JOINED_ISLAND_NAME.send(targetPlayer, island.getName());

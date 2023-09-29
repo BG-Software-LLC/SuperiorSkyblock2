@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.core.menu.impl.internal;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
@@ -13,7 +15,6 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -108,23 +109,15 @@ public class MenuCustom extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
         }
 
         @Override
-        public String getUsage(Locale locale) {
-            return this.args.aliases.get(0);
-        }
-
-        @Override
         public String getDescription(Locale locale) {
             return this.args.descriptions.getOrDefault(locale, "");
         }
 
         @Override
-        public int getMinArgs() {
-            return 1;
-        }
+        public List<CommandArgument<?>> getArguments()
 
-        @Override
-        public int getMaxArgs() {
-            return 1;
+        {
+            return Collections.emptyList();
         }
 
         @Override
@@ -138,14 +131,9 @@ public class MenuCustom extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
         }
 
         @Override
-        public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+        public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
             MenuCustom.this.createView(superiorPlayer, EmptyViewArgs.INSTANCE);
-        }
-
-        @Override
-        public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-            return Collections.emptyList();
         }
 
     }

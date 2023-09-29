@@ -1,23 +1,23 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.InternalAdminSuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandsCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.BoolArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandsCommandContext;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminCmdAll implements InternalAdminSuperiorCommand {
+public class CmdAdminCmdAll implements InternalIslandsCommand {
 
     @Override
     public List<String> getAliases() {
@@ -35,7 +35,9 @@ public class CmdAdminCmdAll implements InternalAdminSuperiorCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments() {
+    public List<CommandArgument<?>> getArguments()
+
+    {
         return new CommandArgumentsBuilder()
                 .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
                 .add(CommandArgument.required("onlineFilter", "online-filter[true/false]", BoolArgumentType.INSTANCE))
@@ -49,17 +51,16 @@ public class CmdAdminCmdAll implements InternalAdminSuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+    public void execute(SuperiorSkyblockPlugin plugin, IslandsCommandContext context) {
         CommandSender dispatcher = context.getDispatcher();
 
-        MultipleIslandsArgumentType.Result islandsResult = context.getRequiredArgument("islands", MultipleIslandsArgumentType.Result.class);
+        List<Island> islands = context.getIslands();
         boolean onlineFilter = context.getRequiredArgument("onlineFilter", boolean.class);
         String command = context.getRequiredArgument("command", String.class);
 
-        List<Island> islands = islandsResult.getIslands();
-        SuperiorPlayer targetPlayer = islandsResult.getTargetPlayer();
-
         islands.forEach(island -> island.executeCommand(command, onlineFilter));
+
+        SuperiorPlayer targetPlayer = context.getTargetPlayer();
 
         if (targetPlayer == null)
             Message.GLOBAL_COMMAND_EXECUTED_NAME.send(dispatcher, islands.size() == 1 ? islands.get(0).getName() : "all");

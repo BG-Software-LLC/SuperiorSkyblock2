@@ -34,7 +34,7 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminIgnore(), false);
         registerCommand(new CmdAdminJoin(), false);
         registerCommand(new CmdAdminKick(), false);
-        registerCommand(new CmdAdminModules(), false);
+//        registerCommand(new CmdAdminModules(), false);
         registerCommand(new CmdAdminMsg(), false);
         registerCommand(new CmdAdminMsgAll(), false);
         registerCommand(new CmdAdminName(), false);

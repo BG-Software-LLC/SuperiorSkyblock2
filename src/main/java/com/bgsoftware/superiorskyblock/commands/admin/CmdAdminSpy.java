@@ -1,10 +1,11 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
-import org.bukkit.command.CommandSender;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,23 +23,15 @@ public class CmdAdminSpy implements InternalSuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin spy";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_SPY.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 2;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 2;
+    {
+        return Collections.emptyList();
     }
 
     @Override
@@ -47,8 +40,8 @@ public class CmdAdminSpy implements InternalSuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
 
         if (!plugin.getEventsBus().callPlayerToggleSpyEvent(superiorPlayer))
             return;
@@ -60,11 +53,6 @@ public class CmdAdminSpy implements InternalSuperiorCommand {
         }
 
         superiorPlayer.toggleAdminSpy();
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return Collections.emptyList();
     }
 
 }

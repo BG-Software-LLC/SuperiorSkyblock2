@@ -1,9 +1,13 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -25,23 +29,17 @@ public class CmdAdminSpawn implements InternalSuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin spawn [" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "]";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_SPAWN.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 2;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 3;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.optional("player", PlayerArgumentType.ONLINE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .build();
     }
 
     @Override
@@ -50,33 +48,23 @@ public class CmdAdminSpawn implements InternalSuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = null;
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-        if (!(sender instanceof Player) && args.length == 2) {
-            sender.sendMessage(ChatColor.RED + "You must specify a player to teleport.");
-            return;
-        } else if (args.length == 3) {
-            targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
-            if (targetPlayer != null && !targetPlayer.isOnline())
-                targetPlayer = null;
-        } else if (sender instanceof Player) {
-            targetPlayer = plugin.getPlayers().getSuperiorPlayer((Player) sender);
-        }
+        SuperiorPlayer targetPlayer = context.getOptionalArgument("player", SuperiorPlayer.class).orElse(null);
 
         if (targetPlayer == null) {
-            Message.INVALID_PLAYER.send(sender, args[2]);
-            return;
+            if (dispatcher instanceof Player) {
+                targetPlayer = plugin.getPlayers().getSuperiorPlayer(dispatcher);
+            } else {
+                dispatcher.sendMessage(ChatColor.RED + "You must specify a player to teleport.");
+                return;
+            }
         }
 
         targetPlayer.teleport(plugin.getGrid().getSpawnIsland());
 
-        Message.SPAWN_TELEPORT_SUCCESS.send(sender, targetPlayer.getName());
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 3 ? CommandTabCompletes.getOnlinePlayers(plugin, args[2], false) : Collections.emptyList();
+        Message.SPAWN_TELEPORT_SUCCESS.send(dispatcher, targetPlayer.getName());
     }
 
 }

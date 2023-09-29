@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
+import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
@@ -49,12 +50,7 @@ public class CmdHelp implements InternalSuperiorCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
         CommandSender dispatcher = context.getDispatcher();
 
-        int page = context.getOptionalArgument("page", int.class).orElse(1);
-
-        if (page <= 0) {
-            Message.INVALID_PAGE.send(dispatcher, page);
-            return;
-        }
+        int page = context.getOptionalArgument("page", Integer.class).orElse(1);
 
         List<SuperiorCommand> subCommands = new SequentialListBuilder<SuperiorCommand>()
                 .filter(subCommand -> subCommand.displayCommand() && (subCommand.getPermission().isEmpty() ||
@@ -80,11 +76,13 @@ public class CmdHelp implements InternalSuperiorCommand {
 
         java.util.Locale locale = PlayerLocales.getLocale(dispatcher);
 
-        for (SuperiorCommand _subCommand : subCommands) {
-            String description = _subCommand.getDescription(locale);
+        for (SuperiorCommand subCommand : subCommands) {
+            String description = subCommand.getDescription(locale);
             if (description == null)
-                new NullPointerException("The description of the command " + _subCommand.getAliases().get(0) + " is null.").printStackTrace();
-            Message.ISLAND_HELP_LINE.send(dispatcher, plugin.getCommands().getLabel() + " " + _subCommand.getUsage(locale), description == null ? "" : description);
+                new NullPointerException("The description of the command " + subCommand.getAliases().get(0) + " is null.").printStackTrace();
+            Message.ISLAND_HELP_LINE.send(dispatcher, plugin.getCommands().getLabel() + " " +
+                            CommandsHelper.getCommandUsage(subCommand, locale),
+                    description == null ? "" : description);
         }
 
         if (page != lastPage)

@@ -1,10 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IslandArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -24,25 +28,17 @@ public class CmdAdminUnignore implements InternalIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin unignore <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_UNIGNORE.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 3;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 3;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
+                .build();
     }
 
     @Override
@@ -51,18 +47,24 @@ public class CmdAdminUnignore implements InternalIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
+    public boolean isSelfIsland() {
         return false;
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
+    public void execute(SuperiorSkyblockPlugin plugin, IslandCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
+
+        Island island = context.getIsland();
+
         island.setIgnored(false);
 
+        SuperiorPlayer targetPlayer = context.getTargetPlayer();
+
         if (targetPlayer == null)
-            Message.UNIGNORED_ISLAND_NAME.send(sender, island.getName());
+            Message.UNIGNORED_ISLAND_NAME.send(dispatcher, island.getName());
         else
-            Message.UNIGNORED_ISLAND.send(sender, targetPlayer.getName());
+            Message.UNIGNORED_ISLAND.send(dispatcher, targetPlayer.getName());
     }
 
 }

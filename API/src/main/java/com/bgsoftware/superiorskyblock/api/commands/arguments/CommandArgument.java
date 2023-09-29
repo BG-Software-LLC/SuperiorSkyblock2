@@ -1,13 +1,14 @@
 package com.bgsoftware.superiorskyblock.api.commands.arguments;
 
-import com.avaje.ebeaninternal.server.core.Message;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+
+import java.util.Locale;
 
 public interface CommandArgument<E> {
 
     String getIdentifier();
 
-    String getDisplayName();
+    String getDisplayName(Locale locale);
 
     boolean isOptional();
 
@@ -18,7 +19,7 @@ public interface CommandArgument<E> {
     }
 
     static <E> CommandArgument<E> optional(String identifier, String displayName, CommandArgumentType<E> argumentType) {
-        return SuperiorSkyblockAPI.getCommands().createArgument(identifier, displayName, argumentType, false);
+        return SuperiorSkyblockAPI.getCommands().createArgument(identifier, argumentType, true, displayName);
     }
 
     static <E> CommandArgument<E> required(String identifier, CommandArgumentType<E> argumentType) {
@@ -26,7 +27,7 @@ public interface CommandArgument<E> {
     }
 
     static <E> CommandArgument<E> required(String identifier, String displayName, CommandArgumentType<E> argumentType) {
-        return SuperiorSkyblockAPI.getCommands().createArgument(identifier, displayName, argumentType, true);
+        return SuperiorSkyblockAPI.getCommands().createArgument(identifier, argumentType, false, displayName);
     }
 
 }

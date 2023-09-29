@@ -1,19 +1,21 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.BlockPositionArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IntArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.WorldArgumentType;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public class CmdAdminSetBlockAmount implements InternalSuperiorCommand {
@@ -29,25 +31,17 @@ public class CmdAdminSetBlockAmount implements InternalSuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin setblockamount <" +
-                Message.COMMAND_ARGUMENT_WORLD.getMessage(locale) + "> <x> <y> <z> <" +
-                Message.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 7;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 7;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("world", WorldArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_WORLD))
+                .add(CommandArgument.required("block-position", "x> <y> <z", BlockPositionArgumentType.INSTANCE))
+                .add(CommandArguments.required("amount", IntArgumentType.AMOUNT, Message.COMMAND_ARGUMENT_AMOUNT))
+                .build();
     }
 
     @Override
@@ -56,51 +50,23 @@ public class CmdAdminSetBlockAmount implements InternalSuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        World world = CommandArguments.getWorld(sender, args[2]);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-        if (world == null)
-            return;
+        World world = context.getRequiredArgument("world", World.class);
+        BlockPosition blockPosition = context.getRequiredArgument("block-position", BlockPosition.class);
+        int amount = context.getRequiredArgument("amount", Integer.class);
 
-        Location location = CommandArguments.getLocation(sender, world, args[3], args[4], args[5]);
-
-        if (location == null)
-            return;
-
-        NumberArgument<Integer> arguments = CommandArguments.getAmount(sender, args[6]);
-
-        if (!arguments.isSucceed())
-            return;
-
-        int amount = arguments.getNumber();
+        Location location = blockPosition.parse(world);
 
         plugin.getStackedBlocks().setStackedBlock(location.getBlock(), amount);
 
-        String formattedLocation = args[2] + ", " + args[3] + ", " + args[4] + ", " + args[5];
-        Message.CHANGED_BLOCK_AMOUNT.send(sender, formattedLocation, amount);
+        String formattedLocation = world.getName() + ", " +
+                blockPosition.getX() + ", " +
+                blockPosition.getY() + ", " +
+                blockPosition.getZ();
+
+        Message.CHANGED_BLOCK_AMOUNT.send(dispatcher, formattedLocation, amount);
     }
 
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> list = new LinkedList<>();
-
-        if (args.length == 3) {
-            list = CommandTabCompletes.getWorlds(args[2]);
-        } else if (sender instanceof Player) {
-            Location location = ((Player) sender).getLocation();
-            if (args.length == 4) {
-                if ((location.getBlockX() + "").contains(args[3]))
-                    list.add(location.getBlockX() + "");
-            } else if (args.length == 5) {
-                if ((location.getBlockY() + "").contains(args[4]))
-                    list.add(location.getBlockY() + "");
-
-            } else if (args.length == 6) {
-                if ((location.getBlockZ() + "").contains(args[5]))
-                    list.add(location.getBlockZ() + "");
-            }
-        }
-
-        return Collections.unmodifiableList(list);
-    }
 }

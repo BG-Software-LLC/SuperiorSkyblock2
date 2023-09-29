@@ -1,24 +1,26 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeLevelBonusEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeWorthBonusEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandsCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.BigDecimalArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandsCommandContext;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminSetBonus implements InternalIslandCommand {
+public class CmdAdminSetBonus implements InternalIslandsCommand {
 
     @Override
     public List<String> getAliases() {
@@ -31,27 +33,19 @@ public class CmdAdminSetBonus implements InternalIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin setbonus <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <worth/level> <" +
-                Message.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_BONUS.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 5;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 5;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArgument.required("bonus-type", "worth/level", StringArgumentType.INSTANCE))
+                .add(CommandArguments.required("bonus", BigDecimalArgumentType.AMOUNT, Message.COMMAND_ARGUMENT_AMOUNT))
+                .build();
     }
 
     @Override
@@ -60,32 +54,30 @@ public class CmdAdminSetBonus implements InternalIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
-        return true;
-    }
+    public void execute(SuperiorSkyblockPlugin plugin, IslandsCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-    @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        boolean isWorthBonus = !args[3].equalsIgnoreCase("level");
+        List<Island> islands = context.getIslands();
+        String bonusType = context.getRequiredArgument("bonus-type", String.class);
+        BigDecimal bonus = context.getRequiredArgument("bonus", BigDecimal.class);
 
-        BigDecimal bonus = CommandArguments.getBigDecimalAmount(sender, args[4]);
-
-        if (bonus == null)
-            return;
+        boolean isWorthBonus = !bonusType.equalsIgnoreCase("level");
 
         boolean anyIslandChanged = false;
 
         for (Island island : islands) {
             if (isWorthBonus) {
-                EventResult<BigDecimal> eventResult = plugin.getEventsBus().callIslandChangeWorthBonusEvent(sender, island,
-                        IslandChangeWorthBonusEvent.Reason.COMMAND, bonus);
+                EventResult<BigDecimal> eventResult = plugin.getEventsBus().callIslandChangeWorthBonusEvent(
+                        dispatcher, island, IslandChangeWorthBonusEvent.Reason.COMMAND, bonus);
+
                 if (!eventResult.isCancelled()) {
                     island.setBonusWorth(eventResult.getResult());
                     anyIslandChanged = true;
                 }
             } else {
-                EventResult<BigDecimal> eventResult = plugin.getEventsBus().callIslandChangeLevelBonusEvent(sender, island,
-                        IslandChangeLevelBonusEvent.Reason.COMMAND, bonus);
+                EventResult<BigDecimal> eventResult = plugin.getEventsBus().callIslandChangeLevelBonusEvent(
+                        dispatcher, island, IslandChangeLevelBonusEvent.Reason.COMMAND, bonus);
+
                 if (!eventResult.isCancelled()) {
                     island.setBonusLevel(eventResult.getResult());
                     anyIslandChanged = true;
@@ -96,12 +88,7 @@ public class CmdAdminSetBonus implements InternalIslandCommand {
         if (!anyIslandChanged)
             return;
 
-        Message.BONUS_SET_SUCCESS.send(sender, bonus.toString());
-    }
-
-    @Override
-    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getCustomComplete(args[3], "worth", "level") : Collections.emptyList();
+        Message.BONUS_SET_SUCCESS.send(dispatcher, bonus.toString());
     }
 
 }

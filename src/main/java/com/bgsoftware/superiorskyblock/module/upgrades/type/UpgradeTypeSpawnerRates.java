@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.module.upgrades.type;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddSpawnerRates;
@@ -20,7 +20,7 @@ import java.util.List;
 
 public class UpgradeTypeSpawnerRates implements IUpgradeType {
 
-    private static final List<InternalSuperiorCommand> commands = Arrays.asList(new CmdAdminAddSpawnerRates(),
+    private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddSpawnerRates(),
             new CmdAdminSetSpawnerRates());
 
     private final SuperiorSkyblockPlugin plugin;
@@ -35,7 +35,7 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
     }
 
     @Override
-    public List<InternalSuperiorCommand> getCommands() {
+    public List<ISuperiorCommand> getCommands() {
         return commands;
     }
 

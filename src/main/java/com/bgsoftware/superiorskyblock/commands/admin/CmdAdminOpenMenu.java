@@ -1,18 +1,21 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.InternalPlayerCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.PlayerCommandContext;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class CmdAdminOpenMenu implements InternalPlayerCommand {
@@ -28,25 +31,18 @@ public class CmdAdminOpenMenu implements InternalPlayerCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin openmenu <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_MENU.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_OPEN_MENU.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 4;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 4;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("player", PlayerArgumentType.ONLINE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .add(CommandArguments.required("menu-name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_MENU))
+                .build();
     }
 
     @Override
@@ -55,20 +51,19 @@ public class CmdAdminOpenMenu implements InternalPlayerCommand {
     }
 
     @Override
-    public boolean supportMultiplePlayers() {
+    public boolean requireIslandFromPlayer() {
         return false;
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-        Menu<BaseMenuView, EmptyViewArgs> menu = plugin.getMenus().getMenu(MenuIdentifiers.MENU_CUSTOM_PREFIX + args[3]);
+    public void execute(SuperiorSkyblockPlugin plugin, PlayerCommandContext context) {
+        SuperiorPlayer targetPlayer = context.getSuperiorPlayer();
+
+        String menuName = context.getRequiredArgument("menu-name", String.class);
+
+        Menu<BaseMenuView, EmptyViewArgs> menu = plugin.getMenus().getMenu(MenuIdentifiers.MENU_CUSTOM_PREFIX + menuName);
         if (menu != null)
             menu.createView(targetPlayer, EmptyViewArgs.INSTANCE);
-    }
-
-    @Override
-    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getMenus(plugin, args[3]) : Collections.emptyList();
     }
 
 }

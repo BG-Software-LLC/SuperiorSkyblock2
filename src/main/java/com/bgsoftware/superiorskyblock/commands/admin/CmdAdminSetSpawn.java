@@ -1,12 +1,13 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
+import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
@@ -25,23 +26,13 @@ public class CmdAdminSetSpawn implements InternalSuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin setspawn";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_SET_SPAWN.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 2;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 2;
+    public List<CommandArgument<?>> getArguments() {
+        return Collections.emptyList();
     }
 
     @Override
@@ -50,8 +41,8 @@ public class CmdAdminSetSpawn implements InternalSuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        Player player = (Player) sender;
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+        Player player = (Player) context.getDispatcher();
         Location playerLocation = player.getLocation();
 
         Location spawnLocation = new Location(player.getWorld(), playerLocation.getBlockX(), playerLocation.getBlockY(),
@@ -67,12 +58,7 @@ public class CmdAdminSetSpawn implements InternalSuperiorCommand {
             Log.error(error, "An unexpected error occurred while setting spawn:");
         }
 
-        Message.SPAWN_SET_SUCCESS.send(sender, newSpawnLocation);
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return Collections.emptyList();
+        Message.SPAWN_SET_SUCCESS.send(player, newSpawnLocation);
     }
 
 }

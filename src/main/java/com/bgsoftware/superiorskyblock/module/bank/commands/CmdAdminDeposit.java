@@ -1,11 +1,15 @@
 package com.bgsoftware.superiorskyblock.module.bank.commands;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandsCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.BigDecimalArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandsCommandContext;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -15,7 +19,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminDeposit implements InternalIslandCommand {
+public class CmdAdminDeposit implements InternalIslandsCommand {
 
     @Override
     public List<String> getAliases() {
@@ -28,27 +32,18 @@ public class CmdAdminDeposit implements InternalIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin deposit <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_DEPOSIT.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 4;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 4;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArguments.required("amount", BigDecimalArgumentType.AMOUNT, Message.COMMAND_ARGUMENT_AMOUNT))
+                .build();
     }
 
     @Override
@@ -57,23 +52,20 @@ public class CmdAdminDeposit implements InternalIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
-        return true;
-    }
+    public void execute(SuperiorSkyblockPlugin plugin, IslandsCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-    @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        BigDecimal amount = CommandArguments.getBigDecimalAmount(sender, args[3]);
+        List<Island> islands = context.getIslands();
+        BigDecimal amount = context.getRequiredArgument("amount", BigDecimal.class);
 
-        if (amount == null)
-            return;
+        BukkitExecutor.data(() -> islands.forEach(island -> island.getIslandBank().depositAdminMoney(dispatcher, amount)));
 
-        BukkitExecutor.data(() -> islands.forEach(island -> island.getIslandBank().depositAdminMoney(sender, amount)));
+        SuperiorPlayer targetPlayer = context.getTargetPlayer();
 
         if (targetPlayer == null)
-            Message.ADMIN_DEPOSIT_MONEY_NAME.send(sender, Formatters.NUMBER_FORMATTER.format(amount), islands.size() == 1 ? islands.get(0).getName() : "all");
+            Message.ADMIN_DEPOSIT_MONEY_NAME.send(dispatcher, Formatters.NUMBER_FORMATTER.format(amount), islands.size() == 1 ? islands.get(0).getName() : "all");
         else
-            Message.ADMIN_DEPOSIT_MONEY.send(sender, Formatters.NUMBER_FORMATTER.format(amount), targetPlayer.getName());
+            Message.ADMIN_DEPOSIT_MONEY.send(dispatcher, Formatters.NUMBER_FORMATTER.format(amount), targetPlayer.getName());
     }
 
 }

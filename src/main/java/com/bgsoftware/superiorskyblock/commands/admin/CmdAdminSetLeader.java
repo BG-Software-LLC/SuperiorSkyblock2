@@ -1,11 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.InternalPlayerCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.PlayerCommandContext;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.command.CommandSender;
@@ -25,10 +28,13 @@ public class CmdAdminSetLeader implements InternalPlayerCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin setleader <" +
-                Message.COMMAND_ARGUMENT_LEADER.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_NEW_LEADER.getMessage(locale) + ">";
+    public List<CommandArgument<?>> getArguments()
+
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .add(CommandArguments.required("new-leader", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .build();
     }
 
     @Override
@@ -37,70 +43,43 @@ public class CmdAdminSetLeader implements InternalPlayerCommand {
     }
 
     @Override
-    public int getMinArgs() {
-        return 4;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 4;
-    }
-
-    @Override
     public boolean canBeExecutedByConsole() {
         return true;
     }
 
     @Override
-    public boolean supportMultiplePlayers() {
-        return false;
-    }
-
-    @Override
-    public boolean requireIsland() {
+    public boolean requireIslandFromPlayer() {
         return true;
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer leader, String[] args) {
-        SuperiorPlayer newLeader = CommandArguments.getPlayer(plugin, sender, args[3]);
+    public void execute(SuperiorSkyblockPlugin plugin, PlayerCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-        if (newLeader == null)
-            return;
+        SuperiorPlayer leader = context.getSuperiorPlayer();
+        SuperiorPlayer newLeader = context.getRequiredArgument("new-leader", SuperiorPlayer.class);
 
         Island island = leader.getIsland();
 
-        assert island != null; // requireIsland is true
-
         if (!island.getOwner().getUniqueId().equals(leader.getUniqueId())) {
-            Message.TRANSFER_ADMIN_NOT_LEADER.send(sender);
+            Message.TRANSFER_ADMIN_NOT_LEADER.send(dispatcher);
             return;
         }
 
         if (leader.getUniqueId().equals(newLeader.getUniqueId())) {
-            Message.TRANSFER_ADMIN_ALREADY_LEADER.send(sender, newLeader.getName());
+            Message.TRANSFER_ADMIN_ALREADY_LEADER.send(dispatcher, newLeader.getName());
             return;
         }
 
         if (!island.isMember(newLeader)) {
-            Message.TRANSFER_ADMIN_DIFFERENT_ISLAND.send(sender);
+            Message.TRANSFER_ADMIN_DIFFERENT_ISLAND.send(dispatcher);
             return;
         }
 
         if (island.transferIsland(newLeader)) {
-            Message.TRANSFER_ADMIN.send(sender, leader.getName(), newLeader.getName());
+            Message.TRANSFER_ADMIN.send(dispatcher, leader.getName(), newLeader.getName());
             IslandUtils.sendMessage(island, Message.TRANSFER_BROADCAST, Collections.emptyList(), newLeader.getName());
         }
-    }
-
-    @Override
-    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-        Island playerIsland = targetPlayer.getIsland();
-        return args.length != 4 ? Collections.emptyList() : CommandTabCompletes.getOnlinePlayers(plugin, args[2], false, onlinePlayer -> {
-            Island onlineIsland = onlinePlayer.getIsland();
-            return !onlinePlayer.equals(targetPlayer) && onlineIsland != null && !onlineIsland.equals(playerIsland) &&
-                    onlineIsland.getOwner().equals(onlinePlayer);
-        });
     }
 
 }

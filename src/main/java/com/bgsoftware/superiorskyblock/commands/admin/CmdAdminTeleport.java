@@ -1,21 +1,22 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.portals.PortalsManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.EnumArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IslandArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.PortalType;
 import org.bukkit.World;
-import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class CmdAdminTeleport implements InternalIslandCommand {
@@ -39,25 +40,18 @@ public class CmdAdminTeleport implements InternalIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin teleport <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> [normal/nether/the_end]";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_TELEPORT.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 3;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 4;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
+                .add(CommandArguments.optional("environment", EnumArgumentType.WORLD_ENVIRONMENT, "normal/nether/the_end"))
+                .build();
     }
 
     @Override
@@ -66,26 +60,20 @@ public class CmdAdminTeleport implements InternalIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
+    public boolean isSelfIsland() {
         return false;
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+    public void execute(SuperiorSkyblockPlugin plugin, IslandCommandContext context) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
 
-        World.Environment environment;
-
-        if (args.length != 4) {
-            environment = plugin.getSettings().getWorlds().getDefaultWorld();
-        } else {
-            environment = CommandArguments.getEnvironment(sender, args[3]);
-            if (environment == null)
-                return;
-        }
+        Island island = context.getIsland();
+        World.Environment environment = context.getOptionalArgument("environment", World.Environment.class)
+                .orElse(plugin.getSettings().getWorlds().getDefaultWorld());
 
         if (plugin.getGrid().getIslandsWorld(island, environment) == null) {
-            Message.WORLD_NOT_ENABLED.send(sender);
+            Message.WORLD_NOT_ENABLED.send(superiorPlayer);
             return;
         }
 
@@ -103,11 +91,6 @@ public class CmdAdminTeleport implements InternalIslandCommand {
                 superiorPlayer.teleport(island.getIslandHome(environment));
             }
         });
-    }
-
-    @Override
-    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getEnvironments(args[3]) : Collections.emptyList();
     }
 
 }

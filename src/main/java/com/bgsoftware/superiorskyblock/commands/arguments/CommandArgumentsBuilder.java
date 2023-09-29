@@ -17,7 +17,7 @@ public class CommandArgumentsBuilder {
 
     }
 
-    public <E> CommandArgumentsBuilder add(CommandArgument<E> argument) {
+    public CommandArgumentsBuilder add(CommandArgument<?> argument) {
         String argumentName = argument.getIdentifier().toLowerCase(Locale.ENGLISH);
 
         CommandArgument<?> current = this.arguments.get(argumentName);
@@ -30,8 +30,7 @@ public class CommandArgumentsBuilder {
     }
 
     public List<CommandArgument<?>> build() {
-        return this.arguments.isEmpty() ? Collections.emptyList() :
-                Collections.unmodifiableList(new LinkedList<>(this.arguments.values()));
+        return this.arguments.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(new LinkedList<>(this.arguments.values()));
     }
 
 }

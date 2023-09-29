@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
-import com.bgsoftware.superiorskyblock.commands.arguments.types.BorderColorArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.EnumArgumentType;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
@@ -36,7 +36,7 @@ public class CmdBorder implements InternalSuperiorCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.optional("border-color", BorderColorArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_BORDER_COLOR))
+                .add(CommandArguments.optional("border-color", EnumArgumentType.BORDER_COLOR, Message.COMMAND_ARGUMENT_BORDER_COLOR))
                 .build();
     }
 

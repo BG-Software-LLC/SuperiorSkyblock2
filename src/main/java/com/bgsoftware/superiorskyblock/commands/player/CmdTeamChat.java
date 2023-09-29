@@ -37,7 +37,9 @@ public class CmdTeamChat implements InternalIslandCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments() {
+    public List<CommandArgument<?>> getArguments()
+
+    {
         return new CommandArgumentsBuilder()
                 .add(CommandArguments.optional("message", StringArgumentType.MULTIPLE, Message.COMMAND_ARGUMENT_MESSAGE))
                 .build();

@@ -12,7 +12,7 @@ public interface SuperiorCommand2 extends SuperiorCommand {
 
     List<CommandArgument<?>> getArguments();
 
-    void execute(SuperiorSkyblock plugin, CommandContext context);
+    void execute(SuperiorSkyblock plugin, CommandContext context) throws CommandSyntaxException;
 
     /**
      * Get the usage of the sub command.

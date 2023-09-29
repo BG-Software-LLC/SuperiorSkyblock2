@@ -33,7 +33,9 @@ public class CmdPanel implements InternalIslandCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments() {
+    public List<CommandArgument<?>> getArguments()
+
+    {
         return new CommandArgumentsBuilder()
                 .add(CommandArgument.optional("action", "members/visitors/toggle", StringArgumentType.INSTANCE))
                 .build();

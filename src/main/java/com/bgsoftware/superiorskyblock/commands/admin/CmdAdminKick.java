@@ -1,10 +1,15 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalPlayerCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.PlayerCommandContext;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -25,23 +30,17 @@ public class CmdAdminKick implements InternalPlayerCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin kick <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_KICK.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 3;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 3;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .build();
     }
 
     @Override
@@ -50,26 +49,26 @@ public class CmdAdminKick implements InternalPlayerCommand {
     }
 
     @Override
-    public boolean supportMultiplePlayers() {
-        return false;
+    public boolean requireIslandFromPlayer() {
+        return true;
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
+    public void execute(SuperiorSkyblockPlugin plugin, PlayerCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
+
+        SuperiorPlayer targetPlayer = context.getSuperiorPlayer();
+
         Island targetIsland = targetPlayer.getIsland();
 
-        if (targetIsland == null) {
-            Message.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
-            return;
-        }
-
         if (targetIsland.getOwner() == targetPlayer) {
-            Message.KICK_ISLAND_LEADER.send(sender);
+            Message.KICK_ISLAND_LEADER.send(dispatcher);
             return;
         }
 
-        IslandUtils.handleKickPlayer(sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null,
-                sender.getName(), targetIsland, targetPlayer);
+        SuperiorPlayer dispatcherPlayer = dispatcher instanceof Player ? plugin.getPlayers().getSuperiorPlayer(dispatcher) : null;
+
+        IslandUtils.handleKickPlayer(dispatcherPlayer, dispatcher.getName(), targetIsland, targetPlayer);
     }
 
 }

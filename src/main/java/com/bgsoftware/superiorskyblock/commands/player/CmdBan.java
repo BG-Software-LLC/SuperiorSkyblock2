@@ -35,7 +35,9 @@ public class CmdBan implements InternalPermissibleCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments() {
+    public List<CommandArgument<?>> getArguments()
+
+    {
         return new CommandArgumentsBuilder()
                 .add(CommandArguments.required("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
                 .build();

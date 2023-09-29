@@ -1,17 +1,17 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeLevelBonusEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeWorthBonusEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.commands.InternalAdminSuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandsCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.BigDecimalArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandsCommandContext;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminAddBonus implements InternalAdminSuperiorCommand {
+public class CmdAdminAddBonus implements InternalIslandsCommand {
 
     @Override
     public List<String> getAliases() {
@@ -42,7 +42,7 @@ public class CmdAdminAddBonus implements InternalAdminSuperiorCommand {
         return new CommandArgumentsBuilder()
                 .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
                 .add(CommandArgument.required("bonus-type", "worth/level", StringArgumentType.INSTANCE))
-                .add(CommandArguments.required("bonus", BigDecimalArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_AMOUNT))
+                .add(CommandArguments.required("bonus", BigDecimalArgumentType.AMOUNT, Message.COMMAND_ARGUMENT_AMOUNT))
                 .build();
     }
 
@@ -52,10 +52,10 @@ public class CmdAdminAddBonus implements InternalAdminSuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+    public void execute(SuperiorSkyblockPlugin plugin, IslandsCommandContext context) {
         CommandSender dispatcher = context.getDispatcher();
 
-        List<Island> islands = context.getRequiredArgument("islands", MultipleIslandsArgumentType.Result.class).getIslands();
+        List<Island> islands = context.getIslands();
         boolean isWorthBonus = context.getRequiredArgument("bonus-type", String.class).equalsIgnoreCase("worth");
         BigDecimal bonus = context.getRequiredArgument("bonus", BigDecimal.class);
 

@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 
-public class IslandRoleArgumentType implements CommandArgumentType<PlayerRole, CommandContext> {
+public class IslandRoleArgumentType implements CommandArgumentType<PlayerRole> {
 
     public static final IslandRoleArgumentType INSTANCE = new IslandRoleArgumentType();
 

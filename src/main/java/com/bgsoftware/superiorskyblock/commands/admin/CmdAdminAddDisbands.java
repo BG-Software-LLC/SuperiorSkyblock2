@@ -1,14 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.InternalAdminSuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalPlayersCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.IntArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.MultiplePlayersArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.PlayersCommandContext;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,7 +16,7 @@ import org.bukkit.command.CommandSender;
 import java.util.Arrays;
 import java.util.List;
 
-public class CmdAdminAddDisbands implements InternalAdminSuperiorCommand {
+public class CmdAdminAddDisbands implements InternalPlayersCommand {
     @Override
     public List<String> getAliases() {
         return Arrays.asList("adddisbands", "givedisbands");
@@ -46,11 +46,11 @@ public class CmdAdminAddDisbands implements InternalAdminSuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+    public void execute(SuperiorSkyblockPlugin plugin, PlayersCommandContext context) {
         CommandSender dispatcher = context.getDispatcher();
 
-        List<SuperiorPlayer> targetPlayers = context.getRequiredArgument("players", List.class);
-        int amount = context.getRequiredArgument("amount", int.class);
+        List<SuperiorPlayer> targetPlayers = context.getPlayers();
+        int amount = context.getRequiredArgument("amount", Integer.class);
 
         BukkitExecutor.data(() -> targetPlayers.forEach(superiorPlayer -> superiorPlayer.setDisbands(superiorPlayer.getDisbands() + amount)));
 

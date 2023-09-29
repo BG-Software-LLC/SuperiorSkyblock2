@@ -42,7 +42,9 @@ public class CmdPermissions implements InternalPermissibleCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments() {
+    public List<CommandArgument<?>> getArguments()
+
+    {
         return new CommandArgumentsBuilder()
                 .add(CommandArguments.optional("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
                 .add(CommandArgument.optional("reset", StringArgumentType.INSTANCE))

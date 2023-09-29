@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuConfigEditor;
@@ -23,23 +25,15 @@ public class CmdAdminSettings implements InternalSuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin settings";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_SETTINGS.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 2;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 2;
+    {
+        return Collections.emptyList();
     }
 
     @Override
@@ -48,13 +42,10 @@ public class CmdAdminSettings implements InternalSuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        Menus.MENU_CONFIG_EDITOR.createView(plugin.getPlayers().getSuperiorPlayer(sender), MenuConfigEditor.Args.ROOT);
-    }
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
+        Menus.MENU_CONFIG_EDITOR.createView(plugin.getPlayers().getSuperiorPlayer(dispatcher), MenuConfigEditor.Args.ROOT);
 
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return Collections.emptyList();
     }
 
 }

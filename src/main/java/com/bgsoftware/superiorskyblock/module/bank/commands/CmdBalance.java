@@ -1,17 +1,17 @@
 package com.bgsoftware.superiorskyblock.module.bank.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IslandArgumentType;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class CmdBalance implements InternalSuperiorCommand {
@@ -27,25 +27,17 @@ public class CmdBalance implements InternalSuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "balance [" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_BALANCE.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 1;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 2;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.optional("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
+                .build();
     }
 
     @Override
@@ -54,30 +46,31 @@ public class CmdBalance implements InternalSuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        IslandArgument arguments = args.length == 1 ? CommandArguments.getIslandWhereStanding(plugin, sender) :
-                CommandArguments.getIsland(plugin, sender, args[1]);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
 
-        Island island = arguments.getIsland();
+        IslandArgumentType.Result islandResult = context.getOptionalArgument("island", IslandArgumentType.Result.class)
+                .orElseGet(() -> {
+                    Island locationIsland = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
+                    return new IslandArgumentType.Result(locationIsland, null);
+                });
 
-        if (island == null)
+        Island island = islandResult.getIsland();
+
+        if (island == null) {
+            Message.INVALID_ISLAND.send(superiorPlayer);
             return;
+        }
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        SuperiorPlayer targetPlayer = arguments.getSuperiorPlayer();
+        SuperiorPlayer targetPlayer = islandResult.getTargetPlayer();
 
         if (island == superiorPlayer.getIsland())
-            Message.ISLAND_BANK_SHOW.send(sender, island.getIslandBank().getBalance());
+            Message.ISLAND_BANK_SHOW.send(superiorPlayer, island.getIslandBank().getBalance());
         else if (targetPlayer == null)
-            Message.ISLAND_BANK_SHOW_OTHER_NAME.send(sender, island.getName(), island.getIslandBank().getBalance());
+            Message.ISLAND_BANK_SHOW_OTHER_NAME.send(superiorPlayer, island.getName(), island.getIslandBank().getBalance());
         else
-            Message.ISLAND_BANK_SHOW_OTHER.send(sender, targetPlayer.getName(), island.getIslandBank().getBalance());
-    }
+            Message.ISLAND_BANK_SHOW_OTHER.send(superiorPlayer, targetPlayer.getName(), island.getIslandBank().getBalance());
 
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 2 ? CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
-                plugin.getSettings().isTabCompleteHideVanished()) : Collections.emptyList();
     }
 
 }

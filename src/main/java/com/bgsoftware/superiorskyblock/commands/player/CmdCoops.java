@@ -29,7 +29,9 @@ public class CmdCoops implements InternalIslandCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments() {
+    public List<CommandArgument<?>> getArguments()
+
+    {
         return Collections.emptyList();
     }
 

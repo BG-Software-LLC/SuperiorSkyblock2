@@ -11,7 +11,7 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 
 import java.util.function.Predicate;
 
-public class PlayerArgumentType implements CommandArgumentType<SuperiorPlayer, CommandContext> {
+public class PlayerArgumentType implements CommandArgumentType<SuperiorPlayer> {
 
     public static final PlayerArgumentType ALL_PLAYERS = new PlayerArgumentType(null);
     public static final PlayerArgumentType ONLINE_PLAYERS = new PlayerArgumentType(SuperiorPlayer::isOnline);

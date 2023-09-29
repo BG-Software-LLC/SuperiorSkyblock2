@@ -1,18 +1,22 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandsCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandsCommandContext;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminMsgAll implements InternalIslandCommand {
+public class CmdAdminMsgAll implements InternalIslandsCommand {
 
     @Override
     public List<String> getAliases() {
@@ -25,27 +29,18 @@ public class CmdAdminMsgAll implements InternalIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin msgall <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_MSG_ALL.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 4;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return Integer.MAX_VALUE;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArguments.required("message", StringArgumentType.MULTIPLE_COLORIZE, Message.COMMAND_ARGUMENT_MESSAGE))
+                .build();
     }
 
     @Override
@@ -54,20 +49,21 @@ public class CmdAdminMsgAll implements InternalIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
-        return true;
-    }
+    public void execute(SuperiorSkyblockPlugin plugin, IslandsCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-    @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        String message = CommandArguments.buildLongString(args, 3, true);
+        List<Island> islands = context.getIslands();
+        String message = context.getRequiredArgument("message", String.class);
+
 
         islands.forEach(island -> island.sendMessage(message));
 
+        SuperiorPlayer targetPlayer = context.getTargetPlayer();
+
         if (targetPlayer == null)
-            Message.GLOBAL_MESSAGE_SENT_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
+            Message.GLOBAL_MESSAGE_SENT_NAME.send(dispatcher, islands.size() == 1 ? islands.get(0).getName() : "all");
         else
-            Message.GLOBAL_MESSAGE_SENT.send(sender, targetPlayer.getName());
+            Message.GLOBAL_MESSAGE_SENT.send(dispatcher, targetPlayer.getName());
     }
 
 }

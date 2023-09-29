@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand2;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.google.common.base.Preconditions;
 
@@ -29,6 +30,9 @@ public abstract class CommandsMap {
     public abstract void loadDefaultCommands();
 
     public void registerCommand(SuperiorCommand superiorCommand, boolean sort) {
+        if (superiorCommand instanceof SuperiorCommand2)
+            superiorCommand = new CachedSuperiorCommand2((SuperiorCommand2) superiorCommand);
+
         List<String> aliases = new LinkedList<>(superiorCommand.getAliases());
         String label = aliases.get(0).toLowerCase(Locale.ENGLISH);
         aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, Collections.emptyList()));

@@ -1,10 +1,15 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.InternalPlayerCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.PlayerCommandContext;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -23,25 +28,18 @@ public class CmdAdminMsg implements InternalPlayerCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin msg <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_MSG.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 4;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return Integer.MAX_VALUE;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("player", PlayerArgumentType.ONLINE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .add(CommandArguments.required("message", StringArgumentType.MULTIPLE_COLORIZE, Message.COMMAND_ARGUMENT_MESSAGE))
+                .build();
     }
 
     @Override
@@ -50,15 +48,19 @@ public class CmdAdminMsg implements InternalPlayerCommand {
     }
 
     @Override
-    public boolean supportMultiplePlayers() {
+    public boolean requireIslandFromPlayer() {
         return false;
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-        String message = CommandArguments.buildLongString(args, 3, true);
+    public void execute(SuperiorSkyblockPlugin plugin, PlayerCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
+
+        SuperiorPlayer targetPlayer = context.getSuperiorPlayer();
+        String message = context.getRequiredArgument("message", String.class);
+
         Message.CUSTOM.send(targetPlayer, message, false);
-        Message.MESSAGE_SENT.send(sender, targetPlayer.getName());
+        Message.MESSAGE_SENT.send(dispatcher, targetPlayer.getName());
     }
 
 }

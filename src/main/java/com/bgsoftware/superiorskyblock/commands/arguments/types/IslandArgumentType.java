@@ -11,7 +11,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 
-public class IslandArgumentType implements CommandArgumentType<IslandArgumentType.Result, CommandContext> {
+public class IslandArgumentType implements CommandArgumentType<IslandArgumentType.Result> {
 
     public static final IslandArgumentType INCLUDE_PLAYERS = new IslandArgumentType(true);
     public static final IslandArgumentType NO_PLAYERS = new IslandArgumentType(false);

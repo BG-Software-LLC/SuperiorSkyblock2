@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.commands.CommandSyntaxException;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.ArgumentsReader;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentType;
 
-public class BoolArgumentType implements CommandArgumentType<Boolean, CommandContext> {
+public class BoolArgumentType implements CommandArgumentType<Boolean> {
 
     public static final BoolArgumentType INSTANCE = new BoolArgumentType();
 

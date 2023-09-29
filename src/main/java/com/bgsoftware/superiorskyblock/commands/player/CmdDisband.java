@@ -37,7 +37,9 @@ public class CmdDisband implements InternalPermissibleCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments() {
+    public List<CommandArgument<?>> getArguments()
+
+    {
         return Collections.emptyList();
     }
 

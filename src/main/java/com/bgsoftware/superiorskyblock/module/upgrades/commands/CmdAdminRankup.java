@@ -1,16 +1,19 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandsCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.UpgradeArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandsCommandContext;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
@@ -22,7 +25,7 @@ import org.bukkit.entity.Player;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminRankup implements InternalIslandCommand {
+public class CmdAdminRankup implements InternalIslandsCommand {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
@@ -43,27 +46,18 @@ public class CmdAdminRankup implements InternalIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin rankup <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_UPGRADE_NAME.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_RANKUP.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 4;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 4;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArguments.required("upgrade", UpgradeArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_UPGRADE_NAME))
+                .build();
     }
 
     @Override
@@ -72,25 +66,21 @@ public class CmdAdminRankup implements InternalIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
-        return true;
-    }
+    public void execute(SuperiorSkyblockPlugin plugin, IslandsCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-    @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Upgrade upgrade = CommandArguments.getUpgrade(plugin, sender, args[3]);
+        List<Island> islands = context.getIslands();
+        Upgrade upgrade = context.getRequiredArgument("upgrade", Upgrade.class);
 
-        if (upgrade == null)
-            return;
-
-        SuperiorPlayer playerSender = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
+        SuperiorPlayer superiorPlayer = dispatcher instanceof Player ?
+                plugin.getPlayers().getSuperiorPlayer(dispatcher) : null;
 
         islands.forEach(island -> {
             UpgradeLevel currentLevel = island.getUpgradeLevel(upgrade);
             UpgradeLevel nextLevel = upgrade.getUpgradeLevel(currentLevel.getLevel() + 1);
 
             EventResult<EventsBus.UpgradeResult> event = plugin.getEventsBus().callIslandUpgradeEvent(
-                    playerSender, island, upgrade, currentLevel, nextLevel, IslandUpgradeEvent.Cause.PLAYER_RANKUP);
+                    superiorPlayer, island, upgrade, currentLevel, nextLevel, IslandUpgradeEvent.Cause.PLAYER_RANKUP);
 
             if (!event.isCancelled()) {
                 SuperiorPlayer owner = island.getOwner();
@@ -105,17 +95,14 @@ public class CmdAdminRankup implements InternalIslandCommand {
             }
         });
 
-        if (islands.size() > 1)
-            Message.RANKUP_SUCCESS_ALL.send(sender, upgrade.getName());
-        else if (targetPlayer == null)
-            Message.RANKUP_SUCCESS_NAME.send(sender, upgrade.getName(), islands.get(0).getName());
-        else
-            Message.RANKUP_SUCCESS.send(sender, upgrade.getName(), targetPlayer.getName());
-    }
+        SuperiorPlayer targetPlayer = context.getTargetPlayer();
 
-    @Override
-    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getUpgrades(plugin, args[3]) : Collections.emptyList();
+        if (islands.size() > 1)
+            Message.RANKUP_SUCCESS_ALL.send(dispatcher, upgrade.getName());
+        else if (targetPlayer == null)
+            Message.RANKUP_SUCCESS_NAME.send(dispatcher, upgrade.getName(), islands.get(0).getName());
+        else
+            Message.RANKUP_SUCCESS.send(dispatcher, upgrade.getName(), targetPlayer.getName());
     }
 
 }

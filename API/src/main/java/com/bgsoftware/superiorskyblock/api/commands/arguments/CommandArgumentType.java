@@ -4,8 +4,8 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.CommandSyntaxException;
 
-public interface CommandArgumentType<R, C extends CommandContext> {
+public interface CommandArgumentType<R> {
 
-    R parse(SuperiorSkyblock plugin, C context, ArgumentsReader reader) throws CommandSyntaxException;
+    R parse(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException;
 
 }

@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.api.commands.arguments.ArgumentsReader;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentType;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 
-public class StringArgumentType implements CommandArgumentType<String, CommandContext> {
+public class StringArgumentType implements CommandArgumentType<String> {
 
     public static final StringArgumentType INSTANCE = new StringArgumentType(false, false);
     public static final StringArgumentType MULTIPLE = new StringArgumentType(true, false);

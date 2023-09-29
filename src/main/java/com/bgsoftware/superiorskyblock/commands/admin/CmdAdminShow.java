@@ -1,13 +1,17 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IslandArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -45,25 +49,17 @@ public class CmdAdminShow implements InternalIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin show <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_SHOW.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 3;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 3;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
+                .build();
     }
 
     @Override
@@ -72,13 +68,17 @@ public class CmdAdminShow implements InternalIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
+    public boolean isSelfIsland() {
         return false;
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
-        java.util.Locale locale = PlayerLocales.getLocale(sender);
+    public void execute(SuperiorSkyblockPlugin plugin, IslandCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
+
+        Island island = context.getIsland();
+
+        java.util.Locale locale = PlayerLocales.getLocale(dispatcher);
         long lastTime = island.getLastTimeUpdate();
 
         StringBuilder infoMessage = new StringBuilder();
@@ -331,7 +331,7 @@ public class CmdAdminShow implements InternalIslandCommand {
         if (!Message.ISLAND_INFO_FOOTER.isEmpty(locale))
             infoMessage.append(Message.ISLAND_INFO_FOOTER.getMessage(locale));
 
-        Message.CUSTOM.send(sender, infoMessage.toString(), false);
+        Message.CUSTOM.send(dispatcher, infoMessage.toString(), false);
     }
 
 }

@@ -1,15 +1,18 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IntArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IslandArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.UpgradeArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -31,27 +34,13 @@ public class CmdAdminSetUpgrade implements InternalIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin setupgrade <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_UPGRADE_NAME.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_LEVEL.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 5;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 5;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder().add(CommandArguments.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME)).add(CommandArguments.required("upgrade", UpgradeArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_UPGRADE_NAME)).add(CommandArguments.required("level", IntArgumentType.LEVEL, Message.COMMAND_ARGUMENT_LEVEL)).build();
     }
 
     @Override
@@ -60,47 +49,35 @@ public class CmdAdminSetUpgrade implements InternalIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
+    public boolean isSelfIsland() {
         return false;
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
-        Upgrade upgrade = CommandArguments.getUpgrade(plugin, sender, args[3]);
+    public void execute(SuperiorSkyblockPlugin plugin, IslandCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-        if (upgrade == null)
-            return;
+        Upgrade upgrade = context.getRequiredArgument("upgrade", Upgrade.class);
+        int level = context.getRequiredArgument("level", Integer.class);
 
-        NumberArgument<Integer> arguments = CommandArguments.getLevel(sender, args[4]);
-
-        if (!arguments.isSucceed())
-            return;
-
-        int level = arguments.getNumber();
         int maxLevel = upgrade.getMaxUpgradeLevel();
-
         if (level > maxLevel) {
-            Message.MAXIMUM_LEVEL.send(sender, maxLevel);
+            Message.MAXIMUM_LEVEL.send(dispatcher, maxLevel);
             return;
         }
 
-        EventResult<EventsBus.UpgradeResult> eventResult = plugin.getEventsBus().callIslandUpgradeEvent(
-                sender, island, upgrade, upgrade.getUpgradeLevel(level), IslandUpgradeEvent.Cause.ADMIN_SET_UPGRADE);
+        Island island = context.getIsland();
 
-        if (eventResult.isCancelled())
-            return;
+        EventResult<EventsBus.UpgradeResult> eventResult = plugin.getEventsBus().callIslandUpgradeEvent(dispatcher, island, upgrade, upgrade.getUpgradeLevel(level), IslandUpgradeEvent.Cause.ADMIN_SET_UPGRADE);
+
+        if (eventResult.isCancelled()) return;
 
         island.setUpgradeLevel(upgrade, level);
 
-        if (targetPlayer == null)
-            Message.SET_UPGRADE_LEVEL_NAME.send(sender, upgrade.getName(), island.getName());
-        else
-            Message.SET_UPGRADE_LEVEL.send(sender, upgrade.getName(), targetPlayer.getName());
-    }
+        SuperiorPlayer targetPlayer = context.getTargetPlayer();
 
-    @Override
-    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getUpgrades(plugin, args[3]) : Collections.emptyList();
+        if (targetPlayer == null) Message.SET_UPGRADE_LEVEL_NAME.send(dispatcher, upgrade.getName(), island.getName());
+        else Message.SET_UPGRADE_LEVEL.send(dispatcher, upgrade.getName(), targetPlayer.getName());
     }
 
 }

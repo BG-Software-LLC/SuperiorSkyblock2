@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class MultiplePlayersArgumentType implements CommandArgumentType<List<SuperiorPlayer>, CommandContext> {
+public class MultiplePlayersArgumentType implements CommandArgumentType<List<SuperiorPlayer>> {
 
     public static final MultiplePlayersArgumentType ALL_PLAYERS = new MultiplePlayersArgumentType(null);
     public static final MultiplePlayersArgumentType ONLINE_PLAYERS = new MultiplePlayersArgumentType(SuperiorPlayer::isOnline);

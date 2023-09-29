@@ -1,10 +1,15 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.IslandArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -29,26 +34,18 @@ public class CmdAdminName implements InternalIslandCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin name <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_NAME.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 4;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 4;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
+                .add(CommandArguments.required("island-name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_ISLAND_NAME))
+                .build();
     }
 
     @Override
@@ -57,20 +54,25 @@ public class CmdAdminName implements InternalIslandCommand {
     }
 
     @Override
-    public boolean supportMultipleIslands() {
+    public boolean isSelfIsland() {
         return false;
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
-        EventResult<String> eventResult = plugin.getEventsBus().callIslandRenameEvent(island, args[3]);
+    public void execute(SuperiorSkyblockPlugin plugin, IslandCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
+
+        Island island = context.getIsland();
+        String islandName = context.getRequiredArgument("island-name", String.class);
+
+        EventResult<String> eventResult = plugin.getEventsBus().callIslandRenameEvent(island, islandName);
 
         if (eventResult.isCancelled())
             return;
 
-        String islandName = eventResult.getResult();
+        islandName = eventResult.getResult();
 
-        if (!IslandNames.isValidName(sender, island, islandName))
+        if (!IslandNames.isValidName(dispatcher, island, islandName))
             return;
 
         String oldName = island.getName();
@@ -80,12 +82,14 @@ public class CmdAdminName implements InternalIslandCommand {
                 Formatters.COLOR_FORMATTER.format(islandName) : islandName;
 
         for (Player player : Bukkit.getOnlinePlayers())
-            Message.NAME_ANNOUNCEMENT.send(player, sender.getName(), coloredName);
+            Message.NAME_ANNOUNCEMENT.send(player, dispatcher.getName(), coloredName);
+
+        SuperiorPlayer targetPlayer = context.getTargetPlayer();
 
         if (targetPlayer == null)
-            Message.CHANGED_NAME_OTHER_NAME.send(sender, oldName, coloredName);
+            Message.CHANGED_NAME_OTHER_NAME.send(dispatcher, oldName, coloredName);
         else
-            Message.CHANGED_NAME_OTHER.send(sender, targetPlayer.getName(), coloredName);
+            Message.CHANGED_NAME_OTHER.send(dispatcher, targetPlayer.getName(), coloredName);
     }
 
 }

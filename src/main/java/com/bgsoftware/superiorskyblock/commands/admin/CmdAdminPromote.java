@@ -1,11 +1,16 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalPlayerCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.PlayerCommandContext;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -24,23 +29,15 @@ public class CmdAdminPromote implements InternalPlayerCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "admin promote <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_PROMOTE.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 3;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 3;
+    public List<CommandArgument<?>> getArguments() {
+        return new CommandArgumentsBuilder()
+                .add(CommandArguments.required("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .build();
     }
 
     @Override
@@ -49,34 +46,27 @@ public class CmdAdminPromote implements InternalPlayerCommand {
     }
 
     @Override
-    public boolean supportMultiplePlayers() {
-        return false;
-    }
-
-    @Override
-    public boolean requireIsland() {
+    public boolean requireIslandFromPlayer() {
         return true;
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-        Island island = targetPlayer.getIsland();
+    public void execute(SuperiorSkyblockPlugin plugin, PlayerCommandContext context) {
+        CommandSender dispatcher = context.getDispatcher();
 
-        if (island == null) {
-            Message.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
-            return;
-        }
+        SuperiorPlayer targetPlayer = context.getSuperiorPlayer();
 
         PlayerRole currentRole = targetPlayer.getPlayerRole();
 
         if (currentRole.isLastRole()) {
-            Message.LAST_ROLE_PROMOTE.send(sender);
+            Message.LAST_ROLE_PROMOTE.send(dispatcher);
             return;
         }
 
+        Island island = targetPlayer.getIsland();
+
         PlayerRole nextRole = currentRole;
         int roleLimit;
-
 
         do {
             nextRole = nextRole.getNextRole();
@@ -85,7 +75,7 @@ public class CmdAdminPromote implements InternalPlayerCommand {
                 roleLimit >= 0 && island.getIslandMembers(nextRole).size() >= roleLimit);
 
         if (nextRole == null || nextRole.isLastRole()) {
-            Message.LAST_ROLE_PROMOTE.send(sender);
+            Message.LAST_ROLE_PROMOTE.send(dispatcher);
             return;
         }
 
@@ -94,7 +84,7 @@ public class CmdAdminPromote implements InternalPlayerCommand {
 
         targetPlayer.setPlayerRole(nextRole);
 
-        Message.PROMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getPlayerRole());
+        Message.PROMOTED_MEMBER.send(dispatcher, targetPlayer.getName(), targetPlayer.getPlayerRole());
         Message.GOT_PROMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
     }
 

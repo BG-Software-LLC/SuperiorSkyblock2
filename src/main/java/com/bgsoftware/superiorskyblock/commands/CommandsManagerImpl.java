@@ -3,14 +3,15 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentType;
 import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentImpl;
 import com.bgsoftware.superiorskyblock.core.Manager;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
-import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
@@ -22,12 +23,9 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.time.Duration;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -35,6 +33,8 @@ import java.util.Set;
 import java.util.UUID;
 
 public class CommandsManagerImpl extends Manager implements CommandsManager {
+
+    private static final String[] EMPTY_ARGS = new String[0];
 
     private final Map<UUID, Map<String, Long>> commandsCooldown = new HashMap<>();
 
@@ -128,6 +128,10 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
         return adminCommandsMap.getSubCommands(true);
     }
 
+    public CommandsMap getAdminCommandsMap() {
+        return this.adminCommandsMap;
+    }
+
     @Nullable
     @Override
     public SuperiorCommand getAdminCommand(String commandLabel) {
@@ -156,6 +160,11 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
         pluginCommand.execute(sender, "", commandArguments);
     }
 
+    @Override
+    public <E> CommandArgument<E> createArgument(String identifier, CommandArgumentType<E> argumentType, boolean isOptional, Object... displayNameComponents) {
+        return new CommandArgumentImpl<>(identifier, displayNameComponents, isOptional, argumentType);
+    }
+
     public String getLabel() {
         return label;
     }
@@ -179,15 +188,13 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
         }
 
         for (File file : commandsFolder.listFiles()) {
-            if (!file.getName().endsWith(".jar"))
-                continue;
+            if (!file.getName().endsWith(".jar")) continue;
 
             try {
                 //noinspection deprecation
                 Class<?> commandClass = JarFiles.getClass(file.toURL(), SuperiorCommand.class, plugin.getPluginClassLoader()).getRight();
 
-                if (commandClass == null)
-                    continue;
+                if (commandClass == null) continue;
 
                 SuperiorCommand superiorCommand = createInstance(commandClass);
 
@@ -211,8 +218,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
         for (Constructor<?> constructor : clazz.getConstructors()) {
             if (constructor.getParameterCount() == 0) {
-                if (!constructor.isAccessible())
-                    constructor.setAccessible(true);
+                if (!constructor.isAccessible()) constructor.setAccessible(true);
 
                 return (SuperiorCommand) constructor.newInstance();
             }
@@ -223,133 +229,56 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
     private class PluginCommand extends BukkitCommand {
 
+        private final SubCommandsHandler commandsHandler;
+
         PluginCommand(String islandCommandLabel) {
             super(islandCommandLabel);
+            this.commandsHandler = new SubCommandsHandler(islandCommandLabel, CommandsManagerImpl.this.playerCommandsMap, this::handleUnknownCommand);
         }
 
         @Override
         public boolean execute(CommandSender sender, String label, String[] args) {
-            java.util.Locale locale = PlayerLocales.getLocale(sender);
+            String subCommand = args.length <= 0 ? null : args[0];
+            String[] commandArgs = args.length <= 1 ? EMPTY_ARGS : Arrays.copyOfRange(args, 1, args.length);
+            this.commandsHandler.execute(plugin, sender, subCommand, commandArgs);
+            return false;
+        }
 
-            if (args.length > 0) {
-                Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), args[0]);
-
-                SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
-                if (command != null) {
-                    if (!(sender instanceof Player) && !command.canBeExecutedByConsole()) {
-                        Message.CUSTOM.send(sender, "&cCan be executed only by players!", true);
-                        return false;
-                    }
-
-                    if (!command.getPermission().isEmpty() && !sender.hasPermission(command.getPermission())) {
-                        Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", command.getPermission());
-                        Message.NO_COMMAND_PERMISSION.send(sender, locale);
-                        return false;
-                    }
-
-                    if (args.length < command.getMinArgs() || args.length > command.getMaxArgs()) {
-                        Log.debugResult(Debug.EXECUTE_COMMAND, "Return Incorrect Usage", command.getUsage(locale));
-                        Message.COMMAND_USAGE.send(sender, locale, getLabel() + " " + command.getUsage(locale));
-                        return false;
-                    }
-
-                    if (sender instanceof Player) {
-                        UUID uuid = ((Player) sender).getUniqueId();
-                        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid);
-                        if (!superiorPlayer.hasPermission("superior.admin.bypass.cooldowns")) {
-                            Pair<Integer, String> commandCooldown = getCooldown(command);
-                            if (commandCooldown != null) {
-                                String commandLabel = command.getAliases().get(0);
-
-                                Map<String, Long> playerCooldowns = commandsCooldown.get(uuid);
-                                long timeNow = System.currentTimeMillis();
-
-                                if (playerCooldowns != null) {
-                                    Long timeToExecute = playerCooldowns.get(commandLabel);
-                                    if (timeToExecute != null) {
-                                        if (timeNow < timeToExecute) {
-                                            String formattedTime = Formatters.TIME_FORMATTER.format(Duration.ofMillis(timeToExecute - timeNow), locale);
-                                            Log.debugResult(Debug.EXECUTE_COMMAND, "Return Cooldown", formattedTime);
-                                            Message.COMMAND_COOLDOWN_FORMAT.send(sender, locale, formattedTime);
-                                            return false;
-                                        }
-                                    }
-                                }
-
-                                commandsCooldown.computeIfAbsent(uuid, u -> new HashMap<>()).put(commandLabel,
-                                        timeNow + commandCooldown.getKey());
-                            }
-                        }
-                    }
-
-                    command.execute(plugin, sender, args);
-                    return false;
-                }
-            }
-
-            if (sender instanceof Player) {
-                SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+        private void handleUnknownCommand(SuperiorSkyblockPlugin plugin, CommandSender dispatcher, String subCommandName, String[] args) {
+            if (dispatcher instanceof Player) {
+                SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(dispatcher);
 
                 if (superiorPlayer != null) {
                     Island island = superiorPlayer.getIsland();
 
                     if (args.length != 0) {
-                        Bukkit.dispatchCommand(sender, label + " help");
+                        Bukkit.dispatchCommand(dispatcher, label + " help");
                     } else if (island == null) {
-                        Bukkit.dispatchCommand(sender, label + " create");
+                        Bukkit.dispatchCommand(dispatcher, label + " create");
                     } else if (superiorPlayer.hasToggledPanel()) {
-                        Bukkit.dispatchCommand(sender, label + " panel");
+                        Bukkit.dispatchCommand(dispatcher, label + " panel");
                     } else {
-                        Bukkit.dispatchCommand(sender, label + " tp");
+                        Bukkit.dispatchCommand(dispatcher, label + " tp");
                     }
 
-                    return false;
+                    return;
                 }
             }
 
-            Message.NO_COMMAND_PERMISSION.send(sender, locale);
-
-            return false;
+            Locale locale = PlayerLocales.getLocale(dispatcher);
+            Message.NO_COMMAND_PERMISSION.send(dispatcher, locale);
         }
 
-        @Override
-        public List<String> tabComplete(CommandSender sender, String label, String[] args) {
-            if (args.length > 0) {
-                SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
-                if (command != null) {
-                    return command.getPermission() != null && !sender.hasPermission(command.getPermission()) ?
-                            Collections.emptyList() : command.tabComplete(plugin, sender, args);
-                }
+        @Nullable
+        private Pair<Integer, String> getCooldown(SuperiorCommand command) {
+            for (String alias : command.getAliases()) {
+                Pair<Integer, String> commandCooldown = plugin.getSettings().getCommandsCooldown().get(alias);
+                if (commandCooldown != null) return commandCooldown;
             }
 
-            List<String> list = new LinkedList<>();
-
-            for (SuperiorCommand subCommand : getSubCommands()) {
-                if (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission())) {
-                    List<String> aliases = new LinkedList<>(subCommand.getAliases());
-                    aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), Collections.emptyList()));
-                    for (String _aliases : aliases) {
-                        if (_aliases.contains(args[0].toLowerCase(Locale.ENGLISH))) {
-                            list.add(_aliases);
-                        }
-                    }
-                }
-            }
-
-            return list;
+            return null;
         }
 
-    }
-
-    @Nullable
-    private Pair<Integer, String> getCooldown(SuperiorCommand command) {
-        for (String alias : command.getAliases()) {
-            Pair<Integer, String> commandCooldown = plugin.getSettings().getCommandsCooldown().get(alias);
-            if (commandCooldown != null)
-                return commandCooldown;
-        }
-
-        return null;
     }
 
 }

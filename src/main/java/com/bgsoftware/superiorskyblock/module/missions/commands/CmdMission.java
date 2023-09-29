@@ -1,16 +1,19 @@
 package com.bgsoftware.superiorskyblock.module.missions.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.CommandSyntaxException;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.MissionArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.player.PlayerLocales;
-import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class CmdMission implements InternalSuperiorCommand {
@@ -26,23 +29,18 @@ public class CmdMission implements InternalSuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "mission complete <" + Message.COMMAND_ARGUMENT_MISSION_NAME.getMessage(locale) + ">";
-    }
-
-    @Override
     public String getDescription(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_MISSION.getMessage(locale);
     }
 
     @Override
-    public int getMinArgs() {
-        return 3;
-    }
+    public List<CommandArgument<?>> getArguments()
 
-    @Override
-    public int getMaxArgs() {
-        return 3;
+    {
+        return new CommandArgumentsBuilder()
+                .add(CommandArgument.required("action", StringArgumentType.INSTANCE))
+                .add(CommandArguments.required("mission", MissionArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_MISSION_NAME))
+                .build();
     }
 
     @Override
@@ -51,21 +49,15 @@ public class CmdMission implements InternalSuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) throws CommandSyntaxException {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getDispatcher());
 
-        if (!args[1].equalsIgnoreCase("complete")) {
-            String description = getDescription(PlayerLocales.getLocale(sender));
-            if (description == null)
-                new NullPointerException("The description of the command " + getAliases().get(0) + " is null.").printStackTrace();
-            Message.CUSTOM.send(sender, description, false);
-            return;
-        }
+        String action = context.getRequiredArgument("action", String.class);
 
-        Mission<?> mission = CommandArguments.getMission(plugin, superiorPlayer, args[2]);
+        if (!action.equalsIgnoreCase("complete"))
+            throw new CommandSyntaxException("Invalid action: " + action);
 
-        if (mission == null)
-            return;
+        Mission<?> mission = context.getRequiredArgument("mission", Mission.class);
 
         List<String> requiredMissions = mission.getRequiredMissions();
 
@@ -90,13 +82,8 @@ public class CmdMission implements InternalSuperiorCommand {
         try {
             plugin.getMissions().rewardMission(mission, superiorPlayer, false);
         } catch (IllegalStateException ex) {
-            Message.INVALID_MISSION.send(superiorPlayer, args[2]);
+            Message.INVALID_MISSION.send(superiorPlayer, context.getInputArgument("mission"));
         }
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return Collections.emptyList();
     }
 
 }

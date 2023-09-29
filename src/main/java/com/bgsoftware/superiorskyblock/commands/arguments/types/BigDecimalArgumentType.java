@@ -9,12 +9,15 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 
 import java.math.BigDecimal;
 
-public class BigDecimalArgumentType implements CommandArgumentType<BigDecimal, CommandContext> {
+public class BigDecimalArgumentType implements CommandArgumentType<BigDecimal> {
 
-    public static final BigDecimalArgumentType INSTANCE = new BigDecimalArgumentType();
+    public static final BigDecimalArgumentType AMOUNT = new BigDecimalArgumentType(Message.INVALID_AMOUNT);
+    public static final BigDecimalArgumentType LIMIT = new BigDecimalArgumentType(Message.INVALID_LIMIT);
 
-    private BigDecimalArgumentType() {
+    private final Message invalidMessage;
 
+    private BigDecimalArgumentType(Message invalidMessage) {
+        this.invalidMessage = invalidMessage;
     }
 
     @Override
@@ -24,7 +27,7 @@ public class BigDecimalArgumentType implements CommandArgumentType<BigDecimal, C
         try {
             return new BigDecimal(argument);
         } catch (NumberFormatException ex) {
-            Message.INVALID_AMOUNT.send(context.getDispatcher());
+            this.invalidMessage.send(context.getDispatcher());
             throw new CommandSyntaxException("Invalid big decimal: " + argument);
         }
     }

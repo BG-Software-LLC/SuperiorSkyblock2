@@ -1,15 +1,15 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.InternalAdminSuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.InternalIslandsCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.IntArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
+import com.bgsoftware.superiorskyblock.commands.context.IslandsCommandContext;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -17,7 +17,7 @@ import org.bukkit.command.CommandSender;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminAddSize implements InternalAdminSuperiorCommand {
+public class CmdAdminAddSize implements InternalIslandsCommand {
 
     @Override
     public List<String> getAliases() {
@@ -48,20 +48,17 @@ public class CmdAdminAddSize implements InternalAdminSuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
+    public void execute(SuperiorSkyblockPlugin plugin, IslandsCommandContext context) {
         CommandSender dispatcher = context.getDispatcher();
 
-        int size = context.getRequiredArgument("size", int.class);
+        int size = context.getRequiredArgument("size", Integer.class);
 
         if (size > plugin.getSettings().getMaxIslandSize()) {
             Message.SIZE_BIGGER_MAX.send(dispatcher);
             return;
         }
 
-        MultipleIslandsArgumentType.Result islandsResult = context.getRequiredArgument("islands", MultipleIslandsArgumentType.Result.class);
-
-        List<Island> islands = islandsResult.getIslands();
-        SuperiorPlayer targetPlayer = islandsResult.getTargetPlayer();
+        List<Island> islands = context.getIslands();
 
         boolean anyIslandChanged = false;
 
@@ -75,6 +72,8 @@ public class CmdAdminAddSize implements InternalAdminSuperiorCommand {
 
         if (!anyIslandChanged)
             return;
+
+        SuperiorPlayer targetPlayer = context.getTargetPlayer();
 
         if (islands.size() > 1)
             Message.CHANGED_ISLAND_SIZE_ALL.send(dispatcher);

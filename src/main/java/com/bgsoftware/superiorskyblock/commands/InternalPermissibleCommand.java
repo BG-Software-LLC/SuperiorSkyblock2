@@ -1,22 +1,23 @@
 package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
+import com.bgsoftware.superiorskyblock.api.commands.CommandSyntaxException;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.context.CommandContextImpl;
 import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public interface InternalPermissibleCommand extends InternalSuperiorCommand {
+public interface InternalPermissibleCommand extends ISuperiorCommand<IslandCommandContext> {
 
     @Override
-    default void execute(SuperiorSkyblockPlugin plugin, CommandContext context) {
-        Island island = null;
-
+    default IslandCommandContext createContext(SuperiorSkyblockPlugin plugin, CommandContextImpl context) throws CommandSyntaxException {
         CommandSender dispatcher = context.getDispatcher();
+
+        Island island = null;
 
         if (!canBeExecutedByConsole() || dispatcher instanceof Player) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(dispatcher);
@@ -24,22 +25,20 @@ public interface InternalPermissibleCommand extends InternalSuperiorCommand {
 
             if (island == null) {
                 Message.INVALID_ISLAND.send(superiorPlayer);
-                return;
+                throw new CommandSyntaxException("Invalid island");
             }
 
             if (!superiorPlayer.hasPermission(getPrivilege())) {
                 getPermissionLackMessage().send(superiorPlayer, island.getRequiredPlayerRole(getPrivilege()));
-                return;
+                throw new CommandSyntaxException("Missing privilege");
             }
         }
 
-        execute(plugin, IslandCommandContext.fromContext(context, island));
+        return IslandCommandContext.fromContext(context, island, null);
     }
 
     IslandPrivilege getPrivilege();
 
     Message getPermissionLackMessage();
-
-    void execute(SuperiorSkyblockPlugin plugin, IslandCommandContext context);
 
 }
