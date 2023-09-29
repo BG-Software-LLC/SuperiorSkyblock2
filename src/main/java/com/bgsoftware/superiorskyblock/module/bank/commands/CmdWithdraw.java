@@ -37,7 +37,7 @@ public class CmdWithdraw implements InternalIslandCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("amount", StringArgumentType.INSTANCE, "all", Message.COMMAND_ARGUMENT_AMOUNT))
+                .add(CommandArgument.required("amount", StringArgumentType.INSTANCE, "all", Message.COMMAND_ARGUMENT_AMOUNT))
                 .build();
     }
 

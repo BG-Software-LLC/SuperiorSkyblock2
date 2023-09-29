@@ -34,12 +34,10 @@ public class CmdMission implements InternalSuperiorCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments()
-
-    {
+    public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
                 .add(CommandArgument.required("action", StringArgumentType.INSTANCE))
-                .add(CommandArguments.required("mission", MissionArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_MISSION_NAME))
+                .add(CommandArgument.required("mission", MissionArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_MISSION_NAME))
                 .build();
     }
 

@@ -37,13 +37,11 @@ public class CmdAdminSetRate implements InternalIslandCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments()
-
-    {
+    public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
-                .add(CommandArguments.required("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
-                .add(CommandArguments.required("rating", EnumArgumentType.RATING, Message.COMMAND_ARGUMENT_RATING))
+                .add(CommandArgument.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
+                .add(CommandArgument.required("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .add(CommandArgument.required("rating", EnumArgumentType.RATING, Message.COMMAND_ARGUMENT_RATING))
                 .build();
     }
 

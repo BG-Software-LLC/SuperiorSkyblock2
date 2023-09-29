@@ -34,11 +34,9 @@ public class CmdAdminSpawn implements InternalSuperiorCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments()
-
-    {
+    public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.optional("player", PlayerArgumentType.ONLINE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .add(CommandArgument.optional("player", PlayerArgumentType.ONLINE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
                 .build();
     }
 

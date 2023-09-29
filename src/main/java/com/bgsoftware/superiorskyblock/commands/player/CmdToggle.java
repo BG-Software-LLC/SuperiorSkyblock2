@@ -32,7 +32,7 @@ public class CmdToggle implements InternalSuperiorCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArgument.required("action", "border/blocks", StringArgumentType.INSTANCE))
+                .add(CommandArgument.required("action", StringArgumentType.INSTANCE, "border/blocks"))
                 .build();
     }
 

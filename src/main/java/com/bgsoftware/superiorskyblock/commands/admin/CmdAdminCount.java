@@ -42,12 +42,10 @@ public class CmdAdminCount implements InternalIslandCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments()
-
-    {
+    public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
-                .add(CommandArguments.optional("material", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_MATERIAL))
+                .add(CommandArgument.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
+                .add(CommandArgument.optional("material", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_MATERIAL))
                 .build();
     }
 

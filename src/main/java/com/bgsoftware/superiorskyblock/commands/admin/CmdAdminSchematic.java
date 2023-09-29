@@ -33,7 +33,7 @@ public class CmdAdminSchematic implements InternalSuperiorCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.optional("schematic-name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_SCHEMATIC_NAME))
+                .add(CommandArgument.optional("schematic-name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_SCHEMATIC_NAME))
                 .build();
     }
 

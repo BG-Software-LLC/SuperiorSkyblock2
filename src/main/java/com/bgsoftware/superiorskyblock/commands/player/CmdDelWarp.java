@@ -40,11 +40,9 @@ public class CmdDelWarp implements InternalPermissibleCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments()
-
-    {
+    public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("warp-name", IslandWarpArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_WARP_NAME))
+                .add(CommandArgument.required("warp-name", IslandWarpArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_WARP_NAME))
                 .build();
     }
 

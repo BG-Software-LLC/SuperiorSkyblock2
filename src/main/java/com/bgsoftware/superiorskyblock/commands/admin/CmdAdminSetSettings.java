@@ -37,13 +37,11 @@ public class CmdAdminSetSettings implements InternalIslandsCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments()
-
-    {
+    public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
-                .add(CommandArguments.required("island-flag", IslandFlagArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_SETTINGS))
-                .add(CommandArguments.required("value", BoolArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_VALUE))
+                .add(CommandArgument.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArgument.required("island-flag", IslandFlagArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_SETTINGS))
+                .add(CommandArgument.required("value", BoolArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_VALUE))
                 .build();
     }
 

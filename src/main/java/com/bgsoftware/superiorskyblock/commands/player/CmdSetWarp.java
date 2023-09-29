@@ -43,10 +43,10 @@ public class CmdSetWarp implements InternalPermissibleCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         CommandArgumentsBuilder builder = new CommandArgumentsBuilder()
-                .add(CommandArguments.required("island-warp-name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_WARP_NAME));
+                .add(CommandArgument.required("island-warp-name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_WARP_NAME));
 
         if (plugin.getSettings().isWarpCategories())
-            builder.add(CommandArguments.optional("warp-category-name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_WARP_CATEGORY));
+            builder.add(CommandArgument.optional("warp-category-name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_WARP_CATEGORY));
 
         return builder.build();
     }

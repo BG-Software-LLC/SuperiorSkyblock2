@@ -40,9 +40,9 @@ public class CmdAdminAddEffect implements InternalIslandsCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
-                .add(CommandArguments.required("effect", PotionEffectArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_EFFECT))
-                .add(CommandArguments.required("level", IntArgumentType.LEVEL, Message.COMMAND_ARGUMENT_LEVEL))
+                .add(CommandArgument.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArgument.required("effect", PotionEffectArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_EFFECT))
+                .add(CommandArgument.required("level", IntArgumentType.LEVEL, Message.COMMAND_ARGUMENT_LEVEL))
                 .build();
     }
 

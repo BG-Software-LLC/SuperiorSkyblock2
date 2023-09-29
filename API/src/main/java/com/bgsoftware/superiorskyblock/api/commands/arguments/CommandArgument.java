@@ -14,20 +14,12 @@ public interface CommandArgument<E> {
 
     CommandArgumentType<E> getType();
 
-    static <E> CommandArgument<E> optional(String identifier, CommandArgumentType<E> argumentType) {
-        return optional(identifier, identifier, argumentType);
+    static <E> CommandArgument<E> optional(String identifier, CommandArgumentType<E> argumentType, Object... displayNameComponents) {
+        return SuperiorSkyblockAPI.getCommands().createArgument(identifier, argumentType, true, displayNameComponents);
     }
 
-    static <E> CommandArgument<E> optional(String identifier, String displayName, CommandArgumentType<E> argumentType) {
-        return SuperiorSkyblockAPI.getCommands().createArgument(identifier, argumentType, true, displayName);
-    }
-
-    static <E> CommandArgument<E> required(String identifier, CommandArgumentType<E> argumentType) {
-        return required(identifier, identifier, argumentType);
-    }
-
-    static <E> CommandArgument<E> required(String identifier, String displayName, CommandArgumentType<E> argumentType) {
-        return SuperiorSkyblockAPI.getCommands().createArgument(identifier, argumentType, false, displayName);
+    static <E> CommandArgument<E> required(String identifier, CommandArgumentType<E> argumentType, Object... displayNameComponents) {
+        return SuperiorSkyblockAPI.getCommands().createArgument(identifier, argumentType, false, displayNameComponents);
     }
 
 }

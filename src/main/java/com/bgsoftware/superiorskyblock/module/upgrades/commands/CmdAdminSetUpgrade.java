@@ -40,7 +40,7 @@ public class CmdAdminSetUpgrade implements InternalIslandCommand {
 
     @Override
     public List<CommandArgument<?>> getArguments() {
-        return new CommandArgumentsBuilder().add(CommandArguments.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME)).add(CommandArguments.required("upgrade", UpgradeArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_UPGRADE_NAME)).add(CommandArguments.required("level", IntArgumentType.LEVEL, Message.COMMAND_ARGUMENT_LEVEL)).build();
+        return new CommandArgumentsBuilder().add(CommandArgument.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME)).add(CommandArgument.required("upgrade", UpgradeArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_UPGRADE_NAME)).add(CommandArgument.required("level", IntArgumentType.LEVEL, Message.COMMAND_ARGUMENT_LEVEL)).build();
     }
 
     @Override

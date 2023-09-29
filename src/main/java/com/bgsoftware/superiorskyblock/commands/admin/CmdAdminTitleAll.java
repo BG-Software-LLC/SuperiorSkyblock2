@@ -39,12 +39,12 @@ public class CmdAdminTitleAll implements InternalIslandsCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
-                .add(CommandArguments.required("fade-in", IntArgumentType.INTERVAL, Message.COMMAND_ARGUMENT_TITLE_FADE_IN))
-                .add(CommandArguments.required("duration", IntArgumentType.INTERVAL, Message.COMMAND_ARGUMENT_TITLE_DURATION))
-                .add(CommandArguments.required("fade-out", IntArgumentType.INTERVAL, Message.COMMAND_ARGUMENT_TITLE_FADE_OUT))
-                .add(CommandArguments.required("message", StringArgumentType.MULTIPLE_COLORIZE, "-title"))
-                .add(CommandArguments.required("unused", StringArgumentType.MULTIPLE_COLORIZE, "-subtitle"))
+                .add(CommandArgument.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArgument.required("fade-in", IntArgumentType.INTERVAL, Message.COMMAND_ARGUMENT_TITLE_FADE_IN))
+                .add(CommandArgument.required("duration", IntArgumentType.INTERVAL, Message.COMMAND_ARGUMENT_TITLE_DURATION))
+                .add(CommandArgument.required("fade-out", IntArgumentType.INTERVAL, Message.COMMAND_ARGUMENT_TITLE_FADE_OUT))
+                .add(CommandArgument.required("message", StringArgumentType.MULTIPLE_COLORIZE, "-title"))
+                .add(CommandArgument.required("unused", StringArgumentType.MULTIPLE_COLORIZE, "-subtitle"))
                 .build();
     }
 

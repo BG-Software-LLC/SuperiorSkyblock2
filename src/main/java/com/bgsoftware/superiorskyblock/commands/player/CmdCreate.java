@@ -40,10 +40,10 @@ public class CmdCreate implements InternalSuperiorCommand {
         CommandArgumentsBuilder builder = new CommandArgumentsBuilder();
 
         if (plugin.getSettings().getIslandNames().isRequiredForCreation())
-            builder.add(CommandArguments.required("name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_ISLAND_NAME));
+            builder.add(CommandArgument.required("name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_ISLAND_NAME));
 
         if (plugin.getSettings().isSchematicNameArgument())
-            builder.add(CommandArguments.optional("schematic-name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_SCHEMATIC_NAME));
+            builder.add(CommandArgument.optional("schematic-name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_SCHEMATIC_NAME));
 
         return builder.build();
     }

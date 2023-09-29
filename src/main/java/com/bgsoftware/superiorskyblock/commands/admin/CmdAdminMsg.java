@@ -33,12 +33,10 @@ public class CmdAdminMsg implements InternalPlayerCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments()
-
-    {
+    public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("player", PlayerArgumentType.ONLINE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
-                .add(CommandArguments.required("message", StringArgumentType.MULTIPLE_COLORIZE, Message.COMMAND_ARGUMENT_MESSAGE))
+                .add(CommandArgument.required("player", PlayerArgumentType.ONLINE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .add(CommandArgument.required("message", StringArgumentType.MULTIPLE_COLORIZE, Message.COMMAND_ARGUMENT_MESSAGE))
                 .build();
     }
 

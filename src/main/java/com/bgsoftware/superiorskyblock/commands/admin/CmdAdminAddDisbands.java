@@ -35,8 +35,8 @@ public class CmdAdminAddDisbands implements InternalPlayersCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("players", MultiplePlayersArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ALL_PLAYERS))
-                .add(CommandArguments.required("amount", IntArgumentType.LIMIT, Message.COMMAND_ARGUMENT_AMOUNT))
+                .add(CommandArgument.required("players", MultiplePlayersArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ALL_PLAYERS))
+                .add(CommandArgument.required("amount", IntArgumentType.LIMIT, Message.COMMAND_ARGUMENT_AMOUNT))
                 .build();
     }
 

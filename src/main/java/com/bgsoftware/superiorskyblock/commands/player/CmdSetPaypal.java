@@ -37,7 +37,7 @@ public class CmdSetPaypal implements InternalPermissibleCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("paypal", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_EMAIL))
+                .add(CommandArgument.required("paypal", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_EMAIL))
                 .build();
     }
 

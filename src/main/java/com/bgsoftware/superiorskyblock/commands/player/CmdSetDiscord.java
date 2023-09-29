@@ -40,11 +40,9 @@ public class CmdSetDiscord implements InternalPermissibleCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments()
-
-    {
+    public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("discord", StringArgumentType.MULTIPLE, Message.COMMAND_ARGUMENT_DISCORD))
+                .add(CommandArgument.required("discord", StringArgumentType.MULTIPLE, Message.COMMAND_ARGUMENT_DISCORD))
                 .build();
     }
 

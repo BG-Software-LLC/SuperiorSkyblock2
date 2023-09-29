@@ -37,7 +37,7 @@ public class CmdHelp implements InternalSuperiorCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.optional("page", IntArgumentType.PAGE, Message.COMMAND_ARGUMENT_PAGE))
+                .add(CommandArgument.optional("page", IntArgumentType.PAGE, Message.COMMAND_ARGUMENT_PAGE))
                 .build();
     }
 

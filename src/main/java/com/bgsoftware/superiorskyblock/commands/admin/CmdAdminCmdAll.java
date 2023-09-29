@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalIslandsCommand;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.BoolArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleIslandsArgumentType;
@@ -35,13 +34,11 @@ public class CmdAdminCmdAll implements InternalIslandsCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments()
-
-    {
+    public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
-                .add(CommandArgument.required("onlineFilter", "online-filter[true/false]", BoolArgumentType.INSTANCE))
-                .add(CommandArguments.required("command", StringArgumentType.MULTIPLE, Message.COMMAND_ARGUMENT_COMMAND))
+                .add(CommandArgument.required("islands", MultipleIslandsArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArgument.required("onlineFilter", BoolArgumentType.INSTANCE, "online-filter[true/false]"))
+                .add(CommandArgument.required("command", StringArgumentType.MULTIPLE, Message.COMMAND_ARGUMENT_COMMAND))
                 .build();
     }
 

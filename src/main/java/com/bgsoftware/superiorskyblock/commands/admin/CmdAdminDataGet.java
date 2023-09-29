@@ -46,9 +46,9 @@ public class CmdAdminDataGet implements InternalPersistentDataCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("holder-type", StringArgumentType.INSTANCE, "player/island"))
-                .add(CommandArguments.required("holder", PersistentDataHolderArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
-                .add(CommandArguments.optional("path", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_PATH))
+                .add(CommandArgument.required("holder-type", StringArgumentType.INSTANCE, "player/island"))
+                .add(CommandArgument.required("holder", PersistentDataHolderArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
+                .add(CommandArgument.optional("path", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_PATH))
                 .build();
     }
 

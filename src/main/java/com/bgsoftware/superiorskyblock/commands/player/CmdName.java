@@ -39,11 +39,9 @@ public class CmdName implements InternalPermissibleCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments()
-
-    {
+    public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_ISLAND_NAME))
+                .add(CommandArgument.required("name", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_ISLAND_NAME))
                 .build();
     }
 

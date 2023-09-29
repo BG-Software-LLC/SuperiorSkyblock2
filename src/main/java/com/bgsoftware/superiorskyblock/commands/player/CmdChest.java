@@ -37,7 +37,7 @@ public class CmdChest implements InternalPermissibleCommand {
 
     @Override
     public List<CommandArgument<?>> getArguments() {
-        return new CommandArgumentsBuilder().add(CommandArguments.optional("page", IntArgumentType.PAGE, Message.COMMAND_ARGUMENT_PAGE)).build();
+        return new CommandArgumentsBuilder().add(CommandArgument.optional("page", IntArgumentType.PAGE, Message.COMMAND_ARGUMENT_PAGE)).build();
     }
 
     @Override

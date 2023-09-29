@@ -49,7 +49,7 @@ public class CmdAdminData implements InternalSuperiorCommand {
 
     @Override
     public List<CommandArgument<?>> getArguments() {
-        return new CommandArgumentsBuilder().add(CommandArguments.required("sub-command", StringArgumentType.INSTANCE, "get/set/remove")).add(CommandArguments.optional("args", StringArgumentType.MULTIPLE)).build();
+        return new CommandArgumentsBuilder().add(CommandArgument.required("sub-command", StringArgumentType.INSTANCE, "get/set/remove")).add(CommandArgument.optional("args", StringArgumentType.MULTIPLE)).build();
     }
 
     @Override

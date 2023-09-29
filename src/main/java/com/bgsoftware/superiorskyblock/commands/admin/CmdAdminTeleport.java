@@ -45,12 +45,10 @@ public class CmdAdminTeleport implements InternalIslandCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments()
-
-    {
+    public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
-                .add(CommandArguments.optional("environment", EnumArgumentType.WORLD_ENVIRONMENT, "normal/nether/the_end"))
+                .add(CommandArgument.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
+                .add(CommandArgument.optional("environment", EnumArgumentType.WORLD_ENVIRONMENT, "normal/nether/the_end"))
                 .build();
     }
 

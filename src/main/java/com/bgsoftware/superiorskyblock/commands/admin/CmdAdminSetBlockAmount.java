@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.BlockPositionArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.IntArgumentType;
@@ -38,9 +37,9 @@ public class CmdAdminSetBlockAmount implements InternalSuperiorCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("world", WorldArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_WORLD))
-                .add(CommandArgument.required("block-position", "x> <y> <z", BlockPositionArgumentType.INSTANCE))
-                .add(CommandArguments.required("amount", IntArgumentType.AMOUNT, Message.COMMAND_ARGUMENT_AMOUNT))
+                .add(CommandArgument.required("world", WorldArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_WORLD))
+                .add(CommandArgument.required("block-position", BlockPositionArgumentType.INSTANCE, "x> <y> <z"))
+                .add(CommandArgument.required("amount", IntArgumentType.AMOUNT, Message.COMMAND_ARGUMENT_AMOUNT))
                 .build();
     }
 

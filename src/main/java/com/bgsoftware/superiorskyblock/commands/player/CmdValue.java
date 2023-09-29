@@ -43,7 +43,7 @@ public class CmdValue implements InternalSuperiorCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.optional("material", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_MATERIAL))
+                .add(CommandArgument.optional("material", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_MATERIAL))
                 .build();
     }
 

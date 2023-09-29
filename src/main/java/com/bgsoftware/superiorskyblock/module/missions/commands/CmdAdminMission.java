@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalPlayerCommand;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.MissionArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
@@ -38,13 +37,11 @@ public class CmdAdminMission implements InternalPlayerCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments()
-
-    {
+    public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
-                .add(CommandArgument.required("action", "complete/reset", StringArgumentType.INSTANCE))
-                .add(CommandArguments.required("mission", MissionArgumentType.INSTANCE, "all", Message.COMMAND_ARGUMENT_MISSION_NAME))
+                .add(CommandArgument.required("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .add(CommandArgument.required("action", StringArgumentType.INSTANCE, "complete/reset"))
+                .add(CommandArgument.required("mission", MissionArgumentType.INSTANCE, "all", Message.COMMAND_ARGUMENT_MISSION_NAME))
                 .build();
     }
 

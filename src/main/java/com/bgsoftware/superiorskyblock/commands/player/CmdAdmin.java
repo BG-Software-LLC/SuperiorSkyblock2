@@ -46,8 +46,8 @@ public class CmdAdmin implements InternalSuperiorCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.optional("sub-command", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_PAGE))
-                .add(CommandArguments.optional("args", StringArgumentType.MULTIPLE))
+                .add(CommandArgument.optional("sub-command", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_PAGE))
+                .add(CommandArgument.optional("args", StringArgumentType.MULTIPLE))
                 .build();
     }
 

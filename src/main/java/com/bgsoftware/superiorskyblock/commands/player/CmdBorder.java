@@ -36,7 +36,7 @@ public class CmdBorder implements InternalSuperiorCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.optional("border-color", EnumArgumentType.BORDER_COLOR, Message.COMMAND_ARGUMENT_BORDER_COLOR))
+                .add(CommandArgument.optional("border-color", EnumArgumentType.BORDER_COLOR, Message.COMMAND_ARGUMENT_BORDER_COLOR))
                 .build();
     }
 

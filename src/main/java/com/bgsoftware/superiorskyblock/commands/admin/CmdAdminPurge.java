@@ -36,7 +36,7 @@ public class CmdAdminPurge implements InternalSuperiorCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("purge", StringArgumentType.INSTANCE, "cancel", Message.COMMAND_ARGUMENT_TIME))
+                .add(CommandArgument.required("purge", StringArgumentType.INSTANCE, "cancel", Message.COMMAND_ARGUMENT_TIME))
                 .build();
     }
 

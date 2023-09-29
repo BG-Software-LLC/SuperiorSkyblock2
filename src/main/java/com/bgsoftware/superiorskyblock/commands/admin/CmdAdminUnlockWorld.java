@@ -36,13 +36,11 @@ public class CmdAdminUnlockWorld implements InternalIslandsCommand {
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments()
-
-    {
+    public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArguments.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
-                .add(CommandArguments.required("environment", EnumArgumentType.WORLD_ENVIRONMENT, "normal/nether/the_end"))
-                .add(CommandArguments.required("unlock", BoolArgumentType.INSTANCE, "true/false"))
+                .add(CommandArgument.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME, Message.COMMAND_ARGUMENT_ALL_ISLANDS))
+                .add(CommandArgument.required("environment", EnumArgumentType.WORLD_ENVIRONMENT, "normal/nether/the_end"))
+                .add(CommandArgument.required("unlock", BoolArgumentType.INSTANCE, "true/false"))
                 .build();
     }
 
