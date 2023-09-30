@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -8,15 +10,18 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.SuggestionsSelector;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.BoolArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
-import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
 import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class CmdPermissions implements InternalPermissibleCommand {
@@ -39,8 +44,8 @@ public class CmdPermissions implements InternalPermissibleCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArgument.optional("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
-                .add(CommandArgument.optional("reset", StringArgumentType.INSTANCE))
+                .add(CommandArgument.optional("player", PlayerArgumentType.allOf(Selector.INSTANCE), Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .add(CommandArgument.optional("reset", BoolArgumentType.INSTANCE, "reset[true/false]"))
                 .build();
     }
 
@@ -66,8 +71,7 @@ public class CmdPermissions implements InternalPermissibleCommand {
         Object permissionHolder = SPlayerRole.guestRole();
 
         SuperiorPlayer targetPlayer = context.getOptionalArgument("player", SuperiorPlayer.class).orElse(null);
-        boolean setToDefault = context.getOptionalArgument("reset", String.class)
-                .map(s -> s.equalsIgnoreCase("reset")).orElse(false);
+        boolean setToDefault = context.getOptionalArgument("reset", boolean.class).orElse(false);
 
         if (!setToDefault && targetPlayer != null) {
             if (island.isMember(targetPlayer) && !superiorPlayer.getPlayerRole().isHigherThan(targetPlayer.getPlayerRole())) {
@@ -98,6 +102,24 @@ public class CmdPermissions implements InternalPermissibleCommand {
             }
         }
 
+    }
+
+    private static class Selector implements SuggestionsSelector<SuperiorPlayer> {
+
+        private static final Selector INSTANCE = new Selector();
+
+        @Override
+        public List<SuperiorPlayer> getAllPossibilities(SuperiorSkyblock plugin, CommandContext context) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) context.getDispatcher());
+            Island island = superiorPlayer.getIsland();
+            return island == null ? Collections.emptyList() : island.getIslandMembers(true);
+        }
+
+        @Override
+        public boolean check(SuperiorSkyblock plugin, CommandContext context, SuperiorPlayer targetPlayer) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) context.getDispatcher());
+            return !superiorPlayer.getPlayerRole().isHigherThan(targetPlayer.getPlayerRole());
+        }
     }
 
 }

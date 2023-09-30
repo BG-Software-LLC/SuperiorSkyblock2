@@ -1,14 +1,16 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalPermissibleCommand;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.SuggestionsSelector;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.IslandRoleArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
 import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
@@ -41,7 +43,7 @@ public class CmdSetRole implements InternalPermissibleCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArgument.required("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .add(CommandArgument.required("player", PlayerArgumentType.allOf(Selector.INSTANCE), Message.COMMAND_ARGUMENT_PLAYER_NAME))
                 .add(CommandArgument.required("island-role", IslandRoleArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_ISLAND_ROLE))
                 .build();
     }
@@ -138,6 +140,27 @@ public class CmdSetRole implements InternalPermissibleCommand {
             Message.GOT_DEMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
         }
 
+    }
+
+    private static class Selector implements SuggestionsSelector<SuperiorPlayer> {
+
+        private static final Selector INSTANCE = new Selector();
+
+        @Override
+        public List<SuperiorPlayer> getAllPossibilities(SuperiorSkyblock plugin, CommandContext context) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) context.getDispatcher());
+            Island island = superiorPlayer.getIsland();
+            return island.getIslandMembers(false);
+        }
+
+        @Override
+        public boolean check(SuperiorSkyblock plugin, CommandContext context, SuperiorPlayer targetPlayer) {
+            if (!(context.getDispatcher() instanceof Player))
+                return true;
+
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) context.getDispatcher());
+            return !targetPlayer.getPlayerRole().isHigherThan(superiorPlayer.getPlayerRole());
+        }
     }
 
 }

@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalPlayerCommand;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.SuggestionsSelectors;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
 import com.bgsoftware.superiorskyblock.commands.context.PlayerCommandContext;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -37,7 +37,7 @@ public class CmdAdminKick implements InternalPlayerCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArgument.required("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .add(CommandArgument.required("player", PlayerArgumentType.allOf(SuggestionsSelectors.NON_LEADER_PLAYERS), Message.COMMAND_ARGUMENT_PLAYER_NAME))
                 .build();
     }
 

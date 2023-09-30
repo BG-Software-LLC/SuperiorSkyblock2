@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.CommandSyntaxException;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.arguments.SuggestionsSelector;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 
 import java.util.function.Predicate;
@@ -14,9 +15,12 @@ public abstract class AbstractPlayerArgumentType<E> implements CommandArgumentTy
 
     @Nullable
     protected final PlayerSelector selector;
+    @Nullable
+    protected final SuggestionsSelector<SuperiorPlayer> suggestionsSelector;
 
-    protected AbstractPlayerArgumentType(@Nullable PlayerSelector selector) {
+    protected AbstractPlayerArgumentType(@Nullable PlayerSelector selector, @Nullable SuggestionsSelector<SuperiorPlayer> suggestionsSelector) {
         this.selector = selector;
+        this.suggestionsSelector = suggestionsSelector;
     }
 
     protected final SuperiorPlayer parsePlayer(SuperiorSkyblock plugin, CommandContext context, String name) throws CommandSyntaxException {

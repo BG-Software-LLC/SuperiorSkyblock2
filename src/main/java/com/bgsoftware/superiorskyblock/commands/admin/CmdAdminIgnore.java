@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.IslandArgumentType;
 import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
@@ -35,7 +34,7 @@ public class CmdAdminIgnore implements InternalIslandCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArgument.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
+                .add(CommandArgument.required("island", IslandArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
                 .build();
     }
 

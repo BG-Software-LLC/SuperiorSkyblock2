@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.IntArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.IslandArgumentType;
@@ -40,7 +39,7 @@ public class CmdAdminSetUpgrade implements InternalIslandCommand {
 
     @Override
     public List<CommandArgument<?>> getArguments() {
-        return new CommandArgumentsBuilder().add(CommandArgument.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME)).add(CommandArgument.required("upgrade", UpgradeArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_UPGRADE_NAME)).add(CommandArgument.required("level", IntArgumentType.LEVEL, Message.COMMAND_ARGUMENT_LEVEL)).build();
+        return new CommandArgumentsBuilder().add(CommandArgument.required("island", IslandArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME)).add(CommandArgument.required("upgrade", UpgradeArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_UPGRADE_NAME)).add(CommandArgument.required("level", IntArgumentType.LEVEL, Message.COMMAND_ARGUMENT_LEVEL)).build();
     }
 
     @Override

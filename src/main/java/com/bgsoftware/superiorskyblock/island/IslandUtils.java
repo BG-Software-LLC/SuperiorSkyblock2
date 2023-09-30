@@ -204,14 +204,17 @@ public class IslandUtils {
         return totalAmount == 0 ? 0 : (island.getGeneratorAmount(key, environment) * 100D) / totalAmount;
     }
 
-    public static boolean checkKickRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
+    public static boolean checkKickRestrictions(SuperiorPlayer superiorPlayer, Island island,
+                                                SuperiorPlayer targetPlayer, boolean sendMessages) {
         if (!island.isMember(targetPlayer)) {
-            Message.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
+            if (sendMessages)
+                Message.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
             return false;
         }
 
         if (!targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())) {
-            Message.KICK_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
+            if (sendMessages)
+                Message.KICK_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return false;
         }
 
@@ -233,16 +236,18 @@ public class IslandUtils {
         Message.GOT_KICKED.send(target, callerName);
     }
 
-    public static boolean checkBanRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
+    public static boolean checkBanRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer, boolean sendMessages) {
         Island playerIsland = superiorPlayer.getIsland();
         if (playerIsland != null && playerIsland.isMember(targetPlayer) &&
                 !targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())) {
-            Message.BAN_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
+            if (sendMessages)
+                Message.BAN_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return false;
         }
 
         if (island.isBanned(targetPlayer)) {
-            Message.PLAYER_ALREADY_BANNED.send(superiorPlayer);
+            if (sendMessages)
+                Message.PLAYER_ALREADY_BANNED.send(superiorPlayer);
             return false;
         }
 

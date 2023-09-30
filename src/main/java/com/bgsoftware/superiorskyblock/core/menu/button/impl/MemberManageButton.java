@@ -41,14 +41,13 @@ public class MemberManageButton extends AbstractMenuViewButton<PlayerMenuView> {
                 menuView.setPreviousMove(false);
                 plugin.getMenus().openMemberRole(menuView.getInventoryViewer(), MenuViewWrapper.fromView(menuView), menuView.getSuperiorPlayer());
             }
-        },
-        BAN_MEMBER {
+        }, BAN_MEMBER {
             @Override
             void onButtonClick(PlayerMenuView menuView, InventoryClickEvent clickEvent) {
                 SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
                 if (plugin.getSettings().isBanConfirm()) {
                     Island island = inventoryViewer.getIsland();
-                    if (IslandUtils.checkBanRestrictions(inventoryViewer, island, menuView.getSuperiorPlayer())) {
+                    if (IslandUtils.checkBanRestrictions(inventoryViewer, island, menuView.getSuperiorPlayer(), true)) {
                         menuView.setPreviousMove(false);
                         plugin.getMenus().openConfirmBan(inventoryViewer, MenuViewWrapper.fromView(menuView), island, menuView.getSuperiorPlayer());
                     }
@@ -56,18 +55,16 @@ public class MemberManageButton extends AbstractMenuViewButton<PlayerMenuView> {
                     plugin.getCommands().dispatchSubCommand(clickEvent.getWhoClicked(), "ban", menuView.getSuperiorPlayer().getName());
                 }
             }
-        },
-        KICK_MEMBER {
+        }, KICK_MEMBER {
             @Override
             void onButtonClick(PlayerMenuView menuView, InventoryClickEvent clickEvent) {
                 SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
                 if (plugin.getSettings().isKickConfirm()) {
                     Island island = inventoryViewer.getIsland();
 
-                    if (island == null)
-                        return;
+                    if (island == null) return;
 
-                    if (IslandUtils.checkKickRestrictions(inventoryViewer, island, menuView.getSuperiorPlayer())) {
+                    if (IslandUtils.checkKickRestrictions(inventoryViewer, island, menuView.getSuperiorPlayer(), true)) {
                         menuView.setPreviousMove(false);
                         plugin.getMenus().openConfirmKick(inventoryViewer, MenuViewWrapper.fromView(menuView), island, menuView.getSuperiorPlayer());
                     }
@@ -105,10 +102,8 @@ public class MemberManageButton extends AbstractMenuViewButton<PlayerMenuView> {
 
         private final ManageAction manageAction;
 
-        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
-                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, ManageAction manageAction) {
-            super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
-                    MemberManageButton.class, MemberManageButton::new);
+        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands, @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, ManageAction manageAction) {
+            super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, MemberManageButton.class, MemberManageButton::new);
             this.manageAction = Objects.requireNonNull(manageAction, "manageAction cannot be null");
         }
 

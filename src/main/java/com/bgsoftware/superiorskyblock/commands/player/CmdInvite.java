@@ -1,18 +1,21 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalPermissibleCommand;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.SuggestionsSelector;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
 import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,7 +41,7 @@ public class CmdInvite implements InternalPermissibleCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArgument.required("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .add(CommandArgument.required("player", PlayerArgumentType.allOf(Selector.INSTANCE), Message.COMMAND_ARGUMENT_PLAYER_NAME))
                 .build();
     }
 
@@ -96,6 +99,25 @@ public class CmdInvite implements InternalPermissibleCommand {
         }
 
         IslandUtils.sendMessage(island, announcementMessage, Collections.emptyList(), superiorPlayer.getName(), targetPlayer.getName());
+    }
+
+    private static class Selector implements SuggestionsSelector<SuperiorPlayer> {
+
+        private static final Selector INSTANCE = new Selector();
+
+        @Override
+        public List<SuperiorPlayer> getAllPossibilities(SuperiorSkyblock plugin, CommandContext context) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) context.getDispatcher());
+            Island island = superiorPlayer.getIsland();
+            return island == null ? Collections.emptyList() : plugin.getPlayers().getAllPlayers();
+        }
+
+        @Override
+        public boolean check(SuperiorSkyblock plugin, CommandContext context, SuperiorPlayer targetPlayer) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) context.getDispatcher());
+            Island island = superiorPlayer.getIsland();
+            return !island.isMember(targetPlayer) && !island.isBanned(targetPlayer);
+        }
     }
 
 }

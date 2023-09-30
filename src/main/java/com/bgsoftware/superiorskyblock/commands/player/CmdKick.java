@@ -6,8 +6,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalPermissibleCommand;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.SuggestionsSelectors;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
 import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
@@ -38,7 +38,7 @@ public class CmdKick implements InternalPermissibleCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArgument.required("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .add(CommandArgument.required("player", PlayerArgumentType.allOf(SuggestionsSelectors.MEMBERS_WITH_LOWER_ROLE), Message.COMMAND_ARGUMENT_PLAYER_NAME))
                 .build();
     }
 
@@ -64,7 +64,7 @@ public class CmdKick implements InternalPermissibleCommand {
 
         SuperiorPlayer targetPlayer = context.getRequiredArgument("player", SuperiorPlayer.class);
 
-        if (!IslandUtils.checkKickRestrictions(superiorPlayer, island, targetPlayer))
+        if (!IslandUtils.checkKickRestrictions(superiorPlayer, island, targetPlayer, true))
             return;
 
         if (plugin.getSettings().isKickConfirm()) {

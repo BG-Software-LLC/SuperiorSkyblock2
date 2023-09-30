@@ -6,8 +6,8 @@ import com.bgsoftware.superiorskyblock.api.events.IslandJoinEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalIslandCommand;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.SuggestionsSelectors;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.IslandArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
 import com.bgsoftware.superiorskyblock.commands.context.IslandCommandContext;
@@ -39,8 +39,8 @@ public class CmdAdminAdd implements InternalIslandCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArgument.required("island", IslandArgumentType.INCLUDE_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
-                .add(CommandArgument.required("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .add(CommandArgument.required("island", IslandArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
+                .add(CommandArgument.required("player", PlayerArgumentType.allOf(SuggestionsSelectors.PLAYERS_WITH_NO_ISLAND), Message.COMMAND_ARGUMENT_PLAYER_NAME))
                 .build();
     }
 
@@ -64,6 +64,7 @@ public class CmdAdminAdd implements InternalIslandCommand {
             Message.PLAYER_ALREADY_IN_ISLAND.send(dispatcher);
             return;
         }
+
         Island island = context.getIsland();
 
         if (!plugin.getEventsBus().callIslandJoinEvent(targetPlayer, island, IslandJoinEvent.Cause.ADMIN))

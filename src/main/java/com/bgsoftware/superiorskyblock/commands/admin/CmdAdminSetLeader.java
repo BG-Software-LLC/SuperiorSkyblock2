@@ -1,12 +1,15 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalPlayerCommand;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.SuggestionsSelector;
+import com.bgsoftware.superiorskyblock.commands.arguments.SuggestionsSelectors;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
 import com.bgsoftware.superiorskyblock.commands.context.PlayerCommandContext;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -30,8 +33,8 @@ public class CmdAdminSetLeader implements InternalPlayerCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArgument.required("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
-                .add(CommandArgument.required("new-leader", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .add(CommandArgument.required("player", PlayerArgumentType.allOf(SuggestionsSelectors.NON_LEADER_PLAYERS), Message.COMMAND_ARGUMENT_PLAYER_NAME))
+                .add(CommandArgument.required("new-leader", PlayerArgumentType.allOf(Selector.INSTANCE), Message.COMMAND_ARGUMENT_PLAYER_NAME))
                 .build();
     }
 
@@ -77,6 +80,23 @@ public class CmdAdminSetLeader implements InternalPlayerCommand {
         if (island.transferIsland(newLeader)) {
             Message.TRANSFER_ADMIN.send(dispatcher, leader.getName(), newLeader.getName());
             IslandUtils.sendMessage(island, Message.TRANSFER_BROADCAST, Collections.emptyList(), newLeader.getName());
+        }
+    }
+
+    private static class Selector implements SuggestionsSelector<SuperiorPlayer> {
+
+        private static final Selector INSTANCE = new Selector();
+
+        @Override
+        public List<SuperiorPlayer> getAllPossibilities(SuperiorSkyblock plugin, CommandContext context) {
+            SuperiorPlayer leader = context.getRequiredArgument("player", SuperiorPlayer.class);
+            Island island = leader.getIsland();
+            return island == null ? Collections.emptyList() : island.getIslandMembers(false);
+        }
+
+        @Override
+        public boolean check(SuperiorSkyblock plugin, CommandContext context, SuperiorPlayer superiorPlayer) {
+            return true;
         }
     }
 

@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandSuggestions;
+import com.bgsoftware.superiorskyblock.commands.arguments.SuggestionsSelectors;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 
@@ -113,9 +114,9 @@ public class PersistentDataHolderArgumentType implements CommandArgumentType<IPe
         switch (holderType) {
             case ISLAND:
                 CommandSuggestions.getIslandSuggestions(plugin, name, null, suggestions);
-                return CommandSuggestions.getPlayerSuggestions(plugin, name, SuperiorPlayer::hasIsland, suggestions);
+                return CommandSuggestions.getPlayerSuggestions(plugin, context, name, SuggestionsSelectors.PLAYERS_WITH_ISLAND, suggestions);
             case PLAYER:
-                return CommandSuggestions.getPlayerSuggestions(plugin, name, null, suggestions);
+                return CommandSuggestions.getPlayerSuggestions(plugin, context, name, null, suggestions);
         }
 
         return suggestions;

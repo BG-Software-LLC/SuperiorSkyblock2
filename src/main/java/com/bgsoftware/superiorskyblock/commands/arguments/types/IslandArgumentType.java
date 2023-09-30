@@ -15,8 +15,7 @@ import java.util.Locale;
 
 public class IslandArgumentType extends AbstractIslandArgumentType<IslandArgumentType.Result> {
 
-    public static final IslandArgumentType INCLUDE_PLAYERS = new IslandArgumentType(true);
-    public static final IslandArgumentType NO_PLAYERS = new IslandArgumentType(false);
+    public static final IslandArgumentType INSTANCE = new IslandArgumentType(true);
 
     private IslandArgumentType(boolean includePlayerSearch) {
         super(includePlayerSearch);
