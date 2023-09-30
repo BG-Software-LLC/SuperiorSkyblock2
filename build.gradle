@@ -34,8 +34,8 @@ allprojects {
             file.text.contains('Bukkit.broadcastMessage')
         }.getFiles()
 
-//        if (!filesWithDebug.isEmpty())
-//            throw new GradleException("Found debug messages: " + filesWithDebug)
+        if (!filesWithDebug.isEmpty())
+            throw new GradleException("Found debug messages: " + filesWithDebug)
     }
 
     build {
