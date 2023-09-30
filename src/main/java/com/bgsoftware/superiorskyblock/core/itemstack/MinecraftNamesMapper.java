@@ -36,24 +36,6 @@ public class MinecraftNamesMapper {
         this.enumNamesMapping = fetchEnumNamesMapping();
     }
 
-    public <E extends Enum<E>> Optional<E> mapName(Class<E> expectedEnumClass, String name) {
-        return Optional.ofNullable(getMappedName(expectedEnumClass, name)
-                .map(mappedName -> {
-                    try {
-                        return Enum.valueOf(expectedEnumClass, mappedName.toUpperCase(Locale.ENGLISH));
-                    } catch (IllegalArgumentException error) {
-                        return null;
-                    }
-                })
-                .orElseGet(() -> {
-                    try {
-                        return Enum.valueOf(expectedEnumClass, name.toUpperCase(Locale.ENGLISH));
-                    } catch (IllegalArgumentException error) {
-                        return null;
-                    }
-                }));
-    }
-
     public Optional<String> getMappedName(Class<?> expectedEnumClass, String name) {
         return Optional.ofNullable(enumNamesMapping.get(expectedEnumClass))
                 .map(mappings -> mappings.get(name));
