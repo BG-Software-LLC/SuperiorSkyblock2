@@ -12,20 +12,25 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 
 public class EnumArgumentType<E extends Enum<E>> implements CommandArgumentType<E> {
 
-    public static final EnumArgumentType<BorderColor> BORDER_COLOR = new EnumArgumentType<>(BorderColor.class, Message.INVALID_BORDER_COLOR);
-    public static final EnumArgumentType<World.Environment> WORLD_ENVIRONMENT = new EnumArgumentType<>(World.Environment.class, Message.INVALID_ENVIRONMENT);
-    public static final EnumArgumentType<Biome> BIOME = new EnumArgumentType<>(Biome.class, Message.INVALID_BIOME);
-    public static final EnumArgumentType<Rating> RATING = new EnumArgumentType<>(Rating.class, Message.INVALID_RATE);
+    public static final EnumArgumentType<BorderColor> BORDER_COLOR = new EnumArgumentType<>(BorderColor.class, BorderColor.values(), Message.INVALID_BORDER_COLOR);
+    public static final EnumArgumentType<World.Environment> WORLD_ENVIRONMENT = new EnumArgumentType<>(World.Environment.class, World.Environment.values(), Message.INVALID_ENVIRONMENT);
+    public static final EnumArgumentType<Biome> BIOME = new EnumArgumentType<>(Biome.class, Biome.values(), Message.INVALID_BIOME);
+    public static final EnumArgumentType<Rating> RATING = new EnumArgumentType<>(Rating.class, Rating.values(), Message.INVALID_RATE);
 
     private final Class<E> enumClazz;
+    private final List<E> values;
     private final Message invalidMessage;
 
-    private EnumArgumentType(Class<E> enumClazz, Message invalidMessage) {
+    private EnumArgumentType(Class<E> enumClazz, E[] values, Message invalidMessage) {
         this.enumClazz = enumClazz;
+        this.values = new LinkedList<>(Arrays.asList(values));
         this.invalidMessage = invalidMessage;
     }
 
@@ -41,6 +46,21 @@ public class EnumArgumentType<E extends Enum<E>> implements CommandArgumentType<
         }
 
         return enumObject;
+    }
+
+    @Override
+    public List<String> getSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
+        String argument = reader.read().toLowerCase(Locale.ENGLISH);
+
+        List<String> suggestions = new LinkedList<>();
+
+        for (E enumValue : values) {
+            String enumValueName = enumValue.name().toLowerCase(Locale.ENGLISH);
+            if (enumValueName.contains(argument))
+                suggestions.add(enumValueName);
+        }
+
+        return suggestions;
     }
 
 }

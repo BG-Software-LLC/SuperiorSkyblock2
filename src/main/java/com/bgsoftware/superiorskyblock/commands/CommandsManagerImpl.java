@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.ArgumentsReader;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentType;
 import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
@@ -238,20 +239,29 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
         @Override
         public boolean execute(CommandSender sender, String label, String[] args) {
-            String subCommand = args.length <= 0 ? null : args[0];
-            String[] commandArgs = args.length <= 1 ? EMPTY_ARGS : Arrays.copyOfRange(args, 1, args.length);
-            this.commandsHandler.execute(plugin, sender, subCommand, commandArgs);
+            String subCommand = args.length == 0 ? null : args[0];
+            ArgumentsReader commandArgsReader = new ArgumentsReader(args);
+            commandArgsReader.setCursor(1);
+            this.commandsHandler.execute(plugin, sender, subCommand, commandArgsReader);
             return false;
         }
 
-        private void handleUnknownCommand(SuperiorSkyblockPlugin plugin, CommandSender dispatcher, String subCommandName, String[] args) {
+        @Override
+        public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
+            String subCommand = args.length == 0 ? null : args[0];
+            ArgumentsReader commandArgsReader = new ArgumentsReader(args);
+            commandArgsReader.setCursor(1);
+            return this.commandsHandler.tabComplete(plugin, sender, subCommand, commandArgsReader);
+        }
+
+        private void handleUnknownCommand(SuperiorSkyblockPlugin plugin, CommandSender dispatcher, String subCommandName, ArgumentsReader reader) {
             if (dispatcher instanceof Player) {
                 SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(dispatcher);
 
                 if (superiorPlayer != null) {
                     Island island = superiorPlayer.getIsland();
 
-                    if (args.length != 0) {
+                    if (reader.hasNext()) {
                         Bukkit.dispatchCommand(dispatcher, label + " help");
                     } else if (island == null) {
                         Bukkit.dispatchCommand(dispatcher, label + " create");

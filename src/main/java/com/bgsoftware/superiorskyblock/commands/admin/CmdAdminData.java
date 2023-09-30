@@ -4,12 +4,12 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.CommandSyntaxException;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.ArgumentsReader;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.commands.CommandsMap;
 import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.SubCommandsHandler;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
@@ -61,10 +61,10 @@ public class CmdAdminData implements InternalSuperiorCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) throws CommandSyntaxException {
         String subCommandName = context.getRequiredArgument("sub-command", String.class);
         String[] args = context.getOptionalArgument("args", String.class).map(s -> s.split(" ")).orElse(EMPTY_ARGS);
-        this.commandsHandler.execute(plugin, context.getDispatcher(), subCommandName, args);
+        this.commandsHandler.execute(plugin, context.getDispatcher(), subCommandName, new ArgumentsReader(args));
     }
 
-    private void handleUnknownCommand(SuperiorSkyblockPlugin plugin, CommandSender dispatcher, String subCommandName, String[] args) {
+    private void handleUnknownCommand(SuperiorSkyblockPlugin plugin, CommandSender dispatcher, String subCommandName, ArgumentsReader unused) {
         List<SuperiorCommand> subCommands = new SequentialListBuilder<SuperiorCommand>()
                 .filter(subCommand -> subCommand.displayCommand() && (subCommand.getPermission().isEmpty() || dispatcher.hasPermission(subCommand.getPermission())))
                 .build(commandsMap.getSubCommands(false));

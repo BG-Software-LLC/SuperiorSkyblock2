@@ -8,6 +8,8 @@ import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentTyp
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 
 public class PotionEffectArgumentType implements CommandArgumentType<PotionEffectType> {
@@ -26,6 +28,21 @@ public class PotionEffectArgumentType implements CommandArgumentType<PotionEffec
         }
 
         return potionEffectType;
+    }
+
+    @Override
+    public List<String> getSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
+        String argument = reader.read().toLowerCase(Locale.ENGLISH);
+
+        List<String> suggestions = new LinkedList<>();
+
+        for (PotionEffectType potionEffectType : PotionEffectType.values()) {
+            String potionEffectTypeName = potionEffectType.getName().toLowerCase(Locale.ENGLISH);
+            if (potionEffectTypeName.contains(argument))
+                suggestions.add(potionEffectTypeName);
+        }
+
+        return suggestions;
     }
 
 }

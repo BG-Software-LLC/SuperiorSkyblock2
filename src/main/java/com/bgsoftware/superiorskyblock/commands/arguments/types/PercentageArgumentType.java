@@ -7,6 +7,9 @@ import com.bgsoftware.superiorskyblock.api.commands.arguments.ArgumentsReader;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentType;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 
+import java.util.Collections;
+import java.util.List;
+
 public class PercentageArgumentType implements CommandArgumentType<PercentageArgumentType.Result> {
 
     public static final PercentageArgumentType AMOUNT = new PercentageArgumentType(Message.INVALID_AMOUNT);
@@ -40,6 +43,12 @@ public class PercentageArgumentType implements CommandArgumentType<PercentageArg
         }
 
         return new Result(i, isPercentage);
+    }
+
+    @Override
+    public List<String> getSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
+        reader.read(); // skip argument
+        return Collections.emptyList();
     }
 
     public static class Result {

@@ -8,6 +8,11 @@ import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentTyp
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+
+import java.util.Collections;
+import java.util.List;
 
 public class BlockPositionArgumentType implements CommandArgumentType<BlockPosition> {
 
@@ -26,6 +31,32 @@ public class BlockPositionArgumentType implements CommandArgumentType<BlockPosit
             Message.INVALID_BLOCK.send(context.getDispatcher(), formattedBlockPosition);
             throw new CommandSyntaxException("Invalid block position: " + formattedBlockPosition);
         }
+    }
+
+    @Override
+    public List<String> getSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) {
+        String suggestion = null;
+
+        Location location = ((Player) context.getDispatcher()).getLocation();
+
+        String block;
+
+        try {
+            block = location.getBlockX() + "";
+            if (block.contains(reader.read()))
+                suggestion = block;
+
+            block = location.getBlockY() + "";
+            if (block.contains(reader.read()))
+                suggestion = block;
+
+            block = location.getBlockZ() + "";
+            if (block.contains(reader.read()))
+                suggestion = block;
+        } catch (CommandSyntaxException ignored) {
+        }
+
+        return suggestion == null ? Collections.emptyList() : Collections.singletonList(suggestion);
     }
 
 }

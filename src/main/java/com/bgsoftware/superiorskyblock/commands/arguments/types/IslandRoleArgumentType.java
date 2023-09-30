@@ -9,6 +9,10 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
 public class IslandRoleArgumentType implements CommandArgumentType<PlayerRole> {
 
     public static final IslandRoleArgumentType INSTANCE = new IslandRoleArgumentType();
@@ -29,6 +33,21 @@ public class IslandRoleArgumentType implements CommandArgumentType<PlayerRole> {
         }
 
         return playerRole;
+    }
+
+    @Override
+    public List<String> getSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
+        String argument = reader.read().toLowerCase(Locale.ENGLISH);
+
+        List<String> suggestions = new LinkedList<>();
+
+        for (PlayerRole islandRole : plugin.getRoles().getRoles()) {
+            String islandRoleName = islandRole.getName().toLowerCase(Locale.ENGLISH);
+            if (islandRoleName.contains(argument))
+                suggestions.add(islandRoleName);
+        }
+
+        return suggestions;
     }
 
 }

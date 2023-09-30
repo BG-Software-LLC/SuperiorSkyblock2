@@ -11,6 +11,9 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 
+import java.util.Collections;
+import java.util.List;
+
 public class PersistentDataHolderArgumentType implements CommandArgumentType<IPersistentDataHolder> {
 
     public static final PersistentDataHolderArgumentType INSTANCE = new PersistentDataHolderArgumentType();
@@ -75,4 +78,11 @@ public class PersistentDataHolderArgumentType implements CommandArgumentType<IPe
 
         return persistentDataHolder;
     }
+
+    @Override
+    public List<String> getSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
+        reader.read();
+        return Collections.emptyList();
+    }
+
 }

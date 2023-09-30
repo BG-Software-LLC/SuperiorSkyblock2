@@ -8,6 +8,8 @@ import com.bgsoftware.superiorskyblock.api.commands.arguments.ArgumentsReader;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentType;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.BiPredicate;
 
 public class IntArgumentType implements CommandArgumentType<Integer> {
@@ -47,6 +49,12 @@ public class IntArgumentType implements CommandArgumentType<Integer> {
         }
 
         return i;
+    }
+
+    @Override
+    public List<String> getSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
+        reader.read(); // skip argument
+        return Collections.emptyList();
     }
 
     private interface Filter extends BiPredicate<CommandContext, Integer> {
