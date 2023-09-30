@@ -2,16 +2,17 @@ package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.CommandSyntaxException;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.api.commands.arguments.ArgumentsReader;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgument;
 import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.commands.InternalSuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.SubCommandsHandler;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
-import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArrayArgumentType;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
@@ -30,8 +31,8 @@ public class CmdAdmin implements InternalSuperiorCommand {
     private static final String ADMIN_LABEL = plugin.getCommands().getLabel() + " admin";
 
 
-    private final SubCommandsHandler commandsHandler = new SubCommandsHandler(
-            ADMIN_LABEL, plugin.getCommands().getAdminCommandsMap(), CmdAdmin::handleUnknownCommand);
+    private final SubCommandsHandler commandsHandler = new SubCommandsHandler(ADMIN_LABEL,
+            plugin.getCommands().getAdminCommandsMap(), CmdAdmin::handleUnknownCommand);
 
     @Override
     public List<String> getAliases() {
@@ -46,8 +47,7 @@ public class CmdAdmin implements InternalSuperiorCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArgument.optional("sub-command", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_PAGE))
-                .add(CommandArgument.optional("args", StringArgumentType.MULTIPLE))
+                .add(CommandArgument.optional("args", StringArrayArgumentType.withSuggestions(this::handleSuggestions), Message.COMMAND_ARGUMENT_PAGE))
                 .build();
     }
 
@@ -63,19 +63,27 @@ public class CmdAdmin implements InternalSuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandContext context) throws CommandSyntaxException {
-        String subCommandName = context.getOptionalArgument("sub-command", String.class).orElse(null);
-        String[] args = context.getOptionalArgument("args", String.class).map(s -> s.split(" ")).orElse(EMPTY_ARGS);
+        String[] args = context.getOptionalArgument("args", String[].class).orElse(EMPTY_ARGS);
 
-        if (subCommandName != null) {
-            commandsHandler.execute(plugin, context.getDispatcher(), subCommandName, args);
+        if (args.length == 0) {
+            handleUnknownCommand(plugin, context.getDispatcher(), null, ArgumentsReader.EMPTY);
             return;
         }
 
-        handleUnknownCommand(plugin, context.getDispatcher(), null, args);
+        String subCommandName = args[0];
+        ArgumentsReader subCommandArgs = new ArgumentsReader(args);
+        subCommandArgs.setCursor(1);
+
+        this.commandsHandler.execute(plugin, context.getDispatcher(), subCommandName, subCommandArgs);
+    }
+
+    private List<String> handleSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
+        String subCommandName = reader.hasNext() ? reader.read() : null;
+        return this.commandsHandler.tabComplete((SuperiorSkyblockPlugin) plugin, context.getDispatcher(), subCommandName, reader);
     }
 
     private static void handleUnknownCommand(SuperiorSkyblockPlugin plugin, CommandSender dispatcher,
-                                             @Nullable String subCommandName, String[] unused) {
+                                             @Nullable String subCommandName, ArgumentsReader unused) {
         Locale locale = PlayerLocales.getLocale(dispatcher);
 
         int page = 1;
@@ -92,9 +100,7 @@ public class CmdAdmin implements InternalSuperiorCommand {
             return;
         }
 
-        List<SuperiorCommand> subCommands = new SequentialListBuilder<SuperiorCommand>()
-                .filter(subCommand -> subCommand.getPermission().isEmpty() || dispatcher.hasPermission(subCommand.getPermission()))
-                .build(plugin.getCommands().getAdminSubCommands());
+        List<SuperiorCommand> subCommands = new SequentialListBuilder<SuperiorCommand>().filter(subCommand -> subCommand.getPermission().isEmpty() || dispatcher.hasPermission(subCommand.getPermission())).build(plugin.getCommands().getAdminSubCommands());
 
         if (subCommands.isEmpty()) {
             Message.NO_COMMAND_PERMISSION.send(dispatcher, locale);
@@ -118,15 +124,12 @@ public class CmdAdmin implements InternalSuperiorCommand {
                 String description = subCommand.getDescription(locale);
                 if (description == null)
                     new NullPointerException("The description of the command " + subCommand.getAliases().get(0) + " is null.").printStackTrace();
-                Message.ADMIN_HELP_LINE.send(dispatcher, locale, ADMIN_LABEL + " " +
-                        CommandsHelper.getCommandUsage(subCommand, locale), description);
+                Message.ADMIN_HELP_LINE.send(dispatcher, locale, ADMIN_LABEL + " " + CommandsHelper.getCommandUsage(subCommand, locale), description);
             }
         }
 
-        if (page != lastPage)
-            Message.ADMIN_HELP_NEXT_PAGE.send(dispatcher, locale, page + 1);
-        else
-            Message.ADMIN_HELP_FOOTER.send(dispatcher, locale);
+        if (page != lastPage) Message.ADMIN_HELP_NEXT_PAGE.send(dispatcher, locale, page + 1);
+        else Message.ADMIN_HELP_FOOTER.send(dispatcher, locale);
     }
 
 }

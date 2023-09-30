@@ -9,6 +9,10 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
 public class IslandWarpArgumentType implements CommandArgumentType<IslandWarp> {
 
     public static final IslandWarpArgumentType INSTANCE = new IslandWarpArgumentType();
@@ -32,6 +36,23 @@ public class IslandWarpArgumentType implements CommandArgumentType<IslandWarp> {
         }
 
         return islandWarp;
+    }
+
+    @Override
+    public List<String> getSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
+        String argument = reader.read().toLowerCase(Locale.ENGLISH);
+
+        Island island = context.getRequiredArgument("island", IslandArgumentType.Result.class).getIsland();
+
+        List<String> suggestions = new LinkedList<>();
+
+        for (String islandWarpName : island.getIslandWarps().keySet()) {
+            islandWarpName = islandWarpName.toLowerCase(Locale.ENGLISH);
+            if (islandWarpName.contains(argument))
+                suggestions.add(islandWarpName);
+        }
+
+        return suggestions;
     }
 
 }

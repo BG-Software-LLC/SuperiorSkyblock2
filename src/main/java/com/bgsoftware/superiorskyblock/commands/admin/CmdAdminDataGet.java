@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.commands.InternalPersistentDataCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.EnumArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.PersistentDataHolderArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
 import com.bgsoftware.superiorskyblock.commands.context.PersistentDataHolderCommandContext;
@@ -46,7 +47,7 @@ public class CmdAdminDataGet implements InternalPersistentDataCommand {
     @Override
     public List<CommandArgument<?>> getArguments() {
         return new CommandArgumentsBuilder()
-                .add(CommandArgument.required("holder-type", StringArgumentType.INSTANCE, "player/island"))
+                .add(CommandArgument.required("holder-type", EnumArgumentType.DATA_HOLDER, "player/island"))
                 .add(CommandArgument.required("holder", PersistentDataHolderArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_PLAYER_NAME, Message.COMMAND_ARGUMENT_ISLAND_NAME))
                 .add(CommandArgument.optional("path", StringArgumentType.INSTANCE, Message.COMMAND_ARGUMENT_PATH))
                 .build();

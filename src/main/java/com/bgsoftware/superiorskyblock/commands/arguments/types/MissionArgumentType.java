@@ -4,11 +4,13 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.CommandSyntaxException;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.ArgumentsReader;
-import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentType;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 
-public class MissionArgumentType implements CommandArgumentType<Mission<?>> {
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
+public class MissionArgumentType extends AbstractMissionArgumentType<Mission<?>> {
 
     public static final MissionArgumentType INSTANCE = new MissionArgumentType();
 
@@ -19,15 +21,14 @@ public class MissionArgumentType implements CommandArgumentType<Mission<?>> {
     @Override
     public Mission<?> parse(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
         String argument = reader.read();
+        return parseMission(plugin, context, argument);
+    }
 
-        Mission<?> mission = plugin.getMissions().getMission(argument);
-
-        if (mission == null) {
-            Message.INVALID_MISSION.send(context.getDispatcher(), argument);
-            throw new CommandSyntaxException("Invalid mission: " + argument);
-        }
-
-        return mission;
+    @Override
+    public List<String> getSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
+        String argument = reader.read().toLowerCase(Locale.ENGLISH);
+        List<String> suggestions = new LinkedList<>();
+        return getMissionSuggestions(plugin, argument, suggestions);
     }
 
 }

@@ -8,6 +8,8 @@ import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentTyp
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
 
 public class BigDecimalArgumentType implements CommandArgumentType<BigDecimal> {
 
@@ -30,6 +32,12 @@ public class BigDecimalArgumentType implements CommandArgumentType<BigDecimal> {
             this.invalidMessage.send(context.getDispatcher());
             throw new CommandSyntaxException("Invalid big decimal: " + argument);
         }
+    }
+
+    @Override
+    public List<String> getSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
+        reader.read(); // skip argument
+        return Collections.emptyList();
     }
 
 }

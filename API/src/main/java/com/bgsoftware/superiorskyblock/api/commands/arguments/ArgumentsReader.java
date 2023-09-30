@@ -4,6 +4,8 @@ import com.bgsoftware.superiorskyblock.api.commands.CommandSyntaxException;
 
 public class ArgumentsReader {
 
+    public static final ArgumentsReader EMPTY = new ArgumentsReader(new String[0]);
+
     private final String[] args;
     private int cursor;
 
@@ -28,6 +30,10 @@ public class ArgumentsReader {
 
     public void setCursor(int cursor) {
         this.cursor = cursor;
+    }
+
+    public String[] getRaw() {
+        return this.args;
     }
 
 }

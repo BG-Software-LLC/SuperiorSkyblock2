@@ -10,6 +10,8 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 
 public class IslandFlagArgumentType implements CommandArgumentType<IslandFlag> {
@@ -35,6 +37,21 @@ public class IslandFlagArgumentType implements CommandArgumentType<IslandFlag> {
         }
 
         return islandFlag;
+    }
+
+    @Override
+    public List<String> getSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
+        String argument = reader.read().toLowerCase(Locale.ENGLISH);
+
+        List<String> suggestions = new LinkedList<>();
+
+        for (IslandFlag islandFlag : IslandFlag.values()) {
+            String islandFlagName = islandFlag.getName().toLowerCase(Locale.ENGLISH);
+            if (islandFlagName.contains(argument))
+                suggestions.add(islandFlagName);
+        }
+
+        return suggestions;
     }
 
 }

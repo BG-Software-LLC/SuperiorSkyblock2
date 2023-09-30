@@ -8,6 +8,8 @@ import com.bgsoftware.superiorskyblock.api.commands.arguments.ArgumentsReader;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentType;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 
 public class DoubleArgumentType implements CommandArgumentType<Double> {
@@ -40,6 +42,12 @@ public class DoubleArgumentType implements CommandArgumentType<Double> {
             i = this.transformer.apply(i);
 
         return i;
+    }
+
+    @Override
+    public List<String> getSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
+        reader.read(); // skip argument
+        return Collections.emptyList();
     }
 
     private interface Transformer extends Function<Double, Double> {

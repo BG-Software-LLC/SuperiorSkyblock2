@@ -7,6 +7,9 @@ import com.bgsoftware.superiorskyblock.api.commands.arguments.ArgumentsReader;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentType;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 
+import java.util.Collections;
+import java.util.List;
+
 public class StringArgumentType implements CommandArgumentType<String> {
 
     public static final StringArgumentType INSTANCE = new StringArgumentType(false, false);
@@ -30,6 +33,16 @@ public class StringArgumentType implements CommandArgumentType<String> {
             argument.append(" ").append(reader.read());
 
         return this.isColorize ? Formatters.COLOR_FORMATTER.format(argument.toString()) : argument.toString();
+    }
+
+    @Override
+    public List<String> getSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
+        reader.read(); // skip argument
+
+        while (this.isMultiple && reader.hasNext())
+            reader.read(); // skip argument
+
+        return Collections.emptyList();
     }
 
 }

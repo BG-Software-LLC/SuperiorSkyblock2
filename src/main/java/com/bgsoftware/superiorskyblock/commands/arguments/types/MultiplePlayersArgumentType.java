@@ -5,25 +5,22 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.commands.CommandContext;
 import com.bgsoftware.superiorskyblock.api.commands.CommandSyntaxException;
 import com.bgsoftware.superiorskyblock.api.commands.arguments.ArgumentsReader;
-import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandSuggestions;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.Locale;
 
-public class MultiplePlayersArgumentType implements CommandArgumentType<List<SuperiorPlayer>> {
+public class MultiplePlayersArgumentType extends AbstractPlayerArgumentType<List<SuperiorPlayer>> {
 
     public static final MultiplePlayersArgumentType ALL_PLAYERS = new MultiplePlayersArgumentType(null);
     public static final MultiplePlayersArgumentType ONLINE_PLAYERS = new MultiplePlayersArgumentType(SuperiorPlayer::isOnline);
 
-    @Nullable
-    private final PlayerSelector selector;
-
     private MultiplePlayersArgumentType(@Nullable PlayerSelector selector) {
-        this.selector = selector;
+        super(selector);
     }
 
     @Override
@@ -36,18 +33,19 @@ public class MultiplePlayersArgumentType implements CommandArgumentType<List<Sup
                     .build(plugin.getPlayers().getAllPlayers());
         }
 
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(name);
-
-        if (targetPlayer == null || (this.selector != null && !this.selector.test(targetPlayer))) {
-            Message.INVALID_PLAYER.send(context.getDispatcher(), name);
-            throw new CommandSyntaxException("Invalid player");
-        }
-
-        return Collections.singletonList(targetPlayer);
+        return Collections.singletonList(parsePlayer(plugin, context, name));
     }
 
-    public interface PlayerSelector extends Predicate<SuperiorPlayer> {
+    @Override
+    public List<String> getSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
+        String argument = reader.read().toLowerCase(Locale.ENGLISH);
 
+        List<String> suggestions = new LinkedList<>();
+
+        if ("*".contains(argument))
+            suggestions.add("*");
+
+        return CommandSuggestions.getPlayerSuggestions(plugin, argument, this.selector, suggestions);
     }
 
 }

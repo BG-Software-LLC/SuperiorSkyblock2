@@ -9,6 +9,10 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
 public class WorldArgumentType implements CommandArgumentType<World> {
 
     public static final WorldArgumentType INSTANCE = new WorldArgumentType();
@@ -25,6 +29,21 @@ public class WorldArgumentType implements CommandArgumentType<World> {
         }
 
         return world;
+    }
+
+    @Override
+    public List<String> getSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
+        String argumentWorld = reader.read().toLowerCase(Locale.ENGLISH);
+
+        List<String> suggestions = new LinkedList<>();
+
+        for (World world : Bukkit.getWorlds()) {
+            String worldName = world.getName();
+            if (worldName.toLowerCase(Locale.ENGLISH).contains(argumentWorld))
+                suggestions.add(worldName);
+        }
+
+        return suggestions;
     }
 
 }

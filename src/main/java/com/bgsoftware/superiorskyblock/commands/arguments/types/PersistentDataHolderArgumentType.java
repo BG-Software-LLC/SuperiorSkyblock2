@@ -8,8 +8,13 @@ import com.bgsoftware.superiorskyblock.api.commands.arguments.CommandArgumentTyp
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandSuggestions;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 public class PersistentDataHolderArgumentType implements CommandArgumentType<IPersistentDataHolder> {
 
@@ -19,60 +24,101 @@ public class PersistentDataHolderArgumentType implements CommandArgumentType<IPe
 
     }
 
+    public enum HolderType {
+
+        PLAYER,
+        ISLAND
+
+    }
+
     @Override
     public IPersistentDataHolder parse(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
         String name = reader.read();
 
-        String holderType = context.getRequiredArgument("holder-type", String.class);
+        HolderType holderType = context.getOptionalArgument("holder-type", HolderType.class).orElse(null);
+
+        if (holderType == null) {
+            throw new CommandSyntaxException("Unknown type: " + context.getInputArgument("holder-type"));
+        }
 
         IPersistentDataHolder persistentDataHolder;
 
-        if (holderType.equalsIgnoreCase("player")) {
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(name);
-            if (superiorPlayer == null) {
-                if (name.equalsIgnoreCase(context.getDispatcher().getName())) {
-                    Message.INVALID_ISLAND.send(context.getDispatcher());
-                } else {
-                    Message.INVALID_ISLAND_OTHER.send(context.getDispatcher(), name);
-                }
-
-                throw new CommandSyntaxException("Invalid player");
-            }
-
-            persistentDataHolder = superiorPlayer;
-        } else if (holderType.equalsIgnoreCase("island")) {
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(name);
-            if (superiorPlayer != null) {
-                Island island = superiorPlayer.getIsland();
-                if (island == null) {
+        switch (holderType) {
+            case PLAYER: {
+                SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(name);
+                if (superiorPlayer == null) {
                     if (name.equalsIgnoreCase(context.getDispatcher().getName())) {
                         Message.INVALID_ISLAND.send(context.getDispatcher());
                     } else {
-                        Message.INVALID_ISLAND_OTHER.send(context.getDispatcher(), superiorPlayer.getName());
+                        Message.INVALID_ISLAND_OTHER.send(context.getDispatcher(), name);
                     }
 
-                    throw new CommandSyntaxException("Missing island");
+                    throw new CommandSyntaxException("Invalid player");
                 }
 
                 persistentDataHolder = superiorPlayer;
-            } else {
-                Island island = plugin.getGrid().getIsland(name);
-                if (island == null) {
-                    if (name.equalsIgnoreCase(context.getDispatcher().getName())) {
-                        Message.INVALID_ISLAND.send(context.getDispatcher());
-                    } else {
-                        Message.INVALID_ISLAND_OTHER_NAME.send(context.getDispatcher(), Formatters.STRIP_COLOR_FORMATTER.format(name));
+                break;
+            }
+            case ISLAND: {
+                SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(name);
+                if (superiorPlayer != null) {
+                    Island island = superiorPlayer.getIsland();
+                    if (island == null) {
+                        if (name.equalsIgnoreCase(context.getDispatcher().getName())) {
+                            Message.INVALID_ISLAND.send(context.getDispatcher());
+                        } else {
+                            Message.INVALID_ISLAND_OTHER.send(context.getDispatcher(), superiorPlayer.getName());
+                        }
+
+                        throw new CommandSyntaxException("Missing island");
                     }
 
-                    throw new CommandSyntaxException("Missing island");
+                    persistentDataHolder = superiorPlayer;
+                } else {
+                    Island island = plugin.getGrid().getIsland(name);
+                    if (island == null) {
+                        if (name.equalsIgnoreCase(context.getDispatcher().getName())) {
+                            Message.INVALID_ISLAND.send(context.getDispatcher());
+                        } else {
+                            Message.INVALID_ISLAND_OTHER_NAME.send(context.getDispatcher(), Formatters.STRIP_COLOR_FORMATTER.format(name));
+                        }
+
+                        throw new CommandSyntaxException("Missing island");
+                    }
+
+                    persistentDataHolder = island;
                 }
 
-                persistentDataHolder = island;
+                break;
             }
-        } else {
-            throw new CommandSyntaxException("Unknown type: " + holderType);
+
+            default:
+                throw new AssertionError();
         }
 
         return persistentDataHolder;
     }
+
+    @Override
+    public List<String> getSuggestions(SuperiorSkyblock plugin, CommandContext context, ArgumentsReader reader) throws CommandSyntaxException {
+        String name = reader.read();
+
+        HolderType holderType = context.getOptionalArgument("holder-type", HolderType.class).orElse(null);
+
+        if (holderType == null)
+            return Collections.emptyList();
+
+        List<String> suggestions = new LinkedList<>();
+
+        switch (holderType) {
+            case ISLAND:
+                CommandSuggestions.getIslandSuggestions(plugin, name, null, suggestions);
+                return CommandSuggestions.getPlayerSuggestions(plugin, name, SuperiorPlayer::hasIsland, suggestions);
+            case PLAYER:
+                return CommandSuggestions.getPlayerSuggestions(plugin, name, null, suggestions);
+        }
+
+        return suggestions;
+    }
+
 }

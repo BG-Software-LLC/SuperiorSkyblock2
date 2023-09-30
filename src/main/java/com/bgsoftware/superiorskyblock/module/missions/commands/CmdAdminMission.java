@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.InternalPlayerCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArgumentsBuilder;
-import com.bgsoftware.superiorskyblock.commands.arguments.types.MissionArgumentType;
+import com.bgsoftware.superiorskyblock.commands.arguments.types.MultipleMissionsArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.PlayerArgumentType;
 import com.bgsoftware.superiorskyblock.commands.arguments.types.StringArgumentType;
 import com.bgsoftware.superiorskyblock.commands.context.PlayerCommandContext;
@@ -41,7 +41,7 @@ public class CmdAdminMission implements InternalPlayerCommand {
         return new CommandArgumentsBuilder()
                 .add(CommandArgument.required("player", PlayerArgumentType.ALL_PLAYERS, Message.COMMAND_ARGUMENT_PLAYER_NAME))
                 .add(CommandArgument.required("action", StringArgumentType.INSTANCE, "complete/reset"))
-                .add(CommandArgument.required("mission", MissionArgumentType.INSTANCE, "all", Message.COMMAND_ARGUMENT_MISSION_NAME))
+                .add(CommandArgument.required("missions", MultipleMissionsArgumentType.INSTANCE, "all", Message.COMMAND_ARGUMENT_MISSION_NAME))
                 .build();
     }
 
@@ -60,7 +60,7 @@ public class CmdAdminMission implements InternalPlayerCommand {
         CommandSender dispatcher = context.getDispatcher();
 
         SuperiorPlayer targetPlayer = context.getSuperiorPlayer();
-        List<Mission<?>> missions = context.getRequiredArgument("mission", List.class);
+        List<Mission<?>> missions = context.getRequiredArgument("missions", List.class);
         String action = context.getRequiredArgument("action", String.class);
 
         if (action.equalsIgnoreCase("complete")) {
