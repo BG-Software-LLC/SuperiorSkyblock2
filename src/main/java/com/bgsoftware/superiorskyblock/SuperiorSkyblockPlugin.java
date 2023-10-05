@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.dependencies.DependenciesManager;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
@@ -95,29 +96,19 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     /* Managers */
     private final DataManager dataHandler = new DataManager(this);
     private final FactoriesManagerImpl factoriesHandler = new FactoriesManagerImpl();
-    private final GridManagerImpl gridHandler = new GridManagerImpl(this,
-            new DefaultIslandsPurger(), new DefaultIslandPreviews());
-    private final StackedBlocksManagerImpl stackedBlocksHandler = new StackedBlocksManagerImpl(this,
-            new DefaultStackedBlocksContainer());
-    private final BlockValuesManagerImpl blockValuesHandler = new BlockValuesManagerImpl(this,
-            new BlockWorthValuesContainer(), new BlockLevelsContainer(),
-            new GeneralBlockValuesContainer(), new GeneralBlockValuesContainer());
-    private final SchematicsManagerImpl schematicsHandler = new SchematicsManagerImpl(this,
-            new DefaultSchematicsContainer());
+    private final GridManagerImpl gridHandler = new GridManagerImpl(this, new DefaultIslandsPurger(), new DefaultIslandPreviews());
+    private final StackedBlocksManagerImpl stackedBlocksHandler = new StackedBlocksManagerImpl(this, new DefaultStackedBlocksContainer());
+    private final BlockValuesManagerImpl blockValuesHandler = new BlockValuesManagerImpl(this, new BlockWorthValuesContainer(), new BlockLevelsContainer(), new GeneralBlockValuesContainer(), new GeneralBlockValuesContainer());
+    private final SchematicsManagerImpl schematicsHandler = new SchematicsManagerImpl(this, new DefaultSchematicsContainer());
     private final PlayersManagerImpl playersHandler = new PlayersManagerImpl(this);
-    private final RolesManagerImpl rolesHandler = new RolesManagerImpl(this,
-            new DefaultRolesContainer());
-    private final MissionsManagerImpl missionsHandler = new MissionsManagerImpl(this,
-            new DefaultMissionsContainer());
+    private final RolesManagerImpl rolesHandler = new RolesManagerImpl(this, new DefaultRolesContainer());
+    private final MissionsManagerImpl missionsHandler = new MissionsManagerImpl(this, new DefaultMissionsContainer());
     private final MenusManagerImpl menusHandler = new MenusManagerImpl(this);
     private final KeysManagerImpl keysHandler = new KeysManagerImpl(this);
     private final ProvidersManagerImpl providersHandler = new ProvidersManagerImpl(this);
-    private final UpgradesManagerImpl upgradesHandler = new UpgradesManagerImpl(this,
-            new DefaultUpgradesContainer());
-    private final CommandsManagerImpl commandsHandler = new CommandsManagerImpl(this,
-            new PlayerCommandsMap(this), new AdminCommandsMap(this));
-    private final ModulesManagerImpl modulesHandler = new ModulesManagerImpl(this,
-            new DefaultModulesContainer(this));
+    private final UpgradesManagerImpl upgradesHandler = new UpgradesManagerImpl(this, new DefaultUpgradesContainer());
+    private final CommandsManagerImpl commandsHandler = new CommandsManagerImpl(this, new PlayerCommandsMap(this), new AdminCommandsMap(this));
+    private final ModulesManagerImpl modulesHandler = new ModulesManagerImpl(this, new DefaultModulesContainer(this));
     private final ServicesHandler servicesHandler = new ServicesHandler(this);
     private final SettingsManagerImpl settingsHandler = new SettingsManagerImpl(this);
 
@@ -153,7 +144,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     public void onLoad() {
         plugin = this;
 
-        new Metrics(this, 4119);
+        DependenciesManager.inject(this);
 
         bukkitListeners.registerListenerFailureFilter();
 
@@ -183,6 +174,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         }
 
         this.servicesHandler.loadDefaultServices(this);
+
+        new Metrics(this, 4119);
     }
 
     @Override
@@ -190,8 +183,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         try {
             if (SuperiorSkyblockAPI.getSuperiorSkyblock() == null) {
                 shouldEnable = false;
-                ManagerLoadException.handle(new ManagerLoadException("The API instance was not initialized properly. Contact Ome_R regarding this!",
-                        ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN));
+                ManagerLoadException.handle(new ManagerLoadException("The API instance was not initialized properly. Contact Ome_R regarding this!", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN));
                 return;
             }
 
@@ -245,8 +237,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 bukkitListeners.registerListeners();
             } catch (RuntimeException ex) {
                 shouldEnable = false;
-                ManagerLoadException handlerError = new ManagerLoadException("Cannot load plugin due to a missing event: " + ex.getMessage() + " - contact @Ome_R!",
-                        ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+                ManagerLoadException handlerError = new ManagerLoadException("Cannot load plugin due to a missing event: " + ex.getMessage() + " - contact @Ome_R!", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
                 Log.error(handlerError, "An error occurred while registering listeners:");
                 Bukkit.shutdown();
                 return;
@@ -265,8 +256,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             // Calculate the maximum amount of islands that fit into the world.
             if (calculateMaxPossibleIslands() < 1000) {
-                Log.warn("It seems like you configured your max-world-size in server.properties to be a small number (",
-                        nmsAlgorithms.getMaxWorldSize(), ").");
+                Log.warn("It seems like you configured your max-world-size in server.properties to be a small number (", nmsAlgorithms.getMaxWorldSize(), ").");
                 Log.warn("This can lead to weird behaviors when new islands are generated beyond this limit.");
                 Log.warn("Increase the value to for better experience (Default: 29999984)");
             }
@@ -287,11 +277,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                         }
                     }
 
-                    if (playerIsland != null)
-                        playerIsland.setCurrentlyActive(true);
+                    if (playerIsland != null) playerIsland.setCurrentlyActive(true);
 
-                    if (island != null)
-                        island.setPlayerInside(superiorPlayer, true);
+                    if (island != null) island.setPlayerInside(superiorPlayer, true);
                 }
             }, 1L);
 
@@ -308,8 +296,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     public void onDisable() {
         BukkitExecutor.prepareDisable();
 
-        if (!shouldEnable)
-            return;
+        if (!shouldEnable) return;
 
         ChunksProvider.stop();
 
@@ -346,8 +333,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             Log.info("Shutting down calculation task...");
             CalcTask.cancelTask();
 
-            if (nmsChunks != null)
-                nmsChunks.shutdown();
+            if (nmsChunks != null) nmsChunks.shutdown();
 
             Log.info("Shutting down executor");
             BukkitExecutor.close();
@@ -378,16 +364,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             ReflectMethod<Integer> getDataVersion = new ReflectMethod<>(UnsafeValues.class, "getDataVersion");
             int dataVersion = getDataVersion.invoke(Bukkit.getUnsafe());
 
-            List<Pair<Integer, String>> versions = Arrays.asList(
-                    new Pair<>(2729, null),
-                    new Pair<>(2730, "v1_17"),
-                    new Pair<>(2974, null),
-                    new Pair<>(2975, "v1_18"),
-                    new Pair<>(3336, null),
-                    new Pair<>(3337, "v1_19"),
-                    new Pair<>(3465, "v1_20_1"),
-                    new Pair<>(3578, "v1_20_2")
-            );
+            List<Pair<Integer, String>> versions = Arrays.asList(new Pair<>(2729, null), new Pair<>(2730, "v1_17"), new Pair<>(2974, null), new Pair<>(2975, "v1_18"), new Pair<>(3336, null), new Pair<>(3337, "v1_19"), new Pair<>(3465, "v1_20_1"), new Pair<>(3578, "v1_20_2"));
 
             for (Pair<Integer, String> versionData : versions) {
                 if (dataVersion <= versionData.getKey()) {
@@ -416,10 +393,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             }
         }
 
-        new ManagerLoadException(
-                "The plugin doesn't support your minecraft version.\n" +
-                        "Please try a different version.",
-                ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
+        new ManagerLoadException("The plugin doesn't support your minecraft version.\n" + "Please try a different version.", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
 
         return false;
     }
@@ -469,8 +443,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                                 if (constructor.getParameterCount() == 0) {
                                     worldGenerator = (ChunkGenerator) generatorClass.newInstance();
                                     return;
-                                } else if (constructor.getParameterTypes()[0].equals(JavaPlugin.class) ||
-                                        constructor.getParameterTypes()[0].equals(SuperiorSkyblock.class)) {
+                                } else if (constructor.getParameterTypes()[0].equals(JavaPlugin.class) || constructor.getParameterTypes()[0].equals(SuperiorSkyblock.class)) {
                                     worldGenerator = (ChunkGenerator) constructor.newInstance(this);
                                     return;
                                 }
@@ -510,14 +483,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         }
 
         if (!checkScriptEngine()) {
-            throw new ManagerLoadException(
-                    "It seems like the script engine of the plugin is corrupted.\n" +
-                            "This may occur by one of the following reasons:\n" +
-                            "1. You have a module/plugin that sets a custom script that doesn't work well.\n" +
-                            "2. You're using Java 16 without installing an external module engine.\n" +
-                            "If that's the case, check out the following link:\n" +
-                            "https://github.com/BG-Software-LLC/SuperiorSkyblock2-NashornEngine",
-                    ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+            throw new ManagerLoadException("It seems like the script engine of the plugin is corrupted.\n" + "This may occur by one of the following reasons:\n" + "1. You have a module/plugin that sets a custom script that doesn't work well.\n" + "2. You're using Java 16 without installing an external module engine.\n" + "If that's the case, check out the following link:\n" + "https://github.com/BG-Software-LLC/SuperiorSkyblock2-NashornEngine", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
 
         blockValuesHandler.loadData();
@@ -553,15 +519,13 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
                 Island island = gridHandler.getIslandAt(player.getLocation());
                 superiorPlayer.updateWorldBorder(island);
-                if (island != null)
-                    island.applyEffects(superiorPlayer);
+                if (island != null) island.applyEffects(superiorPlayer);
             }
         });
 
         CalcTask.startTask();
 
-        if (!loadGrid)
-            modulesHandler.reloadModules(ModuleLoadTime.AFTER_HANDLERS_LOADING);
+        if (!loadGrid) modulesHandler.reloadModules(ModuleLoadTime.AFTER_HANDLERS_LOADING);
     }
 
     @Override
@@ -652,8 +616,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     @Override
     @Deprecated
     public WorldEventsManager getWorldEventsManager() {
-        if (this.worldEventsManager == null)
-            this.worldEventsManager = new WorldEventsManagerImpl(this);
+        if (this.worldEventsManager == null) this.worldEventsManager = new WorldEventsManagerImpl(this);
 
         return this.worldEventsManager;
     }
@@ -683,8 +646,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     public NMSDragonFight getNMSDragonFight() {
         if (nmsDragonFight == null) {
             try {
-                nmsDragonFight = settingsHandler.getWorlds().getEnd().isDragonFight() ?
-                        loadNMSClass("NMSDragonFightImpl", nmsPackageVersion) : new NMSDragonFightImpl();
+                nmsDragonFight = settingsHandler.getWorlds().getEnd().isDragonFight() ? loadNMSClass("NMSDragonFightImpl", nmsPackageVersion) : new NMSDragonFightImpl();
             } catch (Exception error) {
                 nmsDragonFight = new NMSDragonFightImpl();
             }
