@@ -57,6 +57,13 @@ public interface PagedMenuLayout<V extends MenuView<V, ?>> extends MenuLayout<V>
         Builder<V, E> setPagedObjectSlots(List<Integer> slots, PagedMenuTemplateButton.Builder<V, E> buttonBuilder);
 
         /**
+         * Set a custom order for the paged objects for this layout.
+         *
+         * @param slotsOrder The correct order of the slots
+         */
+        Builder<V, E> setCustomLayoutOrder(List<Integer> slotsOrder);
+
+        /**
          * Get the {@link PagedMenuLayout} from this builder.
          */
         @Override

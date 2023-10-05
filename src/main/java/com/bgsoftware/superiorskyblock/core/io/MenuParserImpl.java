@@ -156,6 +156,9 @@ public class MenuParserImpl implements MenuParser {
         menuLayoutBuilder.setNextPageSlots(parseButtonSlots(cfg, "next-page", menuPatternSlots));
         menuLayoutBuilder.setPagedObjectSlots(parseButtonSlots(cfg, "slots", menuPatternSlots), pagedButtonBuilder);
 
+        if (cfg.isList("custom-order"))
+            menuLayoutBuilder.setCustomLayoutOrder(cfg.getIntegerList("custom-order"));
+
         boolean previousMoveAllowed = cfg.getBoolean("previous-menu", true);
         boolean skipOneItem = cfg.getBoolean("skip-one-item", false);
         GameSound openingSound = getSound(cfg.getConfigurationSection("open-sound"));
