@@ -418,4 +418,11 @@ public interface GridManager extends IDatabaseBridgeHolder {
      */
     IslandsContainer getIslandsContainer();
 
+    /**
+     * Set a new islands container.
+     *
+     * @param islandsContainer The new islands container to set.
+     */
+    void setIslandsContainer(IslandsContainer islandsContainer);
+
 }

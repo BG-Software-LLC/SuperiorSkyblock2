@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.island;
 
-import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
@@ -101,12 +100,6 @@ public class GridManagerImpl extends Manager implements GridManager {
         super(plugin);
         this.islandsPurger = islandsPurger;
         this.islandPreviews = islandPreviews;
-    }
-
-    public void setIslandsContainer(@NotNull IslandsContainer islandsContainer) {
-        this.islandsContainer = islandsContainer;
-        pendingSortingTypes.forEach(sortingType -> islandsContainer.addSortingType(sortingType, false));
-        pendingSortingTypes.clear();
     }
 
     @Override
@@ -752,6 +745,14 @@ public class GridManagerImpl extends Manager implements GridManager {
     @Override
     public IslandsContainer getIslandsContainer() {
         return this.islandsContainer;
+    }
+
+    @Override
+    public void setIslandsContainer(IslandsContainer islandsContainer) {
+        Preconditions.checkNotNull(islandsContainer, "islandsContainer parameter cannot be null");
+        this.islandsContainer = islandsContainer;
+        pendingSortingTypes.forEach(sortingType -> islandsContainer.addSortingType(sortingType, false));
+        pendingSortingTypes.clear();
     }
 
     @Override
