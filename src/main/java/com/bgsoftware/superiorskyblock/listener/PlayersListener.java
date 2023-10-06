@@ -1,7 +1,5 @@
 package com.bgsoftware.superiorskyblock.listener;
 
-import com.bgsoftware.common.annotations.NotNull;
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
@@ -292,6 +290,10 @@ public class PlayersListener implements Listener {
         SuperiorPlayer damagerPlayer = !(e instanceof EntityDamageByEntityEvent) ? null :
                 BukkitEntities.getPlayerSource(((EntityDamageByEntityEvent) e).getDamager())
                         .map(plugin.getPlayers()::getSuperiorPlayer).orElse(null);
+
+        // Some plugins, such as Sentinel, may actually cause a NPC to attack.
+        if (damagerPlayer instanceof SuperiorNPCPlayer)
+            return;
 
         if (damagerPlayer == null) {
             if (island != null) {

@@ -156,6 +156,9 @@ public class MenuParserImpl implements MenuParser {
         menuLayoutBuilder.setNextPageSlots(parseButtonSlots(cfg, "next-page", menuPatternSlots));
         menuLayoutBuilder.setPagedObjectSlots(parseButtonSlots(cfg, "slots", menuPatternSlots), pagedButtonBuilder);
 
+        if (cfg.isList("custom-order"))
+            menuLayoutBuilder.setCustomLayoutOrder(cfg.getIntegerList("custom-order"));
+
         boolean previousMoveAllowed = cfg.getBoolean("previous-menu", true);
         boolean skipOneItem = cfg.getBoolean("skip-one-item", false);
         GameSound openingSound = getSound(cfg.getConfigurationSection("open-sound"));
@@ -291,7 +294,7 @@ public class MenuParserImpl implements MenuParser {
             try {
                 String materialType = section.getString("type");
                 materialType = MinecraftNamesMapper.getMinecraftName(materialType)
-                        .flatMap(minecraftKey -> NAMES_MAPPER.get().getMappedName(Material.class, minecraftKey))
+                        .map(minecraftKey -> NAMES_MAPPER.get().getMappedName(Material.class, minecraftKey).orElse(minecraftKey))
                         .orElse(materialType);
                 if (materialType.contains(":")) {
                     String[] materialSections = materialType.toUpperCase(Locale.ENGLISH).split(":");
@@ -410,15 +413,18 @@ public class MenuParserImpl implements MenuParser {
     }
 
     private static <E extends Enum<E>> E getMinecraftEnum(Class<E> type, String name) throws IllegalArgumentException {
-        return MinecraftNamesMapper.getMinecraftName(name)
-                .flatMap(minecraftKey -> NAMES_MAPPER.get().mapName(type, minecraftKey))
-                .orElseGet(() -> Enum.valueOf(type, name.toUpperCase(Locale.ENGLISH)));
+        String mappedName = MinecraftNamesMapper.getMinecraftName(name)
+                .map(minecraftKey -> NAMES_MAPPER.get().getMappedName(type, minecraftKey).orElse(minecraftKey))
+                .orElse(name);
+
+        return Enum.valueOf(type, mappedName.toUpperCase(Locale.ENGLISH));
     }
 
     private static <T> T getMinecraftEnum(Class<T> type, String name, Function<String, T> enumCreator) throws IllegalArgumentException {
         String mappedName = MinecraftNamesMapper.getMinecraftName(name)
-                .flatMap(minecraftKey -> NAMES_MAPPER.get().getMappedName(type, minecraftKey))
+                .map(minecraftKey -> NAMES_MAPPER.get().getMappedName(type, minecraftKey).orElse(minecraftKey))
                 .orElse(name);
+
         return Optional.ofNullable(enumCreator.apply(mappedName.toUpperCase(Locale.ENGLISH)))
                 .orElseThrow(() -> new IllegalArgumentException("No enum constant " + type.getCanonicalName() + "." + name));
     }

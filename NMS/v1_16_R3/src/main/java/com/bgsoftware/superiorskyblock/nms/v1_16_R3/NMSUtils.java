@@ -18,6 +18,7 @@ import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.Chunk;
 import net.minecraft.server.v1_16_R3.ChunkConverter;
 import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
+import net.minecraft.server.v1_16_R3.ChunkProviderServer;
 import net.minecraft.server.v1_16_R3.ChunkSection;
 import net.minecraft.server.v1_16_R3.HeightMap;
 import net.minecraft.server.v1_16_R3.IBlockData;
@@ -48,6 +49,8 @@ public class NMSUtils {
             PlayerChunkMap.class, Map.class, "visibleChunks");
     private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(
             PlayerChunk.class, "a", Packet.class, boolean.class);
+    private static final ReflectMethod<Chunk> CHUNK_PROVIDER_SERVER_GET_CHUNK_IF_CACHED = new ReflectMethod<>(
+            ChunkProviderServer.class, "getChunkAtIfCachedImmediately", int.class, int.class);
 
     private static final List<CompletableFuture<Void>> PENDING_CHUNK_ACTIONS = new LinkedList<>();
 
@@ -96,19 +99,21 @@ public class NMSUtils {
                                                  boolean saveChunks, ChunkCallback chunkCallback) {
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
 
-        Iterator<ChunkCoordIntPair> chunksIterator = chunks.iterator();
-        while (chunksIterator.hasNext()) {
-            ChunkCoordIntPair chunkPos = chunksIterator.next();
-            Chunk cachedUnloadedChunk = worldServer.getChunkProvider().getChunkAtIfCachedImmediately(chunkPos.x, chunkPos.z);
-            if (cachedUnloadedChunk != null) {
-                chunkCallback.onLoadedChunk(cachedUnloadedChunk);
-                chunksIterator.remove();
+        if (CHUNK_PROVIDER_SERVER_GET_CHUNK_IF_CACHED.isValid()) {
+            Iterator<ChunkCoordIntPair> chunksIterator = chunks.iterator();
+            while (chunksIterator.hasNext()) {
+                ChunkCoordIntPair chunkPos = chunksIterator.next();
+                Chunk cachedUnloadedChunk = worldServer.getChunkProvider().getChunkAtIfCachedImmediately(chunkPos.x, chunkPos.z);
+                if (cachedUnloadedChunk != null) {
+                    chunkCallback.onLoadedChunk(cachedUnloadedChunk);
+                    chunksIterator.remove();
+                }
             }
-        }
 
-        if (chunks.isEmpty()) {
-            chunkCallback.onFinish();
-            return;
+            if (chunks.isEmpty()) {
+                chunkCallback.onFinish();
+                return;
+            }
         }
 
         CompletableFuture<Void> pendingTask = new CompletableFuture<>();

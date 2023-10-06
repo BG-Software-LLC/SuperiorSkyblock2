@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'SuperiorSkyblock'
-version = "2023.2"
+version = "2023.3"
 
 project.ext {
     archiveFolder = file("archive/")
@@ -34,8 +34,8 @@ allprojects {
             file.text.contains('Bukkit.broadcastMessage')
         }.getFiles()
 
-//        if (!filesWithDebug.isEmpty())
-//            throw new GradleException("Found debug messages: " + filesWithDebug)
+        if (!filesWithDebug.isEmpty())
+            throw new GradleException("Found debug messages: " + filesWithDebug)
     }
 
     build {
@@ -64,6 +64,7 @@ dependencies {
     implementation 'com.bgsoftware.common.reflection:ReflectionUtils:1.0.2'
     implementation 'com.bgsoftware.common.executors:Executors:1.0.1'
     implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:1.0.0'
+    implementation 'com.bgsoftware.common.dependencies:DependenciesManager:b1'
 
     implementation 'com.zaxxer:HikariCP:4.0.3'
     implementation 'org.slf4j:slf4j-api:2.0.5'

@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.player;
 
-import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
@@ -133,7 +132,9 @@ public class PlayersManagerImpl extends Manager implements PlayersManager {
         return this.playersContainer;
     }
 
-    public void setPlayersContainer(@NotNull PlayersContainer playersContainer) {
+    @Override
+    public void setPlayersContainer(PlayersContainer playersContainer) {
+        Preconditions.checkNotNull(playersContainer, "playersContainer parameter cannot be null");
         this.playersContainer = playersContainer;
     }
 

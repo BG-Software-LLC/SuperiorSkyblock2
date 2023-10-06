@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
@@ -376,11 +375,10 @@ public class ProtectionListener implements Listener {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handlePlayerEnderPearl(superiorPlayer, e.getTo());
 
-        if (interactionResult == InteractionResult.SUCCESS)
+        if (!ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             return;
 
         e.setCancelled(true);
-        Message.TELEPORT_OUTSIDE_ISLAND.send(superiorPlayer);
 
         if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
             BukkitItems.addItem(new ItemStack(Material.ENDER_PEARL), e.getPlayer().getInventory(),

@@ -136,6 +136,9 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                                                     Location destinationPortalLocation) {
         Island island = plugin.getGrid().getIslandAt(portalLocation);
 
+        if (island == null)
+            return EntityPortalResult.PORTAL_NOT_IN_ISLAND;
+
         EntityPortalResult entityPortalResult = simulateEntityPortalFromIsland(entity, island, portalLocation, portalType);
         if (entityPortalResult != EntityPortalResult.SUCCEED)
             return entityPortalResult;
