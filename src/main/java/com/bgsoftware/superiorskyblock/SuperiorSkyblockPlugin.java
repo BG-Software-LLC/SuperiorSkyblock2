@@ -209,11 +209,13 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             modulesHandler.loadData();
 
+            modulesHandler.runModuleLifecycle(ModuleLoadTime.PLUGIN_INITIALIZE, false);
+
             EventsBus.PluginInitializeResult eventResult = eventsBus.callPluginInitializeEvent(this);
             this.playersHandler.setPlayersContainer(Optional.ofNullable(eventResult.getPlayersContainer()).orElse(new DefaultPlayersContainer()));
             this.gridHandler.setIslandsContainer(Optional.ofNullable(eventResult.getIslandsContainer()).orElse(new DefaultIslandsContainer(this)));
 
-            modulesHandler.enableModules(ModuleLoadTime.BEFORE_WORLD_CREATION);
+            modulesHandler.runModuleLifecycle(ModuleLoadTime.BEFORE_WORLD_CREATION, false);
 
             try {
                 providersHandler.getWorldsProvider().prepareWorlds();
@@ -224,6 +226,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 Bukkit.shutdown();
                 return;
             }
+
+            modulesHandler.runModuleLifecycle(ModuleLoadTime.NORMAL, false);
 
             try {
                 reloadPlugin(true);
@@ -242,8 +246,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 Bukkit.shutdown();
                 return;
             }
-
-            modulesHandler.enableModules(ModuleLoadTime.AFTER_HANDLERS_LOADING);
 
             if (updater.isOutdated()) {
                 Log.info("");
@@ -473,13 +475,14 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     public void reloadPlugin(boolean loadGrid) throws ManagerLoadException {
         ItemSkulls.readTextures(this);
 
-        if (!loadGrid) {
-            modulesHandler.reloadModules(ModuleLoadTime.BEFORE_WORLD_CREATION);
-            settingsHandler.loadData();
-            modulesHandler.reloadModules(ModuleLoadTime.NORMAL);
-        } else {
+        if (loadGrid) {
             commandsHandler.loadData();
-            modulesHandler.enableModules(ModuleLoadTime.NORMAL);
+        } else {
+            settingsHandler.loadData();
+
+            modulesHandler.runModuleLifecycle(ModuleLoadTime.PLUGIN_INITIALIZE, true);
+            modulesHandler.runModuleLifecycle(ModuleLoadTime.BEFORE_WORLD_CREATION, true);
+            modulesHandler.runModuleLifecycle(ModuleLoadTime.NORMAL, true);
         }
 
         if (!checkScriptEngine()) {
@@ -509,10 +512,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             dataHandler.loadData();
             stackedBlocksHandler.loadData();
             modulesHandler.loadModulesData(this);
-            modulesHandler.enableModules(ModuleLoadTime.AFTER_MODULE_DATA_LOAD);
-        } else {
-            modulesHandler.reloadModules(ModuleLoadTime.AFTER_MODULE_DATA_LOAD);
         }
+
+        modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_MODULE_DATA_LOAD, !loadGrid);
 
         BukkitExecutor.sync(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -525,7 +527,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
         CalcTask.startTask();
 
-        if (!loadGrid) modulesHandler.reloadModules(ModuleLoadTime.AFTER_HANDLERS_LOADING);
+        modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_HANDLERS_LOADING, !loadGrid);
     }
 
     @Override

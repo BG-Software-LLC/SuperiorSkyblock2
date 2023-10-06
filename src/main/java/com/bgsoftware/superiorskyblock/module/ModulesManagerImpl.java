@@ -170,12 +170,22 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
     @Override
     public void enableModules(ModuleLoadTime moduleLoadTime) {
         Preconditions.checkNotNull(moduleLoadTime, "moduleLoadTime parameter cannot be null.");
-        filterModules(moduleLoadTime).forEach(this::enableModule);
     }
 
-    public void reloadModules(ModuleLoadTime moduleLoadTime) {
-        Preconditions.checkNotNull(moduleLoadTime, "moduleLoadTime parameter cannot be null.");
+    public void runModuleLifecycle(ModuleLoadTime moduleLoadTime, boolean isReload) {
+        if (isReload) {
+            reloadModulesInternal(moduleLoadTime);
+        } else {
+            enableModulesInternal(moduleLoadTime);
+        }
+    }
+
+    private void reloadModulesInternal(ModuleLoadTime moduleLoadTime) {
         filterModules(moduleLoadTime).forEach(this::reloadModuleInternal);
+    }
+
+    private void enableModulesInternal(ModuleLoadTime moduleLoadTime) {
+        filterModules(moduleLoadTime).forEach(this::enableModule);
     }
 
     private void reloadModuleInternal(PluginModule pluginModule) {
