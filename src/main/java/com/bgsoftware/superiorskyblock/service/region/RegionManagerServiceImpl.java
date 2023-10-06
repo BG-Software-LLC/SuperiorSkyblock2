@@ -345,17 +345,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         Island island = plugin.getGrid().getIslandAt(destination);
 
-        InteractionResult interactionResult = handleInteractionInternal(superiorPlayer, destination, island,
-                null, 0, true, false);
-
-        if (interactionResult != null)
-            return interactionResult;
-
-        if (island == null)
-            return InteractionResult.SUCCESS;
-
         return handleInteractionInternal(superiorPlayer, destination, island, IslandPrivileges.ENDER_PEARL,
-                0, false, false);
+                0, true, false);
     }
 
     @Override
