@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.key.types.CustomKey;
 import com.bgsoftware.superiorskyblock.core.key.types.EntityTypeKey;
@@ -67,7 +68,7 @@ public class Keys {
             CreatureSpawner creatureSpawner = (CreatureSpawner) block.getState();
             baseKey = getSpawnerKeyFromCreatureSpawner(creatureSpawner);
         } else {
-            short durability = block.getData();
+            short durability = ServerVersion.isLegacy() ? block.getData() : 0;
             baseKey = MaterialKey.of(blockType, durability);
         }
 
