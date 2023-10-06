@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,7 +64,7 @@ public class SubCommandsHandler {
                         Message.COMMAND_USAGE.send(dispatcher, locale, this.label + " " + usage);
                     }
                 } else {
-                    String[] args = Arrays.copyOfRange(reader.getRaw(), reader.getCursor(), reader.getRaw().length);
+                    String[] args = reader.getRaw();
 
                     if (args.length < command.getMinArgs() || args.length > command.getMaxArgs()) {
                         String usage = CommandsHelper.getCommandUsage(command, locale);
