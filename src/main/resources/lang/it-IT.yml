@@ -340,7 +340,7 @@ GENERATOR_CLEARED_NAME: '&e&lIsola | &7Cancellati con successo gli importi del g
 GENERATOR_CLEARED_ALL: '&e&lIsola | &7Cancellati con successo gli importi del generatore per tutte le isole.'
 GENERATOR_UPDATED: '&e&lIsola | &7Aggiornato con successo la percentuale di generazione di {0} sull''isola di {1}.'
 GENERATOR_UPDATED_NAME: '&e&lIsola | &7Aggiornato con successo la percentuale di generazione di {0} sull''isola {1}.'
-                                                                                                            
+
 GLOBAL_COMMAND_EXECUTED: '&e&lIsola | &7Successfully executed the command on {0}''s island members!'
 GLOBAL_COMMAND_EXECUTED_NAME: '&e&lIsola | &7Successfully executed the command on the island members of {0}!'
 GENERATOR_UPDATED_ALL: '&e&lIsola | &7Aggiornato con successo la percentuale di generazione di {0} in tutte le isole.'
@@ -437,8 +437,8 @@ ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lIsola | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_COOP_LIMIT: '&e&lIsola | &7Coop Limit: {0}'
-                                                                          
-                                                                          
+
+
 ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |
   &e&lIsola | &7Effetti dell'isola:
   {0}
@@ -651,6 +651,7 @@ RATE_REMOVE_ALL: '&e&lIsola | &7Rimosse con successo tutte le valutazioni di {0}
 RATE_REMOVE_ALL_ISLANDS: '&e&lIslola | &7Rimosse con successo le valutazioni di tutte le isole.'
 RATE_SUCCESS: '&e&lIsola | &7Hai valutato quest''isola con {0} stelle!'
 REACHED_BLOCK_LIMIT: '&e&lAggiornamenti | &7Hai raggiunto il limite di {0} dell''isola.'
+REACHED_ENTITY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity {0}.'
 RECALC_ALREADY_RUNNING: '&c&lErrore | &7La tua isola è già in fase di ricalcolo.'
 RECALC_ALREADY_RUNNING_OTHER: '&c&lErrore | &7L''isola è già stata ricalcolata.'
 RECALC_ALL_ISLANDS: '&e&lIsola | &7Ricalcolo di tutte le isole...'

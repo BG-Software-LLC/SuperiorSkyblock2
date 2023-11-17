@@ -6,20 +6,18 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.LocationKey;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Hanging;
-import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -34,7 +32,6 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class UpgradeTypeEntityLimits implements IUpgradeType {
@@ -60,11 +57,15 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
     private class EntityLimitsListener implements Listener {
 
-        private final Map<LocationKey, UUID> vehiclesOwners = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
+        private final Map<LocationKey, Player> vehiclesOwners = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
+        private final Map<EntityType, Player> spawnEggPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onEntitySpawn(CreatureSpawnEvent e) {
-            if (BukkitEntities.canBypassEntityLimit(e.getEntity()) || !BukkitEntities.canHaveLimit(e.getEntityType()))
+            Entity entity = e.getEntity();
+            EntityType entityType = entity.getType();
+
+            if (BukkitEntities.canBypassEntityLimit(entity) || !BukkitEntities.canHaveLimit(entityType))
                 return;
 
             Island island = plugin.getGrid().getIslandAt(e.getLocation());
@@ -72,28 +73,37 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            island.hasReachedEntityLimit(Keys.of(e.getEntity())).whenComplete((result, ex) -> {
-                if (result) {
-                    e.setCancelled(true);
+            Player spawningPlayer = spawnEggPlayers.remove(entityType);
+
+            boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
+
+            if (hasReachedLimit) {
+                e.setCancelled(true);
+                if (spawningPlayer != null && spawningPlayer.isOnline()) {
+                    Message.REACHED_ENTITY_LIMIT.send(spawningPlayer, Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
                 }
-            });
+            }
         }
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onHangingPlace(HangingPlaceEvent e) {
-            if (BukkitEntities.canBypassEntityLimit(e.getEntity()) || !BukkitEntities.canHaveLimit(e.getEntity().getType()))
+            Entity entity = e.getEntity();
+            EntityType entityType = entity.getType();
+
+            if (BukkitEntities.canBypassEntityLimit(entity) || !BukkitEntities.canHaveLimit(entityType))
                 return;
 
-            Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+            Island island = plugin.getGrid().getIslandAt(entity.getLocation());
 
             if (island == null)
                 return;
 
-            island.hasReachedEntityLimit(Keys.of(e.getEntity())).whenComplete((result, ex) -> {
-                if (result) {
-                    e.setCancelled(true);
-                }
-            });
+            boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
+
+            if (hasReachedLimit) {
+                e.setCancelled(true);
+                Message.REACHED_ENTITY_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
+            }
         }
 
         @EventHandler
@@ -119,33 +129,56 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            vehiclesOwners.put(new LocationKey(blockLocation), e.getPlayer().getUniqueId());
+            vehiclesOwners.put(new LocationKey(blockLocation), e.getPlayer());
         }
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onVehicleSpawn(VehicleCreateEvent e) {
-            if (BukkitEntities.canBypassEntityLimit(e.getVehicle()) || !BukkitEntities.canHaveLimit(e.getVehicle().getType()))
+            Entity entity = e.getVehicle();
+            EntityType entityType = entity.getType();
+
+            if (BukkitEntities.canBypassEntityLimit(entity) || !BukkitEntities.canHaveLimit(entityType))
                 return;
 
-            Island island = plugin.getGrid().getIslandAt(e.getVehicle().getLocation());
+            Location entityLocation = entity.getLocation();
+
+            Island island = plugin.getGrid().getIslandAt(entityLocation);
 
             if (island == null)
                 return;
 
-            UUID placedVehicle = vehiclesOwners.remove(new LocationKey(e.getVehicle().getLocation()));
+            Player vehicleOwner = vehiclesOwners.remove(new LocationKey(entityLocation));
 
-            island.hasReachedEntityLimit(Keys.of(e.getVehicle())).whenComplete((result, ex) -> {
-                if (result) {
-                    BukkitExecutor.sync(() -> {
-                        removeEntity(e.getVehicle());
-                        if (placedVehicle != null) {
-                            Player player = Bukkit.getPlayer(placedVehicle);
-                            if (player != null)
-                                BukkitItems.addItem(asItemStack(e.getVehicle()), player.getInventory(), player.getLocation());
-                        }
-                    });
+            boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
+
+            if (hasReachedLimit) {
+                entity.remove();
+                if (vehicleOwner != null && vehicleOwner.isOnline()) {
+                    Message.REACHED_ENTITY_LIMIT.send(vehicleOwner, Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
+                    BukkitItems.addItem(asItemStack(e.getVehicle()), vehicleOwner.getInventory(), vehicleOwner.getLocation());
                 }
-            });
+            }
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onSpawnEggUse(PlayerInteractEvent e) {
+            if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null ||
+                    e.getPlayer().getGameMode() == GameMode.CREATIVE)
+                return;
+
+            PlayerHand usedHand = BukkitItems.getHand(e);
+            ItemStack usedItem = BukkitItems.getHandItem(e.getPlayer(), usedHand);
+            EntityType spawnEggEntityType = usedItem == null ? EntityType.UNKNOWN : BukkitItems.getEntityType(usedItem);
+
+            if (spawnEggEntityType == EntityType.UNKNOWN || !BukkitEntities.canHaveLimit(spawnEggEntityType))
+                return;
+
+            Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
+
+            if (island == null)
+                return;
+
+            spawnEggPlayers.put(spawnEggEntityType, e.getPlayer());
         }
 
         private ItemStack asItemStack(Entity entity) {
@@ -177,14 +210,6 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             }
 
             throw new IllegalArgumentException("Cannot find an item for " + entity.getType());
-        }
-
-        private void removeEntity(Entity entity) {
-            if (ServerVersion.isAtLeast(ServerVersion.v1_17)) {
-                BukkitExecutor.ensureMain(entity::remove);
-            } else {
-                entity.remove();
-            }
         }
 
     }
