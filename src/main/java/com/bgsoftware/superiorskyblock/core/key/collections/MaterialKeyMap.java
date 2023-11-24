@@ -9,13 +9,10 @@ import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.types.CustomKey;
 import com.bgsoftware.superiorskyblock.core.key.types.LazyKey;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
-import java.util.AbstractMap;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -68,6 +65,8 @@ public class MaterialKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V> 
     }
 
     private V getInternal(Key key, boolean tryGlobal) {
+        Preconditions.checkArgument(!(key instanceof LazyKey), "Cannot call getInternal on LazyKey directly.");
+
         V value;
 
         if (key instanceof MaterialKey) {
@@ -213,7 +212,18 @@ public class MaterialKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V> 
 
     @Override
     public V getRaw(Key key, V def) {
-        return size() == 0 ? def : Optional.ofNullable(getInternal(key, false)).orElse(def);
+        if (size() == 0)
+            return def;
+
+        return getRawNoSizeCheck(key, def);
+    }
+
+    private V getRawNoSizeCheck(Key key, V def) {
+        if (key instanceof LazyKey) {
+            return getRawNoSizeCheck(((LazyKey<?>) key).getBaseKey(), def);
+        }
+
+        return Optional.ofNullable(getInternal(key, false)).orElse(def);
     }
 
     @Override
