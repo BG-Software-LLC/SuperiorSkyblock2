@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -29,16 +28,17 @@ public class IslandOutsideListener implements Listener {
         if (!plugin.getSettings().isStopLeaving())
             return;
 
-        Island playerIsland = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
-        Island entityIsland = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
-
-        if (plugin.getPlayers().getSuperiorPlayer(e.getPlayer()).hasBypassModeEnabled())
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        if (superiorPlayer.hasBypassModeEnabled())
             return;
 
-        if (playerIsland != null && (entityIsland == null || entityIsland.equals(playerIsland)) &&
-                !playerIsland.isInsideRange(e.getRightClicked().getLocation())) {
-            e.setCancelled(true);
-        }
+        Location entityLocation = e.getRightClicked().getLocation();
+        Island entityIsland = plugin.getGrid().getIslandAt(entityLocation);
+
+        if (entityIsland != null && entityIsland.isInsideRange(entityLocation))
+            return;
+
+        e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -46,16 +46,16 @@ public class IslandOutsideListener implements Listener {
         if (!plugin.getSettings().isStopLeaving())
             return;
 
-        Island playerIsland = plugin.getGrid().getIslandAt(e.getEntered().getLocation());
-        Island entityIsland = plugin.getGrid().getIslandAt(e.getVehicle().getLocation());
-
         if (e.getEntered() instanceof Player && plugin.getPlayers().getSuperiorPlayer(e.getEntered()).hasBypassModeEnabled())
             return;
 
-        if (playerIsland != null && (entityIsland == null || entityIsland.equals(playerIsland)) &&
-                !playerIsland.isInsideRange(e.getVehicle().getLocation())) {
-            e.setCancelled(true);
-        }
+        Location vehicleLocation = e.getVehicle().getLocation();
+        Island entityIsland = plugin.getGrid().getIslandAt(vehicleLocation);
+
+        if (entityIsland != null && entityIsland.isInsideRange(vehicleLocation))
+            return;
+
+        e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -72,17 +72,13 @@ public class IslandOutsideListener implements Listener {
         if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
             return;
 
-        Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
-        Island fromIsland = plugin.getGrid().getIslandAt(e.getFrom());
+        Entity passenger = e.getVehicle().getPassenger();
+        SuperiorPlayer superiorPlayer = passenger instanceof Player ? plugin.getPlayers().getSuperiorPlayer(passenger) : null;
 
-        if (fromIsland != null && (toIsland == null || toIsland.equals(fromIsland)) && !fromIsland.isInsideRange(e.getTo())) {
-            Entity passenger = e.getVehicle().getPassenger();
-            SuperiorPlayer superiorPlayer = passenger instanceof Player ? plugin.getPlayers().getSuperiorPlayer(passenger) : null;
-            if (passenger != null && (superiorPlayer == null || !superiorPlayer.hasBypassModeEnabled())) {
-                e.getVehicle().setPassenger(null);
-                EntityTeleports.teleport(passenger, e.getFrom());
-            }
-        }
+        if (superiorPlayer == null)
+            return;
+
+        handlePlayerMove(superiorPlayer, from, to, false, true);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -99,23 +95,46 @@ public class IslandOutsideListener implements Listener {
         if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
             return;
 
-        Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
-        Island fromIsland = plugin.getGrid().getIslandAt(e.getFrom());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        if (handlePlayerMove(superiorPlayer, from, to, true, false))
+            e.setCancelled(true);
+    }
 
-        if (fromIsland != null && (toIsland == null || toIsland.equals(fromIsland)) && !fromIsland.isInsideRange(e.getTo())) {
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-            if (!superiorPlayer.hasBypassModeEnabled()) {
-                e.setCancelled(true);
-                BukkitExecutor.sync(() -> {
-                    superiorPlayer.teleport(fromIsland, result -> {
-                        if (!result) {
-                            superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-                        }
-                    });
-                }, 1L);
-            }
+    private boolean handlePlayerMove(SuperiorPlayer superiorPlayer, Location from, Location to,
+                                     boolean delayTeleport, boolean forceTeleport) {
+        if (superiorPlayer.hasBypassModeEnabled())
+            return false;
+
+        Island toIsland = plugin.getGrid().getIslandAt(to);
+        if (toIsland != null && toIsland.isInsideRange(to))
+            return false;
+
+        if (delayTeleport) {
+            // If we don't delay the teleport, it will not occur due to the cancellation of PlayerMoveEvent
+            BukkitExecutor.sync(() -> handlePlayerMoveOutsideIslandTeleport(superiorPlayer, from, forceTeleport), 1L);
+        } else {
+            handlePlayerMoveOutsideIslandTeleport(superiorPlayer, from, forceTeleport);
         }
 
+        return true;
+    }
+
+    private void handlePlayerMoveOutsideIslandTeleport(SuperiorPlayer superiorPlayer, Location from, boolean forceTeleport) {
+        Island fromIsland = plugin.getGrid().getIslandAt(from);
+
+        // We don't teleport in case we're inside the island, we just cancel the event.
+        if (!forceTeleport && fromIsland != null && fromIsland.isInsideRange(from))
+            return;
+
+        if (fromIsland != null) {
+            superiorPlayer.teleport(fromIsland, result -> {
+                if (!result) {
+                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                }
+            });
+        } else {
+            superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+        }
     }
 
 }
