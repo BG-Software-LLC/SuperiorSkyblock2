@@ -100,36 +100,15 @@ public class MissionsModule extends BuiltinModule {
         }
 
         updateConfig(plugin);
+
+        if (enabled)
+            loadMissionCategories(plugin);
     }
 
     @Override
     public void onEnable(SuperiorSkyblockPlugin plugin) {
-        if (!enabled)
-            return;
-
-        ConfigurationSection categoriesSection = config.getConfigurationSection("categories");
-
-        if (categoriesSection != null) {
-            for (String categoryName : categoriesSection.getKeys(false)) {
-                ConfigurationSection categorySection = categoriesSection.getConfigurationSection(categoryName);
-
-                if (categorySection == null)
-                    continue;
-
-                List<Mission<?>> categoryMissions = new LinkedList<>();
-
-                if (!canLoadCategory(plugin, categoryName, categoryMissions))
-                    continue;
-
-                int slot = categorySection.getInt("slot");
-
-                String formattedCategoryName = categorySection.getString("name", categoryName);
-
-                plugin.getMissions().loadMissionCategory(new SMissionCategory(formattedCategoryName, slot, categoryMissions));
-
-                missionsToLoad.addAll(categoryMissions);
-            }
-        }
+        if (enabled)
+            loadMissionCategories(plugin);
     }
 
     @Override
@@ -174,6 +153,34 @@ public class MissionsModule extends BuiltinModule {
     @Override
     protected String[] getIgnoredSections() {
         return new String[]{"categories"};
+    }
+
+    private void loadMissionCategories(SuperiorSkyblockPlugin plugin) {
+        plugin.getMissions().clearData();
+
+        ConfigurationSection categoriesSection = config.getConfigurationSection("categories");
+
+        if (categoriesSection != null) {
+            for (String categoryName : categoriesSection.getKeys(false)) {
+                ConfigurationSection categorySection = categoriesSection.getConfigurationSection(categoryName);
+
+                if (categorySection == null)
+                    continue;
+
+                List<Mission<?>> categoryMissions = new LinkedList<>();
+
+                if (!canLoadCategory(plugin, categoryName, categoryMissions))
+                    continue;
+
+                int slot = categorySection.getInt("slot");
+
+                String formattedCategoryName = categorySection.getString("name", categoryName);
+
+                plugin.getMissions().loadMissionCategory(new SMissionCategory(formattedCategoryName, slot, categoryMissions));
+
+                missionsToLoad.addAll(categoryMissions);
+            }
+        }
     }
 
     private boolean canLoadCategory(SuperiorSkyblockPlugin plugin, String categoryName, List<Mission<?>> categoryMissions) {

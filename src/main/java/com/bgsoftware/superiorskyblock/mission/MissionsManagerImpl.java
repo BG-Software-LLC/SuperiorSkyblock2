@@ -67,6 +67,10 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
         BukkitExecutor.asyncTimer(this::saveMissionsData, 6000L); // Save missions data every 5 minutes
     }
 
+    public void clearData() {
+        this.missionsContainer.clearMissionsData();
+    }
+
     @Override
     public Mission<?> getMission(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
