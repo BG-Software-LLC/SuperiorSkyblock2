@@ -17,6 +17,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class UpgradeTypeSpawnerRates implements IUpgradeType {
@@ -31,8 +32,8 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
     }
 
     @Override
-    public Listener getListener() {
-        return new SpawnerRatesListener();
+    public List<Listener> getListeners() {
+        return Collections.singletonList(new SpawnerRatesListener());
     }
 
     @Override

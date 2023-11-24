@@ -45,8 +45,8 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
     }
 
     @Override
-    public Listener getListener() {
-        return new BlockLimitsListener();
+    public List<Listener> getListeners() {
+        return Collections.singletonList(new BlockLimitsListener());
     }
 
     @Override

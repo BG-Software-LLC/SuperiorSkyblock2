@@ -17,12 +17,17 @@ import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Hanging;
+import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
@@ -30,14 +35,20 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class UpgradeTypeEntityLimits implements IUpgradeType {
 
     private static final ReflectMethod<EquipmentSlot> INTERACT_GET_HAND = new ReflectMethod<>(
             PlayerInteractEvent.class, "getHand");
+
+    private final Map<EntityType, Player> entityBreederPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
+    private final Map<LocationKey, Player> vehiclesOwners = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
+    private final Map<EntityType, Player> spawnEggPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -46,8 +57,14 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
     }
 
     @Override
-    public Listener getListener() {
-        return new EntityLimitsListener();
+    public List<Listener> getListeners() {
+        List<Listener> listeners = new LinkedList<>();
+
+        listeners.add(new EntityLimitsListener());
+
+        checkEntityBreedListener().ifPresent(listeners::add);
+
+        return listeners;
     }
 
     @Override
@@ -55,10 +72,17 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
         return Collections.emptyList();
     }
 
+    private Optional<Listener> checkEntityBreedListener() {
+        try {
+            Class.forName("org.bukkit.event.entity.EntityBreedEvent");
+            return Optional.of(new EntityLimitsBreedListener());
+        } catch (ClassNotFoundException error) {
+            return Optional.empty();
+        }
+    }
+
     private class EntityLimitsListener implements Listener {
 
-        private final Map<LocationKey, Player> vehiclesOwners = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
-        private final Map<EntityType, Player> spawnEggPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onEntitySpawn(CreatureSpawnEvent e) {
@@ -73,7 +97,19 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            Player spawningPlayer = spawnEggPlayers.remove(entityType);
+            Player spawningPlayer;
+
+            switch (e.getSpawnReason()) {
+                case SPAWNER_EGG:
+                    spawningPlayer = spawnEggPlayers.remove(entityType);
+                    break;
+                case BREEDING:
+                    spawningPlayer = entityBreederPlayers.remove(entityType);
+                    break;
+                default:
+                    spawningPlayer = null;
+                    break;
+            }
 
             boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
 
@@ -162,8 +198,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnEggUse(PlayerInteractEvent e) {
-            if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null ||
-                    e.getPlayer().getGameMode() == GameMode.CREATIVE)
+            if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null)
                 return;
 
             PlayerHand usedHand = BukkitItems.getHand(e);
@@ -210,6 +245,26 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             }
 
             throw new IllegalArgumentException("Cannot find an item for " + entity.getType());
+        }
+
+    }
+
+    private class EntityLimitsBreedListener implements Listener {
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onEntityBreed(EntityBreedEvent e) {
+            Entity child = e.getEntity();
+            EntityType childEntityType = child.getType();
+
+            if (!(e.getBreeder() instanceof Player) || !BukkitEntities.canHaveLimit(childEntityType))
+                return;
+
+            Island island = plugin.getGrid().getIslandAt(child.getLocation());
+
+            if (island == null)
+                return;
+
+            entityBreederPlayers.put(childEntityType, (Player) e.getBreeder());
         }
 
     }
