@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
 import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.MenusProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.PermissionsProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.PricesProvider;
@@ -72,6 +73,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private List<Runnable> pricesLoadCallbacks = new LinkedList<>();
     private SpawnersProvider spawnersProvider = new SpawnersProvider_Default();
     private StackedBlocksProvider stackedBlocksProvider = new StackedBlocksProvider_Default();
+    private List<EntitiesProvider> entitiesProviders = new LinkedList<>();
     private EconomyProvider economyProvider = new EconomyProvider_Default();
     private EconomyProvider bankEconomyProvider = new EconomyProvider_Default();
     private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
@@ -106,6 +108,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             registerGeneralHooks();
             registerSpawnersProvider();
             registerStackedBlocksProvider();
+            registerEntitiesProvider();
             registerPermissionsProvider();
             registerPricesProvider();
             registerVanishProvider();
@@ -139,6 +142,17 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     public void setStackedBlocksProvider(StackedBlocksProvider stackedBlocksProvider) {
         Preconditions.checkNotNull(stackedBlocksProvider, "stackedBlocksProvider parameter cannot be null.");
         this.stackedBlocksProvider = stackedBlocksProvider;
+    }
+
+    @Override
+    public List<EntitiesProvider> getEntitiesProviders() {
+        return Collections.unmodifiableList(this.entitiesProviders);
+    }
+
+    @Override
+    public void addEntitiesProvider(EntitiesProvider entitiesProvider) {
+        Preconditions.checkNotNull(entitiesProvider, "entitiesProvider parameter cannot be null.");
+        this.entitiesProviders.add(entitiesProvider);
     }
 
     @Override
@@ -499,6 +513,17 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         }
 
         stackedBlocksProvider.ifPresent(this::setStackedBlocksProvider);
+    }
+
+    private void registerEntitiesProvider() {
+        if (canRegisterHook("WildStacker")) {
+            Optional<EntitiesProvider> entitiesProvider = createInstance("entities.EntitiesProvider_WildStacker");
+            entitiesProvider.ifPresent(this::addEntitiesProvider);
+        }
+        if (canRegisterHook("RoseStacker")) {
+            Optional<EntitiesProvider> entitiesProvider = createInstance("entities.EntitiesProvider_RoseStacker");
+            entitiesProvider.ifPresent(this::addEntitiesProvider);
+        }
     }
 
     private void registerPermissionsProvider() {

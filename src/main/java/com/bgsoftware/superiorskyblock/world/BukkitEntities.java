@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.world;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -136,7 +137,15 @@ public class BukkitEntities {
     }
 
     public static boolean canBypassEntityLimit(Entity entity) {
-        return entity instanceof ArmorStand && !((ArmorStand) entity).isVisible();
+        if (entity instanceof ArmorStand && !((ArmorStand) entity).isVisible())
+            return true;
+
+        for (EntitiesProvider entitiesProvider : plugin.getProviders().getEntitiesProviders()) {
+            if (!entitiesProvider.shouldTrackEntity(entity))
+                return true;
+        }
+
+        return false;
     }
 
     public static EntityCategory getCategory(EntityType entityType) {
