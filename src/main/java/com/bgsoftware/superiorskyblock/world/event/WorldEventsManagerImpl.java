@@ -46,11 +46,17 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
     public void loadChunk(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "chunk parameter cannot be null.");
 
-        Island island = plugin.getGrid().getIslandAt(chunk);
-
-        if (island == null || island.isSpawn())
+        if (!plugin.getGrid().isIslandsWorld(chunk.getWorld()))
             return;
 
+        List<Island> chunkIslands = plugin.getGrid().getIslandsAt(chunk);
+        chunkIslands.forEach(island -> {
+            if (!island.isSpawn())
+                handleIslandChunkLoad(island, chunk);
+        });
+    }
+
+    private void handleIslandChunkLoad(Island island, Chunk chunk) {
         plugin.getNMSChunks().injectChunkSections(chunk);
 
         Set<Chunk> pendingLoadedChunksForIsland = this.pendingLoadedChunks.computeIfAbsent(island.getUniqueId(), u -> new LinkedHashSet<>());
@@ -116,15 +122,18 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
 
         plugin.getStackedBlocks().removeStackedBlockHolograms(chunk);
 
-        Island island = plugin.getGrid().getIslandAt(chunk);
+        List<Island> chunkIslands = plugin.getGrid().getIslandsAt(chunk);
+        chunkIslands.forEach(island -> {
+            if (!island.isSpawn())
+                handleIslandChunkUnload(island, chunk);
+        });
+    }
 
-        if (island == null)
-            return;
-
+    private void handleIslandChunkUnload(Island island, Chunk chunk) {
         if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class))
             plugin.getNMSChunks().startTickingChunk(island, chunk, true);
 
-        if (!island.isSpawn() && !plugin.getNMSChunks().isChunkEmpty(chunk))
+        if (!plugin.getNMSChunks().isChunkEmpty(chunk))
             island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
 
         Arrays.stream(chunk.getEntities()).forEach(this.worldRecordService.get()::recordEntityDespawn);

@@ -39,6 +39,7 @@ import com.bgsoftware.superiorskyblock.island.preview.IslandPreviews;
 import com.bgsoftware.superiorskyblock.island.preview.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.purge.IslandsPurger;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -53,6 +54,8 @@ import org.bukkit.block.Block;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -467,29 +470,74 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     @Override
+    @Deprecated
     public Island getIslandAt(Chunk chunk) {
-        if (chunk == null)
+        Preconditions.checkNotNull(chunk, "chunk argument cannot be null");
+
+        if (!plugin.getGrid().isIslandsWorld(chunk.getWorld()))
             return null;
+
+        ChunkPosition chunkPosition = ChunkPosition.of(chunk);
+        Location cornerLocation = WorldBlocks.getChunkBlock(chunkPosition, 0, 100, 0);
 
         Island island;
 
-        Location corner = chunk.getBlock(0, 100, 0).getLocation();
-        if ((island = getIslandAt(corner)) != null)
+        // Checks corner at 0, y, 0
+        if ((island = getIslandAt(cornerLocation)) != null)
             return island;
 
-        corner = chunk.getBlock(15, 100, 0).getLocation();
-        if ((island = getIslandAt(corner)) != null)
+        // Checks corner at 15, y, 0
+        cornerLocation.add(15, 0, 0);
+        if ((island = getIslandAt(cornerLocation)) != null)
             return island;
 
-        corner = chunk.getBlock(0, 100, 15).getLocation();
-        if ((island = getIslandAt(corner)) != null)
+        // Checks corner at 15, y, 15
+        cornerLocation.add(0, 0, 15);
+        if ((island = getIslandAt(cornerLocation)) != null)
             return island;
 
-        corner = chunk.getBlock(15, 100, 15).getLocation();
-        if ((island = getIslandAt(corner)) != null)
+        // Checks corner at 0, y, 15
+        cornerLocation.add(-15, 0, 0);
+        if ((island = getIslandAt(cornerLocation)) != null)
             return island;
 
         return null;
+    }
+
+    @Override
+    public List<Island> getIslandsAt(Chunk chunk) {
+        Preconditions.checkNotNull(chunk, "chunk argument cannot be null");
+
+        if (!plugin.getGrid().isIslandsWorld(chunk.getWorld()))
+            return Collections.emptyList();
+
+        Set<Island> islands = new LinkedHashSet<>();
+
+        ChunkPosition chunkPosition = ChunkPosition.of(chunk);
+        Location cornerLocation = WorldBlocks.getChunkBlock(chunkPosition, 0, 100, 0);
+
+        Island island;
+
+        // Checks corner at 0, y, 0
+        if ((island = getIslandAt(cornerLocation)) != null)
+            islands.add(island);
+
+        // Checks corner at 15, y, 0
+        cornerLocation.add(15, 0, 0);
+        if ((island = getIslandAt(cornerLocation)) != null)
+            islands.add(island);
+
+        // Checks corner at 15, y, 15
+        cornerLocation.add(0, 0, 15);
+        if ((island = getIslandAt(cornerLocation)) != null)
+            islands.add(island);
+
+        // Checks corner at 0, y, 15
+        cornerLocation.add(-15, 0, 0);
+        if ((island = getIslandAt(cornerLocation)) != null)
+            islands.add(island);
+
+        return islands.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(new LinkedList<>(islands));
     }
 
     @Override

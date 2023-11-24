@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddSpawnerRates;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetSpawnerRates;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -72,12 +73,12 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onChunkLoad(ChunkLoadEvent e) {
-            Island island = plugin.getGrid().getIslandAt(e.getChunk());
+            List<Island> chunkIslands = plugin.getGrid().getIslandsAt(e.getChunk());
+            chunkIslands.forEach(island -> handleIslandChunkLoad(island, e.getChunk()));
+        }
 
-            if (island == null)
-                return;
-
-            List<Location> blockEntities = plugin.getNMSChunks().getBlockEntities(e.getChunk());
+        private void handleIslandChunkLoad(Island island, Chunk chunk) {
+            List<Location> blockEntities = plugin.getNMSChunks().getBlockEntities(chunk);
 
             if (blockEntities.isEmpty())
                 return;
@@ -85,7 +86,7 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
             // We want to replace the spawner in a delay so other plugins that might change the spawner will be taken in action as well.
             // Block entities that are not spawners will not be touched.
             BukkitExecutor.sync(() -> {
-                if (e.getChunk().isLoaded()) {
+                if (chunk.isLoaded()) {
                     blockEntities.forEach(blockEntity -> {
                         plugin.getNMSWorld().listenSpawner(blockEntity, spawnDelay -> calculateNewSpawnerDelay(island, spawnDelay));
                     });

@@ -198,9 +198,20 @@ public interface GridManager extends IDatabaseBridgeHolder {
      *
      * @param chunk The chunk to check.
      * @return The island at that position. May be null.
+     * @deprecated See {@link #getIslandsAt(Chunk)}
      */
     @Nullable
+    @Deprecated
     Island getIslandAt(@Nullable Chunk chunk);
+
+    /**
+     * Get all the islands from a chunk.
+     *
+     * @param chunk The chunk to check.
+     * @return The islands at that position.
+     */
+    @Nullable
+    List<Island> getIslandsAt(@Nullable Chunk chunk);
 
     /**
      * Transfer an island's leadership to another owner.
