@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.listener;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 
@@ -62,6 +63,9 @@ public class IslandOutsideListener implements Listener {
         if (!plugin.getSettings().isStopLeaving())
             return;
 
+        if (!e.getVehicle().getWorld().equals(e.getTo().getWorld()))
+            return;
+
         Location from = e.getFrom();
         Location to = e.getTo();
 
@@ -71,8 +75,7 @@ public class IslandOutsideListener implements Listener {
         Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
         Island fromIsland = plugin.getGrid().getIslandAt(e.getFrom());
 
-        if (fromIsland != null && e.getVehicle().getWorld().equals(e.getTo().getWorld()) &&
-                (toIsland == null || toIsland.equals(fromIsland)) && !fromIsland.isInsideRange(e.getTo())) {
+        if (fromIsland != null && (toIsland == null || toIsland.equals(fromIsland)) && !fromIsland.isInsideRange(e.getTo())) {
             Entity passenger = e.getVehicle().getPassenger();
             SuperiorPlayer superiorPlayer = passenger instanceof Player ? plugin.getPlayers().getSuperiorPlayer(passenger) : null;
             if (passenger != null && (superiorPlayer == null || !superiorPlayer.hasBypassModeEnabled())) {
@@ -80,6 +83,39 @@ public class IslandOutsideListener implements Listener {
                 EntityTeleports.teleport(passenger, e.getFrom());
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    private void onPlayerMove(PlayerMoveEvent e) {
+        if (!plugin.getSettings().isStopLeaving())
+            return;
+
+        if (!e.getPlayer().getWorld().equals(e.getTo().getWorld()))
+            return;
+
+        Location from = e.getFrom();
+        Location to = e.getTo();
+
+        if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
+            return;
+
+        Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
+        Island fromIsland = plugin.getGrid().getIslandAt(e.getFrom());
+
+        if (fromIsland != null && (toIsland == null || toIsland.equals(fromIsland)) && !fromIsland.isInsideRange(e.getTo())) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+            if (!superiorPlayer.hasBypassModeEnabled()) {
+                e.setCancelled(true);
+                BukkitExecutor.sync(() -> {
+                    superiorPlayer.teleport(fromIsland, result -> {
+                        if (!result) {
+                            superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                        }
+                    });
+                }, 1L);
+            }
+        }
+
     }
 
 }
