@@ -194,7 +194,12 @@ public class NMSUtils {
         }
 
         if (chunkHolder != null) {
-            SEND_PACKETS_TO_RELEVANT_PLAYERS.invoke(chunkHolder, packet, false);
+            if (SEND_PACKETS_TO_RELEVANT_PLAYERS.isValid()) {
+                SEND_PACKETS_TO_RELEVANT_PLAYERS.invoke(chunkHolder, packet, false);
+            } else {
+                chunkHolder.playerProvider.getPlayers(chunkPos, false).forEach(serverPlayer ->
+                        serverPlayer.connection.send(packet));
+            }
         }
     }
 
