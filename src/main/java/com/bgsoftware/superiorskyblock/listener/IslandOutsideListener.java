@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,6 +29,9 @@ public class IslandOutsideListener implements Listener {
         if (!plugin.getSettings().isStopLeaving())
             return;
 
+        if (!plugin.getGrid().isIslandsWorld(e.getRightClicked().getWorld()))
+            return;
+
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         if (superiorPlayer.hasBypassModeEnabled())
             return;
@@ -44,6 +48,9 @@ public class IslandOutsideListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     private void onMinecartRightClick(VehicleEnterEvent e) {
         if (!plugin.getSettings().isStopLeaving())
+            return;
+
+        if (!plugin.getGrid().isIslandsWorld(e.getVehicle().getWorld()))
             return;
 
         if (e.getEntered() instanceof Player && plugin.getPlayers().getSuperiorPlayer(e.getEntered()).hasBypassModeEnabled())
@@ -63,7 +70,12 @@ public class IslandOutsideListener implements Listener {
         if (!plugin.getSettings().isStopLeaving())
             return;
 
-        if (!e.getVehicle().getWorld().equals(e.getTo().getWorld()))
+        World world = e.getTo().getWorld();
+
+        if (!plugin.getGrid().isIslandsWorld(world))
+            return;
+
+        if (!e.getVehicle().getWorld().equals(world))
             return;
 
         Location from = e.getFrom();
@@ -86,7 +98,12 @@ public class IslandOutsideListener implements Listener {
         if (!plugin.getSettings().isStopLeaving())
             return;
 
-        if (!e.getPlayer().getWorld().equals(e.getTo().getWorld()))
+        World world = e.getTo().getWorld();
+
+        if (!plugin.getGrid().isIslandsWorld(world))
+            return;
+
+        if (!e.getPlayer().getWorld().equals(world))
             return;
 
         Location from = e.getFrom();
