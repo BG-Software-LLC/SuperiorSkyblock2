@@ -121,7 +121,6 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
             BukkitExecutor.sync(stackedBlock::updateName, 2L);
             StackedBlocksDatabaseBridge.saveStackedBlock(this, stackedBlock);
         } else {
-            stackedBlock.removeHologram();
             this.stackedBlocksContainer.removeStackedBlock(location);
             StackedBlocksDatabaseBridge.deleteStackedBlock(this, stackedBlock);
         }
@@ -138,7 +137,6 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
         StackedBlock oldStackedBlock = this.stackedBlocksContainer.removeStackedBlock(location);
 
         if (oldStackedBlock != null) {
-            oldStackedBlock.removeHologram();
             StackedBlocksDatabaseBridge.deleteStackedBlock(this, oldStackedBlock);
         }
 
