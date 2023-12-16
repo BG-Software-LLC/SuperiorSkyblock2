@@ -1,0 +1,7 @@
+group 'NMS:Spigot-1_20_R3'
+
+dependencies {
+    compileOnly "org.spigotmc:v1_20_R3:b3973-3"
+    compileOnly project(":API")
+    compileOnly rootProject
+}

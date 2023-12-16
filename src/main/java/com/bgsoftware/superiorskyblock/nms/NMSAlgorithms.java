@@ -15,6 +15,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
+import java.lang.reflect.Field;
+
 public interface NMSAlgorithms {
 
     void registerCommand(BukkitCommand command);
@@ -40,6 +42,25 @@ public interface NMSAlgorithms {
     String getMinecraftKey(ItemStack itemStack);
 
     Enchantment getGlowEnchant();
+
+    default Enchantment createGlowEnchantment() {
+        Enchantment glowEnchant = getGlowEnchant();
+
+        try {
+            Field field = Enchantment.class.getDeclaredField("acceptingNew");
+            field.setAccessible(true);
+            field.set(null, true);
+            field.setAccessible(false);
+        } catch (Exception ignored) {
+        }
+
+        try {
+            Enchantment.registerEnchantment(glowEnchant);
+        } catch (Exception ignored) {
+        }
+
+        return glowEnchant;
+    }
 
     @Nullable
     Object createMenuInventoryHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title);

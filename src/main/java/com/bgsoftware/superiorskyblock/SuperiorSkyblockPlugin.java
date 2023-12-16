@@ -196,7 +196,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             loadUpgradeCostLoaders();
 
-            GlowEnchantment.registerGlowEnchantment();
+            GlowEnchantment.registerGlowEnchantment(this);
 
             try {
                 settingsHandler.loadData();
@@ -366,7 +366,17 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             ReflectMethod<Integer> getDataVersion = new ReflectMethod<>(UnsafeValues.class, "getDataVersion");
             int dataVersion = getDataVersion.invoke(Bukkit.getUnsafe());
 
-            List<Pair<Integer, String>> versions = Arrays.asList(new Pair<>(2729, null), new Pair<>(2730, "v1_17"), new Pair<>(2974, null), new Pair<>(2975, "v1_18"), new Pair<>(3336, null), new Pair<>(3337, "v1_19"), new Pair<>(3465, "v1_20_1"), new Pair<>(3578, "v1_20_2"));
+            List<Pair<Integer, String>> versions = Arrays.asList(
+                    new Pair<>(2729, null),
+                    new Pair<>(2730, "v1_17"),
+                    new Pair<>(2974, null),
+                    new Pair<>(2975, "v1_18"),
+                    new Pair<>(3336, null),
+                    new Pair<>(3337, "v1_19"),
+                    new Pair<>(3465, "v1_20_1"),
+                    new Pair<>(3578, "v1_20_2"),
+                    new Pair<>(3700, "v1_20_3")
+            );
 
             for (Pair<Integer, String> versionData : versions) {
                 if (dataVersion <= versionData.getKey()) {
