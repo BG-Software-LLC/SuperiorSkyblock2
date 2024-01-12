@@ -6,11 +6,14 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 
@@ -77,11 +80,22 @@ public class CmdVisit implements ISuperiorCommand {
         }
 
         if (targetIsland.isLocked() && !targetIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)) {
-            Message.NO_CLOSE_BYPASS.send(sender);
+            Message.NO_CLOSE_BYPASS.send(superiorPlayer);
             return;
         }
 
-        superiorPlayer.teleport(visitLocation);
+        if (plugin.getSettings().getVisitWarmup() > 0 && !superiorPlayer.hasBypassModeEnabled()) {
+            Message.TELEPORT_WARMUP.send(superiorPlayer, Formatters.TIME_FORMATTER.format(
+                    Duration.ofMillis(plugin.getSettings().getVisitWarmup()), superiorPlayer.getUserLocale()));
+
+            Location finalVisitLocation = visitLocation;
+
+            superiorPlayer.setTeleportTask(BukkitExecutor.sync(() ->
+                            teleportPlayerNoWarmup(superiorPlayer, targetIsland, finalVisitLocation, true),
+                    plugin.getSettings().getHomeWarmup() / 50));
+        } else {
+            teleportPlayerNoWarmup(superiorPlayer, targetIsland, visitLocation, false);
+        }
     }
 
     @Override
@@ -93,6 +107,17 @@ public class CmdVisit implements ISuperiorCommand {
                         (!plugin.getSettings().getVisitorsSign().isRequiredForVisit() || onlineIsland.getVisitorsLocation(null /* unused */) != null) ||
                                 superiorPlayer.hasBypassModeEnabled()) && (!onlineIsland.isLocked() ||
                         onlineIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS))) : Collections.emptyList();
+    }
+
+    private void teleportPlayerNoWarmup(SuperiorPlayer superiorPlayer, Island island, Location visitLocation, boolean checkIslandLock) {
+        superiorPlayer.setTeleportTask(null);
+
+        if (checkIslandLock && island.isLocked() && !island.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)) {
+            Message.NO_CLOSE_BYPASS.send(superiorPlayer);
+            return;
+        }
+
+        superiorPlayer.teleport(visitLocation);
     }
 
 }
