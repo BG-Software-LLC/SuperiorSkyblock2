@@ -69,10 +69,15 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
     }
 
     public void clearData() {
+        saveMissionsData();
+
         List<Mission<?>> missionsList = plugin.getMissions().getAllMissions();
         this.missionsContainer.clearMissionsData();
 
         for (Mission<?> mission : missionsList) {
+            // Unload the mission
+            mission.unload();
+
             // We now want to unload the ClassLoader and free the held handles for the file.
             ClassLoader classLoader = mission.getClass().getClassLoader();
             if (classLoader instanceof URLClassLoader) {

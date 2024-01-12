@@ -163,8 +163,6 @@ public class MissionsModule extends BuiltinModule {
     }
 
     private void loadMissionCategories(SuperiorSkyblockPlugin plugin) {
-        plugin.getMissions().clearData();
-
         ConfigurationSection categoriesSection = config.getConfigurationSection("categories");
 
         if (categoriesSection != null) {
