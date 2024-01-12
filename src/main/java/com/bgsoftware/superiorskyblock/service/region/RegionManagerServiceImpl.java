@@ -400,11 +400,14 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             superiorPlayer.teleport(island, result -> {
                 if (!result) {
                     Message.TELEPORTED_FAILED.send(superiorPlayer);
-                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland(), result2 -> {
+                        if (superiorPlayer.getPlayerStatus() == PlayerStatus.VOID_TELEPORT)
+                            superiorPlayer.setPlayerStatus(PlayerStatus.NONE);
+                    });
+                } else {
+                    if (superiorPlayer.getPlayerStatus() == PlayerStatus.VOID_TELEPORT)
+                        superiorPlayer.setPlayerStatus(PlayerStatus.NONE);
                 }
-
-                if (superiorPlayer.getPlayerStatus() == PlayerStatus.VOID_TELEPORT)
-                    superiorPlayer.setPlayerStatus(PlayerStatus.NONE);
             });
 
             return MoveResult.VOID_TELEPORT;
