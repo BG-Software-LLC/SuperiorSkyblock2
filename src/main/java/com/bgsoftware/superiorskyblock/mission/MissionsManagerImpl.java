@@ -36,6 +36,7 @@ import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -68,7 +69,23 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
     }
 
     public void clearData() {
+        List<Mission<?>> missionsList = plugin.getMissions().getAllMissions();
         this.missionsContainer.clearMissionsData();
+
+        for (Mission<?> mission : missionsList) {
+            // We now want to unload the ClassLoader and free the held handles for the file.
+            ClassLoader classLoader = mission.getClass().getClassLoader();
+            if (classLoader instanceof URLClassLoader) {
+                try {
+                    ((URLClassLoader) classLoader).close();
+                } catch (Exception error) {
+                    Log.error(error, "An error occurred while unloading mission ", mission.getName(), ":");
+                }
+            }
+        }
+
+        // This is an attempt to force Windows to free the handles of the file.
+        System.gc();
     }
 
     @Override

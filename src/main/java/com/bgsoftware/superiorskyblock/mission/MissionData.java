@@ -17,7 +17,7 @@ public class MissionData {
     private static int currentIndex = 0;
 
     private final int index;
-    private final Mission<?> mission;
+    private final String missionName;
     private final List<ItemStack> itemRewards = new LinkedList<>();
     private final List<String> commandRewards = new LinkedList<>();
     private final boolean autoReward;
@@ -34,7 +34,7 @@ public class MissionData {
 
     MissionData(Mission<?> mission, ConfigurationSection section) {
         this.index = currentIndex++;
-        this.mission = mission;
+        this.missionName = mission.getName();
         this.islandMission = section.getBoolean("island", false);
         this.autoReward = section.getBoolean("auto-reward", true);
         this.disbandReset = section.getBoolean("disband-reset", false);
@@ -79,8 +79,8 @@ public class MissionData {
         return index;
     }
 
-    public Mission<?> getMission() {
-        return mission;
+    public String getMissionName() {
+        return this.missionName;
     }
 
     public boolean isDisbandReset() {
@@ -109,7 +109,7 @@ public class MissionData {
 
     @Override
     public String toString() {
-        return "MissionData{name=" + mission.getName() + "}";
+        return "MissionData{name=" + this.missionName + "}";
     }
 
 }

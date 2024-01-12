@@ -26,7 +26,7 @@ public abstract class BuiltinModule extends PluginModule {
 
     @Override
     public final void onReload(SuperiorSkyblock plugin) {
-        onPluginInit(plugin);
+        onReload((SuperiorSkyblockPlugin) plugin);
     }
 
     @Override
@@ -84,6 +84,10 @@ public abstract class BuiltinModule extends PluginModule {
     }
 
     public abstract void onEnable(SuperiorSkyblockPlugin plugin);
+
+    public void onReload(SuperiorSkyblockPlugin plugin) {
+        onPluginInit(plugin);
+    }
 
     public abstract void onDisable(SuperiorSkyblockPlugin plugin);
 

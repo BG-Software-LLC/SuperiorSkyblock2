@@ -35,6 +35,7 @@ import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LocationKey;
@@ -73,6 +74,7 @@ import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.island.warp.SIslandWarp;
 import com.bgsoftware.superiorskyblock.island.warp.SWarpCategory;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
+import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
@@ -110,6 +112,7 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -127,6 +130,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SIsland implements Island {
@@ -196,7 +200,7 @@ public class SIsland implements Island {
     private final AtomicReference<BigDecimal> islandLevel = new AtomicReference<>(BigDecimal.ZERO);
     private final AtomicReference<BigDecimal> bonusWorth = new AtomicReference<>(BigDecimal.ZERO);
     private final AtomicReference<BigDecimal> bonusLevel = new AtomicReference<>(BigDecimal.ZERO);
-    private final Map<Mission<?>, Integer> completedMissions = new ConcurrentHashMap<>();
+    private final Map<MissionReference, Counter> completedMissions = new ConcurrentHashMap<>();
     private final Synchronized<IslandChest[]> islandChests = Synchronized.of(createDefaultIslandChests());
     private final Synchronized<CompletableFuture<Biome>> biomeGetterTask = Synchronized.of(null);
     private final AtomicInteger generatedSchematics = new AtomicInteger(0);
@@ -4280,19 +4284,20 @@ public class SIsland implements Island {
     @Override
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        setAmountMissionCompleted(mission, completedMissions.getOrDefault(mission, 0) + 1);
+        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(1));
     }
 
     @Override
     public void resetMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        setAmountMissionCompleted(mission, completedMissions.getOrDefault(mission, 0) - 1);
+        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(-1));
     }
 
     @Override
     public boolean hasCompletedMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        return completedMissions.getOrDefault(mission, 0) > 0;
+        Counter finishCount = completedMissions.get(new MissionReference(mission));
+        return finishCount != null && finishCount.get() > 0;
     }
 
     @Override
@@ -4310,29 +4315,39 @@ public class SIsland implements Island {
     @Override
     public int getAmountMissionCompleted(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        return completedMissions.getOrDefault(mission, 0);
+        Counter finishCount = completedMissions.get(new MissionReference(mission));
+        return finishCount == null ? 0 : finishCount.get();
     }
 
     @Override
     public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.set(finishCount));
+    }
 
-        Log.debug(Debug.SET_ISLAND_MISSION_COMPLETED, mission.getName(), finishCount);
+    private void changeAmountMissionsCompletedInternal(Mission<?> mission, Function<Counter, Integer> action) {
+        String missionName = mission.getName();
+
+        MissionReference missionReference = new MissionReference(mission);
+
+        Counter finishCount = completedMissions.computeIfAbsent(missionReference, r -> new Counter(0));
+        int oldFinishCount = action.apply(finishCount);
+        int newFinishCount = finishCount.get();
+
+        Log.debug(Debug.SET_ISLAND_MISSION_COMPLETED, missionName, finishCount);
 
         // We always want to reset data
         mission.clearData(getOwner());
 
-        if (finishCount > 0) {
-            Integer oldFinishCount = completedMissions.put(mission, finishCount);
-
-            if (Objects.equals(oldFinishCount, finishCount))
+        if (newFinishCount > 0) {
+            if (newFinishCount == oldFinishCount)
                 return;
 
-            IslandsDatabaseBridge.saveMission(this, mission, finishCount);
+            IslandsDatabaseBridge.saveMission(this, mission, newFinishCount);
         } else {
-            Integer oldFinishCount = completedMissions.remove(mission);
+            completedMissions.remove(missionReference);
 
-            if (oldFinishCount == null)
+            if (oldFinishCount <= 0)
                 return;
 
             IslandsDatabaseBridge.removeMission(this, mission);
@@ -4341,19 +4356,28 @@ public class SIsland implements Island {
         plugin.getMenus().refreshMissionsCategory(mission.getMissionCategory());
     }
 
-    /*
-     *  Object related methods
-     */
-
     @Override
     public List<Mission<?>> getCompletedMissions() {
-        return new SequentialListBuilder<Mission<?>>().build(completedMissions.keySet());
+        return new SequentialListBuilder<MissionReference>()
+                .filter(MissionReference::isValid)
+                .map(completedMissions.keySet(), MissionReference::getMission);
     }
 
     @Override
     public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
-        return Collections.unmodifiableMap(completedMissions);
+        Map<Mission<?>, Integer> completedMissions = new LinkedHashMap<>();
+
+        this.completedMissions.forEach((mission, finishCount) -> {
+            if (mission.isValid())
+                completedMissions.put(mission.getMission(), finishCount.get());
+        });
+
+        return completedMissions.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(completedMissions);
     }
+
+    /*
+     *  Object related methods
+     */
 
     @Override
     public int hashCode() {

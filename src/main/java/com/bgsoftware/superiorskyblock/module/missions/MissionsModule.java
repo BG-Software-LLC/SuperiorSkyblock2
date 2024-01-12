@@ -112,6 +112,13 @@ public class MissionsModule extends BuiltinModule {
     }
 
     @Override
+    public void onReload(SuperiorSkyblockPlugin plugin) {
+        // Before we continue with the reload, we want to unload all the missions.
+        plugin.getMissions().clearData();
+        super.onReload(plugin);
+    }
+
+    @Override
     public void onDisable(SuperiorSkyblockPlugin plugin) {
         if (enabled)
             plugin.getMissions().saveMissionsData();

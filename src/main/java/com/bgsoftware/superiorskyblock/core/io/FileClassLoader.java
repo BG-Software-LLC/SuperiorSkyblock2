@@ -20,7 +20,7 @@ public class FileClassLoader extends URLClassLoader {
 
     private final Map<String, Class<?>> classes = new ConcurrentHashMap<>();
 
-    private final JarFile jar;
+    private JarFile jar;
     private final Manifest manifest;
     private final URL url;
 
@@ -41,11 +41,12 @@ public class FileClassLoader extends URLClassLoader {
 
     @Override
     public void close() throws IOException {
-        try {
-            super.close();
-        } finally {
-            jar.close();
-        }
+        this.classes.clear();
+
+        jar.close();
+        this.jar = null;
+
+        super.close();
     }
 
     @Override
