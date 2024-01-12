@@ -315,6 +315,14 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                     );
                 }
             });
+
+            // Auto complete other missions that depend on the mission that was just completed
+            for (Mission<?> otherMission : getAllMissions()) {
+                if (otherMission.canComplete(superiorPlayer) && otherMission.getRequiredMissions().contains(mission.getName())) {
+                    // Auto reward the next mission
+                    rewardMission(otherMission, superiorPlayer, checkAutoReward, forceReward, null);
+                }
+            }
         }
     }
 
