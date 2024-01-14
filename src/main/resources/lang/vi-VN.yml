@@ -725,6 +725,7 @@ RATE_REMOVE_ALL: '&e&lĐánh giá | &7Thành công xóa bỏ tất cả đánh g
 RATE_REMOVE_ALL_ISLANDS: '&e&lĐảo | &7Thành công xóa bỏ tất cả đánh giá của tất cả các đảo.'
 RATE_SUCCESS: '&e&lĐánh giá | &7Bạn đánh giả đảo này với {0} sao!'
 REACHED_BLOCK_LIMIT: '&e&lNâng Cấp | &7Bạn đã đạt giới hạn {0} khối của đảo.'
+REACHED_ENTITY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity {0}.'
 RECALC_ALREADY_RUNNING: '&c&lLỗi | &7Đảo của bạn đang được tính toán lại, vui lòng chờ.'
 RECALC_ALREADY_RUNNING_OTHER: '&c&lLỗi | &7Hòn đảo này đang được tính toán lại, vui lòng chờ.'
 RECALC_ALL_ISLANDS: '&e&lĐảo | &7Recalculating all islands...'

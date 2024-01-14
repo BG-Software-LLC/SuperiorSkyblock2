@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.handlers;
 import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.MenusProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.PermissionsProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.PricesProvider;
@@ -41,6 +42,18 @@ public interface ProvidersManager {
      * @param stackedBlocksProvider The stacked-blocks provider to set.
      */
     void setStackedBlocksProvider(StackedBlocksProvider stackedBlocksProvider);
+
+    /**
+     * Get the currently used stacked-entities provider.
+     */
+    List<EntitiesProvider> getEntitiesProviders();
+
+    /**
+     * Add a custom entities provider for the plugin.
+     *
+     * @param entitiesProvider The entities provider to add.
+     */
+    void addEntitiesProvider(EntitiesProvider entitiesProvider);
 
     /**
      * Get the currently used economy-provider.

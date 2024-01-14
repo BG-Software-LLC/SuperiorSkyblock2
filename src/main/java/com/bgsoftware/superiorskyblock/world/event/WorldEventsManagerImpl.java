@@ -15,15 +15,11 @@ import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLim
 import com.google.common.base.Preconditions;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Deprecated
 public class WorldEventsManagerImpl implements WorldEventsManager {
@@ -50,12 +46,17 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
     public void loadChunk(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "chunk parameter cannot be null.");
 
-        Location firstBlock = chunk.getBlock(0, 100, 0).getLocation();
-        Island island = plugin.getGrid().getIslandAt(firstBlock);
-
-        if (island == null || island.isSpawn())
+        if (!plugin.getGrid().isIslandsWorld(chunk.getWorld()))
             return;
 
+        List<Island> chunkIslands = plugin.getGrid().getIslandsAt(chunk);
+        chunkIslands.forEach(island -> {
+            if (!island.isSpawn())
+                handleIslandChunkLoad(island, chunk);
+        });
+    }
+
+    private void handleIslandChunkLoad(Island island, Chunk chunk) {
         plugin.getNMSChunks().injectChunkSections(chunk);
 
         Set<Chunk> pendingLoadedChunksForIsland = this.pendingLoadedChunks.computeIfAbsent(island.getUniqueId(), u -> new LinkedHashSet<>());
@@ -75,7 +76,8 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
 
         if (chunk.getX() == (islandCenter.getBlockX() >> 4) && chunk.getZ() == (islandCenter.getBlockZ() >> 4)) {
             if (chunk.getWorld().getEnvironment() == plugin.getSettings().getWorlds().getDefaultWorld()) {
-                island.setBiome(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ()), false);
+                Block chunkBlock = chunk.getBlock(0, 100, 0);
+                island.setBiome(chunk.getWorld().getBiome(chunkBlock.getX(), chunkBlock.getZ()), false);
             }
 
             if (entityLimitsEnabled)
@@ -120,15 +122,18 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
 
         plugin.getStackedBlocks().removeStackedBlockHolograms(chunk);
 
-        Island island = plugin.getGrid().getIslandAt(chunk);
+        List<Island> chunkIslands = plugin.getGrid().getIslandsAt(chunk);
+        chunkIslands.forEach(island -> {
+            if (!island.isSpawn())
+                handleIslandChunkUnload(island, chunk);
+        });
+    }
 
-        if (island == null)
-            return;
-
+    private void handleIslandChunkUnload(Island island, Chunk chunk) {
         if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class))
             plugin.getNMSChunks().startTickingChunk(island, chunk, true);
 
-        if (!island.isSpawn() && !plugin.getNMSChunks().isChunkEmpty(chunk))
+        if (!plugin.getNMSChunks().isChunkEmpty(chunk))
             island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
 
         Arrays.stream(chunk.getEntities()).forEach(this.worldRecordService.get()::recordEntityDespawn);

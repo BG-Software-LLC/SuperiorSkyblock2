@@ -821,6 +821,7 @@ RATE_REMOVE_ALL_ISLANDS: '&e&lInsel | &7Alle Bewertungen aller Inseln wurden erf
   entfernt.'
 RATE_SUCCESS: '&e&lInsel | &7Du hast diese Insel mit {0} Sternen bewertet!'
 REACHED_BLOCK_LIMIT: '&e&lUpgrades | &7Du hast das Limit der Insel für {0} Block erreicht.'
+REACHED_ENTITY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity {0}.'
 RECALC_ALREADY_RUNNING: '&c&lError | &7Deine Insel wird bereits neu berechnet.'
 RECALC_ALREADY_RUNNING_OTHER: '&c&lFehler | &7Diese Insel wird bereits neu berechnet.'
 RECALC_ALL_ISLANDS: '&e&lInsel | &7Alle Inseln neu berechnen...'

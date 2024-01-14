@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.listener;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.signs.IslandSigns;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -29,7 +30,7 @@ public class SignsListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     private void onSignPlace(SignChangeEvent e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-        String[] signLines = e.getLines();
+        String[] signLines = e.getLines().clone();
 
         IslandSigns.Result result = IslandSigns.handleSignPlace(superiorPlayer, e.getBlock().getLocation(), signLines, true);
         switch (result.getReason()) {
@@ -42,9 +43,17 @@ public class SignsListener implements Listener {
                 break;
         }
 
-        // In 1.16.5+ of Paper, the SignChangeEvent doesn't have the lines array of the signs.
-        // Therefore, we manually need to set them.
-        plugin.getNMSWorld().setSignLines(e, signLines);
+        // We want to update the sign only one tick later, so other plugins don't interface with it
+        // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/1916
+        BukkitExecutor.sync(() -> {
+            BlockState blockState = e.getBlock().getState();
+            if (blockState instanceof Sign) {
+                Sign sign = (Sign) blockState;
+                for (int i = 0; i < signLines.length; ++i)
+                    sign.setLine(i, signLines[i]);
+                sign.update();
+            }
+        }, 1L);
     }
 
     /* SIGN BREAKS */

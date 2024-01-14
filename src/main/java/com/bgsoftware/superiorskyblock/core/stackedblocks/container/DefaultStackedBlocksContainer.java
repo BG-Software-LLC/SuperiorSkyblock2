@@ -36,6 +36,8 @@ public class DefaultStackedBlocksContainer implements StackedBlocksContainer {
         StackedBlock removedStackedBlock = chunkStackedBlocks == null ? null : chunkStackedBlocks.remove(new LocationKey(location));
         if (chunkStackedBlocks != null && chunkStackedBlocks.isEmpty())
             this.stackedBlocks.remove(chunkPosition);
+        if (removedStackedBlock != null)
+            removedStackedBlock.markAsRemoved();
         return removedStackedBlock;
     }
 

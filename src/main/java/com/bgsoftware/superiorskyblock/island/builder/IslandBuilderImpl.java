@@ -15,12 +15,14 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.DirtyChunk;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.container.value.Value;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
+import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -74,7 +76,7 @@ public class IslandBuilderImpl implements Island.Builder {
     public final Map<String, Integer> upgrades = new LinkedHashMap<>();
     public final KeyMap<Value<Integer>> blockLimits = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
     public final Map<UUID, Rating> ratings = new LinkedHashMap<>();
-    public final Map<Mission<?>, Integer> completedMissions = new LinkedHashMap<>();
+    public final Map<MissionReference, Counter> completedMissions = new LinkedHashMap<>();
     public final Map<IslandFlag, Byte> islandFlags = new LinkedHashMap<>();
     public final EnumMap<World.Environment, KeyMap<Value<Integer>>> cobbleGeneratorValues = new EnumMap<>(World.Environment.class);
     public final List<SIsland.UniqueVisitor> uniqueVisitors = new LinkedList<>();
@@ -426,13 +428,20 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public Island.Builder setCompletedMission(Mission<?> mission, int finishCount) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        this.completedMissions.put(mission, finishCount);
+        this.completedMissions.put(new MissionReference(mission), new Counter(finishCount));
         return this;
     }
 
     @Override
     public Map<Mission<?>, Integer> getCompletedMissions() {
-        return Collections.unmodifiableMap(this.completedMissions);
+        Map<Mission<?>, Integer> completedMissions = new LinkedHashMap<>();
+
+        this.completedMissions.forEach((mission, finishCount) -> {
+            if (mission.isValid())
+                completedMissions.put(mission.getMission(), finishCount.get());
+        });
+
+        return completedMissions.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(completedMissions);
     }
 
     @Override

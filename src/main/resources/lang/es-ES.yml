@@ -643,6 +643,7 @@ RATE_REMOVE_ALL: '&e&lIsla | &7Se eliminaron con éxito todas las calificaciones
 RATE_REMOVE_ALL_ISLANDS: '&e&lIsland | &7Successfully removed all ratings of all the islands.'
 RATE_SUCCESS: '&e&lIsla | &7¡Calificaste esta isla con {0} estrellas!'
 REACHED_BLOCK_LIMIT: '&e&lMejoras| &7Has alcanzado el límite de {0} bloques de la isla.'
+REACHED_ENTITY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity {0}.'
 RECALC_ALREADY_RUNNING: '&c&lError | &7Tu isla ya está siendo calculada.'
 RECALC_ALREADY_RUNNING_OTHER: '&c&lError | &7Esta isla ya está siendo calculada.'
 RECALC_ALL_ISLANDS: '&e&lIsla | &7Volviendo a calcular todas las islas...'

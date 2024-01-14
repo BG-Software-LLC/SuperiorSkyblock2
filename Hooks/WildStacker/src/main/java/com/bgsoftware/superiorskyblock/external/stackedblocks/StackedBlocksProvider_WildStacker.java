@@ -7,12 +7,15 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.external.WildStackerSnapshotsContainer;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceInventoryEvent;
@@ -24,6 +27,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -36,6 +41,12 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
     private static boolean registered = false;
 
     private final SuperiorSkyblockPlugin plugin;
+    private final LazyReference<RegionManagerService> regionManagerService = new LazyReference<RegionManagerService>() {
+        @Override
+        protected RegionManagerService create() {
+            return plugin.getServices().getService(RegionManagerService.class);
+        }
+    };
 
     public StackedBlocksProvider_WildStacker(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
@@ -126,6 +137,25 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
                 e.setCancelled(true);
             } else {
                 island.handleBlockPlace(blockKey, increaseAmount);
+            }
+        }
+
+        @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+        public void onBarrelUnstackOnOtherIsland(BarrelUnstackEvent e) {
+            Entity unstackSource = e.getUnstackSource();
+
+            if (!(unstackSource instanceof Player))
+                return;
+
+            Player player = (Player) unstackSource;
+
+            Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
+            if (island == null)
+                return;
+
+            if (!island.hasPermission(player, IslandPrivileges.BREAK)) {
+                e.setCancelled(true);
+                Message.PROTECTION.send(player);
             }
         }
 

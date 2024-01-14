@@ -174,6 +174,7 @@ public class SettingsContainer {
     public final Map<String, List<String>> eventCommands;
     public final long warpsWarmup;
     public final long homeWarmup;
+    public final long visitWarmup;
     public final boolean liquidUpdate;
     public final boolean lightsUpdate;
     public final List<String> pvpWorlds;
@@ -447,6 +448,7 @@ public class SettingsContainer {
         }
         warpsWarmup = config.getLong("warps-warmup", 0);
         homeWarmup = config.getLong("home-warmup", 0);
+        visitWarmup = config.getLong("visit-warmup", 0);
         liquidUpdate = config.getBoolean("liquid-update", false);
         lightsUpdate = config.getBoolean("lights-update", false);
         pvpWorlds = config.getStringList("pvp-worlds");

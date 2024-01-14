@@ -38,6 +38,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,7 +46,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -82,10 +82,16 @@ public class UpgradesModule extends BuiltinModule {
 
     @Override
     public Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin) {
-        return !isEnabled() ? null : enabledUpgrades.stream()
-                .map(IUpgradeType::getListener)
-                .filter(Objects::nonNull)
-                .toArray(Listener[]::new);
+        if (!isEnabled())
+            return null;
+
+        List<Listener> listenersList = new ArrayList<>();
+
+        for (IUpgradeType upgradeType : enabledUpgrades) {
+            listenersList.addAll(upgradeType.getListeners());
+        }
+
+        return listenersList.toArray(new Listener[0]);
     }
 
     @Override

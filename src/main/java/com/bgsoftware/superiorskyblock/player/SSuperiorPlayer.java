@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
@@ -25,6 +26,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
+import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -39,6 +41,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +50,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class SSuperiorPlayer implements SuperiorPlayer {
 
@@ -57,7 +61,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Nullable
     private PersistentDataContainer persistentDataContainer; // Lazy loading
 
-    private final Map<Mission<?>, Integer> completedMissions = new ConcurrentHashMap<>();
+    private final Map<MissionReference, Counter> completedMissions = new ConcurrentHashMap<>();
     private final List<UUID> pendingInvites = new LinkedList<>();
 
     private final UUID uuid;
@@ -852,7 +856,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         this.disbands = otherPlayer.getDisbands();
         this.borderColor = otherPlayer.getBorderColor();
         this.lastTimeStatus = otherPlayer.getLastTimeStatus();
-        this.completedMissions.putAll(otherPlayer.getCompletedMissionsWithAmounts());
+        this.completedMissions.clear();
+
+        otherPlayer.getCompletedMissionsWithAmounts().forEach((mission, finishCount) ->
+                this.completedMissions.put(new MissionReference(mission), new Counter(finishCount)));
 
         if (!otherPlayer.isPersistentDataContainerEmpty()) {
             byte[] data = otherPlayer.getPersistentDataContainer().serialize();
@@ -891,19 +898,20 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        this.setAmountMissionCompleted(mission, completedMissions.getOrDefault(mission, 0) + 1);
+        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(1));
     }
 
     @Override
     public void resetMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        this.setAmountMissionCompleted(mission, completedMissions.getOrDefault(mission, 0) - 1);
+        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(-1));
     }
 
     @Override
     public boolean hasCompletedMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        return completedMissions.getOrDefault(mission, 0) > 0;
+        Counter finishCount = completedMissions.get(new MissionReference(mission));
+        return finishCount != null && finishCount.get() > 0;
     }
 
     @Override
@@ -917,29 +925,39 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public int getAmountMissionCompleted(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        return completedMissions.getOrDefault(mission, 0);
+        Counter finishCount = completedMissions.get(new MissionReference(mission));
+        return finishCount == null ? 0 : finishCount.get();
     }
 
     @Override
     public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.set(finishCount));
+    }
 
-        Log.debug(Debug.SET_PLAYER_MISSION_COMPLETED, getName(), mission.getName(), finishCount);
+    private void changeAmountMissionsCompletedInternal(Mission<?> mission, Function<Counter, Integer> action) {
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+
+        MissionReference missionReference = new MissionReference(mission);
+
+        Counter finishCount = completedMissions.computeIfAbsent(missionReference, r -> new Counter(0));
+        int oldFinishCount = action.apply(finishCount);
+        int newFinishCount = finishCount.get();
+
+        Log.debug(Debug.SET_PLAYER_MISSION_COMPLETED, getName(), mission.getName(), newFinishCount);
 
         // We always want to reset data
         mission.clearData(this);
 
-        if (finishCount > 0) {
-            Integer oldFinishCount = completedMissions.put(mission, finishCount);
-
-            if (Objects.equals(oldFinishCount, finishCount))
+        if (newFinishCount > 0) {
+            if (newFinishCount == oldFinishCount)
                 return;
 
-            PlayersDatabaseBridge.saveMission(this, mission, finishCount);
+            PlayersDatabaseBridge.saveMission(this, mission, newFinishCount);
         } else {
-            Integer oldFinishCount = completedMissions.remove(mission);
+            completedMissions.remove(missionReference);
 
-            if (oldFinishCount == null)
+            if (oldFinishCount <= 0)
                 return;
 
             PlayersDatabaseBridge.removeMission(this, mission);
@@ -948,17 +966,26 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public List<Mission<?>> getCompletedMissions() {
-        return new SequentialListBuilder<Mission<?>>().build(completedMissions.keySet());
+        return new SequentialListBuilder<MissionReference>()
+                .filter(MissionReference::isValid)
+                .map(completedMissions.keySet(), MissionReference::getMission);
+    }
+
+    @Override
+    public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
+        Map<Mission<?>, Integer> completedMissions = new LinkedHashMap<>();
+
+        this.completedMissions.forEach((mission, finishCount) -> {
+            if (mission.isValid())
+                completedMissions.put(mission.getMission(), finishCount.get());
+        });
+
+        return completedMissions.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(completedMissions);
     }
 
     /*
      *   Other Methods
      */
-
-    @Override
-    public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
-        return Collections.unmodifiableMap(completedMissions);
-    }
 
     @Override
     public int hashCode() {

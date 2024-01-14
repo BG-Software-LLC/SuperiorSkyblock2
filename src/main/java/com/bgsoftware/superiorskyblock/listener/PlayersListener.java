@@ -456,7 +456,7 @@ public class PlayersListener implements Listener {
 
     @EventHandler
     private void onPlayerFall(EntityDamageEvent e) {
-        if (e.getCause() != EntityDamageEvent.DamageCause.FALL || !(e.getEntity() instanceof Player))
+        if (!(e.getEntity() instanceof Player))
             return;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getEntity());

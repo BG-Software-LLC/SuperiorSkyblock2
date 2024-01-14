@@ -77,7 +77,7 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
                 Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
-            } else {
+            } else if (increaseAmount > 1) {
                 island.handleBlockPlace(blockKey, increaseAmount - 1);
             }
         }

@@ -53,41 +53,37 @@ public class StackedBlock {
 
     public void markAsRemoved() {
         removed = true;
+        removeHologram();
     }
 
     public void updateName() {
-        if (removed) {
+        if (this.removed || this.amount <= 1) {
             removeHologram();
             return;
         }
 
-        if (amount <= 1) {
-            removeHologram();
-        } else {
-            Key currentBlockKey = Keys.of(location.getBlock());
+        Key currentBlockKey = Keys.of(location.getBlock());
 
-            if (blockKey == null || blockKey.equals(ConstantKeys.AIR)) {
-                blockKey = currentBlockKey;
-                if (blockKey.equals(ConstantKeys.AIR))
-                    return;
-            }
-
-            // Must be checked in order to fix issue #632
-            if (!currentBlockKey.equals(blockKey)) {
-                removeHologram();
+        if (blockKey == null || blockKey.equals(ConstantKeys.AIR)) {
+            blockKey = currentBlockKey;
+            if (blockKey.equals(ConstantKeys.AIR))
                 return;
-            }
-
-            if (hologram == null)
-                hologram = hologramsService.get().createHologram(getLocation().add(0.5, 1, 0.5));
-
-            hologram.setHologramName(plugin.getSettings().getStackedBlocks().getCustomName()
-                    .replace("{0}", String.valueOf(amount))
-                    .replace("{1}", Formatters.CAPITALIZED_FORMATTER.format(blockKey.getGlobalKey()))
-                    .replace("{2}", Formatters.NUMBER_FORMATTER.format(amount))
-            );
         }
 
+        // Must be checked in order to fix issue #632
+        if (!currentBlockKey.equals(blockKey)) {
+            removeHologram();
+            return;
+        }
+
+        if (hologram == null)
+            hologram = hologramsService.get().createHologram(getLocation().add(0.5, 1, 0.5));
+
+        hologram.setHologramName(plugin.getSettings().getStackedBlocks().getCustomName()
+                .replace("{0}", String.valueOf(amount))
+                .replace("{1}", Formatters.CAPITALIZED_FORMATTER.format(blockKey.getGlobalKey()))
+                .replace("{2}", Formatters.NUMBER_FORMATTER.format(amount))
+        );
     }
 
     public void removeHologram() {

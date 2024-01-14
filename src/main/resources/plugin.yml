@@ -7,7 +7,8 @@ website: https://bg-software.com/
 api-version: '1.13'
 author: Ome_R
 
-softdepend:
+# Custom section used by DependenciesManager, which replaces softdepend.
+class-depends:
   - AdvancedSpawners
   - CMI
   - ChangeSkin

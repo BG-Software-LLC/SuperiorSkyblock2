@@ -356,6 +356,13 @@ public interface SettingsManager {
     long getHomeWarmup();
 
     /**
+     * Delay before teleporting to another island, in milliseconds.
+     * If 0, no delay will be.
+     * Config-path: visit-warmup
+     */
+    long getVisitWarmup();
+
+    /**
      * Whether liquids should receive a physics update when placed in schematics or not.
      * Config-path: liquid-update
      */
