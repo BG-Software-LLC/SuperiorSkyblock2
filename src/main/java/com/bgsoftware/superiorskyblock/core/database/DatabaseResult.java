@@ -116,7 +116,15 @@ public class DatabaseResult {
     }
 
     public Optional<byte[]> getBlob(String key) {
-        return getObject(key, byte[].class);
+        Object obj = getObject(key);
+
+        if (obj instanceof String) {
+            return Optional.of(((String) obj).getBytes());
+        } else if (obj instanceof byte[]) {
+            return Optional.of((byte[]) obj);
+        }
+
+        return Optional.empty();
     }
 
     private <T> Optional<T> getObject(String key, Class<T> clazz) {
