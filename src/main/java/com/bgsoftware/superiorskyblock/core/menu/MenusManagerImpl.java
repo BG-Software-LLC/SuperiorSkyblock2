@@ -166,6 +166,16 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     }
 
     @Override
+    public void openIslandBannedPlayers(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
+        plugin.getProviders().getMenusProvider().openIslandBannedPlayers(targetPlayer, previousMenu, targetIsland);
+    }
+
+    @Override
+    public void refreshIslandBannedPlayers(Island island) {
+        plugin.getProviders().getMenusProvider().refreshIslandBannedPlayers(island);
+    }
+
+    @Override
     public void openIslandChest(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         plugin.getProviders().getMenusProvider().openIslandChest(targetPlayer, previousMenu, targetIsland);
     }

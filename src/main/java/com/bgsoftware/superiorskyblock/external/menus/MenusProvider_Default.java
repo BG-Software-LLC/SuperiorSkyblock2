@@ -195,6 +195,19 @@ public class MenusProvider_Default implements MenusProvider {
     }
 
     @Override
+    public void openIslandBannedPlayers(SuperiorPlayer targetPlayer, ISuperiorMenu previousMenu, Island targetIsland) {
+        Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
+        Menus.MENU_ISLAND_BANNED_PLAYERS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+    }
+
+    @Override
+    public void refreshIslandBannedPlayers(Island island) {
+        Preconditions.checkNotNull(island, "island parameter cannot be null.");
+        Menus.MENU_ISLAND_BANNED_PLAYERS.refreshViews(island);
+    }
+
+    @Override
     public void openIslandChest(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");

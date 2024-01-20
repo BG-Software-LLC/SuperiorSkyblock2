@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCoops;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCounts;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuGlobalWarps;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandBank;
+import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandBannedPlayers;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandChest;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandCreation;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandFlags;
@@ -60,6 +61,7 @@ public class Menus {
     public static MenuCounts MENU_COUNTS;
     public static MenuGlobalWarps MENU_GLOBAL_WARPS;
     public static MenuIslandBank MENU_ISLAND_BANK;
+    public static MenuIslandBannedPlayers MENU_ISLAND_BANNED_PLAYERS;
     public static MenuIslandChest MENU_ISLAND_CHEST;
     public static MenuIslandCreation MENU_ISLAND_CREATION;
     public static MenuIslandFlags MENU_ISLAND_FLAGS;
@@ -105,6 +107,7 @@ public class Menus {
         MENU_COUNTS = createMenu(MenuCounts.createInstance());
         MENU_GLOBAL_WARPS = createMenu(MenuGlobalWarps.createInstance());
         MENU_ISLAND_BANK = createMenu(MenuIslandBank.createInstance());
+        MENU_ISLAND_BANNED_PLAYERS = createMenu(MenuIslandBannedPlayers.createInstance());
         MENU_ISLAND_CHEST = createMenu(MenuIslandChest.createInstance());
         MENU_ISLAND_CREATION = createMenu(MenuIslandCreation.createInstance());
         MENU_ISLAND_FLAGS = createMenu(MenuIslandFlags.createInstance());

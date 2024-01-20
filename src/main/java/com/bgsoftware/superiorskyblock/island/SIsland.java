@@ -620,6 +620,8 @@ public class SIsland implements Island {
         if (isMember(superiorPlayer))
             kickMember(superiorPlayer);
 
+        plugin.getMenus().refreshIslandBannedPlayers(this);
+
         Location location = superiorPlayer.getLocation();
 
         if (location != null && isInside(location))
@@ -638,8 +640,11 @@ public class SIsland implements Island {
 
         boolean unbannedPlayer = bannedPlayers.remove(superiorPlayer);
 
-        if (unbannedPlayer)
+        if (unbannedPlayer) {
+            plugin.getMenus().refreshIslandBannedPlayers(this);
+
             IslandsDatabaseBridge.removeBannedPlayer(this, superiorPlayer);
+        }
     }
 
     @Override
