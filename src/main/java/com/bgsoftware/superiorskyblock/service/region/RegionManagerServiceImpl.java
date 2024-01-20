@@ -401,12 +401,10 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 if (!result) {
                     Message.TELEPORTED_FAILED.send(superiorPlayer);
                     superiorPlayer.teleport(plugin.getGrid().getSpawnIsland(), result2 -> {
-                        if (superiorPlayer.getPlayerStatus() == PlayerStatus.VOID_TELEPORT)
-                            superiorPlayer.setPlayerStatus(PlayerStatus.NONE);
+                        forgetVoidTeleportPlayerStatus(superiorPlayer);
                     });
                 } else {
-                    if (superiorPlayer.getPlayerStatus() == PlayerStatus.VOID_TELEPORT)
-                        superiorPlayer.setPlayerStatus(PlayerStatus.NONE);
+                    forgetVoidTeleportPlayerStatus(superiorPlayer);
                 }
             });
 
@@ -414,6 +412,14 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         }
 
         return MoveResult.SUCCESS;
+    }
+
+    private void forgetVoidTeleportPlayerStatus(SuperiorPlayer superiorPlayer) {
+        BukkitExecutor.sync(() -> {
+            if (superiorPlayer.getPlayerStatus() == PlayerStatus.VOID_TELEPORT) {
+                superiorPlayer.setPlayerStatus(PlayerStatus.NONE);
+            }
+        }, 40L);
     }
 
     @Override

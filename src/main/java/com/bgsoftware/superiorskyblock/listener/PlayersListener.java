@@ -456,12 +456,14 @@ public class PlayersListener implements Listener {
 
     @EventHandler
     private void onPlayerFall(EntityDamageEvent e) {
-        if (!(e.getEntity() instanceof Player))
+        if (e.getCause() != EntityDamageEvent.DamageCause.FALL || !(e.getEntity() instanceof Player))
             return;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getEntity());
-        if (superiorPlayer.getPlayerStatus() == PlayerStatus.VOID_TELEPORT)
+        if (superiorPlayer.getPlayerStatus() == PlayerStatus.VOID_TELEPORT) {
             e.setCancelled(true);
+        }
+
     }
 
     /* PLAYER DEATH */
