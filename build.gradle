@@ -10,7 +10,8 @@ version = "2023.3"
 project.ext {
     archiveFolder = file("archive/")
     targetFolder = file("target/")
-    buildVersion = System.getenv("BUILD_NUMBER") == null ? version : version + "-b" + System.getenv("BUILD_NUMBER")
+    buildVersion = System.getenv("BUILD_NUMBER") == null || Boolean.parseBoolean(System.getenv("STABLE_BUILD")) ?
+            version : version + "-b" + System.getenv("BUILD_NUMBER")
 }
 
 allprojects {
@@ -64,6 +65,7 @@ dependencies {
     implementation 'com.bgsoftware.common.reflection:ReflectionUtils:1.0.2'
     implementation 'com.bgsoftware.common.executors:Executors:1.0.1'
     implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:1.0.0'
+    implementation 'com.bgsoftware.common.dependencies:DependenciesManager:b2'
 
     implementation 'com.zaxxer:HikariCP:4.0.3'
     implementation 'org.slf4j:slf4j-api:2.0.5'
