@@ -100,9 +100,6 @@ public class MissionsModule extends BuiltinModule {
         }
 
         updateConfig(plugin);
-
-        if (enabled)
-            loadMissionCategories(plugin);
     }
 
     @Override
@@ -116,6 +113,7 @@ public class MissionsModule extends BuiltinModule {
         // Before we continue with the reload, we want to unload all the missions.
         plugin.getMissions().clearData();
         super.onReload(plugin);
+        onEnable(plugin);
     }
 
     @Override
