@@ -41,6 +41,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -88,7 +89,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private long lastTimeStatus;
 
     private BukkitTask teleportTask = null;
-    private PlayerStatus playerStatus = PlayerStatus.NONE;
+    private EnumSet<PlayerStatus> playerStatuses = EnumSet.noneOf(PlayerStatus.class);
 
     public SSuperiorPlayer(SuperiorPlayerBuilderImpl builder) {
         this.uuid = builder.uuid;
@@ -122,7 +123,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
             return target ? HitActionResult.TARGET_NOT_ONLINE : HitActionResult.NOT_ONLINE;
 
         // Checks for pvp warm-up
-        if (player.getPlayerStatus() == PlayerStatus.PVP_IMMUNED)
+        if (player.hasPlayerStatus(PlayerStatus.PVP_IMMUNED))
             return target ? HitActionResult.TARGET_PVP_WARMUP : HitActionResult.PVP_WARMUP;
 
         Island standingIsland = plugin.getGrid().getIslandAt(player.getLocation());
@@ -769,7 +770,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     @Deprecated
     public boolean isImmunedToPvP() {
-        return this.playerStatus == PlayerStatus.PVP_IMMUNED;
+        return this.hasPlayerStatus(PlayerStatus.PVP_IMMUNED);
     }
 
     @Override
@@ -777,14 +778,14 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void setImmunedToPvP(boolean immunedToPvP) {
         if (immunedToPvP)
             setPlayerStatus(PlayerStatus.PVP_IMMUNED);
-        else if (getPlayerStatus() == PlayerStatus.PVP_IMMUNED)
-            setPlayerStatus(PlayerStatus.NONE);
+        else
+            removePlayerStatus(PlayerStatus.PVP_IMMUNED);
     }
 
     @Override
     @Deprecated
     public boolean isLeavingFlag() {
-        return this.playerStatus == PlayerStatus.LEAVING_ISLAND;
+        return this.hasPlayerStatus(PlayerStatus.LEAVING_ISLAND);
     }
 
     @Override
@@ -792,21 +793,21 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void setLeavingFlag(boolean leavingFlag) {
         if (leavingFlag)
             setPlayerStatus(PlayerStatus.LEAVING_ISLAND);
-        else if (getPlayerStatus() == PlayerStatus.LEAVING_ISLAND)
-            setPlayerStatus(PlayerStatus.NONE);
+        else
+            removePlayerStatus(PlayerStatus.LEAVING_ISLAND);
     }
 
     @Override
     public boolean isImmunedToPortals() {
-        return this.playerStatus == PlayerStatus.PORTALS_IMMUNED;
+        return this.hasPlayerStatus(PlayerStatus.PORTALS_IMMUNED);
     }
 
     @Override
     public void setImmunedToPortals(boolean immuneToTeleport) {
         if (immuneToTeleport)
             setPlayerStatus(PlayerStatus.PORTALS_IMMUNED);
-        else if (getPlayerStatus() == PlayerStatus.PORTALS_IMMUNED)
-            setPlayerStatus(PlayerStatus.NONE);
+        else
+            removePlayerStatus(PlayerStatus.PORTALS_IMMUNED);
     }
 
     @Override
@@ -823,18 +824,43 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public PlayerStatus getPlayerStatus() {
-        return this.playerStatus;
+        for (PlayerStatus playerStatus : PlayerStatus.values()) {
+            if (this.playerStatuses.contains(playerStatus))
+                return playerStatus;
+        }
+
+        return PlayerStatus.NONE;
     }
 
     @Override
     public void setPlayerStatus(PlayerStatus playerStatus) {
         Preconditions.checkNotNull(playerStatus, "playerStatus cannot be null");
+        Preconditions.checkArgument(playerStatus != PlayerStatus.NONE, "Cannot set PlayerStatus.NONE");
 
-        if (this.playerStatus == playerStatus)
+        if (this.hasPlayerStatus(playerStatus))
             return;
 
         Log.debug(Debug.SET_PLAYER_STATUS, getName(), playerStatus.name());
-        this.playerStatus = playerStatus;
+        this.playerStatuses.add(playerStatus);
+    }
+
+    @Override
+    public void removePlayerStatus(PlayerStatus playerStatus) {
+        Preconditions.checkNotNull(playerStatus, "playerStatus cannot be null");
+        Preconditions.checkArgument(playerStatus != PlayerStatus.NONE, "Cannot remove PlayerStatus.NONE");
+
+        if (!this.hasPlayerStatus(playerStatus))
+            return;
+
+        Log.debug(Debug.REMOVE_PLAYER_STATUS, getName(), playerStatus.name());
+        this.playerStatuses.remove(playerStatus);
+    }
+
+    @Override
+    public boolean hasPlayerStatus(PlayerStatus playerStatus) {
+        Preconditions.checkNotNull(playerStatus, "playerStatus cannot be null");
+        Preconditions.checkArgument(playerStatus != PlayerStatus.NONE, "Cannot check PlayerStatus.NONE");
+        return this.playerStatuses.contains(playerStatus);
     }
 
     @Override

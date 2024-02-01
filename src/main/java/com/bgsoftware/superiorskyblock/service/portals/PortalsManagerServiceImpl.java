@@ -105,7 +105,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         if (targetDestination == World.Environment.THE_END && !plugin.getSettings().getWorlds().getEnd().isEnabled())
             return EntityPortalResult.DESTINATION_WORLD_DISABLED;
 
-        if (checkImmunedPortalsStatus && superiorPlayer.getPlayerStatus() == PlayerStatus.PORTALS_IMMUNED)
+        if (checkImmunedPortalsStatus && superiorPlayer.hasPlayerStatus(PlayerStatus.PORTALS_IMMUNED))
             return EntityPortalResult.PLAYER_IMMUNED_TO_PORTAL;
 
         EntityPortalResult portalResult = entityPortalResultSupplier.get();

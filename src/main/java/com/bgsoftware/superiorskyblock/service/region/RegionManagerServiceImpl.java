@@ -416,9 +416,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
     private void forgetVoidTeleportPlayerStatus(SuperiorPlayer superiorPlayer) {
         BukkitExecutor.sync(() -> {
-            if (superiorPlayer.getPlayerStatus() == PlayerStatus.VOID_TELEPORT) {
-                superiorPlayer.setPlayerStatus(PlayerStatus.NONE);
-            }
+            superiorPlayer.removePlayerStatus(PlayerStatus.VOID_TELEPORT);
         }, 40L);
     }
 
@@ -485,8 +483,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
     private MoveResult handlePlayerEnterIslandInternal(SuperiorPlayer superiorPlayer, Island toIsland, @Nullable Location from, Location to, IslandEnterEvent.EnterCause enterCause) {
         // This can happen after the leave event is cancelled.
-        if (superiorPlayer.getPlayerStatus() == PlayerStatus.LEAVING_ISLAND) {
-            superiorPlayer.setPlayerStatus(PlayerStatus.NONE);
+        if (superiorPlayer.hasPlayerStatus(PlayerStatus.LEAVING_ISLAND)) {
+            superiorPlayer.removePlayerStatus(PlayerStatus.LEAVING_ISLAND);
             return MoveResult.SUCCESS;
         }
 
@@ -521,8 +519,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 BukkitExecutor.sync(() -> plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland), 1L);
                 superiorPlayer.setPlayerStatus(PlayerStatus.PORTALS_IMMUNED);
                 BukkitExecutor.sync(() -> {
-                    if (superiorPlayer.getPlayerStatus() == PlayerStatus.PORTALS_IMMUNED)
-                        superiorPlayer.setPlayerStatus(PlayerStatus.NONE);
+                    superiorPlayer.removePlayerStatus(PlayerStatus.PORTALS_IMMUNED);
                 }, 100L);
             }
 
@@ -541,16 +538,14 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             if (plugin.getSettings().isImmuneToPvPWhenTeleport()) {
                 superiorPlayer.setPlayerStatus(PlayerStatus.PVP_IMMUNED);
                 BukkitExecutor.sync(() -> {
-                    if (superiorPlayer.getPlayerStatus() == PlayerStatus.PVP_IMMUNED)
-                        superiorPlayer.setPlayerStatus(PlayerStatus.NONE);
+                    superiorPlayer.removePlayerStatus(PlayerStatus.PVP_IMMUNED);
                 }, 200L);
             }
         }
 
         superiorPlayer.setPlayerStatus(PlayerStatus.PORTALS_IMMUNED);
         BukkitExecutor.sync(() -> {
-            if (superiorPlayer.getPlayerStatus() == PlayerStatus.PORTALS_IMMUNED)
-                superiorPlayer.setPlayerStatus(PlayerStatus.NONE);
+            superiorPlayer.removePlayerStatus(PlayerStatus.PORTALS_IMMUNED);
         }, 100L);
 
         Player player = superiorPlayer.asPlayer();

@@ -465,6 +465,7 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    @Deprecated
     public PlayerStatus getPlayerStatus() {
         return PlayerStatus.NONE;
     }
@@ -472,6 +473,16 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
     @Override
     public void setPlayerStatus(PlayerStatus playerStatus) {
         // Do nothing.
+    }
+
+    @Override
+    public void removePlayerStatus(PlayerStatus playerStatus) {
+        // Do nothing.
+    }
+
+    @Override
+    public boolean hasPlayerStatus(PlayerStatus playerStatus) {
+        return false;
     }
 
     @Override
