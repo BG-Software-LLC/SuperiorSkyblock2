@@ -473,7 +473,10 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             spawnersProvider = createInstance("spawners.SpawnersProvider_PvpingSpawners");
         } else if (canRegisterHook("EpicSpawners") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("EpicSpawners"))) {
-            if (Bukkit.getPluginManager().getPlugin("EpicSpawners").getDescription().getVersion().startsWith("7")) {
+            String version = Bukkit.getPluginManager().getPlugin("EpicSpawners").getDescription().getVersion();
+            if (version.startsWith("8")) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_EpicSpawners8");
+            } else if (version.startsWith("7")) {
                 spawnersProvider = createInstance("spawners.SpawnersProvider_EpicSpawners7");
             } else {
                 spawnersProvider = createInstance("spawners.SpawnersProvider_EpicSpawners6");

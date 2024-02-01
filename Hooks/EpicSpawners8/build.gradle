@@ -1,0 +1,13 @@
+group 'Hooks:EpicSpawners8'
+
+dependencies {
+    compileOnly "com.songoda:EpicSpawners:8.1.0"
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_epicspawners8') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_epicspawners8").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}
