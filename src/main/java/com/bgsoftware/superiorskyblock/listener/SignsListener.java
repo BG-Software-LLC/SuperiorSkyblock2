@@ -43,6 +43,10 @@ public class SignsListener implements Listener {
                 break;
         }
 
+        // Only update the lines if changed
+        if (Arrays.equals(signLines, e.getLines()))
+            return;
+
         // We want to update the sign only one tick later, so other plugins don't interface with it
         // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/1916
         BukkitExecutor.sync(() -> {
