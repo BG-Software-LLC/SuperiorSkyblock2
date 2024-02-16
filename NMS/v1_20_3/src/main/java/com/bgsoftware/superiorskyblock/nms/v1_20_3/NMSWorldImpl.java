@@ -65,8 +65,10 @@ import java.util.function.IntFunction;
 public class NMSWorldImpl implements NMSWorld {
 
     private static final ReflectMethod<Object> LINES_SIGN_CHANGE_EVENT = new ReflectMethod<>(SignChangeEvent.class, "lines");
-    private static final ReflectField<List<TickingBlockEntity>> LEVEL_BLOCK_ENTITY_TICKERS = new ReflectField<>(
+    private static final ReflectField<List<TickingBlockEntity>> LEVEL_BLOCK_ENTITY_TICKERS_PROTECTED = new ReflectField<>(
             Level.class, List.class, Modifier.PROTECTED | Modifier.FINAL, 1);
+    private static final ReflectField<List<TickingBlockEntity>> LEVEL_BLOCK_ENTITY_TICKERS_PUBLIC = new ReflectField<>(
+            Level.class, List.class, Modifier.PUBLIC | Modifier.FINAL, 1);
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -101,7 +103,14 @@ public class NMSWorldImpl implements NMSWorld {
         if (!(blockEntity instanceof SpawnerBlockEntity spawnerBlockEntity))
             return;
 
-        List<TickingBlockEntity> blockEntityTickers = LEVEL_BLOCK_ENTITY_TICKERS.get(serverLevel);
+        List<TickingBlockEntity> blockEntityTickers;
+
+        if (LEVEL_BLOCK_ENTITY_TICKERS_PROTECTED.isValid()) {
+            blockEntityTickers = LEVEL_BLOCK_ENTITY_TICKERS_PROTECTED.get(serverLevel);
+        } else {
+            blockEntityTickers = serverLevel.blockEntityTickers;
+        }
+
         Iterator<TickingBlockEntity> blockEntityTickersIterator = blockEntityTickers.iterator();
         List<TickingBlockEntity> tickersToAdd = new ArrayList<>();
 
