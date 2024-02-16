@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
+import com.bgsoftware.superiorskyblock.api.events.MissionCompleteEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
@@ -16,6 +17,7 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Bukkit;
@@ -54,6 +56,15 @@ public class FeaturesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onIslandEvent(IslandEvent event) {
+        handleEventCommands(event);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private void onIslandEvent(MissionCompleteEvent event) {
+        handleEventCommands(event);
+    }
+
+    private void handleEventCommands(Event event) {
         List<String> commands = plugin.getSettings().getEventCommands().get(event.getClass().getSimpleName().toLowerCase(Locale.ENGLISH));
 
         if (commands == null)
@@ -63,7 +74,9 @@ public class FeaturesListener implements Listener {
 
         Map<String, String> placeholdersReplaces = new HashMap<>();
 
-        placeholdersReplaces.put("%island%", event.getIsland().getName());
+        if (event instanceof IslandEvent)
+            placeholdersReplaces.put("%island%", ((IslandEvent) event).getIsland().getName());
+
         eventMethods.getPlayer(event).ifPresent(playerName -> placeholdersReplaces.put("%player%", playerName));
         eventMethods.getTarget(event).ifPresent(targetName -> placeholdersReplaces.put("%target%", targetName));
 
@@ -79,13 +92,17 @@ public class FeaturesListener implements Listener {
         } else if (event instanceof IslandWorthCalculatedEvent) {
             placeholdersReplaces.put("%worth%", ((IslandWorthCalculatedEvent) event).getWorth().toString());
             placeholdersReplaces.put("%level%", ((IslandWorthCalculatedEvent) event).getLevel().toString());
+        } else if (event instanceof MissionCompleteEvent) {
+            placeholdersReplaces.put("%mission%", ((MissionCompleteEvent) event).getMission().getName());
         }
 
-        for (String command : commands) {
-            for (Map.Entry<String, String> replaceEntry : placeholdersReplaces.entrySet())
-                command = command.replace(replaceEntry.getKey(), replaceEntry.getValue());
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-        }
+        BukkitExecutor.ensureMain(() -> {
+            for (String command : commands) {
+                for (Map.Entry<String, String> replaceEntry : placeholdersReplaces.entrySet())
+                    command = command.replace(replaceEntry.getKey(), replaceEntry.getValue());
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+            }
+        });
     }
 
     /* OBSIDIAN TO LAVA */
