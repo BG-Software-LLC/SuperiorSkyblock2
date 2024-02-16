@@ -137,12 +137,18 @@ public class BukkitEntities {
     }
 
     public static boolean canBypassEntityLimit(Entity entity) {
+        return canBypassEntityLimit(entity, true);
+    }
+
+    public static boolean canBypassEntityLimit(Entity entity, boolean checkProviders) {
         if (entity instanceof ArmorStand && !((ArmorStand) entity).isVisible())
             return true;
 
-        for (EntitiesProvider entitiesProvider : plugin.getProviders().getEntitiesProviders()) {
-            if (!entitiesProvider.shouldTrackEntity(entity))
-                return true;
+        if (checkProviders) {
+            for (EntitiesProvider entitiesProvider : plugin.getProviders().getEntitiesProviders()) {
+                if (!entitiesProvider.shouldTrackEntity(entity))
+                    return true;
+            }
         }
 
         return false;
