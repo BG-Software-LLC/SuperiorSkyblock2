@@ -4,6 +4,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
+import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -64,15 +67,24 @@ public class EntityTrackingListener implements Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         private void onEntityRemove(com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent e) {
+            if (!BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class) ||
+                    !BukkitEntities.canHaveLimit(e.getEntityType()) ||
+                    BukkitEntities.canBypassEntityLimit(e.getEntity()))
+                return;
+
             Location entityLocation = e.getEntity().getLocation();
 
             BukkitExecutor.sync(() -> {
+                if (e.getEntity().isValid() && !e.getEntity().isDead())
+                    return;
+
                 World world = entityLocation.getWorld();
                 int chunkX = entityLocation.getBlockX() >> 4;
                 int chunkZ = entityLocation.getBlockZ() >> 4;
                 // We don't want to track entities that are removed due to chunk being unloaded.
-                if (world.isChunkLoaded(chunkX, chunkZ))
+                if (world.isChunkLoaded(chunkX, chunkZ)) {
                     worldRecordService.get().recordEntityDespawn(e.getEntity());
+                }
             }, 1L);
         }
 
