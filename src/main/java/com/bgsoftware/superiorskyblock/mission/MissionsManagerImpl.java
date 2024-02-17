@@ -342,7 +342,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             for (Mission<?> otherMission : getAllMissions()) {
                 if (otherMission.canComplete(superiorPlayer) && otherMission.getRequiredMissions().contains(mission.getName())) {
                     // Auto reward the next mission
-                    rewardMission(otherMission, superiorPlayer, checkAutoReward, forceReward, null);
+                    rewardMission(otherMission, superiorPlayer, true);
                 }
             }
         }
