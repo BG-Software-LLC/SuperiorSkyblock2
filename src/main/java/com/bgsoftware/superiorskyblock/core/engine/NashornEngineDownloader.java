@@ -19,7 +19,7 @@ import java.nio.file.Paths;
 public class NashornEngineDownloader {
 
     private static final Gson GSON = new Gson();
-    private static final String JENKINS_URL = "https://hub.bg-software.com/job/SuperiorSkyblock%20Addons/job/NashornEngine/lastSuccessfulBuild/";
+    private static final String JENKINS_URL = "https://hub.bg-software.com/job/SuperiorSkyblock2%20-%20NashornEngine%20Module%20-%20Dev%20Builds/lastSuccessfulBuild/";
     private static final String JENKINS_API_ENDPOINT = JENKINS_URL + "api/json";
     private static final String JENKINS_ARTIFACTS_ENDPOINT = JENKINS_URL + "artifact/target/";
 
