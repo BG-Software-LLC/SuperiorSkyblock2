@@ -2,13 +2,14 @@ package com.bgsoftware.superiorskyblock;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.dependencies.DependenciesManager;
-import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.common.nmsloader.INMSLoader;
+import com.bgsoftware.common.nmsloader.NMSHandlersFactory;
+import com.bgsoftware.common.nmsloader.NMSLoadException;
 import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -16,7 +17,6 @@ import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.config.SettingsManagerImpl;
-import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.database.DataManager;
 import com.bgsoftware.superiorskyblock.core.engine.EnginesFactory;
 import com.bgsoftware.superiorskyblock.core.engine.NashornEngineDownloader;
@@ -62,7 +62,7 @@ import com.bgsoftware.superiorskyblock.module.container.DefaultModulesContainer;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
-import com.bgsoftware.superiorskyblock.nms.NMSDragonFightImpl;
+import com.bgsoftware.superiorskyblock.nms.NMSDragonFightChooser;
 import com.bgsoftware.superiorskyblock.nms.NMSEntities;
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
@@ -78,15 +78,12 @@ import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.UnsafeValues;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
@@ -358,67 +355,25 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         return super.getClassLoader();
     }
 
-    @SuppressWarnings("deprecation")
     private boolean loadNMSAdapter() {
-        if (ServerVersion.isLessThan(ServerVersion.v1_17)) {
-            nmsPackageVersion = getServer().getClass().getPackage().getName().split("\\.")[3];
-        } else {
-            ReflectMethod<Integer> getDataVersion = new ReflectMethod<>(UnsafeValues.class, "getDataVersion");
-            int dataVersion = getDataVersion.invoke(Bukkit.getUnsafe());
-
-            List<Pair<Integer, String>> versions = Arrays.asList(
-                    new Pair<>(2729, null),
-                    new Pair<>(2730, "v1_17"),
-                    new Pair<>(2974, null),
-                    new Pair<>(2975, "v1_18"),
-                    new Pair<>(3336, null),
-                    new Pair<>(3337, "v1_19"),
-                    new Pair<>(3465, "v1_20_1"),
-                    new Pair<>(3578, "v1_20_2"),
-                    new Pair<>(3700, "v1_20_3")
-            );
-
-            for (Pair<Integer, String> versionData : versions) {
-                if (dataVersion <= versionData.getKey()) {
-                    nmsPackageVersion = versionData.getValue();
-                    break;
-                }
-            }
-
-            if (nmsPackageVersion == null) {
-                Log.error("Data version: ", dataVersion);
-            }
-        }
-
-        if (nmsPackageVersion != null) {
-            try {
-                nmsAlgorithms = loadNMSClass("NMSAlgorithmsImpl", nmsPackageVersion);
-                nmsChunks = loadNMSClass("NMSChunksImpl", nmsPackageVersion);
-                nmsEntities = loadNMSClass("NMSEntitiesImpl", nmsPackageVersion);
-                nmsHolograms = loadNMSClass("NMSHologramsImpl", nmsPackageVersion);
-                nmsPlayers = loadNMSClass("NMSPlayersImpl", nmsPackageVersion);
-                nmsTags = loadNMSClass("NMSTagsImpl", nmsPackageVersion);
-                nmsWorld = loadNMSClass("NMSWorldImpl", nmsPackageVersion);
-                return true;
-            } catch (Exception error) {
-                Log.error(error, "An unexpected error occurred while loading nms support:");
-            }
-        }
-
-        new ManagerLoadException("The plugin doesn't support your minecraft version.\n" + "Please try a different version.", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
-
-        return false;
-    }
-
-    private <T> T loadNMSClass(String className, String version) throws Exception {
-        Class<?> nmsClass = Class.forName(String.format("com.bgsoftware.superiorskyblock.nms.%s.%s", version, className));
         try {
-            Constructor<?> constructor = nmsClass.getConstructor(SuperiorSkyblockPlugin.class);
-            // noinspection unchecked
-            return (T) constructor.newInstance(this);
-        } catch (NoSuchMethodException error) {
-            // noinspection unchecked
-            return (T) nmsClass.newInstance();
+            INMSLoader nmsLoader = NMSHandlersFactory.createNMSLoader(this);
+
+            this.nmsAlgorithms = nmsLoader.loadNMSHandler(NMSAlgorithms.class);
+            this.nmsChunks = nmsLoader.loadNMSHandler(NMSChunks.class);
+            this.nmsEntities = nmsLoader.loadNMSHandler(NMSEntities.class);
+            this.nmsHolograms = nmsLoader.loadNMSHandler(NMSHolograms.class);
+            this.nmsPlayers = nmsLoader.loadNMSHandler(NMSPlayers.class);
+            this.nmsTags = nmsLoader.loadNMSHandler(NMSTags.class);
+            this.nmsWorld = nmsLoader.loadNMSHandler(NMSWorld.class);
+            this.nmsDragonFight = new NMSDragonFightChooser(plugin, () -> nmsLoader.loadNMSHandler(NMSDragonFight.class));
+
+            return true;
+        } catch (NMSLoadException error) {
+            new ManagerLoadException(error, "The plugin doesn't support your minecraft version.\n" + "Please try a different version.",
+                    ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
+
+            return false;
         }
     }
 
@@ -656,14 +611,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     }
 
     public NMSDragonFight getNMSDragonFight() {
-        if (nmsDragonFight == null) {
-            try {
-                nmsDragonFight = settingsHandler.getWorlds().getEnd().isDragonFight() ? loadNMSClass("NMSDragonFightImpl", nmsPackageVersion) : new NMSDragonFightImpl();
-            } catch (Exception error) {
-                nmsDragonFight = new NMSDragonFightImpl();
-            }
-        }
-
         return nmsDragonFight;
     }
 
