@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -165,7 +166,14 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            vehiclesOwners.put(new LocationKey(blockLocation), e.getPlayer());
+            LocationKey futureEntitySpawnLocation = new LocationKey(
+                    blockLocation.getWorld().getName(),
+                    blockLocation.getX(),
+                    blockLocation.getY() + 1,
+                    blockLocation.getZ()
+            );
+
+            vehiclesOwners.put(futureEntitySpawnLocation, e.getPlayer());
         }
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -183,7 +191,14 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            Player vehicleOwner = vehiclesOwners.remove(new LocationKey(entityLocation));
+            LocationKey entityBlockLocation = new LocationKey(
+                    entityLocation.getWorld().getName(),
+                    entityLocation.getBlockX(),
+                    entityLocation.getBlockY(),
+                    entityLocation.getBlockZ()
+            );
+
+            Player vehicleOwner = vehiclesOwners.remove(entityBlockLocation);
 
             boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
 
