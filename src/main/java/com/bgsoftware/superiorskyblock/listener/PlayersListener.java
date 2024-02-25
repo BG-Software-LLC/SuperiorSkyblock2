@@ -40,21 +40,12 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.InventoryHolder;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PlayersListener implements Listener {
 
@@ -348,6 +339,26 @@ public class PlayersListener implements Listener {
         PlayerChat playerChat = PlayerChat.getChatListener(e.getPlayer());
         if (playerChat != null && playerChat.supply(e.getMessage())) {
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    private void onPlayerBedEnter(PlayerBedEnterEvent e) {
+        // check if all players on this island are currently sleeping
+        Player p = e.getPlayer();
+        Island island = plugin.getGrid().getIslandAt(p.getLocation());
+        if (island != null) {
+            // if island is not null it means we are on an island
+            List<UUID> members = new ArrayList<>(island.getIslandMembers().stream().map(SuperiorPlayer::getUniqueId).toList());
+            members.add(island.getOwner().getUniqueId());
+
+            for (SuperiorPlayer pl: plugin.getPlayers().getAllPlayers().stream().filter(SuperiorPlayer::isOnline).toList()){
+                pl.asPlayer().setSleepingIgnored(false);
+                if (pl.getLocation().getWorld() == p.getLocation().getWorld() && !members.contains(pl.getUniqueId())) {
+                    // If player is not part of this island but is on our world, ignore if they are sleeping or not
+                    pl.asPlayer().setSleepingIgnored(true);
+                }
+            }
         }
     }
 
