@@ -37,6 +37,10 @@ publishing {
 
 }
 
+java {
+    withSourcesJar()
+}
+
 task generateAPIDocs(type: Javadoc) {
     source = sourceSets.main.allJava
 }
