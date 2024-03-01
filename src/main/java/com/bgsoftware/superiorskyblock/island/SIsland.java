@@ -1948,7 +1948,7 @@ public class SIsland implements Island {
 
         Log.debug(Debug.EXECUTE_ISLAND_COMMANDS, owner.getName(), command, onlyOnlineMembers, ignoredList);
 
-        forEachIslandMember(ignoredList, true, islandMember ->
+        forEachIslandMember(ignoredList, onlyOnlineMembers, islandMember ->
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player-name}", islandMember.getName()))
         );
     }
