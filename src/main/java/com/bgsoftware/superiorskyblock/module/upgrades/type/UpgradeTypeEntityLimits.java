@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.type;
 
-import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
@@ -14,10 +13,9 @@ import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Hanging;
@@ -32,7 +30,6 @@ import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
@@ -43,9 +40,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class UpgradeTypeEntityLimits implements IUpgradeType {
-
-    private static final ReflectMethod<EquipmentSlot> INTERACT_GET_HAND = new ReflectMethod<>(
-            PlayerInteractEvent.class, "getHand");
 
     private final Map<EntityType, Player> entityBreederPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
     private final Map<LocationKey, Player> vehiclesOwners = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
@@ -145,14 +139,18 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
         @EventHandler
         public void onVehicleSpawn(PlayerInteractEvent e) {
-            if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null ||
-                    e.getPlayer().getGameMode() == GameMode.CREATIVE)
+            if (e.getAction() != Action.RIGHT_CLICK_BLOCK)
                 return;
 
-            if (INTERACT_GET_HAND.isValid() && INTERACT_GET_HAND.invoke(e) != EquipmentSlot.HAND)
+            PlayerHand playerHand = BukkitItems.getHand(e);
+            if (playerHand != PlayerHand.MAIN_HAND)
                 return;
 
-            Material handType = e.getItem().getType();
+            ItemStack handItem = BukkitItems.getHandItem(e.getPlayer(), playerHand);
+            if (handItem == null)
+                return;
+
+            Material handType = handItem.getType();
 
             // Check if minecart or boat
             boolean isMinecart = Materials.isRail(e.getClickedBlock().getType()) && Materials.isMinecart(handType);
@@ -206,7 +204,8 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
                 entity.remove();
                 if (vehicleOwner != null && vehicleOwner.isOnline()) {
                     Message.REACHED_ENTITY_LIMIT.send(vehicleOwner, Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
-                    BukkitItems.addItem(asItemStack(e.getVehicle()), vehicleOwner.getInventory(), vehicleOwner.getLocation());
+                    if (!(e.getVehicle() instanceof Boat))
+                        BukkitItems.addItem(asItemStack(e.getVehicle()), vehicleOwner.getInventory(), vehicleOwner.getLocation());
                 }
             }
         }
