@@ -172,6 +172,7 @@ island-roles:
       - ANIMAL_DAMAGE
       - ANIMAL_SHEAR
       - BREAK
+      - BRUSH
       - BUILD
       - CLOSE_BYPASS
       - CROPS_GROWTH

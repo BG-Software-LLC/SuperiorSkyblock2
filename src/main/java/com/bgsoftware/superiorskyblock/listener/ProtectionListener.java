@@ -75,6 +75,8 @@ public class ProtectionListener implements Listener {
             ProjectileHitEvent.class, "getHitBlock");
     @Nullable
     private static final Material CHORUS_FLOWER = EnumHelper.getEnum(Material.class, "CHORUS_FLOWER");
+    @Nullable
+    private static final Material BRUSH = EnumHelper.getEnum(Material.class, "BRUSH");
 
     private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
@@ -203,6 +205,19 @@ public class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(dispenseBlockLocation);
 
         if (island != null && !island.isInsideRange(dispenseBlockLocation))
+            e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onBrushUse(PlayerInteractEvent e) {
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null || e.getClickedBlock() == null ||
+                e.getItem().getType() != BRUSH)
+            return;
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        InteractionResult interactionResult = this.protectionManager.get().handleCustomInteraction(
+                superiorPlayer, e.getClickedBlock().getLocation(), IslandPrivileges.BRUSH);
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
     }
 
