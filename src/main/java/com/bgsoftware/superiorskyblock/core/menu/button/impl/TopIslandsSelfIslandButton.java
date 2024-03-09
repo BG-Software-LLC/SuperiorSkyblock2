@@ -72,7 +72,11 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
             if (islandCommands != null) {
                 islandCommands.forEach(command -> Bukkit.dispatchCommand(command.startsWith("PLAYER:") ?
                                 player : Bukkit.getConsoleSender(),
-                        command.replace("PLAYER:", "").replace("%player%", player.getName())));
+                        command.replace("PLAYER:", "")
+                                .replace("%player%", player.getName())
+                                .replace("%island%", island.getName())
+                                .replace("%owner%", island.getOwner().getName())
+                ));
             }
 
             menuView.setPreviousMove(false);
