@@ -55,6 +55,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
@@ -75,6 +76,8 @@ public class ProtectionListener implements Listener {
             ProjectileHitEvent.class, "getHitBlock");
     @Nullable
     private static final Material CHORUS_FLOWER = EnumHelper.getEnum(Material.class, "CHORUS_FLOWER");
+    @Nullable
+    private static final Material CHORUS_FRUIT = EnumHelper.getEnum(Material.class, "CHORUS_FRUIT");
     @Nullable
     private static final Material BRUSH = EnumHelper.getEnum(Material.class, "BRUSH");
 
@@ -219,6 +222,19 @@ public class ProtectionListener implements Listener {
                 superiorPlayer, e.getClickedBlock().getLocation(), IslandPrivileges.BRUSH);
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onChorusFruitConsume(PlayerItemConsumeEvent e) {
+        if (CHORUS_FRUIT == null || e.getItem().getType() != CHORUS_FRUIT)
+            return;
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        InteractionResult interactionResult = this.protectionManager.get().handlePlayerConsumeChorusFruit(
+                superiorPlayer, e.getPlayer().getLocation());
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
+            e.setCancelled(true);
+
     }
 
     /* ENTITY INTERACTS */

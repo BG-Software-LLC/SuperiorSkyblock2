@@ -20,6 +20,7 @@ public class IslandPrivileges {
     public static final IslandPrivilege BUILD = register("BUILD");
     public static final IslandPrivilege CHANGE_NAME = register("CHANGE_NAME");
     public static final IslandPrivilege CHEST_ACCESS = register("CHEST_ACCESS");
+    public static final IslandPrivilege CHORUS_FRUIT = register("CHORUS_FRUIT", ServerVersion.isAtLeast(ServerVersion.v1_9));
     public static final IslandPrivilege CLOSE_BYPASS = register("CLOSE_BYPASS");
     public static final IslandPrivilege CLOSE_ISLAND = register("CLOSE_ISLAND");
     public static final IslandPrivilege COOP_MEMBER = register("COOP_MEMBER");

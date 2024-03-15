@@ -321,6 +321,21 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     }
 
     @Override
+    public InteractionResult handlePlayerConsumeChorusFruit(SuperiorPlayer superiorPlayer, Location location) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
+        Preconditions.checkNotNull(location, "location cannot be null");
+        Preconditions.checkArgument(location.getWorld() != null, "destination's world cannot be null");
+
+        if (IslandPrivileges.CHORUS_FRUIT == null) {
+            // Chorus Fruit privilege does not exist, we will just return SUCCESS in this case.
+            return InteractionResult.SUCCESS;
+        }
+
+        Island island = plugin.getGrid().getIslandAt(location);
+        return handleInteractionInternal(superiorPlayer, location, island, IslandPrivileges.CHORUS_FRUIT, 0, true, true);
+    }
+
+    @Override
     public InteractionResult handleCustomInteraction(SuperiorPlayer superiorPlayer, Location location, IslandPrivilege islandPrivilege) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(location, "location cannot be null");

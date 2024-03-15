@@ -175,6 +175,7 @@ island-roles:
       - BRUSH
       - BUILD
       - CLOSE_BYPASS
+      - CHORUS_FRUIT
       - CROPS_GROWTH
       - DROP_ITEMS
       - ENDER_PEARL
