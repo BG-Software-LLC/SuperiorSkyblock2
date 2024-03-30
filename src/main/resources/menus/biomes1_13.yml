@@ -110,19 +110,19 @@ items:
       lore:
         - '&7Change your island biome to swamp.'
   '~':
-    biome: WOODED_HILLS
+    biome: BADLANDS
     access:
       type: PLAYER_HEAD
       skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODJkNWZlZmUyMGRhZjMxYzIzOGVlMjI3ZGQxNDE4MjdhZGE1ZWY4NDgyZDhkMzU3YmJlNWE3Y2Y0MGFmODUifX19'
-      name: '&eMesa Biome &a(Available)'
+      name: '&eBadlands Biome &a(Available)'
       lore:
-        - '&7Change your island biome to Mesa.'
+        - '&7Change your island biome to Badlands.'
     no-access:
       type: PLAYER_HEAD
       skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODJkNWZlZmUyMGRhZjMxYzIzOGVlMjI3ZGQxNDE4MjdhZGE1ZWY4NDgyZDhkMzU3YmJlNWE3Y2Y0MGFmODUifX19'
-      name: '&eMesa Biome &c(Unavailable)'
+      name: '&eBadlands Biome &c(Unavailable)'
       lore:
-        - '&7Change your island biome to Mesa.'
+        - '&7Change your island biome to Badlands.'
 
 sounds:
   '!':
