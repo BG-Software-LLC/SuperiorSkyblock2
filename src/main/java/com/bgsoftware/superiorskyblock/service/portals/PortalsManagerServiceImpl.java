@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.service.portals.EntityPortalResult;
 import com.bgsoftware.superiorskyblock.api.service.portals.PortalsManagerService;
-import com.bgsoftware.superiorskyblock.api.service.region.MoveResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
@@ -66,18 +65,16 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
 
     @Override
     public EntityPortalResult handlePlayerPortal(SuperiorPlayer superiorPlayer, Location portalLocation,
-                                                 PortalType portalType, Location destinationLocation,
+                                                 PortalType portalType, Location unused,
                                                  boolean checkImmunedPortalsStatus) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null.");
         Preconditions.checkNotNull(portalLocation, "portalLocation cannot be null.");
         Preconditions.checkNotNull(portalType, "portalType cannot be null.");
-        Preconditions.checkNotNull(destinationLocation, "destinationLocation cannot be null.");
         Preconditions.checkArgument(!(superiorPlayer instanceof SuperiorNPCPlayer), "superiorPlayer cannot be an NPC.");
         Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
-        Preconditions.checkArgument(destinationLocation.getWorld() != null, "portalLocation's world cannot be null");
 
         return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, checkImmunedPortalsStatus,
-                () -> simulateEntityPortal(superiorPlayer.asPlayer(), portalLocation, portalType, destinationLocation));
+                () -> simulatePlayerPortal(superiorPlayer, portalLocation, portalType));
     }
 
     @Override
@@ -132,31 +129,13 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         return simulateEntityPortalFromIsland(entity, island, portalLocation, portalType);
     }
 
-    private EntityPortalResult simulateEntityPortal(Entity entity, Location portalLocation, PortalType portalType,
-                                                    Location destinationPortalLocation) {
+    private EntityPortalResult simulatePlayerPortal(SuperiorPlayer superiorPlayer, Location portalLocation, PortalType portalType) {
         Island island = plugin.getGrid().getIslandAt(portalLocation);
 
         if (island == null)
             return EntityPortalResult.PORTAL_NOT_IN_ISLAND;
 
-        EntityPortalResult entityPortalResult = simulateEntityPortalFromIsland(entity, island, portalLocation, portalType);
-        if (entityPortalResult != EntityPortalResult.SUCCEED)
-            return entityPortalResult;
-
-        if (!(entity instanceof Player))
-            return EntityPortalResult.SUCCEED;
-
-        Island toIsland = plugin.getGrid().getIslandAt(destinationPortalLocation);
-        if (toIsland == null)
-            return EntityPortalResult.SUCCEED;
-
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(entity);
-        MoveResult moveResult = this.regionManagerService.get().handlePlayerTeleportByPortal(superiorPlayer,
-                portalLocation, destinationPortalLocation);
-        if (moveResult != MoveResult.SUCCESS)
-            return EntityPortalResult.DESTINATION_ISLAND_NOT_PERMITTED;
-
-        return EntityPortalResult.SUCCEED;
+        return simulateEntityPortalFromIsland(superiorPlayer.asPlayer(), island, portalLocation, portalType);
     }
 
     private EntityPortalResult simulateEntityPortalFromIsland(Entity entity, Island island, Location portalLocation,

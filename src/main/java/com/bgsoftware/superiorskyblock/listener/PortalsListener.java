@@ -47,6 +47,8 @@ public class PortalsListener implements Listener {
         if (superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
+        // TODO - do we really need this? Why not use EntityPortalEnterEvent below?
+
         PortalType portalType = (e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ? PortalType.NETHER : PortalType.ENDER;
 
         EntityPortalResult portalResult = this.portalsManager.get().handlePlayerPortal(superiorPlayer, e.getFrom(),
