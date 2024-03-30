@@ -4052,9 +4052,18 @@ public class SIsland implements Island {
     }
 
     private void calcIslandWorthInternal(@Nullable SuperiorPlayer asker, @Nullable Runnable callback) {
-        Log.debug(Debug.CALCULATE_ISLAND, owner.getName(), asker);
+        try {
+            this.beingRecalculated = true;
+            runCalcIslandWorthInternal(asker, callback);
+        } catch (Throwable error) {
+            // In case of an error, we get out of the recalculate state.
+            this.beingRecalculated = false;
+            throw error;
+        }
+    }
 
-        beingRecalculated = true;
+    private void runCalcIslandWorthInternal(@Nullable SuperiorPlayer asker, @Nullable Runnable callback) {
+        Log.debug(Debug.CALCULATE_ISLAND, owner.getName(), asker);
 
         BigDecimal oldWorth = getWorth();
         BigDecimal oldLevel = getIslandLevel();
@@ -4070,6 +4079,8 @@ public class SIsland implements Island {
         }
 
         calculationResult.whenComplete((result, error) -> {
+            beingRecalculated = false;
+
             if (error != null) {
                 if (error instanceof TimeoutException) {
                     if (asker != null)
@@ -4081,8 +4092,6 @@ public class SIsland implements Island {
                     if (asker != null)
                         Message.ISLAND_WORTH_ERROR.send(asker);
                 }
-
-                beingRecalculated = false;
 
                 return;
             }
@@ -4100,8 +4109,6 @@ public class SIsland implements Island {
 
             saveBlockCounts(this.currentTotalBlockCounts.get(), oldWorth, oldLevel);
             updateLastTime();
-
-            beingRecalculated = false;
         });
     }
 
