@@ -593,6 +593,11 @@ public class GridManagerImpl extends Manager implements GridManager {
     public World getIslandsWorld(Island island, World.Environment environment) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+
+        if (island.isSpawn()) {
+            return island.getIslandHome(environment).getWorld();
+        }
+
         return plugin.getProviders().getWorldsProvider().getIslandsWorld(island, environment);
     }
 
@@ -600,6 +605,10 @@ public class GridManagerImpl extends Manager implements GridManager {
     public WorldInfo getIslandsWorldInfo(Island island, World.Environment environment) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+
+        if (island.isSpawn()) {
+            return WorldInfo.of(island.getIslandHome(environment).getWorld());
+        }
 
         WorldsProvider worldsProvider = plugin.getProviders().getWorldsProvider();
 
@@ -615,6 +624,10 @@ public class GridManagerImpl extends Manager implements GridManager {
     public WorldInfo getIslandsWorldInfo(Island island, String worldName) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null.");
+
+        if (island.isSpawn()) {
+            return WorldInfo.of(island.getIslandHome(World.Environment.NORMAL).getWorld());
+        }
 
         WorldsProvider worldsProvider = plugin.getProviders().getWorldsProvider();
 
