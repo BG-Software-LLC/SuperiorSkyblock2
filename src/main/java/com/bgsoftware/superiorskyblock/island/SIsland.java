@@ -2518,7 +2518,7 @@ public class SIsland implements Island {
     public boolean isChunkDirty(String worldName, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null.");
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, worldName);
-        Preconditions.checkArgument(worldInfo == null || isChunkInside(chunkX, chunkZ),
+        Preconditions.checkArgument(worldInfo != null && isChunkInside(chunkX, chunkZ),
                 "Chunk must be within the island boundaries.");
         return this.dirtyChunksContainer.isMarkedDirty(ChunkPosition.of(worldInfo, chunkX, chunkZ));
     }
