@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
+import com.bgsoftware.superiorskyblock.api.hooks.LazyWorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandBlockFlags;
@@ -3377,9 +3378,9 @@ public class SIsland implements Island {
             Message.TELEPORT_WARMUP.send(superiorPlayer, Formatters.TIME_FORMATTER.format(
                     Duration.ofMillis(plugin.getSettings().getWarpsWarmup()), superiorPlayer.getUserLocale()));
             superiorPlayer.setTeleportTask(BukkitExecutor.sync(() ->
-                    warpPlayerWithoutWarmup(superiorPlayer, islandWarp), plugin.getSettings().getWarpsWarmup() / 50));
+                    warpPlayerWithoutWarmup(superiorPlayer, islandWarp, true), plugin.getSettings().getWarpsWarmup() / 50));
         } else {
-            warpPlayerWithoutWarmup(superiorPlayer, islandWarp);
+            warpPlayerWithoutWarmup(superiorPlayer, islandWarp, true);
         }
     }
 
@@ -4256,16 +4257,27 @@ public class SIsland implements Island {
      *  Island top methods
      */
 
-    private void warpPlayerWithoutWarmup(SuperiorPlayer superiorPlayer, IslandWarp islandWarp) {
-        Location location = islandWarp.getLocation();
-        superiorPlayer.setTeleportTask(null);
-
+    private void warpPlayerWithoutWarmup(SuperiorPlayer superiorPlayer, IslandWarp islandWarp, boolean shouldRetryOnNullWorld) {
         // Warp doesn't exist anymore.
         if (getWarp(islandWarp.getName()) == null) {
             Message.INVALID_WARP.send(superiorPlayer, islandWarp.getName());
             deleteWarp(islandWarp.getName());
             return;
         }
+
+        Location location = islandWarp.getLocation();
+        if (location.getWorld() == null) {
+            if (shouldRetryOnNullWorld && location instanceof LazyWorldLocation &&
+                    plugin.getProviders().getWorldsProvider() instanceof LazyWorldsProvider) {
+                LazyWorldsProvider worldsProvider = (LazyWorldsProvider) plugin.getProviders().getWorldsProvider();
+                WorldInfo worldInfo = worldsProvider.getIslandsWorldInfo(this, ((LazyWorldLocation) location).getWorldName());
+                worldsProvider.prepareWorld(this, worldInfo.getEnvironment(),
+                        () -> warpPlayerWithoutWarmup(superiorPlayer, islandWarp, false));
+                return;
+            }
+        }
+
+        superiorPlayer.setTeleportTask(null);
 
         if (!isInsideRange(location)) {
             Message.UNSAFE_WARP.send(superiorPlayer);
