@@ -129,11 +129,14 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         Island island = plugin.getGrid().getIslandAt(blockLocation);
 
-        InteractionResult interactionResult = handleInteractionInternal(superiorPlayer, blockLocation, island, null, 0, true, false);
+        InteractionResult interactionResult = handleInteractionInternal(superiorPlayer, blockLocation, island,
+                null, 0, true, false);
 
-        if (interactionResult != InteractionResult.SUCCESS) return interactionResult;
+        if (interactionResult != InteractionResult.SUCCESS)
+            return interactionResult;
 
-        if (island == null) return InteractionResult.SUCCESS;
+        if (island == null)
+            return InteractionResult.SUCCESS;
 
         BlockState blockState = block.getState();
         EntityType spawnType = usedItem == null ? EntityType.UNKNOWN : BukkitItems.getEntityType(usedItem);

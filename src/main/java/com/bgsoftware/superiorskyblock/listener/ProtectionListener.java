@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -234,7 +235,32 @@ public class ProtectionListener implements Listener {
                 superiorPlayer, e.getPlayer().getLocation());
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled(true);
+    }
 
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    private void onMinecartPlace(PlayerInteractEvent e) {
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getClickedBlock() == null)
+            return;
+
+        PlayerHand playerHand = BukkitItems.getHand(e);
+        if (playerHand != PlayerHand.MAIN_HAND)
+            return;
+
+        ItemStack handItem = BukkitItems.getHandItem(e.getPlayer(), playerHand);
+
+        if (handItem == null)
+            return;
+
+        Material handItemType = handItem.getType();
+        Material clickedBlockType = e.getClickedBlock().getType();
+
+        if ((Materials.isMinecart(handItemType) && Materials.isRail(clickedBlockType)) || Materials.isBoat(handItemType)) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+            InteractionResult interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer,
+                    e.getClickedBlock().getLocation(), IslandPrivileges.MINECART_PLACE);
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
+                e.setCancelled(true);
+        }
     }
 
     /* ENTITY INTERACTS */
