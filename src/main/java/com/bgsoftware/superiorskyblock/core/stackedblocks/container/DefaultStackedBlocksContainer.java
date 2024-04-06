@@ -1,10 +1,14 @@
 package com.bgsoftware.superiorskyblock.core.stackedblocks.container;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LocationKey;
+import com.bgsoftware.superiorskyblock.core.WorldInfoImpl;
 import com.bgsoftware.superiorskyblock.core.stackedblocks.StackedBlock;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +28,22 @@ public class DefaultStackedBlocksContainer implements StackedBlocksContainer {
 
     @Override
     public StackedBlock createStackedBlock(Location location) {
-        ChunkPosition chunkPosition = ChunkPosition.of(location);
+        World world = location.getWorld();
+
+        ChunkPosition chunkPosition;
+
+        if (world != null) {
+            chunkPosition = ChunkPosition.of(location);
+        } else if (location instanceof LazyWorldLocation) {
+            String worldName = ((LazyWorldLocation) location).getWorldName();
+            // We do not care about the environment here.
+            WorldInfo worldInfo = new WorldInfoImpl(worldName, null);
+            chunkPosition = ChunkPosition.of(worldInfo, location.getBlockX() >> 4, location.getBlockZ() >> 4);
+        } else {
+            throw new IllegalArgumentException("Cannot load stacked block with invalid world " +
+                    LazyWorldLocation.getWorldName(location) + ", skipping...");
+        }
+
         return this.stackedBlocks.computeIfAbsent(chunkPosition, c -> new HashMap<>())
                 .computeIfAbsent(new LocationKey(location), l -> new StackedBlock(location.clone()));
     }

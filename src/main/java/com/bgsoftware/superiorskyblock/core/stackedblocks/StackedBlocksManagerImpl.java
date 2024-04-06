@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
+import com.bgsoftware.superiorskyblock.api.hooks.LazyWorldsProvider;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
@@ -274,10 +275,12 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
             return;
         }
 
-        if (location.get().getWorld() == null) {
-            Log.warn("Cannot load stacked block with invalid world ",
-                    LazyWorldLocation.getWorldName(location.get()), ", skipping...");
-            return;
+        if (!(plugin.getProviders().getWorldsProvider() instanceof LazyWorldsProvider)) {
+            if (location.get().getWorld() == null) {
+                Log.warn("Cannot load stacked block with invalid world ",
+                        LazyWorldLocation.getWorldName(location.get()), ", skipping...");
+                return;
+            }
         }
 
         Optional<Integer> amount = resultSet.getInt("amount");
@@ -306,9 +309,13 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
             });
         }
 
-        StackedBlock stackedBlock = this.stackedBlocksContainer.createStackedBlock(location.get());
-        stackedBlock.setAmount(amount.get());
-        stackedBlock.setBlockKey(blockKey);
+        try {
+            StackedBlock stackedBlock = this.stackedBlocksContainer.createStackedBlock(location.get());
+            stackedBlock.setAmount(amount.get());
+            stackedBlock.setBlockKey(blockKey);
+        } catch (IllegalArgumentException error) {
+            Log.error(error);
+        }
     }
 
     private void updateStackedBlockKeys() {
