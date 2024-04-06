@@ -3321,7 +3321,8 @@ public class SIsland implements Island {
 
         Log.debug(Debug.CREATE_WARP, owner.getName(), name, location, warpCategory);
 
-        IslandWarp islandWarp = loadIslandWarp(name, location, warpCategory, !plugin.getSettings().isPublicWarps(), null);
+        IslandWarp islandWarp = loadIslandWarp(name, LazyWorldLocation.of(location), warpCategory,
+                !plugin.getSettings().isPublicWarps(), null);
 
         IslandsDatabaseBridge.saveWarp(this, islandWarp);
 
@@ -4136,12 +4137,12 @@ public class SIsland implements Island {
         return warpCategory;
     }
 
-    public IslandWarp loadIslandWarp(String name, Location location, @Nullable WarpCategory warpCategory,
+    public IslandWarp loadIslandWarp(String name, LazyWorldLocation location, @Nullable WarpCategory warpCategory,
                                      boolean isPrivate, @Nullable ItemStack icon) {
         if (warpCategory == null)
             warpCategory = warpCategories.values().stream().findFirst().orElseGet(() -> createWarpCategory("Default Category"));
 
-        IslandWarp islandWarp = new SIslandWarp(name, location.clone(), warpCategory, isPrivate, icon);
+        IslandWarp islandWarp = new SIslandWarp(name, location.clone(true), warpCategory, isPrivate, icon);
 
         islandWarp.getCategory().getWarps().add(islandWarp);
 

@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.DirtyChunk;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.island.SIsland;
@@ -681,7 +682,7 @@ public class IslandBuilderImpl implements Island.Builder {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
         Preconditions.checkNotNull(category, "category parameter cannot be null.");
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        this.warps.add(new WarpRecord(name, category, location, isPrivate, icon));
+        this.warps.add(new WarpRecord(name, category, LazyWorldLocation.of(location), isPrivate, icon));
         return this;
     }
 

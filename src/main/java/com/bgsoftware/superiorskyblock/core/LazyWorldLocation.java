@@ -11,8 +11,16 @@ public class LazyWorldLocation extends Location {
 
     private final String worldName;
 
+    public static LazyWorldLocation of(Location location) {
+        if (location instanceof LazyWorldLocation)
+            return (LazyWorldLocation) ((LazyWorldLocation) location).clone(true);
+
+        return new LazyWorldLocation(location.getWorld().getName(), location.getX(), location.getY(), location.getZ(),
+                location.getPitch(), location.getYaw());
+    }
+
     public LazyWorldLocation(String worldName, double x, double y, double z, float pitch, float yaw) {
-        super(Bukkit.getWorld(worldName), x, y, z, pitch, yaw);
+        super(Bukkit.getWorld(worldName), x, y, z, yaw, pitch);
         this.worldName = worldName;
     }
 
@@ -26,7 +34,11 @@ public class LazyWorldLocation extends Location {
 
     @Override
     public Location clone() {
-        return getWorld() == null ? new LazyWorldLocation(this.worldName, getX(), getY(), getZ(), getPitch(), getYaw()) :
+        return clone(false);
+    }
+
+    public Location clone(boolean keepLazy) {
+        return keepLazy || getWorld() == null ? new LazyWorldLocation(this.worldName, getX(), getY(), getZ(), getPitch(), getYaw()) :
                 super.clone();
     }
 
