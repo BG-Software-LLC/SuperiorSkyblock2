@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Boat;
@@ -164,7 +165,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            LocationKey futureEntitySpawnLocation = new LocationKey(
+            LocationKey futureEntitySpawnLocation = isMinecart ? new LocationKey(blockLocation) : new LocationKey(
                     blockLocation.getWorld().getName(),
                     blockLocation.getX(),
                     blockLocation.getY() + 1,
