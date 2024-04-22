@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.google.common.base.Preconditions;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
@@ -136,15 +135,19 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
     @Override
     public void dispatchSubCommand(CommandSender sender, String subCommand) {
-        dispatchSubCommand(sender, subCommand, "");
+        dispatchSubCommand(sender, subCommand, null);
     }
 
     @Override
-    public void dispatchSubCommand(CommandSender sender, String subCommand, String args) {
-        String[] argsSplit = args.split(" ");
+    public void dispatchSubCommand(CommandSender sender, String subCommand, @Nullable String args) {
+        // We first check that the sub command is enabled.
+        if (getCommand(subCommand) == null)
+            return;
+
+        String[] argsSplit = args == null ? null : args.split(" ");
         String[] commandArguments;
 
-        if (argsSplit.length == 1 && argsSplit[0].isEmpty()) {
+        if (argsSplit == null || (argsSplit.length == 1 && argsSplit[0].isEmpty())) {
             commandArguments = new String[1];
             commandArguments[0] = subCommand;
         } else {
@@ -294,14 +297,15 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                     Island island = superiorPlayer.getIsland();
 
                     if (args.length != 0) {
-                        Bukkit.dispatchCommand(sender, label + " help");
+                        dispatchSubCommand(sender, "help");
                     } else if (island == null) {
-                        Bukkit.dispatchCommand(sender, label + " create");
+                        dispatchSubCommand(sender, "create");
                     } else if (superiorPlayer.hasToggledPanel()) {
-                        Bukkit.dispatchCommand(sender, label + " panel");
+                        dispatchSubCommand(sender, "panel");
                     } else {
-                        Bukkit.dispatchCommand(sender, label + " tp");
+                        dispatchSubCommand(sender, "tp");
                     }
+
 
                     return false;
                 }

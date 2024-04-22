@@ -73,6 +73,7 @@ public interface CommandsManager {
 
     /**
      * Dispatch a sub command.
+     * If the sub command does not exist, this is a no-op.
      *
      * @param sender     The sender to dispatch the command.
      * @param subCommand The sub-command to dispatch.
@@ -81,11 +82,12 @@ public interface CommandsManager {
 
     /**
      * Dispatch a sub command.
+     * If the sub command does not exist, this is a no-op.
      *
      * @param sender     The sender to dispatch the command.
      * @param subCommand The sub-command to dispatch.
-     * @param args       List of arguments of the sub-command.
+     * @param args       The argument to use for the command.
      */
-    void dispatchSubCommand(CommandSender sender, String subCommand, String args);
+    void dispatchSubCommand(CommandSender sender, String subCommand, @Nullable String args);
 
 }
