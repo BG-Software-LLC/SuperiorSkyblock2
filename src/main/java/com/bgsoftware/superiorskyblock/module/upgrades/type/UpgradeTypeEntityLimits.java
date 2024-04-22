@@ -1,26 +1,22 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.type;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.LocationKey;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
-import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Hanging;
-import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -93,19 +89,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            Player spawningPlayer;
-
-            switch (e.getSpawnReason()) {
-                case SPAWNER_EGG:
-                    spawningPlayer = spawnEggPlayers.remove(entityType);
-                    break;
-                case BREEDING:
-                    spawningPlayer = entityBreederPlayers.remove(entityType);
-                    break;
-                default:
-                    spawningPlayer = null;
-                    break;
-            }
+            Player spawningPlayer = getSpawningPlayerFromSpawnEvent(e);
 
             boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
 
@@ -216,7 +200,9 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
             PlayerHand usedHand = BukkitItems.getHand(e);
             ItemStack usedItem = BukkitItems.getHandItem(e.getPlayer(), usedHand);
-            EntityType spawnEggEntityType = usedItem == null ? EntityType.UNKNOWN : BukkitItems.getEntityType(usedItem);
+            EntityType spawnEggEntityType = usedItem == null ? EntityType.UNKNOWN :
+                    usedItem.getType() == Material.ARMOR_STAND ? EntityType.ARMOR_STAND :
+                            BukkitItems.getEntityType(usedItem);
 
             if (spawnEggEntityType == EntityType.UNKNOWN || !BukkitEntities.canHaveLimit(spawnEggEntityType))
                 return;
@@ -229,35 +215,22 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             spawnEggPlayers.put(spawnEggEntityType, e.getPlayer());
         }
 
-        private ItemStack asItemStack(Entity entity) {
-            if (entity instanceof Hanging) {
-                switch (entity.getType()) {
-                    case ITEM_FRAME:
-                        return new ItemStack(Material.ITEM_FRAME);
-                    case PAINTING:
-                        return new ItemStack(Material.PAINTING);
-                }
-            } else if (entity instanceof Minecart) {
-                Material material = Material.valueOf(plugin.getNMSAlgorithms().getMinecartBlock((Minecart) entity).getGlobalKey());
-                switch (material.name()) {
-                    case "HOPPER":
-                        return new ItemStack(Material.HOPPER_MINECART);
-                    case "COMMAND_BLOCK":
-                        return new ItemStack(Material.valueOf("COMMAND_BLOCK_MINECART"));
-                    case "COMMAND":
-                        return new ItemStack(Material.COMMAND_MINECART);
-                    case "TNT":
-                        return new ItemStack(ServerVersion.isLegacy() ? Material.EXPLOSIVE_MINECART : Material.valueOf("TNT_MINECART"));
-                    case "FURNACE":
-                        return new ItemStack(ServerVersion.isLegacy() ? Material.POWERED_MINECART : Material.valueOf("FURNACE_MINECART"));
-                    case "CHEST":
-                        return new ItemStack(ServerVersion.isLegacy() ? Material.STORAGE_MINECART : Material.valueOf("CHEST_MINECART"));
-                    default:
-                        return new ItemStack(Material.MINECART);
-                }
+        @Nullable
+        private Player getSpawningPlayerFromSpawnEvent(CreatureSpawnEvent event) {
+            EntityType entityType = event.getEntityType();
+
+            if (entityType == EntityType.ARMOR_STAND) {
+                return spawnEggPlayers.remove(entityType);
             }
 
-            throw new IllegalArgumentException("Cannot find an item for " + entity.getType());
+            switch (event.getSpawnReason()) {
+                case SPAWNER_EGG:
+                    return spawnEggPlayers.remove(entityType);
+                case BREEDING:
+                    return entityBreederPlayers.remove(entityType);
+            }
+
+            return null;
         }
 
     }
