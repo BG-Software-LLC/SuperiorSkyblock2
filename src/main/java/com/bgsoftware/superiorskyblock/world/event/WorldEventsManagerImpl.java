@@ -4,9 +4,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Mutable;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
@@ -18,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -57,6 +60,14 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
     }
 
     private void handleIslandChunkLoad(Island island, Chunk chunk) {
+        ChunkPosition chunkPosition = ChunkPosition.of(chunk);
+
+        if (!island.getBiome().name().equals(plugin.getSettings().getWorlds().getNormal().getBiome())) {
+            List<Player> playersToUpdate = new SequentialListBuilder<Player>()
+                    .build(island.getAllPlayersInside(), SuperiorPlayer::asPlayer);
+            plugin.getNMSChunks().setBiome(Collections.singletonList(chunkPosition), island.getBiome(), playersToUpdate);
+        }
+
         plugin.getNMSChunks().injectChunkSections(chunk);
 
         Set<Chunk> pendingLoadedChunksForIsland = this.pendingLoadedChunks.computeIfAbsent(island.getUniqueId(), u -> new LinkedHashSet<>());
@@ -107,7 +118,6 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
             }
         }, 2L);
 
-        ChunkPosition chunkPosition = ChunkPosition.of(chunk);
         DefaultIslandCalculationAlgorithm.CACHED_CALCULATED_CHUNKS.remove(chunkPosition);
 
         plugin.getStackedBlocks().updateStackedBlockHolograms(chunk);
