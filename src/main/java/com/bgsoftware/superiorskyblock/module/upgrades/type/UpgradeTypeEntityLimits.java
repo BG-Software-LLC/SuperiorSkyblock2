@@ -205,8 +205,6 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
                 entity.remove();
                 if (vehicleOwner != null && vehicleOwner.isOnline()) {
                     Message.REACHED_ENTITY_LIMIT.send(vehicleOwner, Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
-                    if (!(e.getVehicle() instanceof Boat))
-                        BukkitItems.addItem(asItemStack(e.getVehicle()), vehicleOwner.getInventory(), vehicleOwner.getLocation());
                 }
             }
         }
