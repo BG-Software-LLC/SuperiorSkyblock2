@@ -26,7 +26,7 @@ allprojects {
     }
 
     dependencies {
-        compileOnly 'com.bgsoftware.common.reflection:ReflectionUtils:1.0.2'
+        compileOnly 'com.bgsoftware.common.reflection:ReflectionUtils:b2'
         compileOnly 'com.bgsoftware.common.annotations:Annotations:b2'
     }
 
@@ -62,11 +62,11 @@ dependencies {
 
     implementation 'com.bgsoftware.common.config:CommentedConfiguration:1.0.3'
     implementation 'com.bgsoftware.common.updater:Updater:latest'
-    implementation 'com.bgsoftware.common.reflection:ReflectionUtils:1.0.2'
+    implementation 'com.bgsoftware.common.reflection:ReflectionUtils:b2'
     implementation 'com.bgsoftware.common.executors:Executors:b3'
     implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:1.0.0'
     implementation 'com.bgsoftware.common.dependencies:DependenciesManager:b2'
-    implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b1'
+    implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b2'
 
     implementation 'com.zaxxer:HikariCP:4.0.3'
     implementation 'org.slf4j:slf4j-api:2.0.5'
