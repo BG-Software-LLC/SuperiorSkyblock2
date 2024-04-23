@@ -73,7 +73,7 @@ public interface CommandsManager {
 
     /**
      * Dispatch a sub command.
-     * If the sub command does not exist, this is a no-op.
+     * If the sub command does not exist, Bukkit#dispatchCommand is executed.
      *
      * @param sender     The sender to dispatch the command.
      * @param subCommand The sub-command to dispatch.
@@ -82,7 +82,7 @@ public interface CommandsManager {
 
     /**
      * Dispatch a sub command.
-     * If the sub command does not exist, this is a no-op.
+     * If the sub command does not exist, Bukkit#dispatchCommand is executed.
      *
      * @param sender     The sender to dispatch the command.
      * @param subCommand The sub-command to dispatch.

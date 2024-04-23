@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.google.common.base.Preconditions;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
@@ -141,8 +142,10 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
     @Override
     public void dispatchSubCommand(CommandSender sender, String subCommand, @Nullable String args) {
         // We first check that the sub command is enabled.
-        if (getCommand(subCommand) == null)
+        if (getCommand(subCommand) == null) {
+            Bukkit.dispatchCommand(sender, this.label + " " + subCommand + (args == null ? "" : " " + args));
             return;
+        }
 
         String[] argsSplit = args == null ? null : args.split(" ");
         String[] commandArguments;
@@ -234,10 +237,14 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
         public boolean execute(CommandSender sender, String label, String[] args) {
             java.util.Locale locale = PlayerLocales.getLocale(sender);
 
-            if (args.length > 0) {
-                Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), args[0]);
+            String executedSubCommand = null;
 
-                SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
+            if (args.length > 0) {
+                executedSubCommand = args[0];
+
+                Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), executedSubCommand);
+
+                SuperiorCommand command = playerCommandsMap.getCommand(executedSubCommand);
                 if (command != null) {
                     if (!(sender instanceof Player) && !command.canBeExecutedByConsole()) {
                         Message.CUSTOM.send(sender, "&cCan be executed only by players!", true);
@@ -296,16 +303,21 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                 if (superiorPlayer != null) {
                     Island island = superiorPlayer.getIsland();
 
+                    String subCommandToExecute;
                     if (args.length != 0) {
-                        dispatchSubCommand(sender, "help");
+                        subCommandToExecute = "help";
                     } else if (island == null) {
-                        dispatchSubCommand(sender, "create");
+                        subCommandToExecute = "create";
                     } else if (superiorPlayer.hasToggledPanel()) {
-                        dispatchSubCommand(sender, "panel");
+                        subCommandToExecute = "panel";
                     } else {
-                        dispatchSubCommand(sender, "tp");
+                        subCommandToExecute = "tp";
                     }
 
+                    // We don't want to end up in an infinite loop
+                    if (!subCommandToExecute.equalsIgnoreCase(executedSubCommand)) {
+                        dispatchSubCommand(sender, subCommandToExecute);
+                    }
 
                     return false;
                 }
