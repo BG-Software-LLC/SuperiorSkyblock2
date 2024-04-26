@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.core;
+package com.bgsoftware.superiorskyblock.core.schematic;
 
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
