@@ -487,6 +487,9 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             if (mission == null) {
                 File missionJar = new File(missionsFolder, missionSection.getString("mission-file") + ".jar");
 
+                if (!missionJar.exists())
+                    throw new RuntimeException("The mission file " + missionJar.getName() + " is not valid.");
+
                 FileClassLoader missionClassLoader = new FileClassLoader(missionJar, plugin.getPluginClassLoader());
 
                 Either<Class<?>, Throwable> missionClassLookup = JarFiles.getClass(missionJar.toURL(), Mission.class, missionClassLoader);
