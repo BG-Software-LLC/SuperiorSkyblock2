@@ -32,7 +32,7 @@ allprojects {
     }
 
     dependencies {
-        compileOnly 'com.bgsoftware.common.reflection:ReflectionUtils:b2'
+        compileOnly 'com.bgsoftware.common.reflection:ReflectionUtils:b3'
         compileOnly 'com.bgsoftware.common.annotations:Annotations:b2'
     }
 
@@ -68,11 +68,11 @@ dependencies {
 
     implementation 'com.bgsoftware.common.config:CommentedConfiguration:1.0.3'
     implementation 'com.bgsoftware.common.updater:Updater:latest'
-    implementation 'com.bgsoftware.common.reflection:ReflectionUtils:b2'
+    implementation 'com.bgsoftware.common.reflection:ReflectionUtils:b3'
     implementation 'com.bgsoftware.common.executors:Executors:b3'
     implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:1.0.0'
     implementation 'com.bgsoftware.common.dependencies:DependenciesManager:b2'
-    implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b2'
+    implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b3'
 
     implementation 'com.zaxxer:HikariCP:4.0.3'
     implementation 'org.slf4j:slf4j-api:2.0.5'
@@ -105,8 +105,9 @@ processResources {
 shadowJar {
     dependsOn(jar)
 
-    relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.libs.hikari'
-    relocate 'org.bstats', 'com.bgsoftware.superiorskyblock.libs.bstats'
+    // TODO: Fix relocate
+//    relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.libs.com.zaxxer.hikari'
+//    relocate 'org.bstats', 'com.bgsoftware.superiorskyblock.libs.org.bstats'
 
     archiveFileName = rootProject.name + "-" + rootProject.buildVersion + ".jar"
 
