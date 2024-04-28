@@ -18,6 +18,12 @@ allprojects {
     apply plugin: 'java'
     apply plugin: 'com.github.johnrengelman.shadow'
 
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(8))
+        }
+    }
+
     repositories {
         maven { url 'https://repo.bg-software.com/repository/nms/' }
         maven { url 'https://repo.bg-software.com/repository/api/' }
