@@ -66,11 +66,11 @@ dependencies {
     implementation fileTree(rootProject.archiveFolder.getAbsolutePath())
     implementation project(":API")
 
-    implementation 'com.bgsoftware.common.config:CommentedConfiguration:1.0.3'
-    implementation 'com.bgsoftware.common.updater:Updater:latest'
+    implementation 'com.bgsoftware.common.config:CommentedConfiguration:b1'
+    implementation 'com.bgsoftware.common.updater:Updater:b1'
     implementation 'com.bgsoftware.common.reflection:ReflectionUtils:b3'
     implementation 'com.bgsoftware.common.executors:Executors:b3'
-    implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:1.0.0'
+    implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:b11:all@jar'
     implementation 'com.bgsoftware.common.dependencies:DependenciesManager:b2'
     implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b3'
 
