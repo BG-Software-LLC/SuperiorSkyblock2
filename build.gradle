@@ -107,6 +107,7 @@ shadowJar {
 
     relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.libs.com.zaxxer.hikari'
     relocate 'org.bstats', 'com.bgsoftware.superiorskyblock.libs.org.bstats'
+    relocate 'com.bgsoftware.common', 'com.bgsoftware.superiorskyblock.libs.com.bgsoftware.common'
 
     archiveFileName = rootProject.name + "-" + rootProject.buildVersion + ".jar"
 
