@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms;
 
+import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import org.bukkit.Location;
@@ -16,6 +17,10 @@ public interface NMSTags {
     CompoundTag convertToNBT(ItemStack itemStack);
 
     ItemStack getFromNBTTag(ItemStack itemStack, CompoundTag compoundTag);
+
+    default ItemStack getSkullWithTexture(ItemStack itemStack, String texture) {
+        return ItemSkulls.getPlayerHeadNoNMS(itemStack, texture);
+    }
 
     CompoundTag getNBTTag(Entity entity);
 

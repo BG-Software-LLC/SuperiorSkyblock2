@@ -21,6 +21,8 @@ import java.util.UUID;
 @SuppressWarnings("WeakerAccess")
 public class ItemSkulls {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private static final String NULL_PLAYER_TEXTURE = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19";
     private static final Map<String, String> entitySkullTextures = new HashMap<>();
     private static final LazyReference<MinecraftHeadsClient> minecraftHeadsClient = new LazyReference<MinecraftHeadsClient>() {
@@ -56,6 +58,10 @@ public class ItemSkulls {
     }
 
     public static ItemStack getPlayerHead(ItemStack itemStack, String texture) {
+        return plugin.getNMSTags().getSkullWithTexture(itemStack, texture);
+    }
+
+    public static ItemStack getPlayerHeadNoNMS(ItemStack itemStack, String texture) {
         CompoundTag compoundTag = Serializers.ITEM_STACK_TO_TAG_SERIALIZER.serialize(itemStack);
 
         CompoundTag nbtTag = compoundTag.getCompound("NBT", new CompoundTag());

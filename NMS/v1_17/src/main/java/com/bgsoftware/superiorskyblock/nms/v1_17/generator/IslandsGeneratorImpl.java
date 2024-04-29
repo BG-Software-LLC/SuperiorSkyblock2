@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17.generator;
 
+import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
@@ -22,7 +23,7 @@ import java.util.Random;
 public class IslandsGeneratorImpl extends IslandsGenerator {
 
     private static final ReflectField<ChunkBiomeContainer> CHUNK_BIOME_CONTAINER = new ReflectField<>(
-            "org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid",
+            new ClassInfo("generator.CustomChunkGenerator$CustomBiomeGrid", ClassInfo.PackageType.CRAFTBUKKIT),
             ChunkBiomeContainer.class, "biome");
     private static final ReflectField<Biome[]> BIOME_BASE_ARRAY = new ReflectField<>(
             ChunkBiomeContainer.class, Biome[].class, "f");

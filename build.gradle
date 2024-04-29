@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'io.github.goooler.shadow' version '8.1.7'
     id 'maven-publish'
 }
 
@@ -16,7 +16,13 @@ project.ext {
 
 allprojects {
     apply plugin: 'java'
-    apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'io.github.goooler.shadow'
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(8))
+        }
+    }
 
     repositories {
         maven { url 'https://repo.bg-software.com/repository/nms/' }
@@ -26,7 +32,7 @@ allprojects {
     }
 
     dependencies {
-        compileOnly 'com.bgsoftware.common.reflection:ReflectionUtils:1.0.2'
+        compileOnly 'com.bgsoftware.common.reflection:ReflectionUtils:b3'
         compileOnly 'com.bgsoftware.common.annotations:Annotations:b2'
     }
 
@@ -60,13 +66,13 @@ dependencies {
     implementation fileTree(rootProject.archiveFolder.getAbsolutePath())
     implementation project(":API")
 
-    implementation 'com.bgsoftware.common.config:CommentedConfiguration:1.0.3'
-    implementation 'com.bgsoftware.common.updater:Updater:latest'
-    implementation 'com.bgsoftware.common.reflection:ReflectionUtils:1.0.2'
+    implementation 'com.bgsoftware.common.config:CommentedConfiguration:b1'
+    implementation 'com.bgsoftware.common.updater:Updater:b1'
+    implementation 'com.bgsoftware.common.reflection:ReflectionUtils:b3'
     implementation 'com.bgsoftware.common.executors:Executors:b3'
-    implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:1.0.0'
+    implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:b11:all@jar'
     implementation 'com.bgsoftware.common.dependencies:DependenciesManager:b2'
-    implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b1'
+    implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b3'
 
     implementation 'com.zaxxer:HikariCP:4.0.3'
     implementation 'org.slf4j:slf4j-api:2.0.5'
@@ -99,8 +105,9 @@ processResources {
 shadowJar {
     dependsOn(jar)
 
-    relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.libs.hikari'
-    relocate 'org.bstats', 'com.bgsoftware.superiorskyblock.libs.bstats'
+    relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.libs.com.zaxxer.hikari'
+    relocate 'org.bstats', 'com.bgsoftware.superiorskyblock.libs.org.bstats'
+    relocate 'com.bgsoftware.common', 'com.bgsoftware.superiorskyblock.libs.com.bgsoftware.common'
 
     archiveFileName = rootProject.name + "-" + rootProject.buildVersion + ".jar"
 
@@ -113,7 +120,7 @@ shadowJar {
     configurations = [project.configurations.getByName("runtimeClasspath")]
 }
 
-task copyAPI(type: Copy) {
+task copyAPI(type: Copy, dependsOn: ':API:build') {
     from rootProject.archiveFolder.getAbsolutePath() + '/API.jar'
     into rootProject.targetFolder.getAbsolutePath()
     rename('API.jar', rootProject.name + 'API.jar')
@@ -131,3 +138,6 @@ build {
 publish.shouldRunAfter shadowJar
 shadowJar.shouldRunAfter build
 build.shouldRunAfter subprojects.build
+
+shadowJar.dependsOn subprojects.build
+compileJava.dependsOn childProjects.values().shadowJar

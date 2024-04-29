@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.layout;
 
+import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
@@ -31,8 +32,8 @@ public abstract class AbstractMenuLayout<V extends MenuView<V, ?>> implements Me
     };
 
     private static final ReflectField<Object> INVENTORY = new ReflectField<>(
-            "org.bukkit.craftbukkit.VERSION.inventory.CraftInventory", Object.class, "inventory")
-            .removeFinal();
+            new ClassInfo("inventory.CraftInventory", ClassInfo.PackageType.CRAFTBUKKIT),
+            Object.class, "inventory").removeFinal();
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
