@@ -138,6 +138,7 @@ build {
 publish.shouldRunAfter shadowJar
 shadowJar.shouldRunAfter build
 build.shouldRunAfter subprojects.build
+clean.shouldRunAfter copyAPI
 
 shadowJar.dependsOn subprojects.build
 compileJava.dependsOn childProjects.values().shadowJar
