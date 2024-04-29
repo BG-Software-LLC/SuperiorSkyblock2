@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'io.github.goooler.shadow' version '8.1.7'
     id 'maven-publish'
 }
 
@@ -16,7 +16,7 @@ project.ext {
 
 allprojects {
     apply plugin: 'java'
-    apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'io.github.goooler.shadow'
 
     java {
         toolchain {
@@ -105,9 +105,8 @@ processResources {
 shadowJar {
     dependsOn(jar)
 
-    // TODO: Fix relocate
-//    relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.libs.com.zaxxer.hikari'
-//    relocate 'org.bstats', 'com.bgsoftware.superiorskyblock.libs.org.bstats'
+    relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.libs.com.zaxxer.hikari'
+    relocate 'org.bstats', 'com.bgsoftware.superiorskyblock.libs.org.bstats'
 
     archiveFileName = rootProject.name + "-" + rootProject.buildVersion + ".jar"
 
@@ -120,7 +119,7 @@ shadowJar {
     configurations = [project.configurations.getByName("runtimeClasspath")]
 }
 
-task copyAPI(type: Copy) {
+task copyAPI(type: Copy, dependsOn: ':API:build') {
     from rootProject.archiveFolder.getAbsolutePath() + '/API.jar'
     into rootProject.targetFolder.getAbsolutePath()
     rename('API.jar', rootProject.name + 'API.jar')
@@ -138,3 +137,6 @@ build {
 publish.shouldRunAfter shadowJar
 shadowJar.shouldRunAfter build
 build.shouldRunAfter subprojects.build
+
+shadowJar.dependsOn subprojects.build
+compileJava.dependsOn childProjects.values().shadowJar
