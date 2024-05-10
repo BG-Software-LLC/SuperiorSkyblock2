@@ -132,8 +132,8 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
 
         try {
             pluginModule.onEnable(plugin);
-        } catch (Exception error) {
-            Log.error("An unexpected error occurred while disabling the module ", pluginModule.getName(), ".");
+        } catch (Throwable error) {
+            Log.error("An unexpected error occurred while enabling the module ", pluginModule.getName(), ".");
             Log.error(error, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");
 
             try {
