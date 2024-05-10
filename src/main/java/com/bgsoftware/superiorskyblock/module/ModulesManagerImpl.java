@@ -65,10 +65,10 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
 
         Either<Class<?>, Throwable> moduleClassLookup = JarFiles.getClass(moduleFile.toURL(), PluginModule.class, moduleClassLoader);
 
-        if (moduleClassLookup.getLeft() != null)
-            throw new RuntimeException("An error occurred while reading " + moduleFile.getName(), moduleClassLookup.getLeft());
+        if (moduleClassLookup.getRight() != null)
+            throw new RuntimeException("An error occurred while reading " + moduleFile.getName(), moduleClassLookup.getRight());
 
-        Class<?> moduleClass = moduleClassLookup.getRight();
+        Class<?> moduleClass = moduleClassLookup.getLeft();
 
         if (moduleClass == null)
             throw new RuntimeException("The module file " + moduleFile.getName() + " is not valid.");

@@ -29,14 +29,14 @@ public class JarFiles {
                 try {
                     Class<?> c = cl.loadClass(clazzName);
                     if (clazz.isAssignableFrom(c)) {
-                        return Either.right(c);
+                        return Either.left(c);
                     }
                 } catch (NoClassDefFoundError ignored) {
                     // If we can't find the class, can just be ignored.
                 }
             }
         } catch (Throwable error) {
-            return Either.left(error);
+            return Either.right(error);
         }
 
         return Either.right(null);

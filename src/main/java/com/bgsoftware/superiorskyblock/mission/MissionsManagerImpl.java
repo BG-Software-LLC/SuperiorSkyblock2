@@ -494,10 +494,10 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
                 Either<Class<?>, Throwable> missionClassLookup = JarFiles.getClass(missionJar.toURL(), Mission.class, missionClassLoader);
 
-                if (missionClassLookup.getLeft() != null)
-                    throw new RuntimeException("An unexpected error occurred while reading " + missionJar.getName() + ".", missionClassLookup.getLeft());
+                if (missionClassLookup.getRight() != null)
+                    throw new RuntimeException("An unexpected error occurred while reading " + missionJar.getName() + ".", missionClassLookup.getRight());
 
-                Class<?> missionClass = missionClassLookup.getRight();
+                Class<?> missionClass = missionClassLookup.getLeft();
 
                 if (missionClass == null)
                     throw new RuntimeException("The mission file " + missionJar.getName() + " is not valid.");

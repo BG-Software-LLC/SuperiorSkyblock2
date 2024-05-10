@@ -190,7 +190,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
             try {
                 //noinspection deprecation
-                Class<?> commandClass = JarFiles.getClass(file.toURL(), SuperiorCommand.class, plugin.getPluginClassLoader()).getRight();
+                Class<?> commandClass = JarFiles.getClass(file.toURL(), SuperiorCommand.class, plugin.getPluginClassLoader()).getLeft();
 
                 if (commandClass == null)
                     continue;

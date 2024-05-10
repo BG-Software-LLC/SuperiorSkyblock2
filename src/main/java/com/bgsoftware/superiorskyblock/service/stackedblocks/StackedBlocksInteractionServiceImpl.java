@@ -74,7 +74,7 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
 
         int amountToDeposit = onlinePlayer == null ? 1 : handItem == null ? 1 : onlinePlayer.isSneaking() ? handItem.getAmount() : 1;
 
-        return handleBlockStackInternal(superiorPlayer, block, amountToDeposit, Either.right(usedHand));
+        return handleBlockStackInternal(superiorPlayer, block, amountToDeposit, Either.left(usedHand));
     }
 
     @Override
@@ -91,7 +91,7 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
         if (interactionResult != InteractionResult.SUCCESS)
             return interactionResult;
 
-        return handleBlockStackInternal(superiorPlayer, block, amountToDeposit, Either.left(itemRemovalCallback));
+        return handleBlockStackInternal(superiorPlayer, block, amountToDeposit, Either.right(itemRemovalCallback));
     }
 
     @Override
@@ -253,7 +253,7 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
 
         final int finalAmountToDeposit = amountToDeposit;
 
-        removalData.ifLeft(itemRemovalCallback -> itemRemovalCallback.accept(finalAmountToDeposit)).ifRight(usedHand -> {
+        removalData.ifRight(itemRemovalCallback -> itemRemovalCallback.accept(finalAmountToDeposit)).ifLeft(usedHand -> {
             if (onlinePlayer != null && onlinePlayer.getGameMode() != GameMode.CREATIVE) {
                 BukkitItems.removeHandItem(onlinePlayer, PlayerHand.of(usedHand), finalAmountToDeposit);
             }

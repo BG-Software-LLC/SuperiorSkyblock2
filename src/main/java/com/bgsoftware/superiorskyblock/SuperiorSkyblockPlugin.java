@@ -404,7 +404,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 if (generatorsFilesList != null) {
                     for (File file : generatorsFilesList) {
                         //noinspection deprecation
-                        Class<?> generatorClass = JarFiles.getClass(file.toURL(), ChunkGenerator.class, getClassLoader()).getRight();
+                        Class<?> generatorClass = JarFiles.getClass(file.toURL(), ChunkGenerator.class, getClassLoader()).getLeft();
                         if (generatorClass != null) {
                             for (Constructor<?> constructor : generatorClass.getConstructors()) {
                                 if (constructor.getParameterCount() == 0) {
