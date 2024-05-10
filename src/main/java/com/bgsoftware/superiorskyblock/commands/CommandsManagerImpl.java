@@ -9,7 +9,10 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
+import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
+import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookupFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -184,29 +187,40 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
             return;
         }
 
-        for (File file : commandsFolder.listFiles()) {
-            if (!file.getName().endsWith(".jar"))
-                continue;
+        File[] folderFiles = commandsFolder.listFiles();
+        if (folderFiles == null || folderFiles.length == 0)
+            return;
 
-            try {
-                //noinspection deprecation
-                Class<?> commandClass = JarFiles.getClass(file.toURL(), SuperiorCommand.class, plugin.getPluginClassLoader()).getLeft();
-
-                if (commandClass == null)
+        try (FilesLookup filesLookup = FilesLookupFactory.getInstance().lookupFolder(commandsFolder)) {
+            for (File file : folderFiles) {
+                String fileName = file.getName();
+                if (!fileName.endsWith(".jar"))
                     continue;
 
-                SuperiorCommand superiorCommand = createInstance(commandClass);
+                try {
+                    file = filesLookup.getFile(fileName);
 
-                if (file.getName().toLowerCase(Locale.ENGLISH).contains("admin")) {
-                    registerAdminCommand(superiorCommand);
-                    Log.info("Successfully loaded external admin command: ", file.getName().split("\\.")[0]);
-                } else {
-                    registerCommand(superiorCommand);
-                    Log.info("Successfully loaded external command: ", file.getName().split("\\.")[0]);
+                    FileClassLoader classLoader = new FileClassLoader(file, plugin.getPluginClassLoader());
+
+                    //noinspection deprecation
+                    Class<?> commandClass = JarFiles.getClass(file.toURL(), SuperiorCommand.class, classLoader).getLeft();
+
+                    if (commandClass == null)
+                        continue;
+
+                    SuperiorCommand superiorCommand = createInstance(commandClass);
+
+                    if (file.getName().toLowerCase(Locale.ENGLISH).contains("admin")) {
+                        registerAdminCommand(superiorCommand);
+                        Log.info("Successfully loaded external admin command: ", file.getName().split("\\.")[0]);
+                    } else {
+                        registerCommand(superiorCommand);
+                        Log.info("Successfully loaded external command: ", file.getName().split("\\.")[0]);
+                    }
+
+                } catch (Exception error) {
+                    Log.error(error, "An unexpected error occurred while loading an external command ", file.getName(), ":");
                 }
-
-            } catch (Exception error) {
-                Log.error(error, "An unexpected error occurred while loading an external command ", file.getName(), ":");
             }
         }
 
