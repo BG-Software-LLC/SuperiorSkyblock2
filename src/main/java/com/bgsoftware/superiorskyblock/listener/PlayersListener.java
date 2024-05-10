@@ -262,14 +262,23 @@ public class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onPlayerChangeWorld(PlayerChangedWorldEvent e) {
-        Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        checkPlayerFlyState(e.getPlayer());
+    }
 
-        if (island != null && superiorPlayer.hasIslandFlyEnabled() && !e.getPlayer().getAllowFlight() &&
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private void onPlayerTeleportFly(PlayerTeleportEvent e) {
+        checkPlayerFlyState(e.getPlayer());
+    }
+
+    private void checkPlayerFlyState(Player player) {
+        Island island = plugin.getGrid().getIslandAt(player.getLocation());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+
+        if (island != null && superiorPlayer.hasIslandFlyEnabled() && !player.getAllowFlight() &&
                 island.hasPermission(superiorPlayer, IslandPrivileges.FLY))
             BukkitExecutor.sync(() -> {
-                e.getPlayer().setAllowFlight(true);
-                e.getPlayer().setFlying(true);
+                player.setAllowFlight(true);
+                player.setFlying(true);
             }, 1L);
     }
 
