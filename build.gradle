@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'SuperiorSkyblock'
-version = "2023.3"
+version = "2024.1"
 
 project.ext {
     archiveFolder = file("archive/")
