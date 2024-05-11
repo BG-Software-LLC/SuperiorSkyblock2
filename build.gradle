@@ -127,6 +127,7 @@ task copyAPI(type: Copy, dependsOn: ':API:build') {
 }
 
 clean {
+    delete rootProject.archiveFolder
 }
 
 build {
