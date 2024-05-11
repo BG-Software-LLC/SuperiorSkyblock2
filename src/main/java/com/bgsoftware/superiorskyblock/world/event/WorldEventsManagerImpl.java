@@ -22,7 +22,14 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 @Deprecated
 public class WorldEventsManagerImpl implements WorldEventsManager {
@@ -95,6 +102,8 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
                 recalculateEntities.setValue(true);
         }
 
+        plugin.getStackedBlocks().updateStackedBlockHolograms(chunk);
+
         BukkitExecutor.sync(() -> {
             if (!pendingLoadedChunksForIsland.remove(chunk) || !chunk.isLoaded())
                 return;
@@ -116,11 +125,6 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
                 pendingLoadedChunksForIsland.clear();
                 this.pendingLoadedChunks.remove(island.getUniqueId());
             }
-        }, 2L);
-
-        BukkitExecutor.sync(() -> {
-            if (chunk.isLoaded())
-                plugin.getStackedBlocks().updateStackedBlockHolograms(chunk);
         }, 2L);
 
         DefaultIslandCalculationAlgorithm.CACHED_CALCULATED_CHUNKS.remove(chunkPosition);

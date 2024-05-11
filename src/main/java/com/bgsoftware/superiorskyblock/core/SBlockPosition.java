@@ -1,30 +1,31 @@
 package com.bgsoftware.superiorskyblock.core;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class SBlockPosition implements BlockPosition {
 
+    @Nullable
+    private final WorldsRegistry.SyncedWorld world;
     private final int x;
     private final int y;
     private final int z;
-    private final String world;
 
     public SBlockPosition(LazyWorldLocation location) {
         this(location.getWorldName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     public SBlockPosition(Location location) {
-        this(location.getWorld() == null ? null : location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        this(LazyWorldLocation.getWorldName(location), location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     public SBlockPosition(String world, int x, int y, int z) {
-        this.world = world;
+        this.world = world == null ? null : WorldsRegistry.getWorld(world);
         this.x = x;
         this.y = y;
         this.z = z;
@@ -33,13 +34,13 @@ public class SBlockPosition implements BlockPosition {
     @Override
     @Deprecated
     public String getWorldName() {
-        return world;
+        return world == null ? null : world.getWorldName();
     }
 
     @Override
     @Deprecated
     public World getWorld() {
-        return Bukkit.getWorld(world);
+        return world == null ? null : world.getBukkitWorld();
     }
 
     @Override
@@ -59,7 +60,7 @@ public class SBlockPosition implements BlockPosition {
 
     @Override
     public BlockPosition offset(int x, int y, int z) {
-        return new SBlockPosition(this.world, this.x + x, this.y + y, this.z + z);
+        return new SBlockPosition(this.world == null ? null : this.world.getWorldName(), this.x + x, this.y + y, this.z + z);
     }
 
     @Override
@@ -78,7 +79,7 @@ public class SBlockPosition implements BlockPosition {
     @Deprecated
     public Location parse() {
         World world = getWorld();
-        return world == null ? new LazyWorldLocation(this.world, getX(), getY(), getZ(), 0, 0) :
+        return world == null ? new LazyWorldLocation(this.world == null ? null : this.world.getWorldName(), getX(), getY(), getZ(), 0, 0) :
                 new Location(world, getX(), getY(), getZ());
     }
 
@@ -87,7 +88,7 @@ public class SBlockPosition implements BlockPosition {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SBlockPosition that = (SBlockPosition) o;
-        return x == that.x && y == that.y && z == that.z && world.equals(that.world);
+        return x == that.x && y == that.y && z == that.z && Objects.equals(world, that.world);
     }
 
     @Override
