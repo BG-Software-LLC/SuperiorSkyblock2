@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.key.types;
 
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
+import com.bgsoftware.superiorskyblock.core.key.MaterialKeySource;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import org.bukkit.Material;
@@ -19,7 +20,7 @@ public class MaterialKey extends BaseKey<MaterialKey> {
             if (material != Materials.SPAWNER.toBukkitType()) {
                 MaterialKey globalKey = of(material);
                 globalKey.loadLazyCaches();
-                MaterialKey id0Key = of(material, (short) 0);
+                MaterialKey id0Key = of(material, (short) 0, MaterialKeySource.BLOCK);
                 id0Key.loadLazyCaches();
             }
         }
@@ -29,26 +30,30 @@ public class MaterialKey extends BaseKey<MaterialKey> {
     private final short durability;
     private final String durabilityAsString;
     protected final boolean isGlobalType;
+    private final MaterialKeySource materialKeySource;
 
-    public static MaterialKey of(Material type, short durability) {
+    public static MaterialKey of(Material type, short durability, MaterialKeySource materialKeySource) {
         Preconditions.checkArgument(type != Materials.SPAWNER.toBukkitType());
 
-        if (durability == 0)
-            return ID_0_MATERIAL_KEYS_CACHE.computeIfAbsent(type, unused -> new MaterialKey(type, (short) 0, false));
+        if (durability == 0 && materialKeySource == MaterialKeySource.BLOCK)
+            return ID_0_MATERIAL_KEYS_CACHE.computeIfAbsent(type, unused ->
+                    new MaterialKey(type, (short) 0, false, MaterialKeySource.BLOCK));
 
-        return new MaterialKey(type, durability, false);
+        return new MaterialKey(type, durability, false, materialKeySource);
     }
 
     public static MaterialKey of(Material type) {
-        return GLOBAL_MATERIAL_KEYS_CACHE.computeIfAbsent(type, unused -> new MaterialKey(type, (short) 0, true));
+        return GLOBAL_MATERIAL_KEYS_CACHE.computeIfAbsent(type, unused ->
+                new MaterialKey(type, (short) 0, true, MaterialKeySource.BLOCK));
     }
 
-    protected MaterialKey(Material type, short durability, boolean isGlobalType) {
+    protected MaterialKey(Material type, short durability, boolean isGlobalType, MaterialKeySource materialKeySource) {
         super(MaterialKey.class);
         this.type = Preconditions.checkNotNull(type, "type parameter cannot be null");
         this.durability = durability;
         this.durabilityAsString = isGlobalType ? "" : String.valueOf(this.durability);
         this.isGlobalType = isGlobalType;
+        this.materialKeySource = materialKeySource;
     }
 
     @Override
@@ -64,6 +69,10 @@ public class MaterialKey extends BaseKey<MaterialKey> {
     @Override
     public String getSubKey() {
         return this.durabilityAsString;
+    }
+
+    public MaterialKeySource getMaterialKeySource() {
+        return materialKeySource;
     }
 
     @Override
