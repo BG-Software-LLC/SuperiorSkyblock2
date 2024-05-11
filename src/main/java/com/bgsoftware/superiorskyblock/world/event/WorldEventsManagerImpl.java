@@ -118,9 +118,12 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
             }
         }, 2L);
 
-        DefaultIslandCalculationAlgorithm.CACHED_CALCULATED_CHUNKS.remove(chunkPosition);
+        BukkitExecutor.sync(() -> {
+            if (chunk.isLoaded())
+                plugin.getStackedBlocks().updateStackedBlockHolograms(chunk);
+        }, 2L);
 
-        plugin.getStackedBlocks().updateStackedBlockHolograms(chunk);
+        DefaultIslandCalculationAlgorithm.CACHED_CALCULATED_CHUNKS.remove(chunkPosition);
     }
 
     @Override
