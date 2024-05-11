@@ -98,7 +98,8 @@ public class SBlockPosition implements BlockPosition {
 
     @Override
     public String toString() {
-        return world + ", " + x + ", " + y + ", " + z;
+        String worldName = world == null ? "null" : world.getWorldName();
+        return worldName + ", " + x + ", " + y + ", " + z;
     }
 
 }
