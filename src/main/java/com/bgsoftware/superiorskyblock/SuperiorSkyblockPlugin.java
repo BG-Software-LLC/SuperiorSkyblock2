@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
-import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
@@ -76,7 +75,6 @@ import com.bgsoftware.superiorskyblock.player.container.DefaultPlayersContainer;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
 import com.bgsoftware.superiorskyblock.service.ServicesHandler;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
-import com.bgsoftware.superiorskyblock.world.event.WorldEventsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
 import org.bstats.bukkit.Metrics;
@@ -120,11 +118,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     @Nullable
     private ChunkGenerator worldGenerator = null;
     @Nullable
-    @Deprecated
-    private WorldEventsManager worldEventsManager = null;
 
     /* NMS */
-    private String nmsPackageVersion;
     private NMSAlgorithms nmsAlgorithms;
     private NMSChunks nmsChunks;
     private NMSDragonFight nmsDragonFight;
@@ -594,20 +589,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     @Override
     public void setScriptEngine(@Nullable IScriptEngine scriptEngine) {
         this.scriptEngine = scriptEngine == null ? EnginesFactory.createDefaultEngine() : scriptEngine;
-    }
-
-    @Override
-    @Deprecated
-    public WorldEventsManager getWorldEventsManager() {
-        if (this.worldEventsManager == null) this.worldEventsManager = new WorldEventsManagerImpl(this);
-
-        return this.worldEventsManager;
-    }
-
-    @Override
-    @Deprecated
-    public void setWorldEventsManager(@Nullable WorldEventsManager worldEventsManager) {
-        this.worldEventsManager = worldEventsManager;
     }
 
     public EventsBus getEventsBus() {
