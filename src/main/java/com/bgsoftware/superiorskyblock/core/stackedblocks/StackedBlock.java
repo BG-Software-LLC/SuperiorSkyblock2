@@ -4,7 +4,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.service.hologram.Hologram;
 import com.bgsoftware.superiorskyblock.api.service.hologram.HologramsService;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -20,7 +22,7 @@ public class StackedBlock {
         }
     };
 
-    private final Location location;
+    private final BlockPosition blockPosition;
 
     private int amount;
     private Key blockKey;
@@ -28,11 +30,12 @@ public class StackedBlock {
     private boolean removed;
 
     public StackedBlock(Location location) {
-        this.location = location;
+        this.blockPosition = new SBlockPosition(location);
     }
 
     public Location getLocation() {
-        return location.clone();
+        //noinspection deprecation
+        return this.blockPosition.parse();
     }
 
     public int getAmount() {
@@ -53,41 +56,41 @@ public class StackedBlock {
 
     public void markAsRemoved() {
         removed = true;
+        removeHologram();
     }
 
     public void updateName() {
-        if (removed) {
+        if (this.removed || this.amount <= 1) {
             removeHologram();
             return;
         }
 
-        if (amount <= 1) {
-            removeHologram();
-        } else {
-            Key currentBlockKey = Keys.of(location.getBlock());
+        Location location = getLocation();
+        if (location.getWorld() == null)
+            return;
 
-            if (blockKey == null || blockKey.equals(ConstantKeys.AIR)) {
-                blockKey = currentBlockKey;
-                if (blockKey.equals(ConstantKeys.AIR))
-                    return;
-            }
+        Key currentBlockKey = Keys.of(location.getBlock());
 
-            // Must be checked in order to fix issue #632
-            if (!currentBlockKey.equals(blockKey)) {
-                removeHologram();
+        if (blockKey == null || blockKey.equals(ConstantKeys.AIR)) {
+            blockKey = currentBlockKey;
+            if (blockKey.equals(ConstantKeys.AIR))
                 return;
-            }
-
-            if (hologram == null)
-                hologram = hologramsService.get().createHologram(getLocation().add(0.5, 1, 0.5));
-
-            hologram.setHologramName(plugin.getSettings().getStackedBlocks().getCustomName()
-                    .replace("{0}", String.valueOf(amount))
-                    .replace("{1}", Formatters.CAPITALIZED_FORMATTER.format(blockKey.getGlobalKey()))
-                    .replace("{2}", Formatters.NUMBER_FORMATTER.format(amount))
-            );
         }
 
+        // Must be checked in order to fix issue #632
+        if (!currentBlockKey.equals(blockKey)) {
+            removeHologram();
+            return;
+        }
+
+        if (hologram == null)
+            hologram = hologramsService.get().createHologram(getLocation().add(0.5, 1, 0.5));
+
+        hologram.setHologramName(plugin.getSettings().getStackedBlocks().getCustomName()
+                .replace("{0}", String.valueOf(amount))
+                .replace("{1}", Formatters.CAPITALIZED_FORMATTER.format(blockKey.getGlobalKey()))
+                .replace("{2}", Formatters.NUMBER_FORMATTER.format(amount))
+        );
     }
 
     public void removeHologram() {

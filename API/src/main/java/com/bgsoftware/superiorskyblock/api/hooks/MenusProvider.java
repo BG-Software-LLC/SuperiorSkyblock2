@@ -172,6 +172,23 @@ public interface MenusProvider {
     void refreshIslandBank(Island island);
 
     /**
+     * Open the island-banned-players menu.
+     * Used when running the /is ban command.
+     *
+     * @param targetPlayer The player to open the menu for.
+     * @param previousMenu The previous menu that was opened, if exists.
+     * @param targetIsland The island to open the menu for.
+     */
+    void openIslandBannedPlayers(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland);
+
+    /**
+     * Refresh the banned-players menu for a specific island.
+     *
+     * @param island The island to refresh the menus for.
+     */
+    void refreshIslandBannedPlayers(Island island);
+
+    /**
      * Open the island-chests menu.
      * Used to open the shared chests menu of an island.
      *

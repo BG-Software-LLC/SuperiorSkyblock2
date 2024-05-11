@@ -107,6 +107,15 @@ public interface RegionManagerService {
     InteractionResult handlePlayerEnderPearl(SuperiorPlayer superiorPlayer, Location destination);
 
     /**
+     * Handle a player consuming a Chorus Fruit.
+     *
+     * @param superiorPlayer The player that consumed the Chorus Fruit.
+     * @param location       The location of the player.
+     * @return The result of the interaction.
+     */
+    InteractionResult handlePlayerConsumeChorusFruit(SuperiorPlayer superiorPlayer, Location location);
+
+    /**
      * Handle an entity damaging another entity.
      *
      * @param damager The entity that dealt the damage.

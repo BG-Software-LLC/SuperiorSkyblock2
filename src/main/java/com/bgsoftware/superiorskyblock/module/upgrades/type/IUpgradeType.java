@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface IUpgradeType {
 
-    Listener getListener();
+    List<Listener> getListeners();
 
     List<ISuperiorCommand> getCommands();
 

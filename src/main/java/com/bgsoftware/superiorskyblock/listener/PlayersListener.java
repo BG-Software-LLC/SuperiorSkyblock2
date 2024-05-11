@@ -234,7 +234,7 @@ public class PlayersListener implements Listener {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
-        if (superiorPlayer instanceof SuperiorNPCPlayer || superiorPlayer.getPlayerStatus() == PlayerStatus.VOID_TELEPORT)
+        if (superiorPlayer instanceof SuperiorNPCPlayer || superiorPlayer.hasPlayerStatus(PlayerStatus.VOID_TELEPORT))
             return;
 
         MoveResult moveResult = this.regionManagerService.get().handlePlayerMove(superiorPlayer, from, to);
@@ -460,8 +460,10 @@ public class PlayersListener implements Listener {
             return;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getEntity());
-        if (superiorPlayer.getPlayerStatus() == PlayerStatus.VOID_TELEPORT)
+        if (superiorPlayer.hasPlayerStatus(PlayerStatus.VOID_TELEPORT)) {
             e.setCancelled(true);
+        }
+
     }
 
     /* PLAYER DEATH */

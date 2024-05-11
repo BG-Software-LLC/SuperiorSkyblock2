@@ -5,6 +5,12 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 public enum ModuleLoadTime {
 
     /**
+     * When used, the module will be loaded before the plugin is initialized.
+     * This makes it possible to listen to the PluginInitializeEvent and alter it.
+     */
+    PLUGIN_INITIALIZE,
+
+    /**
      * When used, the module will be enabled before the plugin loads the worlds for the islands.
      */
     BEFORE_WORLD_CREATION,

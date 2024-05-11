@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.world.schematic.impl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
-import com.bgsoftware.superiorskyblock.core.SchematicBlockData;
+import com.bgsoftware.superiorskyblock.core.schematic.SchematicBlockData;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;

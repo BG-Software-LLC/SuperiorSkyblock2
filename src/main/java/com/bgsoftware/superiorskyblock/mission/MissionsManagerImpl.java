@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
 import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
+import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -36,6 +37,7 @@ import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -65,6 +67,31 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             return;
 
         BukkitExecutor.asyncTimer(this::saveMissionsData, 6000L); // Save missions data every 5 minutes
+    }
+
+    public void clearData() {
+        saveMissionsData();
+
+        List<Mission<?>> missionsList = plugin.getMissions().getAllMissions();
+        this.missionsContainer.clearMissionsData();
+
+        for (Mission<?> mission : missionsList) {
+            // Unload the mission
+            mission.unload();
+
+            // We now want to unload the ClassLoader and free the held handles for the file.
+            ClassLoader classLoader = mission.getClass().getClassLoader();
+            if (classLoader instanceof URLClassLoader) {
+                try {
+                    ((URLClassLoader) classLoader).close();
+                } catch (Exception error) {
+                    Log.error(error, "An error occurred while unloading mission ", mission.getName(), ":");
+                }
+            }
+        }
+
+        // This is an attempt to force Windows to free the handles of the file.
+        System.gc();
     }
 
     @Override
@@ -311,6 +338,14 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                     );
                 }
             });
+
+            // Auto complete other missions that depend on the mission that was just completed
+            for (Mission<?> otherMission : getAllMissions()) {
+                if (otherMission.canComplete(superiorPlayer) && otherMission.getRequiredMissions().contains(mission.getName())) {
+                    // Auto reward the next mission
+                    rewardMission(otherMission, superiorPlayer, true);
+                }
+            }
         }
     }
 
@@ -444,23 +479,26 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
     }
 
     @SuppressWarnings("deprecation")
-    public Mission<?> loadMission(String missionName, File missionsFolder, ConfigurationSection missionSection) {
+    public Mission<?> loadMission(String missionName, FilesLookup filesLookup, ConfigurationSection missionSection) {
         Mission<?> newMission = null;
 
         try {
             Mission<?> mission = plugin.getMissions().getMission(missionName);
 
             if (mission == null) {
-                File missionJar = new File(missionsFolder, missionSection.getString("mission-file") + ".jar");
+                File missionJar = filesLookup.getFile(missionSection.getString("mission-file") + ".jar");
+
+                if (!missionJar.exists())
+                    throw new RuntimeException("The mission file " + missionJar.getName() + " is not valid.");
 
                 FileClassLoader missionClassLoader = new FileClassLoader(missionJar, plugin.getPluginClassLoader());
 
                 Either<Class<?>, Throwable> missionClassLookup = JarFiles.getClass(missionJar.toURL(), Mission.class, missionClassLoader);
 
-                if (missionClassLookup.getLeft() != null)
-                    throw new RuntimeException("An unexpected error occurred while reading " + missionJar.getName() + ".", missionClassLookup.getLeft());
+                if (missionClassLookup.getRight() != null)
+                    throw new RuntimeException("An unexpected error occurred while reading " + missionJar.getName() + ".", missionClassLookup.getRight());
 
-                Class<?> missionClass = missionClassLookup.getRight();
+                Class<?> missionClass = missionClassLookup.getLeft();
 
                 if (missionClass == null)
                     throw new RuntimeException("The mission file " + missionJar.getName() + " is not valid.");

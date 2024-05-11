@@ -116,4 +116,11 @@ public interface PlayersManager {
      */
     PlayersContainer getPlayersContainer();
 
+    /**
+     * Set a new players container.
+     *
+     * @param playersContainer The new players container to set.
+     */
+    void setPlayersContainer(PlayersContainer playersContainer);
+
 }

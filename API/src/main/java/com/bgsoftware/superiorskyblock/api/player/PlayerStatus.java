@@ -25,6 +25,7 @@ public enum PlayerStatus {
     /**
      * The player has no special status.
      */
+    @Deprecated
     NONE
 
 }

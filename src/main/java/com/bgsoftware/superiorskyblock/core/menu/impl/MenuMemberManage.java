@@ -13,7 +13,7 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.MemberManageButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
-import com.bgsoftware.superiorskyblock.core.menu.view.PlayerMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.PlayerViewArgs;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -21,16 +21,16 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.util.Arrays;
 
-public class MenuMemberManage extends AbstractMenu<PlayerMenuView, PlayerViewArgs> {
+public class MenuMemberManage extends AbstractMenu<MenuMemberManage.View, PlayerViewArgs> {
 
-    private MenuMemberManage(MenuParseResult<PlayerMenuView> parseResult) {
+    private MenuMemberManage(MenuParseResult<MenuMemberManage.View> parseResult) {
         super(MenuIdentifiers.MENU_MEMBER_MANAGE, parseResult);
     }
 
     @Override
-    protected PlayerMenuView createViewInternal(SuperiorPlayer superiorPlayer, PlayerViewArgs args,
-                                                @Nullable MenuView<?, ?> previousMenuView) {
-        return new PlayerMenuView(superiorPlayer, previousMenuView, this, args);
+    protected MenuMemberManage.View createViewInternal(SuperiorPlayer superiorPlayer, PlayerViewArgs args,
+                                                       @Nullable MenuView<?, ?> previousMenuView) {
+        return new MenuMemberManage.View(superiorPlayer, previousMenuView, this, args);
     }
 
     public void closeViews(SuperiorPlayer islandMember) {
@@ -39,7 +39,7 @@ public class MenuMemberManage extends AbstractMenu<PlayerMenuView, PlayerViewArg
 
     @Nullable
     public static MenuMemberManage createInstance() {
-        MenuParseResult<PlayerMenuView> menuParseResult = MenuParserImpl.getInstance().loadMenu("member-manage.yml",
+        MenuParseResult<MenuMemberManage.View> menuParseResult = MenuParserImpl.getInstance().loadMenu("member-manage.yml",
                 MenuMemberManage::convertOldGUI);
 
         if (menuParseResult == null) {
@@ -48,7 +48,7 @@ public class MenuMemberManage extends AbstractMenu<PlayerMenuView, PlayerViewArg
 
         MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
-        MenuLayout.Builder<PlayerMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
+        MenuLayout.Builder<MenuMemberManage.View> patternBuilder = menuParseResult.getLayoutBuilder();
 
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "roles", menuPatternSlots),
                 new MemberManageButton.Builder().setManageAction(MemberManageButton.ManageAction.SET_ROLE));
@@ -60,11 +60,18 @@ public class MenuMemberManage extends AbstractMenu<PlayerMenuView, PlayerViewArg
         return new MenuMemberManage(menuParseResult);
     }
 
-    public static class View extends PlayerMenuView {
+    public static class View extends AbstractMenuView<View, PlayerViewArgs> {
+
+        private final SuperiorPlayer superiorPlayer;
 
         View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView,
              MenuMemberManage menu, PlayerViewArgs args) {
-            super(inventoryViewer, previousMenuView, menu, args);
+            super(inventoryViewer, previousMenuView, menu);
+            this.superiorPlayer = args.getSuperiorPlayer();
+        }
+
+        public SuperiorPlayer getSuperiorPlayer() {
+            return this.superiorPlayer;
         }
 
         @Override

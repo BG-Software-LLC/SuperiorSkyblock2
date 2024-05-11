@@ -354,6 +354,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public long getVisitWarmup() {
+        return this.global.getHomeWarmup();
+    }
+
+    @Override
     public boolean isLiquidUpdate() {
         return this.global.isLiquidUpdate();
     }

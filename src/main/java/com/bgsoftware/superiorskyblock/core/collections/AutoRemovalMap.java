@@ -76,8 +76,9 @@ public class AutoRemovalMap<K, V> implements Map<K, V> {
 
     @Override
     public V remove(Object key) {
+        V value = elements.remove(key);
         this.elementsLifeTime.invalidate(key);
-        return elements.remove(key);
+        return value;
     }
 
     @Override

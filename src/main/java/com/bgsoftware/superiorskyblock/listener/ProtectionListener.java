@@ -11,8 +11,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
@@ -56,6 +56,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
@@ -76,6 +77,10 @@ public class ProtectionListener implements Listener {
             ProjectileHitEvent.class, "getHitBlock");
     @Nullable
     private static final Material CHORUS_FLOWER = EnumHelper.getEnum(Material.class, "CHORUS_FLOWER");
+    @Nullable
+    private static final Material CHORUS_FRUIT = EnumHelper.getEnum(Material.class, "CHORUS_FRUIT");
+    @Nullable
+    private static final Material BRUSH = EnumHelper.getEnum(Material.class, "BRUSH");
 
     private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
@@ -205,6 +210,57 @@ public class ProtectionListener implements Listener {
 
         if (island != null && !island.isInsideRange(dispenseBlockLocation))
             e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onBrushUse(PlayerInteractEvent e) {
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null || e.getClickedBlock() == null ||
+                e.getItem().getType() != BRUSH)
+            return;
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        InteractionResult interactionResult = this.protectionManager.get().handleCustomInteraction(
+                superiorPlayer, e.getClickedBlock().getLocation(), IslandPrivileges.BRUSH);
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
+            e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onChorusFruitConsume(PlayerItemConsumeEvent e) {
+        if (CHORUS_FRUIT == null || e.getItem().getType() != CHORUS_FRUIT)
+            return;
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        InteractionResult interactionResult = this.protectionManager.get().handlePlayerConsumeChorusFruit(
+                superiorPlayer, e.getPlayer().getLocation());
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
+            e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    private void onMinecartPlace(PlayerInteractEvent e) {
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getClickedBlock() == null)
+            return;
+
+        PlayerHand playerHand = BukkitItems.getHand(e);
+        if (playerHand != PlayerHand.MAIN_HAND)
+            return;
+
+        ItemStack handItem = BukkitItems.getHandItem(e.getPlayer(), playerHand);
+
+        if (handItem == null)
+            return;
+
+        Material handItemType = handItem.getType();
+        Material clickedBlockType = e.getClickedBlock().getType();
+
+        if ((Materials.isMinecart(handItemType) && Materials.isRail(clickedBlockType)) || Materials.isBoat(handItemType)) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+            InteractionResult interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer,
+                    e.getClickedBlock().getLocation(), IslandPrivileges.MINECART_PLACE);
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
+                e.setCancelled(true);
+        }
     }
 
     /* ENTITY INTERACTS */
@@ -376,11 +432,10 @@ public class ProtectionListener implements Listener {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult = this.protectionManager.get().handlePlayerEnderPearl(superiorPlayer, e.getTo());
 
-        if (interactionResult == InteractionResult.SUCCESS)
+        if (!ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             return;
 
         e.setCancelled(true);
-        Message.TELEPORT_OUTSIDE_ISLAND.send(superiorPlayer);
 
         if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
             BukkitItems.addItem(new ItemStack(Material.ENDER_PEARL), e.getPlayer().getInventory(),

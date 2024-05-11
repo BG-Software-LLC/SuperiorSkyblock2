@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
@@ -20,6 +21,7 @@ import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
+import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -50,7 +52,7 @@ import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.world.StructureGrowEvent;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -60,8 +62,6 @@ import java.util.concurrent.TimeUnit;
 
 public class BlockChangesListener implements Listener {
 
-    private static final ReflectMethod<EquipmentSlot> INTERACT_GET_HAND = new ReflectMethod<>(
-            PlayerInteractEvent.class, "getHand");
     private static final ReflectMethod<Block> PROJECTILE_HIT_EVENT_TARGET_BLOCK = new ReflectMethod<>(
             ProjectileHitEvent.class, "getHitBlock");
     @Nullable
@@ -138,14 +138,20 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onMinecartPlace(PlayerInteractEvent e) {
-        Material handItemType;
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || !Materials.isRail(e.getClickedBlock().getType()))
+            return;
 
-        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || // Making sure right-clicking block
-                e.getItem() == null || // Making sure right-clicking with valid item
-                !Materials.isRail(e.getClickedBlock().getType()) || // Making sure clicked block is a rail
-                !Materials.isMinecart((handItemType = e.getItem().getType())) || // Making sure hand item is minecart
-                (INTERACT_GET_HAND.isValid() && INTERACT_GET_HAND.invoke(e) != EquipmentSlot.HAND) // Making sure only call onces, for main hand.
-        )
+        PlayerHand playerHand = BukkitItems.getHand(e);
+        if (playerHand != PlayerHand.MAIN_HAND)
+            return;
+
+        ItemStack handItem = BukkitItems.getHandItem(e.getPlayer(), playerHand);
+
+        if (handItem == null)
+            return;
+
+        Material handItemType = handItem.getType();
+        if (!Materials.isMinecart(handItemType))
             return;
 
         Key minecartBlockKey = getMinecartBlockKey(handItemType);

@@ -3,9 +3,12 @@ package com.bgsoftware.superiorskyblock.world;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -59,6 +62,14 @@ public class WorldBlocks {
                 chunkSnapshot.getX(), chunkSnapshot.getZ(), true);
 
         return true;
+    }
+
+    public static Location getChunkBlock(ChunkPosition chunkPosition, int x, int y, int z) {
+        int realWorldChunkX = chunkPosition.getX() << 4;
+        int realWorldChunkZ = chunkPosition.getZ() << 4;
+
+        return new LazyWorldLocation(chunkPosition.getWorldName(),
+                realWorldChunkX + x, y, realWorldChunkZ + z, 0, 0);
     }
 
 }

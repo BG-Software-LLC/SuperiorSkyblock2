@@ -589,7 +589,10 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
 
     /**
      * Get the status of the player.
+     *
+     * @deprecated See {@link #hasPlayerStatus(PlayerStatus)}
      */
+    @Deprecated
     PlayerStatus getPlayerStatus();
 
     /**
@@ -598,6 +601,20 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * @param playerStatus The new status of the player.
      */
     void setPlayerStatus(PlayerStatus playerStatus);
+
+    /**
+     * Remove a status of the player.
+     *
+     * @param playerStatus The status to remove.
+     */
+    void removePlayerStatus(PlayerStatus playerStatus);
+
+    /**
+     * Check if player is in status.
+     *
+     * @param playerStatus The status to check.
+     */
+    boolean hasPlayerStatus(PlayerStatus playerStatus);
 
     /**
      * Merge another player into this object.

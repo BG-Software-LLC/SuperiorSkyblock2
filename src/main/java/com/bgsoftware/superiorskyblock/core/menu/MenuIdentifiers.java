@@ -17,6 +17,7 @@ public class MenuIdentifiers {
     public static final String MENU_CUSTOM_PREFIX = "MenuCustom_";
     public static final String MENU_GLOBAL_WARPS = "MenuGlobalWarps";
     public static final String MENU_ISLAND_BANK = "MenuIslandBank";
+    public static final String MENU_ISLAND_BANNED_PLAYERS = "MenuIslandBannedPlayers";
     public static final String MENU_ISLAND_CHEST = "MenuIslandChest";
     public static final String MENU_ISLAND_CREATION = "MenuIslandCreation";
     public static final String MENU_ISLAND_FLAGS = "MenuIslandFlags";

@@ -468,6 +468,7 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    @Deprecated
     public PlayerStatus getPlayerStatus() {
         return this.handle.getPlayerStatus();
     }
@@ -475,6 +476,16 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void setPlayerStatus(PlayerStatus playerStatus) {
         this.handle.setPlayerStatus(playerStatus);
+    }
+
+    @Override
+    public void removePlayerStatus(PlayerStatus playerStatus) {
+        this.handle.removePlayerStatus(playerStatus);
+    }
+
+    @Override
+    public boolean hasPlayerStatus(PlayerStatus playerStatus) {
+        return this.handle.hasPlayerStatus(playerStatus);
     }
 
     @Override

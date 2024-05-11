@@ -372,6 +372,39 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  chorus_fruit:
+    display-menu: true
+    permission-enabled:
+      type: CHORUS_FRUIT
+      name: '&6Chorus Fruit'
+      lore:
+        - '&7Access to consume chorus fruits inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: CHORUS_FRUIT
+      name: '&6Chorus Fruit'
+      lore:
+        - '&7Access to consume chorus fruits inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: CHORUS_FRUIT
+      name: '&6Chorus Fruit'
+      lore:
+        - '&7Access to consume chorus fruits inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   close_bypass:
     display-menu: true
     permission-enabled:

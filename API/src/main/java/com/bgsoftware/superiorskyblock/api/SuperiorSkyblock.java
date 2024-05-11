@@ -17,7 +17,6 @@ import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
-import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
 import org.bukkit.plugin.Plugin;
 
 public interface SuperiorSkyblock extends Plugin {
@@ -109,20 +108,5 @@ public interface SuperiorSkyblock extends Plugin {
      *                     When null, the default java script engine will be set instead.
      */
     void setScriptEngine(@Nullable IScriptEngine scriptEngine);
-
-    /**
-     * Get the world events-manager of the plugin.
-     */
-    @Deprecated
-    WorldEventsManager getWorldEventsManager();
-
-    /**
-     * Set a new world events-manager for the plugin.
-     *
-     * @param worldEventsManager The new events-manager to set.
-     *                           If null, the default events-manager will be set.
-     */
-    @Deprecated
-    void setWorldEventsManager(@Nullable WorldEventsManager worldEventsManager);
 
 }

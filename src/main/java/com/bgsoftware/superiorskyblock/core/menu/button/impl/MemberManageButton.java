@@ -9,17 +9,17 @@ import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
+import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMemberManage;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
-import com.bgsoftware.superiorskyblock.core.menu.view.PlayerMenuView;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.List;
 import java.util.Objects;
 
-public class MemberManageButton extends AbstractMenuViewButton<PlayerMenuView> {
+public class MemberManageButton extends AbstractMenuViewButton<MenuMemberManage.View> {
 
-    private MemberManageButton(AbstractMenuTemplateButton<PlayerMenuView> templateButton, PlayerMenuView menuView) {
+    private MemberManageButton(AbstractMenuTemplateButton<MenuMemberManage.View> templateButton, MenuMemberManage.View menuView) {
         super(templateButton, menuView);
     }
 
@@ -37,14 +37,14 @@ public class MemberManageButton extends AbstractMenuViewButton<PlayerMenuView> {
 
         SET_ROLE {
             @Override
-            void onButtonClick(PlayerMenuView menuView, InventoryClickEvent clickEvent) {
+            void onButtonClick(MenuMemberManage.View menuView, InventoryClickEvent clickEvent) {
                 menuView.setPreviousMove(false);
                 plugin.getMenus().openMemberRole(menuView.getInventoryViewer(), MenuViewWrapper.fromView(menuView), menuView.getSuperiorPlayer());
             }
         },
         BAN_MEMBER {
             @Override
-            void onButtonClick(PlayerMenuView menuView, InventoryClickEvent clickEvent) {
+            void onButtonClick(MenuMemberManage.View menuView, InventoryClickEvent clickEvent) {
                 SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
                 if (plugin.getSettings().isBanConfirm()) {
                     Island island = inventoryViewer.getIsland();
@@ -59,7 +59,7 @@ public class MemberManageButton extends AbstractMenuViewButton<PlayerMenuView> {
         },
         KICK_MEMBER {
             @Override
-            void onButtonClick(PlayerMenuView menuView, InventoryClickEvent clickEvent) {
+            void onButtonClick(MenuMemberManage.View menuView, InventoryClickEvent clickEvent) {
                 SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
                 if (plugin.getSettings().isKickConfirm()) {
                     Island island = inventoryViewer.getIsland();
@@ -81,11 +81,11 @@ public class MemberManageButton extends AbstractMenuViewButton<PlayerMenuView> {
 
         }
 
-        abstract void onButtonClick(PlayerMenuView menuView, InventoryClickEvent clickEvent);
+        abstract void onButtonClick(MenuMemberManage.View menuView, InventoryClickEvent clickEvent);
 
     }
 
-    public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<PlayerMenuView> {
+    public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<MenuMemberManage.View> {
 
         private ManageAction manageAction;
 
@@ -95,13 +95,13 @@ public class MemberManageButton extends AbstractMenuViewButton<PlayerMenuView> {
         }
 
         @Override
-        public MenuTemplateButton<PlayerMenuView> build() {
+        public MenuTemplateButton<MenuMemberManage.View> build() {
             return new Template(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, manageAction);
         }
 
     }
 
-    public static class Template extends MenuTemplateButtonImpl<PlayerMenuView> {
+    public static class Template extends MenuTemplateButtonImpl<MenuMemberManage.View> {
 
         private final ManageAction manageAction;
 

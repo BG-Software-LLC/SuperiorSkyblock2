@@ -1,0 +1,49 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lIsland Banned Players'
+previous-menu: true
+
+pattern:
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ @ @ @ @'
+  - '$ $ $ $ $ $ $ $ $'
+  - '# # % # * # ^ # #'
+
+slots: '@'
+previous-page: '%'
+current-page: '*'
+next-page: '^'
+
+items:
+  '@':
+    type: PLAYER_HEAD
+    name: '&e{0}'
+    lore:
+      - '&7Click to unban the player.'
+  '%':
+    type: PAPER
+    name: '{0}Previous Page'
+  '*':
+    type: SUNFLOWER
+    name: '&aCurrent Page'
+    lore:
+      - '&7Page {0}'
+  '^':
+    type: PAPER
+    name: '{0}Next Page'
+  '$':
+    type: BLACK_STAINED_GLASS_PANE
+    name: '&f'
+
+sounds:
+  '@':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2

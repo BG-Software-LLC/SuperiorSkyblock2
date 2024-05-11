@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.MissionsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -25,7 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory.View, MenuMissionsCategory.Args, Mission<?>> {
+public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory.View, MenuMissionsCategory.Args, MissionReference> {
 
     private final boolean sortByCompletion;
     private final boolean removeCompleted;
@@ -57,7 +58,7 @@ public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory
 
         MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
-        PagedMenuLayout.Builder<View, Mission<?>> patternBuilder = (PagedMenuLayout.Builder<View, Mission<?>>) menuParseResult.getLayoutBuilder();
+        PagedMenuLayout.Builder<View, MissionReference> patternBuilder = (PagedMenuLayout.Builder<View, MissionReference>) menuParseResult.getLayoutBuilder();
 
         boolean sortByCompletion = cfg.getBoolean("sort-by-completion", false);
         boolean removeCompleted = cfg.getBoolean("remove-completed", false);
@@ -94,10 +95,10 @@ public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory
 
     }
 
-    public class View extends AbstractPagedMenuView<View, Args, Mission<?>> {
+    public class View extends AbstractPagedMenuView<View, Args, MissionReference> {
 
         private final MissionCategory missionCategory;
-        private final List<Mission<?>> missions;
+        private final List<MissionReference> missions;
 
         View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView,
              Menu<View, Args> menu, Args args) {
@@ -115,7 +116,7 @@ public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory
 
                 this.missions = listBuilder
                         .filter(mission -> plugin.getMissions().canDisplayMission(mission, inventoryViewer, removeCompleted))
-                        .build(args.missionCategory.getMissions());
+                        .map(args.missionCategory.getMissions(), MissionReference::new);
             }
         }
 
@@ -125,7 +126,7 @@ public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory
         }
 
         @Override
-        protected List<Mission<?>> requestObjects() {
+        protected List<MissionReference> requestObjects() {
             return missions;
         }
 

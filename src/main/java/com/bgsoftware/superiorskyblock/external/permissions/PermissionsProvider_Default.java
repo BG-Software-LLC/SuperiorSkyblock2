@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.external.permissions;
 
+import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.api.hooks.PermissionsProvider;
 import org.bukkit.entity.Player;
@@ -12,7 +13,8 @@ import java.util.Map;
 public class PermissionsProvider_Default implements PermissionsProvider {
 
     private static final ReflectField<PermissibleBase> HUMAN_ENTITY_PERMS = new ReflectField<>(
-            "org.bukkit.craftbukkit.VERSION.entity.CraftHumanEntity", PermissibleBase.class, "perm");
+            new ClassInfo("entity.CraftHumanEntity", ClassInfo.PackageType.CRAFTBUKKIT),
+            PermissibleBase.class, "perm");
     private static final ReflectField<Map<String, PermissionAttachmentInfo>> PERMISSIBLE_BASE_PERMISSIONS =
             new ReflectField<>(PermissibleBase.class, Map.class, "permissions");
 

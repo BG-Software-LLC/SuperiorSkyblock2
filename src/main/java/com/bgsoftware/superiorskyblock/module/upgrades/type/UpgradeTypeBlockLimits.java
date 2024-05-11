@@ -1,18 +1,19 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.type;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.Mutable;
+import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -26,7 +27,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.StructureGrowEvent;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 
@@ -35,9 +36,6 @@ import java.util.List;
 
 public class UpgradeTypeBlockLimits implements IUpgradeType {
 
-    private static final ReflectMethod<EquipmentSlot> INTERACT_GET_HAND = new ReflectMethod<>(
-            PlayerInteractEvent.class, "getHand");
-
     private final SuperiorSkyblockPlugin plugin;
 
     public UpgradeTypeBlockLimits(SuperiorSkyblockPlugin plugin) {
@@ -45,8 +43,8 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
     }
 
     @Override
-    public Listener getListener() {
-        return new BlockLimitsListener();
+    public List<Listener> getListeners() {
+        return Collections.singletonList(new BlockLimitsListener());
     }
 
     @Override
@@ -73,17 +71,25 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
         @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
         public void onCartPlace(PlayerInteractEvent e) {
-            if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null ||
-                    !Materials.isRail(e.getClickedBlock().getType()) ||
-                    !Materials.isMinecart(e.getItem().getType()))
+            if (e.getAction() != Action.RIGHT_CLICK_BLOCK || !Materials.isRail(e.getClickedBlock().getType()))
                 return;
 
-            if (INTERACT_GET_HAND.isValid() && INTERACT_GET_HAND.invoke(e) != EquipmentSlot.HAND)
+            PlayerHand playerHand = BukkitItems.getHand(e);
+            if (playerHand != PlayerHand.MAIN_HAND)
+                return;
+
+            ItemStack handItem = BukkitItems.getHandItem(e.getPlayer(), playerHand);
+            if (handItem == null)
+                return;
+
+            Material handItemType = handItem.getType();
+
+            if (!Materials.isMinecart(handItemType))
                 return;
 
             Mutable<Key> minecraftKey = new Mutable<>(null);
 
-            if (preventMinecartPlace(e.getItem().getType(), e.getClickedBlock().getLocation(), minecraftKey)) {
+            if (preventMinecartPlace(handItemType, e.getClickedBlock().getLocation(), minecraftKey)) {
                 e.setCancelled(true);
                 Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(
                         minecraftKey.getValue().getGlobalKey()));

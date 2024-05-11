@@ -100,7 +100,7 @@ public class ChunkPosition {
         ChunkPosition that = (ChunkPosition) o;
         return x == that.x &&
                 z == that.z &&
-                worldInfo.equals(that.worldInfo);
+                worldInfo.getName().equals(that.worldInfo.getName());
     }
 
     @Override

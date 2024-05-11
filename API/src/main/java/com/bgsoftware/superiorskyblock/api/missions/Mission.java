@@ -151,6 +151,15 @@ public abstract class Mission<V> {
     public abstract void load(JavaPlugin plugin, ConfigurationSection missionSection) throws MissionLoadException;
 
     /**
+     * Unloads this mission.
+     * <p>
+     * There is no need to handle data-saving, this is done automatically by the plugin.
+     */
+    public void unload() {
+
+    }
+
+    /**
      * Get the progress of a specific player.
      * Method should return a value between 0.0 and 1.0
      *

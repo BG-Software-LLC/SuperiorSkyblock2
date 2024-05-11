@@ -5,9 +5,12 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.MaterialKeySource;
+import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
@@ -37,6 +40,10 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
 
         if (amount.compareTo(BigInteger.ZERO) == 0)
             return false;
+
+        if (!ServerVersion.isLegacy() && key instanceof MaterialKey &&
+                ((MaterialKey) key).getMaterialKeySource() == MaterialKeySource.ITEM)
+            key = ((MaterialKey) key).toGlobalKey();
 
         BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
         BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
@@ -70,6 +77,10 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
 
         if (amount.compareTo(BigInteger.ZERO) == 0)
             return false;
+
+        if (!ServerVersion.isLegacy() && key instanceof MaterialKey &&
+                ((MaterialKey) key).getMaterialKeySource() == MaterialKeySource.ITEM)
+            key = ((MaterialKey) key).toGlobalKey();
 
         BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
         BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);

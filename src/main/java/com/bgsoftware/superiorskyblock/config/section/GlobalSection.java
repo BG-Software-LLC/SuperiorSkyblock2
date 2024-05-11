@@ -188,6 +188,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().homeWarmup;
     }
 
+    public long getVisitWarmup() {
+        return getContainer().visitWarmup;
+    }
+
     public boolean isLiquidUpdate() {
         return getContainer().liquidUpdate;
     }

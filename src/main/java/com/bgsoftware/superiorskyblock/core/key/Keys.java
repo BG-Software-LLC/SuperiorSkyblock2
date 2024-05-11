@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.key.types.CustomKey;
 import com.bgsoftware.superiorskyblock.core.key.types.EntityTypeKey;
@@ -67,8 +68,8 @@ public class Keys {
             CreatureSpawner creatureSpawner = (CreatureSpawner) block.getState();
             baseKey = getSpawnerKeyFromCreatureSpawner(creatureSpawner);
         } else {
-            short durability = block.getData();
-            baseKey = MaterialKey.of(blockType, durability);
+            short data = ServerVersion.isLegacy() ? block.getData() : 0;
+            baseKey = MaterialKey.of(blockType, data, MaterialKeySource.BLOCK);
         }
 
         return plugin.getBlockValues().convertKey(baseKey, block.getLocation());
@@ -79,7 +80,8 @@ public class Keys {
         if (blockState instanceof CreatureSpawner) {
             baseKey = getSpawnerKeyFromCreatureSpawner((CreatureSpawner) blockState);
         } else {
-            baseKey = MaterialKey.of(blockState.getType(), blockState.getRawData());
+            short data = ServerVersion.isLegacy() ? blockState.getRawData() : 0;
+            baseKey = MaterialKey.of(blockState.getType(), data, MaterialKeySource.BLOCK);
         }
 
         return plugin.getBlockValues().convertKey(baseKey, blockState.getLocation());
@@ -95,7 +97,7 @@ public class Keys {
     public static Key of(ItemStack itemStack) {
         Material itemType = itemStack.getType();
         Key baseKey = (itemType == Materials.SPAWNER.toBukkitType()) ?
-                plugin.getProviders().getSpawnerKey(itemStack) : MaterialKey.of(itemType, itemStack.getDurability());
+                plugin.getProviders().getSpawnerKey(itemStack) : MaterialKey.of(itemType, itemStack.getDurability(), MaterialKeySource.ITEM);
         return plugin.getBlockValues().convertKey(baseKey, itemStack);
     }
 

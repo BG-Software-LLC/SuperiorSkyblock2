@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockGrowEvent;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class UpgradeTypeCropGrowth implements IUpgradeType {
@@ -25,8 +26,8 @@ public class UpgradeTypeCropGrowth implements IUpgradeType {
     }
 
     @Override
-    public Listener getListener() {
-        return new CropGrowthListener();
+    public List<Listener> getListeners() {
+        return Collections.singletonList(new CropGrowthListener());
     }
 
     @Override

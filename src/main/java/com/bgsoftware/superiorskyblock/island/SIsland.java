@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
+import com.bgsoftware.superiorskyblock.api.hooks.LazyWorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandBlockFlags;
@@ -35,6 +36,7 @@ import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LocationKey;
@@ -73,6 +75,7 @@ import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.island.warp.SIslandWarp;
 import com.bgsoftware.superiorskyblock.island.warp.SWarpCategory;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
+import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
@@ -110,6 +113,7 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -127,6 +131,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SIsland implements Island {
@@ -196,7 +201,7 @@ public class SIsland implements Island {
     private final AtomicReference<BigDecimal> islandLevel = new AtomicReference<>(BigDecimal.ZERO);
     private final AtomicReference<BigDecimal> bonusWorth = new AtomicReference<>(BigDecimal.ZERO);
     private final AtomicReference<BigDecimal> bonusLevel = new AtomicReference<>(BigDecimal.ZERO);
-    private final Map<Mission<?>, Integer> completedMissions = new ConcurrentHashMap<>();
+    private final Map<MissionReference, Counter> completedMissions = new ConcurrentHashMap<>();
     private final Synchronized<IslandChest[]> islandChests = Synchronized.of(createDefaultIslandChests());
     private final Synchronized<CompletableFuture<Biome>> biomeGetterTask = Synchronized.of(null);
     private final AtomicInteger generatedSchematics = new AtomicInteger(0);
@@ -616,6 +621,8 @@ public class SIsland implements Island {
         if (isMember(superiorPlayer))
             kickMember(superiorPlayer);
 
+        plugin.getMenus().refreshIslandBannedPlayers(this);
+
         Location location = superiorPlayer.getLocation();
 
         if (location != null && isInside(location))
@@ -634,8 +641,11 @@ public class SIsland implements Island {
 
         boolean unbannedPlayer = bannedPlayers.remove(superiorPlayer);
 
-        if (unbannedPlayer)
+        if (unbannedPlayer) {
+            plugin.getMenus().refreshIslandBannedPlayers(this);
+
             IslandsDatabaseBridge.removeBannedPlayer(this, superiorPlayer);
+        }
     }
 
     @Override
@@ -1939,7 +1949,7 @@ public class SIsland implements Island {
 
         Log.debug(Debug.EXECUTE_ISLAND_COMMANDS, owner.getName(), command, onlyOnlineMembers, ignoredList);
 
-        forEachIslandMember(ignoredList, true, islandMember ->
+        forEachIslandMember(ignoredList, onlyOnlineMembers, islandMember ->
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player-name}", islandMember.getName()))
         );
     }
@@ -2508,7 +2518,7 @@ public class SIsland implements Island {
     public boolean isChunkDirty(String worldName, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null.");
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, worldName);
-        Preconditions.checkArgument(worldInfo == null || isChunkInside(chunkX, chunkZ),
+        Preconditions.checkArgument(worldInfo != null && isChunkInside(chunkX, chunkZ),
                 "Chunk must be within the island boundaries.");
         return this.dirtyChunksContainer.isMarkedDirty(ChunkPosition.of(worldInfo, chunkX, chunkZ));
     }
@@ -3312,7 +3322,8 @@ public class SIsland implements Island {
 
         Log.debug(Debug.CREATE_WARP, owner.getName(), name, location, warpCategory);
 
-        IslandWarp islandWarp = loadIslandWarp(name, location, warpCategory, !plugin.getSettings().isPublicWarps(), null);
+        IslandWarp islandWarp = loadIslandWarp(name, LazyWorldLocation.of(location), warpCategory,
+                !plugin.getSettings().isPublicWarps(), null);
 
         IslandsDatabaseBridge.saveWarp(this, islandWarp);
 
@@ -3367,9 +3378,9 @@ public class SIsland implements Island {
             Message.TELEPORT_WARMUP.send(superiorPlayer, Formatters.TIME_FORMATTER.format(
                     Duration.ofMillis(plugin.getSettings().getWarpsWarmup()), superiorPlayer.getUserLocale()));
             superiorPlayer.setTeleportTask(BukkitExecutor.sync(() ->
-                    warpPlayerWithoutWarmup(superiorPlayer, islandWarp), plugin.getSettings().getWarpsWarmup() / 50));
+                    warpPlayerWithoutWarmup(superiorPlayer, islandWarp, true), plugin.getSettings().getWarpsWarmup() / 50));
         } else {
-            warpPlayerWithoutWarmup(superiorPlayer, islandWarp);
+            warpPlayerWithoutWarmup(superiorPlayer, islandWarp, true);
         }
     }
 
@@ -4043,9 +4054,18 @@ public class SIsland implements Island {
     }
 
     private void calcIslandWorthInternal(@Nullable SuperiorPlayer asker, @Nullable Runnable callback) {
-        Log.debug(Debug.CALCULATE_ISLAND, owner.getName(), asker);
+        try {
+            this.beingRecalculated = true;
+            runCalcIslandWorthInternal(asker, callback);
+        } catch (Throwable error) {
+            // In case of an error, we get out of the recalculate state.
+            this.beingRecalculated = false;
+            throw error;
+        }
+    }
 
-        beingRecalculated = true;
+    private void runCalcIslandWorthInternal(@Nullable SuperiorPlayer asker, @Nullable Runnable callback) {
+        Log.debug(Debug.CALCULATE_ISLAND, owner.getName(), asker);
 
         BigDecimal oldWorth = getWorth();
         BigDecimal oldLevel = getIslandLevel();
@@ -4061,6 +4081,8 @@ public class SIsland implements Island {
         }
 
         calculationResult.whenComplete((result, error) -> {
+            beingRecalculated = false;
+
             if (error != null) {
                 if (error instanceof TimeoutException) {
                     if (asker != null)
@@ -4072,8 +4094,6 @@ public class SIsland implements Island {
                     if (asker != null)
                         Message.ISLAND_WORTH_ERROR.send(asker);
                 }
-
-                beingRecalculated = false;
 
                 return;
             }
@@ -4091,8 +4111,6 @@ public class SIsland implements Island {
 
             saveBlockCounts(this.currentTotalBlockCounts.get(), oldWorth, oldLevel);
             updateLastTime();
-
-            beingRecalculated = false;
         });
     }
 
@@ -4120,12 +4138,12 @@ public class SIsland implements Island {
         return warpCategory;
     }
 
-    public IslandWarp loadIslandWarp(String name, Location location, @Nullable WarpCategory warpCategory,
+    public IslandWarp loadIslandWarp(String name, LazyWorldLocation location, @Nullable WarpCategory warpCategory,
                                      boolean isPrivate, @Nullable ItemStack icon) {
         if (warpCategory == null)
             warpCategory = warpCategories.values().stream().findFirst().orElseGet(() -> createWarpCategory("Default Category"));
 
-        IslandWarp islandWarp = new SIslandWarp(name, location.clone(), warpCategory, isPrivate, icon);
+        IslandWarp islandWarp = new SIslandWarp(name, location.clone(true), warpCategory, isPrivate, icon);
 
         islandWarp.getCategory().getWarps().add(islandWarp);
 
@@ -4239,16 +4257,27 @@ public class SIsland implements Island {
      *  Island top methods
      */
 
-    private void warpPlayerWithoutWarmup(SuperiorPlayer superiorPlayer, IslandWarp islandWarp) {
-        Location location = islandWarp.getLocation();
-        superiorPlayer.setTeleportTask(null);
-
+    private void warpPlayerWithoutWarmup(SuperiorPlayer superiorPlayer, IslandWarp islandWarp, boolean shouldRetryOnNullWorld) {
         // Warp doesn't exist anymore.
         if (getWarp(islandWarp.getName()) == null) {
             Message.INVALID_WARP.send(superiorPlayer, islandWarp.getName());
             deleteWarp(islandWarp.getName());
             return;
         }
+
+        Location location = islandWarp.getLocation();
+        if (location.getWorld() == null) {
+            if (shouldRetryOnNullWorld && location instanceof LazyWorldLocation &&
+                    plugin.getProviders().getWorldsProvider() instanceof LazyWorldsProvider) {
+                LazyWorldsProvider worldsProvider = (LazyWorldsProvider) plugin.getProviders().getWorldsProvider();
+                WorldInfo worldInfo = worldsProvider.getIslandsWorldInfo(this, ((LazyWorldLocation) location).getWorldName());
+                worldsProvider.prepareWorld(this, worldInfo.getEnvironment(),
+                        () -> warpPlayerWithoutWarmup(superiorPlayer, islandWarp, false));
+                return;
+            }
+        }
+
+        superiorPlayer.setTeleportTask(null);
 
         if (!isInsideRange(location)) {
             Message.UNSAFE_WARP.send(superiorPlayer);
@@ -4280,19 +4309,20 @@ public class SIsland implements Island {
     @Override
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        setAmountMissionCompleted(mission, completedMissions.getOrDefault(mission, 0) + 1);
+        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(1));
     }
 
     @Override
     public void resetMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        setAmountMissionCompleted(mission, completedMissions.getOrDefault(mission, 0) - 1);
+        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(-1));
     }
 
     @Override
     public boolean hasCompletedMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        return completedMissions.getOrDefault(mission, 0) > 0;
+        Counter finishCount = completedMissions.get(new MissionReference(mission));
+        return finishCount != null && finishCount.get() > 0;
     }
 
     @Override
@@ -4310,29 +4340,39 @@ public class SIsland implements Island {
     @Override
     public int getAmountMissionCompleted(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        return completedMissions.getOrDefault(mission, 0);
+        Counter finishCount = completedMissions.get(new MissionReference(mission));
+        return finishCount == null ? 0 : finishCount.get();
     }
 
     @Override
     public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.set(finishCount));
+    }
 
-        Log.debug(Debug.SET_ISLAND_MISSION_COMPLETED, mission.getName(), finishCount);
+    private void changeAmountMissionsCompletedInternal(Mission<?> mission, Function<Counter, Integer> action) {
+        String missionName = mission.getName();
+
+        MissionReference missionReference = new MissionReference(mission);
+
+        Counter finishCount = completedMissions.computeIfAbsent(missionReference, r -> new Counter(0));
+        int oldFinishCount = action.apply(finishCount);
+        int newFinishCount = finishCount.get();
+
+        Log.debug(Debug.SET_ISLAND_MISSION_COMPLETED, missionName, finishCount);
 
         // We always want to reset data
         mission.clearData(getOwner());
 
-        if (finishCount > 0) {
-            Integer oldFinishCount = completedMissions.put(mission, finishCount);
-
-            if (Objects.equals(oldFinishCount, finishCount))
+        if (newFinishCount > 0) {
+            if (newFinishCount == oldFinishCount)
                 return;
 
-            IslandsDatabaseBridge.saveMission(this, mission, finishCount);
+            IslandsDatabaseBridge.saveMission(this, mission, newFinishCount);
         } else {
-            Integer oldFinishCount = completedMissions.remove(mission);
+            completedMissions.remove(missionReference);
 
-            if (oldFinishCount == null)
+            if (oldFinishCount <= 0)
                 return;
 
             IslandsDatabaseBridge.removeMission(this, mission);
@@ -4341,19 +4381,28 @@ public class SIsland implements Island {
         plugin.getMenus().refreshMissionsCategory(mission.getMissionCategory());
     }
 
-    /*
-     *  Object related methods
-     */
-
     @Override
     public List<Mission<?>> getCompletedMissions() {
-        return new SequentialListBuilder<Mission<?>>().build(completedMissions.keySet());
+        return new SequentialListBuilder<MissionReference>()
+                .filter(MissionReference::isValid)
+                .map(completedMissions.keySet(), MissionReference::getMission);
     }
 
     @Override
     public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
-        return Collections.unmodifiableMap(completedMissions);
+        Map<Mission<?>, Integer> completedMissions = new LinkedHashMap<>();
+
+        this.completedMissions.forEach((mission, finishCount) -> {
+            if (mission.isValid())
+                completedMissions.put(mission.getMission(), finishCount.get());
+        });
+
+        return completedMissions.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(completedMissions);
     }
+
+    /*
+     *  Object related methods
+     */
 
     @Override
     public int hashCode() {

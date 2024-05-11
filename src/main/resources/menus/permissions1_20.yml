@@ -1,0 +1,2324 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lPermissions Controller'
+previous-menu: true
+
+pattern:
+  - '$ $ $ $ $ $ $ $ $'
+  - '$ @ @ @ @ @ @ @ $'
+  - '$ @ @ @ @ @ @ @ $'
+  - '$ @ @ @ @ @ @ @ $'
+  - '$ $ % $ * $ ^ $ $'
+
+slots: '@'
+previous-page: '%'
+current-page: '*'
+next-page: '^'
+
+messages:
+  no-role-permission: '&8 - &c{}'
+  exact-role-permission: '&8 - &2{}'
+  higher-role-permission: '&8 - &a{}'
+
+items:
+  '$':
+    type: CYAN_STAINED_GLASS_PANE
+    name: '&f'
+  '%':
+    type: PAPER
+    name: '{0}Previous Page'
+  '*':
+    type: SUNFLOWER
+    name: '&aCurrent Page'
+    lore:
+      - '&7Page {0}'
+  '^':
+    type: PAPER
+    name: '{0}Next Page'
+
+permissions:
+  all:
+    display-menu: true
+    permission-enabled:
+      type: BEDROCK
+      name: '&6All'
+      lore:
+        - '&7Access to all the abilities of the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: BEDROCK
+      name: '&6All'
+      lore:
+        - '&7Access to all the abilities of the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: BEDROCK
+      name: '&6All'
+      lore:
+        - '&7Access to all the abilities of the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  animal_breed:
+    display-menu: true
+    permission-enabled:
+      type: WHEAT
+      name: '&6Animal Breed'
+      lore:
+        - '&7Access to breed animals inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      name: '&6Animal Breed'
+      type: WHEAT
+      lore:
+        - '&7Access to breed animals inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      name: '&6Animal Breed'
+      type: WHEAT
+      lore:
+        - '&7Access to breed animals inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  animal_damage:
+    display-menu: true
+    permission-enabled:
+      type: DIAMOND_SWORD
+      name: '&6Animal Damage'
+      lore:
+        - '&7Access to damage animals inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: DIAMOND_SWORD
+      name: '&6Animal Damage'
+      lore:
+        - '&7Access to damage animals inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: DIAMOND_SWORD
+      name: '&6Animal Damage'
+      lore:
+        - '&7Access to damage animals inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  animal_shear:
+    display-menu: true
+    permission-enabled:
+      type: SHEARS
+      name: '&6Animal Shear'
+      lore:
+        - '&7Access to shear animals inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: SHEARS
+      name: '&6Animal Shear'
+      lore:
+        - '&7Access to shear animals inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: SHEARS
+      name: '&6Animal Shear'
+      lore:
+        - '&7Access to shear animals inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  animal_spawn:
+    display-menu: true
+    permission-enabled:
+      type: CHICKEN_SPAWN_EGG
+      name: '&6Animal Spawn'
+      lore:
+        - '&7Access to spawn animals inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: CHICKEN_SPAWN_EGG
+      name: '&6Animal Spawn'
+      lore:
+        - '&7Access to spawn animals inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: CHICKEN_SPAWN_EGG
+      name: '&6Animal Spawn'
+      lore:
+        - '&7Access to spawn animals inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  ban_member:
+    display-menu: true
+    permission-enabled:
+      type: SKELETON_SKULL
+      name: '&6Ban Member'
+      lore:
+        - '&7Access to ban members from the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: SKELETON_SKULL
+      name: '&6Ban Member'
+      lore:
+        - '&7Access to ban members from the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: SKELETON_SKULL
+      name: '&6Ban Member'
+      lore:
+        - '&7Access to ban members from the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  break:
+    display-menu: true
+    permission-enabled:
+      type: DIAMOND_PICKAXE
+      name: '&6Break'
+      lore:
+        - '&7Access to break blocks inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: DIAMOND_PICKAXE
+      name: '&6Break'
+      lore:
+        - '&7Access to break blocks inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: DIAMOND_PICKAXE
+      name: '&6Break'
+      lore:
+        - '&7Access to break blocks inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  brush:
+    display-menu: true
+    permission-enabled:
+      type: BRUSH
+      name: '&6Brush'
+      lore:
+        - '&7Access to brush suspicious blocks inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: BRUSH
+      name: '&6Brush'
+      lore:
+        - '&7Access to brush suspicious blocks inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: BRUSH
+      name: '&6Brush'
+      lore:
+        - '&7Access to brush suspicious blocks inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  build:
+    display-menu: true
+    permission-enabled:
+      type: COBBLESTONE
+      name: '&6Build'
+      lore:
+        - '&7Access to place blocks inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: COBBLESTONE
+      name: '&6Build'
+      lore:
+        - '&7Access to place blocks inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: COBBLESTONE
+      name: '&6Build'
+      lore:
+        - '&7Access to place blocks inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  change_name:
+    display-menu: true
+    permission-enabled:
+      type: NAME_TAG
+      name: '&6Change Name'
+      lore:
+        - '&7Access to change the island''s name.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: NAME_TAG
+      name: '&6Change Name'
+      lore:
+        - '&7Access to change the island''s name.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: NAME_TAG
+      name: '&6Change Name'
+      lore:
+        - '&7Access to change the island''s name.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  chest_access:
+    display-menu: true
+    permission-enabled:
+      type: CHEST
+      name: '&6Chest Access'
+      lore:
+        - '&7Access to open chests inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: CHEST
+      name: '&6Chest Access'
+      lore:
+        - '&7Access to open chests inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: CHEST
+      name: '&6Chest Access'
+      lore:
+        - '&7Access to open chests inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  chorus_fruit:
+    display-menu: true
+    permission-enabled:
+      type: CHORUS_FRUIT
+      name: '&6Chorus Fruit'
+      lore:
+        - '&7Access to consume chorus fruits inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: CHORUS_FRUIT
+      name: '&6Chorus Fruit'
+      lore:
+        - '&7Access to consume chorus fruits inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: CHORUS_FRUIT
+      name: '&6Chorus Fruit'
+      lore:
+        - '&7Access to consume chorus fruits inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  close_bypass:
+    display-menu: true
+    permission-enabled:
+      type: TRIPWIRE_HOOK
+      name: '&6Locked Bypass'
+      lore:
+        - '&7Access to bypass the island''s lock.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: TRIPWIRE_HOOK
+      name: '&6Locked Bypass'
+      lore:
+        - '&7Access to bypass the island''s lock.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: TRIPWIRE_HOOK
+      name: '&6Locked Bypass'
+      lore:
+        - '&7Access to bypass the island''s lock.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  close_island:
+    display-menu: true
+    permission-enabled:
+      type: BARRIER
+      name: '&6Lock Island'
+      lore:
+        - '&7Access to lock the island from public.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: BARRIER
+      name: '&6Lock Island'
+      lore:
+        - '&7Access to lock the island from public.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: BARRIER
+      name: '&6Lock Island'
+      lore:
+        - '&7Access to lock the island from public.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  coop_member:
+    display-menu: true
+    permission-enabled:
+      type: GOLDEN_APPLE
+      name: '&6Coop Member'
+      lore:
+        - '&7Access to add a player as a co-op member.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: GOLDEN_APPLE
+      name: '&6Coop Member'
+      lore:
+        - '&7Access to add a player as a co-op member.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: GOLDEN_APPLE
+      name: '&6Coop Member'
+      lore:
+        - '&7Access to add a player as a co-op member.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  delete_warp:
+    display-menu: true
+    permission-enabled:
+      type: ENDER_PEARL
+      name: '&6Delete Warp'
+      lore:
+        - '&7Access to delete island warps.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: ENDER_PEARL
+      name: '&6Delete Warp'
+      lore:
+        - '&7Access to delete island warps.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: ENDER_PEARL
+      name: '&6Delete Warp'
+      lore:
+        - '&7Access to delete island warps.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  demote_members:
+    display-menu: true
+    permission-enabled:
+      type: IRON_INGOT
+      name: '&6Demote Members'
+      lore:
+        - '&7Access to demote members inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: IRON_INGOT
+      name: '&6Demote Members'
+      lore:
+        - '&7Access to demote members inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: IRON_INGOT
+      name: '&6Demote Members'
+      lore:
+        - '&7Access to demote members inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  deposit_money:
+    display-menu: true
+    permission-enabled:
+      type: MAP
+      name: '&6Deposit Money'
+      lore:
+        - '&7Access to deposit money into the island''s bank.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: MAP
+      name: '&6Deposit Money'
+      lore:
+        - '&7Access to deposit money into the island''s bank.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: MAP
+      name: '&6Deposit Money'
+      lore:
+        - '&7Access to deposit money into the island''s bank.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  disband_island:
+    display-menu: true
+    permission-enabled:
+      type: TNT
+      name: '&6Disband Island'
+      lore:
+        - '&7Access to disband the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: TNT
+      name: '&6Disband Island'
+      lore:
+        - '&7Access to disband the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: TNT
+      name: '&6Disband Island'
+      lore:
+        - '&7Access to disband the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  discord_show:
+    display-menu: true
+    permission-enabled:
+      type: LIGHT_BLUE_TERRACOTTA
+      name: '&6Discord Show'
+      lore:
+        - '&7Access to check the island''s linked discord.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: LIGHT_BLUE_TERRACOTTA
+      name: '&6Discord Show'
+      lore:
+        - '&7Access to check the island''s linked discord.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: LIGHT_BLUE_TERRACOTTA
+      name: '&6Discord Show'
+      lore:
+        - '&7Access to check the island''s linked discord.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  drop_items:
+    display-menu: true
+    permission-enabled:
+      type: ARROW
+      name: '&6Drop Items'
+      lore:
+        - '&7Access to drop items inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: ARROW
+      name: '&6Drop Items'
+      lore:
+        - '&7Access to drop items inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: ARROW
+      name: '&6Drop Items'
+      lore:
+        - '&7Access to drop items inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  ender_pearl:
+    display-menu: true
+    permission-enabled:
+      type: ENDER_PEARL
+      name: '&6Ender Pearl'
+      lore:
+        - '&7Access to use ender pearls inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: ENDER_PEARL
+      name: '&6Ender Pearl'
+      lore:
+        - '&7Access to use ender pearls inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: ENDER_PEARL
+      name: '&6Ender Pearl'
+      lore:
+        - '&7Access to use ender pearls inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  expel_bypass:
+    display-menu: true
+    permission-enabled:
+      type: FEATHER
+      name: '&6Expel Bypass'
+      lore:
+        - '&7Access to bypass from being expelled.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: FEATHER
+      name: '&6Expel Bypass'
+      lore:
+        - '&7Access to bypass from being expelled.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: FEATHER
+      name: '&6Expel Bypass'
+      lore:
+        - '&7Access to bypass from being expelled.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  expel_players:
+    display-menu: true
+    permission-enabled:
+      type: DISPENSER
+      name: '&6Expel Players'
+      lore:
+        - '&7Access to expel players from the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: DISPENSER
+      name: '&6Expel Players'
+      lore:
+        - '&7Access to expel players from the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: DISPENSER
+      name: '&6Expel Players'
+      lore:
+        - '&7Access to expel players from the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  farm_tramping:
+    display-menu: true
+    permission-enabled:
+      type: FARMLAND
+      name: '&6Farm Tramping'
+      lore:
+        - '&7Access to tramp farmlands inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: FARMLAND
+      name: '&6Farm Tramping'
+      lore:
+        - '&7Access to tramp farmlands inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: FARMLAND
+      name: '&6Farm Tramping'
+      lore:
+        - '&7Access to tramp farmlands inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  fertilize:
+    display-menu: true
+    permission-enabled:
+      type: BONE_MEAL
+      name: '&6Fertilize'
+      lore:
+        - '&7Access to fertilize blocks around the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: BONE_MEAL
+      name: '&6Fertilize'
+      lore:
+        - '&7Access to fertilize blocks around the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: BONE_MEAL
+      name: '&6Fertilize'
+      lore:
+        - '&7Access to fertilize blocks around the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  fish:
+    display-menu: true
+    permission-enabled:
+      type: FISHING_ROD
+      name: '&6Fish'
+      lore:
+        - '&7Access fishing around the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: FISHING_ROD
+      name: '&6Fish'
+      lore:
+        - '&7Access fishing around the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: FISHING_ROD
+      name: '&6Fish'
+      lore:
+        - '&7Access fishing around the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  fly:
+    display-menu: true
+    permission-enabled:
+      type: FEATHER
+      name: '&6Fly'
+      lore:
+        - '&7Access fly around the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: FEATHER
+      name: '&6Fly'
+      lore:
+        - '&7Access fly around the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: FEATHER
+      name: '&6Fly'
+      lore:
+        - '&7Access fly around the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  horse_interact:
+    display-menu: true
+    permission-enabled:
+      type: HORSE_SPAWN_EGG
+      name: '&6Horse Interact'
+      lore:
+        - '&7Access to interact with horses inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: HORSE_SPAWN_EGG
+      name: '&6Horse Interact'
+      lore:
+        - '&7Access to interact with horses inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: HORSE_SPAWN_EGG
+      name: '&6Horse Interact'
+      lore:
+        - '&7Access to interact with horses inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  ignite_creeper:
+    display-menu: true
+    permission-enabled:
+      type: CREEPER_SPAWN_EGG
+      name: '&6Ignite Creepers'
+      lore:
+        - '&7Access to ignite creepers with flint and steel inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: CREEPER_SPAWN_EGG
+      name: '&6Ignite Creepers'
+      lore:
+        - '&7Access to ignite creepers with flint and steel inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: CREEPER_SPAWN_EGG
+      name: '&6Ignite Creepers'
+      lore:
+        - '&7Access to ignite creepers with flint and steel inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  interact:
+    display-menu: true
+    permission-enabled:
+      type: PISTON
+      name: '&6Interact'
+      lore:
+        - '&7Access to interact with blocks inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: PISTON
+      name: '&6Interact'
+      lore:
+        - '&7Access to interact with blocks inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: PISTON
+      name: '&6Interact'
+      lore:
+        - '&7Access to interact with blocks inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  invite_member:
+    display-menu: true
+    permission-enabled:
+      type: PLAYER_HEAD
+      data: 3
+      name: '&6Invite Member'
+      lore:
+        - '&7Access to invite new members to the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: PLAYER_HEAD
+      name: '&6Invite Member'
+      lore:
+        - '&7Access to invite new members to the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: PLAYER_HEAD
+      name: '&6Invite Member'
+      lore:
+        - '&7Access to invite new members to the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  island_chest:
+    display-menu: true
+    permission-enabled:
+      type: ENDER_CHEST
+      name: '&6Community Chest'
+      lore:
+        - '&7Access to the community chest of the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: ENDER_CHEST
+      name: '&6Community Chest'
+      lore:
+        - '&7Access to the community chest of the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: ENDER_CHEST
+      name: '&6Community Chest'
+      lore:
+        - '&7Access to the community chest of the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  item_frame:
+    display-menu: true
+    permission-enabled:
+      type: ITEM_FRAME
+      name: '&6Item Frame'
+      lore:
+        - '&7Access to interact with item frames inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: ITEM_FRAME
+      name: '&6Item Frame'
+      lore:
+        - '&7Access to interact with item frames inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: ITEM_FRAME
+      name: '&6Item Frame'
+      lore:
+        - '&7Access to interact with item frames inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  kick_member:
+    display-menu: true
+    permission-enabled:
+      type: SKELETON_SKULL
+      name: '&6Kick Member'
+      lore:
+        - '&7Access to kick members from the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: SKELETON_SKULL
+      name: '&6Kick Member'
+      lore:
+        - '&7Access to kick members from the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: SKELETON_SKULL
+      name: '&6Kick Member'
+      lore:
+        - '&7Access to kick members from the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  leash:
+    display-menu: true
+    permission-enabled:
+      type: LEAD
+      name: '&6Leash Mobs'
+      lore:
+        - '&7Access to leash mobs inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: LEAD
+      name: '&6Leash Mobs'
+      lore:
+        - '&7Access to leash mobs inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: LEAD
+      name: '&6Leash Mobs'
+      lore:
+        - '&7Access to leash mobs inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  monster_damage:
+    display-menu: true
+    permission-enabled:
+      type: ZOMBIE_HEAD
+      name: '&6Monster Damage'
+      lore:
+        - '&7Access to damage monsters inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: ZOMBIE_HEAD
+      name: '&6Monster Damage'
+      lore:
+        - '&7Access to damage monsters inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: ZOMBIE_HEAD
+      name: '&6Monster Damage'
+      lore:
+        - '&7Access to damage monsters inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  minecart_damage:
+    display-menu: true
+    permission-enabled:
+      type: TNT_MINECART
+      name: '&6Minecart Damage'
+      lore:
+        - '&7Access to damage minecarts inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: TNT_MINECART
+      name: '&6Minecart Damage'
+      lore:
+        - '&7Access to damage minecarts inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: TNT_MINECART
+      name: '&6Minecart Damage'
+      lore:
+        - '&7Access to damage minecarts inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  minecart_enter:
+    display-menu: true
+    permission-enabled:
+      type: HOPPER_MINECART
+      name: '&6Minecart Enter'
+      lore:
+        - '&7Access to enter minecarts inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: HOPPER_MINECART
+      name: '&6Minecart Enter'
+      lore:
+        - '&7Access to enter minecarts inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: HOPPER_MINECART
+      name: '&6Minecart Enter'
+      lore:
+        - '&7Access to enter minecarts inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  minecart_open:
+    display-menu: true
+    permission-enabled:
+      type: CHEST_MINECART
+      name: '&6Minecart Open'
+      lore:
+        - '&7Access to open minecarts inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: CHEST_MINECART
+      name: '&6Minecart Open'
+      lore:
+        - '&7Access to open minecarts inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: CHEST_MINECART
+      name: '&6Minecart Open'
+      lore:
+        - '&7Access to open minecarts inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  minecart_place:
+    display-menu: true
+    permission-enabled:
+      type: MINECART
+      name: '&6Minecart Place'
+      lore:
+        - '&7Access to place minecarts inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: MINECART
+      name: '&6Minecart Place'
+      lore:
+        - '&7Access to place minecarts inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: MINECART
+      name: '&6Minecart Place'
+      lore:
+        - '&7Access to place minecarts inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  monster_spawn:
+    display-menu: true
+    permission-enabled:
+      type: CAVE_SPIDER_SPAWN_EGG
+      name: '&6Monster Spawn'
+      lore:
+        - '&7Access to spawn monsters inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: CAVE_SPIDER_SPAWN_EGG
+      name: '&6Monster Spawn'
+      lore:
+        - '&7Access to spawn monsters inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: CAVE_SPIDER_SPAWN_EGG
+      name: '&6Monster Spawn'
+      lore:
+        - '&7Access to spawn monsters inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  name_entity:
+    display-menu: true
+    permission-enabled:
+      type: NAME_TAG
+      name: '&6Name Entity'
+      lore:
+        - '&7Access to name-tag entities inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: NAME_TAG
+      name: '&6Name Entity'
+      lore:
+        - '&7Access to name-tag entities inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: NAME_TAG
+      name: '&6Name Entity'
+      lore:
+        - '&7Access to name-tag entities inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  open_island:
+    display-menu: true
+    permission-enabled:
+      type: REDSTONE_TORCH
+      name: '&6Open Island'
+      lore:
+        - '&7Access to open the island to the public.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: REDSTONE_TORCH
+      name: '&6Open Island'
+      lore:
+        - '&7Access to open the island to the public.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: REDSTONE_TORCH
+      name: '&6Open Island'
+      lore:
+        - '&7Access to open the island to the public.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  painting:
+    display-menu: true
+    permission-enabled:
+      type: PAINTING
+      name: '&6Painting'
+      lore:
+        - '&7Access to interact with paintings inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: PAINTING
+      name: '&6Painting'
+      lore:
+        - '&7Access to interact with paintings inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: PAINTING
+      name: '&6Painting'
+      lore:
+        - '&7Access to interact with paintings inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  paypal_show:
+    display-menu: true
+    permission-enabled:
+      type: BLUE_WOOL
+      name: '&6Paypal Show'
+      lore:
+        - '&7Access to check the island''s linked paypal.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: BLUE_WOOL
+      name: '&6Paypal Show'
+      lore:
+        - '&7Access to check the island''s linked paypal.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: BLUE_WOOL
+      name: '&6Paypal Show'
+      lore:
+        - '&7Access to check the island''s linked paypal.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  pickup_axolotl:
+    display-menu: true
+    permission-enabled:
+      type: AXOLOTL_SPAWN_EGG
+      name: '&6Pickup Axolotls'
+      lore:
+        - '&7Access to pickup axolotls using a water bucket inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: AXOLOTL_SPAWN_EGG
+      name: '&6Pickup Axolotls'
+      lore:
+        - '&7Access to pickup axolotls using a water bucket inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: AXOLOTL_SPAWN_EGG
+      name: '&6Pickup Axolotls'
+      lore:
+        - '&7Access to pickup axolotls using a water bucket inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  pickup_drops:
+    display-menu: true
+    permission-enabled:
+      type: HOPPER
+      name: '&6Pickup Drops'
+      lore:
+        - '&7Access to pickup items inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: HOPPER
+      name: '&6Pickup Drops'
+      lore:
+        - '&7Access to pickup items inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: HOPPER
+      name: '&6Pickup Drops'
+      lore:
+        - '&7Access to pickup items inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  pickup_fish:
+    display-menu: true
+    permission-enabled:
+      type: COD
+      name: '&6Pickup Fish'
+      lore:
+        - '&7Access to pickup fish using buckets inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: COD
+      name: '&6Pickup Fish'
+      lore:
+        - '&7Access to pickup fish using buckets inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: COD
+      name: '&6Pickup Fish'
+      lore:
+        - '&7Access to pickup fish using buckets inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  pickup_lectern_book:
+    display-menu: true
+    permission-enabled:
+      type: LECTERN
+      name: '&6Pickup Lectern Book'
+      lore:
+        - '&7Access to pickup books out of lecterns inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: LECTERN
+      name: '&6Pickup Lectern Book'
+      lore:
+        - '&7Access to pickup books out of lecterns inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: LECTERN
+      name: '&6Pickup Lectern Book'
+      lore:
+        - '&7Access to pickup books out of lecterns inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  promote_members:
+    display-menu: true
+    permission-enabled:
+      type: DIAMOND
+      name: '&6Promote Members'
+      lore:
+        - '&7Access to promote members inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: DIAMOND
+      name: '&6Promote Members'
+      lore:
+        - '&7Access to promote members inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: DIAMOND
+      name: '&6Promote Members'
+      lore:
+        - '&7Access to promote members inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  rankup:
+    display-menu: true
+    permission-enabled:
+      type: GOLD_INGOT
+      name: '&6Upgrades Rankup'
+      lore:
+        - '&7Access to rankup island''s upgrades.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: GOLD_INGOT
+      name: '&6Upgrades Rankup'
+      lore:
+        - '&7Access to rankup island''s upgrades.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: GOLD_INGOT
+      name: '&6Upgrades Rankup'
+      lore:
+        - '&7Access to rankup island''s upgrades.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  ratings_show:
+    display-menu: true
+    permission-enabled:
+      type: NETHER_STAR
+      name: '&6Ratings Show'
+      lore:
+        - '&7Access to see all island''s ratings.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: NETHER_STAR
+      name: '&6Ratings Show'
+      lore:
+        - '&7Access to see all island''s ratings.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: NETHER_STAR
+      name: '&6Ratings Show'
+      lore:
+        - '&7Access to see all island''s ratings.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  set_biome:
+    display-menu: true
+    permission-enabled:
+      type: GRASS_BLOCK
+      name: '&6Set Biome'
+      lore:
+        - '&7Access to change the island''s biome.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: GRASS_BLOCK
+      name: '&6Set Biome'
+      lore:
+        - '&7Access to change the island''s biome.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: GRASS_BLOCK
+      name: '&6Set Biome'
+      lore:
+        - '&7Access to change the island''s biome.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  set_discord:
+    display-menu: true
+    permission-enabled:
+      type: LIGHT_BLUE_TERRACOTTA
+      name: '&6Set Discord'
+      lore:
+        - '&7Access to change the discord linked to the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: LIGHT_BLUE_TERRACOTTA
+      name: '&6Set Discord'
+      lore:
+        - '&7Access to change the discord linked to the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: LIGHT_BLUE_TERRACOTTA
+      name: '&6Set Discord'
+      lore:
+        - '&7Access to change the discord linked to the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  set_home:
+    display-menu: true
+    permission-enabled:
+      type: RED_BED
+      name: '&6Set Home'
+      lore:
+        - '&7Access to change the home location of the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: RED_BED
+      name: '&6Set Home'
+      lore:
+        - '&7Access to change the home location of the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: RED_BED
+      name: '&6Set Home'
+      lore:
+        - '&7Access to change the home location of the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  set_paypal:
+    display-menu: true
+    permission-enabled:
+      type: BLUE_WOOL
+      name: '&6Set Paypal'
+      lore:
+        - '&7Access to change the paypal linked to the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: BLUE_WOOL
+      name: '&6Set Paypal'
+      lore:
+        - '&7Access to change the paypal linked to the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: BLUE_WOOL
+      name: '&6Set Paypal'
+      lore:
+        - '&7Access to change the paypal linked to the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  set_permission:
+    display-menu: true
+    permission-enabled:
+      type: REPEATER
+      name: '&6Set Permission'
+      lore:
+        - '&7Access to change permissions for island members.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: REPEATER
+      name: '&6Set Permission'
+      lore:
+        - '&7Access to change permissions for island members.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: REPEATER
+      name: '&6Set Permission'
+      lore:
+        - '&7Access to change permissions for island members.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  set_role:
+    display-menu: true
+    permission-enabled:
+      type: DIAMOND_CHESTPLATE
+      name: '&6Set Role'
+      lore:
+        - '&7Access to change roles for island members.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: DIAMOND_CHESTPLATE
+      name: '&6Set Role'
+      lore:
+        - '&7Access to change roles for island members.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: DIAMOND_CHESTPLATE
+      name: '&6Set Role'
+      lore:
+        - '&7Access to change roles for island members.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  set_settings:
+    display-menu: true
+    permission-enabled:
+      type: LEVER
+      name: '&6Set Settings'
+      lore:
+        - '&7Access to change settings for islands.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: LEVER
+      name: '&6Set Settings'
+      lore:
+        - '&7Access to change settings for islands.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: LEVER
+      name: '&6Set Settings'
+      lore:
+        - '&7Access to change settings for islands.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  set_warp:
+    display-menu: true
+    permission-enabled:
+      type: ENDER_EYE
+      name: '&6Set Warp'
+      lore:
+        - '&7Access to set new warps for the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: ENDER_EYE
+      name: '&6Set Warp'
+      lore:
+        - '&7Access to set new warps for the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: ENDER_EYE
+      name: '&6Set Warp'
+      lore:
+        - '&7Access to set new warps for the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  uncoop_member:
+    display-menu: true
+    permission-enabled:
+      type: GOLDEN_APPLE
+      name: '&6Uncoop Member'
+      lore:
+        - '&7Access to remove co-op members from the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: GOLDEN_APPLE
+      name: '&6Uncoop Member'
+      lore:
+        - '&7Access to remove co-op members from the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: GOLDEN_APPLE
+      name: '&6Uncoop Member'
+      lore:
+        - '&7Access to remove co-op members from the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  sign_interact:
+    display-menu: true
+    permission-enabled:
+      type: OAK_SIGN
+      name: '&6Sign Interact'
+      lore:
+        - '&7Access to interact with signs inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: OAK_SIGN
+      name: '&6Sign Interact'
+      lore:
+        - '&7Access to interact with signs inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: OAK_SIGN
+      name: '&6Sign Interact'
+      lore:
+        - '&7Access to interact with signs inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  spawner_break:
+    display-menu: true
+    permission-enabled:
+      type: SPAWNER
+      name: '&6Spawner Break'
+      lore:
+        - '&7Access to break spawners inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: SPAWNER
+      name: '&6Spawner Break'
+      lore:
+        - '&7Access to break spawners inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: SPAWNER
+      name: '&6Spawner Break'
+      lore:
+        - '&7Access to break spawners inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  turtle_egg_tramping:
+    display-menu: true
+    permission-enabled:
+      type: TURTLE_EGG
+      name: '&6Turtle Eggs Tramping'
+      lore:
+        - '&7Access to tramp turtle eggs inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: TURTLE_EGG
+      name: '&6Turtle Eggs Tramping'
+      lore:
+        - '&7Access to tramp turtle eggs inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: TURTLE_EGG
+      name: '&6Turtle Eggs Tramping'
+      lore:
+        - '&7Access to tramp turtle eggs inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  use:
+    display-menu: true
+    permission-enabled:
+      type: STONE_BUTTON
+      name: '&6Use'
+      lore:
+        - '&7Access to use different blocks inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: STONE_BUTTON
+      name: '&6Use'
+      lore:
+        - '&7Access to use different blocks inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: STONE_BUTTON
+      name: '&6Use'
+      lore:
+        - '&7Access to use different blocks inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  valuable_break:
+    display-menu: true
+    permission-enabled:
+      type: GOLD_INGOT
+      name: '&6Valuable Blocks Break'
+      lore:
+        - '&7Access to break valuable blocks inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: GOLD_INGOT
+      name: '&6Valuable Blocks Break'
+      lore:
+        - '&7Access to break valuable blocks inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: GOLD_INGOT
+      name: '&6Valuable Blocks Break'
+      lore:
+        - '&7Access to break valuable blocks inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  villager_trading:
+    display-menu: true
+    permission-enabled:
+      type: PLAYER_HEAD
+      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDFiODMwZWI0MDgyYWNlYzgzNmJjODM1ZTQwYTExMjgyYmI1MTE5MzMxNWY5MTE4NDMzN2U4ZDM1NTU1ODMifX19'
+      name: '&6Villagers Trading'
+      lore:
+        - '&7Access to trade with villagers inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: PLAYER_HEAD
+      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDFiODMwZWI0MDgyYWNlYzgzNmJjODM1ZTQwYTExMjgyYmI1MTE5MzMxNWY5MTE4NDMzN2U4ZDM1NTU1ODMifX19'
+      name: '&6Villagers Trading'
+      lore:
+        - '&7Access to trade with villagers inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: PLAYER_HEAD
+      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDFiODMwZWI0MDgyYWNlYzgzNmJjODM1ZTQwYTExMjgyYmI1MTE5MzMxNWY5MTE4NDMzN2U4ZDM1NTU1ODMifX19'
+      name: '&6Villagers Trading'
+      lore:
+        - '&7Access to trade with villagers inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  withdraw_money:
+    display-menu: true
+    permission-enabled:
+      type: EMERALD
+      name: '&6Withdraw Money'
+      lore:
+        - '&7Access to withdraw money from the island''s bank.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: EMERALD
+      name: '&6Withdraw Money'
+      lore:
+        - '&7Access to withdraw money from the island''s bank.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: EMERALD
+      name: '&6Withdraw Money'
+      lore:
+        - '&7Access to withdraw money from the island''s bank.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2

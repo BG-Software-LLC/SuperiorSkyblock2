@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 public class DefaultMissionsContainer implements MissionsContainer {
 
     private final Map<String, Mission<?>> missionMap = new HashMap<>();
-    private final Map<Mission<?>, MissionData> missionDataMap = new HashMap<>();
+    private final Map<String, MissionData> missionDataMap = new HashMap<>();
     private final Map<String, MissionCategory> missionCategoryMap = new HashMap<>();
 
     @Override
@@ -47,13 +47,13 @@ public class DefaultMissionsContainer implements MissionsContainer {
 
     @Override
     public void addMissionData(MissionData missionData) {
-        this.missionDataMap.put(missionData.getMission(), missionData);
+        this.missionDataMap.put(missionData.getMissionName(), missionData);
     }
 
     @Nullable
     @Override
     public MissionData getMissionData(Mission<?> mission) {
-        return this.missionDataMap.get(mission);
+        return this.missionDataMap.get(mission.getName());
     }
 
     @Override
@@ -72,11 +72,18 @@ public class DefaultMissionsContainer implements MissionsContainer {
         return new SequentialListBuilder<MissionCategory>().build(missionCategoryMap.values());
     }
 
+    @Override
+    public void clearMissionsData() {
+        this.missionMap.clear();
+        this.missionDataMap.clear();
+        this.missionCategoryMap.clear();
+    }
+
     private List<Mission<?>> getFilteredMissions(Predicate<MissionData> predicate) {
         return new SequentialListBuilder<MissionData>()
                 .filter(predicate)
                 .sorted(Comparator.comparingInt(MissionData::getIndex))
-                .map(missionDataMap.values(), MissionData::getMission);
+                .map(missionDataMap.values(), missionData -> getMission(missionData.getMissionName()));
     }
 
 }

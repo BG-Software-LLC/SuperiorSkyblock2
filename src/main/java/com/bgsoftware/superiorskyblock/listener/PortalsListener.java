@@ -47,6 +47,8 @@ public class PortalsListener implements Listener {
         if (superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
+        // TODO - do we really need this? Why not use EntityPortalEnterEvent below?
+
         PortalType portalType = (e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ? PortalType.NETHER : PortalType.ENDER;
 
         EntityPortalResult portalResult = this.portalsManager.get().handlePlayerPortal(superiorPlayer, e.getFrom(),
@@ -94,8 +96,8 @@ public class PortalsListener implements Listener {
 
                 BukkitExecutor.sync(() -> {
                     EntityTeleports.teleportUntilSuccess(e.getEntity(), island.getIslandHome(World.Environment.NORMAL), 5, () -> {
-                        if (teleportedPlayer != null && teleportedPlayer.getPlayerStatus() == PlayerStatus.LEAVING_ISLAND)
-                            teleportedPlayer.setPlayerStatus(PlayerStatus.NONE);
+                        if (teleportedPlayer != null)
+                            teleportedPlayer.removePlayerStatus(PlayerStatus.LEAVING_ISLAND);
                     });
                 }, 5L);
             }

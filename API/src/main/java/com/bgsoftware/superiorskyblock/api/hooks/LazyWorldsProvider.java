@@ -8,6 +8,15 @@ import org.bukkit.World;
 public interface LazyWorldsProvider extends WorldsProvider {
 
     /**
+     * Prepare world for teleportation.
+     *
+     * @param island         The target island.
+     * @param environment    The environment of the world to prepare.
+     * @param finishCallback Callback function after the preparation is finished.
+     */
+    void prepareWorld(Island island, World.Environment environment, Runnable finishCallback);
+
+    /**
      * Get the {@link WorldInfo} of the world of an island by the environment.
      * The world does not have to be loaded.
      *

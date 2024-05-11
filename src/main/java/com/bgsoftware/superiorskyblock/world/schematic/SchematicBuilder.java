@@ -2,13 +2,14 @@ package com.bgsoftware.superiorskyblock.world.schematic;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.schematic.SchematicEntityFilter;
+import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
+import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.IntTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
-import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -65,7 +66,7 @@ public class SchematicBuilder {
             Location offset = entity.getLocation().subtract(min);
             compoundValue.put("entityType", new StringTag(entity.getType().name()));
             compoundValue.put("offset", new StringTag(Serializers.LOCATION_SERIALIZER.serialize(offset)));
-            compoundValue.put("NBT", plugin.getNMSTags().getNBTTag(entity));
+            compoundValue.put("NBT", SchematicEntityFilter.filterNBTTag(plugin.getNMSTags().getNBTTag(entity)));
         }
         return this;
     }

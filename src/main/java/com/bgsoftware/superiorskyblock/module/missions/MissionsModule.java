@@ -7,6 +7,8 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
+import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookupFactory;
+import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
@@ -104,32 +106,18 @@ public class MissionsModule extends BuiltinModule {
 
     @Override
     public void onEnable(SuperiorSkyblockPlugin plugin) {
-        if (!enabled)
-            return;
+        if (enabled)
+            loadMissionCategories(plugin);
+    }
 
-        ConfigurationSection categoriesSection = config.getConfigurationSection("categories");
-
-        if (categoriesSection != null) {
-            for (String categoryName : categoriesSection.getKeys(false)) {
-                ConfigurationSection categorySection = categoriesSection.getConfigurationSection(categoryName);
-
-                if (categorySection == null)
-                    continue;
-
-                List<Mission<?>> categoryMissions = new LinkedList<>();
-
-                if (!canLoadCategory(plugin, categoryName, categoryMissions))
-                    continue;
-
-                int slot = categorySection.getInt("slot");
-
-                String formattedCategoryName = categorySection.getString("name", categoryName);
-
-                plugin.getMissions().loadMissionCategory(new SMissionCategory(formattedCategoryName, slot, categoryMissions));
-
-                missionsToLoad.addAll(categoryMissions);
-            }
-        }
+    @Override
+    public void onReload(SuperiorSkyblockPlugin plugin) {
+        plugin.getMissions().saveMissionsData();
+        // Before we continue with the reload, we want to unload all the missions.
+        plugin.getMissions().clearData();
+        super.onReload(plugin);
+        onEnable(plugin);
+        plugin.getMissions().loadMissionsData();
     }
 
     @Override
@@ -176,6 +164,32 @@ public class MissionsModule extends BuiltinModule {
         return new String[]{"categories"};
     }
 
+    private void loadMissionCategories(SuperiorSkyblockPlugin plugin) {
+        ConfigurationSection categoriesSection = config.getConfigurationSection("categories");
+
+        if (categoriesSection != null) {
+            for (String categoryName : categoriesSection.getKeys(false)) {
+                ConfigurationSection categorySection = categoriesSection.getConfigurationSection(categoryName);
+
+                if (categorySection == null)
+                    continue;
+
+                List<Mission<?>> categoryMissions = new LinkedList<>();
+
+                if (!canLoadCategory(plugin, categoryName, categoryMissions))
+                    continue;
+
+                int slot = categorySection.getInt("slot");
+
+                String formattedCategoryName = categorySection.getString("name", categoryName);
+
+                plugin.getMissions().loadMissionCategory(new SMissionCategory(formattedCategoryName, slot, categoryMissions));
+
+                missionsToLoad.addAll(categoryMissions);
+            }
+        }
+    }
+
     private boolean canLoadCategory(SuperiorSkyblockPlugin plugin, String categoryName, List<Mission<?>> categoryMissions) {
         File categoryFolder = new File(getModuleFolder(), "categories/" + categoryName);
 
@@ -199,31 +213,33 @@ public class MissionsModule extends BuiltinModule {
 
         Map<Mission<?>, Integer> missionWeights = new HashMap<>();
 
-        for (File missionFile : missionFiles) {
-            String missionName = missionFile.getName().replace(".yml", "");
+        try (FilesLookup filesLookup = FilesLookupFactory.getInstance().lookupFolder(getModuleFolder())) {
+            for (File missionFile : missionFiles) {
+                String missionName = missionFile.getName().replace(".yml", "");
 
-            if (missionName.length() > MAX_MISSIONS_NAME_LENGTH)
-                missionName = missionName.substring(0, MAX_MISSIONS_NAME_LENGTH);
+                if (missionName.length() > MAX_MISSIONS_NAME_LENGTH)
+                    missionName = missionName.substring(0, MAX_MISSIONS_NAME_LENGTH);
 
-            YamlConfiguration missionConfigFile = new YamlConfiguration();
+                YamlConfiguration missionConfigFile = new YamlConfiguration();
 
-            try {
-                missionConfigFile.load(missionFile);
-            } catch (InvalidConfigurationException error) {
-                Log.error(error, "A format-error occurred while parsing the mission file ", missionFile.getName() + ":");
-                continue;
-            } catch (IOException error) {
-                Log.error(error, "An unexpected error occurred while parsing the mission file ", missionFile.getName() + ":");
-                continue;
-            }
+                try {
+                    missionConfigFile.load(missionFile);
+                } catch (InvalidConfigurationException error) {
+                    Log.error(error, "A format-error occurred while parsing the mission file ", missionFile.getName() + ":");
+                    continue;
+                } catch (IOException error) {
+                    Log.error(error, "An unexpected error occurred while parsing the mission file ", missionFile.getName() + ":");
+                    continue;
+                }
 
-            ConfigurationSection missionSection = missionConfigFile.getConfigurationSection("");
+                ConfigurationSection missionSection = missionConfigFile.getConfigurationSection("");
 
-            Mission<?> mission = plugin.getMissions().loadMission(missionName, getModuleFolder(), missionSection);
+                Mission<?> mission = plugin.getMissions().loadMission(missionName, filesLookup, missionSection);
 
-            if (mission != null) {
-                categoryMissions.add(mission);
-                missionWeights.put(mission, missionSection.getInt("weight", 0));
+                if (mission != null) {
+                    categoryMissions.add(mission);
+                    missionWeights.put(mission, missionSection.getInt("weight", 0));
+                }
             }
         }
 

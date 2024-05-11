@@ -19,7 +19,7 @@ public class LocationKey {
         this(location.getWorldName(), location.getX(), location.getY(), location.getZ());
     }
 
-    private LocationKey(String worldName, double x, double y, double z) {
+    public LocationKey(String worldName, double x, double y, double z) {
         this.worldName = worldName;
         this.x = x;
         this.y = y;
@@ -37,6 +37,16 @@ public class LocationKey {
     @Override
     public int hashCode() {
         return Objects.hash(worldName, x, y, z);
+    }
+
+    @Override
+    public String toString() {
+        return "LocationKey{" +
+                "worldName='" + worldName + '\'' +
+                ", x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                '}';
     }
 
 }

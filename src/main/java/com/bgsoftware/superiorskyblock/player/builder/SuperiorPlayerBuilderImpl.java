@@ -5,7 +5,9 @@ import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.google.common.base.Preconditions;
 
@@ -30,7 +32,7 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
     public boolean islandFly = plugin.getSettings().isDefaultIslandFly();
     public BorderColor borderColor = BorderColor.safeValue(plugin.getSettings().getDefaultBorderColor(), BorderColor.BLUE);
     public boolean worldBorderEnabled = plugin.getSettings().isDefaultWorldBorder();
-    public Map<Mission<?>, Integer> completedMissions = new LinkedHashMap<>();
+    public Map<MissionReference, Counter> completedMissions = new LinkedHashMap<>();
     public byte[] persistentData = new byte[0];
 
     public SuperiorPlayerBuilderImpl() {
@@ -171,13 +173,20 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
     @Override
     public SuperiorPlayer.Builder setCompletedMission(Mission<?> mission, int finishCount) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        this.completedMissions.put(mission, finishCount);
+        this.completedMissions.put(new MissionReference(mission), new Counter(finishCount));
         return this;
     }
 
     @Override
     public Map<Mission<?>, Integer> getCompletedMissions() {
-        return Collections.unmodifiableMap(this.completedMissions);
+        Map<Mission<?>, Integer> completedMissions = new LinkedHashMap<>();
+
+        this.completedMissions.forEach((mission, finishCount) -> {
+            if (mission.isValid())
+                completedMissions.put(mission.getMission(), finishCount.get());
+        });
+
+        return completedMissions.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(completedMissions);
     }
 
     @Override

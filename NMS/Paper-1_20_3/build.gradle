@@ -1,0 +1,18 @@
+plugins {
+    id("io.papermc.paperweight.userdev") version "1.6.0"
+}
+
+group 'NMS:Paper-1_20_3'
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+dependencies {
+    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.20.4-R0.1-SNAPSHOT")
+    compileOnly project(":NMS:Spigot-1_20_3")
+    compileOnly project(":API")
+    compileOnly rootProject
+}
