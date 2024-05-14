@@ -178,14 +178,19 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
             BukkitExecutor.ensureMain(() -> {
                 try {
+                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Placing Schematic", "");
                     worldEditSession.finish(island);
 
                     if (island.getOwner().isOnline())
                         finishTasks.forEach(Runnable::run);
 
+                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Spawning Entities", "");
+
                     for (SchematicEntity entity : this.entities) {
                         entity.spawnEntity(min);
                     }
+
+                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Schematic Placement", "");
 
                     island.handleBlocksPlace(cachedCounts);
 

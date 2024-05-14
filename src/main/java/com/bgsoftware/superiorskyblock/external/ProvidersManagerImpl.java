@@ -443,6 +443,9 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
         if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder"))
             registerHook("ItemsAdderHook");
+
+        if (canRegisterHook("SmoothTimber"))
+            registerHook("SmoothTimberHook");
     }
 
     private void registerSpawnersProvider() {

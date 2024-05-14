@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.MaterialKeySource;
 import com.google.common.base.Objects;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -33,7 +34,7 @@ public class SpawnerKey extends MaterialKey {
     }
 
     private SpawnerKey(@Nullable Key spawnerTypeKey) {
-        super(SPAWNER_TYPE, (short) 0, spawnerTypeKey == null);
+        super(SPAWNER_TYPE, (short) 0, spawnerTypeKey == null, MaterialKeySource.BLOCK);
         this.spawnerTypeKey = spawnerTypeKey;
     }
 

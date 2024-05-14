@@ -4,7 +4,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.service.hologram.Hologram;
 import com.bgsoftware.superiorskyblock.api.service.hologram.HologramsService;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -20,7 +22,7 @@ public class StackedBlock {
         }
     };
 
-    private final Location location;
+    private final BlockPosition blockPosition;
 
     private int amount;
     private Key blockKey;
@@ -28,11 +30,12 @@ public class StackedBlock {
     private boolean removed;
 
     public StackedBlock(Location location) {
-        this.location = location;
+        this.blockPosition = new SBlockPosition(location);
     }
 
     public Location getLocation() {
-        return location.clone();
+        //noinspection deprecation
+        return this.blockPosition.parse();
     }
 
     public int getAmount() {
@@ -61,6 +64,10 @@ public class StackedBlock {
             removeHologram();
             return;
         }
+
+        Location location = getLocation();
+        if (location.getWorld() == null)
+            return;
 
         Key currentBlockKey = Keys.of(location.getBlock());
 
