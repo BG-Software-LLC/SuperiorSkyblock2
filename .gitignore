@@ -2,6 +2,9 @@
 .gradle
 gradle.properties
 
+# Ignore archive files
+archive
+
 # Ignore Gradle build output directory
 build
 
