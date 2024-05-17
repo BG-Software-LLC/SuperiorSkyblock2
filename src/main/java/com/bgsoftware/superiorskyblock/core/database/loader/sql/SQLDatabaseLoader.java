@@ -1,10 +1,8 @@
 package com.bgsoftware.superiorskyblock.core.database.loader.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.core.Mutable;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.loader.MachineStateDatabaseLoader;
-import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.DatabaseUpgrade_V0;
 import com.bgsoftware.superiorskyblock.core.database.sql.SQLHelper;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
@@ -32,9 +30,12 @@ public class SQLDatabaseLoader extends MachineStateDatabaseLoader {
                     ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
 
-        SQLDatabase.upgradeDatabase();
+        SQLDatabase.UpgradeResult databaseUpgradeResult = SQLDatabase.upgradeDatabase();
 
         SQLDatabase.initializeDatabase();
+
+        if (databaseUpgradeResult.isUpgraded())
+            GridDatabaseBridge.updateVersion(plugin.getGrid(), databaseUpgradeResult.getDatabaseVersion());
 
         SQLHelper.select("grid", "", new QueryResult<ResultSet>()
                 .onFail(error -> GridDatabaseBridge.insertGrid(plugin.getGrid())));

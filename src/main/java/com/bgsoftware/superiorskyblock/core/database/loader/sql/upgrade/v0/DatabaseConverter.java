@@ -164,7 +164,6 @@ public class DatabaseConverter {
         AtomicBoolean isOldFormat = new AtomicBoolean(true);
 
         SQLHelper.select("stackedBlocks", "", new QueryResult<ResultSet>().onFail(error -> {
-            SQLHelper.close();
             isOldFormat.set(false);
         }));
 

@@ -1,9 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.database.loader.sql;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Mutable;
-import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.DatabaseUpgrade_V0;
 import com.bgsoftware.superiorskyblock.core.database.sql.SQLHelper;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
@@ -11,8 +9,6 @@ import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import java.sql.ResultSet;
 
 public class SQLDatabase {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final Runnable[] DATABASE_UPGRADES = new Runnable[]{
             DatabaseUpgrade_V0.INSTANCE
@@ -31,7 +27,7 @@ public class SQLDatabase {
         createStackedBlocksTable();
     }
 
-    public static void upgradeDatabase() {
+    public static UpgradeResult upgradeDatabase() {
         Mutable<Integer> databaseVersionMutable = new Mutable<>(0);
 
         SQLHelper.select("ssb_metadata", "", new QueryResult<ResultSet>()
@@ -40,14 +36,11 @@ public class SQLDatabase {
                 }));
 
         int databaseVersion = databaseVersionMutable.getValue();
-        boolean updatedDatabase = false;
         while (databaseVersion < DATABASE_UPGRADES.length) {
             DATABASE_UPGRADES[databaseVersion++].run();
-            updatedDatabase = true;
         }
 
-        if (updatedDatabase)
-            GridDatabaseBridge.updateVersion(plugin.getGrid(), databaseVersion);
+        return new UpgradeResult(databaseVersion > databaseVersionMutable.getValue(), databaseVersion);
     }
 
     @SuppressWarnings("unchecked")
@@ -294,6 +287,26 @@ public class SQLDatabase {
                 new Pair<>("block_type", "TEXT"),
                 new Pair<>("amount", "INTEGER")
         );
+    }
+
+    public static class UpgradeResult {
+
+        private final boolean upgraded;
+        private final int databaseVersion;
+
+        UpgradeResult(boolean upgraded, int databaseVersion) {
+            this.upgraded = upgraded;
+            this.databaseVersion = databaseVersion;
+        }
+
+        public boolean isUpgraded() {
+            return upgraded;
+        }
+
+        public int getDatabaseVersion() {
+            return databaseVersion;
+        }
+
     }
 
 }
