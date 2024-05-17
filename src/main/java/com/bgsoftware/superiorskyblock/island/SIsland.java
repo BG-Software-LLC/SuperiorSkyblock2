@@ -2054,8 +2054,15 @@ public class SIsland implements Island {
 
         long currentTime = System.currentTimeMillis() / 1000;
 
+        Log.debug(Debug.GIVE_BANK_INTEREST, "Current Time: " + currentTime, owner.getName() + ", Last Time Status: " + owner.getLastTimeStatus());
+        Log.debug(Debug.GIVE_BANK_INTEREST, "time-elapsed: " + (currentTime - owner.getLastTimeStatus()));
+        Log.debug(Debug.GIVE_BANK_INTEREST, "bankInterestRecentActive: " + BuiltinModules.BANK.bankInterestRecentActive, owner.getName());
+        Log.debug(Debug.GIVE_BANK_INTEREST, "Are valid: " + (checkOnlineOwner && BuiltinModules.BANK.bankInterestRecentActive > 0 &&
+                currentTime - owner.getLastTimeStatus() > BuiltinModules.BANK.bankInterestRecentActive));
+
+
         if (checkOnlineOwner && BuiltinModules.BANK.bankInterestRecentActive > 0 &&
-                currentTime - owner.getLastTimeStatus() > BuiltinModules.BANK.bankInterestRecentActive) {
+                currentTime - getLastInterestTime() > BuiltinModules.BANK.bankInterestRecentActive) {
             Log.debugResult(Debug.GIVE_BANK_INTEREST, "Return Cooldown", owner.getName());
             return false;
         }
@@ -2108,6 +2115,7 @@ public class SIsland implements Island {
     @Override
     public long getNextInterest() {
         long currentTime = System.currentTimeMillis() / 1000;
+        Log.debug(Debug.GIVE_BANK_INTEREST, " Next Interest: " + (BuiltinModules.BANK.bankInterestInterval - (currentTime - lastInterest)) + " seconds: " + owner.getName());
         return BuiltinModules.BANK.bankInterestInterval - (currentTime - lastInterest);
     }
 
@@ -4447,6 +4455,8 @@ public class SIsland implements Island {
     }
 
     private void startBankInterest() {
+        Log.debugResult(Debug.GIVE_BANK_INTEREST, "---------------------- Starting bank interests ----------------------", owner.getName());
+
         if (BuiltinModules.BANK.bankInterestEnabled) {
             long currentTime = System.currentTimeMillis() / 1000;
             long ticksToNextInterest = (BuiltinModules.BANK.bankInterestInterval - (currentTime - this.lastInterest)) * 20;
