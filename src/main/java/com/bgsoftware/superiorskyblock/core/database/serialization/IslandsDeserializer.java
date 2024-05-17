@@ -14,10 +14,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.IDeserializer;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.JsonDeserializer;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.MultipleDeserializer;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.RawDeserializer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -31,7 +27,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
@@ -45,11 +40,8 @@ import java.util.UUID;
 public class IslandsDeserializer {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final Gson gson = new GsonBuilder().create();
-    private static final IDeserializer oldDataDeserializer = new MultipleDeserializer(
-            new JsonDeserializer(null), new RawDeserializer(null, plugin)
-    );
 
+    private static final Gson GSON = new GsonBuilder().create();
     private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
 
     private IslandsDeserializer() {
@@ -284,59 +276,24 @@ public class IslandsDeserializer {
         if (Text.isBlank(dirtyChunks))
             return;
 
-        try {
-            JsonObject dirtyChunksObject = gson.fromJson(dirtyChunks, JsonObject.class);
-            dirtyChunksObject.entrySet().forEach(dirtyChunkEntry -> {
-                String worldName = dirtyChunkEntry.getKey();
-                JsonArray dirtyChunksArray = dirtyChunkEntry.getValue().getAsJsonArray();
+        JsonObject dirtyChunksObject = GSON.fromJson(dirtyChunks, JsonObject.class);
+        dirtyChunksObject.entrySet().forEach(dirtyChunkEntry -> {
+            String worldName = dirtyChunkEntry.getKey();
+            JsonArray dirtyChunksArray = dirtyChunkEntry.getValue().getAsJsonArray();
 
-                dirtyChunksArray.forEach(dirtyChunkElement -> {
-                    String[] chunkPositionSections = dirtyChunkElement.getAsString().split(",");
-                    builder.setDirtyChunk(worldName, Integer.parseInt(chunkPositionSections[0]),
-                            Integer.parseInt(chunkPositionSections[1]));
-                });
+            dirtyChunksArray.forEach(dirtyChunkElement -> {
+                String[] chunkPositionSections = dirtyChunkElement.getAsString().split(",");
+                builder.setDirtyChunk(worldName, Integer.parseInt(chunkPositionSections[0]),
+                        Integer.parseInt(chunkPositionSections[1]));
             });
-        } catch (JsonSyntaxException ex) {
-            if (dirtyChunks.contains("|")) {
-                String[] serializedSections = dirtyChunks.split("\\|");
-
-                for (String section : serializedSections) {
-                    String[] worldSections = section.split("=");
-                    if (worldSections.length == 2) {
-                        String[] dirtyChunkSections = worldSections[1].split(";");
-                        for (String dirtyChunk : dirtyChunkSections) {
-                            String[] dirtyChunkSection = dirtyChunk.split(",");
-                            if (dirtyChunkSection.length == 2) {
-                                builder.setDirtyChunk(worldSections[0],
-                                        Integer.parseInt(dirtyChunkSection[0]), Integer.parseInt(dirtyChunkSection[1]));
-                            }
-                        }
-                    }
-                }
-            } else {
-                String[] dirtyChunkSections = dirtyChunks.split(";");
-                for (String dirtyChunk : dirtyChunkSections) {
-                    String[] dirtyChunkSection = dirtyChunk.split(",");
-                    if (dirtyChunkSection.length == 3) {
-                        builder.setDirtyChunk(dirtyChunkSection[0],
-                                Integer.parseInt(dirtyChunkSection[1]), Integer.parseInt(dirtyChunkSection[2]));
-                    }
-                }
-            }
-        }
+        });
     }
 
     public static void deserializeBlockCounts(Island.Builder builder, String blocks) {
         if (Text.isBlank(blocks))
             return;
 
-        JsonArray blockCounts;
-
-        try {
-            blockCounts = gson.fromJson(blocks, JsonArray.class);
-        } catch (JsonSyntaxException error) {
-            blockCounts = gson.fromJson(oldDataDeserializer.deserializeBlockCounts(blocks), JsonArray.class);
-        }
+        JsonArray blockCounts = GSON.fromJson(blocks, JsonArray.class);
 
         blockCounts.forEach(blockCountElement -> {
             JsonObject blockCountObject = blockCountElement.getAsJsonObject();

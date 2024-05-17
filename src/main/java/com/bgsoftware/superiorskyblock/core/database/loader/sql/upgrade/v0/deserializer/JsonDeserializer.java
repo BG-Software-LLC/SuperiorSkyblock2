@@ -1,6 +1,5 @@
-package com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer;
+package com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deserializer;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -8,11 +7,11 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.DatabaseLoader_V1;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.IslandChestAttributes;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.IslandWarpAttributes;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.PlayerAttributes;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.WarpCategoryAttributes;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.DatabaseConverter;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.IslandChestAttributes;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.IslandWarpAttributes;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.PlayerAttributes;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.WarpCategoryAttributes;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -34,13 +33,11 @@ import java.util.UUID;
 
 public class JsonDeserializer implements IDeserializer {
 
+    public static final JsonDeserializer INSTANCE = new JsonDeserializer();
+
     private static final Gson gson = new Gson();
 
-    @Nullable
-    private final DatabaseLoader_V1 databaseLoader;
-
-    public JsonDeserializer(@Nullable DatabaseLoader_V1 databaseLoader) {
-        this.databaseLoader = databaseLoader;
+    private JsonDeserializer() {
     }
 
     public Map<String, Integer> deserializeMissions(String missions) {
@@ -77,14 +74,12 @@ public class JsonDeserializer implements IDeserializer {
 
     public List<PlayerAttributes> deserializePlayers(String players) {
         List<PlayerAttributes> playerAttributes = new LinkedList<>();
-        if (databaseLoader != null) {
-            JsonArray playersArray = gson.fromJson(players, JsonArray.class);
-            playersArray.forEach(uuid -> {
-                PlayerAttributes _playerAttributes = databaseLoader.getPlayerAttributes(uuid.getAsString());
-                if (_playerAttributes != null)
-                    playerAttributes.add(_playerAttributes);
-            });
-        }
+        JsonArray playersArray = gson.fromJson(players, JsonArray.class);
+        playersArray.forEach(uuid -> {
+            PlayerAttributes _playerAttributes = DatabaseConverter.getPlayerAttributes(uuid.getAsString());
+            if (_playerAttributes != null)
+                playerAttributes.add(_playerAttributes);
+        });
         return Collections.unmodifiableList(playerAttributes);
     }
 

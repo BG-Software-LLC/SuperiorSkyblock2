@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.core.database.loader.v1;
+package com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
@@ -10,27 +10,24 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Mutable;
 import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.database.loader.MachineStateDatabaseLoader;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.BankTransactionsAttributes;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.GridAttributes;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.IslandAttributes;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.IslandChestAttributes;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.IslandWarpAttributes;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.PlayerAttributes;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.StackedBlockAttributes;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.WarpCategoryAttributes;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.EmptyParameterGuardDeserializer;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.IDeserializer;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.JsonDeserializer;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.MultipleDeserializer;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.RawDeserializer;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.SQLDatabase;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.BankTransactionsAttributes;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.GridAttributes;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.IslandAttributes;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.IslandChestAttributes;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.IslandWarpAttributes;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.PlayerAttributes;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.StackedBlockAttributes;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.WarpCategoryAttributes;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deserializer.EmptyParameterGuardDeserializer;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deserializer.IDeserializer;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deserializer.JsonDeserializer;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deserializer.MultipleDeserializer;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deserializer.RawDeserializer;
 import com.bgsoftware.superiorskyblock.core.database.sql.ResultSetMapBridge;
 import com.bgsoftware.superiorskyblock.core.database.sql.SQLHelper;
 import com.bgsoftware.superiorskyblock.core.database.sql.StatementHolder;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
-import com.bgsoftware.superiorskyblock.core.database.sql.session.SQLSession;
-import com.bgsoftware.superiorskyblock.core.database.sql.session.impl.SQLiteSession;
-import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
@@ -47,42 +44,41 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
-public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
+public class DatabaseConverter {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
 
     private static File databaseFile;
-    private static SQLSession session;
     private static boolean isRemoteDatabase;
 
-    private final List<PlayerAttributes> loadedPlayers = new ArrayList<>();
-    private final List<IslandAttributes> loadedIslands = new ArrayList<>();
-    private final List<StackedBlockAttributes> loadedBlocks = new ArrayList<>();
-    private final List<BankTransactionsAttributes> loadedBankTransactions = new ArrayList<>();
-    private final IDeserializer deserializer = new MultipleDeserializer(
+    private static final List<PlayerAttributes> loadedPlayers = new ArrayList<>();
+    private static final List<IslandAttributes> loadedIslands = new ArrayList<>();
+    private static final List<StackedBlockAttributes> loadedBlocks = new ArrayList<>();
+    private static final List<BankTransactionsAttributes> loadedBankTransactions = new ArrayList<>();
+    private static final IDeserializer deserializer = new MultipleDeserializer(
             EmptyParameterGuardDeserializer.getInstance(),
-            new JsonDeserializer(this),
-            new RawDeserializer(this, plugin)
+            JsonDeserializer.INSTANCE,
+            RawDeserializer.INSTANCE
     );
-    private GridAttributes gridAttributes;
+    private static GridAttributes gridAttributes;
 
-    private boolean isOldDatabaseFormat;
+    private DatabaseConverter() {
 
-    @Override
-    public void setState(State state) throws ManagerLoadException {
-        if (state == State.INITIALIZE)
-            isOldDatabaseFormat = isDatabaseOldFormat();
-
-        if (isOldDatabaseFormat)
-            super.setState(state);
     }
 
-    @Override
-    protected void handleInitialize() {
+    public static void tryConvertDatabase() {
+        boolean isOldDatabaseFormat = isDatabaseOldFormat();
+        if (isOldDatabaseFormat) {
+            convertDatabase();
+            saveConvertedData();
+        }
+    }
+
+    private static void convertDatabase() {
         Log.info("[Database-Converter] Detected old database - starting to convert data...");
 
-        session.select("players", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
+        SQLHelper.select("players", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 loadedPlayers.add(loadPlayer(new ResultSetMapBridge(resultSet)));
             }
@@ -90,7 +86,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
 
         Log.info("[Database-Converter] Found ", loadedPlayers.size(), " players in the database.");
 
-        session.select("islands", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
+        SQLHelper.select("islands", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 loadedIslands.add(loadIsland(new ResultSetMapBridge(resultSet)));
             }
@@ -98,7 +94,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
 
         Log.info("[Database-Converter] Found ", loadedIslands.size(), " islands in the database.");
 
-        session.select("stackedBlocks", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
+        SQLHelper.select("stackedBlocks", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 loadedBlocks.add(loadStackedBlock(new ResultSetMapBridge(resultSet)));
             }
@@ -108,7 +104,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
 
         // Ignoring errors as the bankTransactions table may not exist.
         AtomicBoolean foundBankTransaction = new AtomicBoolean(false);
-        session.select("bankTransactions", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
+        SQLHelper.select("bankTransactions", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             foundBankTransaction.set(true);
             while (resultSet.next()) {
                 loadedBankTransactions.add(loadBankTransaction(new ResultSetMapBridge(resultSet)));
@@ -119,7 +115,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
             Log.info("[Database-Converter] Found ", loadedBankTransactions.size(), " bank transactions in the database.");
         }
 
-        session.select("grid", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
+        SQLHelper.select("grid", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             if (resultSet.next()) {
                 gridAttributes = new GridAttributes()
                         .setValue(GridAttributes.Field.LAST_ISLAND, resultSet.getString("lastIsland"))
@@ -131,12 +127,12 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
         Mutable<Throwable> failedBackupError = new Mutable<>(null);
 
         if (!isRemoteDatabase) {
-            session.closeConnection();
+            SQLHelper.close();
             if (!databaseFile.renameTo(new File(databaseFile.getParentFile(), "database-bkp.db"))) {
                 failedBackupError.setValue(new RuntimeException("Failed to rename file to database-bkp.db"));
             } else {
-                session = new SQLiteSession(plugin, false);
-                session.createConnection();
+                SQLHelper.createConnection(plugin);
+                SQLDatabase.initializeDatabase();
             }
         }
 
@@ -147,28 +143,12 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
         }
     }
 
-    @Override
-    protected void handlePostInitialize() {
+    private static void saveConvertedData() {
         savePlayers();
         saveIslands();
         saveStackedBlocks();
         saveBankTransactions();
         saveGrid();
-    }
-
-    @Override
-    protected void handlePreLoadData() {
-        // Do nothing.
-    }
-
-    @Override
-    protected void handlePostLoadData() {
-        // Do nothing.
-    }
-
-    @Override
-    protected void handleShutdown() {
-        // Do nothing.
     }
 
     private static boolean isDatabaseOldFormat() {
@@ -181,16 +161,10 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
                 return false;
         }
 
-        session = SQLHelper.createSession(plugin, false);
-
-        if (!session.createConnection()) {
-            return false;
-        }
-
         AtomicBoolean isOldFormat = new AtomicBoolean(true);
 
-        session.select("stackedBlocks", "", new QueryResult<ResultSet>().onFail(error -> {
-            session.closeConnection();
+        SQLHelper.select("stackedBlocks", "", new QueryResult<ResultSet>().onFail(error -> {
+            SQLHelper.close();
             isOldFormat.set(false);
         }));
 
@@ -208,7 +182,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
         }
     }
 
-    private void savePlayers() {
+    private static void savePlayers() {
         Log.info("[Database-Converter] Converting players...");
 
         StatementHolder playersQuery = new StatementHolder("REPLACE INTO {prefix}players VALUES(?,?,?,?,?)");
@@ -224,7 +198,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
         playersSettingsQuery.executeBatch(false);
     }
 
-    private void saveIslands() {
+    private static void saveIslands() {
         long currentTime = System.currentTimeMillis();
 
         Log.info("[Database-Converter] Converting islands...");
@@ -285,7 +259,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
         islandsWarpsQuery.executeBatch(false);
     }
 
-    private void saveStackedBlocks() {
+    private static void saveStackedBlocks() {
         Log.info("[Database-Converter] Converting stacked blocks...");
 
         StatementHolder insertQuery = new StatementHolder("REPLACE INTO {prefix}stacked_blocks VALUES(?,?,?)");
@@ -301,7 +275,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
         insertQuery.executeBatch(false);
     }
 
-    private void saveBankTransactions() {
+    private static void saveBankTransactions() {
         Log.info("[Database-Converter] Converting bank transactions...");
 
         StatementHolder insertQuery = new StatementHolder("REPLACE INTO {prefix}bank_transactions VALUES(?,?,?,?,?,?,?)");
@@ -321,7 +295,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
         insertQuery.executeBatch(false);
     }
 
-    private void saveGrid() {
+    private static void saveGrid() {
         if (gridAttributes == null)
             return;
 
@@ -336,10 +310,10 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
     }
 
     @SuppressWarnings("unchecked")
-    private void insertPlayer(PlayerAttributes playerAttributes,
-                              StatementHolder playersQuery,
-                              StatementHolder playersMissionsQuery,
-                              StatementHolder playersSettingsQuery) {
+    private static void insertPlayer(PlayerAttributes playerAttributes,
+                                     StatementHolder playersQuery,
+                                     StatementHolder playersMissionsQuery,
+                                     StatementHolder playersSettingsQuery) {
         String playerUUID = playerAttributes.getValue(PlayerAttributes.Field.UUID);
         playersQuery.setObject(playerUUID)
                 .setObject(playerAttributes.getValue(PlayerAttributes.Field.LAST_USED_NAME))
@@ -362,18 +336,18 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
     }
 
     @SuppressWarnings({"unchecked"})
-    private void insertIsland(IslandAttributes islandAttributes, long currentTime,
-                              StatementHolder islandsQuery, StatementHolder islandsBanksQuery,
-                              StatementHolder islandsBansQuery, StatementHolder islandsBlockLimitsQuery,
-                              StatementHolder islandsChestsQuery, StatementHolder islandsEffectsQuery,
-                              StatementHolder islandsEntityLimitsQuery, StatementHolder islandsFlagsQuery,
-                              StatementHolder islandsGeneratorsQuery, StatementHolder islandsHomesQuery,
-                              StatementHolder islandsMembersQuery, StatementHolder islandsMissionsQuery,
-                              StatementHolder islandsPlayerPermissionsQuery, StatementHolder islandsRatingsQuery,
-                              StatementHolder islandsRoleLimitsQuery, StatementHolder islandsRolePermissionsQuery,
-                              StatementHolder islandsSettingsQuery, StatementHolder islandsUpgradesQuery,
-                              StatementHolder islandsVisitorHomesQuery, StatementHolder islandsVisitorsQuery,
-                              StatementHolder islandsWarpCategoriesQuery, StatementHolder islandsWarpsQuery) {
+    private static void insertIsland(IslandAttributes islandAttributes, long currentTime,
+                                     StatementHolder islandsQuery, StatementHolder islandsBanksQuery,
+                                     StatementHolder islandsBansQuery, StatementHolder islandsBlockLimitsQuery,
+                                     StatementHolder islandsChestsQuery, StatementHolder islandsEffectsQuery,
+                                     StatementHolder islandsEntityLimitsQuery, StatementHolder islandsFlagsQuery,
+                                     StatementHolder islandsGeneratorsQuery, StatementHolder islandsHomesQuery,
+                                     StatementHolder islandsMembersQuery, StatementHolder islandsMissionsQuery,
+                                     StatementHolder islandsPlayerPermissionsQuery, StatementHolder islandsRatingsQuery,
+                                     StatementHolder islandsRoleLimitsQuery, StatementHolder islandsRolePermissionsQuery,
+                                     StatementHolder islandsSettingsQuery, StatementHolder islandsUpgradesQuery,
+                                     StatementHolder islandsVisitorHomesQuery, StatementHolder islandsVisitorsQuery,
+                                     StatementHolder islandsWarpCategoriesQuery, StatementHolder islandsWarpsQuery) {
         String islandUUID = islandAttributes.getValue(IslandAttributes.Field.UUID);
         islandsQuery.setObject(islandUUID)
                 .setObject(islandAttributes.getValue(IslandAttributes.Field.OWNER))
@@ -518,7 +492,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
                         .addBatch());
     }
 
-    private <T> void runOnEnvironments(T[] arr, BiConsumer<T, World.Environment> consumer) {
+    private static <T> void runOnEnvironments(T[] arr, BiConsumer<T, World.Environment> consumer) {
         for (World.Environment environment : World.Environment.values()) {
             if (arr[environment.ordinal()] != null) {
                 consumer.accept(arr[environment.ordinal()], environment);
@@ -526,7 +500,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
         }
     }
 
-    private PlayerAttributes loadPlayer(ResultSetMapBridge resultSet) {
+    private static PlayerAttributes loadPlayer(ResultSetMapBridge resultSet) {
         PlayerRole playerRole;
 
         try {
@@ -554,7 +528,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
                 );
     }
 
-    private IslandAttributes loadIsland(ResultSetMapBridge resultSet) {
+    private static IslandAttributes loadIsland(ResultSetMapBridge resultSet) {
         UUID ownerUUID = UUID.fromString((String) resultSet.get("owner"));
         UUID islandUUID;
 
@@ -641,7 +615,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
                 .setValue(IslandAttributes.Field.BANK_LIMIT, resultSet.get("bankLimit", "-2"));
     }
 
-    private StackedBlockAttributes loadStackedBlock(ResultSetMapBridge resultSet) {
+    private static StackedBlockAttributes loadStackedBlock(ResultSetMapBridge resultSet) {
         String world = (String) resultSet.get("world");
         int x = (int) resultSet.get("x");
         int y = (int) resultSet.get("y");
@@ -655,7 +629,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
                 .setValue(StackedBlockAttributes.Field.AMOUNT, amount);
     }
 
-    private BankTransactionsAttributes loadBankTransaction(ResultSetMapBridge resultSet) {
+    private static BankTransactionsAttributes loadBankTransaction(ResultSetMapBridge resultSet) {
         return new BankTransactionsAttributes()
                 .setValue(BankTransactionsAttributes.Field.ISLAND, resultSet.get("island"))
                 .setValue(BankTransactionsAttributes.Field.PLAYER, resultSet.get("player"))
@@ -666,7 +640,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
                 .setValue(BankTransactionsAttributes.Field.AMOUNT, resultSet.get("amount"));
     }
 
-    public PlayerAttributes getPlayerAttributes(String uuid) {
+    public static PlayerAttributes getPlayerAttributes(String uuid) {
         return loadedPlayers.stream().filter(playerAttributes ->
                         playerAttributes.getValue(PlayerAttributes.Field.UUID).equals(uuid))
                 .findFirst()

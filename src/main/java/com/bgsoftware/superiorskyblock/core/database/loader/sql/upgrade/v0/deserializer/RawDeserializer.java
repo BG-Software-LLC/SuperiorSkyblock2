@@ -1,6 +1,5 @@
-package com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer;
+package com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deserializer;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
@@ -10,11 +9,11 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.DirtyChunk;
 import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.DatabaseLoader_V1;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.IslandChestAttributes;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.IslandWarpAttributes;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.PlayerAttributes;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.WarpCategoryAttributes;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.DatabaseConverter;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.IslandChestAttributes;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.IslandWarpAttributes;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.PlayerAttributes;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.WarpCategoryAttributes;
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
@@ -37,13 +36,11 @@ import java.util.UUID;
 
 public class RawDeserializer implements IDeserializer {
 
-    @Nullable
-    private final DatabaseLoader_V1 databaseLoader;
-    private final SuperiorSkyblockPlugin plugin;
+    public static final RawDeserializer INSTANCE = new RawDeserializer();
 
-    public RawDeserializer(@Nullable DatabaseLoader_V1 databaseLoader, SuperiorSkyblockPlugin plugin) {
-        this.databaseLoader = databaseLoader;
-        this.plugin = plugin;
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private RawDeserializer() {
     }
 
     @Override
@@ -86,10 +83,10 @@ public class RawDeserializer implements IDeserializer {
     public List<PlayerAttributes> deserializePlayers(String players) {
         List<PlayerAttributes> playerAttributesList = new LinkedList<>();
 
-        if (players != null && databaseLoader != null) {
+        if (players != null) {
             for (String uuid : players.split(",")) {
                 try {
-                    PlayerAttributes playerAttributes = databaseLoader.getPlayerAttributes(uuid);
+                    PlayerAttributes playerAttributes = DatabaseConverter.getPlayerAttributes(uuid);
                     if (playerAttributes != null)
                         playerAttributesList.add(playerAttributes);
                 } catch (Exception ignored) {
@@ -443,15 +440,29 @@ public class RawDeserializer implements IDeserializer {
         List<DirtyChunk> dirtyChunks = new LinkedList<>();
 
         if (dirtyChunksParam != null) {
-            for (String dirtyChunkSection : dirtyChunksParam.split("\\|")) {
-                String[] dirtyChunkSections = dirtyChunkSection.split("=");
-                String worldName = dirtyChunkSections[0];
-                for (String chunkCoords : dirtyChunkSections[1].split(";")) {
-                    String[] chunkCoordsSections = chunkCoords.split(",");
-                    try {
-                        dirtyChunks.add(new DirtyChunk(worldName, Integer.parseInt(chunkCoordsSections[0]),
-                                Integer.parseInt(chunkCoordsSections[1])));
-                    } catch (NumberFormatException ignored) {
+            if (dirtyChunksParam.contains("|")) {
+                String[] serializedSections = dirtyChunksParam.split("\\|");
+
+                for (String section : serializedSections) {
+                    String[] worldSections = section.split("=");
+                    if (worldSections.length == 2) {
+                        String[] dirtyChunkSections = worldSections[1].split(";");
+                        for (String dirtyChunk : dirtyChunkSections) {
+                            String[] dirtyChunkSection = dirtyChunk.split(",");
+                            if (dirtyChunkSection.length == 2) {
+                                dirtyChunks.add(new DirtyChunk(worldSections[0], Integer.parseInt(dirtyChunkSection[0]),
+                                        Integer.parseInt(dirtyChunkSection[1])));
+                            }
+                        }
+                    }
+                }
+            } else {
+                String[] dirtyChunkSections = dirtyChunksParam.split(";");
+                for (String dirtyChunk : dirtyChunkSections) {
+                    String[] dirtyChunkSection = dirtyChunk.split(",");
+                    if (dirtyChunkSection.length == 3) {
+                        dirtyChunks.add(new DirtyChunk(dirtyChunkSection[0], Integer.parseInt(dirtyChunkSection[1]),
+                                Integer.parseInt(dirtyChunkSection[2])));
                     }
                 }
             }
