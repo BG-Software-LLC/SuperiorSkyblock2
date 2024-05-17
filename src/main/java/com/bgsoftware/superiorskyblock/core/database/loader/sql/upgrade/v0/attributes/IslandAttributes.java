@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes;
+package com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes;
 
 public class IslandAttributes extends AttributesRegistry<IslandAttributes.Field> {
 
