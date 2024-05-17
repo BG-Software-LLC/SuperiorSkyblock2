@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParseException;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
@@ -252,8 +253,8 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             runnable.run();
     }
 
-    public String getDefaultSchematic(World.Environment environment) {
-        String suffix = environment == World.Environment.NETHER ? "_nether" : "_the_end";
+    public String getDefaultSchematic(Dimension dimension) {
+        String suffix = "_" + dimension.getName().toLowerCase(Locale.ENGLISH);
         for (String schematicName : this.schematicsContainer.getSchematicNames()) {
             if (getSchematic(schematicName + suffix) != null)
                 return schematicName;

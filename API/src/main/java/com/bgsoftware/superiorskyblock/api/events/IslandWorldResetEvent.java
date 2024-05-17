@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.World;
 import org.bukkit.event.Cancellable;
@@ -13,7 +14,7 @@ public class IslandWorldResetEvent extends IslandEvent implements Cancellable {
 
     @Nullable
     private final SuperiorPlayer superiorPlayer;
-    private final World.Environment environment;
+    private final Dimension dimension;
 
     private boolean cancelled = false;
 
@@ -25,10 +26,23 @@ public class IslandWorldResetEvent extends IslandEvent implements Cancellable {
      * @param island         The island that the world was reset for.
      * @param environment    The environment of the world that was reset.
      */
+    @Deprecated
     public IslandWorldResetEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, World.Environment environment) {
+        this(superiorPlayer, island, Dimension.getByName(environment.name()));
+    }
+
+    /**
+     * The constructor of the event.
+     *
+     * @param superiorPlayer The player that reset the world of the island.
+     *                       If null, the world was reset by console.
+     * @param island         The island that the world was reset for.
+     * @param dimension      The dimension of the world that was reset.
+     */
+    public IslandWorldResetEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Dimension dimension) {
         super(island);
         this.superiorPlayer = superiorPlayer;
-        this.environment = environment;
+        this.dimension = dimension;
     }
 
     /**
@@ -43,8 +57,16 @@ public class IslandWorldResetEvent extends IslandEvent implements Cancellable {
     /**
      * Get the environment of the world that was reset.
      */
+    @Deprecated
     public World.Environment getEnvironment() {
-        return environment;
+        return this.dimension.getEnvironment();
+    }
+
+    /**
+     * Get the environment of the world that was reset.
+     */
+    public Dimension getDimension() {
+        return this.dimension;
     }
 
     @Override

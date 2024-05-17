@@ -2,13 +2,12 @@ package com.bgsoftware.superiorskyblock.island.upgrade;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.island.container.value.Value;
 import com.bgsoftware.superiorskyblock.island.upgrade.cost.EmptyUpgradeCost;
-import org.bukkit.World;
 
 import java.util.Collections;
-import java.util.EnumMap;
-import java.util.Map;
 
 public class DefaultUpgradeLevel extends SUpgradeLevel {
 
@@ -37,18 +36,8 @@ public class DefaultUpgradeLevel extends SUpgradeLevel {
         return INSTANCE;
     }
 
-    private static <V> Map<World.Environment, V> convertFromArray(V[] arr) {
-        EnumMap<World.Environment, V> result = new EnumMap<>(World.Environment.class);
-
-        int environmentLength = World.Environment.values().length;
-        for (int i = 0; i < arr.length && i < environmentLength; ++i) {
-            if (arr[i] != null) {
-                World.Environment environment = World.Environment.values()[i];
-                result.put(environment, arr[i]);
-            }
-        }
-
-        return result.isEmpty() ? Collections.emptyMap() : result;
+    private static <V> EnumerateMap<Dimension, V> convertFromArray(V[] arr) {
+        return new EnumerateMap<>(arr);
     }
 
 }

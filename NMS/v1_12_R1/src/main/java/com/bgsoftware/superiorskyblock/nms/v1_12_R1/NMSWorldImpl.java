@@ -4,6 +4,7 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -17,6 +18,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_12_R1.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.world.WorldEditSessionImpl;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockDoubleStep;
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -42,12 +44,10 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_12_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_12_R1.block.CraftSign;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.generator.ChunkGenerator;
 
 import java.lang.reflect.Modifier;
 import java.util.function.IntFunction;
@@ -132,9 +132,11 @@ public class NMSWorldImpl implements NMSWorld {
             worldBorder.world = worldServer;
             worldBorder.setSize((islandSize * 2) + 1);
 
-            org.bukkit.World.Environment environment = world.getEnvironment();
+            Dimension dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(world);
+            if (dimension == null)
+                return;
 
-            Location center = island.getCenter(environment);
+            Location center = island.getCenter(dimension);
             worldBorder.setCenter(center.getX(), center.getZ());
 
             switch (superiorPlayer.getBorderColor()) {
@@ -308,8 +310,8 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public ChunkGenerator createGenerator(SuperiorSkyblockPlugin plugin) {
-        return new IslandsGeneratorImpl(plugin);
+    public IslandsGenerator createGenerator(Dimension dimension) {
+        return new IslandsGeneratorImpl(dimension);
     }
 
     @Override

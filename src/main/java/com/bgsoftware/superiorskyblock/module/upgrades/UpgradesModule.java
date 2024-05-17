@@ -9,6 +9,8 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
@@ -31,7 +33,6 @@ import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLim
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeMobDrops;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeSpawnerRates;
-import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffectType;
@@ -39,7 +40,6 @@ import org.bukkit.potion.PotionEffectType;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -231,17 +231,17 @@ public class UpgradesModule extends BuiltinModule {
             for (String entity : levelSection.getConfigurationSection("entity-limits").getKeys(false))
                 entityLimits.put(Keys.ofEntityType(entity), levelSection.getInt("entity-limits." + entity));
         }
-        EnumMap<World.Environment, Map<Key, Integer>> generatorRates = new EnumMap<>(World.Environment.class);
+        EnumerateMap<Dimension, Map<Key, Integer>> generatorRates = new EnumerateMap<>(Dimension.values());
         if (levelSection.contains("generator-rates")) {
             for (String blockOrEnv : levelSection.getConfigurationSection("generator-rates").getKeys(false)) {
                 try {
-                    World.Environment environment = World.Environment.valueOf(blockOrEnv.toUpperCase(Locale.ENGLISH));
+                    Dimension dimension = Dimension.getByName(blockOrEnv.toUpperCase(Locale.ENGLISH));
                     for (String block : levelSection.getConfigurationSection("generator-rates." + blockOrEnv).getKeys(false)) {
-                        generatorRates.computeIfAbsent(environment, e -> KeyMaps.createHashMap(KeyIndicator.MATERIAL)).put(
+                        generatorRates.computeIfAbsent(dimension, e -> KeyMaps.createHashMap(KeyIndicator.MATERIAL)).put(
                                 Keys.ofMaterialAndData(block), levelSection.getInt("generator-rates." + blockOrEnv + "." + block));
                     }
                 } catch (Exception ex) {
-                    generatorRates.computeIfAbsent(plugin.getSettings().getWorlds().getDefaultWorld(), e -> KeyMaps.createHashMap(KeyIndicator.MATERIAL))
+                    generatorRates.computeIfAbsent(plugin.getSettings().getWorlds().getDefaultWorldDimension(), e -> KeyMaps.createHashMap(KeyIndicator.MATERIAL))
                             .put(Keys.ofMaterialAndData(blockOrEnv), levelSection.getInt("generator-rates." + blockOrEnv));
                 }
             }

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.player.algorithm;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -35,6 +36,19 @@ public interface PlayerTeleportAlgorithm {
      * @param environment The environment to teleport the player to.
      * @return CompletableFuture with boolean that indicates whether the teleportation was successful.
      */
-    CompletableFuture<Boolean> teleport(Player player, Island island, World.Environment environment);
+    @Deprecated
+    default CompletableFuture<Boolean> teleport(Player player, Island island, World.Environment environment) {
+        return teleport(player, island, Dimension.getByName(environment.name()));
+    }
+
+    /**
+     * Teleport a player to an island in a specific dimension.
+     *
+     * @param player    The player to teleport.
+     * @param island    The island to teleport the player to.
+     * @param dimension The dimension to teleport the player to.
+     * @return CompletableFuture with boolean that indicates whether the teleportation was successful.
+     */
+    CompletableFuture<Boolean> teleport(Player player, Island island, Dimension dimension);
 
 }

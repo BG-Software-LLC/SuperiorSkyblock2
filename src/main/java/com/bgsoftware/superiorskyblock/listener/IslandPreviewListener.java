@@ -31,7 +31,8 @@ public class IslandPreviewListener implements Listener {
             /* cancelIslandPreview changes the GameMode and teleports the player later.
             In this case tho, we want the things to be instant - no async, no nothing. */
             e.getPlayer().setGameMode(GameMode.SURVIVAL);
-            e.getPlayer().teleport(plugin.getGrid().getSpawnIsland().getCenter(plugin.getSettings().getWorlds().getDefaultWorld()));
+            e.getPlayer().teleport(plugin.getGrid().getSpawnIsland().getCenter(
+                    plugin.getSettings().getWorlds().getDefaultWorldDimension()));
         }
     }
 

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
@@ -65,12 +66,12 @@ public class CmdAdminUnlockWorld implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        World.Environment environment = CommandArguments.getEnvironment(sender, args[3]);
+        Dimension dimension = CommandArguments.getDimension(sender, args[3]);
 
-        if (environment == null)
+        if (dimension == null)
             return;
 
-        if (environment == plugin.getSettings().getWorlds().getDefaultWorld()) {
+        if (dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
             Message.INVALID_ENVIRONMENT.send(sender, args[3]);
             return;
         }
@@ -80,23 +81,12 @@ public class CmdAdminUnlockWorld implements IAdminIslandCommand {
         boolean anyWorldsChanged = false;
 
         for (Island island : islands) {
-            if (enable ? !plugin.getEventsBus().callIslandUnlockWorldEvent(island, environment) :
-                    !plugin.getEventsBus().callIslandLockWorldEvent(island, environment))
+            if (enable ? !plugin.getEventsBus().callIslandUnlockWorldEvent(island, dimension) :
+                    !plugin.getEventsBus().callIslandLockWorldEvent(island, dimension))
                 continue;
 
             anyWorldsChanged = true;
-
-            switch (environment) {
-                case NORMAL:
-                    island.setNormalEnabled(enable);
-                    break;
-                case NETHER:
-                    island.setNetherEnabled(enable);
-                    break;
-                case THE_END:
-                    island.setEndEnabled(enable);
-                    break;
-            }
+            island.setDimensionEnabled(dimension, enable);
         }
 
         if (anyWorldsChanged)
@@ -111,12 +101,7 @@ public class CmdAdminUnlockWorld implements IAdminIslandCommand {
         if (args.length != 4)
             return Collections.emptyList();
 
-        List<String> environments = new ArrayList<>();
-        for (World.Environment environment : World.Environment.values()) {
-            environments.add(environment.name().toLowerCase(Locale.ENGLISH));
-        }
-
-        return CommandTabCompletes.getCustomComplete(args[3], environments.toArray(new String[0]));
+        return CommandTabCompletes.getDimensions(args[3]);
     }
 
 }

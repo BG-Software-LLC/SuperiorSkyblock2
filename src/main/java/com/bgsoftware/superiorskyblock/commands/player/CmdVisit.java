@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
@@ -66,8 +67,8 @@ public class CmdVisit implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
         Location visitLocation = plugin.getSettings().getVisitorsSign().isRequiredForVisit() ?
-                targetIsland.getVisitorsLocation(null /* unused */) :
-                targetIsland.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorld());
+                targetIsland.getVisitorsLocation((Dimension) null /* unused */) :
+                targetIsland.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension());
 
         if (visitLocation == null) {
             Message.INVALID_VISIT_LOCATION.send(sender);
@@ -75,7 +76,7 @@ public class CmdVisit implements ISuperiorCommand {
             if (!superiorPlayer.hasBypassModeEnabled())
                 return;
 
-            visitLocation = targetIsland.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorld());
+            visitLocation = targetIsland.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension());
             Message.INVALID_VISIT_LOCATION_BYPASS.send(sender);
         }
 
@@ -104,7 +105,8 @@ public class CmdVisit implements ISuperiorCommand {
         return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
                 plugin.getSettings().isTabCompleteHideVanished(),
                 (onlinePlayer, onlineIsland) -> onlineIsland != null && (
-                        (!plugin.getSettings().getVisitorsSign().isRequiredForVisit() || onlineIsland.getVisitorsLocation(null /* unused */) != null) ||
+                        (!plugin.getSettings().getVisitorsSign().isRequiredForVisit() ||
+                                onlineIsland.getVisitorsLocation((Dimension) null /* unused */) != null) ||
                                 superiorPlayer.hasBypassModeEnabled()) && (!onlineIsland.isLocked() ||
                         onlineIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS))) : Collections.emptyList();
     }

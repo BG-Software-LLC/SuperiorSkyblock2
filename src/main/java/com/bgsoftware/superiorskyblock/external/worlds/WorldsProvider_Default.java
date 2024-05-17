@@ -1,12 +1,17 @@
 package com.bgsoftware.superiorskyblock.external.worlds;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
+import com.bgsoftware.superiorskyblock.world.Dimensions;
+import com.bgsoftware.superiorskyblock.world.WorldGenerator;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
@@ -17,14 +22,16 @@ import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.block.BlockFace;
 
-import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 public class WorldsProvider_Default implements WorldsProvider {
 
     private final Set<BlockPosition> servedPositions = Sets.newHashSet();
-    private final EnumMap<World.Environment, World> islandWorlds = new EnumMap<>(World.Environment.class);
+    private final EnumerateMap<Dimension, World> islandWorlds = new EnumerateMap<>(Dimension.values());
+    private final Map<UUID, Dimension> islandWorldsToDimensions = new HashMap<>();
     private final SuperiorSkyblockPlugin plugin;
 
     private final LazyReference<DragonBattleService> dragonBattleService = new LazyReference<DragonBattleService>() {
@@ -41,28 +48,42 @@ public class WorldsProvider_Default implements WorldsProvider {
     @Override
     public void prepareWorlds() {
         Difficulty difficulty = Difficulty.valueOf(plugin.getSettings().getWorlds().getDifficulty());
-        if (plugin.getSettings().getWorlds().getNormal().isEnabled())
-            loadWorld(plugin.getSettings().getWorlds().getWorldName(), difficulty, World.Environment.NORMAL);
-        if (plugin.getSettings().getWorlds().getNether().isEnabled())
-            loadWorld(plugin.getSettings().getWorlds().getNether().getName(), difficulty, World.Environment.NETHER);
-        if (plugin.getSettings().getWorlds().getEnd().isEnabled()) {
-            World endWorld = loadWorld(plugin.getSettings().getWorlds().getEnd().getName(), difficulty, World.Environment.THE_END);
-            if (plugin.getSettings().getWorlds().getEnd().isDragonFight())
-                dragonBattleService.get().prepareEndWorld(endWorld);
+        for (Dimension dimension : Dimension.values()) {
+            SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(dimension);
+            if (dimensionConfig != null && dimensionConfig.isEnabled()) {
+                String worldName = dimensionConfig.getName();
+                World world = loadWorld(worldName, difficulty, dimension);
+                if (dimension.getEnvironment() == World.Environment.THE_END &&
+                        dimensionConfig instanceof SettingsManager.Worlds.End &&
+                        ((SettingsManager.Worlds.End) dimensionConfig).isDragonFight()) {
+                    dragonBattleService.get().prepareEndWorld(world);
+                }
+            }
         }
     }
 
     @Override
+    public World getIslandsWorld(Island island, Dimension dimension) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+        return islandWorlds.get(dimension);
+    }
+
+    @Override
+    @Deprecated
     public World getIslandsWorld(Island island, World.Environment environment) {
-        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
-        return islandWorlds.get(environment);
+        return getIslandsWorld(island, Dimensions.fromEnvironment(environment));
+    }
+
+    @Override
+    public Dimension getIslandsWorldDimension(World world) {
+        Preconditions.checkNotNull(world, "world parameter cannot be null.");
+        return islandWorldsToDimensions.get(world.getUID());
     }
 
     @Override
     public boolean isIslandsWorld(World world) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
-        World islandsWorld = getIslandsWorld(null, world.getEnvironment());
-        return islandsWorld != null && world.getUID().equals(islandsWorld.getUID());
+        return islandWorldsToDimensions.containsKey(world.getUID());
     }
 
     @Override
@@ -120,32 +141,48 @@ public class WorldsProvider_Default implements WorldsProvider {
 
     @Override
     public boolean isNormalEnabled() {
-        return plugin.getSettings().getWorlds().getNormal().isEnabled();
+        return isDimensionEnabled(Dimensions.NORMAL);
     }
 
     @Override
     public boolean isNormalUnlocked() {
-        return isNormalEnabled() && plugin.getSettings().getWorlds().getNormal().isUnlocked();
+        return isDimensionUnlocked(Dimensions.NORMAL);
     }
 
     @Override
     public boolean isNetherEnabled() {
-        return plugin.getSettings().getWorlds().getNether().isEnabled();
+        return isDimensionEnabled(Dimensions.NETHER);
     }
 
     @Override
     public boolean isNetherUnlocked() {
-        return isNetherEnabled() && plugin.getSettings().getWorlds().getNether().isUnlocked();
+        return isDimensionUnlocked(Dimensions.NETHER);
     }
 
     @Override
     public boolean isEndEnabled() {
-        return plugin.getSettings().getWorlds().getEnd().isEnabled();
+        return isDimensionEnabled(Dimensions.THE_END);
     }
 
     @Override
     public boolean isEndUnlocked() {
-        return isEndEnabled() && plugin.getSettings().getWorlds().getEnd().isUnlocked();
+        return isDimensionUnlocked(Dimensions.THE_END);
+    }
+
+    @Override
+    public boolean isDimensionEnabled(Dimension dimension) {
+        SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(dimension);
+        // If the config is null, it probably means another plugin registered it.
+        // Therefore, we register it as enabled.
+        return dimensionConfig == null || dimensionConfig.isEnabled();
+    }
+
+    @Override
+    public boolean isDimensionUnlocked(Dimension dimension) {
+        SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(dimension);
+        // If the config is null, it probably means another plugin registered it.
+        // Therefore, we register it as not unlocked by default.
+        return dimensionConfig != null && dimensionConfig.isEnabled() && dimensionConfig.isUnlocked();
     }
 
     private BlockFace getIslandFace(Location location) {
@@ -159,7 +196,7 @@ public class WorldsProvider_Default implements WorldsProvider {
         }
     }
 
-    private World loadWorld(String worldName, Difficulty difficulty, World.Environment environment) {
+    private World loadWorld(String worldName, Difficulty difficulty, Dimension dimension) {
         if (Bukkit.getWorld(worldName) != null) {
             throw new RuntimeException("The world " + worldName + " is already loaded. This can occur by one of the following reasons:\n" +
                     "- Another plugin loaded it manually before SuperiorSkyblock.\n" +
@@ -168,12 +205,13 @@ public class WorldsProvider_Default implements WorldsProvider {
 
         World world = WorldCreator.name(worldName)
                 .type(WorldType.NORMAL)
-                .environment(environment)
-                .generator(plugin.getGenerator())
+                .environment(dimension.getEnvironment())
+                .generator(WorldGenerator.getWorldGenerator(dimension))
                 .createWorld();
 
         world.setDifficulty(difficulty);
-        islandWorlds.put(environment, world);
+        islandWorlds.put(dimension, world);
+        islandWorldsToDimensions.put(world.getUID(), dimension);
 
         plugin.getNMSWorld().removeAntiXray(world);
 

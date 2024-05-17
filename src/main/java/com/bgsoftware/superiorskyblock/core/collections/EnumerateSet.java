@@ -1,9 +1,14 @@
 package com.bgsoftware.superiorskyblock.core.collections;
 
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class EnumerateSet<K extends Enumerable> {
 
@@ -43,6 +48,23 @@ public class EnumerateSet<K extends Enumerable> {
         return !containedBefore;
     }
 
+    public boolean addAll(EnumerateSet<Dimension> other) {
+        boolean added = false;
+
+        for (int i = 0; i < other.values.length; ++i) {
+            boolean value = other.values[i];
+            if (value) {
+                this.ensureCapacity(i + 1);
+                if (!values[i]) {
+                    values[i] = added = true;
+                    ++size;
+                }
+            }
+        }
+
+        return added;
+    }
+
     public boolean remove(K key) {
         if (!isValidKey(key))
             return false;
@@ -58,6 +80,17 @@ public class EnumerateSet<K extends Enumerable> {
     public void clear() {
         this.values = new boolean[this.values.length];
         this.size = 0;
+    }
+
+    public Set<K> collect(Collection<K> enumerables) {
+        Set<K> set = new LinkedHashSet<>();
+
+        for (K key : enumerables) {
+            if (contains(key))
+                set.add(key);
+        }
+
+        return set;
     }
 
     @Override

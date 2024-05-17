@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
@@ -92,7 +93,7 @@ public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, Emp
 
         private final Predicate<Island> ISLANDS_FILTER = island -> {
             if (visitorWarps)
-                return island.getVisitorsLocation(null /* unused */) != null;
+                return island.getVisitorsLocation((Dimension) null /* unused */) != null;
             else if (island.equals(getInventoryViewer().getIsland()))
                 return !island.getIslandWarps().isEmpty();
             else

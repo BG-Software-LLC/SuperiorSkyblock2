@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -20,7 +21,6 @@ import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEff
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeMobDrops;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeSpawnerRates;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.potion.PotionEffectType;
 
@@ -97,7 +97,7 @@ public class CmdAdminShow implements IAdminIslandCommand {
         // Island location
         if (!Message.ISLAND_INFO_LOCATION.isEmpty(locale))
             infoMessage.append(Message.ISLAND_INFO_LOCATION.getMessage(locale, Formatters.LOCATION_FORMATTER.format(
-                    island.getCenter(World.Environment.NORMAL)))).append("\n");
+                    island.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension())))).append("\n");
 
         // Island last time updated
         if (lastTime != -1) {
@@ -265,22 +265,22 @@ public class CmdAdminShow implements IAdminIslandCommand {
         if (BuiltinModules.GENERATORS.isEnabled()) {
             // Island generator rates
             if (!Message.ISLAND_INFO_ADMIN_GENERATOR_RATES.isEmpty(locale) && !Message.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.isEmpty(locale)) {
-                for (World.Environment environment : World.Environment.values()) {
-                    Map<Key, Integer> customGeneratorValues = island.getCustomGeneratorAmounts(environment);
+                for (Dimension dimension : Dimension.values()) {
+                    Map<Key, Integer> customGeneratorValues = island.getCustomGeneratorAmounts(dimension);
                     StringBuilder generatorString = new StringBuilder();
-                    for (Map.Entry<String, Integer> entry : island.getGeneratorPercentages(environment).entrySet()) {
+                    for (Map.Entry<String, Integer> entry : island.getGeneratorPercentages(dimension).entrySet()) {
                         Key key = Keys.ofMaterialAndData(entry.getKey());
                         generatorString.append(Message.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(locale,
                                 Formatters.CAPITALIZED_FORMATTER.format(entry.getKey()),
-                                Formatters.NUMBER_FORMATTER.format(IslandUtils.getGeneratorPercentageDecimal(island, key, environment)),
-                                island.getGeneratorAmount(key, environment))
+                                Formatters.NUMBER_FORMATTER.format(IslandUtils.getGeneratorPercentageDecimal(island, key, dimension)),
+                                island.getGeneratorAmount(key, dimension))
                         );
                         if (!customGeneratorValues.containsKey(key))
                             generatorString.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
                         generatorString.append("\n");
                     }
                     infoMessage.append(Message.ISLAND_INFO_ADMIN_GENERATOR_RATES.getMessage(locale, generatorString,
-                            Formatters.CAPITALIZED_FORMATTER.format(environment.name())));
+                            Formatters.CAPITALIZED_FORMATTER.format(dimension.getName())));
                 }
             }
         }

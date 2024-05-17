@@ -5,6 +5,7 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.Text;
@@ -79,9 +80,11 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private final List<Pair<BlockPos, CompoundTag>> blockEntities = new LinkedList<>();
     private final Set<ChunkPos> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
     private final ServerLevel serverLevel;
+    private final Dimension dimension;
 
     public WorldEditSessionImpl(ServerLevel serverLevel) {
         this.serverLevel = serverLevel;
+        this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(serverLevel.getWorld());
     }
 
     @Override
@@ -180,8 +183,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
         Biome[] biomes = BIOME_BASE_ARRAY.get(levelChunk.getBiomes());
         if (biomes != null) {
             Registry<Biome> biomesRegistry = serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
-            Biome biome = CraftBlock.biomeToBiomeBase(biomesRegistry,
-                    IslandUtils.getDefaultWorldBiome(serverLevel.getWorld().getEnvironment()));
+            Biome biome = CraftBlock.biomeToBiomeBase(biomesRegistry, IslandUtils.getDefaultWorldBiome(this.dimension));
             Arrays.fill(biomes, biome);
         }
 

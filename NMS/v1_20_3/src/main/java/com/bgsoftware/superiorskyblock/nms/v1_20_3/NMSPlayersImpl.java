@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.service.bossbar.BossBarTask;
+import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.md_5.bungee.api.ChatMessageType;
@@ -66,7 +67,7 @@ public class NMSPlayersImpl implements NMSPlayers {
         clearInventory(targetPlayer);
 
         //Setting the entity to the spawn location
-        Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter(org.bukkit.World.Environment.NORMAL);
+        Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter(Dimensions.NORMAL);
 
         if (spawnLocation != null) {
             serverPlayer.setLevel(serverLevel);

@@ -4,8 +4,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LegacyMasks;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
@@ -222,9 +225,18 @@ public class DataManager extends Manager {
                     .setLocked(databaseResult.getBoolean("locked").orElse(false))
                     .setIgnored(databaseResult.getBoolean("ignored").orElse(false))
                     .setDescription(databaseResult.getString("description").orElse(""))
-                    .setGeneratedSchematics(databaseResult.getInt("generated_schematics").orElse(0))
-                    .setUnlockedWorlds(databaseResult.getInt("unlocked_worlds").orElse(0))
                     .setLastTimeUpdated(databaseResult.getLong("last_time_updated").orElse(System.currentTimeMillis() / 1000L));
+
+
+            EnumerateSet<Dimension> generatedSchematics = LegacyMasks.convertGeneratedSchematicsMask(
+                    databaseResult.getInt("generated_schematics").orElse(0));
+            EnumerateSet<Dimension> unlockedWorlds = LegacyMasks.convertUnlockedWorldsMask(
+                    databaseResult.getInt("unlocked_worlds").orElse(0));
+
+            for (Dimension dimension : Dimension.values()) {
+                if (generatedSchematics.contains(dimension)) builder.setGeneratedSchematic(dimension);
+                if (unlockedWorlds.contains(dimension)) builder.setUnlockedWorld(dimension);
+            }
 
             databaseResult.getString("dirty_chunks").ifPresent(dirtyChunks -> {
                 IslandsDeserializer.deserializeDirtyChunks(builder, dirtyChunks);

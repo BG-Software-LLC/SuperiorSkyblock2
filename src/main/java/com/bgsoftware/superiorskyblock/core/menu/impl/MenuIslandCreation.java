@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
@@ -23,7 +24,6 @@ import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -83,11 +83,9 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
         if (menuView != null)
             menuView.closeView();
 
-        World.Environment environment = plugin.getSettings().getWorlds().getDefaultWorld();
-        boolean offset = template.isOffset() || (environment == World.Environment.NORMAL ?
-                plugin.getSettings().getWorlds().getNormal().isSchematicOffset() :
-                environment == World.Environment.NETHER ? plugin.getSettings().getWorlds().getNether().isSchematicOffset() :
-                        plugin.getSettings().getWorlds().getEnd().isSchematicOffset());
+        Dimension dimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
+        boolean offset = template.isOffset() ||
+                plugin.getSettings().getWorlds().getDimensionConfig(dimension).isSchematicOffset();
 
         plugin.getGrid().createIsland(clickedPlayer, schematic, template.getBonusWorth(),
                 template.getBonusLevel(), template.getBiome(), islandName, offset);
