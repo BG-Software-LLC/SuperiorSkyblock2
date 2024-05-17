@@ -132,37 +132,13 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
 
         if (!isRemoteDatabase) {
             session.closeConnection();
-            if (databaseFile.renameTo(new File(databaseFile.getParentFile(), "database-bkp.db"))) {
+            if (!databaseFile.renameTo(new File(databaseFile.getParentFile(), "database-bkp.db"))) {
                 failedBackupError.setValue(new RuntimeException("Failed to rename file to database-bkp.db"));
-            }
-        }
-
-        if (failedBackupError.getValue() != null) {
-            if (!isRemoteDatabase) {
+            } else {
                 session = new SQLiteSession(plugin, false);
                 session.createConnection();
             }
-
-            failedBackupError.setValue(null);
-
-            session.renameTable("islands", "bkp_islands", new QueryResult<Void>()
-                    .onFail(failedBackupError::setValue));
-
-            session.renameTable("players", "bkp_players", new QueryResult<Void>()
-                    .onFail(failedBackupError::setValue));
-
-            session.renameTable("grid", "bkp_grid", new QueryResult<Void>()
-                    .onFail(failedBackupError::setValue));
-
-            session.renameTable("stackedBlocks", "bkp_stackedBlocks", new QueryResult<Void>()
-                    .onFail(failedBackupError::setValue));
-
-            session.renameTable("bankTransactions", "bkp_bankTransactions", new QueryResult<Void>()
-                    .onFail(failedBackupError::setValue));
         }
-
-        if (isRemoteDatabase)
-            session.closeConnection();
 
         if (failedBackupError.getValue() != null) {
             Log.error(failedBackupError.getValue(), "[Database-Converter] Failed to create a backup for the database file:");
