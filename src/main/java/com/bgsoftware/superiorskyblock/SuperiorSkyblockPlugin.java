@@ -487,7 +487,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         if (loadGrid) {
             dataHandler.loadData();
             stackedBlocksHandler.loadData();
-            modulesHandler.loadModulesData(this);
         }
 
         modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_MODULE_DATA_LOAD, !loadGrid);
@@ -504,6 +503,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         CalcTask.startTask();
 
         modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_HANDLERS_LOADING, !loadGrid);
+
+        if (loadGrid) {
+            modulesHandler.loadModulesData(this);
+        }
     }
 
     @Override
