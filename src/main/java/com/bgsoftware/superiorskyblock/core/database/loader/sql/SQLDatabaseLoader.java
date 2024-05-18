@@ -30,6 +30,18 @@ public class SQLDatabaseLoader extends MachineStateDatabaseLoader {
                     ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
 
+        try {
+            SQLHelper.select("ssb_metadata", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
+                int databaseVersion = resultSet.getInt("version");
+
+                if (databaseVersion > SQLDatabase.getCurrentDatabaseVersion())
+                    throw new IllegalStateException("Database is in newer version: " + databaseVersion + " > " + SQLDatabase.getCurrentDatabaseVersion());
+            }).onFail(error -> {
+            }));
+        } catch (IllegalStateException error) {
+            throw new ManagerLoadException(error.getMessage(), ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+        }
+
         SQLDatabase.UpgradeResult databaseUpgradeResult = SQLDatabase.upgradeDatabase();
 
         SQLDatabase.initializeDatabase();
