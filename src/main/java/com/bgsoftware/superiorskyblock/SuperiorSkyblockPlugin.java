@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.config.SettingsManagerImpl;
+import com.bgsoftware.superiorskyblock.core.PluginReloadReason;
 import com.bgsoftware.superiorskyblock.core.database.DataManager;
 import com.bgsoftware.superiorskyblock.core.engine.EnginesFactory;
 import com.bgsoftware.superiorskyblock.core.engine.NashornEngineDownloader;
@@ -227,7 +228,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             modulesHandler.runModuleLifecycle(ModuleLoadTime.NORMAL, false);
 
             try {
-                reloadPlugin(true);
+                reloadPlugin(PluginReloadReason.STARTUP);
             } catch (ManagerLoadException error) {
                 ManagerLoadException.handle(error);
                 shouldEnable = false;
@@ -450,10 +451,13 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         }
     }
 
-    public void reloadPlugin(boolean loadGrid) throws ManagerLoadException {
+    public void reloadPlugin(PluginReloadReason reloadReason) throws ManagerLoadException {
         ItemSkulls.readTextures(this);
 
-        if (!loadGrid) {
+        if (reloadReason == PluginReloadReason.COMMAND) {
+            // The reload was requested by a command. We want to reload the commands, settings and call the
+            // module lifecycles that are not called regularly. If the reload was due to a startup, then
+            // all of that is called already in the onEnable callback of the plugin.
             commandsHandler.loadData();
 
             settingsHandler.loadData();
@@ -473,7 +477,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
         Message.reload();
 
-        if (loadGrid) {
+        if (reloadReason == PluginReloadReason.STARTUP) {
             playersHandler.loadData();
             gridHandler.loadData();
         } else {
@@ -486,12 +490,12 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         menusHandler.loadData();
         missionsHandler.loadData();
 
-        if (loadGrid) {
+        if (reloadReason == PluginReloadReason.STARTUP) {
             dataHandler.loadData();
             stackedBlocksHandler.loadData();
         }
 
-        modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_MODULE_DATA_LOAD, !loadGrid);
+        modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_MODULE_DATA_LOAD, reloadReason == PluginReloadReason.COMMAND);
 
         BukkitExecutor.sync(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -504,9 +508,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
         CalcTask.startTask();
 
-        modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_HANDLERS_LOADING, !loadGrid);
+        modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_HANDLERS_LOADING, reloadReason == PluginReloadReason.COMMAND);
 
-        if (loadGrid) {
+        if (reloadReason == PluginReloadReason.STARTUP) {
             modulesHandler.loadModulesData(this);
         }
     }
