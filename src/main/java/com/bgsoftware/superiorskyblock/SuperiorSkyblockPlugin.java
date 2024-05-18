@@ -204,6 +204,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             modulesHandler.loadData();
 
+            commandsHandler.loadData();
+
             modulesHandler.runModuleLifecycle(ModuleLoadTime.PLUGIN_INITIALIZE, false);
 
             EventsBus.PluginInitializeResult eventResult = eventsBus.callPluginInitializeEvent(this);
@@ -451,9 +453,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     public void reloadPlugin(boolean loadGrid) throws ManagerLoadException {
         ItemSkulls.readTextures(this);
 
-        if (loadGrid) {
+        if (!loadGrid) {
             commandsHandler.loadData();
-        } else {
+
             settingsHandler.loadData();
 
             modulesHandler.runModuleLifecycle(ModuleLoadTime.PLUGIN_INITIALIZE, true);
