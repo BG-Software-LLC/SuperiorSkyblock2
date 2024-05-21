@@ -1,10 +1,11 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.PluginReloadReason;
+import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -52,9 +53,11 @@ public class CmdAdminReload implements ISuperiorCommand {
         Message.RELOAD_PROCCESS_REQUEST.send(sender);
 
         try {
-            plugin.reloadPlugin(false);
+            plugin.reloadPlugin(PluginReloadReason.COMMAND);
         } catch (ManagerLoadException error) {
             Log.error(error, "An unexpected error occurred while reloading the plugin:");
+            if (!ManagerLoadException.handle(error))
+                return;
         }
 
         Message.RELOAD_COMPLETED.send(sender);

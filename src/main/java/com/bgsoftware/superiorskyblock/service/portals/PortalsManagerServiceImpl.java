@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.service.portals;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeLevelBonusEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeWorthBonusEvent;
@@ -33,7 +34,6 @@ import java.math.BigDecimal;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 public class PortalsManagerServiceImpl implements PortalsManagerService, IService {
 
@@ -73,8 +73,18 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         Preconditions.checkArgument(!(superiorPlayer instanceof SuperiorNPCPlayer), "superiorPlayer cannot be an NPC.");
         Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
 
-        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, checkImmunedPortalsStatus,
-                () -> simulatePlayerPortal(superiorPlayer, portalLocation, portalType));
+        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, checkImmunedPortalsStatus, null);
+    }
+
+    @Override
+    public EntityPortalResult handleEntityPortal(Entity entity, Location portalLocation,
+                                                 PortalType portalType, Location unused) {
+        Preconditions.checkNotNull(entity, "entity cannot be null.");
+        Preconditions.checkNotNull(portalLocation, "portalLocation cannot be null.");
+        Preconditions.checkNotNull(portalType, "portalType cannot be null.");
+        Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
+
+        return handleEntityPortalInternal(entity, portalLocation, portalType, null);
     }
 
     @Override
@@ -89,31 +99,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
         Preconditions.checkArgument(island.isInside(portalLocation), "portalLocation is not inside the island.");
 
-        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, checkImmunedPortalsStatus,
-                () -> simulateEntityPortalFromIsland(superiorPlayer.asPlayer(), island, portalLocation, portalType));
-    }
-
-    private EntityPortalResult handlePlayerPortalInternal(SuperiorPlayer superiorPlayer, Location portalLocation,
-                                                          PortalType portalType, boolean checkImmunedPortalsStatus,
-                                                          Supplier<EntityPortalResult> entityPortalResultSupplier) {
-        World.Environment targetDestination = getTargetWorld(portalLocation, portalType);
-        if (targetDestination == World.Environment.NETHER && !plugin.getSettings().getWorlds().getNether().isEnabled())
-            return EntityPortalResult.DESTINATION_WORLD_DISABLED;
-        if (targetDestination == World.Environment.THE_END && !plugin.getSettings().getWorlds().getEnd().isEnabled())
-            return EntityPortalResult.DESTINATION_WORLD_DISABLED;
-
-        if (checkImmunedPortalsStatus && superiorPlayer.hasPlayerStatus(PlayerStatus.PORTALS_IMMUNED))
-            return EntityPortalResult.PLAYER_IMMUNED_TO_PORTAL;
-
-        EntityPortalResult portalResult = entityPortalResultSupplier.get();
-
-        if (portalResult == EntityPortalResult.WORLD_NOT_UNLOCKED && !Message.WORLD_NOT_UNLOCKED.isEmpty(superiorPlayer.getUserLocale())) {
-            World.Environment originalDestination = getTargetWorld(portalLocation, portalType);
-            Message.SCHEMATICS.send(superiorPlayer, Message.WORLD_NOT_UNLOCKED.getMessage(
-                    superiorPlayer.getUserLocale(), Formatters.CAPITALIZED_FORMATTER.format(originalDestination.name())));
-        }
-
-        return portalResult;
+        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, checkImmunedPortalsStatus, island);
     }
 
     @Override
@@ -126,21 +112,54 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
         Preconditions.checkArgument(island.isInside(portalLocation), "portalLocation is not inside the island.");
 
-        return simulateEntityPortalFromIsland(entity, island, portalLocation, portalType);
+        return handleEntityPortalInternal(entity, portalLocation, portalType, island);
     }
 
-    private EntityPortalResult simulatePlayerPortal(SuperiorPlayer superiorPlayer, Location portalLocation, PortalType portalType) {
-        Island island = plugin.getGrid().getIslandAt(portalLocation);
+    private EntityPortalResult handlePlayerPortalInternal(SuperiorPlayer superiorPlayer, Location portalLocation,
+                                                          PortalType portalType, boolean checkImmunedPortalsStatus,
+                                                          @Nullable Island island) {
+        if (island == null) {
+            island = plugin.getGrid().getIslandAt(portalLocation);
 
-        if (island == null)
-            return EntityPortalResult.PORTAL_NOT_IN_ISLAND;
+            if (island == null)
+                return EntityPortalResult.PORTAL_NOT_IN_ISLAND;
+        }
 
-        return simulateEntityPortalFromIsland(superiorPlayer.asPlayer(), island, portalLocation, portalType);
+        if (checkImmunedPortalsStatus && superiorPlayer.hasPlayerStatus(PlayerStatus.PORTALS_IMMUNED))
+            return EntityPortalResult.PLAYER_IMMUNED_TO_PORTAL;
+
+        EntityPortalResult portalResult = simulateEntityPortalFromIsland(superiorPlayer.asPlayer(), island,
+                portalLocation, portalType);
+
+        if (portalResult == EntityPortalResult.WORLD_NOT_UNLOCKED && !Message.WORLD_NOT_UNLOCKED.isEmpty(superiorPlayer.getUserLocale())) {
+            World.Environment originalDestination = getTargetWorld(portalLocation, portalType);
+            Message.SCHEMATICS.send(superiorPlayer, Message.WORLD_NOT_UNLOCKED.getMessage(
+                    superiorPlayer.getUserLocale(), Formatters.CAPITALIZED_FORMATTER.format(originalDestination.name())));
+        }
+
+        return portalResult;
+    }
+
+    private EntityPortalResult handleEntityPortalInternal(Entity entity, Location portalLocation,
+                                                          PortalType portalType, @Nullable Island island) {
+        if (island == null) {
+            island = plugin.getGrid().getIslandAt(portalLocation);
+
+            if (island == null)
+                return EntityPortalResult.PORTAL_NOT_IN_ISLAND;
+        }
+
+        return simulateEntityPortalFromIsland(entity, island, portalLocation, portalType);
     }
 
     private EntityPortalResult simulateEntityPortalFromIsland(Entity entity, Island island, Location portalLocation,
                                                               PortalType portalType) {
         World.Environment originalDestination = getTargetWorld(portalLocation, portalType);
+
+        if (originalDestination == World.Environment.NETHER && !plugin.getSettings().getWorlds().getNether().isEnabled())
+            return EntityPortalResult.DESTINATION_WORLD_DISABLED;
+        if (originalDestination == World.Environment.THE_END && !plugin.getSettings().getWorlds().getEnd().isEnabled())
+            return EntityPortalResult.DESTINATION_WORLD_DISABLED;
 
         if (plugin.getGrid().getIslandsWorld(island, originalDestination) == null) {
             return EntityPortalResult.DESTINATION_NOT_ISLAND_WORLD;

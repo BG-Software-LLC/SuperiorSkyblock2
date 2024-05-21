@@ -43,6 +43,10 @@ public class SQLDatabase {
         return new UpgradeResult(databaseVersion > databaseVersionMutable.getValue(), databaseVersion);
     }
 
+    public static int getCurrentDatabaseVersion() {
+        return DATABASE_UPGRADES.length;
+    }
+
     @SuppressWarnings("unchecked")
     private static void createMetadataTable() {
         Mutable<Integer> databaseVersion = new Mutable<>(0);
@@ -50,7 +54,7 @@ public class SQLDatabase {
         // We check if "islands" table exists. If not, it's a new database,
         // therefore the DB version should be latest. Otherwise, 0.
         SQLHelper.select("islands", "", new QueryResult<ResultSet>()
-                .onFail(error -> databaseVersion.setValue(DATABASE_UPGRADES.length)));
+                .onFail(error -> databaseVersion.setValue(getCurrentDatabaseVersion())));
 
         SQLHelper.createTable("ssb_metadata",
                 new Pair<>("version", "INTEGER DEFAULT " + databaseVersion.getValue())
