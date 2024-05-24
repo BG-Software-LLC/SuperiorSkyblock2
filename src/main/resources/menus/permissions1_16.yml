@@ -1528,39 +1528,6 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
-  pickup_axolotl:
-    display-menu: true
-    permission-enabled:
-      type: AXOLOTL_SPAWN_EGG
-      name: '&6Pickup Axolotls'
-      lore:
-        - '&7Access to pickup axolotls using a water bucket inside the island.'
-        - '&7Currently &aENABLED&7.'
-    permission-disabled:
-      type: AXOLOTL_SPAWN_EGG
-      name: '&6Pickup Axolotls'
-      lore:
-        - '&7Access to pickup axolotls using a water bucket inside the island.'
-        - '&7Currently &cDISABLED&7.'
-    role-permission:
-      type: AXOLOTL_SPAWN_EGG
-      name: '&6Pickup Axolotls'
-      lore:
-        - '&7Access to pickup axolotls using a water bucket inside the island.'
-        - '&7Role: &e{}&7.'
-        - ''
-        - '{0}'
-    has-access:
-      sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
-        volume: 0.2
-        pitch: 0.2
-    no-access:
-      sound:
-        type: BLOCK_ANVIL_PLACE
-        volume: 0.2
-        pitch: 0.2
-
   pickup_drops:
     display-menu: true
     permission-enabled:
