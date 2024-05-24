@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
@@ -142,6 +143,8 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
             if (!recalculatedEntityCounts.isEmpty()) {
                 this.entityCounts.putAll(recalculatedEntityCounts);
             }
+
+            IslandsDatabaseBridge.saveEntityCounts(this.island);
         } finally {
             beingRecalculated = false;
         }

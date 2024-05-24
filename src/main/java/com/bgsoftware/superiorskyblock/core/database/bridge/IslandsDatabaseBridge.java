@@ -480,6 +480,13 @@ public class IslandsDatabaseBridge {
         ));
     }
 
+    public static void saveEntityCounts(Island island) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("entity_counts", IslandsSerializer.serializeEntityCounts(island.getEntitiesTracker().getEntitiesCounts()))
+        ));
+    }
+
     public static void saveIslandChest(Island island, IslandChest islandChest) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("islands_chests",
                 new Pair<>("island", island.getUniqueId().toString()),
@@ -605,7 +612,8 @@ public class IslandsDatabaseBridge {
                     new Pair<>("unlocked_worlds", island.getUnlockedWorldsFlag()),
                     new Pair<>("last_time_updated", System.currentTimeMillis() / 1000L),
                     new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunkPositions(dirtyChunks)),
-                    new Pair<>("block_counts", IslandsSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger()))
+                    new Pair<>("block_counts", IslandsSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger())),
+                    new Pair<>("entity_counts", IslandsSerializer.serializeEntityCounts(island.getEntitiesTracker().getEntitiesCounts()))
             );
 
             databaseBridge.insertObject("islands_banks",

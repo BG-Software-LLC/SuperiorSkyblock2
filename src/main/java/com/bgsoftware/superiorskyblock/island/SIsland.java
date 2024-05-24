@@ -342,6 +342,11 @@ public class SIsland implements Island {
         updateUpgrades();
         updateIslandChests();
 
+        // We can only track entity counts after upgrades are set up
+        if (!builder.entityCounts.isEmpty()) {
+            builder.entityCounts.forEach((entity, count) -> this.entitiesTracker.trackEntity(entity, count.intValue()));
+        }
+
         this.islandBank.setBalance(builder.balance);
         builder.bankTransactions.forEach(this.islandBank::loadTransaction);
         if (builder.persistentData.length > 0)

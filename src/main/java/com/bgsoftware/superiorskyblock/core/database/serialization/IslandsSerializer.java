@@ -32,6 +32,17 @@ public class IslandsSerializer {
         return gson.toJson(blockCountsArray);
     }
 
+    public static String serializeEntityCounts(Map<Key, Integer> entityCounts) {
+        JsonArray entityCountsArray = new JsonArray();
+        entityCounts.forEach((key, amount) -> {
+            JsonObject blockCountObject = new JsonObject();
+            blockCountObject.addProperty("id", key.toString());
+            blockCountObject.addProperty("amount", amount.toString());
+            entityCountsArray.add(blockCountObject);
+        });
+        return gson.toJson(entityCountsArray);
+    }
+
     public static String serializeDirtyChunks(List<DirtyChunk> dirtyChunks) {
         JsonObject dirtyChunksObject = new JsonObject();
         dirtyChunks.forEach(dirtyChunk -> {

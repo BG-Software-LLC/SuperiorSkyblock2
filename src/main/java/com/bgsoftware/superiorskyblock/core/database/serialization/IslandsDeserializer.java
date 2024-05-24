@@ -303,6 +303,20 @@ public class IslandsDeserializer {
         });
     }
 
+    public static void deserializeEntityCounts(Island.Builder builder, String entities) {
+        if (Text.isBlank(entities))
+            return;
+
+        JsonArray entityCounts = GSON.fromJson(entities, JsonArray.class);
+
+        entityCounts.forEach(entityCountElement -> {
+            JsonObject entityCountObject = entityCountElement.getAsJsonObject();
+            Key entityKey = Keys.ofEntityType(entityCountObject.get("id").getAsString());
+            BigInteger amount = new BigInteger(entityCountObject.get("amount").getAsString());
+            builder.setEntityCount(entityKey, amount);
+        });
+    }
+
     public static void deserializeBlockLimits(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_block_limits", blockLimitRow -> {
             DatabaseResult blockLimits = new DatabaseResult(blockLimitRow);
