@@ -35,6 +35,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -46,12 +47,12 @@ import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.PalettedContainerRO;
 import net.minecraft.world.level.chunk.ProtoChunk;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.phys.AABB;
 import org.bukkit.Chunk;
@@ -60,6 +61,7 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftChunk;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBiome;
+import org.bukkit.craftbukkit.entity.CraftEntityType;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
 import org.bukkit.generator.ChunkGenerator;
@@ -376,6 +378,42 @@ public class NMSChunksImpl implements NMSChunks {
             @Override
             public void onFinish() {
                 completableFuture.complete(allCalculatedChunks);
+            }
+        });
+
+        return completableFuture;
+    }
+
+    @Override
+    public CompletableFuture<KeyMap<Counter>> calculateChunkEntities(ChunkPosition chunkPosition) {
+        CompletableFuture<KeyMap<Counter>> completableFuture = new CompletableFuture<>();
+
+        ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+        ChunkPos chunkPos = new ChunkPos(chunkPosition.getX(), chunkPosition.getZ());
+
+        KeyMap<Counter> chunkEntities = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
+
+        NMSUtils.runActionOnEntityChunks(serverLevel, Collections.singletonList(chunkPos), new NMSUtils.ChunkCallback() {
+            @Override
+            public void onLoadedChunk(LevelChunk levelChunk) {
+                for (org.bukkit.entity.Entity bukkitEntity : new CraftChunk(levelChunk).getEntities()) {
+                    chunkEntities.computeIfAbsent(Keys.of(bukkitEntity), i -> new Counter(0)).inc(1);
+                }
+            }
+
+            @Override
+            public void onUnloadedChunk(NMSUtils.UnloadedChunkCompound unloadedChunkCompound) {
+                unloadedChunkCompound.getEntities().forEach(entityTag -> {
+                    EntityType.by((CompoundTag) entityTag).ifPresent(entityType -> {
+                        Key entityKey = Keys.of(CraftEntityType.minecraftToBukkit(entityType));
+                        chunkEntities.computeIfAbsent(entityKey, k -> new Counter(0)).inc(1);
+                    });
+                });
+            }
+
+            @Override
+            public void onFinish() {
+                completableFuture.complete(chunkEntities);
             }
         });
 

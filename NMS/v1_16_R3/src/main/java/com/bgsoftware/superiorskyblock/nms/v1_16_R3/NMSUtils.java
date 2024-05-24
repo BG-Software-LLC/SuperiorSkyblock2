@@ -60,6 +60,11 @@ public class NMSUtils {
 
     public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
                                          boolean saveChunks, ChunkCallback chunkCallback) {
+        runActionOnChunksInternal(worldServer, chunksCoords, saveChunks, chunkCallback);
+    }
+
+    private static void runActionOnChunksInternal(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
+                                                  boolean saveChunks, ChunkCallback chunkCallback) {
         List<ChunkCoordIntPair> unloadedChunks = new LinkedList<>();
         List<Chunk> loadedChunks = new LinkedList<>();
 
@@ -91,12 +96,12 @@ public class NMSUtils {
         }
     }
 
-    public static void runActionOnLoadedChunks(Collection<Chunk> chunks, ChunkCallback chunkCallback) {
+    private static void runActionOnLoadedChunks(Collection<Chunk> chunks, ChunkCallback chunkCallback) {
         chunks.forEach(chunkCallback::onLoadedChunk);
     }
 
-    public static void runActionOnUnloadedChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunks,
-                                                 boolean saveChunks, ChunkCallback chunkCallback) {
+    private static void runActionOnUnloadedChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunks,
+                                                  boolean saveChunks, ChunkCallback chunkCallback) {
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
 
         if (CHUNK_PROVIDER_SERVER_GET_CHUNK_IF_CACHED.isValid()) {

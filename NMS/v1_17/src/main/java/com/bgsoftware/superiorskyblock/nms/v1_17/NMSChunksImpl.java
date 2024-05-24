@@ -30,6 +30,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
@@ -54,6 +55,7 @@ import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_17_R1.util.CraftNamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 
@@ -275,6 +277,43 @@ public class NMSChunksImpl implements NMSChunks {
             @Override
             public void onFinish() {
                 completableFuture.complete(allCalculatedChunks);
+            }
+        });
+
+        return completableFuture;
+    }
+
+    @Override
+    public CompletableFuture<KeyMap<Counter>> calculateChunkEntities(ChunkPosition chunkPosition) {
+        CompletableFuture<KeyMap<Counter>> completableFuture = new CompletableFuture<>();
+
+        ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+        ChunkPos chunkPos = new ChunkPos(chunkPosition.getX(), chunkPosition.getZ());
+
+        KeyMap<Counter> chunkEntities = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
+
+        NMSUtils.runActionOnEntityChunks(serverLevel, Collections.singletonList(chunkPos), new NMSUtils.ChunkCallback() {
+            @Override
+            public void onLoadedChunk(LevelChunk levelChunk) {
+                for (org.bukkit.entity.Entity bukkitEntity : new CraftChunk(levelChunk).getEntities()) {
+                    chunkEntities.computeIfAbsent(Keys.of(bukkitEntity), i -> new Counter(0)).inc(1);
+                }
+            }
+
+            @Override
+            public void onUnloadedChunk(ChunkPos currChunkPos, CompoundTag entityData) {
+                entityData.getList("Entities", 10).forEach(entityTag -> {
+                    EntityType.by((CompoundTag) entityTag).ifPresent(entityType -> {
+                        org.bukkit.entity.EntityType bukkitEntityType = org.bukkit.Registry.ENTITY_TYPE.get(
+                                CraftNamespacedKey.fromMinecraft(EntityType.getKey(entityType)));
+                        chunkEntities.computeIfAbsent(Keys.of(bukkitEntityType), k -> new Counter(0)).inc(1);
+                    });
+                });
+            }
+
+            @Override
+            public void onFinish() {
+                completableFuture.complete(chunkEntities);
             }
         });
 

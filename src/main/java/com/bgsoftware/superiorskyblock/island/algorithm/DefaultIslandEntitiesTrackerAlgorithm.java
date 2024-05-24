@@ -1,18 +1,21 @@
 package com.bgsoftware.superiorskyblock.island.algorithm;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.core.Counter;
+import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.world.BukkitEntities;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.google.common.base.Preconditions;
-import org.bukkit.entity.Entity;
 
 import java.util.Collections;
 import java.util.Map;
@@ -21,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrackerAlgorithm {
 
     private static final long CALCULATE_DELAY = TimeUnit.MINUTES.toMillis(5);
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final KeyMap<Integer> entityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
 
@@ -115,38 +120,42 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
             clearEntityCounts();
 
-            KeyMap<Integer> recalculatedEntityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
+            KeyMap<Counter> recalculatedEntityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
 
-            island.getLoadedChunks(IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS).forEach(chunk -> {
-                for (Entity entity : chunk.getEntities()) {
-                    if (BukkitEntities.canBypassEntityLimit(entity))
-                        continue;
+            CompletableFutureList<KeyMap<Counter>> chunkEntities = new CompletableFutureList<>(-1);
 
-                    Key key = BukkitEntities.getLimitEntityType(entity);
+            IslandUtils.getChunkCoords(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS)
+                    .forEach(((worldInfo, worldChunks) -> worldChunks.forEach(chunkPosition ->
+                            chunkEntities.add(plugin.getNMSChunks().calculateChunkEntities(chunkPosition)))));
 
-                    if (!canTrackEntity(key))
-                        continue;
+            BukkitExecutor.async(() -> {
+                try {
+                    chunkEntities.forEachCompleted(entities -> {
+                        entities.forEach((entity, count) -> {
+                            if (canTrackEntity(entity))
+                                recalculatedEntityCounts.computeIfAbsent(entity, i -> new Counter(0)).inc(count.get());
+                        });
+                    }, error -> {
+                        error.printStackTrace();
+                        beingRecalculated = false;
+                    });
 
-                    int currentEntityAmount = recalculatedEntityCounts.getOrDefault(key, 0);
-                    recalculatedEntityCounts.put(key, currentEntityAmount + 1);
+                    if (!beingRecalculated)
+                        return;
+
+                    if (!recalculatedEntityCounts.isEmpty()) {
+                        recalculatedEntityCounts.forEach((entity, count) ->
+                                this.entityCounts.put(entity, count.get()));
+                    }
+                } finally {
+                    IslandsDatabaseBridge.saveEntityCounts(this.island);
+                    beingRecalculated = false;
                 }
             });
-
-            if (!this.entityCounts.isEmpty()) {
-                for (Map.Entry<Key, Integer> entry : this.entityCounts.entrySet()) {
-                    Integer currentAmount = recalculatedEntityCounts.remove(entry.getKey());
-                    if (currentAmount != null)
-                        entry.setValue(entry.getValue() + currentAmount);
-                }
-            }
-
-            if (!recalculatedEntityCounts.isEmpty()) {
-                this.entityCounts.putAll(recalculatedEntityCounts);
-            }
-
+        } catch (Exception error) {
             IslandsDatabaseBridge.saveEntityCounts(this.island);
-        } finally {
             beingRecalculated = false;
+            throw error;
         }
     }
 
