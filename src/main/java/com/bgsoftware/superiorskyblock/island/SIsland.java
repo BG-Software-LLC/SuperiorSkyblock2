@@ -4114,7 +4114,7 @@ public class SIsland implements Island {
             plugin.getMenus().refreshValues(this);
             plugin.getMenus().refreshCounts(this);
 
-            saveBlockCounts(this.currentTotalBlockCounts.get(), oldWorth, oldLevel);
+            saveBlockCounts(this.currentTotalBlockCounts.get(), oldWorth, oldLevel, true);
             updateLastTime();
         });
     }
@@ -4225,6 +4225,11 @@ public class SIsland implements Island {
     }
 
     private void saveBlockCounts(BigInteger currentTotalBlocksCount, BigDecimal oldWorth, BigDecimal oldLevel) {
+        saveBlockCounts(currentTotalBlocksCount, oldWorth, oldLevel, false);
+    }
+
+    private void saveBlockCounts(BigInteger currentTotalBlocksCount, BigDecimal oldWorth, BigDecimal oldLevel,
+                                 boolean forceBlocksCountSave) {
         BigDecimal newWorth = getWorth();
         BigDecimal newLevel = getIslandLevel();
 
@@ -4236,7 +4241,7 @@ public class SIsland implements Island {
         if (deltaBlockCounts.compareTo(BigInteger.ZERO) < 0)
             deltaBlockCounts = deltaBlockCounts.negate();
 
-        if (deltaBlockCounts.compareTo(plugin.getSettings().getBlockCountsSaveThreshold()) >= 0) {
+        if (forceBlocksCountSave || deltaBlockCounts.compareTo(plugin.getSettings().getBlockCountsSaveThreshold()) >= 0) {
             this.lastSavedBlockCounts = currentTotalBlocksCount;
             IslandsDatabaseBridge.saveBlockCounts(this);
             plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
