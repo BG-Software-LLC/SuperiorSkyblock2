@@ -82,6 +82,7 @@ public class IslandPrivileges {
     public static final IslandPrivilege VALUABLE_BREAK = register("VALUABLE_BREAK");
     public static final IslandPrivilege VILLAGER_TRADING = register("VILLAGER_TRADING");
     public static final IslandPrivilege WITHDRAW_MONEY = register("WITHDRAW_MONEY");
+    public static final IslandPrivilege BYPASS_FLY_ALLOWED = register("BYPASS_FLY_ALLOWED");
 
     private IslandPrivileges() {
 
