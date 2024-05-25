@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 
 public class IslandFlags {
 
+    public static final IslandFlag ALLOW_FLYING = register("ALLOW_FLYING");
     public static final IslandFlag ALWAYS_DAY = register("ALWAYS_DAY");
     public static final IslandFlag ALWAYS_MIDDLE_DAY = register("ALWAYS_MIDDLE_DAY");
     public static final IslandFlag ALWAYS_NIGHT = register("ALWAYS_NIGHT");
