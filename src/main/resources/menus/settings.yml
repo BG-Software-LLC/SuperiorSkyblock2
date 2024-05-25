@@ -38,6 +38,26 @@ items:
     name: '{0}Next Page'
 
 settings:
+  allow_flying:
+    settings-enabled:
+      type: STAINED_CLAY
+      data: 4
+      name: '&6Allow Flying'
+      lore:
+        - '&7Allow players to fly inside your island.'
+        - '&7Currently &aENABLED&7.'
+    settings-disabled:
+      type: STAINED_CLAY
+      data: 4
+      name: '&6Allow Flying'
+      lore:
+        - '&7Allow players to fly inside your island.'
+        - '&7Currently &cDISABLED&7.'
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
+
   always_day:
     settings-enabled:
       type: STAINED_CLAY
