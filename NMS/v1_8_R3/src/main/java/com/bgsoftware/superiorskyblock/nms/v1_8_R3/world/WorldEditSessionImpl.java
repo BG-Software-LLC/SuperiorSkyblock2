@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_8_R3.world;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -75,7 +76,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
             blockEntities.add(new Pair<>(blockPosition, blockEntityData));
 
         if (plugin.getSettings().isLightsUpdate() && block.r() > 0)
-            lights.add(blockPosition);
+            this.lights.add(blockPosition);
 
         ChunkData chunkData = this.chunks.computeIfAbsent(ChunkCoordIntPair.a(chunkX, chunkZ), ChunkData::new);
 
@@ -123,6 +124,9 @@ public class WorldEditSessionImpl implements WorldEditSession {
         chunk.e();
     }
 
+    private static final ReflectMethod<Boolean> WORLD_SERVER_UPDATE_LIGHT_PAPER = new ReflectMethod<>(
+            net.minecraft.server.v1_8_R3.World.class, "updateLight", EnumSkyBlock.class, BlockPosition.class);
+
     @Override
     public void finish(Island island) {
         // Update blocks
@@ -146,7 +150,12 @@ public class WorldEditSessionImpl implements WorldEditSession {
             // For each light block, we calculate its light
             // We only update the lights after all the chunks were loaded.
             BukkitExecutor.sync(() -> {
-                lights.forEach(blockPosition -> worldServer.c(EnumSkyBlock.BLOCK, blockPosition));
+                if (WORLD_SERVER_UPDATE_LIGHT_PAPER.isValid()) {
+                    lights.forEach(blockPosition -> WORLD_SERVER_UPDATE_LIGHT_PAPER.invoke(worldServer, EnumSkyBlock.BLOCK, blockPosition));
+                } else {
+                    lights.forEach(blockPosition -> worldServer.c(EnumSkyBlock.BLOCK, blockPosition));
+                }
+
                 this.chunks.keySet().forEach(chunkKey -> {
                     ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair((int) (long) chunkKey, (int) (chunkKey >> 32));
                     NMSUtils.sendPacketToRelevantPlayers(worldServer, chunkCoord.x, chunkCoord.z,
