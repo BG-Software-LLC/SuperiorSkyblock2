@@ -48,6 +48,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -250,6 +251,38 @@ public class NMSChunksImpl implements NMSChunks {
             @Override
             public void onFinish() {
                 completableFuture.complete(allCalculatedChunks);
+            }
+        });
+
+        return completableFuture;
+    }
+
+    @Override
+    public CompletableFuture<KeyMap<Counter>> calculateChunkEntities(ChunkPosition chunkPosition) {
+        CompletableFuture<KeyMap<Counter>> completableFuture = new CompletableFuture<>();
+
+        WorldServer worldServer = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+        ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
+
+        KeyMap<Counter> chunkEntities = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
+
+        NMSUtils.runActionOnChunks(worldServer, Collections.singletonList(chunkCoord), false, new NMSUtils.ChunkCallback() {
+
+            @Override
+            public void onChunk(Chunk chunk, boolean isLoaded) {
+                for (org.bukkit.entity.Entity bukkitEntity : chunk.bukkitChunk.getEntities()) {
+                    chunkEntities.computeIfAbsent(Keys.of(bukkitEntity), i -> new Counter(0)).inc(1);
+                }
+            }
+
+            @Override
+            public void onUpdateChunk(Chunk chunk) {
+                // Do nothing
+            }
+
+            @Override
+            public void onFinish() {
+                completableFuture.complete(chunkEntities);
             }
         });
 

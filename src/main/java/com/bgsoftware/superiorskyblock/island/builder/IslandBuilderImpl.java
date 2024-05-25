@@ -69,6 +69,7 @@ public class IslandBuilderImpl implements Island.Builder {
     public long lastTimeUpdated = System.currentTimeMillis() / 1000;
     public final Set<DirtyChunk> dirtyChunks = new LinkedHashSet<>();
     public final KeyMap<BigInteger> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+    public final KeyMap<BigInteger> entityCounts = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
     public final EnumMap<World.Environment, Location> islandHomes = new EnumMap<>(World.Environment.class);
     public final List<SuperiorPlayer> members = new LinkedList<>();
     public final List<SuperiorPlayer> bannedPlayers = new LinkedList<>();
@@ -317,6 +318,19 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public KeyMap<BigInteger> getBlockCounts() {
         return KeyMaps.unmodifiableKeyMap(this.blockCounts);
+    }
+
+    @Override
+    public Island.Builder setEntityCount(Key entity, BigInteger count) {
+        Preconditions.checkNotNull(entity, "entity parameter cannot be null.");
+        Preconditions.checkNotNull(count, "count parameter cannot be null.");
+        this.entityCounts.put(entity, count);
+        return this;
+    }
+
+    @Override
+    public KeyMap<BigInteger> getEntityCounts() {
+        return KeyMaps.unmodifiableKeyMap(this.entityCounts);
     }
 
     @Override

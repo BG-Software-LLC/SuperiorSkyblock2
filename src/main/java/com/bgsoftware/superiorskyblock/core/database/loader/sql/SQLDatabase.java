@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.database.loader.sql;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Mutable;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.DatabaseUpgrade_V0;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v1.DatabaseUpgrade_V1;
 import com.bgsoftware.superiorskyblock.core.database.sql.SQLHelper;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 
@@ -11,7 +12,8 @@ import java.sql.ResultSet;
 public class SQLDatabase {
 
     private static final Runnable[] DATABASE_UPGRADES = new Runnable[]{
-            DatabaseUpgrade_V0.INSTANCE
+            DatabaseUpgrade_V0.INSTANCE,
+            DatabaseUpgrade_V1.INSTANCE
     };
 
     private SQLDatabase() {
@@ -81,7 +83,8 @@ public class SQLDatabase {
                 new Pair<>("unlocked_worlds", "INTEGER"),
                 new Pair<>("last_time_updated", "BIGINT"),
                 new Pair<>("dirty_chunks", "LONGTEXT"),
-                new Pair<>("block_counts", "LONGTEXT")
+                new Pair<>("block_counts", "LONGTEXT"),
+                new Pair<>("entity_counts", "LONGTEXT")
         );
 
         SQLHelper.createTable("islands_banks",

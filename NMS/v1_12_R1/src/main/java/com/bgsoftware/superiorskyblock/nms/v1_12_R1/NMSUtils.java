@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public class NMSUtils {
 
@@ -51,8 +52,20 @@ public class NMSUtils {
 
     }
 
+    public static void runActionOnEntityChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
+                                               ChunkCallback chunkCallback) {
+        runActionOnChunksInternal(worldServer, chunksCoords, chunkCallback, unloadedChunks ->
+                runActionOnUnloadedEntityChunks(worldServer, unloadedChunks, chunkCallback));
+    }
+
     public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
                                          boolean saveChunks, ChunkCallback chunkCallback) {
+        runActionOnChunksInternal(worldServer, chunksCoords, chunkCallback, unloadedChunks ->
+                runActionOnUnloadedChunks(worldServer, unloadedChunks, saveChunks, chunkCallback));
+    }
+
+    private static void runActionOnChunksInternal(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
+                                                  ChunkCallback chunkCallback, Consumer<List<ChunkCoordIntPair>> onUnloadChunkAction) {
         List<ChunkCoordIntPair> unloadedChunks = new LinkedList<>();
         List<Chunk> loadedChunks = new LinkedList<>();
 
@@ -74,7 +87,7 @@ public class NMSUtils {
         });
 
         if (hasUnloadedChunks) {
-            runActionOnUnloadedChunks(worldServer, unloadedChunks, saveChunks, chunkCallback);
+            onUnloadChunkAction.accept(unloadedChunks);
         } else {
             chunkCallback.onFinish();
         }
@@ -117,6 +130,11 @@ public class NMSUtils {
             pendingTask.complete(null);
             PENDING_CHUNK_ACTIONS.remove(pendingTask);
         });
+    }
+
+    private static void runActionOnUnloadedEntityChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunks,
+                                                        ChunkCallback chunkCallback) {
+
     }
 
     public static List<CompletableFuture<Void>> getPendingChunkActions() {

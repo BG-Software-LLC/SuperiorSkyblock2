@@ -55,7 +55,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
 
     @Override
     public CompletableFuture<IslandCalculationResult> calculateIsland(Island island) {
-        CompletableFutureList<List<CalculatedChunk>> chunksToLoad = new CompletableFutureList<>();
+        CompletableFutureList<List<CalculatedChunk>> chunksToLoad = new CompletableFutureList<>(plugin.getSettings().getRecalcTaskTimeout());
 
         long profiler = Profiler.start(ProfileType.CALCULATE_ISLAND);
         Log.debug(Debug.CHUNK_CALCULATION, island.getOwner().getName());

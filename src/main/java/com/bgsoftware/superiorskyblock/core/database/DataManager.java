@@ -234,6 +234,10 @@ public class DataManager extends Manager {
                 IslandsDeserializer.deserializeBlockCounts(builder, blockCounts);
             });
 
+            databaseResult.getString("entity_counts").ifPresent(entityCounts -> {
+                IslandsDeserializer.deserializeEntityCounts(builder, entityCounts);
+            });
+
             plugin.getGrid().getIslandsContainer().addIsland(builder.build());
 
             islandsCount.incrementAndGet();

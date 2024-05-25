@@ -29,6 +29,7 @@ import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
 import net.minecraft.server.v1_16_R3.ChunkSection;
 import net.minecraft.server.v1_16_R3.Entity;
 import net.minecraft.server.v1_16_R3.EntityHuman;
+import net.minecraft.server.v1_16_R3.EntityTypes;
 import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.LightEngineThreaded;
@@ -44,17 +45,21 @@ import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldServer;
 import org.bukkit.Location;
+import org.bukkit.Registry;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_16_R3.util.CraftNamespacedKey;
 import org.bukkit.craftbukkit.v1_16_R3.util.UnsafeList;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -263,6 +268,43 @@ public class NMSChunksImpl implements NMSChunks {
             @Override
             public void onFinish() {
                 completableFuture.complete(allCalculatedChunks);
+            }
+        });
+
+        return completableFuture;
+    }
+
+    @Override
+    public CompletableFuture<KeyMap<Counter>> calculateChunkEntities(ChunkPosition chunkPosition) {
+        CompletableFuture<KeyMap<Counter>> completableFuture = new CompletableFuture<>();
+
+        WorldServer worldServer = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+        ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
+
+        KeyMap<Counter> chunkEntities = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
+
+        NMSUtils.runActionOnChunks(worldServer, Collections.singletonList(chunkCoord), false, new NMSUtils.ChunkCallback() {
+            @Override
+            public void onLoadedChunk(Chunk chunk) {
+                for (org.bukkit.entity.Entity bukkitEntity : chunk.getBukkitChunk().getEntities()) {
+                    chunkEntities.computeIfAbsent(Keys.of(bukkitEntity), i -> new Counter(0)).inc(1);
+                }
+            }
+
+            @Override
+            public void onUnloadedChunk(ChunkCoordIntPair currChunkPos, NBTTagCompound entityData) {
+                entityData.getList("Entities", 10).forEach(entityTag -> {
+                    EntityTypes.a((NBTTagCompound) entityTag).ifPresent(entityType -> {
+                        EntityType bukkitEntityType = Registry.ENTITY_TYPE.get(
+                                CraftNamespacedKey.fromMinecraft(EntityTypes.getName(entityType)));
+                        chunkEntities.computeIfAbsent(Keys.of(bukkitEntityType), k -> new Counter(0)).inc(1);
+                    });
+                });
+            }
+
+            @Override
+            public void onFinish() {
+                completableFuture.complete(chunkEntities);
             }
         });
 
