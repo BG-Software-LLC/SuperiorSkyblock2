@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandFlags;
@@ -27,6 +28,8 @@ public class IslandFlagPagedObjectButton extends AbstractPagedMenuButton<MenuIsl
         Island island = menuView.getIsland();
 
         IslandFlag islandFlag = pagedObject.getIslandFlag();
+
+        Log.info("IslandFlagPagedObjectButton", "Clicked on " + islandFlag);
 
         if (islandFlag == null)
             return;
