@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent;
 import org.bukkit.Bukkit;
@@ -35,6 +36,7 @@ import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
@@ -233,6 +235,21 @@ public class IslandFlagsListener implements Listener {
                 }
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private void onPlayerFly(PlayerToggleFlightEvent event) {
+        Player player = event.getPlayer();
+        Island island = plugin.getGrid().getIslandAt(player.getLocation());
+
+        if (!island.hasPermission(player, IslandPrivileges.BYPASS_FLY_ALLOWED)) return;
+        if (!preventAction(player.getLocation(), IslandFlags.ALLOW_FLYING)) return;
+
+        player.setAllowFlight(false);
+        player.setFlying(false);
+
+        if (!event.isFlying()) return;
+        event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
