@@ -60,7 +60,7 @@ public class CmdAdminSchematic implements ISuperiorCommand {
 
             superiorPlayer.toggleSchematicMode();
         } else {
-            if (superiorPlayer.getSchematicPos1() == null || superiorPlayer.getSchematicPos2() == null) {
+            if (superiorPlayer.getSchematicPos1() == null || superiorPlayer.getSchematicPos2() == null || superiorPlayer.getSchematicSpawnLocation() == null) {
                 Message.SCHEMATIC_NOT_READY.send(superiorPlayer);
                 return;
             }
