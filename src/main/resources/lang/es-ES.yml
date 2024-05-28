@@ -663,6 +663,7 @@ SCHEMATIC_READY_TO_CREATE: |
   &e&lSchematics | &7Ha seleccionado dos posiciones. Ejecute /is admin schematic <nombre> para crear una nueva Schematic/Esquematica.
   &e&lSchematics | &7Asegúrese de estar parado en la ubicación de teletransportación al ejecutar el comando.
 SCHEMATIC_RIGHT_SELECT: '&e&lSchematics | &7Posición seleccionada #1 ({0})'
+SCHEMATIC_SPAWN_SELECT: '&e&lSchematics | &7Posición seleccionada #3 ({0})'
 SCHEMATIC_SAVED: '&e&lSchematics | &7Schematic/Esquematica guardada correctamente!'
 SELF_ROLE_CHANGE: '&c&lError | &7No puedes cambiar tu rol.'
 SET_UPGRADE_LEVEL: '&e&lMejoras| &7Se actualizó correctamente el nivel de {0} para la isla de {1}.'

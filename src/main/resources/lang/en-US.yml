@@ -663,6 +663,7 @@ SCHEMATIC_READY_TO_CREATE: |
   &e&lSchematics | &7You have selected two positions. Run /is admin schematic <name> to create a new schematic.
   &e&lSchematics | &7Make sure you stand at the teleportation location when executing the command.
 SCHEMATIC_RIGHT_SELECT: '&e&lSchematics | &7Selected position #1 ({0})'
+SCHEMATIC_SPAWN_SELECT: '&e&lSchematics | &7Selected the spawn location ({0})'
 SCHEMATIC_SAVED: '&e&lSchematics | &7Successfully saved schematic!'
 SELF_ROLE_CHANGE: '&c&lError | &7You cannot change the role of yourself.'
 SET_UPGRADE_LEVEL: '&e&lUpgrades | &7Successfully updated the level of {0} for {1}''s island.'
