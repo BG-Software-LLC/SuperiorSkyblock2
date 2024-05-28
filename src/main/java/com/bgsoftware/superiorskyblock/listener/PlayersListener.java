@@ -431,6 +431,12 @@ public class PlayersListener implements Listener {
 
         e.setCancelled(true);
 
+        if (e.getPlayer().isSneaking()) {
+            Message.SCHEMATIC_SPAWN_SELECT.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(e.getPlayer().getLocation()));
+            superiorPlayer.setSchematicSpawnLocation(e.getPlayer().getLocation());
+            return;
+        }
+
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
             Message.SCHEMATIC_RIGHT_SELECT.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(e.getClickedBlock().getLocation()));
             superiorPlayer.setSchematicPos1(e.getClickedBlock());
@@ -439,7 +445,7 @@ public class PlayersListener implements Listener {
             superiorPlayer.setSchematicPos2(e.getClickedBlock());
         }
 
-        if (superiorPlayer.getSchematicPos1() != null && superiorPlayer.getSchematicPos2() != null)
+        if (superiorPlayer.getSchematicPos1() != null && superiorPlayer.getSchematicPos2() != null && superiorPlayer.getSchematicSpawnLocation() != null)
             Message.SCHEMATIC_READY_TO_CREATE.send(superiorPlayer);
     }
 
