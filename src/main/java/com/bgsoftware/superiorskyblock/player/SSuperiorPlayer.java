@@ -84,6 +84,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     private SBlockPosition schematicPos1 = null;
     private SBlockPosition schematicPos2 = null;
+    private Location schematicSpawnLocation = null;
     private int disbands;
     private BorderColor borderColor;
     private long lastTimeStatus;
@@ -762,6 +763,20 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void setSchematicPos2(@Nullable Block block) {
         Log.debug(Debug.SET_SCHEMATIC_POSITION, getName(), block == null ? "null" : block.getLocation());
         this.schematicPos2 = block == null ? null : new SBlockPosition(block.getLocation());
+    }
+
+    @Override
+    public void setSchematicSpawnLocation(Location location) {
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
+
+        Log.debug(Debug.SET_SCHEMATIC_POSITION, getName(), location.toVector());
+
+        this.schematicSpawnLocation = location;
+    }
+
+    @Override
+    public Location getSchematicSpawnLocation() {
+        return schematicSpawnLocation;
     }
 
     /*

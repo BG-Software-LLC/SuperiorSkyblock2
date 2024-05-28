@@ -525,6 +525,21 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      */
     void setSchematicPos2(@Nullable Block block);
 
+
+    /**
+     * Get the schematic spawn location of the player.
+     *
+     * @param location The location to set.
+     */
+    void setSchematicSpawnLocation(Location location);
+
+    /**
+     * Get the schematic spawn location of the player.
+     *
+     * @return The location that was set.
+     */
+    Location getSchematicSpawnLocation();
+
     /*
      *   Data Methods
      */
