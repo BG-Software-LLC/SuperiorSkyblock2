@@ -103,6 +103,11 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
     }
 
     @Override
+    public Location adjustSpawn(Location location) {
+        return null;
+    }
+
+    @Override
     public List<ChunkPosition> getAffectedChunks() {
         return Collections.emptyList();
     }
