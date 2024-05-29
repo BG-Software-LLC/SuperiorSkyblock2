@@ -239,6 +239,7 @@ public class GridManagerImpl extends Manager implements GridManager {
                 try {
                     Island island = islandCreationResult.getIsland();
                     Location islandLocation = islandCreationResult.getIslandLocation();
+                    Location spawnLocation = islandCreationResult.getSpawnLocation();
                     boolean teleportPlayer = islandCreationResult.shouldTeleportPlayer();
 
                     List<ChunkPosition> affectedChunks = schematic instanceof BaseSchematic ?
@@ -264,7 +265,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
                     IslandsDatabaseBridge.insertIsland(island, affectedChunks);
 
-                    island.setIslandHome(schematic.adjustRotation(islandLocation));
+                    island.setIslandHome(schematic.adjustRotation(spawnLocation));
 
                     BukkitExecutor.sync(() -> builder.owner.runIfOnline(player -> {
                         if (updateGamemode)
@@ -272,11 +273,11 @@ public class GridManagerImpl extends Manager implements GridManager {
 
                         if (!teleportPlayer) {
                             Message.CREATE_ISLAND.send(builder.owner, Formatters.LOCATION_FORMATTER.format(
-                                    islandLocation), System.currentTimeMillis() - startTime);
+                                    spawnLocation), System.currentTimeMillis() - startTime);
                         } else {
                             builder.owner.teleport(island, result -> {
                                 Message.CREATE_ISLAND.send(builder.owner, Formatters.LOCATION_FORMATTER.format(
-                                        islandLocation), System.currentTimeMillis() - startTime);
+                                        spawnLocation), System.currentTimeMillis() - startTime);
 
                                 if (result) {
                                     if (affectedChunks != null)
