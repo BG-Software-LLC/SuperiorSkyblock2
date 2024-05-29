@@ -29,6 +29,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +42,8 @@ import java.util.function.Consumer;
 public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
     private final BlockOffset offset;
+    private final Vector spawn;
+    private final Vector size;
     private final float yaw;
     private final float pitch;
     private final List<SchematicBlockData> blocks;
@@ -59,9 +62,15 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         int offsetY = compoundTag.getInt("offsetY", ySize / 2);
         int offsetZ = compoundTag.getInt("offsetZ", zSize / 2);
 
+        int spawnX = compoundTag.getInt("spawnX", offsetX);
+        int spawnY = compoundTag.getInt("spawnY", offsetY);
+        int spawnZ = compoundTag.getInt("spawnZ", offsetZ);
+
         this.offset = SBlockOffset.fromOffsets(offsetX, offsetY, offsetZ).negate();
         this.yaw = compoundTag.getFloat("yaw");
         this.pitch = compoundTag.getFloat("pitch");
+        this.spawn = new Vector(spawnX, spawnY, spawnZ);
+        this.size = new Vector(xSize, ySize, zSize);
 
         ListTag blocksList = compoundTag.getList("blocks");
         if (blocksList == null) {
@@ -215,6 +224,14 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         location.setYaw(yaw);
         location.setPitch(pitch);
         return location;
+    }
+
+    @Override
+    public Location adjustSpawn(Location center) {
+        Location spawnLocation = center.clone().add(this.spawn.clone());
+        spawnLocation.setPitch(this.pitch);
+        spawnLocation.setYaw(this.yaw);
+        return spawnLocation;
     }
 
     @Override
