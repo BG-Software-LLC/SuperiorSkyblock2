@@ -767,10 +767,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setSchematicSpawnLocation(Location location) {
-        Preconditions.checkNotNull(location, "location parameter cannot be null.");
-
-        Log.debug(Debug.SET_SCHEMATIC_POSITION, getName(), location.toVector());
-
+        Log.debug(Debug.SET_SCHEMATIC_POSITION, getName(), location == null ? "null" : location.toVector());
         this.schematicSpawnLocation = location;
     }
 
