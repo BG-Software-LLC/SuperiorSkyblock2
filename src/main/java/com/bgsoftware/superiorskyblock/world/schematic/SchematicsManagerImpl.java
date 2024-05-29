@@ -29,6 +29,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.util.Vector;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -128,15 +129,19 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
         Location pos1 = superiorPlayer.getSchematicPos1().parse();
         Location pos2 = superiorPlayer.getSchematicPos2().parse();
+        Location spawn = superiorPlayer.getSchematicSpawnLocation().clone();
+
         Location min = new Location(pos1.getWorld(),
                 Math.min(pos1.getX(), pos2.getX()),
                 Math.min(pos1.getY(), pos2.getY()),
                 Math.min(pos1.getZ(), pos2.getZ())
         );
         Location offset = superiorPlayer.getLocation().clone().subtract(min.clone().add(0, 1, 0));
-        Location spawn = superiorPlayer.getSchematicSpawnLocation().clone().subtract(min.clone());
+        Location spawnSubtract = spawn.clone().subtract(min.clone()).subtract(offset);
 
-        saveSchematic(superiorPlayer.getSchematicPos1().parse(), superiorPlayer.getSchematicPos2().parse(), offset, spawn, schematicName, () ->
+        Log.debug(Debug.SAVE_SCHEMATIC, superiorPlayer.getSchematicSpawnLocation(), spawnSubtract, offset);
+
+        saveSchematic(superiorPlayer.getSchematicPos1().parse(), superiorPlayer.getSchematicPos2().parse(), offset, spawnSubtract, schematicName, () ->
                 Message.SCHEMATIC_SAVED.send(superiorPlayer));
 
         superiorPlayer.setSchematicPos1(null);
