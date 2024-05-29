@@ -421,6 +421,16 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void setSchematicSpawnLocation(Location location) {
+        this.handle.setSchematicSpawnLocation(location);
+    }
+
+    @Override
+    public Location getSchematicSpawnLocation() {
+        return this.handle.getSchematicSpawnLocation();
+    }
+
+    @Override
     @Deprecated
     public boolean isImmunedToPvP() {
         return this.handle.isImmunedToPvP();
