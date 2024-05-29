@@ -423,6 +423,16 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
         // Do nothing.
     }
 
+    @Override
+    public void setSchematicSpawnLocation(Location location) {
+        // Do nothing.
+    }
+
+    @Override
+    public Location getSchematicSpawnLocation() {
+        return null;
+    }
+
     @Nullable
     @Override
     public BukkitTask getTeleportTask() {
