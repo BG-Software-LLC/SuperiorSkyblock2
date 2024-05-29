@@ -44,6 +44,7 @@ public interface IslandCreationAlgorithm {
         private final Status status;
         private final Island island;
         private final Location islandLocation;
+        private final Location spawnLocation;
         private final boolean shouldTeleportPlayer;
 
         /**
@@ -52,11 +53,11 @@ public interface IslandCreationAlgorithm {
          * @param island               The created island.
          * @param islandLocation       The location of the island.
          * @param shouldTeleportPlayer Whether to teleport the player to his island or not.
-         * @deprecated See {@link #IslandCreationResult(Status, Island, Location, boolean)}
+         * @deprecated See {@link #IslandCreationResult(Status, Island, Location, Location, boolean)}
          */
         @Deprecated
         public IslandCreationResult(Island island, Location islandLocation, boolean shouldTeleportPlayer) {
-            this(Status.SUCCESS, island, islandLocation, shouldTeleportPlayer);
+            this(Status.SUCCESS, island, islandLocation, null, shouldTeleportPlayer);
         }
 
         /**
@@ -68,10 +69,11 @@ public interface IslandCreationAlgorithm {
          * @param islandLocation       The location of the island.
          * @param shouldTeleportPlayer Whether to teleport the player to his island or not.
          */
-        public IslandCreationResult(Status status, Island island, Location islandLocation, boolean shouldTeleportPlayer) {
+        public IslandCreationResult(Status status, Island island, Location islandLocation, Location spawnLocation, boolean shouldTeleportPlayer) {
             this.status = status;
             this.island = island;
             this.islandLocation = islandLocation;
+            this.spawnLocation = spawnLocation;
             this.shouldTeleportPlayer = shouldTeleportPlayer;
         }
 
@@ -96,6 +98,14 @@ public interface IslandCreationAlgorithm {
         public Location getIslandLocation() {
             Preconditions.checkState(this.getStatus() == Status.SUCCESS, "Result is not successful.");
             return islandLocation;
+        }
+
+        /**
+         * Get the location of the spawn point of the island.
+         */
+        public Location getSpawnLocation() {
+            Preconditions.checkState(this.getStatus() == Status.SUCCESS, "Result is not successful.");
+            return spawnLocation;
         }
 
         /**
