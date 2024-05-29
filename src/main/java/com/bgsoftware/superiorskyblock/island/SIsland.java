@@ -834,6 +834,7 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
 
         Location teleportLocation = islandHomes.readAndGet(teleportLocations -> teleportLocations.get(environment));
+        Log.debug(Debug.TELEPORT_PLAYER, owner.getName(), environment, teleportLocation);
 
         if (teleportLocation == null)
             teleportLocation = getCenter(environment);
