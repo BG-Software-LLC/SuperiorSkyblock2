@@ -70,7 +70,7 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
         // Making sure an island with the same name does not exist.
         if (!Text.isBlank(builder.islandName) && plugin.getGrid().getIsland(builder.islandName) != null) {
             Log.debugResult(Debug.CREATE_ISLAND, "Creation Failed", "Island with the name " + builder.islandName + " already exists.");
-            return CompletableFuture.completedFuture(new IslandCreationResult(IslandCreationResult.Status.NAME_OCCUPIED, null, null, false));
+            return CompletableFuture.completedFuture(new IslandCreationResult(IslandCreationResult.Status.NAME_OCCUPIED, null, null, null, false));
         }
 
         long profiler = Profiler.start(ProfileType.CREATE_ISLAND);
@@ -84,10 +84,12 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
                 builder.owner.getUniqueId(),
                 builder.uuid
         );
+        Location spawnLocation = schematic.adjustSpawn(islandLocation.clone());
 
         Log.debugResult(Debug.CREATE_ISLAND, "Next Island Position", islandLocation);
 
         Island island = builder.setCenter(islandLocation.add(0.5, 0, 0.5)).build();
+        island.setIslandHome(spawnLocation);
 
         island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
 
@@ -97,7 +99,7 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
             schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
                 plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
                         builder.owner.getUniqueId(), builder.uuid);
-                completableFuture.complete(new IslandCreationResult(IslandCreationResult.Status.SUCCESS, island, islandLocation, event.getResult()));
+                completableFuture.complete(new IslandCreationResult(IslandCreationResult.Status.SUCCESS, island, islandLocation, spawnLocation, event.getResult()));
                 island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
                 Profiler.end(profiler);
             }, error -> {
