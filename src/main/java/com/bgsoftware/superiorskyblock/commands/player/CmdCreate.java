@@ -5,6 +5,8 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
@@ -102,6 +104,8 @@ public class CmdCreate implements ISuperiorCommand {
                 return;
             }
         }
+
+        Log.debug(Debug.CREATE_ISLAND, superiorPlayer.getName(), islandName, schematicName);
 
         if (schematicName == null) {
             Menus.MENU_ISLAND_CREATION.openMenu(superiorPlayer, superiorPlayer.getOpenedView(), islandName);
