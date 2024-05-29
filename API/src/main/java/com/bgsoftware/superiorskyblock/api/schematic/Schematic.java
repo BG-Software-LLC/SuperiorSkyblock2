@@ -43,6 +43,14 @@ public interface Schematic {
     Location adjustRotation(Location location);
 
     /**
+     * Adjust schematic's spawn to the given location.
+     *
+     * @param location The location to adjust.
+     * @return The exact same object given as a parameter.
+     */
+    Location adjustSpawn(Location location);
+
+    /**
      * Get the block counts of the schematic.
      */
     Map<Key, Integer> getBlockCounts();
