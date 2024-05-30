@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
 import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
+import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -478,23 +479,26 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
     }
 
     @SuppressWarnings("deprecation")
-    public Mission<?> loadMission(String missionName, File missionsFolder, ConfigurationSection missionSection) {
+    public Mission<?> loadMission(String missionName, FilesLookup filesLookup, ConfigurationSection missionSection) {
         Mission<?> newMission = null;
 
         try {
             Mission<?> mission = plugin.getMissions().getMission(missionName);
 
             if (mission == null) {
-                File missionJar = new File(missionsFolder, missionSection.getString("mission-file") + ".jar");
+                File missionJar = filesLookup.getFile(missionSection.getString("mission-file") + ".jar");
+
+                if (!missionJar.exists())
+                    throw new RuntimeException("The mission file " + missionJar.getName() + " is not valid.");
 
                 FileClassLoader missionClassLoader = new FileClassLoader(missionJar, plugin.getPluginClassLoader());
 
                 Either<Class<?>, Throwable> missionClassLookup = JarFiles.getClass(missionJar.toURL(), Mission.class, missionClassLoader);
 
-                if (missionClassLookup.getLeft() != null)
-                    throw new RuntimeException("An unexpected error occurred while reading " + missionJar.getName() + ".", missionClassLookup.getLeft());
+                if (missionClassLookup.getRight() != null)
+                    throw new RuntimeException("An unexpected error occurred while reading " + missionJar.getName() + ".", missionClassLookup.getRight());
 
-                Class<?> missionClass = missionClassLookup.getRight();
+                Class<?> missionClass = missionClassLookup.getLeft();
 
                 if (missionClass == null)
                     throw new RuntimeException("The mission file " + missionJar.getName() + " is not valid.");

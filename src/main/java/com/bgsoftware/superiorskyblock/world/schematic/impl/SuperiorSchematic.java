@@ -6,9 +6,9 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
-import com.bgsoftware.superiorskyblock.core.SchematicBlock;
-import com.bgsoftware.superiorskyblock.core.SchematicBlockData;
-import com.bgsoftware.superiorskyblock.core.SchematicEntity;
+import com.bgsoftware.superiorskyblock.core.schematic.SchematicBlock;
+import com.bgsoftware.superiorskyblock.core.schematic.SchematicBlockData;
+import com.bgsoftware.superiorskyblock.core.schematic.SchematicEntity;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -178,14 +178,19 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
             BukkitExecutor.ensureMain(() -> {
                 try {
+                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Placing Schematic", "");
                     worldEditSession.finish(island);
 
                     if (island.getOwner().isOnline())
                         finishTasks.forEach(Runnable::run);
 
+                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Spawning Entities", "");
+
                     for (SchematicEntity entity : this.entities) {
                         entity.spawnEntity(min);
                     }
+
+                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Schematic Placement", "");
 
                     island.handleBlocksPlace(cachedCounts);
 

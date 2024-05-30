@@ -7,9 +7,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -22,6 +21,7 @@ import com.bgsoftware.wildstacker.api.events.BarrelPlaceInventoryEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelStackEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelUnstackEvent;
 import com.bgsoftware.wildstacker.api.handlers.SystemManager;
+import com.bgsoftware.wildstacker.api.objects.StackedBarrel;
 import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -32,6 +32,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -41,12 +42,6 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
     private static boolean registered = false;
 
     private final SuperiorSkyblockPlugin plugin;
-    private final LazyReference<RegionManagerService> regionManagerService = new LazyReference<RegionManagerService>() {
-        @Override
-        protected RegionManagerService create() {
-            return plugin.getServices().getService(RegionManagerService.class);
-        }
-    };
 
     public StackedBlocksProvider_WildStacker(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
@@ -61,8 +56,8 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
                 @Override
                 public Key getCustomKey(Location location) {
                     return systemManager.isStackedBarrel(location) ?
-                            Key.of(systemManager.getStackedBarrel(location).getBarrelItem(1)) :
-                            Key.ofMaterialAndData("CAULDRON");
+                            getBarrelKey(systemManager.getStackedBarrel(location)) :
+                            ConstantKeys.CAULDRON;
                 }
 
                 @Override
@@ -112,7 +107,7 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
             if (island == null)
                 return;
 
-            Key blockKey = Key.of(e.getBarrel().getBarrelItem(1));
+            Key blockKey = getBarrelKey(e.getBarrel());
             int increaseAmount = e.getBarrel().getStackAmount();
 
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
@@ -130,7 +125,7 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
             if (island == null)
                 return;
 
-            Key blockKey = Key.of(e.getTarget().getBarrelItem(1));
+            Key blockKey = getBarrelKey(e.getTarget());
             int increaseAmount = e.getTarget().getStackAmount();
 
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
@@ -163,7 +158,7 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
         public void onBarrelUnstack(BarrelUnstackEvent e) {
             Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
             if (island != null)
-                island.handleBlockBreak(Key.of(e.getBarrel().getBarrelItem(1)), e.getAmount());
+                island.handleBlockBreak(getBarrelKey(e.getBarrel()), e.getAmount());
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -173,7 +168,7 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
             if (island == null)
                 return;
 
-            Key blockKey = Key.of(e.getBarrel().getBarrelItem(1));
+            Key blockKey = getBarrelKey(e.getBarrel());
             int increaseAmount = e.getIncreaseAmount();
 
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
@@ -184,6 +179,11 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
             }
         }
 
+    }
+
+    private static Key getBarrelKey(StackedBarrel barrel) {
+        ItemStack barrelItem = barrel.getBarrelItem(1);
+        return ServerVersion.isLegacy() ? Key.of(barrelItem) : Key.of(barrelItem.getType());
     }
 
 }

@@ -65,6 +65,11 @@ public class SQLHelper {
             globalSession.modifyColumnType(tableName, columnName, newType, QueryResult.EMPTY_VOID_QUERY_RESULT);
     }
 
+    public static void addColumn(String tableName, String columnName, String type) {
+        if (isReady())
+            globalSession.addColumn(tableName, columnName, type, QueryResult.EMPTY_VOID_QUERY_RESULT);
+    }
+
     public static void removePrimaryKey(String tableName, String columnName) {
         if (isReady())
             globalSession.removePrimaryKey(tableName, columnName, QueryResult.EMPTY_VOID_QUERY_RESULT);

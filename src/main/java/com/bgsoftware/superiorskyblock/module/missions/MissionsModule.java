@@ -7,6 +7,8 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
+import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookupFactory;
+import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
@@ -211,31 +213,33 @@ public class MissionsModule extends BuiltinModule {
 
         Map<Mission<?>, Integer> missionWeights = new HashMap<>();
 
-        for (File missionFile : missionFiles) {
-            String missionName = missionFile.getName().replace(".yml", "");
+        try (FilesLookup filesLookup = FilesLookupFactory.getInstance().lookupFolder(getModuleFolder())) {
+            for (File missionFile : missionFiles) {
+                String missionName = missionFile.getName().replace(".yml", "");
 
-            if (missionName.length() > MAX_MISSIONS_NAME_LENGTH)
-                missionName = missionName.substring(0, MAX_MISSIONS_NAME_LENGTH);
+                if (missionName.length() > MAX_MISSIONS_NAME_LENGTH)
+                    missionName = missionName.substring(0, MAX_MISSIONS_NAME_LENGTH);
 
-            YamlConfiguration missionConfigFile = new YamlConfiguration();
+                YamlConfiguration missionConfigFile = new YamlConfiguration();
 
-            try {
-                missionConfigFile.load(missionFile);
-            } catch (InvalidConfigurationException error) {
-                Log.error(error, "A format-error occurred while parsing the mission file ", missionFile.getName() + ":");
-                continue;
-            } catch (IOException error) {
-                Log.error(error, "An unexpected error occurred while parsing the mission file ", missionFile.getName() + ":");
-                continue;
-            }
+                try {
+                    missionConfigFile.load(missionFile);
+                } catch (InvalidConfigurationException error) {
+                    Log.error(error, "A format-error occurred while parsing the mission file ", missionFile.getName() + ":");
+                    continue;
+                } catch (IOException error) {
+                    Log.error(error, "An unexpected error occurred while parsing the mission file ", missionFile.getName() + ":");
+                    continue;
+                }
 
-            ConfigurationSection missionSection = missionConfigFile.getConfigurationSection("");
+                ConfigurationSection missionSection = missionConfigFile.getConfigurationSection("");
 
-            Mission<?> mission = plugin.getMissions().loadMission(missionName, getModuleFolder(), missionSection);
+                Mission<?> mission = plugin.getMissions().loadMission(missionName, filesLookup, missionSection);
 
-            if (mission != null) {
-                categoryMissions.add(mission);
-                missionWeights.put(mission, missionSection.getInt("weight", 0));
+                if (mission != null) {
+                    categoryMissions.add(mission);
+                    missionWeights.put(mission, missionSection.getInt("weight", 0));
+                }
             }
         }
 

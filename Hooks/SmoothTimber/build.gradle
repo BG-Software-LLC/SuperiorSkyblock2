@@ -1,0 +1,19 @@
+group 'Hooks:SmoothTimber'
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
+
+dependencies {
+    compileOnly 'com.syntaxphoenix:SmoothTimber:1.27.0'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_smoothtimber') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_smoothtimber").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

@@ -463,6 +463,11 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         Log.debug(Debug.SET_PLAYER_ISLAND, getName(), island == null ? "null" : island.getOwner().getName());
 
         this.playerIsland = island;
+
+        if (this.playerIsland == null) {
+            this.playerRole = SPlayerRole.guestRole();
+        }
+
     }
 
     @Override
@@ -488,7 +493,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public PlayerRole getPlayerRole() {
-        if (playerRole == null)
+        if (playerRole == null || (this.playerIsland == null && this.playerRole != SPlayerRole.guestRole()))
             setPlayerRole(SPlayerRole.guestRole());
 
         return playerRole;

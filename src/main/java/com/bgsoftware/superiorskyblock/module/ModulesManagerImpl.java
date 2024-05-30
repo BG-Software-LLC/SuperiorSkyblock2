@@ -10,6 +10,8 @@ import com.bgsoftware.superiorskyblock.core.Either;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
+import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
+import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookupFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.module.container.ModulesContainer;
 import com.google.common.base.Preconditions;
@@ -65,10 +67,10 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
 
         Either<Class<?>, Throwable> moduleClassLookup = JarFiles.getClass(moduleFile.toURL(), PluginModule.class, moduleClassLoader);
 
-        if (moduleClassLookup.getLeft() != null)
-            throw new RuntimeException("An error occurred while reading " + moduleFile.getName(), moduleClassLookup.getLeft());
+        if (moduleClassLookup.getRight() != null)
+            throw new RuntimeException("An error occurred while reading " + moduleFile.getName(), moduleClassLookup.getRight());
 
-        Class<?> moduleClass = moduleClassLookup.getRight();
+        Class<?> moduleClass = moduleClassLookup.getLeft();
 
         if (moduleClass == null)
             throw new RuntimeException("The module file " + moduleFile.getName() + " is not valid.");
@@ -132,8 +134,8 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
 
         try {
             pluginModule.onEnable(plugin);
-        } catch (Exception error) {
-            Log.error("An unexpected error occurred while disabling the module ", pluginModule.getName(), ".");
+        } catch (Throwable error) {
+            Log.error("An unexpected error occurred while enabling the module ", pluginModule.getName(), ".");
             Log.error(error, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");
 
             try {
@@ -211,13 +213,16 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
     private void registerExternalModules() {
         File[] folderFiles = modulesFolder.listFiles();
 
-        if (folderFiles != null) {
-            for (File file : folderFiles) {
-                if (!file.isDirectory() && file.getName().endsWith(".jar")) {
-                    try {
-                        registerModule(file);
-                    } catch (Exception error) {
-                        Log.error(error, "An unexpected error occurred while registering module ", file.getName(), ":");
+        if (folderFiles != null && folderFiles.length > 0) {
+            try (FilesLookup filesLookup = FilesLookupFactory.getInstance().lookupFolder(this.modulesFolder)) {
+                for (File file : folderFiles) {
+                    String fileName = file.getName();
+                    if (!file.isDirectory() && fileName.endsWith(".jar")) {
+                        try {
+                            registerModule(filesLookup.getFile(fileName));
+                        } catch (Exception error) {
+                            Log.error(error, "An unexpected error occurred while registering module ", fileName, ":");
+                        }
                     }
                 }
             }

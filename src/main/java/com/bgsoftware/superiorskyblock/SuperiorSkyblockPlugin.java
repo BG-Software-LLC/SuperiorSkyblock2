@@ -11,19 +11,22 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
-import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.config.SettingsManagerImpl;
+import com.bgsoftware.superiorskyblock.core.PluginReloadReason;
 import com.bgsoftware.superiorskyblock.core.database.DataManager;
 import com.bgsoftware.superiorskyblock.core.engine.EnginesFactory;
 import com.bgsoftware.superiorskyblock.core.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.factory.FactoriesManagerImpl;
+import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
+import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
+import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookupFactory;
 import com.bgsoftware.superiorskyblock.core.itemstack.GlowEnchantment;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
 import com.bgsoftware.superiorskyblock.core.key.KeysManagerImpl;
@@ -73,7 +76,6 @@ import com.bgsoftware.superiorskyblock.player.container.DefaultPlayersContainer;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
 import com.bgsoftware.superiorskyblock.service.ServicesHandler;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
-import com.bgsoftware.superiorskyblock.world.event.WorldEventsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
 import org.bstats.bukkit.Metrics;
@@ -117,11 +119,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     @Nullable
     private ChunkGenerator worldGenerator = null;
     @Nullable
-    @Deprecated
-    private WorldEventsManager worldEventsManager = null;
 
     /* NMS */
-    private String nmsPackageVersion;
     private NMSAlgorithms nmsAlgorithms;
     private NMSChunks nmsChunks;
     private NMSDragonFight nmsDragonFight;
@@ -206,6 +205,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             modulesHandler.loadData();
 
+            commandsHandler.loadData();
+
             modulesHandler.runModuleLifecycle(ModuleLoadTime.PLUGIN_INITIALIZE, false);
 
             EventsBus.PluginInitializeResult eventResult = eventsBus.callPluginInitializeEvent(this);
@@ -227,7 +228,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             modulesHandler.runModuleLifecycle(ModuleLoadTime.NORMAL, false);
 
             try {
-                reloadPlugin(true);
+                reloadPlugin(PluginReloadReason.STARTUP);
             } catch (ManagerLoadException error) {
                 ManagerLoadException.handle(error);
                 shouldEnable = false;
@@ -398,30 +399,43 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
         if (!generatorFolder.exists()) {
             generatorFolder.mkdirs();
-        } else {
-            try {
-                File[] generatorsFilesList = generatorFolder.listFiles();
-                if (generatorsFilesList != null) {
-                    for (File file : generatorsFilesList) {
-                        //noinspection deprecation
-                        Class<?> generatorClass = JarFiles.getClass(file.toURL(), ChunkGenerator.class, getClassLoader()).getRight();
-                        if (generatorClass != null) {
-                            for (Constructor<?> constructor : generatorClass.getConstructors()) {
-                                if (constructor.getParameterCount() == 0) {
-                                    worldGenerator = (ChunkGenerator) generatorClass.newInstance();
-                                    return;
-                                } else if (constructor.getParameterTypes()[0].equals(JavaPlugin.class) || constructor.getParameterTypes()[0].equals(SuperiorSkyblock.class)) {
-                                    worldGenerator = (ChunkGenerator) constructor.newInstance(this);
-                                    return;
-                                }
-                            }
+            return;
+        }
+
+        File[] generatorsFilesList = generatorFolder.listFiles();
+        if (generatorsFilesList == null || generatorsFilesList.length == 0) {
+            return;
+        }
+
+        try (FilesLookup filesLookup = FilesLookupFactory.getInstance().lookupFolder(generatorFolder)) {
+            for (File file : generatorsFilesList) {
+                String fileName = file.getName();
+                if (!fileName.endsWith(".jar"))
+                    continue;
+
+                file = filesLookup.getFile(fileName);
+
+                FileClassLoader classLoader = new FileClassLoader(file, plugin.getPluginClassLoader());
+
+                //noinspection deprecation
+                Class<?> generatorClass = JarFiles.getClass(file.toURL(), ChunkGenerator.class, classLoader).getLeft();
+
+                if (generatorClass != null) {
+                    for (Constructor<?> constructor : generatorClass.getConstructors()) {
+                        if (constructor.getParameterCount() == 0) {
+                            worldGenerator = (ChunkGenerator) generatorClass.newInstance();
+                            return;
+                        } else if (constructor.getParameterTypes()[0].equals(JavaPlugin.class) || constructor.getParameterTypes()[0].equals(SuperiorSkyblock.class)) {
+                            worldGenerator = (ChunkGenerator) constructor.newInstance(this);
+                            return;
                         }
                     }
                 }
-            } catch (Exception error) {
-                Log.error(error, "An unexpected error occurred while loading the generator:");
             }
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while loading the generator:");
         }
+
     }
 
     private boolean checkScriptEngine() {
@@ -437,12 +451,15 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         }
     }
 
-    public void reloadPlugin(boolean loadGrid) throws ManagerLoadException {
+    public void reloadPlugin(PluginReloadReason reloadReason) throws ManagerLoadException {
         ItemSkulls.readTextures(this);
 
-        if (loadGrid) {
+        if (reloadReason == PluginReloadReason.COMMAND) {
+            // The reload was requested by a command. We want to reload the commands, settings and call the
+            // module lifecycles that are not called regularly. If the reload was due to a startup, then
+            // all of that is called already in the onEnable callback of the plugin.
             commandsHandler.loadData();
-        } else {
+
             settingsHandler.loadData();
 
             modulesHandler.runModuleLifecycle(ModuleLoadTime.PLUGIN_INITIALIZE, true);
@@ -460,7 +477,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
         Message.reload();
 
-        if (loadGrid) {
+        if (reloadReason == PluginReloadReason.STARTUP) {
             playersHandler.loadData();
             gridHandler.loadData();
         } else {
@@ -473,13 +490,12 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         menusHandler.loadData();
         missionsHandler.loadData();
 
-        if (loadGrid) {
+        if (reloadReason == PluginReloadReason.STARTUP) {
             dataHandler.loadData();
             stackedBlocksHandler.loadData();
-            modulesHandler.loadModulesData(this);
         }
 
-        modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_MODULE_DATA_LOAD, !loadGrid);
+        modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_MODULE_DATA_LOAD, reloadReason == PluginReloadReason.COMMAND);
 
         BukkitExecutor.sync(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -492,7 +508,11 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
         CalcTask.startTask();
 
-        modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_HANDLERS_LOADING, !loadGrid);
+        modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_HANDLERS_LOADING, reloadReason == PluginReloadReason.COMMAND);
+
+        if (reloadReason == PluginReloadReason.STARTUP) {
+            modulesHandler.loadModulesData(this);
+        }
     }
 
     @Override
@@ -578,20 +598,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     @Override
     public void setScriptEngine(@Nullable IScriptEngine scriptEngine) {
         this.scriptEngine = scriptEngine == null ? EnginesFactory.createDefaultEngine() : scriptEngine;
-    }
-
-    @Override
-    @Deprecated
-    public WorldEventsManager getWorldEventsManager() {
-        if (this.worldEventsManager == null) this.worldEventsManager = new WorldEventsManagerImpl(this);
-
-        return this.worldEventsManager;
-    }
-
-    @Override
-    @Deprecated
-    public void setWorldEventsManager(@Nullable WorldEventsManager worldEventsManager) {
-        this.worldEventsManager = worldEventsManager;
     }
 
     public EventsBus getEventsBus() {

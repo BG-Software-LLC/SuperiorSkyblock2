@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_20_3;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -34,6 +35,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -51,6 +53,9 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.PalettedContainerRO;
 import net.minecraft.world.level.chunk.ProtoChunk;
+import net.minecraft.world.level.chunk.storage.EntityStorage;
+import net.minecraft.world.level.chunk.storage.IOWorker;
+import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.phys.AABB;
 import org.bukkit.Chunk;
@@ -59,10 +64,12 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_20_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R3.block.CraftBiome;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntityType;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R3.generator.CustomChunkGenerator;
 import org.bukkit.generator.ChunkGenerator;
 
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -76,6 +83,10 @@ public class NMSChunksImpl implements NMSChunks {
 
     private static final boolean hasStatesIterator = new ReflectMethod<>(PalettedContainer.class,
             "forEachLocation", PalettedContainer.CountConsumer.class).isValid();
+    private static final ReflectField<PersistentEntitySectionManager<Entity>> SERVER_LEVEL_ENTITY_MANAGER = new ReflectField<>(
+            ServerLevel.class, PersistentEntitySectionManager.class, Modifier.PUBLIC | Modifier.FINAL, 1);
+    private static final ReflectField<IOWorker> ENTITY_STORAGE_WORKER = new ReflectField<>(
+            EntityStorage.class, IOWorker.class, Modifier.PRIVATE | Modifier.FINAL, 1);
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -380,6 +391,42 @@ public class NMSChunksImpl implements NMSChunks {
             @Override
             public void onFinish() {
                 completableFuture.complete(allCalculatedChunks);
+            }
+        });
+
+        return completableFuture;
+    }
+
+    @Override
+    public CompletableFuture<KeyMap<Counter>> calculateChunkEntities(ChunkPosition chunkPosition) {
+        CompletableFuture<KeyMap<Counter>> completableFuture = new CompletableFuture<>();
+
+        ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+        ChunkPos chunkPos = new ChunkPos(chunkPosition.getX(), chunkPosition.getZ());
+
+        KeyMap<Counter> chunkEntities = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
+
+        NMSUtils.runActionOnEntityChunks(serverLevel, Collections.singletonList(chunkPos), new NMSUtils.ChunkCallback() {
+            @Override
+            public void onLoadedChunk(LevelChunk levelChunk) {
+                for (org.bukkit.entity.Entity bukkitEntity : new CraftChunk(levelChunk).getEntities()) {
+                    chunkEntities.computeIfAbsent(Keys.of(bukkitEntity), i -> new Counter(0)).inc(1);
+                }
+            }
+
+            @Override
+            public void onUnloadedChunk(NMSUtils.UnloadedChunkCompound unloadedChunkCompound) {
+                unloadedChunkCompound.getEntities().forEach(entityTag -> {
+                    EntityType.by((CompoundTag) entityTag).ifPresent(entityType -> {
+                        Key entityKey = Keys.of(CraftEntityType.minecraftToBukkit(entityType));
+                        chunkEntities.computeIfAbsent(entityKey, k -> new Counter(0)).inc(1);
+                    });
+                });
+            }
+
+            @Override
+            public void onFinish() {
+                completableFuture.complete(chunkEntities);
             }
         });
 

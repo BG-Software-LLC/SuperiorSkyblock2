@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.external;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandGenerateBlockEvent;
@@ -54,14 +55,14 @@ public class OraxenHook {
         } catch (Throwable error) {
             availableMechanics.add(new Pair<>(MechanicsManager.getMechanicFactory("block"), (block, itemId) -> {
                 ReflectMethod<Void> setBlockModel = new ReflectMethod<>(
-                        "io.th0rgal.oraxen.mechanics.provided.block.BlockMechanicFactory",
+                        new ClassInfo("io.th0rgal.oraxen.mechanics.provided.block.BlockMechanicFactory", ClassInfo.PackageType.UNKNOWN),
                         "setBlockModel", Block.class, String.class);
                 if (setBlockModel.isValid())
                     setBlockModel.invoke(null, block, itemId);
             }));
             availableMechanics.add(new Pair<>(MechanicsManager.getMechanicFactory("noteblock"), (block, itemId) -> {
                 ReflectMethod<Void> setBlockModel = new ReflectMethod<>(
-                        "io.th0rgal.oraxen.mechanics.provided.noteblock.NoteBlockMechanicFactory",
+                        new ClassInfo("io.th0rgal.oraxen.mechanics.provided.noteblock.NoteBlockMechanicFactory", ClassInfo.PackageType.UNKNOWN),
                         "setBlockModel", Block.class, String.class);
                 if (setBlockModel.isValid())
                     setBlockModel.invoke(null, block, itemId);

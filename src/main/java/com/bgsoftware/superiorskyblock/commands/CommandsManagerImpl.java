@@ -9,7 +9,10 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
+import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
+import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookupFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -136,15 +139,21 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
     @Override
     public void dispatchSubCommand(CommandSender sender, String subCommand) {
-        dispatchSubCommand(sender, subCommand, "");
+        dispatchSubCommand(sender, subCommand, null);
     }
 
     @Override
-    public void dispatchSubCommand(CommandSender sender, String subCommand, String args) {
-        String[] argsSplit = args.split(" ");
+    public void dispatchSubCommand(CommandSender sender, String subCommand, @Nullable String args) {
+        // We first check that the sub command is enabled.
+        if (getCommand(subCommand) == null) {
+            Bukkit.dispatchCommand(sender, this.label + " " + subCommand + (args == null ? "" : " " + args));
+            return;
+        }
+
+        String[] argsSplit = args == null ? null : args.split(" ");
         String[] commandArguments;
 
-        if (argsSplit.length == 1 && argsSplit[0].isEmpty()) {
+        if (argsSplit == null || (argsSplit.length == 1 && argsSplit[0].isEmpty())) {
             commandArguments = new String[1];
             commandArguments[0] = subCommand;
         } else {
@@ -178,29 +187,40 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
             return;
         }
 
-        for (File file : commandsFolder.listFiles()) {
-            if (!file.getName().endsWith(".jar"))
-                continue;
+        File[] folderFiles = commandsFolder.listFiles();
+        if (folderFiles == null || folderFiles.length == 0)
+            return;
 
-            try {
-                //noinspection deprecation
-                Class<?> commandClass = JarFiles.getClass(file.toURL(), SuperiorCommand.class, plugin.getPluginClassLoader()).getRight();
-
-                if (commandClass == null)
+        try (FilesLookup filesLookup = FilesLookupFactory.getInstance().lookupFolder(commandsFolder)) {
+            for (File file : folderFiles) {
+                String fileName = file.getName();
+                if (!fileName.endsWith(".jar"))
                     continue;
 
-                SuperiorCommand superiorCommand = createInstance(commandClass);
+                try {
+                    file = filesLookup.getFile(fileName);
 
-                if (file.getName().toLowerCase(Locale.ENGLISH).contains("admin")) {
-                    registerAdminCommand(superiorCommand);
-                    Log.info("Successfully loaded external admin command: ", file.getName().split("\\.")[0]);
-                } else {
-                    registerCommand(superiorCommand);
-                    Log.info("Successfully loaded external command: ", file.getName().split("\\.")[0]);
+                    FileClassLoader classLoader = new FileClassLoader(file, plugin.getPluginClassLoader());
+
+                    //noinspection deprecation
+                    Class<?> commandClass = JarFiles.getClass(file.toURL(), SuperiorCommand.class, classLoader).getLeft();
+
+                    if (commandClass == null)
+                        continue;
+
+                    SuperiorCommand superiorCommand = createInstance(commandClass);
+
+                    if (file.getName().toLowerCase(Locale.ENGLISH).contains("admin")) {
+                        registerAdminCommand(superiorCommand);
+                        Log.info("Successfully loaded external admin command: ", file.getName().split("\\.")[0]);
+                    } else {
+                        registerCommand(superiorCommand);
+                        Log.info("Successfully loaded external command: ", file.getName().split("\\.")[0]);
+                    }
+
+                } catch (Exception error) {
+                    Log.error(error, "An unexpected error occurred while loading an external command ", file.getName(), ":");
                 }
-
-            } catch (Exception error) {
-                Log.error(error, "An unexpected error occurred while loading an external command ", file.getName(), ":");
             }
         }
 
@@ -231,10 +251,14 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
         public boolean execute(CommandSender sender, String label, String[] args) {
             java.util.Locale locale = PlayerLocales.getLocale(sender);
 
-            if (args.length > 0) {
-                Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), args[0]);
+            String executedSubCommand = null;
 
-                SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
+            if (args.length > 0) {
+                executedSubCommand = args[0];
+
+                Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), executedSubCommand);
+
+                SuperiorCommand command = playerCommandsMap.getCommand(executedSubCommand);
                 if (command != null) {
                     if (!(sender instanceof Player) && !command.canBeExecutedByConsole()) {
                         Message.CUSTOM.send(sender, "&cCan be executed only by players!", true);
@@ -293,14 +317,20 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                 if (superiorPlayer != null) {
                     Island island = superiorPlayer.getIsland();
 
+                    String subCommandToExecute;
                     if (args.length != 0) {
-                        Bukkit.dispatchCommand(sender, label + " help");
+                        subCommandToExecute = "help";
                     } else if (island == null) {
-                        Bukkit.dispatchCommand(sender, label + " create");
+                        subCommandToExecute = "create";
                     } else if (superiorPlayer.hasToggledPanel()) {
-                        Bukkit.dispatchCommand(sender, label + " panel");
+                        subCommandToExecute = "panel";
                     } else {
-                        Bukkit.dispatchCommand(sender, label + " tp");
+                        subCommandToExecute = "tp";
+                    }
+
+                    // We don't want to end up in an infinite loop
+                    if (!subCommandToExecute.equalsIgnoreCase(executedSubCommand)) {
+                        dispatchSubCommand(sender, subCommandToExecute);
                     }
 
                     return false;
