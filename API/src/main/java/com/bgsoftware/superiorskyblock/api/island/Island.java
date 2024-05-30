@@ -36,6 +36,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -43,6 +44,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public interface Island extends Comparable<Island>, IMissionsHolder, IPersistentDataHolder, IDatabaseBridgeHolder {
+
+    /*
+     *  Custom Modifications
+     */
+
+    HashMap<String,Object> metadata();
 
     /*
      *  General methods

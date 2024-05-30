@@ -55,6 +55,7 @@ import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.google.common.base.Preconditions;
+import it.unimi.dsi.fastutil.Hash;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -127,6 +128,11 @@ public class SpawnIsland implements Island {
         this.dirtyChunksContainer = new DirtyChunksContainer(this);
 
         BukkitExecutor.sync(() -> biome = getCenter(null /* unused */).getBlock().getBiome());
+    }
+
+    @Override
+    public HashMap<String,Object> metadata() {
+        return new HashMap<>();
     }
 
     @Override

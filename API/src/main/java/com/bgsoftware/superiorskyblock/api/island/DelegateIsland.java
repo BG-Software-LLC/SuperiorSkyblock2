@@ -30,9 +30,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -72,6 +70,11 @@ public class DelegateIsland implements Island {
     @Override
     public List<SuperiorPlayer> getIslandMembers(boolean includeOwner) {
         return this.handle.getIslandMembers(includeOwner);
+    }
+
+    @Override
+    public HashMap<String, Object> metadata() {
+        return this.handle.metadata();
     }
 
     @Override

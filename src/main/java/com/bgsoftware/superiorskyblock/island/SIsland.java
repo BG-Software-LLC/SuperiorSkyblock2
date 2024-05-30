@@ -233,6 +233,8 @@ public class SIsland implements Island {
     private volatile String description;
     private volatile Biome biome = null;
 
+    private final HashMap<String,Object> metadata = new HashMap<>();
+
     public SIsland(IslandBuilderImpl builder) {
         this.uuid = builder.uuid;
         this.owner = builder.owner;
@@ -348,6 +350,10 @@ public class SIsland implements Island {
             getPersistentDataContainer().load(builder.persistentData);
 
         this.databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
+    }
+
+    public HashMap<String,Object> metadata() {
+        return metadata;
     }
 
     /*
