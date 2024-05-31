@@ -48,6 +48,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
+import org.bukkit.block.data.type.BubbleColumn;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.craftbukkit.block.CraftSign;
@@ -275,7 +276,8 @@ public class NMSWorldImpl implements NMSWorld {
 
         BlockData blockData = block.getBlockData();
 
-        return blockData instanceof Waterlogged && ((Waterlogged) blockData).isWaterlogged();
+        return blockData instanceof BubbleColumn ||
+                (blockData instanceof Waterlogged && ((Waterlogged) blockData).isWaterlogged());
     }
 
     @Override
