@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.database.sql;
 
-import com.bgsoftware.superiorskyblock.core.Mutable;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
@@ -50,7 +50,7 @@ public class StatementHolder {
         if (!this.values.isEmpty())
             addBatch();
 
-        Mutable<String> rawQuery = new Mutable<>(this.query);
+        MutableObject<String> rawQuery = new MutableObject<>(this.query);
 
         executeQuery(async, new QueryResult<PreparedStatement>().onSuccess(preparedStatement -> {
             Connection connection = preparedStatement.getConnection();
@@ -80,7 +80,7 @@ public class StatementHolder {
     }
 
     public void execute(boolean async) {
-        Mutable<String> rawQuery = new Mutable<>(query);
+        MutableObject<String> rawQuery = new MutableObject<>(query);
 
         executeQuery(async, new QueryResult<PreparedStatement>().onSuccess(preparedStatement -> {
             populateStatement(preparedStatement, this.values, rawQuery);
@@ -120,7 +120,7 @@ public class StatementHolder {
     }
 
     private static void populateStatement(PreparedStatement preparedStatement, List<Object> values,
-                                          Mutable<String> rawQuery) throws SQLException {
+                                          MutableObject<String> rawQuery) throws SQLException {
         int currentIndex = 1;
         for (Object value : values) {
             preparedStatement.setObject(currentIndex++, value);

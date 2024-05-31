@@ -14,7 +14,9 @@ import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.island.container.value.Value;
+import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
+import com.bgsoftware.superiorskyblock.core.value.IntValue;
+import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgrade;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.island.upgrade.UpgradeRequirement;
@@ -204,13 +206,13 @@ public class UpgradesModule extends BuiltinModule {
             requirements.add(new UpgradeRequirement(sections[0], Formatters.COLOR_FORMATTER.format(sections[1])));
         }
 
-        Value<Double> cropGrowth = Value.syncedFixed(levelSection.getDouble("crop-growth", -1D));
-        Value<Double> spawnerRates = Value.syncedFixed(levelSection.getDouble("spawner-rates", -1D));
-        Value<Double> mobDrops = Value.syncedFixed(levelSection.getDouble("mob-drops", -1D));
-        Value<Integer> teamLimit = Value.syncedFixed(levelSection.getInt("team-limit", -1));
-        Value<Integer> warpsLimit = Value.syncedFixed(levelSection.getInt("warps-limit", -1));
-        Value<Integer> coopLimit = Value.syncedFixed(levelSection.getInt("coop-limit", -1));
-        Value<Integer> borderSize = Value.syncedFixed(levelSection.getInt("border-size", -1));
+        DoubleValue cropGrowth = DoubleValue.syncedFixed(levelSection.getDouble("crop-growth", -1D));
+        DoubleValue spawnerRates = DoubleValue.syncedFixed(levelSection.getDouble("spawner-rates", -1D));
+        DoubleValue mobDrops = DoubleValue.syncedFixed(levelSection.getDouble("mob-drops", -1D));
+        IntValue teamLimit = IntValue.syncedFixed(levelSection.getInt("team-limit", -1));
+        IntValue warpsLimit = IntValue.syncedFixed(levelSection.getInt("warps-limit", -1));
+        IntValue coopLimit = IntValue.syncedFixed(levelSection.getInt("coop-limit", -1));
+        IntValue borderSize = IntValue.syncedFixed(levelSection.getInt("border-size", -1));
 
         if (borderSize.get() > plugin.getSettings().getMaxIslandSize()) {
             Log.warn("Upgrade by name ", upgrade.getName(), " (level ", level, ") has illegal border-size, skipping...");

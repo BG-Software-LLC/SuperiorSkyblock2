@@ -13,7 +13,9 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
-import com.bgsoftware.superiorskyblock.island.container.value.Value;
+import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
+import com.bgsoftware.superiorskyblock.core.value.IntValue;
+import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.google.common.base.Preconditions;
 import org.bukkit.OfflinePlayer;
@@ -23,11 +25,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import javax.script.ScriptException;
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SUpgradeLevel implements UpgradeLevel {
@@ -45,13 +43,13 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final List<String> commands;
     private final String permission;
     private final Set<UpgradeRequirement> requirements;
-    private final Value<Double> cropGrowth;
-    private final Value<Double> spawnerRates;
-    private final Value<Double> mobDrops;
-    private final Value<Integer> teamLimit;
-    private final Value<Integer> warpsLimit;
-    private final Value<Integer> coopLimit;
-    private final Value<Integer> borderSize;
+    private final DoubleValue cropGrowth;
+    private final DoubleValue spawnerRates;
+    private final DoubleValue mobDrops;
+    private final IntValue teamLimit;
+    private final IntValue warpsLimit;
+    private final IntValue coopLimit;
+    private final IntValue borderSize;
     private final KeyMap<Integer> blockLimits;
     private final KeyMap<Integer> entityLimits;
     private final Map<World.Environment, Map<Key, Integer>> generatorRates;
@@ -62,9 +60,9 @@ public class SUpgradeLevel implements UpgradeLevel {
     private ItemData itemData;
 
     public SUpgradeLevel(int level, UpgradeCost cost, List<String> commands, String permission, Set<UpgradeRequirement> requirements,
-                         Value<Double> cropGrowth, Value<Double> spawnerRates, Value<Double> mobDrops,
-                         Value<Integer> teamLimit, Value<Integer> warpsLimit, Value<Integer> coopLimit,
-                         Value<Integer> borderSize, KeyMap<Integer> blockLimits,
+                         DoubleValue cropGrowth, DoubleValue spawnerRates, DoubleValue mobDrops,
+                         IntValue teamLimit, IntValue warpsLimit, IntValue coopLimit,
+                         IntValue borderSize, KeyMap<Integer> blockLimits,
                          KeyMap<Integer> entityLimits, Map<World.Environment, Map<Key, Integer>> generatorRates,
                          Map<PotionEffectType, Integer> islandEffects, Value<BigDecimal> bankLimit,
                          Map<Integer, Integer> roleLimits) {
@@ -252,65 +250,65 @@ public class SUpgradeLevel implements UpgradeLevel {
                 ));
     }
 
-    public Value<Double> getCropGrowthUpgradeValue() {
+    public DoubleValue getCropGrowthUpgradeValue() {
         return cropGrowth;
     }
 
-    public Value<Double> getSpawnerRatesUpgradeValue() {
+    public DoubleValue getSpawnerRatesUpgradeValue() {
         return spawnerRates;
     }
 
-    public Value<Double> getMobDropsUpgradeValue() {
+    public DoubleValue getMobDropsUpgradeValue() {
         return mobDrops;
     }
 
-    public Map<Key, Value<Integer>> getBlockLimitsUpgradeValue() {
+    public Map<Key, IntValue> getBlockLimitsUpgradeValue() {
         return blockLimits.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
-                entry -> Value.syncedFixed(entry.getValue()))
+                entry -> IntValue.syncedFixed(entry.getValue()))
         );
     }
 
-    public Map<Key, Value<Integer>> getEntityLimitsUpgradeValue() {
+    public Map<Key, IntValue> getEntityLimitsUpgradeValue() {
         return entityLimits.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
-                entry -> Value.syncedFixed(entry.getValue()))
+                entry -> IntValue.syncedFixed(entry.getValue()))
         );
     }
 
-    public Value<Integer> getTeamLimitUpgradeValue() {
+    public IntValue getTeamLimitUpgradeValue() {
         return teamLimit;
     }
 
-    public Value<Integer> getWarpsLimitUpgradeValue() {
+    public IntValue getWarpsLimitUpgradeValue() {
         return warpsLimit;
     }
 
-    public Value<Integer> getCoopLimitUpgradeValue() {
+    public IntValue getCoopLimitUpgradeValue() {
         return coopLimit;
     }
 
-    public Value<Integer> getBorderSizeUpgradeValue() {
+    public IntValue getBorderSizeUpgradeValue() {
         return borderSize;
     }
 
-    public Map<World.Environment, Map<Key, Value<Integer>>> getGeneratorUpgradeValue() {
-        EnumMap<World.Environment, Map<Key, Value<Integer>>> generatorRates = new EnumMap<>(World.Environment.class);
+    public Map<World.Environment, Map<Key, IntValue>> getGeneratorUpgradeValue() {
+        EnumMap<World.Environment, Map<Key, IntValue>> generatorRates = new EnumMap<>(World.Environment.class);
 
         this.generatorRates.forEach(((environment, worldGeneratorRates) -> {
-            Map<Key, Value<Integer>> result = worldGeneratorRates.entrySet().stream().collect(Collectors.toMap(
+            Map<Key, IntValue> result = worldGeneratorRates.entrySet().stream().collect(Collectors.toMap(
                     Map.Entry::getKey,
-                    entry -> Value.syncedFixed(entry.getValue())));
+                    entry -> IntValue.syncedFixed(entry.getValue())));
             generatorRates.put(environment, result);
         }));
 
         return Collections.unmodifiableMap(generatorRates);
     }
 
-    public Map<PotionEffectType, Value<Integer>> getPotionEffectsUpgradeValue() {
+    public Map<PotionEffectType, IntValue> getPotionEffectsUpgradeValue() {
         return islandEffects.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
-                entry -> Value.syncedFixed(entry.getValue()))
+                entry -> IntValue.syncedFixed(entry.getValue()))
         );
     }
 
@@ -318,12 +316,12 @@ public class SUpgradeLevel implements UpgradeLevel {
         return bankLimit;
     }
 
-    public Map<PlayerRole, Value<Integer>> getRoleLimitsUpgradeValue() {
+    public Map<PlayerRole, IntValue> getRoleLimitsUpgradeValue() {
         return roleLimits.entrySet().stream()
                 .filter(entry -> SPlayerRole.fromId(entry.getKey()) != null)
                 .collect(Collectors.toMap(
                         entry -> SPlayerRole.fromId(entry.getKey()),
-                        entry -> Value.syncedFixed(entry.getValue()))
+                        entry -> IntValue.syncedFixed(entry.getValue()))
                 );
     }
 

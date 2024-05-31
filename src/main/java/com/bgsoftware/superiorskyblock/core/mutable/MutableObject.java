@@ -1,10 +1,10 @@
-package com.bgsoftware.superiorskyblock.core;
+package com.bgsoftware.superiorskyblock.core.mutable;
 
-public class Mutable<E> {
+public class MutableObject<E> {
 
     private E value;
 
-    public Mutable(E value) {
+    public MutableObject(E value) {
         this.value = value;
     }
 

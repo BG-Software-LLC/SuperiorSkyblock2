@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuViewButton;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
-import com.bgsoftware.superiorskyblock.core.Mutable;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.CurrentPageButton;
@@ -16,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.NextPageButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.PreviousPageButton;
 import com.bgsoftware.superiorskyblock.core.menu.layout.order.CustomPagedLayoutOrder;
 import com.bgsoftware.superiorskyblock.core.menu.layout.order.PagedLayoutOrder;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableInt;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -48,7 +48,7 @@ public class PagedMenuLayoutImpl<V extends MenuView<V, ?>, E> extends AbstractMe
         // noinspection unchecked
         PagedMenuView<V, ?, E> pagedMenuView = (PagedMenuView<V, ?, E>) menuView;
 
-        Mutable<Integer> pagedObjectSlot = new Mutable<>(0);
+        MutableInt pagedObjectSlot = new MutableInt(0);
 
         // Set all regular buttons in the menu
         for (int slot = 0; slot < this.buttons.length; ++slot) {
@@ -79,15 +79,15 @@ public class PagedMenuLayoutImpl<V extends MenuView<V, ?>, E> extends AbstractMe
     }
 
     private void populateInventoryWithButton(Inventory inventory, MenuViewButton<V> button, int slot,
-                                             PagedMenuView<V, ?, E> menuView, Mutable<Integer> pagedObjectSlot) {
+                                             PagedMenuView<V, ?, E> menuView, MutableInt pagedObjectSlot) {
         int currentPage = menuView.getCurrentPage();
         List<E> pagedObjects = menuView.getPagedObjects();
 
         if (button instanceof PagedMenuViewButton) {
             PagedMenuViewButton<V, E> pagedMenuButton = (PagedMenuViewButton<V, E>) button;
-            int objectIndex = pagedObjectSlot.getValue() + (this.objectsPerPageCount * (currentPage - 1));
+            int objectIndex = pagedObjectSlot.get() + (this.objectsPerPageCount * (currentPage - 1));
 
-            pagedObjectSlot.setValue(pagedObjectSlot.getValue() + 1);
+            pagedObjectSlot.set(pagedObjectSlot.get() + 1);
 
             if (objectIndex >= pagedObjects.size()) {
                 inventory.setItem(slot, ((PagedMenuTemplateButton<V, E>) pagedMenuButton.getTemplate()).getNullItem());

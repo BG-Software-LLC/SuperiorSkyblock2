@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.Mutable;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 
@@ -133,7 +133,7 @@ public class SQLDatabaseBridge implements DatabaseBridge {
 
     @Override
     public void loadObject(String table, DatabaseFilter filter, Consumer<Map<String, Object>> resultConsumer) {
-        Mutable<String> columnFilter = new Mutable<>(getColumnFilter(filter));
+        MutableObject<String> columnFilter = new MutableObject<>(getColumnFilter(filter));
 
         filter.forEach((column, value) -> {
             columnFilter.setValue(columnFilter.getValue().replaceFirst("\\?", value instanceof String ?

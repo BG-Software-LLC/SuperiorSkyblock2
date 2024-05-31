@@ -6,9 +6,9 @@ import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.Mutable;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.WorldsRegistry;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandCalculationAlgorithm;
@@ -31,14 +31,7 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class ChunksListener implements Listener {
 
@@ -145,7 +138,7 @@ public class ChunksListener implements Listener {
         Location islandCenter = island.getCenter(environment);
 
         boolean entityLimitsEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class);
-        Mutable<Boolean> recalculateEntities = new Mutable<>(false);
+        MutableBoolean recalculateEntities = new MutableBoolean(false);
 
         if (chunk.getX() == (islandCenter.getBlockX() >> 4) && chunk.getZ() == (islandCenter.getBlockZ() >> 4)) {
             if (environment == plugin.getSettings().getWorlds().getDefaultWorld()) {
@@ -154,7 +147,7 @@ public class ChunksListener implements Listener {
             }
 
             if (entityLimitsEnabled)
-                recalculateEntities.setValue(true);
+                recalculateEntities.set(true);
         }
 
         plugin.getStackedBlocks().updateStackedBlockHolograms(chunk);
@@ -165,7 +158,7 @@ public class ChunksListener implements Listener {
 
             // If we cannot recalculate entities at this moment, we want to track entities normally.
             if (!island.getEntitiesTracker().canRecalculateEntityCounts())
-                recalculateEntities.setValue(false);
+                recalculateEntities.set(false);
 
             for (Entity entity : chunk.getEntities()) {
                 // We want to delete old holograms of stacked blocks + count entities for the chunk
@@ -175,7 +168,7 @@ public class ChunksListener implements Listener {
                 }
             }
 
-            if (recalculateEntities.getValue()) {
+            if (recalculateEntities.get()) {
                 island.getEntitiesTracker().recalculateEntityCounts();
                 pendingLoadedChunksForIsland.clear();
                 this.pendingLoadedChunks.remove(island.getUniqueId());

@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.Materials;
-import com.bgsoftware.superiorskyblock.core.Mutable;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -87,7 +87,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
             if (!Materials.isMinecart(handItemType))
                 return;
 
-            Mutable<Key> minecraftKey = new Mutable<>(null);
+            MutableObject<Key> minecraftKey = new MutableObject<>(null);
 
             if (preventMinecartPlace(handItemType, e.getClickedBlock().getLocation(), minecraftKey)) {
                 e.setCancelled(true);
@@ -128,7 +128,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
         }
 
-        private boolean preventMinecartPlace(Material minecartType, Location location, @Nullable Mutable<Key> minecraftKey) {
+        private boolean preventMinecartPlace(Material minecartType, Location location, @Nullable MutableObject<Key> minecraftKey) {
             Island island = plugin.getGrid().getIslandAt(location);
 
             if (island == null)

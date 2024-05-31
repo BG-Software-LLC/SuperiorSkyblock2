@@ -2,7 +2,9 @@ package com.bgsoftware.superiorskyblock.island.upgrade;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.island.container.value.Value;
+import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
+import com.bgsoftware.superiorskyblock.core.value.IntValue;
+import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.island.upgrade.cost.EmptyUpgradeCost;
 import org.bukkit.World;
 
@@ -17,13 +19,13 @@ public class DefaultUpgradeLevel extends SUpgradeLevel {
 
     private DefaultUpgradeLevel() {
         super(-1, EmptyUpgradeCost.getInstance(), Collections.emptyList(), "", Collections.emptySet(),
-                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getCropGrowth()),
-                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getSpawnerRates()),
-                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getMobDrops()),
-                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getTeamLimit()),
-                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getWarpsLimit()),
-                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getCoopLimit()),
-                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getIslandSize()),
+                DoubleValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getCropGrowth()),
+                DoubleValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getSpawnerRates()),
+                DoubleValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getMobDrops()),
+                IntValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getTeamLimit()),
+                IntValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getWarpsLimit()),
+                IntValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getCoopLimit()),
+                IntValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getIslandSize()),
                 (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getBlockLimits(),
                 (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getEntityLimits(),
                 convertFromArray(plugin.getSettings().getDefaultValues().getGenerators()),

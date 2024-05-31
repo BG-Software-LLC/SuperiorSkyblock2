@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.Mutable;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.SQLDatabase;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.BankTransactionsAttributes;
@@ -124,7 +124,7 @@ public class DatabaseConverter {
             }
         }).onFail(QueryResult.PRINT_ERROR));
 
-        Mutable<Throwable> failedBackupError = new Mutable<>(null);
+        MutableObject<Throwable> failedBackupError = new MutableObject<>(null);
 
         if (!isRemoteDatabase) {
             SQLHelper.close();
