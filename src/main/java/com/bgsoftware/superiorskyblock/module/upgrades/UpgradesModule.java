@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
@@ -21,18 +22,8 @@ import com.bgsoftware.superiorskyblock.island.upgrade.SUpgrade;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.island.upgrade.UpgradeRequirement;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
-import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRankup;
-import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetUpgrade;
-import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSyncUpgrades;
-import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdRankup;
-import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdUpgrade;
-import com.bgsoftware.superiorskyblock.module.upgrades.type.IUpgradeType;
-import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeBlockLimits;
-import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
-import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
-import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
-import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeMobDrops;
-import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeSpawnerRates;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.*;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.*;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
@@ -40,15 +31,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class UpgradesModule extends BuiltinModule {
@@ -256,7 +239,7 @@ public class UpgradesModule extends BuiltinModule {
                     islandEffects.put(potionEffectType, levelSection.getInt("island-effects." + effect) - 1);
             }
         }
-        Map<Integer, Integer> rolesLimits = new HashMap<>();
+        Map<Integer, Integer> rolesLimits = CollectionsFactory.createInt2IntArrayMap();
         if (levelSection.contains("role-limits")) {
             for (String roleId : levelSection.getConfigurationSection("role-limits").getKeys(false)) {
                 try {

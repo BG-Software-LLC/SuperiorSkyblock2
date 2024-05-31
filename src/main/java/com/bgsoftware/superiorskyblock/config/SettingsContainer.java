@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.DateFormatter;
@@ -254,7 +255,7 @@ public class SettingsContainer {
         defaultSpawnerRates = config.getDouble("default-values.spawner-rates", 1D);
         defaultMobDrops = config.getDouble("default-values.mob-drops", 1D);
         defaultBankLimit = new BigDecimal(config.getString("default-values.bank-limit", "-1"));
-        defaultRoleLimits = new HashMap<>();
+        defaultRoleLimits = CollectionsFactory.createInt2IntHashMap();
         loadListOrSection(config, "default-values.role-limits", "role limit", (role, limit) -> {
             try {
                 defaultRoleLimits.put(Integer.parseInt(role), limit);

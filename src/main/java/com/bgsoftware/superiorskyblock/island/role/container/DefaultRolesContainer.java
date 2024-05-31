@@ -3,18 +3,15 @@ package com.bgsoftware.superiorskyblock.island.role.container;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.google.common.base.Preconditions;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class DefaultRolesContainer implements RolesContainer {
 
-    private final Map<Integer, PlayerRole> rolesByWeight = new HashMap<>();
-    private final Map<Integer, PlayerRole> rolesById = new HashMap<>();
+    private final Map<Integer, PlayerRole> rolesByWeight = CollectionsFactory.createInt2ObjectArrayMap();
+    private final Map<Integer, PlayerRole> rolesById = CollectionsFactory.createInt2ObjectArrayMap();
     private final Map<String, PlayerRole> rolesByName = new HashMap<>();
 
     @Nullable

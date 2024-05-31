@@ -4,22 +4,14 @@ import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.key.collections.EntityTypeKeyMap;
 import com.bgsoftware.superiorskyblock.core.key.collections.LazyLoadedKeyMap;
 import com.bgsoftware.superiorskyblock.core.key.collections.MaterialKeyMap;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 public class KeyMaps {
 
@@ -48,6 +40,10 @@ public class KeyMaps {
 
     public static <V> KeyMap<V> createConcurrentHashMap(KeyIndicator keyIndicator) {
         return createMap(keyIndicator, () -> new ConcurrentHashMap());
+    }
+
+    public static <V> KeyMap<V> createArrayMap(KeyIndicator keyIndicator) {
+        return createMap(keyIndicator, () -> new ArrayMap());
     }
 
     public static <V> KeyMap<V> createMap(KeyIndicator keyIndicator, Supplier<Map> mapCreator) {
