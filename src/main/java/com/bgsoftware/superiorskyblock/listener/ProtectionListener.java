@@ -63,6 +63,7 @@ import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerUnleashEntityEvent;
+import org.bukkit.event.raid.RaidTriggerEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.Inventory;
@@ -95,6 +96,7 @@ public class ProtectionListener implements Listener {
         this.registerPlayerArrowPickupListener();
         this.registerPlayerAttemptPickupItemListener();
         this.registerPlayerTakeLecternBookListener();
+        this.registerRaidTriggerListener();
     }
 
     /* BLOCK INTERACTS */
@@ -526,6 +528,14 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    private void registerRaidTriggerListener() {
+        try {
+            Class.forName("org.bukkit.event.raid.RaidTriggerEvent");
+            Bukkit.getPluginManager().registerEvents(new RaidTriggerListener(), plugin);
+        } catch (Exception ignored) {
+        }
+    }
+
     private class PaperAttemptPickupListener implements Listener {
 
         @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -558,6 +568,21 @@ public class ProtectionListener implements Listener {
             InteractionResult interactionResult = protectionManager.get().handleBlockInteract(superiorPlayer,
                     e.getLectern().getBlock(), Action.RIGHT_CLICK_BLOCK, null);
             if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
+                e.setCancelled(true);
+        }
+
+    }
+
+    private class RaidTriggerListener implements Listener {
+
+        @EventHandler
+        public void onRaidTrigger(RaidTriggerEvent e) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+            Location location = e.getRaid().getLocation();
+
+            Island island = plugin.getGrid().getIslandAt(location);
+
+            if (island == null || island.isSpawn() || !island.isInside(location) || !island.isMember(superiorPlayer))
                 e.setCancelled(true);
         }
 
