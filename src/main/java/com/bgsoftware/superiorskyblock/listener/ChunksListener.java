@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.WorldsRegistry;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
@@ -31,11 +32,17 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public class ChunksListener implements Listener {
 
-    private final Map<UUID, Set<Chunk>> pendingLoadedChunks = new HashMap<>();
+    private final Map<UUID, Set<Chunk>> pendingLoadedChunks = new ArrayMap<>();
 
     private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {

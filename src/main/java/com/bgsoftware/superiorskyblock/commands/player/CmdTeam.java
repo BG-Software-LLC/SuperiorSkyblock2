@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -18,7 +19,6 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -81,7 +81,7 @@ public class CmdTeam implements ISuperiorCommand {
             List<SuperiorPlayer> members = island.getIslandMembers(true);
 
             if (!Message.ISLAND_TEAM_STATUS_ROLES.isEmpty(locale)) {
-                Map<PlayerRole, StringBuilder> rolesStrings = new HashMap<>();
+                Map<PlayerRole, StringBuilder> rolesStrings = new ArrayMap<>();
                 plugin.getRoles().getRoles().stream().filter(PlayerRole::isRoleLadder)
                         .forEach(playerRole -> rolesStrings.put(playerRole, new StringBuilder()));
                 rolesStrings.put(SPlayerRole.lastRole(), new StringBuilder());

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.nms.v1_20_1.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
@@ -56,7 +57,6 @@ import org.bukkit.generator.ChunkGenerator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -76,7 +76,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
         }
     }).get();
 
-    private final Map<Long, ChunkData> chunks = new HashMap<>();
+    private final Map<Long, ChunkData> chunks = CollectionsFactory.createLong2ObjectArrayMap();
     private final List<Pair<BlockPos, BlockState>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPos, CompoundTag>> blockEntities = new LinkedList<>();
     private final Set<ChunkPos> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();

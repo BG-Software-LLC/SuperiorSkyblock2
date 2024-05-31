@@ -11,12 +11,13 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
 public class DefaultStackedBlocksContainer implements StackedBlocksContainer {
 
-    private final Map<ChunkPosition, Map<LocationKey, StackedBlock>> stackedBlocks = new HashMap<>();
+    private final Map<ChunkPosition, Map<LocationKey, StackedBlock>> stackedBlocks = new LinkedHashMap<>();
 
     @Nullable
     @Override

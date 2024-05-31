@@ -4,6 +4,7 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -18,7 +19,6 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -31,7 +31,7 @@ public class CropsBlockEntity extends BlockEntity {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final Map<Long, CropsBlockEntity> tickingChunks = new HashMap<>();
+    private static final Map<Long, CropsBlockEntity> tickingChunks = CollectionsFactory.createLong2ObjectHashMap();
     private static int random = ThreadLocalRandom.current().nextInt();
 
     private final WeakReference<Island> island;

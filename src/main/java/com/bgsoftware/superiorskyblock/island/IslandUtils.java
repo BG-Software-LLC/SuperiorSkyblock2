@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -26,7 +27,6 @@ import org.bukkit.inventory.Inventory;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +88,7 @@ public class IslandUtils {
     }
 
     public static Map<WorldInfo, List<ChunkPosition>> getChunkCoords(Island island, @IslandChunkFlags int flags) {
-        Map<WorldInfo, List<ChunkPosition>> chunkCoords = new HashMap<>();
+        Map<WorldInfo, List<ChunkPosition>> chunkCoords = new ArrayMap<>();
 
         {
             if (plugin.getProviders().getWorldsProvider().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {

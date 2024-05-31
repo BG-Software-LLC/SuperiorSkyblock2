@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
@@ -22,8 +23,18 @@ import com.bgsoftware.superiorskyblock.island.upgrade.SUpgrade;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.island.upgrade.UpgradeRequirement;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
-import com.bgsoftware.superiorskyblock.module.upgrades.commands.*;
-import com.bgsoftware.superiorskyblock.module.upgrades.type.*;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRankup;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetUpgrade;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSyncUpgrades;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdRankup;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdUpgrade;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.IUpgradeType;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeBlockLimits;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeMobDrops;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeSpawnerRates;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
@@ -31,7 +42,14 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class UpgradesModule extends BuiltinModule {
@@ -203,7 +221,7 @@ public class UpgradesModule extends BuiltinModule {
         }
 
         Value<BigDecimal> bankLimit = Value.syncedFixed(new BigDecimal(levelSection.getString("bank-limit", "-1")));
-        KeyMap<Integer> blockLimits = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        KeyMap<Integer> blockLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         if (levelSection.contains("block-limits")) {
             for (String block : levelSection.getConfigurationSection("block-limits").getKeys(false)) {
                 Key blockKey = Keys.ofMaterialAndData(block);
@@ -211,7 +229,7 @@ public class UpgradesModule extends BuiltinModule {
                 plugin.getBlockValues().addCustomBlockKey(blockKey);
             }
         }
-        KeyMap<Integer> entityLimits = KeyMaps.createIdentityHashMap(KeyIndicator.ENTITY_TYPE);
+        KeyMap<Integer> entityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
         if (levelSection.contains("entity-limits")) {
             for (String entity : levelSection.getConfigurationSection("entity-limits").getKeys(false))
                 entityLimits.put(Keys.ofEntityType(entity), levelSection.getInt("entity-limits." + entity));
@@ -222,16 +240,16 @@ public class UpgradesModule extends BuiltinModule {
                 try {
                     World.Environment environment = World.Environment.valueOf(blockOrEnv.toUpperCase(Locale.ENGLISH));
                     for (String block : levelSection.getConfigurationSection("generator-rates." + blockOrEnv).getKeys(false)) {
-                        generatorRates.computeIfAbsent(environment, e -> KeyMaps.createHashMap(KeyIndicator.MATERIAL)).put(
+                        generatorRates.computeIfAbsent(environment, e -> KeyMaps.createArrayMap(KeyIndicator.MATERIAL)).put(
                                 Keys.ofMaterialAndData(block), levelSection.getInt("generator-rates." + blockOrEnv + "." + block));
                     }
                 } catch (Exception ex) {
-                    generatorRates.computeIfAbsent(plugin.getSettings().getWorlds().getDefaultWorld(), e -> KeyMaps.createHashMap(KeyIndicator.MATERIAL))
+                    generatorRates.computeIfAbsent(plugin.getSettings().getWorlds().getDefaultWorld(), e -> KeyMaps.createArrayMap(KeyIndicator.MATERIAL))
                             .put(Keys.ofMaterialAndData(blockOrEnv), levelSection.getInt("generator-rates." + blockOrEnv));
                 }
             }
         }
-        Map<PotionEffectType, Integer> islandEffects = new HashMap<>();
+        Map<PotionEffectType, Integer> islandEffects = new ArrayMap<>();
         if (levelSection.contains("island-effects")) {
             for (String effect : levelSection.getConfigurationSection("island-effects").getKeys(false)) {
                 PotionEffectType potionEffectType = PotionEffectType.getByName(effect);

@@ -263,7 +263,7 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
     }
 
     private static KeyMap<Key> createBlockKeyTransformer() {
-        KeyMap<Key> blockKeyTransformer = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        KeyMap<Key> blockKeyTransformer = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
 
         Material GLOWING_REDSTONE_ORE = EnumHelper.getEnum(Material.class, "GLOWING_REDSTONE_ORE");
         if (GLOWING_REDSTONE_ORE != null)

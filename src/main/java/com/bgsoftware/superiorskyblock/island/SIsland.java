@@ -7,7 +7,16 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.hooks.LazyWorldsProvider;
-import com.bgsoftware.superiorskyblock.api.island.*;
+import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBlockFlags;
+import com.bgsoftware.superiorskyblock.api.island.IslandChest;
+import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
@@ -26,12 +35,23 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.*;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.Counter;
+import com.bgsoftware.superiorskyblock.core.IslandArea;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.core.LocationKey;
+import com.bgsoftware.superiorskyblock.core.SBlockPosition;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.key.*;
+import com.bgsoftware.superiorskyblock.core.key.BaseKey;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -40,11 +60,11 @@ import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
 import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
-import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
-import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
 import com.bgsoftware.superiorskyblock.core.value.IntValue;
 import com.bgsoftware.superiorskyblock.core.value.Value;
+import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
+import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
@@ -66,7 +86,12 @@ import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.WeatherType;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -82,7 +107,25 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -2266,7 +2309,7 @@ public class SIsland implements Island {
         BigDecimal oldWorth = getWorth();
         BigDecimal oldLevel = getIslandLevel();
 
-        KeyMap<BlockChangeResult> result = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        KeyMap<BlockChangeResult> result = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
 
         blocks.forEach((blockKey, amount) -> {
             BlockChangeResult blockResult = handleBlockPlaceWithResult(blockKey, amount, 0);
@@ -2451,7 +2494,7 @@ public class SIsland implements Island {
         BigDecimal oldWorth = getWorth();
         BigDecimal oldLevel = getIslandLevel();
 
-        KeyMap<BlockChangeResult> result = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        KeyMap<BlockChangeResult> result = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
 
         blocks.forEach((blockKey, amount) -> {
             BlockChangeResult blockResult = handleBlockBreakWithResult(blockKey, amount, 0);
@@ -3082,7 +3125,7 @@ public class SIsland implements Island {
 
     @Override
     public Map<PotionEffectType, Integer> getPotionEffects() {
-        Map<PotionEffectType, Integer> islandEffects = new HashMap<>();
+        Map<PotionEffectType, Integer> islandEffects = new ArrayMap<>();
 
         for (PotionEffectType potionEffectType : PotionEffectType.values()) {
             if (potionEffectType != null) {
@@ -3092,7 +3135,7 @@ public class SIsland implements Island {
             }
         }
 
-        return islandEffects;
+        return Collections.unmodifiableMap(islandEffects);
     }
 
     @Override

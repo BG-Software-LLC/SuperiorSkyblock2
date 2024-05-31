@@ -33,4 +33,19 @@ public class JavaCollectionsCreator implements CollectionsCreator {
         return new ArrayMap<>();
     }
 
+    @Override
+    public <V> Map<Long, V> createLong2ObjectHashMap() {
+        return new HashMap<>();
+    }
+
+    @Override
+    public <V> Map<Long, V> createLong2ObjectArrayMap() {
+        return new ArrayMap<>();
+    }
+
+    @Override
+    public <V> Map<Character, V> createChar2ObjectArrayMap() {
+        return new ArrayMap<>();
+    }
+
 }

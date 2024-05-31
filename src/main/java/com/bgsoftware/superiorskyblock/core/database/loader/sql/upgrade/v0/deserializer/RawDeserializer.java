@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.DirtyChunk;
 import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.DatabaseConverter;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.IslandChestAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.IslandWarpAttributes;
@@ -99,7 +100,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public Map<UUID, PlayerPrivilegeNode> deserializePlayerPerms(String permissionNodes) {
-        Map<UUID, PlayerPrivilegeNode> playerPermissions = new HashMap<>();
+        Map<UUID, PlayerPrivilegeNode> playerPermissions = new ArrayMap<>();
 
         if (permissionNodes == null)
             return playerPermissions;
@@ -128,7 +129,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public Map<IslandPrivilege, PlayerRole> deserializeRolePerms(String permissionNodes) {
-        Map<IslandPrivilege, PlayerRole> rolePermissions = new HashMap<>();
+        Map<IslandPrivilege, PlayerRole> rolePermissions = new ArrayMap<>();
 
         if (permissionNodes == null)
             return rolePermissions;
@@ -227,7 +228,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public KeyMap<Integer> deserializeBlockLimits(String blocks) {
-        KeyMap<Integer> blockLimits = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        KeyMap<Integer> blockLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
 
         if (blocks != null) {
             for (String limit : blocks.split(",")) {
@@ -244,7 +245,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public Map<UUID, Rating> deserializeRatings(String ratings) {
-        Map<UUID, Rating> ratingsMap = new HashMap<>();
+        Map<UUID, Rating> ratingsMap = new ArrayMap<>();
 
         if (ratings != null) {
             for (String entry : ratings.split(";")) {
@@ -261,7 +262,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public Map<IslandFlag, Byte> deserializeIslandFlags(String settings) {
-        Map<IslandFlag, Byte> islandSettings = new HashMap<>();
+        Map<IslandFlag, Byte> islandSettings = new ArrayMap<>();
 
         if (settings != null) {
             for (String setting : settings.split(";")) {
@@ -294,12 +295,12 @@ public class RawDeserializer implements IDeserializer {
                 String[] sections = env.split(":");
                 try {
                     World.Environment environment = World.Environment.valueOf(sections[0]);
-                    deserializeGenerators(sections[1], cobbleGenerator[environment.ordinal()] = KeyMaps.createHashMap(KeyIndicator.MATERIAL));
+                    deserializeGenerators(sections[1], cobbleGenerator[environment.ordinal()] = KeyMaps.createArrayMap(KeyIndicator.MATERIAL));
                 } catch (Exception ignored) {
                 }
             }
         } else {
-            deserializeGenerators(generator, cobbleGenerator[0] = KeyMaps.createHashMap(KeyIndicator.MATERIAL));
+            deserializeGenerators(generator, cobbleGenerator[0] = KeyMaps.createArrayMap(KeyIndicator.MATERIAL));
         }
 
         return cobbleGenerator;
@@ -325,7 +326,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public KeyMap<Integer> deserializeEntityLimits(String entities) {
-        KeyMap<Integer> entityLimits = KeyMaps.createIdentityHashMap(KeyIndicator.ENTITY_TYPE);
+        KeyMap<Integer> entityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
 
         if (entities != null) {
             for (String limit : entities.split(",")) {
@@ -342,7 +343,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public Map<PotionEffectType, Integer> deserializeEffects(String effects) {
-        Map<PotionEffectType, Integer> islandEffects = new HashMap<>();
+        Map<PotionEffectType, Integer> islandEffects = new ArrayMap<>();
 
         if (effects != null) {
             for (String effect : effects.split(",")) {
@@ -376,7 +377,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public Map<PlayerRole, Integer> deserializeRoleLimits(String roles) {
-        Map<PlayerRole, Integer> roleLimits = new HashMap<>();
+        Map<PlayerRole, Integer> roleLimits = new ArrayMap<>();
 
         if (roles != null) {
             for (String limit : roles.split(",")) {
@@ -420,7 +421,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public String deserializeBlockCounts(String blockCountsParam) {
-        KeyMap<BigInteger> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        KeyMap<BigInteger> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
 
         if (blockCountsParam != null) {
             for (String blockCountSection : blockCountsParam.split(";")) {

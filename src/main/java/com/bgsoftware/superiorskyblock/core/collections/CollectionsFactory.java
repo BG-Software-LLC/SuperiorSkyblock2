@@ -33,4 +33,16 @@ public class CollectionsFactory {
         return creator.createInt2IntHashMap();
     }
 
+    public static <V> Map<Long, V> createLong2ObjectHashMap() {
+        return creator.createLong2ObjectHashMap();
+    }
+
+    public static <V> Map<Long, V> createLong2ObjectArrayMap() {
+        return creator.createLong2ObjectArrayMap();
+    }
+
+    public static <V> Map<Character, V> createChar2ObjectArrayMap() {
+        return creator.createChar2ObjectArrayMap();
+    }
+
 }

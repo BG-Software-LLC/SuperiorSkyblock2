@@ -1,15 +1,16 @@
 package com.bgsoftware.superiorskyblock.core.menu;
 
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public class MenuPatternSlots {
 
-    private final Map<Character, List<Integer>> charSlots = new HashMap<>();
+    private final Map<Character, List<Integer>> charSlots = CollectionsFactory.createChar2ObjectArrayMap();
 
     public MenuPatternSlots() {
     }

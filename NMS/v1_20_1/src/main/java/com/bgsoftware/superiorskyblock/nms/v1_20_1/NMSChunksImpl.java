@@ -395,7 +395,7 @@ public class NMSChunksImpl implements NMSChunks {
         ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
         ChunkPos chunkPos = new ChunkPos(chunkPosition.getX(), chunkPosition.getZ());
 
-        KeyMap<Counter> chunkEntities = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
+        KeyMap<Counter> chunkEntities = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
 
         NMSUtils.runActionOnEntityChunks(serverLevel, Collections.singletonList(chunkPos), new NMSUtils.ChunkCallback() {
             @Override
@@ -493,7 +493,7 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, Level level, LevelChunkSection[] chunkSections) {
-        KeyMap<Counter> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        KeyMap<Counter> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         List<Location> spawnersLocations = new LinkedList<>();
 
         for (int i = 0; i < chunkSections.length; ++i) {

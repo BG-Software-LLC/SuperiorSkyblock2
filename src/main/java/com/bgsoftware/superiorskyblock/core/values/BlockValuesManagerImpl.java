@@ -54,7 +54,7 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
 
     private static final Bindings bindings = createBindings();
 
-    private static final KeyMap<CustomKeyParser> customKeyParsers = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+    private static final KeyMap<CustomKeyParser> customKeyParsers = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
     private static final KeySet valuesMenuBlocks = MaterialKeySet.createHashSet();
     private static final KeySet customBlockKeys = MaterialKeySet.createHashSet();
 

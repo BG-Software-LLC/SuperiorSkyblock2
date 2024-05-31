@@ -12,4 +12,10 @@ public interface CollectionsCreator {
 
     Map<Integer, Integer> createInt2IntArrayMap();
 
+    <V> Map<Long, V> createLong2ObjectHashMap();
+
+    <V> Map<Long, V> createLong2ObjectArrayMap();
+
+    <V> Map<Character, V> createChar2ObjectArrayMap();
+
 }

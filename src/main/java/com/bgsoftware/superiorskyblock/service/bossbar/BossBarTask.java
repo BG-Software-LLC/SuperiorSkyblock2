@@ -2,10 +2,10 @@ package com.bgsoftware.superiorskyblock.service.bossbar;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -17,7 +17,7 @@ public class BossBarTask extends BukkitRunnable {
 
     private static final BossBarTask EMPTY_TASK = new BossBarTask(EmptyBossBar.getInstance(), 0);
 
-    private static final Map<UUID, Queue<BossBarTask>> PLAYERS_RUNNING_TASKS = new HashMap<>();
+    private static final Map<UUID, Queue<BossBarTask>> PLAYERS_RUNNING_TASKS = new ArrayMap<>();
 
     private final BossBar bossBar;
     private final double progressToRemovePerTick;

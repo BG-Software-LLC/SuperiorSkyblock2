@@ -30,7 +30,7 @@ public class WorldInfoImpl implements WorldInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         WorldInfoImpl worldInfo = (WorldInfoImpl) o;
-        return worldName.equals(worldInfo.worldName) && environment == worldInfo.environment;
+        return environment == worldInfo.environment && worldName.equals(worldInfo.worldName);
     }
 
     @Override

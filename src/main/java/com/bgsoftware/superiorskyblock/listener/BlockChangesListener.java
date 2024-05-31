@@ -115,7 +115,7 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onStructureGrow(StructureGrowEvent e) {
-        KeyMap<Integer> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         e.getBlocks().forEach(blockState -> {
             Key blockKey = Keys.of(blockState);
             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
@@ -277,7 +277,7 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onEntityExplode(EntityExplodeEvent e) {
-        KeyMap<Integer> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         e.blockList().forEach(block -> {
             Key blockKey = Keys.of(block);
             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);

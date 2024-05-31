@@ -68,7 +68,6 @@ import org.bukkit.potion.PotionEffectType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -332,9 +331,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<World.Environment, Location> getIslandHomes() {
-        Map<World.Environment, Location> map = new HashMap<>();
-        map.put(plugin.getSettings().getWorlds().getDefaultWorld(), getIslandHome(null /*unused*/));
-        return map;
+        return Collections.singletonMap(plugin.getSettings().getWorlds().getDefaultWorld(), getIslandHome(null /*unused*/));
     }
 
     @Override

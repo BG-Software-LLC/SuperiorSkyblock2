@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.NMSUtils;
@@ -34,7 +35,6 @@ import org.bukkit.craftbukkit.v1_8_R3.generator.CustomChunkGenerator;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +43,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final Map<Long, ChunkData> chunks = new HashMap<>();
+    private final Map<Long, ChunkData> chunks = CollectionsFactory.createLong2ObjectArrayMap();
     private final List<Pair<BlockPosition, IBlockData>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPosition, CompoundTag>> blockEntities = new LinkedList<>();
     private final List<BlockPosition> lights = new LinkedList<>();

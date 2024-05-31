@@ -15,14 +15,12 @@ import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_20_2.chunks.CropsBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_20_2.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import io.papermc.paper.world.ChunkEntitySlices;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -71,7 +69,6 @@ import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R2.generator.CustomChunkGenerator;
 import org.bukkit.generator.ChunkGenerator;
 
-import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
@@ -407,7 +404,7 @@ public class NMSChunksImpl implements NMSChunks {
         ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
         ChunkPos chunkPos = new ChunkPos(chunkPosition.getX(), chunkPosition.getZ());
 
-        KeyMap<Counter> chunkEntities = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
+        KeyMap<Counter> chunkEntities = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
 
         NMSUtils.runActionOnEntityChunks(serverLevel, Collections.singletonList(chunkPos), new NMSUtils.ChunkCallback() {
             @Override
@@ -504,7 +501,7 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, Level level, LevelChunkSection[] chunkSections) {
-        KeyMap<Counter> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        KeyMap<Counter> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         List<Location> spawnersLocations = new LinkedList<>();
 
         for (int i = 0; i < chunkSections.length; ++i) {

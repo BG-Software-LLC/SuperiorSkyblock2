@@ -20,10 +20,10 @@ import com.bgsoftware.superiorskyblock.core.DirtyChunk;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
 import com.bgsoftware.superiorskyblock.core.value.IntValue;
 import com.bgsoftware.superiorskyblock.core.value.Value;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.google.common.base.Preconditions;
@@ -70,21 +70,21 @@ public class IslandBuilderImpl implements Island.Builder {
     public int unlockedWorldsMask = 0;
     public long lastTimeUpdated = System.currentTimeMillis() / 1000;
     public final Set<DirtyChunk> dirtyChunks = new LinkedHashSet<>();
-    public final KeyMap<BigInteger> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
-    public final KeyMap<BigInteger> entityCounts = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
+    public final KeyMap<BigInteger> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
+    public final KeyMap<BigInteger> entityCounts = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
     public final EnumMap<World.Environment, Location> islandHomes = new EnumMap<>(World.Environment.class);
     public final List<SuperiorPlayer> members = new LinkedList<>();
     public final List<SuperiorPlayer> bannedPlayers = new LinkedList<>();
     public final Map<SuperiorPlayer, PlayerPrivilegeNode> playerPermissions = new LinkedHashMap<>();
     public final Map<IslandPrivilege, PlayerRole> rolePermissions = new LinkedHashMap<>();
     public final Map<String, Integer> upgrades = new LinkedHashMap<>();
-    public final KeyMap<IntValue> blockLimits = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+    public final KeyMap<IntValue> blockLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
     public final Map<UUID, Rating> ratings = new LinkedHashMap<>();
     public final Map<MissionReference, Counter> completedMissions = new LinkedHashMap<>();
     public final Map<IslandFlag, Byte> islandFlags = new LinkedHashMap<>();
     public final EnumMap<World.Environment, KeyMap<IntValue>> cobbleGeneratorValues = new EnumMap<>(World.Environment.class);
     public final List<SIsland.UniqueVisitor> uniqueVisitors = new LinkedList<>();
-    public final KeyMap<IntValue> entityLimits = KeyMaps.createIdentityHashMap(KeyIndicator.ENTITY_TYPE);
+    public final KeyMap<IntValue> entityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
     public final Map<PotionEffectType, IntValue> islandEffects = new LinkedHashMap<>();
     public final List<ItemStack[]> islandChests = new ArrayList<>(plugin.getSettings().getIslandChests().getDefaultPages());
     public final Map<PlayerRole, IntValue> roleLimits = new LinkedHashMap<>();
@@ -480,7 +480,7 @@ public class IslandBuilderImpl implements Island.Builder {
     public Island.Builder setGeneratorRate(Key block, int rate, World.Environment environment) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
-        this.cobbleGeneratorValues.computeIfAbsent(environment, e -> KeyMaps.createHashMap(KeyIndicator.MATERIAL))
+        this.cobbleGeneratorValues.computeIfAbsent(environment, e -> KeyMaps.createArrayMap(KeyIndicator.MATERIAL))
                 .put(block, rate < 0 ? IntValue.syncedFixed(rate) : IntValue.fixed(rate));
         return this;
     }

@@ -28,7 +28,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -313,7 +313,7 @@ public class CmdAdminShow implements IAdminIslandCommand {
 
         // Island members
         if (!Message.ISLAND_INFO_ROLES.isEmpty(locale)) {
-            Map<PlayerRole, StringBuilder> rolesStrings = new HashMap<>();
+            Map<PlayerRole, StringBuilder> rolesStrings = new LinkedHashMap<>();
 
             List<SuperiorPlayer> members = island.getIslandMembers(false);
 

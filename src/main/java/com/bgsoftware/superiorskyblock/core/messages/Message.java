@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -26,7 +27,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -829,7 +829,7 @@ public enum Message {
 
     private final String defaultMessage;
     private final boolean isCustom;
-    private final Map<Locale, IMessageComponent> messages = new HashMap<>();
+    private final Map<Locale, IMessageComponent> messages = new ArrayMap<>();
 
     Message() {
         this(null);

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_8_R3.chunks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Chunk;
@@ -14,7 +15,6 @@ import net.minecraft.server.v1_8_R3.TileEntity;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -24,7 +24,7 @@ public class CropsTickingTileEntity extends TileEntity implements IUpdatePlayerL
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final Map<Long, CropsTickingTileEntity> tickingChunks = new HashMap<>();
+    private static final Map<Long, CropsTickingTileEntity> tickingChunks = CollectionsFactory.createLong2ObjectHashMap();
     private static int random = ThreadLocalRandom.current().nextInt();
 
     private final WeakReference<Island> island;

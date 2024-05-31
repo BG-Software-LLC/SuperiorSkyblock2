@@ -11,7 +11,7 @@ import java.util.function.BiConsumer;
 
 public abstract class BlockValuesContainer {
 
-    private final KeyMap<BigDecimal> valuesMap = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+    private final KeyMap<BigDecimal> valuesMap = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
 
     public abstract void loadDefaultValues(SuperiorSkyblockPlugin plugin);
 
