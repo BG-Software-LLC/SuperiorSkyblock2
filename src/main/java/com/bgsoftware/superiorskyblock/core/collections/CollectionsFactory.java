@@ -1,20 +1,17 @@
 package com.bgsoftware.superiorskyblock.core.collections;
 
 import com.bgsoftware.superiorskyblock.core.collections.creator.CollectionsCreator;
+import com.bgsoftware.superiorskyblock.core.collections.creator.FastUtilCollectionsCreator;
 import com.bgsoftware.superiorskyblock.core.collections.creator.JavaCollectionsCreator;
 
 import java.util.Map;
 
 public class CollectionsFactory {
 
-    private static CollectionsCreator creator = JavaCollectionsCreator.INSTANCE;
+    private static final CollectionsCreator creator = findSuitableCollectionsCreator();
 
     private CollectionsFactory() {
 
-    }
-
-    public static void setCreator(CollectionsCreator creator) {
-        CollectionsFactory.creator = creator;
     }
 
     public static <V> Map<Integer, V> createInt2ObjectHashMap() {
@@ -43,6 +40,16 @@ public class CollectionsFactory {
 
     public static <V> Map<Character, V> createChar2ObjectArrayMap() {
         return creator.createChar2ObjectArrayMap();
+    }
+
+    private static CollectionsCreator findSuitableCollectionsCreator() {
+        try {
+            Class.forName("it.unimi.dsi.fastutil.ints.Int2IntArrayMap");
+            return FastUtilCollectionsCreator.INSTANCE;
+        } catch (ClassNotFoundException ignored) {
+        }
+
+        return JavaCollectionsCreator.INSTANCE;
     }
 
 }
