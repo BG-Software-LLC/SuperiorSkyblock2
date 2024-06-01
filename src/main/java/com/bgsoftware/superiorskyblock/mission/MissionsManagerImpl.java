@@ -39,7 +39,9 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -53,6 +55,8 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             return plugin.getServices().getService(PlaceholdersService.class);
         }
     };
+
+    private final Map<String, FileClassLoader> missionTypesClassLoaders = new HashMap<>();
 
     private final MissionsContainer missionsContainer;
 
@@ -78,17 +82,15 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
         for (Mission<?> mission : missionsList) {
             // Unload the mission
             mission.unload();
-
-            // We now want to unload the ClassLoader and free the held handles for the file.
-            ClassLoader classLoader = mission.getClass().getClassLoader();
-            if (classLoader instanceof URLClassLoader) {
-                try {
-                    ((URLClassLoader) classLoader).close();
-                } catch (Exception error) {
-                    Log.error(error, "An error occurred while unloading mission ", mission.getName(), ":");
-                }
-            }
         }
+
+        this.missionTypesClassLoaders.forEach((missionJarName, classLoader) -> {
+            try {
+                ((URLClassLoader) classLoader).close();
+            } catch (Exception error) {
+                Log.error(error, "An error occurred while unloading mission jar ", missionJarName, ":");
+            }
+        });
 
         // This is an attempt to force Windows to free the handles of the file.
         System.gc();
@@ -486,12 +488,19 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             Mission<?> mission = plugin.getMissions().getMission(missionName);
 
             if (mission == null) {
-                File missionJar = filesLookup.getFile(missionSection.getString("mission-file") + ".jar");
+                String missionJarName = missionSection.getString("mission-file") + ".jar";
+                File missionJar = filesLookup.getFile(missionJarName);
 
                 if (!missionJar.exists())
                     throw new RuntimeException("The mission file " + missionJar.getName() + " is not valid.");
 
-                FileClassLoader missionClassLoader = new FileClassLoader(missionJar, plugin.getPluginClassLoader());
+                FileClassLoader missionClassLoader = this.missionTypesClassLoaders.computeIfAbsent(missionJarName, n -> {
+                    try {
+                        return new FileClassLoader(missionJar, plugin.getPluginClassLoader());
+                    } catch (IOException error) {
+                        throw new RuntimeException(error);
+                    }
+                });
 
                 Either<Class<?>, Throwable> missionClassLookup = JarFiles.getClass(missionJar.toURL(), Mission.class, missionClassLoader);
 
