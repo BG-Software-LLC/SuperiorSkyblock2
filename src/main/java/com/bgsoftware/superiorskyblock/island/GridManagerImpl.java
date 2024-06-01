@@ -844,7 +844,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         resultSet.getString("last_island").map(Serializers.LOCATION_SPACED_SERIALIZER::deserialize)
                 .ifPresent(lastIsland -> this.lastIsland = new SBlockPosition((LazyWorldLocation) lastIsland));
 
-        if (!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().getWorlds().getDefaultWorldName())) {
+        if (!plugin.getSettings().getWorlds().getDefaultWorldName().equals(lastIsland.getWorldName())) {
             lastIsland = new SBlockPosition(plugin.getSettings().getWorlds().getDefaultWorldName(),
                     lastIsland.getX(), lastIsland.getY(), lastIsland.getZ());
         }

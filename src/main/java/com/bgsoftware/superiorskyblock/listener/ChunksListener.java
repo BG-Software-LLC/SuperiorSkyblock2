@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.WorldsRegistry;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -29,7 +28,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
-import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
 import java.util.Arrays;
@@ -64,7 +62,6 @@ public class ChunksListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onWorldUnload(WorldUnloadEvent e) {
-        WorldsRegistry.onWorldUnload(e.getWorld());
         for (Chunk loadedChunk : e.getWorld().getLoadedChunks())
             handleChunkUnload(loadedChunk);
     }
@@ -95,11 +92,6 @@ public class ChunksListener implements Listener {
     @EventHandler
     private void onChunkLoad(ChunkLoadEvent e) {
         handleChunkLoad(e.getChunk(), e.isNewChunk());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    private void onWorldLoad(WorldLoadEvent e) {
-        WorldsRegistry.onWorldLoad(e.getWorld());
     }
 
     private void handleChunkLoad(Chunk chunk, boolean isNewChunk) {
