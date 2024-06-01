@@ -75,6 +75,7 @@ public class IslandFlagsListener implements Listener {
             case "MOUNT":
             case "VILLAGE_INVASION":
             case "VILLAGE_DEFENSE":
+            case "PATROL":
             case "BEEHIVE": {
                 switch (BukkitEntities.getCategory(entityType)) {
                     case ANIMAL:
