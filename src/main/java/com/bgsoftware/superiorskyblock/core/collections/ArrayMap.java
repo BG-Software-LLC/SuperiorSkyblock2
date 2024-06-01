@@ -2,7 +2,14 @@ package com.bgsoftware.superiorskyblock.core.collections;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.AbstractCollection;
+import java.util.AbstractSet;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 public class ArrayMap<K, V> implements Map<K, V> {
 
@@ -167,7 +174,7 @@ public class ArrayMap<K, V> implements Map<K, V> {
         @NotNull
         @Override
         public Object[] toArray() {
-            return ArrayMap.this.keys.clone();
+            return Arrays.copyOf(ArrayMap.this.keys, size());
         }
 
         @NotNull
@@ -230,7 +237,7 @@ public class ArrayMap<K, V> implements Map<K, V> {
         @NotNull
         @Override
         public Object[] toArray() {
-            return ArrayMap.this.values.clone();
+            return Arrays.copyOf(ArrayMap.this.values, size());
         }
 
         @NotNull
