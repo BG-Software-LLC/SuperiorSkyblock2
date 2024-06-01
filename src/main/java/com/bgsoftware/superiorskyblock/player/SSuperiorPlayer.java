@@ -133,13 +133,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
             if (!standingIsland.hasSettingsEnabled(IslandFlags.PVP))
                 return target ? HitActionResult.TARGET_ISLAND_PVP_DISABLE : HitActionResult.ISLAND_PVP_DISABLE;
 
-            // Checks for coop damage
-            if (standingIsland.isCoop(player) && !plugin.getSettings().isCoopDamage())
+            if (!plugin.getSettings().isCoopDamage() && standingIsland.isCoop(player)) {
+                // Checks for coop damage
                 return target ? HitActionResult.TARGET_COOP_DAMAGE : HitActionResult.COOP_DAMAGE;
-
-            // Checks for visitors damage
-            if (standingIsland.isVisitor(player, false) && !plugin.getSettings().isVisitorsDamage())
+            } else if (!plugin.getSettings().isVisitorsDamage() && standingIsland.isVisitor(player, true)) {
+                // Checks for visitors damage
                 return target ? HitActionResult.TARGET_VISITOR_DAMAGE : HitActionResult.VISITOR_DAMAGE;
+            }
         }
 
         return HitActionResult.SUCCESS;
