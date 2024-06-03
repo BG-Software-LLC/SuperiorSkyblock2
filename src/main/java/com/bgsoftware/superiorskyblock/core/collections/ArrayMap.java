@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 
@@ -191,24 +192,13 @@ public class ArrayMap<K, V> implements Map<K, V> {
         }
     }
 
-    private class KeySetItr implements Iterator<K> {
-
-        private int pos = 0;
+    private class KeySetItr extends Itr<K> {
 
         @Override
-        public boolean hasNext() {
-            return pos < size();
+        protected K getNext() {
+            return (K) ArrayMap.this.keys[this.lastRet];
         }
 
-        @Override
-        public K next() {
-            return (K) ArrayMap.this.keys[this.pos++];
-        }
-
-        @Override
-        public void remove() {
-            ArrayMap.this.remove(this.pos--);
-        }
     }
 
     private class Values extends AbstractCollection<V> {
@@ -254,24 +244,13 @@ public class ArrayMap<K, V> implements Map<K, V> {
         }
     }
 
-    private class ValuesItr implements Iterator<V> {
-
-        private int pos = 0;
+    private class ValuesItr extends Itr<V> {
 
         @Override
-        public boolean hasNext() {
-            return pos < size();
+        protected V getNext() {
+            return (V) ArrayMap.this.values[this.lastRet];
         }
 
-        @Override
-        public V next() {
-            return (V) ArrayMap.this.values[this.pos++];
-        }
-
-        @Override
-        public void remove() {
-            ArrayMap.this.remove(this.pos--);
-        }
     }
 
     private class EntrySet extends AbstractSet<Entry<K, V>> {
@@ -304,24 +283,13 @@ public class ArrayMap<K, V> implements Map<K, V> {
 
     }
 
-    private class EntrySetItr implements Iterator<Entry<K, V>> {
-
-        private int pos = 0;
+    private class EntrySetItr extends Itr<Entry<K, V>> {
 
         @Override
-        public boolean hasNext() {
-            return pos < size();
+        protected Entry<K, V> getNext() {
+            return new EntryImpl(this.lastRet);
         }
 
-        @Override
-        public Entry<K, V> next() {
-            return new EntryImpl(this.pos++);
-        }
-
-        @Override
-        public void remove() {
-            ArrayMap.this.remove(this.pos--);
-        }
     }
 
     private class EntryImpl implements Entry<K, V> {
@@ -345,8 +313,38 @@ public class ArrayMap<K, V> implements Map<K, V> {
         @Override
         public V setValue(V v) {
             Object old = ArrayMap.this.values[this.pos];
-            ArrayMap.this.keys[this.pos] = v;
+            ArrayMap.this.values[this.pos] = v;
             return (V) old;
+        }
+    }
+
+    private abstract class Itr<T> implements Iterator<T> {
+
+        protected int pos = 0;
+        protected int lastRet = -1;
+
+        @Override
+        public final boolean hasNext() {
+            return this.pos < size();
+        }
+
+        @Override
+        public final T next() {
+            if (!hasNext())
+                throw new NoSuchElementException();
+            this.lastRet = this.pos++;
+            return getNext();
+        }
+
+        protected abstract T getNext();
+
+        @Override
+        public final void remove() {
+            if (this.lastRet < 0)
+                throw new IllegalStateException();
+            ArrayMap.this.remove(this.lastRet);
+            this.pos = this.lastRet;
+            this.lastRet = -1;
         }
     }
 
