@@ -28,6 +28,7 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
     public Locale locale = PlayerLocales.getDefaultLocale();
     public String textureValue = "";
     public long lastTimeUpdated = -1;
+    public long lastTimeCreatedIsland = -1;
     public boolean toggledPanel = plugin.getSettings().isDefaultToggledPanel();
     public boolean islandFly = plugin.getSettings().isDefaultIslandFly();
     public BorderColor borderColor = BorderColor.safeValue(plugin.getSettings().getDefaultBorderColor(), BorderColor.BLUE);
@@ -123,6 +124,17 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
     @Override
     public long getLastTimeUpdated() {
         return this.lastTimeUpdated;
+    }
+
+    @Override
+    public SuperiorPlayer.Builder setLastIslandCreated(long lastIslandCreated) {
+        this.lastTimeCreatedIsland = lastIslandCreated;
+        return this;
+    }
+
+    @Override
+    public long getLastIslandCreated() {
+        return this.lastTimeCreatedIsland;
     }
 
     @Override

@@ -219,6 +219,7 @@ public class SettingsContainer {
     public final boolean deleteUnsafeWarps;
     public final List<RespawnAction> playerRespawnActions;
     public final BigInteger blockCountsSaveThreshold;
+    public final long creationIslandCooldown;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws ManagerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
@@ -520,6 +521,7 @@ public class SettingsContainer {
             }
         });
         blockCountsSaveThreshold = BigInteger.valueOf(config.getInt("block-counts-save-threshold", 100));
+        creationIslandCooldown = config.getLong("creation-island-cooldown", 30L);
     }
 
     private List<String> loadInteractables(SuperiorSkyblockPlugin plugin) {

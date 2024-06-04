@@ -138,6 +138,7 @@ public class DataManager extends Manager {
                     .setDisbands(databaseResult.getInt("disbands").orElse(0))
                     .setTextureValue(databaseResult.getString("last_used_skin").orElse(""))
                     .setLastTimeUpdated(databaseResult.getLong("last_time_updated").orElse(System.currentTimeMillis() / 1000))
+                    .setLastIslandCreated(databaseResult.getLong("last_island_created").orElse(-1L))
                     .build());
 
             playersCount.incrementAndGet();

@@ -88,6 +88,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private int disbands;
     private BorderColor borderColor;
     private long lastTimeStatus;
+    private long lastTimeCreatedIsland;
 
     private BukkitTask teleportTask = null;
     private EnumSet<PlayerStatus> playerStatuses = EnumSet.noneOf(PlayerStatus.class);
@@ -104,6 +105,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         this.islandFly = builder.islandFly;
         this.borderColor = builder.borderColor;
         this.worldBorderEnabled = builder.worldBorderEnabled;
+        this.lastTimeCreatedIsland = builder.lastTimeCreatedIsland;
         this.completedMissions.putAll(builder.completedMissions);
         if (builder.persistentData.length > 0)
             getPersistentDataContainer().load(builder.persistentData);
@@ -198,6 +200,22 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public long getLastTimeStatus() {
         return lastTimeStatus;
+    }
+
+    @Override
+    public void setLastIslandCreated(long lastIslandCreated) {
+        Log.debug(Debug.SET_PLAYER_LAST_ISLAND_CREATED, getName(), lastIslandCreated);
+
+        if (this.lastTimeCreatedIsland == lastIslandCreated)
+            return;
+
+        this.lastTimeCreatedIsland = lastIslandCreated;
+        PlayersDatabaseBridge.saveLastIslandCreated(this);
+    }
+
+    @Override
+    public long getLastIslandCreated() {
+        return lastTimeCreatedIsland;
     }
 
     @Override

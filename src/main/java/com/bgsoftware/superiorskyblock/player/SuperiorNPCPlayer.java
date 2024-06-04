@@ -75,6 +75,16 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void setLastIslandCreated(long lastIslandCreated) {
+        // Do nothing.
+    }
+
+    @Override
+    public long getLastIslandCreated() {
+        return 0;
+    }
+
+    @Override
     public void updateName() {
         // Do nothing.
     }

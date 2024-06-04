@@ -61,6 +61,13 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
     public void simulateClick(SuperiorPlayer clickedPlayer, String islandName,
                               IslandCreationButton.Template template, boolean isPreviewMode,
                               @Nullable MenuView<?, ?> menuView) {
+
+        if (clickedPlayer.getLastIslandCreated() > 0 && System.currentTimeMillis() / 1000 - clickedPlayer.getLastIslandCreated() < plugin.getSettings().getCreationIslandCooldown()) {
+            long waitTime = plugin.getSettings().getCreationIslandCooldown() - (System.currentTimeMillis() / 1000 - clickedPlayer.getLastIslandCreated());
+            Message.ISLAND_CREATE_COOLDOWN.send(clickedPlayer, waitTime);
+            return;
+        }
+
         String schematic = template.getSchematic().getName();
 
         // Checking for preview of islands.
@@ -92,6 +99,7 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
 
         plugin.getGrid().createIsland(clickedPlayer, schematic, template.getBonusWorth(),
                 template.getBonusLevel(), template.getBiome(), islandName, offset);
+        clickedPlayer.setLastIslandCreated(System.currentTimeMillis() / 1000);
     }
 
     public void openMenu(SuperiorPlayer superiorPlayer, @Nullable MenuView<?, ?> previousMenu, String islandName) {

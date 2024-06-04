@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -103,6 +104,13 @@ public class PlayersDatabaseBridge {
         runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("players",
                 createFilter("uuid", superiorPlayer),
                 new Pair<>("last_time_updated", superiorPlayer.getLastTimeStatus())
+        ));
+    }
+
+    public static void saveLastIslandCreated(SuperiorPlayer superiorPlayer) {
+        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("players",
+                createFilter("uuid", superiorPlayer),
+                new Pair<>("last_island_created", superiorPlayer.getLastIslandCreated())
         ));
     }
 

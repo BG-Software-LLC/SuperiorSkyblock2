@@ -200,6 +200,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().lightsUpdate;
     }
 
+    public long getCreationIslandCooldown() {
+        return getContainer().creationIslandCooldown;
+    }
+
     public List<String> getPvPWorlds() {
         return getContainer().pvpWorlds;
     }

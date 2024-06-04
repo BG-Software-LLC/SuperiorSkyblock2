@@ -417,6 +417,7 @@ ISLAND_BEING_CALCULATED: '&c&lError | &7¡No puedes interactuar con bloques cuan
 ISLAND_CLOSED: '&e&lIsla | &7Cerró con éxito la isla al público.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lError | &7Ya tienes una tarea de creación de islas en curso.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&lIsla | &7Procesando su solicitud...'
+ISLAND_CREATE_COOLDOWN: '&c&lError | &7No puedes crear islas en este momento, por favor espera {0} segundos.'
 ISLAND_FLY_DISABLED: '&e&lVuelo | &7El vuelo de la isla fue automáticamente &cdesactivado&7.'
 ISLAND_FLY_ENABLED: '&e&lVuelo | &7El vuelo de la isla fue automáticamente &aactivado&7.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lIsla | &7&oEstabas dentro de una isla que se disolvio, por lo que se te teletransporto de regreso al spawn...'

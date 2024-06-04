@@ -69,6 +69,16 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void setLastIslandCreated(long lastIslandCreated) {
+        this.handle.setLastIslandCreated(lastIslandCreated);
+    }
+
+    @Override
+    public long getLastIslandCreated() {
+        return this.handle.getLastIslandCreated();
+    }
+
+    @Override
     public void updateName() {
         this.handle.updateName();
     }

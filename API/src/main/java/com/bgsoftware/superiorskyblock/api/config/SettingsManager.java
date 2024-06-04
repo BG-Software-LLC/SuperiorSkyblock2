@@ -375,6 +375,13 @@ public interface SettingsManager {
     boolean isLightsUpdate();
 
     /**
+     * Cooldown between creation of islands, in seconds.
+     * If set to 0, no cooldown is set.
+     * Config-path: creation-island-cooldown
+     */
+    long getCreationIslandCooldown();
+
+    /**
      * List of worlds that pvp is allowed between island-members.
      * Config-path: pvp-worlds
      */
