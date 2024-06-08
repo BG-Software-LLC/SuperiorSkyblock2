@@ -4,8 +4,10 @@ import it.unimi.dsi.fastutil.chars.Char2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import java.util.Map;
@@ -21,6 +23,11 @@ public class FastUtilCollectionsCreator implements CollectionsCreator {
     @Override
     public <V> Map<Integer, V> createInt2ObjectHashMap() {
         return new Int2ObjectOpenHashMap<>();
+    }
+
+    @Override
+    public <V> Map<Integer, V> createInt2ObjectLinkedHashMap() {
+        return new Int2ObjectLinkedOpenHashMap<>();
     }
 
     @Override
@@ -41,6 +48,11 @@ public class FastUtilCollectionsCreator implements CollectionsCreator {
     @Override
     public <V> Map<Long, V> createLong2ObjectHashMap() {
         return new Long2ObjectOpenHashMap<>();
+    }
+
+    @Override
+    public <V> Map<Long, V> createLong2ObjectLinkedHashMap() {
+        return new Long2ObjectLinkedOpenHashMap<>();
     }
 
     @Override

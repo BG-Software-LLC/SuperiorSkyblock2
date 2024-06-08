@@ -18,6 +18,10 @@ public class CollectionsFactory {
         return creator.createInt2ObjectHashMap();
     }
 
+    public static <V> Map<Integer, V> createInt2ObjectLinkedHashMap() {
+        return creator.createInt2ObjectLinkedHashMap();
+    }
+
     public static <V> Map<Integer, V> createInt2ObjectArrayMap() {
         return creator.createInt2ObjectArrayMap();
     }
@@ -32,6 +36,10 @@ public class CollectionsFactory {
 
     public static <V> Map<Long, V> createLong2ObjectHashMap() {
         return creator.createLong2ObjectHashMap();
+    }
+
+    public static <V> Map<Long, V> createLong2ObjectLinkedHashMap() {
+        return creator.createLong2ObjectLinkedHashMap();
     }
 
     public static <V> Map<Long, V> createLong2ObjectArrayMap() {

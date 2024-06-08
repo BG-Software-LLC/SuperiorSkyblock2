@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.collections.creator;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class JavaCollectionsCreator implements CollectionsCreator {
@@ -16,6 +17,11 @@ public class JavaCollectionsCreator implements CollectionsCreator {
     @Override
     public <V> Map<Integer, V> createInt2ObjectHashMap() {
         return new HashMap<>();
+    }
+
+    @Override
+    public <V> Map<Integer, V> createInt2ObjectLinkedHashMap() {
+        return new LinkedHashMap<>();
     }
 
     @Override
@@ -36,6 +42,11 @@ public class JavaCollectionsCreator implements CollectionsCreator {
     @Override
     public <V> Map<Long, V> createLong2ObjectHashMap() {
         return new HashMap<>();
+    }
+
+    @Override
+    public <V> Map<Long, V> createLong2ObjectLinkedHashMap() {
+        return new LinkedHashMap<>();
     }
 
     @Override

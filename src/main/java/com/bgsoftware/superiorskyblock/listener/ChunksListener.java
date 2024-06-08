@@ -174,7 +174,7 @@ public class ChunksListener implements Listener {
             }
         }, 2L);
 
-        DefaultIslandCalculationAlgorithm.CACHED_CALCULATED_CHUNKS.remove(chunkPosition);
+        DefaultIslandCalculationAlgorithm.CACHED_CALCULATED_CHUNKS.write(cache -> cache.remove(chunkPosition));
     }
 
     private static boolean isOldHologram(ArmorStand armorStand) {
