@@ -221,7 +221,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         this.islandCreationAlgorithm.createIsland(builder, this.lastIsland).whenComplete((islandCreationResult, error) -> {
             pendingCreationTasks.remove(builder.owner.getUniqueId());
 
-            if (error != null && islandCreationResult != null) {
+            if (error == null && islandCreationResult != null) {
                 try {
                     createIslandInternalOnSuccessCallback(builder, biome, offset, schematic,
                             updateGamemode, startTime, islandCreationResult);
