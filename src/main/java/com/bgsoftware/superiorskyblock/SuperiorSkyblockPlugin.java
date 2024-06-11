@@ -86,6 +86,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.util.Locale;
 import java.util.Optional;
 
 public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
@@ -118,9 +119,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     private IScriptEngine scriptEngine = EnginesFactory.createDefaultEngine();
     @Nullable
     private ChunkGenerator worldGenerator = null;
-    @Nullable
 
     /* NMS */
+    @Nullable
     private NMSAlgorithms nmsAlgorithms;
     private NMSChunks nmsChunks;
     private NMSDragonFight nmsDragonFight;
@@ -149,10 +150,19 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         } catch (UnsupportedOperationException error) {
             Log.error("The API instance was already initialized. This can be caused by a reload or another plugin initializing it.");
             shouldEnable = false;
+            return;
+        }
+
+        String serverVersion = Bukkit.getVersion();
+        if (serverVersion.toLowerCase(Locale.ENGLISH).contains("arclight")) {
+            Log.error("The plugin does not support this server software: " + serverVersion);
+            shouldEnable = false;
+            return;
         }
 
         if (!loadNMSAdapter()) {
             shouldEnable = false;
+            return;
         }
 
         Runtime.getRuntime().addShutdownHook(new ShutdownTask(this));
@@ -165,8 +175,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         try {
             SortingComparators.initializeTopIslandMembersSorting();
         } catch (IllegalArgumentException error) {
-            shouldEnable = false;
             Log.error("The TopIslandMembersSorting was already initialized. This can be caused by a reload or another plugin initializing it.");
+            shouldEnable = false;
+            return;
         }
 
         this.servicesHandler.loadDefaultServices(this);
