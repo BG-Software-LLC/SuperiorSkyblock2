@@ -221,75 +221,10 @@ public class GridManagerImpl extends Manager implements GridManager {
         this.islandCreationAlgorithm.createIsland(builder, this.lastIsland).whenComplete((islandCreationResult, error) -> {
             pendingCreationTasks.remove(builder.owner.getUniqueId());
 
-            switch (islandCreationResult.getStatus()) {
-                case NAME_OCCUPIED:
-                    builder.owner.setIsland(null);
-                    Message.ISLAND_ALREADY_EXIST.send(builder.owner);
-                    return;
-                case SUCCESS:
-                    break;
-                default:
-                    Log.warn("Cannot handle creation status: " + islandCreationResult.getStatus());
-                    builder.owner.setIsland(null);
-                    Message.CREATE_ISLAND_FAILURE.send(builder.owner);
-                    return;
-            }
-
-            if (error == null) {
+            if (error != null && islandCreationResult != null) {
                 try {
-                    Island island = islandCreationResult.getIsland();
-                    Location islandLocation = islandCreationResult.getIslandLocation();
-                    boolean teleportPlayer = islandCreationResult.shouldTeleportPlayer();
-
-                    List<ChunkPosition> affectedChunks = schematic instanceof BaseSchematic ?
-                            ((BaseSchematic) schematic).getAffectedChunks() : null;
-
-                    this.islandsContainer.addIsland(island);
-                    setLastIsland(new SBlockPosition(islandLocation));
-
-                    try {
-                        island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
-
-                        island.setBiome(biome);
-                        island.setSchematicGenerate(plugin.getSettings().getWorlds().getDefaultWorld());
-                        island.setCurrentlyActive(true);
-
-                        if (offset) {
-                            island.setBonusWorth(island.getRawWorth().negate());
-                            island.setBonusLevel(island.getRawLevel().negate());
-                        }
-                    } finally {
-                        island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
-                    }
-
-                    IslandsDatabaseBridge.insertIsland(island, affectedChunks);
-
-                    island.setIslandHome(schematic.adjustRotation(islandLocation));
-
-                    BukkitExecutor.sync(() -> builder.owner.runIfOnline(player -> {
-                        if (updateGamemode)
-                            player.setGameMode(GameMode.SURVIVAL);
-
-                        if (!teleportPlayer) {
-                            Message.CREATE_ISLAND.send(builder.owner, Formatters.LOCATION_FORMATTER.format(
-                                    islandLocation), System.currentTimeMillis() - startTime);
-                        } else {
-                            builder.owner.teleport(island, result -> {
-                                Message.CREATE_ISLAND.send(builder.owner, Formatters.LOCATION_FORMATTER.format(
-                                        islandLocation), System.currentTimeMillis() - startTime);
-
-                                if (result) {
-                                    if (affectedChunks != null)
-                                        BukkitExecutor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, affectedChunks), 10L);
-                                    if (plugin.getSettings().getWorlds().getDefaultWorld() == World.Environment.THE_END) {
-                                        plugin.getNMSDragonFight().awardTheEndAchievement(player);
-                                        this.dragonBattleService.get().resetEnderDragonBattle(island);
-                                    }
-                                }
-                            });
-                        }
-                    }), 1L);
-
+                    createIslandInternalOnSuccessCallback(builder, biome, offset, schematic,
+                            updateGamemode, startTime, islandCreationResult);
                     return;
                 } catch (Throwable runtimeError) {
                     error = runtimeError;
@@ -298,12 +233,83 @@ public class GridManagerImpl extends Manager implements GridManager {
 
             Log.entering(builder.owner.getName(), builder.bonusWorth, builder.bonusLevel, builder.islandName,
                     offset, biome, schematic.getName());
-            Log.error(error, "An unexpected error occurred while creating an island:");
+
+            if (error != null)
+                Log.error(error, "An unexpected error occurred while creating an island:");
 
             builder.owner.setIsland(null);
 
             Message.CREATE_ISLAND_FAILURE.send(builder.owner);
         });
+    }
+
+    private void createIslandInternalOnSuccessCallback(IslandBuilderImpl builder,
+                                                       Biome biome, boolean offset, Schematic schematic,
+                                                       boolean updateGamemode, long startTime,
+                                                       IslandCreationAlgorithm.IslandCreationResult islandCreationResult) {
+        switch (islandCreationResult.getStatus()) {
+            case NAME_OCCUPIED:
+                builder.owner.setIsland(null);
+                Message.ISLAND_ALREADY_EXIST.send(builder.owner);
+                return;
+            case SUCCESS:
+                break;
+            default:
+                throw new RuntimeException("Cannot handle creation status: " + islandCreationResult.getStatus());
+        }
+
+        Island island = islandCreationResult.getIsland();
+        Location islandLocation = islandCreationResult.getIslandLocation();
+        boolean teleportPlayer = islandCreationResult.shouldTeleportPlayer();
+
+        List<ChunkPosition> affectedChunks = schematic instanceof BaseSchematic ?
+                ((BaseSchematic) schematic).getAffectedChunks() : null;
+
+        this.islandsContainer.addIsland(island);
+        setLastIsland(new SBlockPosition(islandLocation));
+
+        try {
+            island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
+
+            island.setBiome(biome);
+            island.setSchematicGenerate(plugin.getSettings().getWorlds().getDefaultWorld());
+            island.setCurrentlyActive(true);
+
+            if (offset) {
+                island.setBonusWorth(island.getRawWorth().negate());
+                island.setBonusLevel(island.getRawLevel().negate());
+            }
+        } finally {
+            island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
+        }
+
+        IslandsDatabaseBridge.insertIsland(island, affectedChunks);
+
+        island.setIslandHome(schematic.adjustRotation(islandLocation));
+
+        BukkitExecutor.sync(() -> builder.owner.runIfOnline(player -> {
+            if (updateGamemode)
+                player.setGameMode(GameMode.SURVIVAL);
+
+            if (!teleportPlayer) {
+                Message.CREATE_ISLAND.send(builder.owner, Formatters.LOCATION_FORMATTER.format(
+                        islandLocation), System.currentTimeMillis() - startTime);
+            } else {
+                builder.owner.teleport(island, result -> {
+                    Message.CREATE_ISLAND.send(builder.owner, Formatters.LOCATION_FORMATTER.format(
+                            islandLocation), System.currentTimeMillis() - startTime);
+
+                    if (result) {
+                        if (affectedChunks != null)
+                            BukkitExecutor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, affectedChunks), 10L);
+                        if (plugin.getSettings().getWorlds().getDefaultWorld() == World.Environment.THE_END) {
+                            plugin.getNMSDragonFight().awardTheEndAchievement(player);
+                            this.dragonBattleService.get().resetEnderDragonBattle(island);
+                        }
+                    }
+                });
+            }
+        }), 1L);
     }
 
     @Override
