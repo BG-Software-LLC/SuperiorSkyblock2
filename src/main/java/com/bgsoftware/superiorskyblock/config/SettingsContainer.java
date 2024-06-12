@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.DateFormatter;
@@ -80,7 +81,7 @@ public class SettingsContainer {
     public final double defaultSpawnerRates;
     public final double defaultMobDrops;
     public final BigDecimal defaultBankLimit;
-    public final Map<Integer, Integer> defaultRoleLimits;
+    public final Int2IntMapView defaultRoleLimits;
     public final int islandsHeight;
     public final boolean worldBordersEnabled;
     public final boolean stackedBlocksEnabled;

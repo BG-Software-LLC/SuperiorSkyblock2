@@ -1,25 +1,26 @@
 package com.bgsoftware.superiorskyblock.core.collections.creator;
 
-import java.util.Map;
+import com.bgsoftware.superiorskyblock.core.collections.view.Char2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 
 public interface CollectionsCreator {
 
-    <V> Map<Integer, V> createInt2ObjectHashMap();
+    <V> Int2ObjectMapView<V> createInt2ObjectLinkedHashMap();
 
-    <V> Map<Integer, V> createInt2ObjectLinkedHashMap();
+    <V> Int2ObjectMapView<V> createInt2ObjectArrayMap();
 
-    <V> Map<Integer, V> createInt2ObjectArrayMap();
+    Int2IntMapView createInt2IntHashMap();
 
-    Map<Integer, Integer> createInt2IntHashMap();
+    Int2IntMapView createInt2IntArrayMap();
 
-    Map<Integer, Integer> createInt2IntArrayMap();
+    <V> Long2ObjectMapView<V> createLong2ObjectHashMap();
 
-    <V> Map<Long, V> createLong2ObjectHashMap();
+    <V> Long2ObjectMapView<V> createLong2ObjectLinkedHashMap();
 
-    <V> Map<Long, V> createLong2ObjectLinkedHashMap();
+    <V> Long2ObjectMapView<V> createLong2ObjectArrayMap();
 
-    <V> Map<Long, V> createLong2ObjectArrayMap();
-
-    <V> Map<Character, V> createChar2ObjectArrayMap();
+    <V> Char2ObjectMapView<V> createChar2ObjectArrayMap();
 
 }

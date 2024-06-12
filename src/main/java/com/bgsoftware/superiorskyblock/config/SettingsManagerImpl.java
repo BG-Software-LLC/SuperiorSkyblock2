@@ -104,7 +104,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
-    public DefaultValues getDefaultValues() {
+    public DefaultValuesSection getDefaultValues() {
         return this.defaultValues;
     }
 

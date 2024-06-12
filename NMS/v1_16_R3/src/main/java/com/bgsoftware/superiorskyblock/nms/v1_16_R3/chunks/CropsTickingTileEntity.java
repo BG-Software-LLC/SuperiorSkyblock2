@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.Chunk;
@@ -19,7 +20,6 @@ import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
@@ -27,7 +27,7 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final Map<Long, CropsTickingTileEntity> tickingChunks = CollectionsFactory.createLong2ObjectHashMap();
+    private static final Long2ObjectMapView<CropsTickingTileEntity> tickingChunks = CollectionsFactory.createLong2ObjectHashMap();
     private static int random = ThreadLocalRandom.current().nextInt();
 
     private final WeakReference<Island> island;
@@ -61,9 +61,7 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
 
     public static void create(Island island, Chunk chunk) {
         long chunkPair = chunk.getPos().pair();
-        if (!tickingChunks.containsKey(chunkPair)) {
-            tickingChunks.put(chunkPair, new CropsTickingTileEntity(island, chunk));
-        }
+        tickingChunks.computeIfAbsent(chunkPair, i -> new CropsTickingTileEntity(island, chunk));
     }
 
     public static CropsTickingTileEntity remove(ChunkCoordIntPair chunkCoords) {

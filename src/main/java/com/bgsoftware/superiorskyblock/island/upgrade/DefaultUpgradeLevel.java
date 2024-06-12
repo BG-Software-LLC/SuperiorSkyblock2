@@ -31,7 +31,7 @@ public class DefaultUpgradeLevel extends SUpgradeLevel {
                 convertFromArray(plugin.getSettings().getDefaultValues().getGenerators()),
                 Collections.emptyMap(),
                 Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getBankLimit()),
-                plugin.getSettings().getDefaultValues().getRoleLimits()
+                plugin.getSettings().getDefaultValues().getRoleLimitsAsView()
         );
     }
 

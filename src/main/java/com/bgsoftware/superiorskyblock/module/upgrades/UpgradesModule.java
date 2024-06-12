@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadExceptio
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
@@ -257,7 +258,7 @@ public class UpgradesModule extends BuiltinModule {
                     islandEffects.put(potionEffectType, levelSection.getInt("island-effects." + effect) - 1);
             }
         }
-        Map<Integer, Integer> rolesLimits = CollectionsFactory.createInt2IntArrayMap();
+        Int2IntMapView rolesLimits = CollectionsFactory.createInt2IntArrayMap();
         if (levelSection.contains("role-limits")) {
             for (String roleId : levelSection.getConfigurationSection("role-limits").getKeys(false)) {
                 try {

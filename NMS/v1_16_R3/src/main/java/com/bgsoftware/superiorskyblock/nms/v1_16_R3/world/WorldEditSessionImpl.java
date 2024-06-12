@@ -6,8 +6,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.collections.view.LongIterator;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
@@ -71,7 +72,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
         }
     }).get();
 
-    private final Map<Long, ChunkData> chunks = CollectionsFactory.createLong2ObjectHashMap();
+    private final Long2ObjectMapView<ChunkData> chunks = CollectionsFactory.createLong2ObjectHashMap();
     private final List<Pair<BlockPosition, IBlockData>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPosition, CompoundTag>> blockEntities = new LinkedList<>();
     private final Set<ChunkCoordIntPair> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
@@ -147,11 +148,15 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     @Override
     public List<ChunkPosition> getAffectedChunks() {
+        List<ChunkPosition> chunkPositions = new LinkedList<>();
         World bukkitWorld = worldServer.getWorld();
-        return new SequentialListBuilder<Long>().map(chunks.keySet(), chunkKey -> {
+        LongIterator iterator = chunks.keyIterator();
+        while (iterator.hasNext()) {
+            long chunkKey = iterator.next();
             ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(chunkKey);
-            return ChunkPosition.of(bukkitWorld, chunkCoord.x, chunkCoord.z);
-        });
+            chunkPositions.add(ChunkPosition.of(bukkitWorld, chunkCoord.x, chunkCoord.z));
+        }
+        return chunkPositions;
     }
 
     @Override

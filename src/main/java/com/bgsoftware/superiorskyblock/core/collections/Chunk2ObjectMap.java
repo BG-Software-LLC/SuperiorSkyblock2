@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.WorldInfoImpl;
+import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 
 import java.util.AbstractCollection;
 import java.util.AbstractMap;
@@ -26,7 +27,7 @@ public class Chunk2ObjectMap<V> extends AbstractMap<ChunkPosition, V> {
     @Nullable
     private EntrySet entrySet;
 
-    private final Map<String, Map<Long, V>> backendMap = new LinkedHashMap<>();
+    private final Map<String, Long2ObjectMapView<V>> backendMap = new LinkedHashMap<>();
     private int size = 0;
 
     @Override
@@ -61,7 +62,7 @@ public class Chunk2ObjectMap<V> extends AbstractMap<ChunkPosition, V> {
 
     @Nullable
     public V get(String worldName, long chunkPair) {
-        Map<Long, V> worldBackendData = this.backendMap.get(worldName);
+        Long2ObjectMapView<V> worldBackendData = this.backendMap.get(worldName);
         if (worldBackendData == null)
             return null;
 
@@ -69,7 +70,7 @@ public class Chunk2ObjectMap<V> extends AbstractMap<ChunkPosition, V> {
     }
 
     public V computeIfAbsent(String worldName, long chunkPair, Supplier<V> newValue) {
-        Map<Long, V> worldBackendData = this.backendMap.computeIfAbsent(worldName, n ->
+        Long2ObjectMapView<V> worldBackendData = this.backendMap.computeIfAbsent(worldName, n ->
                 CollectionsFactory.createLong2ObjectLinkedHashMap());
 
         return worldBackendData.computeIfAbsent(chunkPair, p -> newValue.get());
@@ -83,7 +84,7 @@ public class Chunk2ObjectMap<V> extends AbstractMap<ChunkPosition, V> {
 
     @Nullable
     public V put(String worldName, long chunkPair, V value) {
-        Map<Long, V> worldBackendData = this.backendMap.computeIfAbsent(worldName, n ->
+        Long2ObjectMapView<V> worldBackendData = this.backendMap.computeIfAbsent(worldName, n ->
                 CollectionsFactory.createLong2ObjectLinkedHashMap());
 
         V oldValue = worldBackendData.put(chunkPair, value);
@@ -106,7 +107,7 @@ public class Chunk2ObjectMap<V> extends AbstractMap<ChunkPosition, V> {
 
     @Nullable
     public V remove(String worldName, long chunkPair) {
-        Map<Long, V> worldBackendData = this.backendMap.get(worldName);
+        Long2ObjectMapView<V> worldBackendData = this.backendMap.get(worldName);
         if (worldBackendData == null)
             return null;
 
@@ -310,7 +311,7 @@ public class Chunk2ObjectMap<V> extends AbstractMap<ChunkPosition, V> {
                     V oldValue = this.cachedValue;
                     this.cachedValue = v;
 
-                    Map<Long, V> worldBackendData = Chunk2ObjectMap.this.backendMap
+                    Long2ObjectMapView<V> worldBackendData = Chunk2ObjectMap.this.backendMap
                             .get(this.chunkPosition.getWorldName());
 
                     worldBackendData.put(this.chunkPosition.asPair(), this.cachedValue);
@@ -325,8 +326,8 @@ public class Chunk2ObjectMap<V> extends AbstractMap<ChunkPosition, V> {
 
     private abstract class Itr<T> implements Iterator<T> {
 
-        protected final Iterator<Entry<String, Map<Long, V>>> worldsIterator;
-        protected Iterator<Entry<Long, V>> currWorldIterator = Collections.emptyIterator();
+        protected final Iterator<Entry<String, Long2ObjectMapView<V>>> worldsIterator;
+        protected Iterator<Long2ObjectMapView.Entry<V>> currWorldIterator = Collections.emptyIterator();
         protected String currWorld;
         protected long currChunk;
         protected V currValue;
@@ -347,12 +348,12 @@ public class Chunk2ObjectMap<V> extends AbstractMap<ChunkPosition, V> {
                     throw new NoSuchElementException();
                 }
 
-                Entry<String, Map<Long, V>> nextWorld = this.worldsIterator.next();
-                this.currWorldIterator = nextWorld.getValue().entrySet().iterator();
+                Entry<String, Long2ObjectMapView<V>> nextWorld = this.worldsIterator.next();
+                this.currWorldIterator = nextWorld.getValue().entryIterator();
                 this.currWorld = nextWorld.getKey();
             }
 
-            Entry<Long, V> nextChunk = this.currWorldIterator.next();
+            Long2ObjectMapView.Entry<V> nextChunk = this.currWorldIterator.next();
             this.currChunk = nextChunk.getKey();
             this.currValue = nextChunk.getValue();
 
@@ -363,7 +364,7 @@ public class Chunk2ObjectMap<V> extends AbstractMap<ChunkPosition, V> {
 
         @Override
         public final void remove() {
-            Map<Long, V> worldBackendData = Chunk2ObjectMap.this.backendMap.get(this.currWorld);
+            Long2ObjectMapView<V> worldBackendData = Chunk2ObjectMap.this.backendMap.get(this.currWorld);
 
             this.currWorldIterator.remove();
             Chunk2ObjectMap.this.onRemove(this.currValue);

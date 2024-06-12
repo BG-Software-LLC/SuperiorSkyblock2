@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
@@ -25,7 +26,13 @@ import org.bukkit.potion.PotionEffectType;
 
 import javax.script.ScriptException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SUpgradeLevel implements UpgradeLevel {
@@ -55,7 +62,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final Map<World.Environment, Map<Key, Integer>> generatorRates;
     private final Map<PotionEffectType, Integer> islandEffects;
     private final Value<BigDecimal> bankLimit;
-    private final Map<Integer, Integer> roleLimits;
+    private final Int2IntMapView roleLimits;
 
     private ItemData itemData;
 
@@ -65,7 +72,7 @@ public class SUpgradeLevel implements UpgradeLevel {
                          IntValue borderSize, KeyMap<Integer> blockLimits,
                          KeyMap<Integer> entityLimits, Map<World.Environment, Map<Key, Integer>> generatorRates,
                          Map<PotionEffectType, Integer> islandEffects, Value<BigDecimal> bankLimit,
-                         Map<Integer, Integer> roleLimits) {
+                         Int2IntMapView roleLimits) {
         this.level = level;
         this.cost = cost;
         this.commands = commands;
@@ -242,12 +249,20 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public Map<PlayerRole, Integer> getRoleLimits() {
-        return roleLimits.entrySet().stream()
-                .filter(entry -> SPlayerRole.fromId(entry.getKey()) != null)
-                .collect(Collectors.toMap(
-                        entry -> SPlayerRole.fromId(entry.getKey()),
-                        Map.Entry::getValue
-                ));
+        if (this.roleLimits.isEmpty())
+            return Collections.emptyMap();
+
+        Map<PlayerRole, Integer> roleLimits = new LinkedHashMap<>();
+
+        Iterator<Int2IntMapView.Entry> iterator = this.roleLimits.entryIterator();
+        while (iterator.hasNext()) {
+            Int2IntMapView.Entry entry = iterator.next();
+            PlayerRole playerRole = SPlayerRole.fromId(entry.getKey());
+            if (playerRole != null)
+                roleLimits.put(playerRole, entry.getValue());
+        }
+
+        return roleLimits.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(roleLimits);
     }
 
     public DoubleValue getCropGrowthUpgradeValue() {
@@ -317,12 +332,20 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     public Map<PlayerRole, IntValue> getRoleLimitsUpgradeValue() {
-        return roleLimits.entrySet().stream()
-                .filter(entry -> SPlayerRole.fromId(entry.getKey()) != null)
-                .collect(Collectors.toMap(
-                        entry -> SPlayerRole.fromId(entry.getKey()),
-                        entry -> IntValue.syncedFixed(entry.getValue()))
-                );
+        if (this.roleLimits.isEmpty())
+            return Collections.emptyMap();
+
+        Map<PlayerRole, IntValue> roleLimits = new LinkedHashMap<>();
+
+        Iterator<Int2IntMapView.Entry> iterator = this.roleLimits.entryIterator();
+        while (iterator.hasNext()) {
+            Int2IntMapView.Entry entry = iterator.next();
+            PlayerRole playerRole = SPlayerRole.fromId(entry.getKey());
+            if (playerRole != null)
+                roleLimits.put(playerRole, IntValue.syncedFixed(entry.getValue()));
+        }
+
+        return roleLimits.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(roleLimits);
     }
 
     public void setItemData(TemplateItem hasNextLevel, TemplateItem noNextLevel,
