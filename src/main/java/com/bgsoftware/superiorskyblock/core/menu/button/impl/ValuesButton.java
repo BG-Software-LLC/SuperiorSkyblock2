@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButt
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandValues;
+import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -53,8 +54,9 @@ public class ValuesButton extends AbstractMenuViewButton<MenuIslandValues.View> 
         BigDecimal amount = new BigDecimal(block.getGlobalKey().contains("SPAWNER") ?
                 island.getExactBlockCountAsBigInteger(block) : island.getBlockCountAsBigInteger(block));
 
-        BigDecimal blockWorth = plugin.getBlockValues().getBlockWorth(block);
-        BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(block);
+        BlockValue blockValue = plugin.getBlockValues().getBlockValue(block);
+        BigDecimal blockWorth = blockValue.getWorth();
+        BigDecimal blockLevel = blockValue.getLevel();
 
         ItemStack itemStack = buttonItem.getBuilder()
                 .replaceAll("{0}", amount + "")

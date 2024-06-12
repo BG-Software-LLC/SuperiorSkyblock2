@@ -63,6 +63,7 @@ import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
 import com.bgsoftware.superiorskyblock.core.value.IntValue;
 import com.bgsoftware.superiorskyblock.core.value.Value;
+import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
@@ -2207,14 +2208,15 @@ public class SIsland implements Island {
         BigDecimal oldWorth = getWorth();
         BigDecimal oldLevel = getIslandLevel();
 
-        BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
-        BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
+        BlockValue blockValue = plugin.getBlockValues().getBlockValue(key);
+        BigDecimal blockWorth = blockValue.getWorth();
+        BigDecimal blockLevel = blockValue.getLevel();
 
         boolean saveBlockCounts = (flags & IslandBlockFlags.SAVE_BLOCK_COUNTS) != 0;
         boolean updateLastTimeStatus = (flags & IslandBlockFlags.UPDATE_LAST_TIME_STATUS) != 0;
 
-        if (blockValue.compareTo(BigDecimal.ZERO) != 0) {
-            islandWorth.updateAndGet(islandWorth -> islandWorth.add(blockValue.multiply(new BigDecimal(amount))));
+        if (blockWorth.compareTo(BigDecimal.ZERO) != 0) {
+            islandWorth.updateAndGet(islandWorth -> islandWorth.add(blockWorth.multiply(new BigDecimal(amount))));
             if (saveBlockCounts)
                 plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_WORTH, this);
         }
@@ -2409,14 +2411,15 @@ public class SIsland implements Island {
 
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
 
-        BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
-        BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
+        BlockValue blockValue = plugin.getBlockValues().getBlockValue(key);
+        BigDecimal blockWorth = blockValue.getWorth();
+        BigDecimal blockLevel = blockValue.getLevel();
 
         boolean saveBlockCounts = (flags & IslandBlockFlags.SAVE_BLOCK_COUNTS) != 0;
         boolean updateLastTimeStatus = (flags & IslandBlockFlags.UPDATE_LAST_TIME_STATUS) != 0;
 
-        if (blockValue.compareTo(BigDecimal.ZERO) != 0) {
-            this.islandWorth.updateAndGet(islandWorth -> islandWorth.subtract(blockValue.multiply(new BigDecimal(amount))));
+        if (blockWorth.compareTo(BigDecimal.ZERO) != 0) {
+            this.islandWorth.updateAndGet(islandWorth -> islandWorth.subtract(blockWorth.multiply(new BigDecimal(amount))));
             if (saveBlockCounts)
                 plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_WORTH, this);
         }
