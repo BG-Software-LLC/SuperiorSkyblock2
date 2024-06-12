@@ -591,10 +591,11 @@ public class SIsland implements Island {
             }
         });
 
-        plugin.getMissions().getAllMissions().stream().filter(mission -> {
+        plugin.getMissions().getPlayerMissions().forEach(mission -> {
             MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
-            return missionData != null && missionData.isLeaveReset();
-        }).forEach(superiorPlayer::resetMission);
+            if (missionData != null && missionData.isLeaveReset())
+                superiorPlayer.resetMission(mission);
+        });
 
         plugin.getMenus().destroyMemberManage(superiorPlayer);
         plugin.getMenus().destroyMemberRole(superiorPlayer);
@@ -1570,7 +1571,7 @@ public class SIsland implements Island {
             if (plugin.getSettings().isDisbandInventoryClear())
                 plugin.getNMSPlayers().clearInventory(islandMember.asOfflinePlayer());
 
-            for (Mission<?> mission : plugin.getMissions().getAllMissions()) {
+            for (Mission<?> mission : plugin.getMissions().getPlayerMissions()) {
                 MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
                 if (missionData != null && missionData.isDisbandReset()) {
                     islandMember.resetMission(mission);
@@ -1584,7 +1585,7 @@ public class SIsland implements Island {
             plugin.getProviders().depositMoney(getOwner(), islandBank.getBalance()
                     .multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund)));
 
-        plugin.getMissions().getAllMissions().forEach(this::resetMission);
+        plugin.getMissions().getIslandMissions().forEach(this::resetMission);
 
         resetChunks(IslandChunkFlags.ONLY_PROTECTED, () -> Profiler.end(profilerId));
 
@@ -1624,10 +1625,8 @@ public class SIsland implements Island {
         IslandsDatabaseBridge.saveIslandLeader(this);
         IslandsDatabaseBridge.addMember(this, previousOwner, getCreationTime());
 
-        plugin.getMissions().getAllMissions().forEach(mission -> {
-            if (mission.getIslandMission())
-                mission.transferData(previousOwner, owner);
-        });
+        plugin.getMissions().getIslandMissions().forEach(mission ->
+                mission.transferData(previousOwner, owner));
 
         return true;
     }
@@ -4328,44 +4327,44 @@ public class SIsland implements Island {
     @Override
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        Preconditions.checkArgument(mission.getIslandMission(), "mission parameter must be island-mission.");
         this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(1));
     }
 
     @Override
     public void resetMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        Preconditions.checkArgument(mission.getIslandMission(), "mission parameter must be island-mission.");
         this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(-1));
     }
 
     @Override
     public boolean hasCompletedMission(Mission<?> mission) {
-        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        Counter finishCount = completedMissions.get(new MissionReference(mission));
-        return finishCount != null && finishCount.get() > 0;
+        return getAmountMissionCompleted(mission) > 0;
     }
 
     @Override
     public boolean canCompleteMissionAgain(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        if (!mission.getIslandMission())
+            return false;
+
         Optional<MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
         return missionDataOptional.isPresent() && getAmountMissionCompleted(mission) <
                 missionDataOptional.get().getResetAmount();
     }
 
-    /*
-     *  Data related methods
-     */
-
     @Override
     public int getAmountMissionCompleted(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        Counter finishCount = completedMissions.get(new MissionReference(mission));
+        Counter finishCount = mission.getIslandMission() ? completedMissions.get(new MissionReference(mission)) : null;
         return finishCount == null ? 0 : finishCount.get();
     }
 
     @Override
     public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        Preconditions.checkArgument(mission.getIslandMission(), "mission parameter must be island-mission.");
         this.changeAmountMissionsCompletedInternal(mission, counter -> counter.set(finishCount));
     }
 
