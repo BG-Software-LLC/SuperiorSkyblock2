@@ -1623,7 +1623,10 @@ public class SIsland implements Island {
         IslandsDatabaseBridge.saveIslandLeader(this);
         IslandsDatabaseBridge.addMember(this, previousOwner, getCreationTime());
 
-        plugin.getMissions().getAllMissions().forEach(mission -> mission.transferData(previousOwner, owner));
+        plugin.getMissions().getAllMissions().forEach(mission -> {
+            if (mission.getIslandMission())
+                mission.transferData(previousOwner, owner);
+        });
 
         return true;
     }
