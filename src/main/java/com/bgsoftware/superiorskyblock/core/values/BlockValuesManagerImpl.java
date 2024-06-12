@@ -12,7 +12,9 @@ import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.KeySets;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.collections.KeySetStrategy;
 import com.bgsoftware.superiorskyblock.core.key.collections.MaterialKeySet;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -60,8 +62,8 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
     private static final Bindings bindings = createBindings();
 
     private static final KeyMap<CustomKeyParser> customKeyParsers = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
-    private static final KeySet valuesMenuBlocks = MaterialKeySet.createHashSet();
-    private static final KeySet customBlockKeys = MaterialKeySet.createHashSet();
+    private static final KeySet valuesMenuBlocks = KeySets.createHashSet(KeyIndicator.MATERIAL);
+    private static final KeySet customBlockKeys = KeySets.createHashSet(KeyIndicator.MATERIAL);
 
     private final BlockValuesContainer blockValuesContainer;
     private final BlockValuesContainer customValuesContainer;

@@ -4,14 +4,19 @@ import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.key.collections.EntityTypeKeyMap;
+import com.bgsoftware.superiorskyblock.core.key.collections.KeyMapStrategy;
 import com.bgsoftware.superiorskyblock.core.key.collections.LazyLoadedKeyMap;
 import com.bgsoftware.superiorskyblock.core.key.collections.MaterialKeyMap;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class KeyMaps {
 
@@ -31,40 +36,26 @@ public class KeyMaps {
     }
 
     public static <V> KeyMap<V> createHashMap(KeyIndicator keyIndicator) {
-        return createMap(keyIndicator, () -> new HashMap());
-    }
-
-    public static <V> KeyMap<V> createIdentityHashMap(KeyIndicator keyIndicator) {
-        return createMap(keyIndicator, () -> new IdentityHashMap(), true);
+        return createMap(keyIndicator, KeyMapStrategy.HASH_MAP);
     }
 
     public static <V> KeyMap<V> createConcurrentHashMap(KeyIndicator keyIndicator) {
-        return createMap(keyIndicator, () -> new ConcurrentHashMap());
+        return createMap(keyIndicator, KeyMapStrategy.CONCURRENT_HASH_MAP);
     }
 
     public static <V> KeyMap<V> createArrayMap(KeyIndicator keyIndicator) {
-        return createMap(keyIndicator, () -> new ArrayMap());
+        return createMap(keyIndicator, KeyMapStrategy.ARRAY_MAP);
     }
 
-    public static <V> KeyMap<V> createMap(KeyIndicator keyIndicator, Supplier<Map> mapCreator) {
-        return createMap(keyIndicator, mapCreator, false);
-    }
-
-    private static <V> KeyMap<V> createMap(KeyIndicator keyIndicator, Supplier<Map> mapCreator, boolean identityMap) {
+    public static <V> KeyMap<V> createMap(KeyIndicator keyIndicator, KeyMapStrategy strategy) {
         switch (keyIndicator) {
             case MATERIAL:
-                return MaterialKeyMap.createMap(mapCreator);
+                return new MaterialKeyMap<>(strategy);
             case ENTITY_TYPE:
-                return EntityTypeKeyMap.createMap(mapCreator, identityMap);
+                return new EntityTypeKeyMap<>(strategy);
         }
 
-        return LazyLoadedKeyMap.createMap(mapCreator, identityMap);
-    }
-
-    public static <V> KeyMap<V> createConcurrentHashMap(KeyIndicator keyIndicator, Map<Key, V> values) {
-        KeyMap<V> keyMap = createConcurrentHashMap(keyIndicator);
-        keyMap.putAll(values);
-        return keyMap;
+        return new LazyLoadedKeyMap<>(strategy);
     }
 
     private static class EmptyKeyMap<V> implements KeyMap<V> {

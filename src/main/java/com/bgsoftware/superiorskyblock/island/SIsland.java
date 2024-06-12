@@ -3696,7 +3696,8 @@ public class SIsland implements Island {
 
             removeGeneratorAmount(key, environment);
         } else if (percentage == 100) {
-            KeyMap<IntValue> cobbleGeneratorValuesOriginal = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL, worldGeneratorRates);
+            KeyMap<IntValue> cobbleGeneratorValuesOriginal = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
+            cobbleGeneratorValuesOriginal.putAll(worldGeneratorRates);
             worldGeneratorRates.clear();
 
             int generatorRate = 1;
