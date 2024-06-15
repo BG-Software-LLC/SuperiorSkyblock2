@@ -5,6 +5,7 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import net.minecraft.server.v1_12_R1.AxisAlignedBB;
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -69,7 +70,7 @@ public class IslandEnderDragonBattle extends EnderDragonBattle {
     private final BossBattleServer bossBattleServer;
     private final AxisAlignedBB borderArea;
 
-    private final LinkedList<Integer> gateways = new LinkedList<>();
+    private final LinkedList<Integer> gateways = Lists.newLinkedList();
 
     private UUID dragonUUID;
     private BlockPosition exitPortalLocation;

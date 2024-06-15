@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.module.container;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.module.ModuleData;
 import com.google.common.base.Preconditions;
@@ -13,14 +13,13 @@ import org.bukkit.event.HandlerList;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 public class DefaultModulesContainer implements ModulesContainer {
 
-    private final Map<String, PluginModule> modulesMap = new HashMap<>();
-    private final Map<PluginModule, ModuleData> modulesData = new ArrayMap<>();
+    private final Map<String, PluginModule> modulesMap = Maps.newHashMap();
+    private final Map<PluginModule, ModuleData> modulesData = Maps.newArrayMap();
 
     private final SuperiorSkyblockPlugin plugin;
 

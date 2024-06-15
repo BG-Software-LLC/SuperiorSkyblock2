@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.island.privilege;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
@@ -15,7 +16,7 @@ public class RolePrivilegeNode extends PrivilegeNodeAbstract {
 
     @Nullable
     private final SPlayerRole playerRole;
-    private final List<RolePrivilegeNode> linkedNodes = new LinkedList<>();
+    private final List<RolePrivilegeNode> linkedNodes = Lists.newLinkedList();
 
     public RolePrivilegeNode(@Nullable SPlayerRole playerRole, @Nullable RolePrivilegeNode linkedNode) {
         this(playerRole, linkedNode, null);

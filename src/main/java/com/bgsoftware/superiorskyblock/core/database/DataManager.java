@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.database;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
@@ -35,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DataManager extends Manager {
 
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
-    private final List<DatabaseLoader> databaseLoaders = new LinkedList<>();
+    private final List<DatabaseLoader> databaseLoaders = Lists.newLinkedList();
 
     public DataManager(SuperiorSkyblockPlugin plugin) {
         super(plugin);

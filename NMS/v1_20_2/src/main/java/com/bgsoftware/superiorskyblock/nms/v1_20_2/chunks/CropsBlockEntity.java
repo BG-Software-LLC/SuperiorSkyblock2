@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.nms.v1_20_2.chunks;
 
+import com.bgsoftware.common.collections.Maps;
+import com.bgsoftware.common.collections.longs.Long2ObjectMap;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
-import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -26,7 +26,7 @@ public class CropsBlockEntity extends BlockEntity {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final Long2ObjectMapView<CropsBlockEntity> tickingChunks = CollectionsFactory.createLong2ObjectHashMap();
+    private static final Long2ObjectMap<CropsBlockEntity> tickingChunks = Maps.newLong2ObjectHashMap();
     private static int random = ThreadLocalRandom.current().nextInt();
 
     private final WeakReference<Island> island;

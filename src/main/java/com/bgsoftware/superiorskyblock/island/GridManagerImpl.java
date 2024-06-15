@@ -42,6 +42,7 @@ import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -53,7 +54,6 @@ import org.bukkit.block.Block;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -97,7 +97,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     private boolean forceSort = false;
 
-    private final List<SortingType> pendingSortingTypes = new LinkedList<>();
+    private final List<SortingType> pendingSortingTypes = Lists.newLinkedList();
 
     public GridManagerImpl(SuperiorSkyblockPlugin plugin, IslandsPurger islandsPurger, IslandPreviews islandPreviews) {
         super(plugin);
@@ -712,7 +712,7 @@ public class GridManagerImpl extends Manager implements GridManager {
     public void calcAllIslands(Runnable callback) {
         Log.debug(Debug.CALCULATE_ALL_ISLANDS);
 
-        List<Island> islands = new ArrayList<>();
+        List<Island> islands = Lists.newArrayList();
 
         {
             for (Island island : this.islandsContainer.getIslandsUnsorted()) {

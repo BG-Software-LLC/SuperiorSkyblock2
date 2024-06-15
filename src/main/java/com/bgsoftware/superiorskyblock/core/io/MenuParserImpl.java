@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.core.io;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.ints.IntList;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
@@ -38,7 +40,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -408,8 +409,8 @@ public class MenuParserImpl implements MenuParser {
         return templateItem;
     }
 
-    public List<Integer> parseButtonSlots(ConfigurationSection section, String key, MenuPatternSlots menuPatternSlots) {
-        return !section.contains(key) ? Collections.emptyList() : menuPatternSlots.getSlots(section.getString(key));
+    public IntList parseButtonSlots(ConfigurationSection section, String key, MenuPatternSlots menuPatternSlots) {
+        return !section.contains(key) ? Lists.newIntArrayList() : menuPatternSlots.getSlots(section.getString(key));
     }
 
     private static <E extends Enum<E>> E getMinecraftEnum(Class<E> type, String name) throws IllegalArgumentException {

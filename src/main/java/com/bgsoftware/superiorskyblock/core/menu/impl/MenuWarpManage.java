@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.core.menu.impl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
-import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
@@ -17,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpManageIconButto
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpManageLocationButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpManagePrivateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpManageRenameButton;
+import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -53,7 +53,7 @@ public class MenuWarpManage extends AbstractMenu<MenuWarpManage.View, MenuWarpMa
 
         MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
-        MenuLayout.Builder<View> patternBuilder = menuParseResult.getLayoutBuilder();
+        AbstractMenuLayout.AbstractBuilder<View> patternBuilder = menuParseResult.getLayoutBuilder();
 
         GameSound successUpdateSound = cfg.isConfigurationSection("success-update-sound") ?
                 MenuParserImpl.getInstance().getSound(cfg.getConfigurationSection("success-update-sound")) : null;

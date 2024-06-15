@@ -1,5 +1,8 @@
 package com.bgsoftware.superiorskyblock.config;
 
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
+import com.bgsoftware.common.collections.ints.Int2IntMap;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
@@ -12,8 +15,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
-import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.DateFormatter;
@@ -45,8 +46,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -81,7 +80,7 @@ public class SettingsContainer {
     public final double defaultSpawnerRates;
     public final double defaultMobDrops;
     public final BigDecimal defaultBankLimit;
-    public final Int2IntMapView defaultRoleLimits;
+    public final Int2IntMap defaultRoleLimits;
     public final int islandsHeight;
     public final boolean worldBordersEnabled;
     public final boolean stackedBlocksEnabled;
@@ -256,7 +255,7 @@ public class SettingsContainer {
         defaultSpawnerRates = config.getDouble("default-values.spawner-rates", 1D);
         defaultMobDrops = config.getDouble("default-values.mob-drops", 1D);
         defaultBankLimit = new BigDecimal(config.getString("default-values.bank-limit", "-1"));
-        defaultRoleLimits = CollectionsFactory.createInt2IntHashMap();
+        defaultRoleLimits = Maps.newInt2IntArrayMap();
         loadListOrSection(config, "default-values.role-limits", "role limit", (role, limit) -> {
             try {
                 defaultRoleLimits.put(Integer.parseInt(role), limit);
@@ -391,7 +390,7 @@ public class SettingsContainer {
         disableRedstoneOffline = config.getBoolean("disable-redstone-offline", true);
         disableRedstoneAFK = config.getBoolean("afk-integrations.disable-redstone", false);
         disableSpawningAFK = config.getBoolean("afk-integrations.disable-spawning", true);
-        commandsCooldown = new HashMap<>();
+        commandsCooldown = Maps.newHashMap();
         for (String subCommand : config.getConfigurationSection("commands-cooldown").getKeys(false)) {
             int cooldown = config.getInt("commands-cooldown." + subCommand + ".cooldown");
             String permission = config.getString("commands-cooldown." + subCommand + ".bypass-permission");
@@ -407,7 +406,7 @@ public class SettingsContainer {
         immuneToPVPWhenTeleport = config.getBoolean("immune-to-pvp-when-teleport", true);
         blockedVisitorsCommands = config.getStringList("blocked-visitors-commands");
         defaultContainersEnabled = config.getBoolean("default-containers.enabled", false);
-        defaultContainersContents = new HashMap<>();
+        defaultContainersContents = Maps.newHashMap();
         if (config.contains("default-containers.containers")) {
             for (String container : config.getConfigurationSection("default-containers.containers").getKeys(false)) {
                 try {
@@ -442,7 +441,7 @@ public class SettingsContainer {
             }
         }
         defaultSignLines = Formatters.formatList(config.getStringList("default-signs"), Formatters.COLOR_FORMATTER);
-        eventCommands = new HashMap<>();
+        eventCommands = Maps.newHashMap();
         if (config.contains("event-commands")) {
             for (String eventName : config.getConfigurationSection("event-commands").getKeys(false)) {
                 eventCommands.put(eventName.toLowerCase(Locale.ENGLISH), config.getStringList("event-commands." + eventName));
@@ -480,14 +479,14 @@ public class SettingsContainer {
         islandChestTitle = Formatters.COLOR_FORMATTER.format(config.getString("island-chests.chest-title", "&4Island Chest"));
         islandChestsDefaultPage = config.getInt("island-chests.default-pages", 0);
         islandChestsDefaultSize = Math.min(6, Math.max(1, config.getInt("island-chests.default-size", 3)));
-        commandAliases = new HashMap<>();
+        commandAliases = Maps.newHashMap();
         if (config.isConfigurationSection("command-aliases")) {
             for (String label : config.getConfigurationSection("command-aliases").getKeys(false)) {
                 commandAliases.put(label.toLowerCase(Locale.ENGLISH), config.getStringList("command-aliases." + label));
             }
         }
         valuableBlocks = KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("valuable-blocks"));
-        islandPreviewLocations = new HashMap<>();
+        islandPreviewLocations = Maps.newHashMap();
         if (config.isConfigurationSection("preview-islands")) {
             for (String schematic : config.getConfigurationSection("preview-islands").getKeys(false)) {
                 try {
@@ -513,7 +512,7 @@ public class SettingsContainer {
                 .orElse(TopIslandMembersSorting.NAMES);
         bossBarLimit = config.getInt("bossbar-limit", 1);
         deleteUnsafeWarps = config.getBoolean("delete-unsafe-warps", true);
-        playerRespawnActions = new LinkedList<>();
+        playerRespawnActions = Lists.newLinkedList();
         config.getStringList("player-respawn").forEach(respawnAction -> {
             try {
                 playerRespawnActions.add(RespawnAction.getByName(respawnAction));

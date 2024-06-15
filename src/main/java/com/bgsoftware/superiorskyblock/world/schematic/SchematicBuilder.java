@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.world.schematic;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
@@ -15,14 +16,13 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("UnusedReturnValue")
 public class SchematicBuilder {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private final Map<String, Tag<?>> compoundValue = new HashMap<>();
+    private final Map<String, Tag<?>> compoundValue = Maps.newHashMap();
 
     public SchematicBuilder withBlockOffset(BlockOffset blockOffset) {
         compoundValue.put("blockPosition", new StringTag(Serializers.OFFSET_SERIALIZER.serialize(blockOffset)));
@@ -72,7 +72,7 @@ public class SchematicBuilder {
     }
 
     public CompoundTag build() {
-        Map<String, Tag<?>> compoundValue = new HashMap<>();
+        Map<String, Tag<?>> compoundValue = Maps.newHashMap();
 
         for (String key : this.compoundValue.keySet()) {
             if (this.compoundValue.get(key) != null)

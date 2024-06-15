@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.external;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
@@ -7,11 +8,10 @@ import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
 import org.bukkit.Chunk;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class WildStackerSnapshotsContainer {
 
-    private static final Map<ChunkPosition, StackedSnapshot> cachedSnapshots = new ConcurrentHashMap<>();
+    private static final Map<ChunkPosition, StackedSnapshot> cachedSnapshots = Maps.newConcurrentHashMap();
 
     private WildStackerSnapshotsContainer() {
 

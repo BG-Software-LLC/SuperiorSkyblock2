@@ -1,17 +1,17 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 
 public class SortingType implements Comparator<Island>, Enumerable {
 
-    private static final Map<String, SortingType> sortingTypes = new HashMap<>();
+    private static final Map<String, SortingType> sortingTypes = Maps.newHashMap();
     private static int ordinalCounter = 0;
 
     private static final Comparator<Island> ISLAND_NAMES_COMPARATOR = (o1, o2) -> {

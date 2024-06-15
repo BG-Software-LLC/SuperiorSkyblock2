@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.world.schematic.parser;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParseException;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
@@ -14,14 +15,13 @@ import org.apache.commons.io.IOUtils;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 public class DefaultSchematicParser implements SchematicParser {
 
     private static final DefaultSchematicParser INSTANCE = new DefaultSchematicParser();
 
-    private static final Map<String, SuperiorSchematic> HASHED_SCHEMATIC = new HashMap<>();
+    private static final Map<String, SuperiorSchematic> HASHED_SCHEMATIC = Maps.newHashMap();
 
     public static DefaultSchematicParser getInstance() {
         return INSTANCE;

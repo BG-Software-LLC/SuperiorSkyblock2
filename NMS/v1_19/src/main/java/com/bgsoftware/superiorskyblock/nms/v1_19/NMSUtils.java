@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -49,7 +50,6 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -73,7 +73,7 @@ public class NMSUtils {
     private static final ReflectField<IOWorker> ENTITY_STORAGE_WORKER = new ReflectField<>(
             EntityStorage.class, IOWorker.class, Modifier.PRIVATE | Modifier.FINAL, 1);
 
-    private static final List<CompletableFuture<Void>> PENDING_CHUNK_ACTIONS = new LinkedList<>();
+    private static final List<CompletableFuture<Void>> PENDING_CHUNK_ACTIONS = Lists.newLinkedList();
 
     private NMSUtils() {
 
@@ -93,8 +93,8 @@ public class NMSUtils {
 
     private static void runActionOnChunksInternal(ServerLevel serverLevel, Collection<ChunkPos> chunksCoords,
                                                   ChunkCallback chunkCallback, Consumer<List<ChunkPos>> onUnloadChunkAction) {
-        List<ChunkPos> unloadedChunks = new LinkedList<>();
-        List<LevelChunk> loadedChunks = new LinkedList<>();
+        List<ChunkPos> unloadedChunks = Lists.newLinkedList();
+        List<LevelChunk> loadedChunks = Lists.newLinkedList();
 
         chunksCoords.forEach(chunkPos -> {
             ChunkAccess chunkAccess;
@@ -155,7 +155,7 @@ public class NMSUtils {
         PENDING_CHUNK_ACTIONS.add(pendingTask);
 
         BukkitExecutor.createTask().runAsync(v -> {
-            List<Pair<ChunkPos, net.minecraft.nbt.CompoundTag>> chunkCompounds = new LinkedList<>();
+            List<Pair<ChunkPos, net.minecraft.nbt.CompoundTag>> chunkCompounds = Lists.newLinkedList();
 
             chunks.forEach(chunkCoords -> {
                 try {

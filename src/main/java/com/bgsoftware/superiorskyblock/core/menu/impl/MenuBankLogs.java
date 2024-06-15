@@ -59,7 +59,7 @@ public class MenuBankLogs extends AbstractPagedMenu<MenuBankLogs.View, IslandVie
 
         MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
-        MenuLayout.Builder<View> patternBuilder = menuParseResult.getLayoutBuilder();
+        AbstractMenuLayout.AbstractBuilder<View> patternBuilder = menuParseResult.getLayoutBuilder();
 
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "time-sort", menuPatternSlots),
                 new BankLogsSortButton.Builder().setSortType(BankLogsSortButton.SortType.TIME));

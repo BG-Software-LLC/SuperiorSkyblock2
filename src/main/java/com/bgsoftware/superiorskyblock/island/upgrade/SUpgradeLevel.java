@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.island.upgrade;
 
+import com.bgsoftware.common.collections.Maps;
+import com.bgsoftware.common.collections.ints.Int2IntMap;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -10,7 +12,6 @@ import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
@@ -29,7 +30,6 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,7 +62,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final Map<World.Environment, Map<Key, Integer>> generatorRates;
     private final Map<PotionEffectType, Integer> islandEffects;
     private final Value<BigDecimal> bankLimit;
-    private final Int2IntMapView roleLimits;
+    private final Int2IntMap roleLimits;
 
     private ItemData itemData;
 
@@ -72,7 +72,7 @@ public class SUpgradeLevel implements UpgradeLevel {
                          IntValue borderSize, KeyMap<Integer> blockLimits,
                          KeyMap<Integer> entityLimits, Map<World.Environment, Map<Key, Integer>> generatorRates,
                          Map<PotionEffectType, Integer> islandEffects, Value<BigDecimal> bankLimit,
-                         Int2IntMapView roleLimits) {
+                         Int2IntMap roleLimits) {
         this.level = level;
         this.cost = cost;
         this.commands = commands;
@@ -252,11 +252,11 @@ public class SUpgradeLevel implements UpgradeLevel {
         if (this.roleLimits.isEmpty())
             return Collections.emptyMap();
 
-        Map<PlayerRole, Integer> roleLimits = new LinkedHashMap<>();
+        Map<PlayerRole, Integer> roleLimits = Maps.newLinkedHashMap();
 
-        Iterator<Int2IntMapView.Entry> iterator = this.roleLimits.entryIterator();
+        Iterator<Int2IntMap.Entry> iterator = this.roleLimits.entriesIterator();
         while (iterator.hasNext()) {
-            Int2IntMapView.Entry entry = iterator.next();
+            Int2IntMap.Entry entry = iterator.next();
             PlayerRole playerRole = SPlayerRole.fromId(entry.getKey());
             if (playerRole != null)
                 roleLimits.put(playerRole, entry.getValue());
@@ -335,11 +335,11 @@ public class SUpgradeLevel implements UpgradeLevel {
         if (this.roleLimits.isEmpty())
             return Collections.emptyMap();
 
-        Map<PlayerRole, IntValue> roleLimits = new LinkedHashMap<>();
+        Map<PlayerRole, IntValue> roleLimits = Maps.newLinkedHashMap();
 
-        Iterator<Int2IntMapView.Entry> iterator = this.roleLimits.entryIterator();
+        Iterator<Int2IntMap.Entry> iterator = this.roleLimits.entriesIterator();
         while (iterator.hasNext()) {
-            Int2IntMapView.Entry entry = iterator.next();
+            Int2IntMap.Entry entry = iterator.next();
             PlayerRole playerRole = SPlayerRole.fromId(entry.getKey());
             if (playerRole != null)
                 roleLimits.put(playerRole, IntValue.syncedFixed(entry.getValue()));

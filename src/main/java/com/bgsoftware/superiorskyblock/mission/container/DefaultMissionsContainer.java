@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.mission.container;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -15,9 +15,9 @@ import java.util.function.Predicate;
 
 public class DefaultMissionsContainer implements MissionsContainer {
 
-    private final Map<String, Mission<?>> missionMap = new HashMap<>();
-    private final Map<String, MissionData> missionDataMap = new HashMap<>();
-    private final Map<String, MissionCategory> missionCategoryMap = new HashMap<>();
+    private final Map<String, Mission<?>> missionMap = Maps.newHashMap();
+    private final Map<String, MissionData> missionDataMap = Maps.newHashMap();
+    private final Map<String, MissionCategory> missionCategoryMap = Maps.newHashMap();
 
     @Override
     public void addMission(Mission<?> mission) {

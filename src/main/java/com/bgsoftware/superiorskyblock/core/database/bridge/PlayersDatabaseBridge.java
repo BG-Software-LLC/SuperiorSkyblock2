@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.database.bridge;
 
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
@@ -12,20 +14,18 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 @SuppressWarnings("unchecked")
 public class PlayersDatabaseBridge {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final Map<UUID, Map<FutureSave, Set<Object>>> SAVE_METHODS_TO_BE_EXECUTED = new ConcurrentHashMap<>();
+    private static final Map<UUID, Map<FutureSave, Set<Object>>> SAVE_METHODS_TO_BE_EXECUTED = Maps.newConcurrentHashMap();
     private static final LazyReference<DatabaseBridge> GLOBAL_PLAYERS_BRIDGE = new LazyReference<DatabaseBridge>() {
         @Override
         protected DatabaseBridge create() {
@@ -254,7 +254,7 @@ public class PlayersDatabaseBridge {
     }
 
     private static DatabaseFilter createFilter(String id, SuperiorPlayer superiorPlayer, Pair<String, Object>... others) {
-        List<Pair<String, Object>> filters = new LinkedList<>();
+        List<Pair<String, Object>> filters = Lists.newLinkedList();
         filters.add(new Pair<>(id, superiorPlayer.getUniqueId().toString()));
         if (others != null)
             filters.addAll(Arrays.asList(others));

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl.internal;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
@@ -29,7 +30,6 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -138,7 +138,7 @@ public class MenuConfigEditor extends AbstractPagedMenu<MenuConfigEditor.View, M
 
     public class View extends AbstractPagedMenuView<View, Args, ItemStack> {
 
-        private final List<String> pathSlots = new LinkedList<>();
+        private final List<String> pathSlots = Lists.newLinkedList();
         private final String path;
 
         View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView,
@@ -162,7 +162,7 @@ public class MenuConfigEditor extends AbstractPagedMenu<MenuConfigEditor.View, M
 
         @Override
         protected List<ItemStack> requestObjects() {
-            LinkedList<ItemStack> itemStacks = new LinkedList<>();
+            List<ItemStack> itemStacks = Lists.newLinkedList();
             buildFromSection(itemStacks, config.getConfigurationSection(this.path));
             return Collections.unmodifiableList(itemStacks);
         }

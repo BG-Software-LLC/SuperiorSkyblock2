@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.service.message;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
@@ -22,7 +23,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -61,7 +61,7 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
     private static class BuilderImpl implements Builder {
 
-        private final List<IMessageComponent> messageComponents = new LinkedList<>();
+        private final List<IMessageComponent> messageComponents = Lists.newLinkedList();
 
         @Override
         public boolean addActionBar(@Nullable String message) {

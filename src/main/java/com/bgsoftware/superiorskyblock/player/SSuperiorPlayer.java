@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.player;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
@@ -42,14 +44,11 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -62,8 +61,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Nullable
     private PersistentDataContainer persistentDataContainer; // Lazy loading
 
-    private final Map<MissionReference, Counter> completedMissions = new ConcurrentHashMap<>();
-    private final List<UUID> pendingInvites = new LinkedList<>();
+    private final Map<MissionReference, Counter> completedMissions = Maps.newConcurrentHashMap();
+    private final List<UUID> pendingInvites = Lists.newLinkedList();
 
     private final UUID uuid;
 
@@ -1008,7 +1007,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
-        Map<Mission<?>, Integer> completedMissions = new LinkedHashMap<>();
+        Map<Mission<?>, Integer> completedMissions = Maps.newLinkedHashMap();
 
         this.completedMissions.forEach((mission, finishCount) -> {
             if (mission.isValid())

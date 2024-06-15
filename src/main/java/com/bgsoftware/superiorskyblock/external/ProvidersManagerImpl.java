@@ -47,6 +47,7 @@ import com.bgsoftware.superiorskyblock.external.stackedblocks.StackedBlocksProvi
 import com.bgsoftware.superiorskyblock.external.worlds.WorldsProvider_Default;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.OfflinePlayer;
@@ -58,9 +59,7 @@ import org.bukkit.inventory.ItemStack;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -69,11 +68,11 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
     private static final BigDecimal MAX_DOUBLE = BigDecimal.valueOf(Double.MAX_VALUE);
 
-    private final List<AFKProvider> AFKProvidersList = new LinkedList<>();
-    private List<Runnable> pricesLoadCallbacks = new LinkedList<>();
+    private final List<AFKProvider> AFKProvidersList = Lists.newLinkedList();
+    private List<Runnable> pricesLoadCallbacks = Lists.newLinkedList();
     private SpawnersProvider spawnersProvider = new SpawnersProvider_Default();
     private StackedBlocksProvider stackedBlocksProvider = new StackedBlocksProvider_Default();
-    private List<EntitiesProvider> entitiesProviders = new LinkedList<>();
+    private List<EntitiesProvider> entitiesProviders = Lists.newLinkedList();
     private EconomyProvider economyProvider = new EconomyProvider_Default();
     private EconomyProvider bankEconomyProvider = new EconomyProvider_Default();
     private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
@@ -92,9 +91,9 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         }
     };
 
-    private final List<ISkinsListener> skinsListeners = new LinkedList<>();
-    private final List<IStackedBlocksListener> stackedBlocksListeners = new LinkedList<>();
-    private final List<IWorldsListener> worldsListeners = new LinkedList<>();
+    private final List<ISkinsListener> skinsListeners = Lists.newLinkedList();
+    private final List<IStackedBlocksListener> stackedBlocksListeners = Lists.newLinkedList();
+    private final List<IWorldsListener> worldsListeners = Lists.newLinkedList();
 
     public ProvidersManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -601,7 +600,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     }
 
     private void registerPlaceholdersProvider() {
-        List<PlaceholdersProvider> placeholdersProviders = new ArrayList<>();
+        List<PlaceholdersProvider> placeholdersProviders = Lists.newArrayList();
 
         if (canRegisterHook("MVdWPlaceholderAPI")) {
             Optional<PlaceholdersProvider> placeholdersProvider = createInstance("placeholders.PlaceholdersProvider_MVdWPlaceholderAPI");

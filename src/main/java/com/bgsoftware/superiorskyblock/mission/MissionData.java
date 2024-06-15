@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.mission;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
@@ -18,8 +19,8 @@ public class MissionData {
 
     private final int index;
     private final String missionName;
-    private final List<ItemStack> itemRewards = new LinkedList<>();
-    private final List<String> commandRewards = new LinkedList<>();
+    private final List<ItemStack> itemRewards = Lists.newLinkedList();
+    private final List<String> commandRewards = Lists.newLinkedList();
     private final boolean autoReward;
     private final boolean islandMission;
     private final boolean disbandReset;

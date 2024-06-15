@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -65,7 +66,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -222,8 +222,8 @@ public class NMSChunksImpl implements NMSChunks {
     @Override
     public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
                                                                     Map<ChunkPosition, CalculatedChunk> unloadedChunksCache) {
-        List<CalculatedChunk> allCalculatedChunks = new LinkedList<>();
-        List<ChunkPos> chunksCoords = new LinkedList<>();
+        List<CalculatedChunk> allCalculatedChunks = Lists.newLinkedList();
+        List<ChunkPos> chunksCoords = Lists.newLinkedList();
 
         Iterator<ChunkPosition> chunkPositionsIterator = chunkPositions.iterator();
         while (chunkPositionsIterator.hasNext()) {
@@ -377,7 +377,7 @@ public class NMSChunksImpl implements NMSChunks {
     @Override
     public List<Location> getBlockEntities(Chunk chunk) {
         LevelChunk levelChunk = ((CraftChunk) chunk).getHandle();
-        List<Location> blockEntities = new LinkedList<>();
+        List<Location> blockEntities = Lists.newLinkedList();
 
         World bukkitWorld = chunk.getWorld();
 
@@ -389,7 +389,7 @@ public class NMSChunksImpl implements NMSChunks {
 
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, LevelChunkSection[] chunkSections) {
         KeyMap<Counter> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
-        List<Location> spawnersLocations = new LinkedList<>();
+        List<Location> spawnersLocations = Lists.newLinkedList();
 
         for (LevelChunkSection levelChunkSection : chunkSections) {
             if (levelChunkSection != null && !levelChunkSection.isEmpty()) {
@@ -454,7 +454,7 @@ public class NMSChunksImpl implements NMSChunks {
         try {
             chunkEntities = levelChunk.entities.iterator();
         } catch (Throwable ex) {
-            List<Entity> worldEntities = new LinkedList<>();
+            List<Entity> worldEntities = Lists.newLinkedList();
             serverLevel.getEntities().get(chunkBounds, worldEntities::add);
             chunkEntities = worldEntities.iterator();
         }

@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
@@ -28,9 +30,7 @@ import java.lang.reflect.Constructor;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -39,7 +39,7 @@ import java.util.UUID;
 
 public class CommandsManagerImpl extends Manager implements CommandsManager {
 
-    private final Map<UUID, Map<String, Long>> commandsCooldown = new HashMap<>();
+    private final Map<UUID, Map<String, Long>> commandsCooldown = Maps.newHashMap();
 
     private final CommandsMap playerCommandsMap;
     private final CommandsMap adminCommandsMap;
@@ -300,7 +300,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                                     }
                                 }
 
-                                commandsCooldown.computeIfAbsent(uuid, u -> new HashMap<>()).put(commandLabel,
+                                commandsCooldown.computeIfAbsent(uuid, u -> Maps.newHashMap()).put(commandLabel,
                                         timeNow + commandCooldown.getKey());
                             }
                         }
@@ -352,23 +352,32 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                 }
             }
 
-            List<String> list = new LinkedList<>();
+            List<String> list = Lists.newLinkedList();
+
+            String arg = args[0].toLowerCase(Locale.ENGLISH);
 
             for (SuperiorCommand subCommand : getSubCommands()) {
                 if (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission())) {
-                    List<String> aliases = new LinkedList<>(subCommand.getAliases());
-                    aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), Collections.emptyList()));
-                    for (String _aliases : aliases) {
-                        if (_aliases.contains(args[0].toLowerCase(Locale.ENGLISH))) {
-                            list.add(_aliases);
-                        }
-                    }
+                    addTabCompletesFromOptions(arg, list, subCommand.getAliases());
+                    addTabCompletesFromOptions(arg, list, plugin.getSettings().getCommandAliases()
+                            .get(subCommand.getAliases().get(0).toLowerCase(Locale.ENGLISH)));
                 }
             }
 
             return list;
         }
 
+    }
+
+    private static void addTabCompletesFromOptions(String arg, List<String> tabCompletes, @Nullable List<String> options) {
+        if (options == null || options.isEmpty())
+            return;
+
+        for (String option : options) {
+            if (option.contains(arg)) {
+                tabCompletes.add(option);
+            }
+        }
     }
 
     @Nullable

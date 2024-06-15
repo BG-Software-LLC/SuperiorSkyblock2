@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.type;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
@@ -30,7 +31,6 @@ import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,7 +50,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
     @Override
     public List<Listener> getListeners() {
-        List<Listener> listeners = new LinkedList<>();
+        List<Listener> listeners = Lists.newLinkedList();
 
         listeners.add(new EntityLimitsListener());
 

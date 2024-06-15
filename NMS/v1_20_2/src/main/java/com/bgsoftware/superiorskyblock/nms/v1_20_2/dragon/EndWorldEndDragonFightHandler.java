@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.nms.v1_20_2.dragon;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.dimension.end.EndDragonFight;
 
@@ -12,8 +14,8 @@ import java.util.UUID;
 
 public class EndWorldEndDragonFightHandler extends EndDragonFight {
 
-    private final Map<UUID, IslandEndDragonFight> worldDragonFightsMap = new HashMap<>();
-    private final List<IslandEndDragonFight> worldDragonFightsList = new LinkedList<>();
+    private final Map<UUID, IslandEndDragonFight> worldDragonFightsMap = Maps.newHashMap();
+    private final List<IslandEndDragonFight> worldDragonFightsList = Lists.newLinkedList();
 
     public EndWorldEndDragonFightHandler(ServerLevel serverLevel) {
         super(serverLevel, serverLevel.getSeed(), serverLevel.serverLevelData.endDragonFightData());

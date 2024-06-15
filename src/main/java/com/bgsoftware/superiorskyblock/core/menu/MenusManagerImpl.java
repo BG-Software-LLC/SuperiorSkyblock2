@@ -31,15 +31,15 @@ import com.bgsoftware.superiorskyblock.core.menu.layout.PagedMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 public class MenusManagerImpl extends Manager implements MenusManager {
 
-    private final Map<String, Menu<?, ?>> registeredMenus = new HashMap<>();
+    private final Map<String, Menu<?, ?>> registeredMenus = Maps.newHashMap();
 
     public MenusManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);

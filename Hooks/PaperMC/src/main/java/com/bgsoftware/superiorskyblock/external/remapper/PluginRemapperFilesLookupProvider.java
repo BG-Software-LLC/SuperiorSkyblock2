@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.external.remapper;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
@@ -38,7 +39,7 @@ public class PluginRemapperFilesLookupProvider implements FilesLookupProvider {
 
         PLUGIN_REMAPPER_LOADING_PLUGINS.invoke(pluginRemapper);
 
-        List<Path> folderFiles = new LinkedList<>();
+        List<Path> folderFiles = Lists.newLinkedList();
         for (File file : folder.listFiles()) {
             if (file.isFile() && file.getName().endsWith(".jar")) {
                 folderFiles.add(file.toPath());

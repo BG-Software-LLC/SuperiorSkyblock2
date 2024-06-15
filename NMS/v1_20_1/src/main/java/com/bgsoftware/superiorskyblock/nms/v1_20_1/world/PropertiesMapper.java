@@ -1,18 +1,18 @@
 package com.bgsoftware.superiorskyblock.nms.v1_20_1.world;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
 public class PropertiesMapper {
 
-    private static final Map<String, Property<?>> nameToProperty = new HashMap<>();
-    private static final Map<Property<?>, String> propertyToName = new HashMap<>();
+    private static final Map<String, Property<?>> nameToProperty = Maps.newHashMap();
+    private static final Map<Property<?>, String> propertyToName = Maps.newHashMap();
 
     static {
         Map<Object, String> fieldsToNames = new IdentityHashMap<>();

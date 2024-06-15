@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.world.schematic.impl;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
@@ -32,6 +33,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,7 +67,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         if (blocksList == null) {
             blocks = Collections.emptyList();
         } else {
-            LinkedList<SchematicBlockData> schematicBlocks = new LinkedList<>();
+            List<SchematicBlockData> schematicBlocks = Lists.newLinkedList();
 
             for (Tag<?> tag : blocksList) {
                 SchematicBlockData schematicBlock = SuperiorSchematicDeserializer.deserializeSchematicBlock((CompoundTag) tag);
@@ -85,7 +87,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         if (entitiesList == null) {
             entities = Collections.emptyList();
         } else {
-            entities = new LinkedList<>();
+            entities = Lists.newLinkedList();
 
             for (Tag<?> tag : entitiesList) {
                 CompoundTag compound = (CompoundTag) tag;
@@ -140,7 +142,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         WorldEditSession worldEditSession = plugin.getNMSWorld().createEditSession(location.getWorld());
         Location min = this.data.offset.applyToLocation(location);
 
-        List<Runnable> finishTasks = new LinkedList<>();
+        List<Runnable> finishTasks = Lists.newLinkedList();
 
         this.data.blocks.forEach(schematicBlockData -> {
             Location blockLocation = schematicBlockData.getBlockOffset().applyToLocation(min.clone());
@@ -155,7 +157,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                 finishTasks.add(() -> schematicBlock.doPostPlace(island));
         });
 
-        List<ChunkPosition> affectedChunks = worldEditSession.getAffectedChunks();
+        Collection<ChunkPosition> affectedChunks = worldEditSession.getAffectedChunks();
         List<CompletableFuture<Chunk>> chunkFutures = new ArrayList<>(affectedChunks.size());
 
         AtomicBoolean failed = new AtomicBoolean(false);

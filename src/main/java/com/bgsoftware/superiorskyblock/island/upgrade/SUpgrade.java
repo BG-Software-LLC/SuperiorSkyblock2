@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.island.upgrade;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
-import com.bgsoftware.superiorskyblock.core.collections.view.EmptyInt2IntMapView;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
 import com.bgsoftware.superiorskyblock.core.value.IntValue;
@@ -37,7 +37,7 @@ public class SUpgrade implements Upgrade {
             Collections.emptyMap(),
             Collections.emptyMap(),
             Value.syncedFixed(new BigDecimal(-2)),
-            EmptyInt2IntMapView.INSTANCE);
+            Maps.emptyInt2IntMap());
 
     private final String name;
 

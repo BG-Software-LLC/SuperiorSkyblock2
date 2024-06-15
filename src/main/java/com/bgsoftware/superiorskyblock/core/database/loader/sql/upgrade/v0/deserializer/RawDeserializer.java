@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deserializer;
 
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
@@ -9,7 +11,6 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.DirtyChunk;
 import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.DatabaseConverter;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.IslandChestAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.IslandWarpAttributes;
@@ -28,8 +29,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigInteger;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -46,7 +45,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public Map<String, Integer> deserializeMissions(String missions) {
-        Map<String, Integer> completedMissions = new HashMap<>();
+        Map<String, Integer> completedMissions = Maps.newHashMap();
 
         if (missions != null) {
             for (String mission : missions.split(";")) {
@@ -82,7 +81,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public List<PlayerAttributes> deserializePlayers(String players) {
-        List<PlayerAttributes> playerAttributesList = new LinkedList<>();
+        List<PlayerAttributes> playerAttributesList = Lists.newLinkedList();
 
         if (players != null) {
             for (String uuid : players.split(",")) {
@@ -100,7 +99,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public Map<UUID, PlayerPrivilegeNode> deserializePlayerPerms(String permissionNodes) {
-        Map<UUID, PlayerPrivilegeNode> playerPermissions = new ArrayMap<>();
+        Map<UUID, PlayerPrivilegeNode> playerPermissions = Maps.newArrayMap();
 
         if (permissionNodes == null)
             return playerPermissions;
@@ -129,7 +128,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public Map<IslandPrivilege, PlayerRole> deserializeRolePerms(String permissionNodes) {
-        Map<IslandPrivilege, PlayerRole> rolePermissions = new ArrayMap<>();
+        Map<IslandPrivilege, PlayerRole> rolePermissions = Maps.newArrayMap();
 
         if (permissionNodes == null)
             return rolePermissions;
@@ -169,7 +168,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public Map<String, Integer> deserializeUpgrades(String upgrades) {
-        Map<String, Integer> upgradesMap = new HashMap<>();
+        Map<String, Integer> upgradesMap = Maps.newHashMap();
 
         if (upgrades != null) {
             for (String entry : upgrades.split(",")) {
@@ -186,7 +185,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public List<IslandWarpAttributes> deserializeWarps(String islandWarps) {
-        List<IslandWarpAttributes> warpAttributes = new LinkedList<>();
+        List<IslandWarpAttributes> warpAttributes = Lists.newLinkedList();
 
         if (islandWarps == null)
             return warpAttributes;
@@ -245,7 +244,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public Map<UUID, Rating> deserializeRatings(String ratings) {
-        Map<UUID, Rating> ratingsMap = new ArrayMap<>();
+        Map<UUID, Rating> ratingsMap = Maps.newArrayMap();
 
         if (ratings != null) {
             for (String entry : ratings.split(";")) {
@@ -262,7 +261,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public Map<IslandFlag, Byte> deserializeIslandFlags(String settings) {
-        Map<IslandFlag, Byte> islandSettings = new ArrayMap<>();
+        Map<IslandFlag, Byte> islandSettings = Maps.newArrayMap();
 
         if (settings != null) {
             for (String setting : settings.split(";")) {
@@ -308,7 +307,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public List<Pair<UUID, Long>> deserializeVisitors(String visitorsRaw) {
-        List<Pair<UUID, Long>> visitors = new LinkedList<>();
+        List<Pair<UUID, Long>> visitors = Lists.newLinkedList();
 
         if (visitorsRaw != null) {
             for (String visitor : visitorsRaw.split(",")) {
@@ -343,7 +342,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public Map<PotionEffectType, Integer> deserializeEffects(String effects) {
-        Map<PotionEffectType, Integer> islandEffects = new ArrayMap<>();
+        Map<PotionEffectType, Integer> islandEffects = Maps.newArrayMap();
 
         if (effects != null) {
             for (String effect : effects.split(",")) {
@@ -359,7 +358,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public List<IslandChestAttributes> deserializeIslandChests(String islandChest) {
-        List<IslandChestAttributes> islandChestAttributes = new LinkedList<>();
+        List<IslandChestAttributes> islandChestAttributes = Lists.newLinkedList();
 
         if (Text.isBlank(islandChest))
             return islandChestAttributes;
@@ -377,7 +376,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public Map<PlayerRole, Integer> deserializeRoleLimits(String roles) {
-        Map<PlayerRole, Integer> roleLimits = new ArrayMap<>();
+        Map<PlayerRole, Integer> roleLimits = Maps.newArrayMap();
 
         if (roles != null) {
             for (String limit : roles.split(",")) {
@@ -396,7 +395,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public List<WarpCategoryAttributes> deserializeWarpCategories(String categories) {
-        List<WarpCategoryAttributes> warpCategoryAttributes = new LinkedList<>();
+        List<WarpCategoryAttributes> warpCategoryAttributes = Lists.newLinkedList();
 
         if (categories == null)
             return warpCategoryAttributes;
@@ -438,7 +437,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public String deserializeDirtyChunks(String dirtyChunksParam) {
-        List<DirtyChunk> dirtyChunks = new LinkedList<>();
+        List<DirtyChunk> dirtyChunks = Lists.newLinkedList();
 
         if (dirtyChunksParam != null) {
             if (dirtyChunksParam.contains("|")) {

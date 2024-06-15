@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.ints.IntList;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
@@ -67,7 +68,7 @@ public class MenuIslandChest extends AbstractPagedMenu<MenuIslandChest.View, Isl
 
         if (cfg.isString("slots")) {
             for (char slotChar : cfg.getString("slots", "").toCharArray()) {
-                List<Integer> slots = menuPatternSlots.getSlots(slotChar);
+                IntList slots = menuPatternSlots.getSlots(slotChar);
 
                 ConfigurationSection validPageSection = cfg.getConfigurationSection("items." + slotChar + ".valid-page");
                 ConfigurationSection invalidPageSection = cfg.getConfigurationSection("items." + slotChar + ".invalid-page");

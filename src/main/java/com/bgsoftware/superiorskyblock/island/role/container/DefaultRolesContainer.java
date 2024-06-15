@@ -1,23 +1,22 @@
 package com.bgsoftware.superiorskyblock.island.role.container;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
+import com.bgsoftware.common.collections.ints.Int2ObjectMap;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
-import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.google.common.base.Preconditions;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 public class DefaultRolesContainer implements RolesContainer {
 
-    private final Int2ObjectMapView<PlayerRole> rolesByWeight = CollectionsFactory.createInt2ObjectArrayMap();
-    private final Int2ObjectMapView<PlayerRole> rolesById = CollectionsFactory.createInt2ObjectArrayMap();
-    private final Map<String, PlayerRole> rolesByName = new HashMap<>();
+    private final Int2ObjectMap<PlayerRole> rolesByWeight = Maps.newInt2ObjectArrayMap();
+    private final Int2ObjectMap<PlayerRole> rolesById = Maps.newInt2ObjectArrayMap();
+    private final Map<String, PlayerRole> rolesByName = Maps.newHashMap();
 
     @Nullable
     @Override
@@ -44,7 +43,7 @@ public class DefaultRolesContainer implements RolesContainer {
     public List<PlayerRole> getRoles() {
         return new SequentialListBuilder<PlayerRole>()
                 .sorted(Comparator.comparingInt(PlayerRole::getId))
-                .build(rolesById.valueIterator());
+                .build(rolesById.valuesIterator());
     }
 
     @Override

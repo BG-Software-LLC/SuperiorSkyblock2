@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
@@ -131,7 +132,7 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
         ItemMeta itemMeta = itemBuilder.getItemMeta();
 
         if (itemMeta != null && itemMeta.hasLore()) {
-            List<String> lore = new LinkedList<>();
+            List<String> lore = Lists.newLinkedList();
 
             for (String line : itemMeta.getLore()) {
                 if (line.contains("{4}")) {

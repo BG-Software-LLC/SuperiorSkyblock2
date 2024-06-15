@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.island.warp;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
@@ -13,7 +14,6 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +22,7 @@ public class SWarpCategory implements WarpCategory {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
 
-    private final List<IslandWarp> islandWarps = new LinkedList<>();
+    private final List<IslandWarp> islandWarps = Lists.newLinkedList();
     private final UUID islandUUID;
     private Island cachedIsland;
 

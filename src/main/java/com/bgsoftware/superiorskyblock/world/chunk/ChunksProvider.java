@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.world.chunk;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.common.executors.IWorker;
 import com.bgsoftware.common.executors.WorkerExecutor;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -15,7 +16,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class ChunksProvider {
@@ -24,7 +24,7 @@ public class ChunksProvider {
 
     private static final WorkerExecutor chunksExecutor = new WorkerExecutor(10);
 
-    private static final Map<ChunkPosition, PendingChunkLoadRequest> pendingRequests = new ConcurrentHashMap<>();
+    private static final Map<ChunkPosition, PendingChunkLoadRequest> pendingRequests = Maps.newConcurrentHashMap();
 
     private static boolean stopped = false;
 

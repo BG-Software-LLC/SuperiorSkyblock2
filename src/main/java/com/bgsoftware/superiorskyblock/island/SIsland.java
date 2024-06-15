@@ -2,6 +2,9 @@ package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.annotations.Size;
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
+import com.bgsoftware.common.collections.Sets;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
@@ -42,7 +45,6 @@ import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LocationKey;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
@@ -86,7 +88,6 @@ import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -114,9 +115,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -128,7 +127,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -170,9 +168,9 @@ public class SIsland implements Island {
     private final Synchronized<DoubleValue> spawnerRates = Synchronized.of(DoubleValue.syncedFixed(-1D));
     private final Synchronized<DoubleValue> mobDrops = Synchronized.of(DoubleValue.syncedFixed(-1D));
     private final Synchronized<Value<BigDecimal>> bankLimit = Synchronized.of(Value.syncedFixed(SYNCED_BANK_LIMIT_VALUE));
-    private final Map<PlayerRole, IntValue> roleLimits = new ConcurrentHashMap<>();
+    private final Map<PlayerRole, IntValue> roleLimits = Maps.newConcurrentHashMap();
     private final Synchronized<EnumMap<World.Environment, KeyMap<IntValue>>> cobbleGeneratorValues = Synchronized.of(new EnumMap<>(World.Environment.class));
-    private final Map<PotionEffectType, IntValue> islandEffects = new ConcurrentHashMap<>();
+    private final Map<PotionEffectType, IntValue> islandEffects = Maps.newConcurrentHashMap();
     private final KeyMap<IntValue> blockLimits = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
     private final KeyMap<IntValue> entityLimits = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
     /*
@@ -184,27 +182,27 @@ public class SIsland implements Island {
     private final Set<SuperiorPlayer> bannedPlayers = Sets.newConcurrentHashSet();
     private final Set<SuperiorPlayer> coopPlayers = Sets.newConcurrentHashSet();
     private final Set<SuperiorPlayer> invitedPlayers = Sets.newConcurrentHashSet();
-    private final Map<SuperiorPlayer, PlayerPrivilegeNode> playerPermissions = new ConcurrentHashMap<>();
-    private final Map<UUID, Rating> ratings = new ConcurrentHashMap<>();
+    private final Map<SuperiorPlayer, PlayerPrivilegeNode> playerPermissions = Maps.newConcurrentHashMap();
+    private final Map<UUID, Rating> ratings = Maps.newConcurrentHashMap();
     /*
      * Island Warps
      */
-    private final Map<String, IslandWarp> warpsByName = new ConcurrentHashMap<>();
-    private final Map<LocationKey, IslandWarp> warpsByLocation = new ConcurrentHashMap<>();
-    private final Map<String, WarpCategory> warpCategories = new ConcurrentHashMap<>();
+    private final Map<String, IslandWarp> warpsByName = Maps.newConcurrentHashMap();
+    private final Map<LocationKey, IslandWarp> warpsByLocation = Maps.newConcurrentHashMap();
+    private final Map<String, WarpCategory> warpCategories = Maps.newConcurrentHashMap();
     /*
      * General Settings
      */
     private final Synchronized<EnumMap<World.Environment, Location>> islandHomes = Synchronized.of(new EnumMap<>(World.Environment.class));
     private final Synchronized<EnumMap<World.Environment, Location>> visitorHomes = Synchronized.of(new EnumMap<>(World.Environment.class));
-    private final Map<IslandPrivilege, PlayerRole> rolePermissions = new ConcurrentHashMap<>();
-    private final Map<IslandFlag, Byte> islandFlags = new ConcurrentHashMap<>();
-    private final Map<String, Integer> upgrades = new ConcurrentHashMap<>();
+    private final Map<IslandPrivilege, PlayerRole> rolePermissions = Maps.newConcurrentHashMap();
+    private final Map<IslandFlag, Byte> islandFlags = Maps.newConcurrentHashMap();
+    private final Map<String, Integer> upgrades = Maps.newConcurrentHashMap();
     private final AtomicReference<BigDecimal> islandWorth = new AtomicReference<>(BigDecimal.ZERO);
     private final AtomicReference<BigDecimal> islandLevel = new AtomicReference<>(BigDecimal.ZERO);
     private final AtomicReference<BigDecimal> bonusWorth = new AtomicReference<>(BigDecimal.ZERO);
     private final AtomicReference<BigDecimal> bonusLevel = new AtomicReference<>(BigDecimal.ZERO);
-    private final Map<MissionReference, Counter> completedMissions = new ConcurrentHashMap<>();
+    private final Map<MissionReference, Counter> completedMissions = Maps.newConcurrentHashMap();
     private final Synchronized<IslandChest[]> islandChests = Synchronized.of(createDefaultIslandChests());
     private final Synchronized<CompletableFuture<Biome>> biomeGetterTask = Synchronized.of(null);
     private final AtomicInteger generatedSchematics = new AtomicInteger(0);
@@ -980,7 +978,7 @@ public class SIsland implements Island {
 
     @Override
     public List<Chunk> getAllChunks(int flags) {
-        List<Chunk> chunks = new LinkedList<>();
+        List<Chunk> chunks = Lists.newLinkedList();
 
         for (World.Environment environment : World.Environment.values()) {
             try {
@@ -1034,7 +1032,7 @@ public class SIsland implements Island {
 
     @Override
     public List<Chunk> getLoadedChunks(@IslandChunkFlags int flags) {
-        List<Chunk> chunks = new LinkedList<>();
+        List<Chunk> chunks = Lists.newLinkedList();
 
         for (World.Environment environment : World.Environment.values()) {
             try {
@@ -3130,7 +3128,7 @@ public class SIsland implements Island {
 
     @Override
     public Map<PotionEffectType, Integer> getPotionEffects() {
-        Map<PotionEffectType, Integer> islandEffects = new ArrayMap<>();
+        Map<PotionEffectType, Integer> islandEffects = Maps.newArrayMap();
 
         for (PotionEffectType potionEffectType : PotionEffectType.values()) {
             if (potionEffectType != null) {
@@ -3841,7 +3839,7 @@ public class SIsland implements Island {
         if (worldGeneratorRates == null)
             return Collections.emptyMap();
 
-        Map<String, Integer> generatorAmountsResult = new HashMap<>();
+        Map<String, Integer> generatorAmountsResult = Maps.newHashMap();
 
         worldGeneratorRates.forEach((blockKey, valueAmount) -> {
             int amount = valueAmount.get();
@@ -4408,7 +4406,7 @@ public class SIsland implements Island {
 
     @Override
     public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
-        Map<Mission<?>, Integer> completedMissions = new LinkedHashMap<>();
+        Map<Mission<?>, Integer> completedMissions = Maps.newLinkedHashMap();
 
         this.completedMissions.forEach((mission, finishCount) -> {
             if (mission.isValid())

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
@@ -9,7 +10,6 @@ import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public class CmdHelp implements ISuperiorCommand {
@@ -106,7 +106,7 @@ public class CmdHelp implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> list = new LinkedList<>();
+        List<String> list = Lists.newLinkedList();
 
         if (args.length == 2) {
             List<SuperiorCommand> subCommands = new SequentialListBuilder<SuperiorCommand>()

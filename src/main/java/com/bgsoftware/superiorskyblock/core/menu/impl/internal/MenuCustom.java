@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl.internal;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
@@ -60,7 +60,7 @@ public class MenuCustom extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
 
             List<String> aliases = Arrays.asList(commandsSection.getString("aliases", "").split(", "));
             String permission = commandsSection.getString("permission", "");
-            Map<Locale, String> descriptions = new ArrayMap<>();
+            Map<Locale, String> descriptions = Maps.newArrayMap();
             if (commandsSection.contains("description")) {
                 for (String locale : commandsSection.getConfigurationSection("description").getKeys(false))
                     descriptions.put(PlayerLocales.getLocale(locale), commandsSection.getString("description." + locale));

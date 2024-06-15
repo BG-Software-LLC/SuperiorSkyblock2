@@ -1,15 +1,15 @@
 package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -17,8 +17,8 @@ import java.util.Map;
 
 public abstract class CommandsMap {
 
-    private final Map<String, SuperiorCommand> subCommands = new LinkedHashMap<>();
-    private final Map<String, SuperiorCommand> aliasesToCommand = new HashMap<>();
+    private final Map<String, SuperiorCommand> subCommands = Maps.newLinkedHashMap();
+    private final Map<String, SuperiorCommand> aliasesToCommand = Maps.newHashMap();
 
     protected final SuperiorSkyblockPlugin plugin;
 
@@ -29,7 +29,8 @@ public abstract class CommandsMap {
     public abstract void loadDefaultCommands();
 
     public void registerCommand(SuperiorCommand superiorCommand, boolean sort) {
-        List<String> aliases = new LinkedList<>(superiorCommand.getAliases());
+        List<String> aliases = Lists.newLinkedList();
+        aliases.addAll(superiorCommand.getAliases());
         String label = aliases.get(0).toLowerCase(Locale.ENGLISH);
         aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, Collections.emptyList()));
 
@@ -44,7 +45,8 @@ public abstract class CommandsMap {
         }
 
         if (sort) {
-            List<SuperiorCommand> superiorCommands = new LinkedList<>(subCommands.values());
+            List<SuperiorCommand> superiorCommands = Lists.newLinkedList();
+            superiorCommands.addAll(subCommands.values());
             superiorCommands.sort(Comparator.comparing(o -> o.getAliases().get(0)));
             subCommands.clear();
             superiorCommands.forEach(s -> subCommands.put(s.getAliases().get(0), s));
@@ -54,7 +56,8 @@ public abstract class CommandsMap {
     public void unregisterCommand(SuperiorCommand superiorCommand) {
         Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
 
-        List<String> aliases = new LinkedList<>(superiorCommand.getAliases());
+        List<String> aliases = Lists.newLinkedList();
+        aliases.addAll(superiorCommand.getAliases());
         String label = aliases.get(0).toLowerCase(Locale.ENGLISH);
         aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, Collections.emptyList()));
 

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.island.bank.logs;
 
 import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
@@ -11,7 +12,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +64,7 @@ public class DatabaseBankLogs implements IBankLogs {
     }
 
     private List<BankTransaction> loadTransactionsFromDatabase() {
-        List<BankTransaction> bankTransactionsList = new LinkedList<>();
+        List<BankTransaction> bankTransactionsList = Lists.newLinkedList();
         island.getDatabaseBridge().loadObject("bank_transactions",
                 DatabaseFilter.fromFilter("island", island.getUniqueId().toString()),
                 bankTransactionRow -> SBankTransaction.fromDatabase(new DatabaseResult(bankTransactionRow))

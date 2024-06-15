@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.layout;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.ints.IntList;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuViewButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
@@ -148,8 +149,18 @@ public class PagedMenuLayoutImpl<V extends MenuView<V, ?>, E> extends AbstractMe
             return this;
         }
 
+        public Builder<V, E> setPreviousPageSlots(IntList slots) {
+            mapButtons(slots, new PreviousPageButton.Builder<>());
+            return this;
+        }
+
         @Override
         public Builder<V, E> setNextPageSlots(List<Integer> slots) {
+            mapButtons(slots, new NextPageButton.Builder<>());
+            return this;
+        }
+
+        public Builder<V, E> setNextPageSlots(IntList slots) {
             mapButtons(slots, new NextPageButton.Builder<>());
             return this;
         }
@@ -160,8 +171,18 @@ public class PagedMenuLayoutImpl<V extends MenuView<V, ?>, E> extends AbstractMe
             return this;
         }
 
+        public Builder<V, E> setCurrentPageSlots(IntList slots) {
+            mapButtons(slots, new CurrentPageButton.Builder<>());
+            return this;
+        }
+
         @Override
         public Builder<V, E> setPagedObjectSlots(List<Integer> slots, PagedMenuTemplateButton.Builder<V, E> buttonBuilder) {
+            mapButtons(slots, buttonBuilder);
+            return this;
+        }
+
+        public Builder<V, E> setPagedObjectSlots(IntList slots, PagedMenuTemplateButton.Builder<V, E> buttonBuilder) {
             mapButtons(slots, buttonBuilder);
             return this;
         }

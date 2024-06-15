@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.google.common.collect.Maps;
 import org.bukkit.Material;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.Ambient;
@@ -30,7 +31,6 @@ import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +42,7 @@ import java.util.function.Supplier;
 public class BukkitEntities {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final Map<UUID, List<ItemStack>> entityContent = new HashMap<>();
+    private static final Map<UUID, List<ItemStack>> entityContent = Maps.newHashMap();
     private static final Class<?> HOGLIN_CLASS = ((Supplier<Class<?>>) () -> {
         try {
             return Class.forName("org.bukkit.entity.Hoglin");

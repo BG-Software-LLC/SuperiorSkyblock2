@@ -1,16 +1,16 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 public class IslandPrivilege implements Enumerable {
 
-    private static final Map<String, IslandPrivilege> islandPrivileges = new HashMap<>();
+    private static final Map<String, IslandPrivilege> islandPrivileges = Maps.newHashMap();
     private static int ordinalCounter = 0;
 
     private final String name;

@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package com.bgsoftware.superiorskyblock.tag;
 
 import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 
@@ -77,7 +78,7 @@ public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
     public static ListTag fromNBT(Object tag) {
         Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ListTag!");
 
-        List<Tag<?>> list = new ArrayList<>();
+        List<Tag<?>> list = Lists.newArrayList();
 
         try {
             int size = plugin.getNMSTags().getNBTTagListSize(tag);
@@ -95,7 +96,7 @@ public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
     public static ListTag fromStream(DataInputStream is, int depth) throws IOException {
         int childType = is.readByte();
         int length = is.readInt();
-        List<Tag<?>> tagList = new ArrayList<>();
+        List<Tag<?>> tagList = Lists.newArrayList();
 
         for (int i = 0; i < length; i++) {
             Tag<?> tag = fromStream(is, depth + 1, childType);

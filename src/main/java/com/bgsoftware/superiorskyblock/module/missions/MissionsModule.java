@@ -1,10 +1,12 @@
 package com.bgsoftware.superiorskyblock.module.missions;
 
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
+import com.bgsoftware.common.collections.ints.IntList;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
@@ -28,7 +30,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +37,7 @@ public class MissionsModule extends BuiltinModule {
 
     private static final int MAX_MISSIONS_NAME_LENGTH = 255;
 
-    private final List<Mission<?>> missionsToLoad = new LinkedList<>();
+    private final List<Mission<?>> missionsToLoad = Lists.newLinkedList();
 
     private boolean enabled = true;
 
@@ -174,7 +175,7 @@ public class MissionsModule extends BuiltinModule {
                 if (categorySection == null)
                     continue;
 
-                List<Mission<?>> categoryMissions = new LinkedList<>();
+                List<Mission<?>> categoryMissions = Lists.newLinkedList();
 
                 if (!canLoadCategory(plugin, categoryName, categoryMissions))
                     continue;
@@ -211,7 +212,7 @@ public class MissionsModule extends BuiltinModule {
             return false;
         }
 
-        Map<Mission<?>, Integer> missionWeights = new ArrayMap<>();
+        Map<Mission<?>, Integer> missionWeights = Maps.newArrayMap();
 
         try (FilesLookup filesLookup = FilesLookupFactory.getInstance().lookupFolder(getModuleFolder())) {
             for (File missionFile : missionFiles) {
@@ -272,16 +273,16 @@ public class MissionsModule extends BuiltinModule {
         MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
         YamlConfiguration missionsMenuConfig = menuLoadResult.getConfig();
 
-        List<Integer> islandsCategorySlot = menuPatternSlots.getSlots(missionsMenuConfig.getString("island-missions", ""));
-        if (islandsCategorySlot.isEmpty()) {
+        IntList islandsCategorySlot = menuPatternSlots.getSlots(missionsMenuConfig.getString("island-missions", ""));
+        if (!islandsCategorySlot.isEmpty()) {
             categoriesSection.set("islands.name", "Islands");
-            categoriesSection.set("islands.slot", islandsCategorySlot.get(0));
+            categoriesSection.set("islands.slot", islandsCategorySlot.getAt(0));
         }
 
-        List<Integer> playersCategorySlot = menuPatternSlots.getSlots(missionsMenuConfig.getString("player-missions", ""));
-        if (playersCategorySlot.isEmpty()) {
+        IntList playersCategorySlot = menuPatternSlots.getSlots(missionsMenuConfig.getString("player-missions", ""));
+        if (!playersCategorySlot.isEmpty()) {
             categoriesSection.set("players.name", "Players");
-            categoriesSection.set("players.slot", playersCategorySlot.get(0));
+            categoriesSection.set("players.slot", playersCategorySlot.getAt(0));
         }
 
         File islandsCategoryFile = new File(getModuleFolder(), "categories/islands");

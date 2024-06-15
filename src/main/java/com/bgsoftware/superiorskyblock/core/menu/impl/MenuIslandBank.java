@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.ints.IntList;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
-import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankCustomWithdrawB
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankDepositButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankWithdrawButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.OpenBankLogsButton;
+import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.IslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -114,12 +115,12 @@ public class MenuIslandBank extends AbstractMenu<IslandMenuView, IslandViewArgs>
 
         MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
-        MenuLayout.Builder<IslandMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
+        AbstractMenuLayout.AbstractBuilder<IslandMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
 
         if (cfg.isConfigurationSection("items")) {
             for (String itemChar : cfg.getConfigurationSection("items").getKeys(false)) {
                 if (cfg.contains("items." + itemChar + ".bank-action")) {
-                    List<Integer> slots = menuPatternSlots.getSlots(itemChar);
+                    IntList slots = menuPatternSlots.getSlots(itemChar);
 
                     if (slots.isEmpty()) {
                         continue;

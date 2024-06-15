@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
@@ -8,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.SQLDatabase;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.BankTransactionsAttributes;
@@ -29,6 +29,7 @@ import com.bgsoftware.superiorskyblock.core.database.sql.SQLHelper;
 import com.bgsoftware.superiorskyblock.core.database.sql.StatementHolder;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.World;
@@ -36,7 +37,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -52,10 +52,10 @@ public class DatabaseConverter {
     private static File databaseFile;
     private static boolean isRemoteDatabase;
 
-    private static final List<PlayerAttributes> loadedPlayers = new ArrayList<>();
-    private static final List<IslandAttributes> loadedIslands = new ArrayList<>();
-    private static final List<StackedBlockAttributes> loadedBlocks = new ArrayList<>();
-    private static final List<BankTransactionsAttributes> loadedBankTransactions = new ArrayList<>();
+    private static final List<PlayerAttributes> loadedPlayers = Lists.newArrayList();
+    private static final List<IslandAttributes> loadedIslands = Lists.newArrayList();
+    private static final List<StackedBlockAttributes> loadedBlocks = Lists.newArrayList();
+    private static final List<BankTransactionsAttributes> loadedBankTransactions = Lists.newArrayList();
     private static final IDeserializer deserializer = new MultipleDeserializer(
             EmptyParameterGuardDeserializer.getInstance(),
             JsonDeserializer.INSTANCE,

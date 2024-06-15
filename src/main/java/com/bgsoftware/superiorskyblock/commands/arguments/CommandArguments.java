@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.arguments;
 
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
@@ -26,8 +28,6 @@ import org.bukkit.potion.PotionEffectType;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -55,7 +55,7 @@ public class CommandArguments {
     }
 
     public static IslandsListArgument getMultipleIslands(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
-        List<Island> islands = new LinkedList<>();
+        List<Island> islands = Lists.newLinkedList();
         SuperiorPlayer targetPlayer;
 
         if (argument.equals("*")) {
@@ -95,7 +95,7 @@ public class CommandArguments {
     }
 
     public static List<SuperiorPlayer> getMultiplePlayers(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
-        List<SuperiorPlayer> players = new LinkedList<>();
+        List<SuperiorPlayer> players = Lists.newLinkedList();
 
         if (argument.equals("*")) {
             players = plugin.getPlayers().getAllPlayers();
@@ -138,7 +138,7 @@ public class CommandArguments {
     }
 
     public static List<Mission<?>> getMultipleMissions(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
-        List<Mission<?>> missions = new LinkedList<>();
+        List<Mission<?>> missions = Lists.newLinkedList();
 
         if (argument.equals("*")) {
             missions = plugin.getMissions().getAllMissions();
@@ -378,7 +378,7 @@ public class CommandArguments {
     }
 
     public static Map<String, String> parseArguments(String[] args) {
-        Map<String, String> parsedArgs = new HashMap<>();
+        Map<String, String> parsedArgs = Maps.newHashMap();
         String currentKey = null;
         StringBuilder stringBuilder = new StringBuilder();
 

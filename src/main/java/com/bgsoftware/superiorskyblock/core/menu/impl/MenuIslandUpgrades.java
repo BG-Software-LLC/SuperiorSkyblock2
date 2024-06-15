@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.ints.IntList;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
@@ -55,7 +55,7 @@ public class MenuIslandUpgrades extends AbstractMenu<IslandMenuView, IslandViewA
 
         MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
-        MenuLayout.Builder<IslandMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
+        AbstractMenuLayout.AbstractBuilder<IslandMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
 
         if (cfg.contains("upgrades")) {
             ConfigurationSection upgradesSection = cfg.getConfigurationSection("upgrades");
@@ -66,8 +66,8 @@ public class MenuIslandUpgrades extends AbstractMenu<IslandMenuView, IslandViewA
                     continue;
                 }
 
-                List<Integer> slots = MenuParserImpl.getInstance().parseButtonSlots(upgradeSection, "item", menuPatternSlots);
-                upgrade.setSlots(slots);
+                IntList slots = MenuParserImpl.getInstance().parseButtonSlots(upgradeSection, "item", menuPatternSlots);
+                upgrade.setSlots(slots.handle());
 
                 patternBuilder.mapButtons(slots, new UpgradeButton.Builder(upgrade));
 

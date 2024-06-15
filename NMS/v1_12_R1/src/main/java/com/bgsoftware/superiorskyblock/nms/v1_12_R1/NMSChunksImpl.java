@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -176,8 +177,9 @@ public class NMSChunksImpl implements NMSChunks {
     @Override
     public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
                                                                     Map<ChunkPosition, CalculatedChunk> unloadedChunksCache) {
-        List<CalculatedChunk> allCalculatedChunks = new LinkedList<>();
-        List<ChunkCoordIntPair> chunksCoords = new LinkedList<>();
+        List<CalculatedChunk> allCalculatedChunks = Lists.newLinkedList();
+        List<ChunkCoordIntPair> chunksCoords = Lists.newLinkedList();
+        ;
 
         Iterator<ChunkPosition> chunkPositionsIterator = chunkPositions.iterator();
         while (chunkPositionsIterator.hasNext()) {
@@ -204,7 +206,7 @@ public class NMSChunksImpl implements NMSChunks {
                 ChunkPosition chunkPosition = ChunkPosition.of(worldServer.getWorld(), chunk.locX, chunk.locZ);
 
                 KeyMap<Counter> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
-                List<Location> spawnersLocations = new LinkedList<>();
+                List<Location> spawnersLocations = Lists.newLinkedList();
 
                 for (ChunkSection chunkSection : chunk.getSections()) {
                     if (chunkSection != null && chunkSection != Chunk.a && !isChunkSectionEmpty(chunkSection)) {
@@ -331,7 +333,7 @@ public class NMSChunksImpl implements NMSChunks {
     @Override
     public List<Location> getBlockEntities(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        List<Location> blockEntities = new LinkedList<>();
+        List<Location> blockEntities = Lists.newLinkedList();
 
         World bukkitWorld = bukkitChunk.getWorld();
 

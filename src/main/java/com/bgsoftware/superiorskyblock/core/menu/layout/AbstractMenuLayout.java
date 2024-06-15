@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.layout;
 
+import com.bgsoftware.common.collections.ints.IntList;
 import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -152,10 +153,19 @@ public abstract class AbstractMenuLayout<V extends MenuView<V, ?>> implements Me
         @Override
         public AbstractBuilder<V> setButtons(List<Integer> slots, MenuTemplateButton<V> button) {
             for (int slot : slots) {
-                if (slot >= 0 && slot < this.buttons.length)
-                    this.buttons[slot] = button;
+                setButtonsForSlot(slot, button);
             }
             return this;
+        }
+
+        public AbstractBuilder<V> setButtons(IntList slots, MenuTemplateButton<V> button) {
+            slots.iterator().forEachRemaining(slot -> setButtonsForSlot(slot, button));
+            return this;
+        }
+
+        public void setButtonsForSlot(int slot, MenuTemplateButton<V> button) {
+            if (slot >= 0 && slot < this.buttons.length)
+                this.buttons[slot] = button;
         }
 
         @Override
@@ -173,15 +183,24 @@ public abstract class AbstractMenuLayout<V extends MenuView<V, ?>> implements Me
         @Override
         public AbstractBuilder<V> mapButtons(List<Integer> slots, MenuTemplateButton.Builder<V> buttonBuilder) {
             for (int slot : slots) {
-                if (slot >= 0 && slot < this.buttons.length) {
-                    if (this.buttons[slot] == null) {
-                        this.buttons[slot] = buttonBuilder.build();
-                    } else {
-                        this.buttons[slot] = ((AbstractMenuTemplateButton<V>) this.buttons[slot]).applyToBuilder(buttonBuilder).build();
-                    }
-                }
+                mapButtonForSlot(slot, buttonBuilder);
             }
             return this;
+        }
+
+        public AbstractBuilder<V> mapButtons(IntList slots, MenuTemplateButton.Builder<V> buttonBuilder) {
+            slots.iterator().forEachRemaining(slot -> mapButtonForSlot(slot, buttonBuilder));
+            return this;
+        }
+
+        private void mapButtonForSlot(int slot, MenuTemplateButton.Builder<V> buttonBuilder) {
+            if (slot >= 0 && slot < this.buttons.length) {
+                if (this.buttons[slot] == null) {
+                    this.buttons[slot] = buttonBuilder.build();
+                } else {
+                    this.buttons[slot] = ((AbstractMenuTemplateButton<V>) this.buttons[slot]).applyToBuilder(buttonBuilder).build();
+                }
+            }
         }
 
         @Override

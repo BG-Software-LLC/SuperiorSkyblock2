@@ -2,12 +2,12 @@ package com.bgsoftware.superiorskyblock.core.collections;
 
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -76,7 +76,7 @@ public class EnumerateMap<K extends Enumerable, V> {
     }
 
     public <T> Map<K, T> collect(Collection<K> enumerables, Function<V, T> valuesMapper) {
-        Map<K, T> map = new HashMap<>();
+        Map<K, T> map = Maps.newHashMap();
 
         for (K key : enumerables) {
             V value = get(key);

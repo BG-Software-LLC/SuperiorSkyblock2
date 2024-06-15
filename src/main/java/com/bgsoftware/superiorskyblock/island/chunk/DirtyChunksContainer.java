@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.chunk;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
@@ -11,7 +12,6 @@ import org.bukkit.World;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.LinkedList;
 import java.util.List;
 
 public class DirtyChunksContainer {
@@ -99,7 +99,7 @@ public class DirtyChunksContainer {
         if (this.dirtyChunks.isEmpty())
             return Collections.emptyList();
 
-        List<ChunkPosition> dirtyChunkPositions = new LinkedList<>();
+        List<ChunkPosition> dirtyChunkPositions = Lists.newLinkedList();
 
         this.dirtyChunks.forEach(((environment, dirtyChunks) -> {
             if (!dirtyChunks.isEmpty()) {

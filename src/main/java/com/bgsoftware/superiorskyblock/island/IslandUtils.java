@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.island;
 
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -12,7 +14,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -68,7 +69,7 @@ public class IslandUtils {
     }
 
     public static List<ChunkPosition> getChunkCoords(Island island, WorldInfo worldInfo, @IslandChunkFlags int flags) {
-        List<ChunkPosition> chunkCoords = new LinkedList<>();
+        List<ChunkPosition> chunkCoords = Lists.newLinkedList();
 
         boolean onlyProtected = (flags & IslandChunkFlags.ONLY_PROTECTED) != 0;
         boolean noEmptyChunks = (flags & IslandChunkFlags.NO_EMPTY_CHUNKS) != 0;
@@ -88,7 +89,7 @@ public class IslandUtils {
     }
 
     public static Map<WorldInfo, List<ChunkPosition>> getChunkCoords(Island island, @IslandChunkFlags int flags) {
-        Map<WorldInfo, List<ChunkPosition>> chunkCoords = new ArrayMap<>();
+        Map<WorldInfo, List<ChunkPosition>> chunkCoords = Maps.newArrayMap();
 
         {
             if (plugin.getProviders().getWorldsProvider().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
@@ -135,7 +136,7 @@ public class IslandUtils {
     public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island, @IslandChunkFlags int flags,
                                                                    ChunkLoadReason chunkLoadReason,
                                                                    Consumer<Chunk> onChunkLoad) {
-        List<CompletableFuture<Chunk>> chunkCoords = new LinkedList<>();
+        List<CompletableFuture<Chunk>> chunkCoords = Lists.newLinkedList();
 
         {
             if (plugin.getProviders().getWorldsProvider().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {

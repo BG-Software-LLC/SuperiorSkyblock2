@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.core.profiler;
 
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -22,7 +22,7 @@ public class Profiler {
 
     private static final long INVALID_PROFILE_ID = -1;
 
-    private static final Map<Long, ProfilerSession> profilerSessions = new ConcurrentHashMap<>();
+    private static final Map<Long, ProfilerSession> profilerSessions = Maps.newConcurrentHashMap();
     private static final AtomicLong lastProfilerId = new AtomicLong(0);
 
     public static long start(ProfileType profileType) {
@@ -76,7 +76,7 @@ public class Profiler {
         }
 
         String[] dump() {
-            List<String> dump = new ArrayList<>();
+            List<String> dump = Lists.newArrayList();
 
             dump.add("Profiler #" + this.id);
             dump.add("  Type: " + this.profileType.getPrettyName());

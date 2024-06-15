@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deserializer;
 
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -7,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.DatabaseConverter;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.IslandChestAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.IslandWarpAttributes;
@@ -26,8 +27,6 @@ import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -42,7 +41,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public Map<String, Integer> deserializeMissions(String missions) {
-        Map<String, Integer> completedMissions = new HashMap<>();
+        Map<String, Integer> completedMissions = Maps.newHashMap();
 
         JsonArray missionsArray = gson.fromJson(missions, JsonArray.class);
         missionsArray.forEach(missionElement -> {
@@ -74,7 +73,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public List<PlayerAttributes> deserializePlayers(String players) {
-        List<PlayerAttributes> playerAttributes = new LinkedList<>();
+        List<PlayerAttributes> playerAttributes = Lists.newLinkedList();
         JsonArray playersArray = gson.fromJson(players, JsonArray.class);
         playersArray.forEach(uuid -> {
             PlayerAttributes _playerAttributes = DatabaseConverter.getPlayerAttributes(uuid.getAsString());
@@ -85,7 +84,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public Map<UUID, PlayerPrivilegeNode> deserializePlayerPerms(String permissionNodes) {
-        Map<UUID, PlayerPrivilegeNode> playerPermissions = new ArrayMap<>();
+        Map<UUID, PlayerPrivilegeNode> playerPermissions = Maps.newArrayMap();
 
         JsonObject globalObject = gson.fromJson(permissionNodes, JsonObject.class);
         JsonArray playersArray = globalObject.getAsJsonArray("players");
@@ -114,7 +113,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public Map<IslandPrivilege, PlayerRole> deserializeRolePerms(String permissionNodes) {
-        Map<IslandPrivilege, PlayerRole> rolePermissions = new ArrayMap<>();
+        Map<IslandPrivilege, PlayerRole> rolePermissions = Maps.newArrayMap();
 
         JsonObject globalObject = gson.fromJson(permissionNodes, JsonObject.class);
         JsonArray rolesArray = globalObject.getAsJsonArray("roles");
@@ -135,7 +134,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public Map<String, Integer> deserializeUpgrades(String upgrades) {
-        Map<String, Integer> upgradesMap = new HashMap<>();
+        Map<String, Integer> upgradesMap = Maps.newHashMap();
 
         JsonArray upgradesArray = gson.fromJson(upgrades, JsonArray.class);
         upgradesArray.forEach(upgradeElement -> {
@@ -149,7 +148,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public List<IslandWarpAttributes> deserializeWarps(String islandWarps) {
-        List<IslandWarpAttributes> islandWarpList = new LinkedList<>();
+        List<IslandWarpAttributes> islandWarpList = Lists.newLinkedList();
 
         JsonArray warpsArray = gson.fromJson(islandWarps, JsonArray.class);
         warpsArray.forEach(warpElement -> {
@@ -186,7 +185,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public Map<UUID, Rating> deserializeRatings(String ratings) {
-        Map<UUID, Rating> ratingsMap = new ArrayMap<>();
+        Map<UUID, Rating> ratingsMap = Maps.newArrayMap();
 
         JsonArray ratingsArray = gson.fromJson(ratings, JsonArray.class);
         ratingsArray.forEach(ratingElement -> {
@@ -203,7 +202,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public Map<IslandFlag, Byte> deserializeIslandFlags(String settings) {
-        Map<IslandFlag, Byte> islandFlags = new ArrayMap<>();
+        Map<IslandFlag, Byte> islandFlags = Maps.newArrayMap();
 
         JsonArray islandFlagsArray = gson.fromJson(settings, JsonArray.class);
         islandFlagsArray.forEach(islandFlagElement -> {
@@ -242,7 +241,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public List<Pair<UUID, Long>> deserializeVisitors(String visitors) {
-        List<Pair<UUID, Long>> visitorsList = new LinkedList<>();
+        List<Pair<UUID, Long>> visitorsList = Lists.newLinkedList();
 
         JsonArray playersArray = gson.fromJson(visitors, JsonArray.class);
 
@@ -274,7 +273,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public Map<PotionEffectType, Integer> deserializeEffects(String effects) {
-        Map<PotionEffectType, Integer> islandEffects = new ArrayMap<>();
+        Map<PotionEffectType, Integer> islandEffects = Maps.newArrayMap();
 
         JsonArray effectsArray = gson.fromJson(effects, JsonArray.class);
         effectsArray.forEach(effectElement -> {
@@ -290,7 +289,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public List<IslandChestAttributes> deserializeIslandChests(String islandChest) {
-        List<IslandChestAttributes> islandChestList = new LinkedList<>();
+        List<IslandChestAttributes> islandChestList = Lists.newLinkedList();
 
         JsonArray islandChestsArray = gson.fromJson(islandChest, JsonArray.class);
         islandChestsArray.forEach(islandChestElement -> {
@@ -307,7 +306,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public Map<PlayerRole, Integer> deserializeRoleLimits(String roles) {
-        Map<PlayerRole, Integer> roleLimits = new ArrayMap<>();
+        Map<PlayerRole, Integer> roleLimits = Maps.newArrayMap();
 
         JsonArray roleLimitsArray = gson.fromJson(roles, JsonArray.class);
         roleLimitsArray.forEach(roleElement -> {
@@ -323,7 +322,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public List<WarpCategoryAttributes> deserializeWarpCategories(String categories) {
-        List<WarpCategoryAttributes> warpCategories = new LinkedList<>();
+        List<WarpCategoryAttributes> warpCategories = Lists.newLinkedList();
 
         JsonArray warpCategoriesArray = gson.fromJson(categories, JsonArray.class);
         warpCategoriesArray.forEach(warpCategoryElement -> {

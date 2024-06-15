@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.external;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -32,7 +33,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -45,7 +45,7 @@ public class OraxenHook {
     private static final List<Pair<MechanicFactory, SetBlockModelFunction>> AVAILABLE_MECHANICS;
 
     static {
-        List<Pair<MechanicFactory, SetBlockModelFunction>> availableMechanics = new LinkedList<>();
+        List<Pair<MechanicFactory, SetBlockModelFunction>> availableMechanics = Lists.newLinkedList();
 
         try {
             Class.forName("io.th0rgal.oraxen.mechanics.provided.gameplay.block.BlockMechanicFactory");

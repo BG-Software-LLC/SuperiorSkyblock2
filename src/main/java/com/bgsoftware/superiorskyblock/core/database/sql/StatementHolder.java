@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.core.database.sql;
 
-import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.logging.StackTrace;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 
 import java.sql.Connection;
@@ -19,9 +20,9 @@ public class StatementHolder {
 
     private static final Pattern QUERY_VALUE_PATTERN = Pattern.compile("\\?");
 
-    private final List<List<Object>> batches = new LinkedList<>();
+    private final List<List<Object>> batches = Lists.newLinkedList();
 
-    private final List<Object> values = new LinkedList<>();
+    private final List<Object> values = Lists.newLinkedList();
     private String query;
 
     public StatementHolder(String statement) {

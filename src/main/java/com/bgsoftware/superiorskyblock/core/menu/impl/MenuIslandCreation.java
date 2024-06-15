@@ -120,7 +120,7 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
 
         MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
-        MenuLayout.Builder<View> patternBuilder = menuParseResult.getLayoutBuilder();
+        AbstractMenuLayout.AbstractBuilder<View> patternBuilder = menuParseResult.getLayoutBuilder();
 
         if (cfg.isConfigurationSection("items")) {
             for (String itemSectionName : cfg.getConfigurationSection("items").getKeys(false)) {

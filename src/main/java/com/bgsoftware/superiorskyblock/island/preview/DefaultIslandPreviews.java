@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.preview;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
@@ -7,11 +8,10 @@ import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultIslandPreviews implements IslandPreviews {
 
-    private final Map<UUID, IslandPreview> islandPreviews = new ConcurrentHashMap<>();
+    private final Map<UUID, IslandPreview> islandPreviews = Maps.newConcurrentHashMap();
 
     @Override
     public void startIslandPreview(IslandPreview islandPreview) {

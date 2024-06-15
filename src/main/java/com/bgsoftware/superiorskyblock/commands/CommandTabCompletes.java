@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
@@ -28,7 +29,6 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.BiPredicate;
@@ -88,7 +88,7 @@ public class CommandTabCompletes {
     public static List<String> getOnlinePlayersWithIslands(SuperiorSkyblockPlugin plugin, String argument,
                                                            boolean hideVanish,
                                                            @Nullable BiPredicate<SuperiorPlayer, Island> predicate) {
-        List<String> tabArguments = new LinkedList<>();
+        List<String> tabArguments = Lists.newLinkedList();
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
 
         for (Player player : Bukkit.getOnlinePlayers()) {

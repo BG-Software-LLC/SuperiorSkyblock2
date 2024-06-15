@@ -34,6 +34,7 @@ package com.bgsoftware.superiorskyblock.tag;
 
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 
@@ -56,7 +57,7 @@ public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Ta
     /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagCompound");
 
     public CompoundTag() {
-        this(new HashMap<>());
+        this(Maps.newHashMap());
     }
 
     public CompoundTag(CompoundTag other) {
@@ -266,7 +267,7 @@ public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Ta
     public static CompoundTag fromNBT(Object tag) {
         Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to CompoundTag!");
 
-        Map<String, Tag<?>> map = new HashMap<>();
+        Map<String, Tag<?>> map = Maps.newHashMap();
 
         try {
             Set<String> keySet = plugin.getNMSTags().getNBTCompoundValue(tag);
@@ -283,7 +284,7 @@ public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Ta
     }
 
     public static CompoundTag fromStream(DataInputStream is, int depth) throws IOException {
-        Map<String, Tag<?>> tagMap = new HashMap<>();
+        Map<String, Tag<?>> tagMap = Maps.newHashMap();
         Tag<?> tag;
 
         while (!((tag = Tag.fromStream(is, depth + 1)) instanceof EndTag)) {

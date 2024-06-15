@@ -4,6 +4,7 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
@@ -24,7 +25,6 @@ import net.minecraft.server.v1_8_R3.World;
 import net.minecraft.server.v1_8_R3.WorldServer;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -44,8 +44,8 @@ public class NMSUtils {
 
     public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
                                          boolean saveChunks, ChunkCallback chunkCallback) {
-        List<ChunkCoordIntPair> unloadedChunks = new LinkedList<>();
-        List<Chunk> loadedChunks = new LinkedList<>();
+        List<ChunkCoordIntPair> unloadedChunks = Lists.newLinkedList();
+        List<Chunk> loadedChunks = Lists.newLinkedList();
 
         chunksCoords.forEach(chunkCoords -> {
             Chunk chunk = worldServer.getChunkIfLoaded(chunkCoords.x, chunkCoords.z);

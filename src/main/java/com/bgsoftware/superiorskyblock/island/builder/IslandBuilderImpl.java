@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.island.builder;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.enums.SyncStatus;
@@ -37,9 +39,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,21 +73,21 @@ public class IslandBuilderImpl implements Island.Builder {
     public final KeyMap<BigInteger> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
     public final KeyMap<BigInteger> entityCounts = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
     public final EnumMap<World.Environment, Location> islandHomes = new EnumMap<>(World.Environment.class);
-    public final List<SuperiorPlayer> members = new LinkedList<>();
-    public final List<SuperiorPlayer> bannedPlayers = new LinkedList<>();
-    public final Map<SuperiorPlayer, PlayerPrivilegeNode> playerPermissions = new LinkedHashMap<>();
-    public final Map<IslandPrivilege, PlayerRole> rolePermissions = new LinkedHashMap<>();
-    public final Map<String, Integer> upgrades = new LinkedHashMap<>();
+    public final List<SuperiorPlayer> members = Lists.newLinkedList();
+    public final List<SuperiorPlayer> bannedPlayers = Lists.newLinkedList();
+    public final Map<SuperiorPlayer, PlayerPrivilegeNode> playerPermissions = Maps.newLinkedHashMap();
+    public final Map<IslandPrivilege, PlayerRole> rolePermissions = Maps.newLinkedHashMap();
+    public final Map<String, Integer> upgrades = Maps.newLinkedHashMap();
     public final KeyMap<IntValue> blockLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
-    public final Map<UUID, Rating> ratings = new LinkedHashMap<>();
-    public final Map<MissionReference, Counter> completedMissions = new LinkedHashMap<>();
-    public final Map<IslandFlag, Byte> islandFlags = new LinkedHashMap<>();
+    public final Map<UUID, Rating> ratings = Maps.newLinkedHashMap();
+    public final Map<MissionReference, Counter> completedMissions = Maps.newLinkedHashMap();
+    public final Map<IslandFlag, Byte> islandFlags = Maps.newLinkedHashMap();
     public final EnumMap<World.Environment, KeyMap<IntValue>> cobbleGeneratorValues = new EnumMap<>(World.Environment.class);
-    public final List<SIsland.UniqueVisitor> uniqueVisitors = new LinkedList<>();
+    public final List<SIsland.UniqueVisitor> uniqueVisitors = Lists.newLinkedList();
     public final KeyMap<IntValue> entityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
-    public final Map<PotionEffectType, IntValue> islandEffects = new LinkedHashMap<>();
+    public final Map<PotionEffectType, IntValue> islandEffects = Maps.newLinkedHashMap();
     public final List<ItemStack[]> islandChests = new ArrayList<>(plugin.getSettings().getIslandChests().getDefaultPages());
-    public final Map<PlayerRole, IntValue> roleLimits = new LinkedHashMap<>();
+    public final Map<PlayerRole, IntValue> roleLimits = Maps.newLinkedHashMap();
     public final EnumMap<World.Environment, Location> visitorHomes = new EnumMap<>(World.Environment.class);
     public IntValue islandSize = IntValue.syncedFixed(-1);
     public IntValue warpsLimit = IntValue.syncedFixed(-1);
@@ -99,9 +99,9 @@ public class IslandBuilderImpl implements Island.Builder {
     public Value<BigDecimal> bankLimit = Value.syncedFixed(SYNCED_BANK_LIMIT_VALUE);
     public BigDecimal balance = BigDecimal.ZERO;
     public long lastInterestTime = System.currentTimeMillis() / 1000;
-    public List<WarpRecord> warps = new LinkedList<>();
-    public List<WarpCategoryRecord> warpCategories = new LinkedList<>();
-    public List<BankTransaction> bankTransactions = new LinkedList<>();
+    public List<WarpRecord> warps = Lists.newLinkedList();
+    public List<WarpCategoryRecord> warpCategories = Lists.newLinkedList();
+    public List<BankTransaction> bankTransactions = Lists.newLinkedList();
     public byte[] persistentData = new byte[0];
 
     public IslandBuilderImpl() {
@@ -451,7 +451,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Map<Mission<?>, Integer> getCompletedMissions() {
-        Map<Mission<?>, Integer> completedMissions = new LinkedHashMap<>();
+        Map<Mission<?>, Integer> completedMissions = Maps.newLinkedHashMap();
 
         this.completedMissions.forEach((mission, finishCount) -> {
             if (mission.isValid())
@@ -504,7 +504,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Map<SuperiorPlayer, Long> getUniqueVisitors() {
-        LinkedHashMap<SuperiorPlayer, Long> result = new LinkedHashMap<>();
+        Map<SuperiorPlayer, Long> result = Maps.newLinkedHashMap();
         this.uniqueVisitors.forEach(uniqueVisitor ->
                 result.put(uniqueVisitor.getSuperiorPlayer(), uniqueVisitor.getLastVisitTime()));
         return Collections.unmodifiableMap(result);

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.stackedblocks;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
@@ -27,7 +28,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -159,7 +159,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     public Map<Location, Integer> removeStackedBlocks(ChunkPosition chunkPosition) {
         Preconditions.checkNotNull(chunkPosition, "chunkPosition parameter cannot be null.");
 
-        Map<Location, Integer> removedStackedBlocks = new LinkedHashMap<>();
+        Map<Location, Integer> removedStackedBlocks = Maps.newLinkedHashMap();
 
         try {
             databaseBridge.batchOperations(true);
@@ -186,7 +186,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ);
 
-        Map<Location, Integer> chunkStackedBlocks = new LinkedHashMap<>();
+        Map<Location, Integer> chunkStackedBlocks = Maps.newLinkedHashMap();
 
         this.stackedBlocksContainer.forEach(chunkPosition, stackedBlock ->
                 chunkStackedBlocks.put(stackedBlock.getLocation(), stackedBlock.getAmount()));
@@ -196,7 +196,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
 
     @Override
     public Map<Location, Integer> getStackedBlocks() {
-        Map<Location, Integer> allStackedBlocks = new LinkedHashMap<>();
+        Map<Location, Integer> allStackedBlocks = Maps.newLinkedHashMap();
         this.stackedBlocksContainer.forEach(stackedBlock ->
                 allStackedBlocks.put(stackedBlock.getLocation(), stackedBlock.getAmount()));
         return Collections.unmodifiableMap(allStackedBlocks);

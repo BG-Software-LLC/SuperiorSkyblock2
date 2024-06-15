@@ -27,6 +27,8 @@ import com.bgsoftware.superiorskyblock.mission.container.MissionsContainer;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
@@ -39,7 +41,6 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -56,7 +57,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
         }
     };
 
-    private final Map<String, FileClassLoader> missionTypesClassLoaders = new HashMap<>();
+    private final Map<String, FileClassLoader> missionTypesClassLoaders = Maps.newHashMap();
 
     private final MissionsContainer missionsContainer;
 
@@ -292,7 +293,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                 }
             }
 
-            List<ItemStack> itemRewards = new ArrayList<>();
+            List<ItemStack> itemRewards = Lists.newArrayList();
             List<String> commandRewards;
 
             //noinspection SynchronizationOnLocalVariableOrMethodParameter

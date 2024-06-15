@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
@@ -14,7 +15,6 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -125,7 +125,7 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
         if (args.length != 4)
             return Collections.emptyList();
 
-        List<String> environments = new ArrayList<>();
+        List<String> environments = Lists.newArrayList();
 
         for (World.Environment environment : World.Environment.values()) {
             if (environment != plugin.getSettings().getWorlds().getDefaultWorld()) {

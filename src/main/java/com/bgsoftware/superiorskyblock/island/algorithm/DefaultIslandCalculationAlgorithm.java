@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.algorithm;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
@@ -31,7 +32,6 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -179,7 +179,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
     }
 
     private static List<Pair<Key, Key>> createMinecartBlockTypes() {
-        List<Pair<Key, Key>> minecartBlockTypes = new LinkedList<>();
+        List<Pair<Key, Key>> minecartBlockTypes = Lists.newLinkedList();
 
         minecartBlockTypes.add(new Pair<>(ConstantKeys.ENTITY_MINECART_COMMAND, ConstantKeys.COMMAND_BLOCK));
         minecartBlockTypes.add(new Pair<>(ConstantKeys.ENTITY_MINECART_CHEST, ConstantKeys.CHEST));

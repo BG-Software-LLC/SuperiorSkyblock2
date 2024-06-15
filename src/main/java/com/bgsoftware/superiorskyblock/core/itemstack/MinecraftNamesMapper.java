@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.itemstack;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -12,7 +12,6 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -43,7 +42,7 @@ public class MinecraftNamesMapper {
     }
 
     private static Map<Class<?>, Map<String, String>> fetchEnumNamesMapping() {
-        Map<Class<?>, Map<String, String>> mappedNames = new ArrayMap<>();
+        Map<Class<?>, Map<String, String>> mappedNames = Maps.newArrayMap();
 
         try {
             HttpsURLConnection connection = (HttpsURLConnection) new URL(ServerVersion.isLegacy() ?
@@ -74,7 +73,7 @@ public class MinecraftNamesMapper {
                         throw new MappingFormatException("Invalid class name: " + className);
                     }
 
-                    Map<String, String> classMappings = new HashMap<>();
+                    Map<String, String> classMappings = Maps.newHashMap();
 
                     JsonElement jsonMappingsElement = ensureFieldExists(classMapping, "mappings");
                     if (!jsonMappingsElement.isJsonObject())

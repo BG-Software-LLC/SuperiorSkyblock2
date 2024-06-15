@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -20,7 +21,6 @@ import org.bukkit.entity.Player;
 
 import java.math.BigInteger;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -67,7 +67,7 @@ public class CmdAdminCount implements IAdminIslandCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> list = new LinkedList<>();
+        List<String> list = Lists.newLinkedList();
 
         if (args.length == 3) {
             String argument = args[2].toLowerCase(Locale.ENGLISH);

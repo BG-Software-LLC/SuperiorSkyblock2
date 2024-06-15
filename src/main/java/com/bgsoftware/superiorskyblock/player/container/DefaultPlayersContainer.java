@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.player.container;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.player.container.PlayersContainer;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
@@ -9,12 +10,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultPlayersContainer implements PlayersContainer {
 
-    private final Map<UUID, SuperiorPlayer> players = new ConcurrentHashMap<>();
-    private final Map<String, SuperiorPlayer> playersByNames = new ConcurrentHashMap<>();
+    private final Map<UUID, SuperiorPlayer> players = Maps.newConcurrentHashMap();
+    private final Map<String, SuperiorPlayer> playersByNames = Maps.newConcurrentHashMap();
 
     @Nullable
     @Override

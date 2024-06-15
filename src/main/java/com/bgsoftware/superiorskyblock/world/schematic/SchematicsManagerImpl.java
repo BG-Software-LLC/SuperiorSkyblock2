@@ -25,6 +25,8 @@ import com.bgsoftware.superiorskyblock.world.schematic.container.SchematicsConta
 import com.bgsoftware.superiorskyblock.world.schematic.impl.SuperiorSchematic;
 import com.bgsoftware.superiorskyblock.world.schematic.parser.DefaultSchematicParser;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -40,9 +42,6 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -197,8 +196,8 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
         int ySize = max.getBlockY() - min.getBlockY();
         int zSize = max.getBlockZ() - min.getBlockZ();
 
-        List<Tag<?>> blocks = new ArrayList<>();
-        List<Tag<?>> entities = new ArrayList<>();
+        List<Tag<?>> blocks = Lists.newArrayList();
+        List<Tag<?>> entities = Lists.newArrayList();
 
         for (int x = 0; x <= xSize; x++) {
             for (int z = 0; z <= zSize; z++) {
@@ -230,7 +229,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             entities.add(new SchematicBuilder().applyEntity(livingEntity, min).build());
         }
 
-        Map<String, Tag<?>> compoundValue = new HashMap<>();
+        Map<String, Tag<?>> compoundValue = Maps.newHashMap();
         compoundValue.put("xSize", new IntTag(xSize));
         compoundValue.put("ySize", new IntTag(ySize));
         compoundValue.put("zSize", new IntTag(zSize));
@@ -324,7 +323,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
     }
 
     private List<Entity> getEntities(Location min, Location max) {
-        List<Entity> livingEntities = new LinkedList<>();
+        List<Entity> livingEntities = Lists.newLinkedList();
 
         Chunk minChunk = min.getChunk();
         Chunk maxChunk = max.getChunk();

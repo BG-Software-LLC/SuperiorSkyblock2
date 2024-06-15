@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -62,7 +63,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -215,8 +215,8 @@ public class NMSChunksImpl implements NMSChunks {
     @Override
     public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
                                                                     Map<ChunkPosition, CalculatedChunk> unloadedChunksCache) {
-        List<CalculatedChunk> allCalculatedChunks = new LinkedList<>();
-        List<ChunkCoordIntPair> chunksCoords = new LinkedList<>();
+        List<CalculatedChunk> allCalculatedChunks = Lists.newLinkedList();
+        List<ChunkCoordIntPair> chunksCoords = Lists.newLinkedList();
 
         Iterator<ChunkPosition> chunkPositionsIterator = chunkPositions.iterator();
         while (chunkPositionsIterator.hasNext()) {
@@ -366,7 +366,7 @@ public class NMSChunksImpl implements NMSChunks {
     @Override
     public List<Location> getBlockEntities(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        List<Location> blockEntities = new LinkedList<>();
+        List<Location> blockEntities = Lists.newLinkedList();
 
         org.bukkit.World bukkitWorld = bukkitChunk.getWorld();
 
@@ -378,7 +378,7 @@ public class NMSChunksImpl implements NMSChunks {
 
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, ChunkSection[] chunkSections) {
         KeyMap<Counter> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
-        List<Location> spawnersLocations = new LinkedList<>();
+        List<Location> spawnersLocations = Lists.newLinkedList();
 
         for (ChunkSection chunkSection : chunkSections) {
             if (chunkSection != null && !chunkSection.c()) {

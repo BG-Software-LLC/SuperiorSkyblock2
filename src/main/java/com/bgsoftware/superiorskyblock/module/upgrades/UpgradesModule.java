@@ -1,6 +1,9 @@
 package com.bgsoftware.superiorskyblock.module.upgrades;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
+import com.bgsoftware.common.collections.ints.Int2IntMap;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
@@ -9,9 +12,6 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
-import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
-import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
@@ -43,10 +43,8 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -57,7 +55,7 @@ public class UpgradesModule extends BuiltinModule {
 
     private static final int MAX_UPGRADES_NAME_LENGTH = 255;
 
-    private final List<IUpgradeType> enabledUpgrades = new LinkedList<>();
+    private final List<IUpgradeType> enabledUpgrades = Lists.newLinkedList();
 
     public UpgradesModule() {
         super("upgrades");
@@ -89,7 +87,7 @@ public class UpgradesModule extends BuiltinModule {
         if (!isEnabled())
             return null;
 
-        List<Listener> listenersList = new ArrayList<>();
+        List<Listener> listenersList = Lists.newArrayList();
 
         for (IUpgradeType upgradeType : enabledUpgrades) {
             listenersList.addAll(upgradeType.getListeners());
@@ -250,7 +248,7 @@ public class UpgradesModule extends BuiltinModule {
                 }
             }
         }
-        Map<PotionEffectType, Integer> islandEffects = new ArrayMap<>();
+        Map<PotionEffectType, Integer> islandEffects = Maps.newArrayMap();
         if (levelSection.contains("island-effects")) {
             for (String effect : levelSection.getConfigurationSection("island-effects").getKeys(false)) {
                 PotionEffectType potionEffectType = PotionEffectType.getByName(effect);
@@ -258,7 +256,7 @@ public class UpgradesModule extends BuiltinModule {
                     islandEffects.put(potionEffectType, levelSection.getInt("island-effects." + effect) - 1);
             }
         }
-        Int2IntMapView rolesLimits = CollectionsFactory.createInt2IntArrayMap();
+        Int2IntMap rolesLimits = Maps.newInt2IntArrayMap();
         if (levelSection.contains("role-limits")) {
             for (String roleId : levelSection.getConfigurationSection("role-limits").getKeys(false)) {
                 try {

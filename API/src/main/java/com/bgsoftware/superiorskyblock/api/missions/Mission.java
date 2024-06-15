@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.api.missions;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.google.common.base.Preconditions;
@@ -10,20 +12,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class Mission<V> {
 
-    private final List<String> requiredMissions = new LinkedList<>();
-    private final List<String> requiredChecks = new LinkedList<>();
-    private final Map<SuperiorPlayer, V> missionData = new ConcurrentHashMap<>();
+    private final List<String> requiredMissions = Lists.newLinkedList();
+    private final List<String> requiredChecks = Lists.newLinkedList();
+    private final Map<SuperiorPlayer, V> missionData = Maps.newConcurrentHashMap();
 
     private String name = null;
     private MissionCategory missionCategory = null;

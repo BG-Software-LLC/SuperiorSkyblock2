@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.menu;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuViewButton;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
@@ -13,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -26,7 +26,7 @@ import java.util.function.Predicate;
  */
 public abstract class BaseMenu<V extends MenuView<V, A>, A extends ViewArgs> implements Menu<V, A> {
 
-    protected final List<V> openedMenuViews = new LinkedList<>();
+    protected final List<V> openedMenuViews = Lists.newLinkedList();
 
     protected final String identifier;
     protected final MenuLayout<V> menuLayout;

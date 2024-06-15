@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.player.builder;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -12,7 +13,6 @@ import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.google.common.base.Preconditions;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -32,7 +32,7 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
     public boolean islandFly = plugin.getSettings().isDefaultIslandFly();
     public BorderColor borderColor = BorderColor.safeValue(plugin.getSettings().getDefaultBorderColor(), BorderColor.BLUE);
     public boolean worldBorderEnabled = plugin.getSettings().isDefaultWorldBorder();
-    public Map<MissionReference, Counter> completedMissions = new LinkedHashMap<>();
+    public Map<MissionReference, Counter> completedMissions = Maps.newLinkedHashMap();
     public byte[] persistentData = new byte[0];
 
     public SuperiorPlayerBuilderImpl() {
@@ -179,7 +179,7 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
 
     @Override
     public Map<Mission<?>, Integer> getCompletedMissions() {
-        Map<Mission<?>, Integer> completedMissions = new LinkedHashMap<>();
+        Map<Mission<?>, Integer> completedMissions = Maps.newLinkedHashMap();
 
         this.completedMissions.forEach((mission, finishCount) -> {
             if (mission.isValid())

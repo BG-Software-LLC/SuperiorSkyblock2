@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.key;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 
 import java.util.HashMap;
@@ -39,7 +40,7 @@ public interface KeyMap<V> extends Map<Key, V> {
      * Create a new empty {@link KeyMap<V>} instance based on {@link HashMap}.
      */
     static <V> KeyMap<V> createKeyMap() {
-        return createKeyMap(() -> new HashMap<>());
+        return createKeyMap(() -> Maps.newHashMap());
     }
 
     /**
@@ -50,14 +51,14 @@ public interface KeyMap<V> extends Map<Key, V> {
      * @param map The map to create {@link KeySet} from.
      */
     static <V> KeyMap<V> createKeyMap(Map<Key, V> map) {
-        return SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys().createKeyMap(() -> new HashMap<>(), map);
+        return SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys().createKeyMap(() -> Maps.newHashMap(), map);
     }
 
     /**
      * Create a new empty {@link KeyMap<V>} instance based on {@link ConcurrentHashMap}.
      */
     static <V> KeyMap<V> createConcurrentKeyMap() {
-        return createKeyMap(() -> new ConcurrentHashMap<>());
+        return createKeyMap(() -> Maps.newConcurrentHashMap());
     }
 
     /**
@@ -68,7 +69,7 @@ public interface KeyMap<V> extends Map<Key, V> {
      * @param map The map to create {@link KeySet} from.
      */
     static <V> KeyMap<V> createConcurrentKeyMap(Map<Key, V> map) {
-        return SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys().createKeyMap(() -> new ConcurrentHashMap<>(), map);
+        return SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys().createKeyMap(() -> Maps.newConcurrentHashMap(), map);
     }
 
     /**

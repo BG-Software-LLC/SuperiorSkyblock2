@@ -34,6 +34,7 @@ allprojects {
     dependencies {
         compileOnly 'com.bgsoftware.common.reflection:ReflectionUtils:b6'
         compileOnly 'com.bgsoftware.common.annotations:Annotations:b2'
+        compileOnly files('D:\\workspace\\Collections\\target\\Collections20.jar')
     }
 
     task checkDebug() {
@@ -73,6 +74,7 @@ dependencies {
     implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:b11:all@jar'
     implementation 'com.bgsoftware.common.dependencies:DependenciesManager:b2'
     implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b4'
+    implementation files('D:\\workspace\\Collections\\target\\Collections20.jar')
 
     implementation 'com.zaxxer:HikariCP:4.0.3'
     implementation 'org.slf4j:slf4j-api:2.0.5'

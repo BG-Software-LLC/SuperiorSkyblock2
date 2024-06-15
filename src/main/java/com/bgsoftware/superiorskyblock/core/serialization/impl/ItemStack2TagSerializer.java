@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.serialization.impl;
 
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
@@ -14,7 +15,6 @@ import com.bgsoftware.superiorskyblock.tag.Tag;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class ItemStack2TagSerializer implements ISerializer<ItemStack, CompoundTag> {
@@ -39,7 +39,7 @@ public class ItemStack2TagSerializer implements ISerializer<ItemStack, CompoundT
         if (serializable == null)
             return new CompoundTag();
 
-        Map<String, Tag<?>> compoundValues = new HashMap<>();
+        Map<String, Tag<?>> compoundValues = Maps.newHashMap();
 
         compoundValues.put("type", new StringTag(serializable.getType().name()));
         compoundValues.put("amount", new IntTag(serializable.getAmount()));

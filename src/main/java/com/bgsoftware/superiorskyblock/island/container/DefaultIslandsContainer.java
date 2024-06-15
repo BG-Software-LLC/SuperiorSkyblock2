@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.island.container;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
@@ -21,15 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class DefaultIslandsContainer implements IslandsContainer {
 
-    private final Map<IslandPosition, Island> islandsByPositions = new ConcurrentHashMap<>();
-    private final Map<UUID, Island> islandsByUUID = new ConcurrentHashMap<>();
+    private final Map<IslandPosition, Island> islandsByPositions = Maps.newConcurrentHashMap();
+    private final Map<UUID, Island> islandsByUUID = Maps.newConcurrentHashMap();
 
-    private final Map<SortingType, Synchronized<List<Island>>> sortedIslands = new ConcurrentHashMap<>();
+    private final Map<SortingType, Synchronized<List<Island>>> sortedIslands = Maps.newConcurrentHashMap();
 
     private final EnumerateSet<SortingType> notifiedValues = new EnumerateSet<>(SortingType.values());
 

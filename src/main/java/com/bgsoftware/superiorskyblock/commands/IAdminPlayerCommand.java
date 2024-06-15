@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -7,9 +8,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public interface IAdminPlayerCommand extends ISuperiorCommand {
@@ -37,7 +36,7 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
 
     @Override
     default List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> tabVariables = new LinkedList<>();
+        List<String> tabVariables = Lists.newLinkedList();
 
         if (args.length == 3) {
             if (supportMultiplePlayers() && "*".contains(args[2]))

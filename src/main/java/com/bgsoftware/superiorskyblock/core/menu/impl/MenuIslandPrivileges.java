@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.menu.impl;
 
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -27,7 +28,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,7 +88,7 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
         String exactRolePermission = cfg.getString("messages.exact-role-permission", "");
         String higherRolePermission = cfg.getString("messages.higher-role-permission", "");
 
-        List<MenuIslandPrivileges.IslandPrivilegeInfo> islandPrivileges = new LinkedList<>();
+        List<MenuIslandPrivileges.IslandPrivilegeInfo> islandPrivileges = Lists.newLinkedList();
 
         Optional.ofNullable(cfg.getConfigurationSection("permissions")).ifPresent(permissionsSection -> {
             for (String islandPrivilegeName : permissionsSection.getKeys(false)) {

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.messages;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
@@ -9,7 +10,6 @@ import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -829,7 +829,7 @@ public enum Message {
 
     private final String defaultMessage;
     private final boolean isCustom;
-    private final Map<Locale, IMessageComponent> messages = new ArrayMap<>();
+    private final Map<Locale, IMessageComponent> messages = Maps.newArrayMap();
 
     Message() {
         this(null);

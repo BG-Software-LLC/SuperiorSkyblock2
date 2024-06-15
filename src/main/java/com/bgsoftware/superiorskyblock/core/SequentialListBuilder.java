@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.core;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.superiorskyblock.core.collections.view.LongIterator;
+import com.bgsoftware.common.collections.Lists;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.LongFunction;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -38,7 +37,7 @@ public class SequentialListBuilder<E> {
     }
 
     public <O> List<E> build(Collection<O> collection, Function<O, E> mapper) {
-        LinkedList<E> sequentialList = new LinkedList<>();
+        List<E> sequentialList = Lists.newLinkedList();
 
         collection.forEach(element -> {
             E mappedElement = mapper.apply(element);
@@ -51,7 +50,7 @@ public class SequentialListBuilder<E> {
 
 
     public <O> List<O> map(Collection<E> collection, Function<E, O> mapper) {
-        LinkedList<O> sequentialList = new LinkedList<>();
+        List<O> sequentialList = Lists.newLinkedList();
 
         collection.forEach(element -> {
             if (predicate == null || predicate.test(element))
@@ -62,7 +61,7 @@ public class SequentialListBuilder<E> {
     }
 
     public <O> List<O> map(Iterator<E> iterator, Function<E, O> mapper) {
-        LinkedList<O> sequentialList = new LinkedList<>();
+        List<O> sequentialList = Lists.newLinkedList();
 
         while (iterator.hasNext()) {
             E next = iterator.next();
@@ -74,7 +73,7 @@ public class SequentialListBuilder<E> {
     }
 
     public List<E> build(Stream<E> stream) {
-        LinkedList<E> sequentialList = new LinkedList<>();
+        List<E> sequentialList = Lists.newLinkedList();
 
         stream.forEach(element -> {
             if (predicate == null || predicate.test(element))
@@ -85,12 +84,12 @@ public class SequentialListBuilder<E> {
     }
 
     public List<E> build(Collection<E> collection) {
-        LinkedList<E> sequentialList;
+        List<E> sequentialList;
 
         if (predicate == null) {
             sequentialList = new LinkedList<>(collection);
         } else {
-            sequentialList = new LinkedList<>();
+            sequentialList = Lists.newLinkedList();
             collection.forEach(element -> {
                 if (predicate.test(element))
                     sequentialList.add(element);
@@ -101,7 +100,7 @@ public class SequentialListBuilder<E> {
     }
 
     public List<E> build(Iterator<E> iterator) {
-        LinkedList<E> sequentialList = new LinkedList<>();
+        List<E> sequentialList = Lists.newLinkedList();
 
         if (predicate == null) {
             while (iterator.hasNext())

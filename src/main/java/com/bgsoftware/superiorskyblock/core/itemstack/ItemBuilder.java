@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.itemstack;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -26,7 +27,6 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 public class ItemBuilder {
@@ -124,7 +124,7 @@ public class ItemBuilder {
         if (itemMeta == null)
             return this;
 
-        List<String> loreList = new LinkedList<>();
+        List<String> loreList = Lists.newLinkedList();
 
         firstLine = Formatters.COLOR_FORMATTER.format(firstLine);
         loreList.add(firstLine);

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.io;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.google.common.io.ByteStreams;
 
 import java.io.File;
@@ -18,7 +19,7 @@ import java.util.jar.Manifest;
 
 public class FileClassLoader extends URLClassLoader {
 
-    private final Map<String, Class<?>> classes = new ConcurrentHashMap<>();
+    private final Map<String, Class<?>> classes = Maps.newConcurrentHashMap();
 
     private JarFile jar;
     private final Manifest manifest;

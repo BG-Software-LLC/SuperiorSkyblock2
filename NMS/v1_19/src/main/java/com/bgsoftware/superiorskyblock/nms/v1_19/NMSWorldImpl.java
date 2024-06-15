@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -59,7 +60,6 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.IntFunction;
@@ -108,7 +108,7 @@ public class NMSWorldImpl implements NMSWorld {
 
         List<TickingBlockEntity> blockEntityTickers = LEVEL_BLOCK_ENTITY_TICKERS.get(serverLevel);
         Iterator<TickingBlockEntity> blockEntityTickersIterator = blockEntityTickers.iterator();
-        List<TickingBlockEntity> tickersToAdd = new ArrayList<>();
+        List<TickingBlockEntity> tickersToAdd = Lists.newArrayList();
 
         while (blockEntityTickersIterator.hasNext()) {
             TickingBlockEntity tickingBlockEntity = blockEntityTickersIterator.next();

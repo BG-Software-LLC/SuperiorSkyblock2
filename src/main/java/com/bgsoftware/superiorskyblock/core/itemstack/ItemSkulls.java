@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.itemstack;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
@@ -14,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,7 +24,7 @@ public class ItemSkulls {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final String NULL_PLAYER_TEXTURE = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19";
-    private static final Map<String, String> entitySkullTextures = new HashMap<>();
+    private static final Map<String, String> entitySkullTextures = Maps.newHashMap();
     private static final LazyReference<MinecraftHeadsClient> minecraftHeadsClient = new LazyReference<MinecraftHeadsClient>() {
         @Override
         protected MinecraftHeadsClient create() {

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.external.stackedblocks;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -60,7 +61,7 @@ public class StackedBlocksProvider_RoseStacker implements StackedBlocksProvider_
 
         ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ);
 
-        Map<Key, Integer> blockKeys = new HashMap<>();
+        Map<Key, Integer> blockKeys = Maps.newHashMap();
         RoseStackerAPI.getInstance().getStackedBlocks().entrySet().stream()
                 .filter(entry -> chunkPosition.isInsideChunk(entry.getKey().getLocation()))
                 .forEach(entry -> {

@@ -1,20 +1,20 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3.world;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import net.minecraft.server.v1_16_R3.IBlockState;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Map;
 
 public class BlockStatesMapper {
 
-    private static final Map<String, IBlockState<?>> nameToBlockState = new HashMap<>();
-    private static final Map<IBlockState<?>, String> blockStateToName = new HashMap<>();
+    private static final Map<String, IBlockState<?>> nameToBlockState = Maps.newHashMap();
+    private static final Map<IBlockState<?>, String> blockStateToName = Maps.newHashMap();
 
     static {
-        Map<String, String> fieldNameToName = new HashMap<>();
+        Map<String, String> fieldNameToName = Maps.newHashMap();
         fieldNameToName.put("F", "axis-empty");
         fieldNameToName.put("N", "facing-notup");
         fieldNameToName.put("O", "facing-horizontal");

@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.core.menu.impl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
-import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
@@ -18,6 +17,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.IconEditLoreButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.IconEditTypeButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.IconRenameButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpIconEditConfirmButton;
+import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractIconProviderMenu;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.warp.WarpIcons;
@@ -46,7 +46,8 @@ public class MenuWarpIconEdit extends AbstractMenu<AbstractIconProviderMenu.View
 
         MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
-        MenuLayout.Builder<AbstractIconProviderMenu.View<IslandWarp>> patternBuilder = menuParseResult.getLayoutBuilder();
+        AbstractMenuLayout.AbstractBuilder<AbstractIconProviderMenu.View<IslandWarp>> patternBuilder =
+                menuParseResult.getLayoutBuilder();
 
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-type", menuPatternSlots),
                 new IconEditTypeButton.Builder<>(Message.WARP_ICON_NEW_TYPE));

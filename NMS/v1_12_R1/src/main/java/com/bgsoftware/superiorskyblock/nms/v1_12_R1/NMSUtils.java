@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -26,7 +27,6 @@ import net.minecraft.server.v1_12_R1.WorldServer;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -46,7 +46,7 @@ public class NMSUtils {
 
     private static final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
 
-    private static final List<CompletableFuture<Void>> PENDING_CHUNK_ACTIONS = new LinkedList<>();
+    private static final List<CompletableFuture<Void>> PENDING_CHUNK_ACTIONS = Lists.newLinkedList();
 
     private NMSUtils() {
 
@@ -66,8 +66,8 @@ public class NMSUtils {
 
     private static void runActionOnChunksInternal(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
                                                   ChunkCallback chunkCallback, Consumer<List<ChunkCoordIntPair>> onUnloadChunkAction) {
-        List<ChunkCoordIntPair> unloadedChunks = new LinkedList<>();
-        List<Chunk> loadedChunks = new LinkedList<>();
+        List<ChunkCoordIntPair> unloadedChunks = Lists.newLinkedList();
+        List<Chunk> loadedChunks = Lists.newLinkedList();
 
         chunksCoords.forEach(chunkCoords -> {
             Chunk chunk = worldServer.getChunkIfLoaded(chunkCoords.x, chunkCoords.z);

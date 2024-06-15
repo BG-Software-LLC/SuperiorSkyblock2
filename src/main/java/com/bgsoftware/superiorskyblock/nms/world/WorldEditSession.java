@@ -7,13 +7,14 @@ import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface WorldEditSession {
 
     void setBlock(Location location, int combinedId, @Nullable CompoundTag statesTag, @Nullable CompoundTag blockEntityData);
 
-    List<ChunkPosition> getAffectedChunks();
+    Collection<ChunkPosition> getAffectedChunks();
 
     void applyBlocks(Chunk chunk);
 

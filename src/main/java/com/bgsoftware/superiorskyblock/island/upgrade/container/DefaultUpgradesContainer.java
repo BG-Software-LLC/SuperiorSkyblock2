@@ -1,19 +1,19 @@
 package com.bgsoftware.superiorskyblock.island.upgrade.container;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 public class DefaultUpgradesContainer implements UpgradesContainer {
 
-    private final Map<String, Upgrade> upgrades = new HashMap<>();
-    private final Map<String, UpgradeCostLoader> upgradeCostLoaders = new HashMap<>();
+    private final Map<String, Upgrade> upgrades = Maps.newHashMap();
+    private final Map<String, UpgradeCostLoader> upgradeCostLoaders = Maps.newHashMap();
 
     @Nullable
     @Override

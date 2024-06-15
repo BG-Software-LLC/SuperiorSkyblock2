@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
@@ -24,7 +25,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<MenuIslandPrivileges.View, MenuIslandPrivileges.IslandPrivilegeInfo> {
@@ -176,7 +176,7 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
         if (!Menus.MENU_ISLAND_PRIVILEGES.getNoRolePermission().isEmpty() &&
                 !Menus.MENU_ISLAND_PRIVILEGES.getExactRolePermission().isEmpty() &&
                 !Menus.MENU_ISLAND_PRIVILEGES.getHigherRolePermission().isEmpty()) {
-            List<String> roleString = new ArrayList<>();
+            List<String> roleString = Lists.newArrayList();
 
             int roleWeight = requiredRole == null ? Integer.MAX_VALUE : requiredRole.getWeight();
             PlayerRole currentRole;

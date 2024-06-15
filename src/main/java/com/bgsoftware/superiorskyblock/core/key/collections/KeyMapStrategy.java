@@ -1,10 +1,8 @@
 package com.bgsoftware.superiorskyblock.core.key.collections;
 
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
+import com.bgsoftware.common.collections.Maps;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public abstract class KeyMapStrategy {
@@ -12,21 +10,21 @@ public abstract class KeyMapStrategy {
     public static final KeyMapStrategy ARRAY_MAP = new KeyMapStrategy() {
         @Override
         public <K, V> Map<K, V> create(boolean isCustomKeyMap) {
-            return new ArrayMap<>();
+            return Maps.newArrayMap();
         }
     };
 
     public static final KeyMapStrategy CONCURRENT_HASH_MAP = new KeyMapStrategy() {
         @Override
         public <K, V> Map<K, V> create(boolean isCustomKeyMap) {
-            return new ConcurrentHashMap<>();
+            return Maps.newConcurrentHashMap();
         }
     };
 
     public static final KeyMapStrategy HASH_MAP = new KeyMapStrategy() {
         @Override
         public <K, V> Map<K, V> create(boolean isCustomKeyMap) {
-            return new HashMap<>();
+            return Maps.newHashMap();
         }
     };
 

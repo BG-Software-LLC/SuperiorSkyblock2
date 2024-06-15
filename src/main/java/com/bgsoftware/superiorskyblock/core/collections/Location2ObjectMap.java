@@ -2,10 +2,11 @@ package com.bgsoftware.superiorskyblock.core.collections;
 
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
+import com.bgsoftware.common.collections.ints.Int2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 
@@ -158,7 +159,7 @@ public class Location2ObjectMap<V> extends AbstractMap<Location, V> {
         if (chunkMap == null)
             return;
 
-        Iterator<V> iterator = chunkMap.backendData.valueIterator();
+        Iterator<V> iterator = chunkMap.backendData.valuesIterator();
         while (iterator.hasNext())
             consumer.accept(iterator.next());
     }
@@ -168,7 +169,7 @@ public class Location2ObjectMap<V> extends AbstractMap<Location, V> {
         if (chunkMap == null)
             return;
 
-        Iterator<V> iterator = chunkMap.backendData.valueIterator();
+        Iterator<V> iterator = chunkMap.backendData.valuesIterator();
         while (iterator.hasNext())
             predicate.accept(iterator.next());
 
@@ -220,7 +221,7 @@ public class Location2ObjectMap<V> extends AbstractMap<Location, V> {
 
     private static class ChunkMap<V> {
 
-        private final Int2ObjectMapView<V> backendData = CollectionsFactory.createInt2ObjectLinkedHashMap();
+        private final Int2ObjectMap<V> backendData = Maps.newInt2ObjectLinkedHashMap();
 
         @Nullable
         public V get(int relativeX, int blockY, int relativeZ) {
@@ -438,7 +439,7 @@ public class Location2ObjectMap<V> extends AbstractMap<Location, V> {
     private abstract class Itr<T> implements Iterator<T> {
 
         protected final Iterator<Entry<ChunkPosition, ChunkMap<V>>> worldsIterator;
-        protected Iterator<Int2ObjectMapView.Entry<V>> currChunkIterator = Collections.emptyIterator();
+        protected Iterator<Int2ObjectMap.Entry<V>> currChunkIterator = Collections.emptyIterator();
         protected String currWorld;
         protected long currChunk;
         protected ChunkMap<V> currChunkMap;
@@ -461,10 +462,10 @@ public class Location2ObjectMap<V> extends AbstractMap<Location, V> {
                 this.currWorld = nextChunk.getKey().getWorldName();
                 this.currChunk = nextChunk.getKey().asPair();
                 this.currChunkMap = nextChunk.getValue();
-                this.currChunkIterator = this.currChunkMap.backendData.entryIterator();
+                this.currChunkIterator = this.currChunkMap.backendData.entriesIterator();
             }
 
-            Int2ObjectMapView.Entry<V> nextBlock = this.currChunkIterator.next();
+            Int2ObjectMap.Entry<V> nextBlock = this.currChunkIterator.next();
             this.currBlockIdx = nextBlock.getKey();
             this.currValue = nextBlock.getValue();
 

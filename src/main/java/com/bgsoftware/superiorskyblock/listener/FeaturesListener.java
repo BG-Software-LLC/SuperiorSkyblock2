@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandCreateEvent;
@@ -15,7 +16,6 @@ import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -31,7 +31,6 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -39,7 +38,7 @@ import java.util.Optional;
 
 public class FeaturesListener implements Listener {
 
-    private final Map<Class<? extends Event>, EventMethods> CACHED_EVENT_METHODS = new ArrayMap<>();
+    private final Map<Class<? extends Event>, EventMethods> CACHED_EVENT_METHODS = Maps.newArrayMap();
 
     private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
@@ -73,7 +72,7 @@ public class FeaturesListener implements Listener {
 
         EventMethods eventMethods = CACHED_EVENT_METHODS.computeIfAbsent(event.getClass(), EventMethods::new);
 
-        Map<String, String> placeholdersReplaces = new HashMap<>();
+        Map<String, String> placeholdersReplaces = Maps.newHashMap();
 
         if (event instanceof IslandEvent)
             placeholdersReplaces.put("%island%", ((IslandEvent) event).getIsland().getName());

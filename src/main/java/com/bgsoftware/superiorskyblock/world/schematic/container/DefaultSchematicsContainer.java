@@ -1,21 +1,21 @@
 package com.bgsoftware.superiorskyblock.world.schematic.container;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 public class DefaultSchematicsContainer implements SchematicsContainer {
 
-    private final Map<String, Schematic> schematicMap = new HashMap<>();
-    private final List<SchematicParser> schematicParsers = new LinkedList<>();
+    private final Map<String, Schematic> schematicMap = Maps.newHashMap();
+    private final List<SchematicParser> schematicParsers = Lists.newLinkedList();
 
     @Nullable
     @Override

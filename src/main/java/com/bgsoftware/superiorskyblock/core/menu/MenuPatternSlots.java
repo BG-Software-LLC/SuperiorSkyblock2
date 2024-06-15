@@ -1,41 +1,39 @@
 package com.bgsoftware.superiorskyblock.core.menu;
 
-import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
-import com.bgsoftware.superiorskyblock.core.collections.view.Char2ObjectMapView;
-import com.bgsoftware.superiorskyblock.core.collections.view.CharIterator;
-
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
+import com.bgsoftware.common.collections.ints.Int2ObjectMap;
+import com.bgsoftware.common.collections.ints.IntIterator;
+import com.bgsoftware.common.collections.ints.IntList;
 
 public class MenuPatternSlots {
 
-    private final Char2ObjectMapView<List<Integer>> charSlots = CollectionsFactory.createChar2ObjectArrayMap();
+    private final Int2ObjectMap<IntList> charSlots = Maps.newInt2ObjectArrayMap();
 
     public MenuPatternSlots() {
     }
 
-    public CharIterator getChars() {
-        return this.charSlots.keyIterator();
+    public IntIterator getChars() {
+        return this.charSlots.keysIterator();
     }
 
     public void addSlot(char character, int slot) {
-        this.charSlots.computeIfAbsent(character, ch -> new LinkedList<>()).add(slot);
+        this.charSlots.computeIfAbsent(character, ch -> Lists.newIntArrayList()).add(slot);
     }
 
-    public List<Integer> getSlots(char character) {
-        List<Integer> slots = this.charSlots.get(character);
-        return slots == null ? Collections.emptyList() : slots;
+    public IntList getSlots(char character) {
+        IntList slots = this.charSlots.get(character);
+        return slots == null ? Lists.emptyIntArrayList() : slots;
     }
 
-    public List<Integer> getSlots(String str) {
+    public IntList getSlots(String str) {
         for (char ch : str.toCharArray()) {
-            List<Integer> slots = getSlots(ch);
+            IntList slots = getSlots(ch);
             if (!slots.isEmpty())
                 return slots;
         }
 
-        return Collections.emptyList();
+        return Lists.emptyIntArrayList();
     }
 
 }

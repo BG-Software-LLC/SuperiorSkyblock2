@@ -8,10 +8,10 @@ import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.island.role.container.RolesContainer;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 
 public class RolesManagerImpl extends Manager implements RolesManager {
@@ -48,7 +48,7 @@ public class RolesManagerImpl extends Manager implements RolesManager {
         if (laddersSection == null)
             throw new ManagerLoadException("Missing \"ladder\" section for island roles", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
 
-        List<ConfigurationSection> rolesByWeight = new LinkedList<>();
+        List<ConfigurationSection> rolesByWeight = Lists.newLinkedList();
         for (String roleSectionName : laddersSection.getKeys(false))
             rolesByWeight.add(laddersSection.getConfigurationSection(roleSectionName));
         rolesByWeight.sort(Comparator.comparingInt(o -> o.getInt("weight", -1)));

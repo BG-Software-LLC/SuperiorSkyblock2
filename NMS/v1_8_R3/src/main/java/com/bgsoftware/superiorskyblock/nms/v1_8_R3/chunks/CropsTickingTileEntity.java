@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.nms.v1_8_R3.chunks;
 
+import com.bgsoftware.common.collections.Maps;
+import com.bgsoftware.common.collections.longs.Long2ObjectMap;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
-import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Chunk;
@@ -24,7 +24,7 @@ public class CropsTickingTileEntity extends TileEntity implements IUpdatePlayerL
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final Long2ObjectMapView<CropsTickingTileEntity> tickingChunks = CollectionsFactory.createLong2ObjectHashMap();
+    private static final Long2ObjectMap<CropsTickingTileEntity> tickingChunks = Maps.newLong2ObjectHashMap();
     private static int random = ThreadLocalRandom.current().nextInt();
 
     private final WeakReference<Island> island;

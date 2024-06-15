@@ -61,7 +61,7 @@ public class MenuIslandValues extends AbstractMenu<MenuIslandValues.View, Island
 
         MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
-        MenuLayout.Builder<View> patternBuilder = menuParseResult.getLayoutBuilder();
+        AbstractMenuLayout.AbstractBuilder<View> patternBuilder = menuParseResult.getLayoutBuilder();
 
         KeySet keysToUpdate = KeySets.createHashSet(KeyIndicator.MATERIAL);
 

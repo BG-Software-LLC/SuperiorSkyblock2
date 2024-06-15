@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
@@ -7,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
@@ -40,7 +40,7 @@ import java.util.UUID;
 
 public class ChunksListener implements Listener {
 
-    private final Map<UUID, Set<Chunk>> pendingLoadedChunks = new ArrayMap<>();
+    private final Map<UUID, Set<Chunk>> pendingLoadedChunks = Maps.newArrayMap();
 
     private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {

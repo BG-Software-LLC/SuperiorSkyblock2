@@ -1,17 +1,17 @@
 package com.bgsoftware.superiorskyblock.api.player.respawn;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 public abstract class RespawnAction implements Enumerable {
 
-    private static final Map<String, RespawnAction> respawnActions = new HashMap<>();
+    private static final Map<String, RespawnAction> respawnActions = Maps.newHashMap();
     private static int ordinalCounter = 0;
 
     private final String name;

@@ -20,12 +20,12 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.bukkit.OfflinePlayer;
 
 import java.time.Duration;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -213,10 +213,10 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put(SortingTypes.BY_PLAYERS, targetIsland -> Formatters.NUMBER_FORMATTER.format(targetIsland.getAllPlayersInside().size()))
                     .build();
 
-    private final Map<String, IslandPlaceholderParser> CUSTOM_ISLAND_PARSERS = new HashMap<>();
-    private final Map<String, PlayerPlaceholderParser> CUSTOM_PLAYER_PARSERS = new HashMap<>();
+    private final Map<String, IslandPlaceholderParser> CUSTOM_ISLAND_PARSERS = Maps.newHashMap();
+    private final Map<String, PlayerPlaceholderParser> CUSTOM_PLAYER_PARSERS = Maps.newHashMap();
 
-    private final List<PlaceholdersProvider> placeholdersProviders = new LinkedList<>();
+    private final List<PlaceholdersProvider> placeholdersProviders = Lists.newLinkedList();
 
     public PlaceholdersServiceImpl() {
     }
