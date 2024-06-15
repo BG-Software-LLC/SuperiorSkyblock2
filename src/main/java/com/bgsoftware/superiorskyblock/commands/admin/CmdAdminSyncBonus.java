@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeLevelBonusEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeWorthBonusEvent;
@@ -16,7 +17,6 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +26,7 @@ public class CmdAdminSyncBonus implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("syncbonus");
+        return Lists.singleton("syncbonus");
     }
 
     @Override
@@ -108,7 +108,7 @@ public class CmdAdminSyncBonus implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getCustomComplete(args[3], "worth", "level") : Collections.emptyList();
+        return args.length == 4 ? CommandTabCompletes.getCustomComplete(args[3], "worth", "level") : Lists.emptyList();
     }
 
     private static BigDecimal calculateValue(Island island, boolean calculateWorth) {

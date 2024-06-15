@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.core.key.types.LazyKey;
 import com.google.common.base.Preconditions;
 
 import java.util.AbstractSet;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -180,6 +179,7 @@ public class AbstractKeySet<K extends Key> extends AbstractSet<Key> implements K
 
     private class SetIterator implements Iterator<Key> {
 
+        @Nullable
         private Iterator<Key> currIterator;
         private boolean isInnerSetIterator;
         private final boolean shouldRunCustomIterator;
@@ -192,7 +192,7 @@ public class AbstractKeySet<K extends Key> extends AbstractSet<Key> implements K
                 this.currIterator = innerSet.iterator();
                 this.isInnerSetIterator = true;
             } else {
-                this.currIterator = customInnerSet == null ? Collections.emptyIterator() : customInnerSet.iterator();
+                this.currIterator = customInnerSet == null ? null : customInnerSet.iterator();
                 this.isInnerSetIterator = false;
             }
         }
@@ -200,15 +200,15 @@ public class AbstractKeySet<K extends Key> extends AbstractSet<Key> implements K
         @Override
         public boolean hasNext() {
             if (this.isInnerSetIterator) {
-                return this.shouldRunCustomIterator || this.currIterator.hasNext();
+                return this.shouldRunCustomIterator || (this.currIterator != null && this.currIterator.hasNext());
             }
 
-            return this.currIterator.hasNext();
+            return (this.currIterator != null && this.currIterator.hasNext());
         }
 
         @Override
         public Key next() {
-            if (!this.currIterator.hasNext()) {
+            if (this.currIterator == null || !this.currIterator.hasNext()) {
                 if (!this.isInnerSetIterator || !this.shouldRunCustomIterator) {
                     throw new NoSuchElementException();
                 }

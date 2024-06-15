@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
@@ -13,7 +14,6 @@ import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +22,7 @@ public class CmdWarp implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("warp");
+        return Lists.singleton("warp");
     }
 
     @Override
@@ -136,7 +136,7 @@ public class CmdWarp implements ISuperiorCommand {
                     }
                 }
 
-                return tabCompletes.isEmpty() ? Collections.emptyList() : tabCompletes;
+                return tabCompletes.isEmpty() ? Lists.emptyList() : tabCompletes;
             }
             case 3: {
                 Island targetIsland = plugin.getGrid().getIsland(args[1]);
@@ -149,7 +149,7 @@ public class CmdWarp implements ISuperiorCommand {
             }
         }
 
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
 }

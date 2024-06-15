@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.config;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
@@ -31,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -608,7 +608,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     private void convertData(YamlConfiguration cfg) {
         if (cfg.contains("default-hoppers-limit")) {
-            cfg.set("default-limits", Collections.singletonList("HOPPER:" + cfg.getInt("default-hoppers-limit")));
+            cfg.set("default-limits", Lists.newLinkedList("HOPPER:" + cfg.getInt("default-hoppers-limit")));
             cfg.set("default-hoppers-limit", null);
         }
         if (cfg.contains("default-permissions")) {
@@ -632,7 +632,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         if (cfg.contains("spawn-protection"))
             cfg.set("spawn.protection", cfg.getBoolean("spawn-protection"));
         if (cfg.getBoolean("spawn-pvp", false))
-            cfg.set("spawn.settings", Collections.singletonList("PVP"));
+            cfg.set("spawn.settings", Lists.newLinkedList("PVP"));
         if (cfg.contains("island-world"))
             cfg.set("worlds.normal-world", cfg.getString("island-world"));
         if (cfg.contains("welcome-sign-line"))

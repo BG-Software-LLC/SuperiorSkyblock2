@@ -1,5 +1,8 @@
 package com.bgsoftware.superiorskyblock.island.upgrade;
 
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
+import com.bgsoftware.common.collections.Sets;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
@@ -8,7 +11,6 @@ import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.island.upgrade.cost.EmptyUpgradeCost;
 import org.bukkit.World;
 
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -18,7 +20,7 @@ public class DefaultUpgradeLevel extends SUpgradeLevel {
     private static final DefaultUpgradeLevel INSTANCE = new DefaultUpgradeLevel();
 
     private DefaultUpgradeLevel() {
-        super(-1, EmptyUpgradeCost.getInstance(), Collections.emptyList(), "", Collections.emptySet(),
+        super(-1, EmptyUpgradeCost.getInstance(), Lists.emptyList(), "", Sets.emptySet(),
                 DoubleValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getCropGrowth()),
                 DoubleValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getSpawnerRates()),
                 DoubleValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getMobDrops()),
@@ -29,7 +31,7 @@ public class DefaultUpgradeLevel extends SUpgradeLevel {
                 (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getBlockLimits(),
                 (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getEntityLimits(),
                 convertFromArray(plugin.getSettings().getDefaultValues().getGenerators()),
-                Collections.emptyMap(),
+                Maps.emptyMap(),
                 Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getBankLimit()),
                 plugin.getSettings().getDefaultValues().getRoleLimitsAsView()
         );
@@ -50,7 +52,7 @@ public class DefaultUpgradeLevel extends SUpgradeLevel {
             }
         }
 
-        return result.isEmpty() ? Collections.emptyMap() : result;
+        return result.isEmpty() ? Maps.emptyMap() : result;
     }
 
 }

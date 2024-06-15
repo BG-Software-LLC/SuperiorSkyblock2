@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
@@ -12,26 +14,28 @@ import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.serialization.impl.PersistentDataSerializer;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
-import com.google.common.collect.ImmutableMap;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 public class CmdAdminData implements ISuperiorCommand {
 
-    private static final Map<String, SubCommand> subCommands = new ImmutableMap.Builder<String, SubCommand>()
-            .put("set", new SetSubCommand())
-            .put("get", new GetSubCommand())
-            .put("remove", new RemoveSubCommand())
-            .build();
+    private final Map<String, SubCommand> subCommands = setupSubCommands();
+
+    private Map<String, SubCommand> setupSubCommands() {
+        Map<String, SubCommand> subCommands = Maps.newLinkedHashMap();
+        subCommands.put("set", new SetSubCommand());
+        subCommands.put("get", new GetSubCommand());
+        subCommands.put("remove", new RemoveSubCommand());
+        return Maps.unmodifiable(subCommands);
+    }
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("data");
+        return Lists.singleton("data");
     }
 
     @Override
@@ -105,17 +109,17 @@ public class CmdAdminData implements ISuperiorCommand {
                 return CommandTabCompletes.getCustomComplete(args[2], "get", "set", "remove");
             case 4: {
                 SubCommand subCommand = subCommands.get(args[2].toLowerCase(Locale.ENGLISH));
-                return subCommand == null ? Collections.emptyList() :
+                return subCommand == null ? Lists.emptyList() :
                         CommandTabCompletes.getCustomComplete(args[3], "island", "player");
             }
             case 5: {
                 SubCommand subCommand = subCommands.get(args[2].toLowerCase(Locale.ENGLISH));
-                return subCommand == null ? Collections.emptyList() : args[3].equalsIgnoreCase("island") ?
+                return subCommand == null ? Lists.emptyList() : args[3].equalsIgnoreCase("island") ?
                         CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[4], false, null) :
                         CommandTabCompletes.getOnlinePlayers(plugin, args[4], false);
             }
             default: {
-                return Collections.emptyList();
+                return Lists.emptyList();
             }
         }
     }

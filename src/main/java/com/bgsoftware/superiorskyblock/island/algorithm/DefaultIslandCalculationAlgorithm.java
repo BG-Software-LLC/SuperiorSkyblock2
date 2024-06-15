@@ -30,7 +30,6 @@ import org.bukkit.Location;
 
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +71,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
                 CompletableFuture<List<CalculatedChunk>> calculateCompletable = new CompletableFuture<>();
                 completableFuture.whenComplete((chunk, ex) -> {
                     CACHED_CALCULATED_CHUNKS.write(cache ->
-                            plugin.getNMSChunks().calculateChunks(Collections.singletonList(ChunkPosition.of(chunk)), cache)
+                            plugin.getNMSChunks().calculateChunks(Lists.singleton(ChunkPosition.of(chunk)), cache)
                                     .whenComplete((pair, ex2) -> calculateCompletable.complete(pair)));
 
                 });
@@ -188,7 +187,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
         minecartBlockTypes.add(new Pair<>(ConstantKeys.ENTITY_MINECART_HOPPER, ConstantKeys.HOPPER));
         minecartBlockTypes.add(new Pair<>(ConstantKeys.ENTITY_MINECART_MOB_SPAWNER, ConstantKeys.MOB_SPAWNER));
 
-        return Collections.unmodifiableList(minecartBlockTypes);
+        return Lists.unmodifiable(minecartBlockTypes);
     }
 
     private static class BlockCountsTracker implements IslandCalculationResult {

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
@@ -22,7 +23,6 @@ import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -108,7 +108,7 @@ public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory
             this.missionCategory = args.missionCategory;
 
             if (inventoryViewer == null) {
-                this.missions = Collections.emptyList();
+                this.missions = Lists.emptyList();
             } else {
                 SequentialListBuilder<Mission<?>> listBuilder = new SequentialListBuilder<>();
 

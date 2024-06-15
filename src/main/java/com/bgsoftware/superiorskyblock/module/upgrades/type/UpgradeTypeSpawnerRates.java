@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.type;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
@@ -17,7 +18,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class UpgradeTypeSpawnerRates implements IUpgradeType {
@@ -33,7 +33,7 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
 
     @Override
     public List<Listener> getListeners() {
-        return Collections.singletonList(new SpawnerRatesListener());
+        return Lists.singleton(new SpawnerRatesListener());
     }
 
     @Override

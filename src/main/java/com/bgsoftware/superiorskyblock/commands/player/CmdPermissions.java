@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -135,7 +134,7 @@ public class CmdPermissions implements IPermissibleCommand {
                 tabVariables.add("reset");
         }
 
-        return Collections.unmodifiableList(tabVariables);
+        return Lists.unmodifiable(tabVariables);
     }
 
 }

@@ -37,7 +37,6 @@ import org.bukkit.potion.PotionEffectType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -345,7 +344,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Map<World.Environment, Location> getIslandHomes() {
-        return Collections.unmodifiableMap(this.islandHomes);
+        return Maps.unmodifiable(this.islandHomes);
     }
 
     @Override
@@ -357,7 +356,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public List<SuperiorPlayer> getIslandMembers() {
-        return Collections.unmodifiableList(this.members);
+        return Lists.unmodifiable(this.members);
     }
 
     @Override
@@ -369,7 +368,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public List<SuperiorPlayer> getBannedPlayers() {
-        return Collections.unmodifiableList(this.bannedPlayers);
+        return Lists.unmodifiable(this.bannedPlayers);
     }
 
     @Override
@@ -383,7 +382,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Map<SuperiorPlayer, PermissionNode> getPlayerPermissions() {
-        return Collections.unmodifiableMap(this.playerPermissions);
+        return Maps.unmodifiable(this.playerPermissions);
     }
 
     @Override
@@ -396,7 +395,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Map<IslandPrivilege, PlayerRole> getRolePermissions() {
-        return Collections.unmodifiableMap(this.rolePermissions);
+        return Maps.unmodifiable(this.rolePermissions);
     }
 
     @Override
@@ -408,7 +407,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Map<Upgrade, Integer> getUpgrades() {
-        return Collections.unmodifiableMap(this.upgrades.entrySet().stream().collect(Collectors.toMap(
+        return Maps.unmodifiable(this.upgrades.entrySet().stream().collect(Collectors.toMap(
                 entry -> plugin.getUpgrades().getUpgrade(entry.getKey()),
                 Map.Entry::getValue
         )));
@@ -436,7 +435,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Map<SuperiorPlayer, Rating> getRatings() {
-        return Collections.unmodifiableMap(this.ratings.entrySet().stream().collect(Collectors.toMap(
+        return Maps.unmodifiable(this.ratings.entrySet().stream().collect(Collectors.toMap(
                 entry -> plugin.getPlayers().getSuperiorPlayer(entry.getKey()),
                 Map.Entry::getValue
         )));
@@ -458,7 +457,7 @@ public class IslandBuilderImpl implements Island.Builder {
                 completedMissions.put(mission.getMission(), finishCount.get());
         });
 
-        return completedMissions.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(completedMissions);
+        return completedMissions.isEmpty() ? Maps.emptyMap() : Maps.unmodifiable(completedMissions);
     }
 
     @Override
@@ -470,7 +469,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Map<IslandFlag, SyncStatus> getIslandFlags() {
-        return Collections.unmodifiableMap(this.islandFlags.entrySet().stream().collect(Collectors.toMap(
+        return Maps.unmodifiable(this.islandFlags.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
                 entry -> entry.getValue() == 1 ? SyncStatus.ENABLED : SyncStatus.DISABLED
         )));
@@ -492,7 +491,7 @@ public class IslandBuilderImpl implements Island.Builder {
         this.cobbleGeneratorValues.forEach(((environment, generatorRates) ->
                 result.put(environment, KeyMap.createKeyMap(IntValue.unboxMap(generatorRates)))));
 
-        return Collections.unmodifiableMap(result);
+        return Maps.unmodifiable(result);
     }
 
     @Override
@@ -507,7 +506,7 @@ public class IslandBuilderImpl implements Island.Builder {
         Map<SuperiorPlayer, Long> result = Maps.newLinkedHashMap();
         this.uniqueVisitors.forEach(uniqueVisitor ->
                 result.put(uniqueVisitor.getSuperiorPlayer(), uniqueVisitor.getLastVisitTime()));
-        return Collections.unmodifiableMap(result);
+        return Maps.unmodifiable(result);
     }
 
     @Override
@@ -531,7 +530,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Map<PotionEffectType, Integer> getIslandEffects() {
-        return Collections.unmodifiableMap(IntValue.unboxMap(this.islandEffects));
+        return Maps.unmodifiable(IntValue.unboxMap(this.islandEffects));
     }
 
     @Override
@@ -553,7 +552,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public List<ItemStack[]> getIslandChests() {
-        return Collections.unmodifiableList(this.islandChests);
+        return Lists.unmodifiable(this.islandChests);
     }
 
     @Override
@@ -565,7 +564,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Map<PlayerRole, Integer> getRoleLimits() {
-        return Collections.unmodifiableMap(IntValue.unboxMap(this.roleLimits));
+        return Maps.unmodifiable(IntValue.unboxMap(this.roleLimits));
     }
 
     @Override
@@ -578,7 +577,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Map<World.Environment, Location> getVisitorHomes() {
-        return Collections.unmodifiableMap(visitorHomes);
+        return Maps.unmodifiable(visitorHomes);
     }
 
     @Override
@@ -755,7 +754,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public List<BankTransaction> getBankTransactions() {
-        return Collections.unmodifiableList(this.bankTransactions);
+        return Lists.unmodifiable(this.bankTransactions);
     }
 
     @Override

@@ -42,7 +42,6 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -1014,7 +1013,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
                 completedMissions.put(mission.getMission(), finishCount.get());
         });
 
-        return completedMissions.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(completedMissions);
+        return completedMissions.isEmpty() ? Maps.emptyMap() : Maps.unmodifiable(completedMissions);
     }
 
     /*

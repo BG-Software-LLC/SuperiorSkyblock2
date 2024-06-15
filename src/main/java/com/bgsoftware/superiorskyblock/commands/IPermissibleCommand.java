@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -10,7 +11,6 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
 import java.util.List;
 
 public interface IPermissibleCommand extends ISuperiorCommand {
@@ -50,7 +50,7 @@ public interface IPermissibleCommand extends ISuperiorCommand {
         }
 
         return superiorPlayer == null || (island != null && superiorPlayer.hasPermission(getPrivilege())) ?
-                tabComplete(plugin, superiorPlayer, island, args) : Collections.emptyList();
+                tabComplete(plugin, superiorPlayer, island, args) : Lists.emptyList();
     }
 
     IslandPrivilege getPrivilege();
@@ -60,7 +60,7 @@ public interface IPermissibleCommand extends ISuperiorCommand {
     void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args);
 
     default List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
 }

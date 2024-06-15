@@ -1,22 +1,21 @@
 package com.bgsoftware.superiorskyblock.world.schematic.impl;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
-import com.bgsoftware.superiorskyblock.core.schematic.SchematicBlockData;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.schematic.SchematicBlockData;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
-import com.google.common.collect.Maps;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -24,7 +23,7 @@ public class SuperiorSchematicDeserializer {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final EnumMap<BlockFace, Byte> rotationToByte = Maps.newEnumMap(BlockFace.class);
+    private static final EnumMap<BlockFace, Byte> rotationToByte = new EnumMap<>(BlockFace.class);
 
     static {
         rotationToByte.put(BlockFace.EAST, (byte) 4);
@@ -61,7 +60,7 @@ public class SuperiorSchematicDeserializer {
         {
             CompoundTag patterns = compoundTag.getCompound("patterns");
             if (patterns != null) {
-                ListTag patternsList = new ListTag(CompoundTag.class, Collections.emptyList());
+                ListTag patternsList = new ListTag(CompoundTag.class, Lists.emptyList());
 
                 for (Tag<?> tag : patterns) {
                     if (tag instanceof CompoundTag) {
@@ -80,7 +79,7 @@ public class SuperiorSchematicDeserializer {
         {
             CompoundTag contents = compoundTag.getCompound("contents");
             if (contents != null) {
-                ListTag items = new ListTag(CompoundTag.class, Collections.emptyList());
+                ListTag items = new ListTag(CompoundTag.class, Lists.emptyList());
                 for (Map.Entry<String, Tag<?>> item : contents.entrySet()) {
                     if (item.getValue() instanceof CompoundTag) {
                         try {

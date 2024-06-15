@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandJoinEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -13,14 +14,13 @@ import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.command.CommandSender;
 
-import java.util.Collections;
 import java.util.List;
 
 public class CmdAdminAdd implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("add");
+        return Lists.newLinkedList(new String[]{"add"});
     }
 
     @Override
@@ -76,7 +76,7 @@ public class CmdAdminAdd implements IAdminIslandCommand {
         if (!plugin.getEventsBus().callIslandJoinEvent(targetPlayer, island, IslandJoinEvent.Cause.ADMIN))
             return;
 
-        IslandUtils.sendMessage(island, Message.JOIN_ANNOUNCEMENT, Collections.emptyList(), targetPlayer.getName());
+        IslandUtils.sendMessage(island, Message.JOIN_ANNOUNCEMENT, Lists.emptyList(), targetPlayer.getName());
 
         island.revokeInvite(targetPlayer);
         island.addMember(targetPlayer, SPlayerRole.defaultRole());
@@ -98,7 +98,7 @@ public class CmdAdminAdd implements IAdminIslandCommand {
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
         return args.length == 4 ? CommandTabCompletes.getOnlinePlayers(plugin, args[2], false,
-                superiorPlayer -> superiorPlayer.getIsland() == null) : Collections.emptyList();
+                superiorPlayer -> superiorPlayer.getIsland() == null) : Lists.emptyList();
     }
 
 }

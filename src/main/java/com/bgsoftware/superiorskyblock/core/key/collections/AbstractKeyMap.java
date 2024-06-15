@@ -12,7 +12,6 @@ import com.google.common.base.Preconditions;
 
 import java.util.AbstractMap;
 import java.util.AbstractSet;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -288,6 +287,7 @@ public class AbstractKeyMap<K extends Key, V> extends AbstractMap<Key, V> implem
 
     private class EntryIterator implements Iterator<Entry<Key, V>> {
 
+        @Nullable
         private Iterator<Entry> currIterator;
         private boolean isInnerMapIterator;
         private final boolean shouldRunCustomIterator;
@@ -300,7 +300,7 @@ public class AbstractKeyMap<K extends Key, V> extends AbstractMap<Key, V> implem
                 this.currIterator = innerMap.entrySet().iterator();
                 this.isInnerMapIterator = true;
             } else {
-                this.currIterator = customInnerMap == null ? Collections.emptyIterator() : customInnerMap.entrySet().iterator();
+                this.currIterator = customInnerMap == null ? null : customInnerMap.entrySet().iterator();
                 this.isInnerMapIterator = false;
             }
         }
@@ -308,15 +308,15 @@ public class AbstractKeyMap<K extends Key, V> extends AbstractMap<Key, V> implem
         @Override
         public boolean hasNext() {
             if (this.isInnerMapIterator) {
-                return this.shouldRunCustomIterator || this.currIterator.hasNext();
+                return this.shouldRunCustomIterator || (this.currIterator != null && this.currIterator.hasNext());
             }
 
-            return this.currIterator.hasNext();
+            return this.currIterator != null && this.currIterator.hasNext();
         }
 
         @Override
         public Entry<Key, V> next() {
-            if (!this.currIterator.hasNext()) {
+            if (this.currIterator == null || !this.currIterator.hasNext()) {
                 if (!this.isInnerMapIterator || !this.shouldRunCustomIterator) {
                     throw new NoSuchElementException();
                 }

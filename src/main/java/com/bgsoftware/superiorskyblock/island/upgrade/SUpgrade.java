@@ -1,7 +1,9 @@
 package com.bgsoftware.superiorskyblock.island.upgrade;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.collections.Maps;
+import com.bgsoftware.common.collections.Sets;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
@@ -11,7 +13,6 @@ import com.bgsoftware.superiorskyblock.island.upgrade.cost.EmptyUpgradeCost;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,9 +23,9 @@ public class SUpgrade implements Upgrade {
 
     private static final SUpgradeLevel NULL_LEVEL = new SUpgradeLevel(0,
             EmptyUpgradeCost.getInstance(),
-            Collections.emptyList(),
+            Lists.emptyList(),
             "",
-            Collections.emptySet(),
+            Sets.emptySet(),
             DoubleValue.syncedFixed(-1D),
             DoubleValue.syncedFixed(-1D),
             DoubleValue.syncedFixed(-1D),
@@ -34,8 +35,8 @@ public class SUpgrade implements Upgrade {
             IntValue.syncedFixed(-1),
             KeyMaps.createEmptyMap(),
             KeyMaps.createEmptyMap(),
-            Collections.emptyMap(),
-            Collections.emptyMap(),
+            Maps.emptyMap(),
+            Maps.emptyMap(),
             Value.syncedFixed(new BigDecimal(-2)),
             Maps.emptyInt2IntMap());
 
@@ -70,7 +71,7 @@ public class SUpgrade implements Upgrade {
 
     @Override
     public List<Integer> getSlots() {
-        return Collections.unmodifiableList(new LinkedList<>(this.slots));
+        return Lists.unmodifiable(new LinkedList<>(this.slots));
     }
 
     @Override

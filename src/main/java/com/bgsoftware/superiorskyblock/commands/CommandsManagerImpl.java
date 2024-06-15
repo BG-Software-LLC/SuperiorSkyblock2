@@ -29,7 +29,6 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -348,7 +347,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                 SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
                 if (command != null) {
                     return command.getPermission() != null && !sender.hasPermission(command.getPermission()) ?
-                            Collections.emptyList() : command.tabComplete(plugin, sender, args);
+                            Lists.emptyList() : command.tabComplete(plugin, sender, args);
                 }
             }
 

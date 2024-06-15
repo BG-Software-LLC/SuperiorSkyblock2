@@ -23,7 +23,7 @@ public class MenuPatternSlots {
 
     public IntList getSlots(char character) {
         IntList slots = this.charSlots.get(character);
-        return slots == null ? Lists.emptyIntArrayList() : slots;
+        return slots == null ? Lists.emptyIntList() : slots;
     }
 
     public IntList getSlots(String str) {
@@ -33,7 +33,7 @@ public class MenuPatternSlots {
                 return slots;
         }
 
-        return Lists.emptyIntArrayList();
+        return Lists.emptyIntList();
     }
 
 }

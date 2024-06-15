@@ -3,8 +3,6 @@ package com.bgsoftware.superiorskyblock.island.purge;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

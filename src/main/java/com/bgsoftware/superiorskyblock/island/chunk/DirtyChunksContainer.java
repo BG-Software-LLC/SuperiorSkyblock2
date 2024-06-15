@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridg
 import org.bukkit.World;
 
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 
@@ -97,7 +96,7 @@ public class DirtyChunksContainer {
 
     public List<ChunkPosition> getDirtyChunks() {
         if (this.dirtyChunks.isEmpty())
-            return Collections.emptyList();
+            return Lists.emptyList();
 
         List<ChunkPosition> dirtyChunkPositions = Lists.newLinkedList();
 

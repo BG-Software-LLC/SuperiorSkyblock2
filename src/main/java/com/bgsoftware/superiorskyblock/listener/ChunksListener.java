@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -31,7 +32,6 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +118,7 @@ public class ChunksListener implements Listener {
                 List<Player> playersToUpdate = new SequentialListBuilder<Player>()
                         .filter(player -> player.getWorld().equals(world))
                         .build(island.getAllPlayersInside(), SuperiorPlayer::asPlayer);
-                plugin.getNMSChunks().setBiome(Collections.singletonList(ChunkPosition.of(chunk)), island.getBiome(), playersToUpdate);
+                plugin.getNMSChunks().setBiome(Lists.singleton(ChunkPosition.of(chunk)), island.getBiome(), playersToUpdate);
             }
         }
 

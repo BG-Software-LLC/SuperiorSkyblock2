@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.nms.v1_12_R1.dragon;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Sets;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import net.minecraft.server.v1_12_R1.AxisAlignedBB;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Blocks;
@@ -38,7 +38,6 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -70,7 +69,7 @@ public class IslandEnderDragonBattle extends EnderDragonBattle {
     private final BossBattleServer bossBattleServer;
     private final AxisAlignedBB borderArea;
 
-    private final LinkedList<Integer> gateways = Lists.newLinkedList();
+    private final List<Integer> gateways = Lists.newArrayList();
 
     private UUID dragonUUID;
     private BlockPosition exitPortalLocation;
@@ -167,7 +166,7 @@ public class IslandEnderDragonBattle extends EnderDragonBattle {
         this.generateExitPortal(true);
 
         if (!gateways.isEmpty()) {
-            int i = gateways.removeLast();
+            int i = gateways.remove(gateways.size() - 1);
             int j = MathHelper.floor(96.0D * Math.cos(2.0D * (-3.141592653589793D + 0.15707963267948966D * (double) i)));
             int k = MathHelper.floor(96.0D * Math.sin(2.0D * (-3.141592653589793D + 0.15707963267948966D * (double) i)));
             BlockPosition blockPosition = new BlockPosition(j, 75, k);

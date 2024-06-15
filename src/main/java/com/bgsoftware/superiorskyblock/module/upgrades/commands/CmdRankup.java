@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -24,7 +25,6 @@ import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import org.bukkit.Bukkit;
 
 import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
 
 public class CmdRankup implements IPermissibleCommand {
@@ -39,7 +39,7 @@ public class CmdRankup implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("rankup");
+        return Lists.singleton("rankup");
     }
 
     @Override
@@ -152,7 +152,7 @@ public class CmdRankup implements IPermissibleCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        return args.length == 2 ? CommandTabCompletes.getUpgrades(plugin, args[1]) : Collections.emptyList();
+        return args.length == 2 ? CommandTabCompletes.getUpgrades(plugin, args[1]) : Lists.emptyList();
     }
 
 }

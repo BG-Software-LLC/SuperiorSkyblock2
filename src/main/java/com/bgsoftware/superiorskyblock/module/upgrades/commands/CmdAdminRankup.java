@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -19,7 +20,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
 import java.util.List;
 
 public class CmdAdminRankup implements IAdminIslandCommand {
@@ -34,7 +34,7 @@ public class CmdAdminRankup implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("rankup");
+        return Lists.singleton("rankup");
     }
 
     @Override
@@ -115,7 +115,7 @@ public class CmdAdminRankup implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getUpgrades(plugin, args[3]) : Collections.emptyList();
+        return args.length == 4 ? CommandTabCompletes.getUpgrades(plugin, args[3]) : Lists.emptyList();
     }
 
 }

@@ -111,7 +111,6 @@ import java.math.RoundingMode;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.EnumMap;
@@ -427,7 +426,7 @@ public class SIsland implements Island {
         if (includeOwner)
             members.add(owner);
 
-        return Collections.unmodifiableList(members);
+        return Lists.unmodifiable(members);
     }
 
     @Override
@@ -444,7 +443,7 @@ public class SIsland implements Island {
         if (rolesToFilter.contains(SPlayerRole.lastRole()))
             members.add(owner);
 
-        return Collections.unmodifiableList(members);
+        return Lists.unmodifiable(members);
     }
 
     @Override
@@ -853,7 +852,7 @@ public class SIsland implements Island {
 
     @Override
     public Map<World.Environment, Location> getIslandHomes() {
-        return islandHomes.readAndGet(Collections::unmodifiableMap);
+        return islandHomes.readAndGet(Maps::unmodifiable);
     }
 
     @Override
@@ -987,7 +986,7 @@ public class SIsland implements Island {
             }
         }
 
-        return Collections.unmodifiableList(chunks);
+        return Lists.unmodifiable(chunks);
     }
 
     @Override
@@ -1041,7 +1040,7 @@ public class SIsland implements Island {
             }
         }
 
-        return Collections.unmodifiableList(chunks);
+        return Lists.unmodifiable(chunks);
     }
 
     @Override
@@ -1498,12 +1497,12 @@ public class SIsland implements Island {
 
     @Override
     public Map<SuperiorPlayer, PermissionNode> getPlayerPermissions() {
-        return Collections.unmodifiableMap(playerPermissions);
+        return Maps.unmodifiable(playerPermissions);
     }
 
     @Override
     public Map<IslandPrivilege, PlayerRole> getRolePermissions() {
-        return Collections.unmodifiableMap(rolePermissions);
+        return Maps.unmodifiable(rolePermissions);
     }
 
     @Override
@@ -1559,7 +1558,7 @@ public class SIsland implements Island {
     public void disbandIsland() {
         long profilerId = Profiler.start(ProfileType.DISBAND_ISLAND, 2);
 
-        forEachIslandMember(Collections.emptyList(), false, islandMember -> {
+        forEachIslandMember(Lists.emptyList(), false, islandMember -> {
             if (islandMember.equals(owner)) {
                 owner.setIsland(null);
             } else {
@@ -1912,7 +1911,7 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(message, "message parameter cannot be null.");
         Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
 
-        List<UUID> ignoredList = ignoredMembers.length == 0 ? Collections.emptyList() : Arrays.asList(ignoredMembers);
+        List<UUID> ignoredList = ignoredMembers.length == 0 ? Lists.emptyList() : Arrays.asList(ignoredMembers);
 
         Log.debug(Debug.SEND_MESSAGE, owner.getName(), message, ignoredList);
 
@@ -1921,7 +1920,7 @@ public class SIsland implements Island {
 
     @Override
     public void sendMessage(IMessageComponent messageComponent, Object... args) {
-        this.sendMessage(messageComponent, Collections.emptyList(), args);
+        this.sendMessage(messageComponent, Lists.emptyList(), args);
     }
 
     @Override
@@ -1939,7 +1938,7 @@ public class SIsland implements Island {
                           int fadeOut, UUID... ignoredMembers) {
         Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
 
-        List<UUID> ignoredList = ignoredMembers.length == 0 ? Collections.emptyList() : Arrays.asList(ignoredMembers);
+        List<UUID> ignoredList = ignoredMembers.length == 0 ? Lists.emptyList() : Arrays.asList(ignoredMembers);
 
         Log.debug(Debug.SEND_TITLE, owner.getName(), title, subtitle, fadeIn, duration, fadeOut, ignoredList);
 
@@ -1953,7 +1952,7 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(command, "command parameter cannot be null.");
         Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
 
-        List<UUID> ignoredList = ignoredMembers.length == 0 ? Collections.emptyList() : Arrays.asList(ignoredMembers);
+        List<UUID> ignoredList = ignoredMembers.length == 0 ? Lists.emptyList() : Arrays.asList(ignoredMembers);
 
         Log.debug(Debug.EXECUTE_ISLAND_COMMANDS, owner.getName(), command, onlyOnlineMembers, ignoredList);
 
@@ -2710,7 +2709,7 @@ public class SIsland implements Island {
 
     @Override
     public Map<String, Integer> getUpgrades() {
-        return Collections.unmodifiableMap(upgrades);
+        return Maps.unmodifiable(upgrades);
     }
 
     @Override
@@ -2845,12 +2844,12 @@ public class SIsland implements Island {
     public Map<Key, Integer> getBlocksLimits() {
         KeyMap<Integer> blockLimits = KeyMap.createKeyMap();
         this.blockLimits.forEach((block, limit) -> blockLimits.put(block, limit.get()));
-        return Collections.unmodifiableMap(blockLimits);
+        return Maps.unmodifiable(blockLimits);
     }
 
     @Override
     public Map<Key, Integer> getCustomBlocksLimits() {
-        return Collections.unmodifiableMap(this.blockLimits.entrySet().stream()
+        return Maps.unmodifiable(this.blockLimits.entrySet().stream()
                 .filter(entry -> !entry.getValue().isSynced())
                 .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())));
     }
@@ -2939,14 +2938,14 @@ public class SIsland implements Island {
 
     @Override
     public Map<Key, Integer> getEntitiesLimitsAsKeys() {
-        return Collections.unmodifiableMap(this.entityLimits.entrySet().stream().collect(
+        return Maps.unmodifiable(this.entityLimits.entrySet().stream().collect(
                 KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())
         ));
     }
 
     @Override
     public Map<Key, Integer> getCustomEntitiesLimits() {
-        return Collections.unmodifiableMap(this.entityLimits.entrySet().stream()
+        return Maps.unmodifiable(this.entityLimits.entrySet().stream()
                 .filter(entry -> !entry.getValue().isSynced())
                 .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())));
     }
@@ -3138,7 +3137,7 @@ public class SIsland implements Island {
             }
         }
 
-        return Collections.unmodifiableMap(islandEffects);
+        return Maps.unmodifiable(islandEffects);
     }
 
     @Override
@@ -3319,7 +3318,7 @@ public class SIsland implements Island {
 
     @Override
     public Map<String, WarpCategory> getWarpCategories() {
-        return Collections.unmodifiableMap(warpCategories);
+        return Maps.unmodifiable(warpCategories);
     }
 
     @Override
@@ -3433,7 +3432,7 @@ public class SIsland implements Island {
 
     @Override
     public Map<String, IslandWarp> getIslandWarps() {
-        return Collections.unmodifiableMap(warpsByName);
+        return Maps.unmodifiable(warpsByName);
     }
 
     @Override
@@ -3502,7 +3501,7 @@ public class SIsland implements Island {
 
     @Override
     public Map<UUID, Rating> getRatings() {
-        return Collections.unmodifiableMap(ratings);
+        return Maps.unmodifiable(ratings);
     }
 
     @Override
@@ -3529,7 +3528,7 @@ public class SIsland implements Island {
 
     @Override
     public Map<IslandFlag, Byte> getAllSettings() {
-        return Collections.unmodifiableMap(islandFlags);
+        return Maps.unmodifiable(islandFlags);
     }
 
     @Override
@@ -3837,7 +3836,7 @@ public class SIsland implements Island {
                 cobbleGeneratorValues -> cobbleGeneratorValues.get(environment));
 
         if (worldGeneratorRates == null)
-            return Collections.emptyMap();
+            return Maps.emptyMap();
 
         Map<String, Integer> generatorAmountsResult = Maps.newHashMap();
 
@@ -3848,7 +3847,7 @@ public class SIsland implements Island {
             }
         });
 
-        return generatorAmountsResult.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorAmountsResult);
+        return generatorAmountsResult.isEmpty() ? Maps.emptyMap() : Maps.unmodifiable(generatorAmountsResult);
     }
 
     @Override
@@ -3859,9 +3858,9 @@ public class SIsland implements Island {
                 cobbleGeneratorValues -> cobbleGeneratorValues.get(environment));
 
         if (worldGeneratorRates == null)
-            return Collections.emptyMap();
+            return Maps.emptyMap();
 
-        return Collections.unmodifiableMap(worldGeneratorRates.entrySet().stream()
+        return Maps.unmodifiable(worldGeneratorRates.entrySet().stream()
                 .filter(entry -> !entry.getValue().isSynced())
                 .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())));
     }
@@ -4312,7 +4311,7 @@ public class SIsland implements Island {
                 Message.TELEPORTED_TO_WARP.send(superiorPlayer);
                 if (superiorPlayer.isShownAsOnline()) {
                     IslandUtils.sendMessage(this, Message.TELEPORTED_TO_WARP_ANNOUNCEMENT,
-                            Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName(), islandWarp.getName());
+                            Lists.newArrayList(superiorPlayer.getUniqueId()), superiorPlayer.getName(), islandWarp.getName());
                 }
             }
         });
@@ -4413,7 +4412,7 @@ public class SIsland implements Island {
                 completedMissions.put(mission.getMission(), finishCount.get());
         });
 
-        return completedMissions.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(completedMissions);
+        return completedMissions.isEmpty() ? Maps.emptyMap() : Maps.unmodifiable(completedMissions);
     }
 
     /*

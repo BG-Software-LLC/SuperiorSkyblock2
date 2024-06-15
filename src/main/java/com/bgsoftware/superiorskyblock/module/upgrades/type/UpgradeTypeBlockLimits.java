@@ -1,18 +1,19 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.type;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.Materials;
-import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,7 +32,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 
-import java.util.Collections;
 import java.util.List;
 
 public class UpgradeTypeBlockLimits implements IUpgradeType {
@@ -44,12 +44,12 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
     @Override
     public List<Listener> getListeners() {
-        return Collections.singletonList(new BlockLimitsListener());
+        return Lists.singleton(new BlockLimitsListener());
     }
 
     @Override
     public List<ISuperiorCommand> getCommands() {
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
     private class BlockLimitsListener implements Listener {

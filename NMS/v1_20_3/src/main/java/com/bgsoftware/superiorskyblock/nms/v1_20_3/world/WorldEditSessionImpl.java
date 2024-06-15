@@ -58,7 +58,6 @@ import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -271,7 +270,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private class ChunkData {
         private final LevelChunkSection[] chunkSections = new LevelChunkSection[serverLevel.getSectionsCount()];
         private final Map<Heightmap.Types, Heightmap> heightmaps = new EnumMap<>(Heightmap.Types.class);
-        private final List<BlockPos> lights = isStarLightInterface ? Collections.emptyList() : Lists.newLinkedList();
+        private final List<BlockPos> lights = isStarLightInterface ? Lists.emptyList() : Lists.newLinkedList();
 
         public ChunkData(long chunkKey) {
             ChunkPos chunkPos = new ChunkPos(chunkKey);
@@ -311,7 +310,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
                     serverLevel.getChunkSource().getGenerator(),
                     bukkitGenerator);
 
-            WorldGenRegion region = new WorldGenRegion(serverLevel, Collections.singletonList(tempChunk),
+            WorldGenRegion region = new WorldGenRegion(serverLevel, Lists.singleton(tempChunk),
                     ChunkStatus.SURFACE, 0);
 
             chunkGenerator.buildSurface(region,

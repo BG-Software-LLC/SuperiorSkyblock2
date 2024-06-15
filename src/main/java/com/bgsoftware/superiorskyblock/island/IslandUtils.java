@@ -26,7 +26,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -229,7 +228,7 @@ public class IslandUtils {
 
         island.kickMember(target);
 
-        IslandUtils.sendMessage(island, Message.KICK_ANNOUNCEMENT, Collections.emptyList(), target.getName(), callerName);
+        IslandUtils.sendMessage(island, Message.KICK_ANNOUNCEMENT, Lists.emptyList(), target.getName(), callerName);
 
         Message.GOT_KICKED.send(target, callerName);
     }
@@ -256,7 +255,7 @@ public class IslandUtils {
 
         island.banMember(target, caller);
 
-        IslandUtils.sendMessage(island, Message.BAN_ANNOUNCEMENT, Collections.emptyList(), target.getName(), caller.getName());
+        IslandUtils.sendMessage(island, Message.BAN_ANNOUNCEMENT, Lists.emptyList(), target.getName(), caller.getName());
 
         Message.GOT_BANNED.send(target, island.getOwner().getName());
     }

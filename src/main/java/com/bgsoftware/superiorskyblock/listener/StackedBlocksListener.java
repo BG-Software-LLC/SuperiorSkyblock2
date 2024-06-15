@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.stackedblocks.InteractionResult;
@@ -36,7 +37,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -284,7 +284,7 @@ public class StackedBlocksListener implements Listener {
                 SBlockOffset.fromOffsets(-1, 2, -1)
         ));
 
-        return Collections.unmodifiableMap(offsetsMap);
+        return Maps.unmodifiable(offsetsMap);
     }
 
     private class PhysicsListener implements Listener {

@@ -52,7 +52,6 @@ import org.bukkit.craftbukkit.v1_18_R2.util.CraftChatMessage;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -289,7 +288,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
                     serverLevel.getChunkSource().getGenerator(),
                     bukkitGenerator);
 
-            WorldGenRegion region = new WorldGenRegion(serverLevel, Collections.singletonList(tempChunk),
+            WorldGenRegion region = new WorldGenRegion(serverLevel, Lists.singleton(tempChunk),
                     ChunkStatus.SURFACE, 0);
 
             chunkGenerator.buildSurface(region,

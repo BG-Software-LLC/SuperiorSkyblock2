@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
-import java.util.Collections;
 import java.util.List;
 
 public interface IAdminPlayerCommand extends ISuperiorCommand {
@@ -53,7 +52,7 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
             }
         }
 
-        return Collections.unmodifiableList(tabVariables);
+        return Lists.unmodifiable(tabVariables);
     }
 
     boolean supportMultiplePlayers();
@@ -71,7 +70,7 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
     }
 
     default List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
 }

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.island.bank;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
@@ -28,7 +29,6 @@ import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -109,7 +109,7 @@ public class SIslandBank implements IslandBank {
 
             addTransaction(bankTransaction, true);
 
-            IslandUtils.sendMessage(island, Message.DEPOSIT_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(),
+            IslandUtils.sendMessage(island, Message.DEPOSIT_ANNOUNCEMENT, Lists.emptyList(), superiorPlayer.getName(),
                     Formatters.NUMBER_FORMATTER.format(amount));
 
             plugin.getMenus().refreshBankLogs(island);
@@ -213,7 +213,7 @@ public class SIslandBank implements IslandBank {
 
             addTransaction(bankTransaction, true);
 
-            IslandUtils.sendMessage(island, Message.WITHDRAW_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(),
+            IslandUtils.sendMessage(island, Message.WITHDRAW_ANNOUNCEMENT, Lists.emptyList(), superiorPlayer.getName(),
                     Formatters.NUMBER_FORMATTER.format(withdrawAmount));
 
             plugin.getMenus().refreshBankLogs(island);

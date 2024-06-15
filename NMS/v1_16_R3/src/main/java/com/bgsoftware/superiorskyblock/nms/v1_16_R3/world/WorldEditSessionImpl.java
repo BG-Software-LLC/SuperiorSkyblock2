@@ -50,7 +50,6 @@ import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -295,7 +294,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
                     worldServer.getChunkProvider().getChunkGenerator(),
                     bukkitGenerator);
 
-            RegionLimitedWorldAccess region = new RegionLimitedWorldAccess(worldServer, Collections.singletonList(tempChunk));
+            RegionLimitedWorldAccess region = new RegionLimitedWorldAccess(worldServer, Lists.singleton(tempChunk));
 
             chunkGenerator.buildBase(region, tempChunk);
 

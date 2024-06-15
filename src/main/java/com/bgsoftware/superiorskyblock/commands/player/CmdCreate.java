@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -10,7 +11,6 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
 import org.bukkit.command.CommandSender;
 
-import java.util.Collections;
 import java.util.List;
 
 public class CmdCreate implements ISuperiorCommand {
@@ -19,7 +19,7 @@ public class CmdCreate implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("create");
+        return Lists.singleton("create");
     }
 
     @Override
@@ -114,7 +114,7 @@ public class CmdCreate implements ISuperiorCommand {
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         int argumentLength = plugin.getSettings().getIslandNames().isRequiredForCreation() ? 3 : 2;
         return plugin.getSettings().isSchematicNameArgument() && args.length == argumentLength ?
-                CommandTabCompletes.getSchematics(plugin, args[argumentLength - 1]) : Collections.emptyList();
+                CommandTabCompletes.getSchematics(plugin, args[argumentLength - 1]) : Lists.emptyList();
     }
 
 }

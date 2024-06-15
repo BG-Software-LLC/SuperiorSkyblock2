@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -12,7 +13,6 @@ import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class CmdPardon implements IPermissibleCommand {
@@ -79,14 +79,14 @@ public class CmdPardon implements IPermissibleCommand {
 
         island.unbanMember(targetPlayer);
 
-        IslandUtils.sendMessage(island, Message.UNBAN_ANNOUNCEMENT, Collections.emptyList(), targetPlayer.getName(), superiorPlayer.getName());
+        IslandUtils.sendMessage(island, Message.UNBAN_ANNOUNCEMENT, Lists.emptyList(), targetPlayer.getName(), superiorPlayer.getName());
 
         Message.GOT_UNBANNED.send(targetPlayer, island.getOwner().getName());
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        return args.length == 2 ? CommandTabCompletes.getIslandBannedPlayers(island, args[1]) : Collections.emptyList();
+        return args.length == 2 ? CommandTabCompletes.getIslandBannedPlayers(island, args[1]) : Lists.emptyList();
     }
 
 }

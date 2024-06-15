@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -21,7 +20,7 @@ public class CmdAdmin implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("admin");
+        return Lists.singleton("admin");
     }
 
     @Override
@@ -141,7 +140,7 @@ public class CmdAdmin implements ISuperiorCommand {
             SuperiorCommand command = plugin.getCommands().getAdminCommand(args[1]);
             if (command != null) {
                 return command.getPermission() != null && !sender.hasPermission(command.getPermission()) ?
-                        Collections.emptyList() : command.tabComplete(plugin, sender, args);
+                        Lists.emptyList() : command.tabComplete(plugin, sender, args);
             }
         }
 
@@ -158,7 +157,7 @@ public class CmdAdmin implements ISuperiorCommand {
             }
         }
 
-        return Collections.unmodifiableList(list);
+        return Lists.unmodifiable(list);
     }
 
     private static void addTabCompletesFromOptions(String arg, List<String> tabCompletes, @Nullable List<String> options) {

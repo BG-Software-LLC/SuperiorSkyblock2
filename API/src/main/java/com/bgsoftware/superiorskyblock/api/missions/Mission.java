@@ -11,7 +11,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -116,14 +115,14 @@ public abstract class Mission<V> {
      * Get the required missions for completing this mission.
      */
     public List<String> getRequiredMissions() {
-        return Collections.unmodifiableList(requiredMissions);
+        return Lists.unmodifiable(requiredMissions);
     }
 
     /**
      * Get the required checks for completing this mission.
      */
     public List<String> getRequiredChecks() {
-        return Collections.unmodifiableList(requiredChecks);
+        return Lists.unmodifiable(requiredChecks);
     }
 
     /**

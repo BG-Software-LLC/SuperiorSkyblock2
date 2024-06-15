@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -32,7 +31,7 @@ public class CacheBankLogs implements IBankLogs {
     @Override
     public List<BankTransaction> getTransactions(UUID playerUUID) {
         Synchronized<List<BankTransaction>> transactions = this.transactionsByPlayers.get(playerUUID);
-        return transactions == null ? Collections.emptyList() : transactions.readAndGet(Collections::unmodifiableList);
+        return transactions == null ? Lists.emptyList() : transactions.readAndGet(Lists::unmodifiable);
     }
 
     @Override

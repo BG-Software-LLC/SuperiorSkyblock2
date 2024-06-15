@@ -9,8 +9,6 @@ import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public class MissionData {
@@ -69,11 +67,11 @@ public class MissionData {
     }
 
     public List<ItemStack> getItemRewards() {
-        return Collections.unmodifiableList(itemRewards);
+        return Lists.unmodifiable(itemRewards);
     }
 
     public List<String> getCommandRewards() {
-        return Collections.unmodifiableList(commandRewards);
+        return Lists.unmodifiable(commandRewards);
     }
 
     public int getIndex() {

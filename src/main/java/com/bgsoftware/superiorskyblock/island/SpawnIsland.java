@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.island;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
@@ -68,7 +69,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -155,17 +155,17 @@ public class SpawnIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getIslandMembers(boolean includeOwner) {
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
     @Override
     public List<SuperiorPlayer> getIslandMembers(PlayerRole... playerRoles) {
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
     @Override
     public List<SuperiorPlayer> getBannedPlayers() {
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
     @Override
@@ -175,7 +175,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getIslandVisitors(boolean vanishPlayers) {
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
     @Override
@@ -185,12 +185,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getUniqueVisitors() {
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
     @Override
     public List<Pair<SuperiorPlayer, Long>> getUniqueVisitorsWithTimes() {
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
     @Override
@@ -210,7 +210,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getInvitedPlayers() {
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
     @Override
@@ -265,7 +265,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getCoopPlayers() {
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
     @Override
@@ -331,7 +331,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<World.Environment, Location> getIslandHomes() {
-        return Collections.singletonMap(plugin.getSettings().getWorlds().getDefaultWorld(), getIslandHome(null /*unused*/));
+        return Maps.singleton(plugin.getSettings().getWorlds().getDefaultWorld(), getIslandHome(null /*unused*/));
     }
 
     @Override
@@ -436,7 +436,7 @@ public class SpawnIsland implements Island {
         }
 
 
-        return Collections.unmodifiableList(chunks);
+        return Lists.unmodifiable(chunks);
     }
 
     @Override
@@ -494,7 +494,7 @@ public class SpawnIsland implements Island {
             }
         }
 
-        return Collections.unmodifiableList(chunks);
+        return Lists.unmodifiable(chunks);
     }
 
     @Override
@@ -746,12 +746,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<SuperiorPlayer, PermissionNode> getPlayerPermissions() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
     public Map<IslandPrivilege, PlayerRole> getRolePermissions() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
@@ -1232,7 +1232,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<Key, BigInteger> getBlockCountsAsBigInteger() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
@@ -1302,7 +1302,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<String, Integer> getUpgrades() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
@@ -1387,12 +1387,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<Key, Integer> getBlocksLimits() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
     public Map<Key, Integer> getCustomBlocksLimits() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
@@ -1432,12 +1432,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<Key, Integer> getEntitiesLimitsAsKeys() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
     public Map<Key, Integer> getCustomEntitiesLimits() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
@@ -1527,7 +1527,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<PotionEffectType, Integer> getPotionEffects() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
@@ -1577,12 +1577,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<PlayerRole, Integer> getRoleLimits() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
     public Map<PlayerRole, Integer> getCustomRoleLimits() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
@@ -1612,7 +1612,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<String, WarpCategory> getWarpCategories() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
@@ -1652,7 +1652,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<String, IslandWarp> getIslandWarps() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
@@ -1682,7 +1682,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<UUID, Rating> getRatings() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
@@ -1697,7 +1697,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<IslandFlag, Byte> getAllSettings() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
@@ -1728,7 +1728,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<String, Integer> getGeneratorPercentages(World.Environment environment) {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
@@ -1753,12 +1753,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
     public Map<Key, Integer> getCustomGeneratorAmounts(World.Environment environment) {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override
@@ -1880,12 +1880,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public List<Mission<?>> getCompletedMissions() {
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
     @Override
     public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override

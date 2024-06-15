@@ -20,7 +20,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -29,7 +28,7 @@ public class CmdAdminCount implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("count");
+        return Lists.singleton("count");
     }
 
     @Override
@@ -96,7 +95,7 @@ public class CmdAdminCount implements IAdminIslandCommand {
             }
         }
 
-        return Collections.unmodifiableList(list);
+        return Lists.unmodifiable(list);
     }
 
     @Override

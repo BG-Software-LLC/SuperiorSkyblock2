@@ -29,7 +29,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -90,18 +89,18 @@ public class MenuConfigEditor extends AbstractPagedMenu<MenuConfigEditor.View, M
         patternBuilder.setButton(47, new DummyButton.Builder<View>()
                 .setButtonItem(new TemplateItem(new ItemBuilder(Material.PAPER).withName("{0}Previous Page")))
                 .build());
-        patternBuilder.setPreviousPageSlots(Collections.singletonList(47));
+        patternBuilder.setPreviousPageSlots(Lists.newArrayList(47));
 
         patternBuilder.setButton(49, new DummyButton.Builder<View>()
                 .setButtonItem(new TemplateItem(new ItemBuilder(Materials.SUNFLOWER.toBukkitType())
                         .withName("&aCurrent Page").withLore("&7Page {0}")))
                 .build());
-        patternBuilder.setCurrentPageSlots(Collections.singletonList(49));
+        patternBuilder.setCurrentPageSlots(Lists.newArrayList(49));
 
         patternBuilder.setButton(51, new DummyButton.Builder<View>()
                 .setButtonItem(new TemplateItem(new ItemBuilder(Material.PAPER).withName("{0}Next Page")))
                 .build());
-        patternBuilder.setNextPageSlots(Collections.singletonList(51));
+        patternBuilder.setNextPageSlots(Lists.newArrayList(51));
 
         patternBuilder.setPagedObjectSlots(IntStream.range(0, 36).boxed().collect(Collectors.toList()),
                 new ConfigEditorPagedObjectButton.Builder());
@@ -164,7 +163,7 @@ public class MenuConfigEditor extends AbstractPagedMenu<MenuConfigEditor.View, M
         protected List<ItemStack> requestObjects() {
             List<ItemStack> itemStacks = Lists.newLinkedList();
             buildFromSection(itemStacks, config.getConfigurationSection(this.path));
-            return Collections.unmodifiableList(itemStacks);
+            return Lists.unmodifiable(itemStacks);
         }
 
         private void buildFromSection(List<ItemStack> itemStacks, ConfigurationSection section) {

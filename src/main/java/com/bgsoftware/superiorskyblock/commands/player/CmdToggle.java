@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
@@ -7,14 +8,13 @@ import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
-import java.util.Collections;
 import java.util.List;
 
 public class CmdToggle implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("toggle");
+        return Lists.singleton("toggle");
     }
 
     @Override
@@ -93,7 +93,7 @@ public class CmdToggle implements ISuperiorCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return args.length == 2 ? CommandTabCompletes.getCustomComplete(args[1], var ->
-                sender.hasPermission("superior.island.toggle." + var), "border", "blocks") : Collections.emptyList();
+                sender.hasPermission("superior.island.toggle." + var), "border", "blocks") : Lists.emptyList();
     }
 
 }

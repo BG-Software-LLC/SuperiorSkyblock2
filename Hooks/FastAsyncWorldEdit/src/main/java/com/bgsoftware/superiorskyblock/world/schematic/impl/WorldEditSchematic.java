@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.world.schematic.impl;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -21,7 +22,6 @@ import com.sk89q.worldedit.world.block.BlockState;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -104,7 +104,7 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
 
     @Override
     public List<ChunkPosition> getAffectedChunks() {
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
     private void readBlocks() {

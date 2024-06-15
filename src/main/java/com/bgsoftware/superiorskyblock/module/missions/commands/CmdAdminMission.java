@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.missions.commands;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
@@ -12,14 +13,13 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 
-import java.util.Collections;
 import java.util.List;
 
 public class CmdAdminMission implements IAdminPlayerCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("mission");
+        return Lists.singleton("mission");
     }
 
     @Override
@@ -102,7 +102,7 @@ public class CmdAdminMission implements IAdminPlayerCommand {
         return args.length == 4 ? CommandTabCompletes.getCustomComplete(args[3], "complete", "reset") :
                 args.length == 5 && args[3].equalsIgnoreCase("complete") || args[3].equalsIgnoreCase("reset") ?
                         args[4].equals("*") ? CommandTabCompletes.getAllMissions(plugin) : CommandTabCompletes.getMissions(plugin, args[4]) :
-                        Collections.emptyList();
+                        Lists.emptyList();
     }
 
 }

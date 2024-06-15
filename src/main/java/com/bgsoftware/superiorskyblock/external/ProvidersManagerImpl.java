@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.external;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.common.shopsbridge.ShopsProvider;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -47,7 +48,6 @@ import com.bgsoftware.superiorskyblock.external.stackedblocks.StackedBlocksProvi
 import com.bgsoftware.superiorskyblock.external.worlds.WorldsProvider_Default;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.OfflinePlayer;
@@ -59,7 +59,6 @@ import org.bukkit.inventory.ItemStack;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -145,7 +144,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
     @Override
     public List<EntitiesProvider> getEntitiesProviders() {
-        return Collections.unmodifiableList(this.entitiesProviders);
+        return Lists.unmodifiable(this.entitiesProviders);
     }
 
     @Override
@@ -200,7 +199,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
     @Override
     public List<AFKProvider> getAFKProviders() {
-        return Collections.unmodifiableList(this.AFKProvidersList);
+        return Lists.unmodifiable(this.AFKProvidersList);
     }
 
     @Override

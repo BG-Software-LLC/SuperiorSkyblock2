@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.mission;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 
-import java.util.Collections;
 import java.util.List;
 
 public class SMissionCategory implements MissionCategory {
@@ -31,7 +31,7 @@ public class SMissionCategory implements MissionCategory {
 
     @Override
     public List<Mission<?>> getMissions() {
-        return Collections.unmodifiableList(this.missions);
+        return Lists.unmodifiable(this.missions);
     }
 
 }

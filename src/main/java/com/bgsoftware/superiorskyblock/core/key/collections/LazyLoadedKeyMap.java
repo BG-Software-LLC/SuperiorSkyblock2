@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.key.collections;
 
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Sets;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.key.types.EntityTypeKey;
@@ -9,7 +10,6 @@ import com.bgsoftware.superiorskyblock.core.key.types.LazyKey;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 
 import java.util.AbstractMap;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -77,7 +77,7 @@ public class LazyLoadedKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V
     @NotNull
     @Override
     public Set<Entry<Key, V>> entrySet() {
-        return this.delegate == null ? Collections.emptySet() : this.delegate.entrySet();
+        return this.delegate == null ? Sets.emptySet() : this.delegate.entrySet();
     }
 
     @Override

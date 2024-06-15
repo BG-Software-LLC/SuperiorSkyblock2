@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.serialization.impl;
 
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.ISerializer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
@@ -18,7 +19,6 @@ import java.io.DataOutputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class InventorySerializer implements ISerializer<ItemStack[], byte[]> {
@@ -70,7 +70,7 @@ public class InventorySerializer implements ISerializer<ItemStack[], byte[]> {
             }
         }
 
-        ListTag items = new ListTag(CompoundTag.class, Collections.emptyList());
+        ListTag items = new ListTag(CompoundTag.class, Lists.emptyList());
         for (ItemStack itemStack : serializedItems)
             items.addTag(Serializers.ITEM_STACK_TO_TAG_SERIALIZER.serialize(itemStack));
 

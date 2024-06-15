@@ -1,16 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -32,7 +30,7 @@ public abstract class CommandsMap {
         List<String> aliases = Lists.newLinkedList();
         aliases.addAll(superiorCommand.getAliases());
         String label = aliases.get(0).toLowerCase(Locale.ENGLISH);
-        aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, Collections.emptyList()));
+        aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, Lists.emptyList()));
 
         if (subCommands.containsKey(label)) {
             subCommands.remove(label);
@@ -59,7 +57,7 @@ public abstract class CommandsMap {
         List<String> aliases = Lists.newLinkedList();
         aliases.addAll(superiorCommand.getAliases());
         String label = aliases.get(0).toLowerCase(Locale.ENGLISH);
-        aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, Collections.emptyList()));
+        aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, Lists.emptyList()));
 
         subCommands.remove(label);
         aliasesToCommand.values().removeIf(sC -> sC.getAliases().get(0).equals(aliases.get(0)));

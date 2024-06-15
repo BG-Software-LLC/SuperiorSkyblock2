@@ -1,12 +1,14 @@
 package com.bgsoftware.superiorskyblock.core;
 
+import com.bgsoftware.common.collections.Maps;
+import com.bgsoftware.common.collections.Sets;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -23,9 +25,9 @@ public enum Materials {
     END_PORTAL_FRAME("ENDER_PORTAL_FRAME");
 
 
-    private static final EnumMap<Material, MaterialTag> MATERIAL_TAGS = setupMaterialTags();
-    private static final EnumSet<Material> BLOCK_NON_LEGACY_MATERIALS = allOf(material -> material.isBlock() && !isLegacy(material));
-    private static final EnumSet<Material> SOLID_MATERIALS = allOf(Material::isSolid);
+    private static final Map<Material, MaterialTag> MATERIAL_TAGS = setupMaterialTags();
+    private static final Set<Material> BLOCK_NON_LEGACY_MATERIALS = Sets.unmodifiable(allOf(material -> material.isBlock() && !isLegacy(material)));
+    private static final Set<Material> SOLID_MATERIALS = Sets.unmodifiable(allOf(Material::isSolid));
 
     private final String bukkitType;
     private final short bukkitData;
@@ -96,11 +98,11 @@ public enum Materials {
     }
 
     public static Set<Material> getBlocksNonLegacy() {
-        return Collections.unmodifiableSet(BLOCK_NON_LEGACY_MATERIALS);
+        return BLOCK_NON_LEGACY_MATERIALS;
     }
 
     public static Set<Material> getSolids() {
-        return Collections.unmodifiableSet(SOLID_MATERIALS);
+        return SOLID_MATERIALS;
     }
 
     public static void init() {
@@ -113,7 +115,7 @@ public enum Materials {
         return enumSet;
     }
 
-    private static EnumMap<Material, MaterialTag> setupMaterialTags() {
+    private static Map<Material, MaterialTag> setupMaterialTags() {
         EnumMap<Material, MaterialTag> enumMap = new EnumMap<>(Material.class);
         Arrays.stream(Material.values()).forEach(material -> {
             String materialName = material.name();
@@ -140,7 +142,7 @@ public enum Materials {
             else if (ServerVersion.isLegacy() ? material == Material.INK_SACK : materialName.contains("_DYE"))
                 enumMap.put(material, DyeMaterialTag.INSTANCE);
         });
-        return enumMap;
+        return Maps.unmodifiable(enumMap);
     }
 
     private interface MaterialTag {

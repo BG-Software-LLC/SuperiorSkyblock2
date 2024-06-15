@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.data;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -25,7 +25,7 @@ public abstract class DatabaseFilter {
             Pair<String, Object> filter = filters.get(0);
             return fromFilter(filter.getKey(), filter.getValue());
         } else {
-            return new DatabaseFilterList(filters);
+            return new DatabaseFilterList(Lists.unmodifiable(filters));
         }
     }
 
@@ -51,7 +51,7 @@ public abstract class DatabaseFilter {
 
         @Override
         public Collection<Pair<String, Object>> getFilters() {
-            return Collections.unmodifiableCollection(filters);
+            return filters;
         }
 
     }
@@ -65,7 +65,7 @@ public abstract class DatabaseFilter {
 
         @Override
         public Collection<Pair<String, Object>> getFilters() {
-            return Collections.emptyList();
+            return Lists.emptyList();
         }
 
     }
@@ -87,7 +87,7 @@ public abstract class DatabaseFilter {
 
         @Override
         public Collection<Pair<String, Object>> getFilters() {
-            return Collections.singleton(new Pair<>(filterKey, filterValue));
+            return Lists.singleton(new Pair<>(filterKey, filterValue));
         }
 
     }

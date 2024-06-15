@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -13,7 +14,6 @@ import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class CmdUncoop implements IPermissibleCommand {
@@ -80,7 +80,7 @@ public class CmdUncoop implements IPermissibleCommand {
 
         island.removeCoop(targetPlayer);
 
-        IslandUtils.sendMessage(island, Message.UNCOOP_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(), targetPlayer.getName());
+        IslandUtils.sendMessage(island, Message.UNCOOP_ANNOUNCEMENT, Lists.emptyList(), superiorPlayer.getName(), targetPlayer.getName());
 
         if (island.getName().isEmpty())
             Message.LEFT_ISLAND_COOP.send(targetPlayer, superiorPlayer.getName());
@@ -91,7 +91,7 @@ public class CmdUncoop implements IPermissibleCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         return args.length == 2 ? CommandTabCompletes.getOnlinePlayers(plugin, args[1],
-                plugin.getSettings().isTabCompleteHideVanished(), island::isCoop) : Collections.emptyList();
+                plugin.getSettings().isTabCompleteHideVanished(), island::isCoop) : Lists.emptyList();
     }
 
 }

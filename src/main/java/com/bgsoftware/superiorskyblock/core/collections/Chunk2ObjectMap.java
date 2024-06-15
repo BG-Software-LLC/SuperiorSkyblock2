@@ -11,7 +11,6 @@ import java.util.AbstractCollection;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -327,7 +326,8 @@ public class Chunk2ObjectMap<V> extends AbstractMap<ChunkPosition, V> {
     private abstract class Itr<T> implements Iterator<T> {
 
         protected final Iterator<Entry<String, Long2ObjectMap<V>>> worldsIterator;
-        protected Iterator<Long2ObjectMap.Entry<V>> currWorldIterator = Collections.emptyIterator();
+        @Nullable
+        protected Iterator<Long2ObjectMap.Entry<V>> currWorldIterator = null;
         protected String currWorld;
         protected long currChunk;
         protected V currValue;
@@ -338,12 +338,12 @@ public class Chunk2ObjectMap<V> extends AbstractMap<ChunkPosition, V> {
 
         @Override
         public final boolean hasNext() {
-            return this.currWorldIterator.hasNext() || this.worldsIterator.hasNext();
+            return (this.currWorldIterator != null && this.currWorldIterator.hasNext()) || this.worldsIterator.hasNext();
         }
 
         @Override
         public final T next() {
-            if (!this.currWorldIterator.hasNext()) {
+            if (this.currWorldIterator == null || !this.currWorldIterator.hasNext()) {
                 if (!this.worldsIterator.hasNext()) {
                     throw new NoSuchElementException();
                 }

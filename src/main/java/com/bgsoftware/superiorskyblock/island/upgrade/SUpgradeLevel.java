@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.upgrade;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.common.collections.ints.Int2IntMap;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -27,7 +28,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import javax.script.ScriptException;
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
@@ -109,7 +109,7 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public List<String> getCommands() {
-        return Collections.unmodifiableList(commands);
+        return Lists.unmodifiable(commands);
     }
 
     @Override
@@ -168,7 +168,7 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public Map<Key, Integer> getBlockLimits() {
-        return Collections.unmodifiableMap(blockLimits);
+        return Maps.unmodifiable(blockLimits);
     }
 
     @Override
@@ -185,7 +185,7 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public Map<Key, Integer> getEntityLimitsAsKeys() {
-        return Collections.unmodifiableMap(entityLimits);
+        return Maps.unmodifiable(entityLimits);
     }
 
     @Override
@@ -220,7 +220,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         Map<Key, Integer> generatorRates = this.generatorRates.get(environment);
-        return generatorRates == null ? Collections.emptyMap() : generatorRates.entrySet().stream().collect(Collectors.toMap(
+        return generatorRates == null ? Maps.emptyMap() : generatorRates.entrySet().stream().collect(Collectors.toMap(
                 entry -> entry.getKey().toString(),
                 Map.Entry::getValue));
     }
@@ -233,7 +233,7 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public Map<PotionEffectType, Integer> getPotionEffects() {
-        return Collections.unmodifiableMap(islandEffects);
+        return Maps.unmodifiable(islandEffects);
     }
 
     @Override
@@ -250,7 +250,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     @Override
     public Map<PlayerRole, Integer> getRoleLimits() {
         if (this.roleLimits.isEmpty())
-            return Collections.emptyMap();
+            return Maps.emptyMap();
 
         Map<PlayerRole, Integer> roleLimits = Maps.newLinkedHashMap();
 
@@ -262,7 +262,7 @@ public class SUpgradeLevel implements UpgradeLevel {
                 roleLimits.put(playerRole, entry.getValue());
         }
 
-        return roleLimits.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(roleLimits);
+        return roleLimits.isEmpty() ? Maps.emptyMap() : Maps.unmodifiable(roleLimits);
     }
 
     public DoubleValue getCropGrowthUpgradeValue() {
@@ -317,7 +317,7 @@ public class SUpgradeLevel implements UpgradeLevel {
             generatorRates.put(environment, result);
         }));
 
-        return Collections.unmodifiableMap(generatorRates);
+        return Maps.unmodifiable(generatorRates);
     }
 
     public Map<PotionEffectType, IntValue> getPotionEffectsUpgradeValue() {
@@ -333,7 +333,7 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     public Map<PlayerRole, IntValue> getRoleLimitsUpgradeValue() {
         if (this.roleLimits.isEmpty())
-            return Collections.emptyMap();
+            return Maps.emptyMap();
 
         Map<PlayerRole, IntValue> roleLimits = Maps.newLinkedHashMap();
 
@@ -345,7 +345,7 @@ public class SUpgradeLevel implements UpgradeLevel {
                 roleLimits.put(playerRole, IntValue.syncedFixed(entry.getValue()));
         }
 
-        return roleLimits.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(roleLimits);
+        return roleLimits.isEmpty() ? Maps.emptyMap() : Maps.unmodifiable(roleLimits);
     }
 
     public void setItemData(TemplateItem hasNextLevel, TemplateItem noNextLevel,

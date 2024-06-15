@@ -26,7 +26,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -68,7 +67,7 @@ public class CommandArguments {
                 islands.add(arguments.getIsland());
         }
 
-        return new IslandsListArgument(Collections.unmodifiableList(islands), targetPlayer);
+        return new IslandsListArgument(Lists.unmodifiable(islands), targetPlayer);
     }
 
     public static IslandArgument getSenderIsland(SuperiorSkyblockPlugin plugin, CommandSender sender) {
@@ -105,7 +104,7 @@ public class CommandArguments {
                 players.add(targetPlayer);
         }
 
-        return Collections.unmodifiableList(players);
+        return Lists.unmodifiable(players);
     }
 
     public static IslandArgument getIslandWhereStanding(SuperiorSkyblockPlugin plugin, CommandSender sender) {
@@ -148,7 +147,7 @@ public class CommandArguments {
                 missions.add(mission);
         }
 
-        return Collections.unmodifiableList(missions);
+        return Lists.unmodifiable(missions);
     }
 
     public static Upgrade getUpgrade(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument) {

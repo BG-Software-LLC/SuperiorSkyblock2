@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.algorithm;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
@@ -17,7 +18,6 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.google.common.base.Preconditions;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -100,7 +100,7 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
     @Override
     public Map<Key, Integer> getEntitiesCounts() {
-        return Collections.unmodifiableMap(entityCounts);
+        return Maps.unmodifiable(entityCounts);
     }
 
     @Override

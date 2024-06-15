@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
@@ -11,7 +12,6 @@ import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -19,7 +19,7 @@ public class CmdAdminModules implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("modules");
+        return Lists.singleton("modules");
     }
 
     @Override
@@ -125,7 +125,7 @@ public class CmdAdminModules implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length != 3 ? Collections.emptyList() : CommandTabCompletes.getModules(plugin, args[2]);
+        return args.length != 3 ? Lists.emptyList() : CommandTabCompletes.getModules(plugin, args[2]);
     }
 
 }

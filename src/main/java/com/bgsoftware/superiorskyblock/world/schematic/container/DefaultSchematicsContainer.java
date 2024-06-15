@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,7 +39,7 @@ public class DefaultSchematicsContainer implements SchematicsContainer {
 
     @Override
     public List<SchematicParser> getSchematicParsers() {
-        return Collections.unmodifiableList(this.schematicParsers);
+        return Lists.unmodifiable(this.schematicParsers);
     }
 
 }

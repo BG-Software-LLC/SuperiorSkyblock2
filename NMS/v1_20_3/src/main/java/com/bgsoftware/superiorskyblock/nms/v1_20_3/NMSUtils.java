@@ -46,7 +46,6 @@ import org.bukkit.craftbukkit.v1_20_R3.CraftChunk;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -229,7 +228,7 @@ public class NMSUtils {
     }
 
     public static List<CompletableFuture<Void>> getPendingChunkActions() {
-        return Collections.unmodifiableList(PENDING_CHUNK_ACTIONS);
+        return Lists.unmodifiable(PENDING_CHUNK_ACTIONS);
     }
 
     public static ProtoChunk createProtoChunk(ChunkPos chunkPos, ServerLevel serverLevel) {

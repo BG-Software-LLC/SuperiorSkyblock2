@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -12,7 +13,6 @@ import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class CmdTransfer implements ISuperiorCommand {
@@ -85,7 +85,7 @@ public class CmdTransfer implements ISuperiorCommand {
         }
 
         if (island.transferIsland(targetPlayer))
-            IslandUtils.sendMessage(island, Message.TRANSFER_BROADCAST, Collections.emptyList(), targetPlayer.getName());
+            IslandUtils.sendMessage(island, Message.TRANSFER_BROADCAST, Lists.emptyList(), targetPlayer.getName());
     }
 
     @Override
@@ -93,7 +93,7 @@ public class CmdTransfer implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
         return args.length == 2 && island != null && superiorPlayer.getPlayerRole().isLastRole() ?
-                CommandTabCompletes.getIslandMembers(island, args[1]) : Collections.emptyList();
+                CommandTabCompletes.getIslandMembers(island, args[1]) : Lists.emptyList();
     }
 
 }

@@ -28,7 +28,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.BiPredicate;
@@ -104,7 +103,7 @@ public class CommandTabCompletes {
             }
         }
 
-        return Collections.unmodifiableList(tabArguments);
+        return Lists.unmodifiable(tabArguments);
     }
 
     public static List<String> getIslandWarps(Island island, String argument) {

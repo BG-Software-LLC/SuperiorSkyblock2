@@ -60,7 +60,6 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -283,7 +282,7 @@ public class NMSChunksImpl implements NMSChunks {
 
         KeyMap<Counter> chunkEntities = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
 
-        NMSUtils.runActionOnChunks(worldServer, Collections.singletonList(chunkCoord), false, new NMSUtils.ChunkCallback() {
+        NMSUtils.runActionOnChunks(worldServer, Lists.singleton(chunkCoord), false, new NMSUtils.ChunkCallback() {
             @Override
             public void onLoadedChunk(Chunk chunk) {
                 for (org.bukkit.entity.Entity bukkitEntity : chunk.getBukkitChunk().getEntities()) {

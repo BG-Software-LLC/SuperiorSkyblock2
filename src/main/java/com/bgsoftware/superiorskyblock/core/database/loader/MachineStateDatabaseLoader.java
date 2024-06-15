@@ -1,14 +1,14 @@
 package com.bgsoftware.superiorskyblock.core.database.loader;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 
 public abstract class MachineStateDatabaseLoader implements DatabaseLoader {
 
-    private final Map<State, StateAction> STATE_MACHINE_HANDLES = Collections.unmodifiableMap(new EnumMap<State, StateAction>(State.class) {{
+    private final Map<State, StateAction> STATE_MACHINE_HANDLES = Maps.unmodifiable(new EnumMap<State, StateAction>(State.class) {{
         put(State.INITIALIZE, MachineStateDatabaseLoader.this::handleInitialize);
         put(State.POST_INITIALIZE, MachineStateDatabaseLoader.this::handlePostInitialize);
         put(State.PRE_LOAD_DATA, MachineStateDatabaseLoader.this::handlePreLoadData);

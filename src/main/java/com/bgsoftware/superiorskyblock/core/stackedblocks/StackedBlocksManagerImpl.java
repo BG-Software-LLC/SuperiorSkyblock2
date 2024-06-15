@@ -27,7 +27,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -172,7 +171,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
             databaseBridge.batchOperations(false);
         }
 
-        return Collections.unmodifiableMap(removedStackedBlocks);
+        return Maps.unmodifiable(removedStackedBlocks);
     }
 
     @Override
@@ -191,7 +190,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
         this.stackedBlocksContainer.forEach(chunkPosition, stackedBlock ->
                 chunkStackedBlocks.put(stackedBlock.getLocation(), stackedBlock.getAmount()));
 
-        return Collections.unmodifiableMap(chunkStackedBlocks);
+        return Maps.unmodifiable(chunkStackedBlocks);
     }
 
     @Override
@@ -199,7 +198,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
         Map<Location, Integer> allStackedBlocks = Maps.newLinkedHashMap();
         this.stackedBlocksContainer.forEach(stackedBlock ->
                 allStackedBlocks.put(stackedBlock.getLocation(), stackedBlock.getAmount()));
-        return Collections.unmodifiableMap(allStackedBlocks);
+        return Maps.unmodifiable(allStackedBlocks);
     }
 
     @Override

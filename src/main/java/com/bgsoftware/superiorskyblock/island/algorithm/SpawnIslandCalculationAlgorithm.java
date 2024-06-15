@@ -1,15 +1,15 @@
 package com.bgsoftware.superiorskyblock.island.algorithm;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 
-import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 public class SpawnIslandCalculationAlgorithm implements IslandCalculationAlgorithm {
 
     private static final SpawnIslandCalculationAlgorithm INSTANCE = new SpawnIslandCalculationAlgorithm();
-    private static final IslandCalculationResult RESULT = Collections::emptyMap;
+    private static final IslandCalculationResult RESULT = Maps::emptyMap;
 
     private SpawnIslandCalculationAlgorithm() {
 

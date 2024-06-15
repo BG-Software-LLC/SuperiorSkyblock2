@@ -27,7 +27,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -165,7 +164,7 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
 
         @Override
         protected List<IslandPrivilegeInfo> requestObjects() {
-            return Collections.unmodifiableList(islandPrivileges);
+            return Lists.unmodifiable(islandPrivileges);
         }
 
     }
@@ -203,8 +202,8 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
             this.roleIslandPrivilegeItem = roleIslandPrivilegeItem;
             this.accessSound = accessSound;
             this.noAccessSound = noAccessSound;
-            this.accessCommands = accessCommands == null ? Collections.emptyList() : accessCommands;
-            this.noAccessCommands = noAccessCommands == null ? Collections.emptyList() : noAccessCommands;
+            this.accessCommands = accessCommands == null ? Lists.emptyList() : accessCommands;
+            this.noAccessCommands = noAccessCommands == null ? Lists.emptyList() : noAccessCommands;
             this.position = position;
         }
 

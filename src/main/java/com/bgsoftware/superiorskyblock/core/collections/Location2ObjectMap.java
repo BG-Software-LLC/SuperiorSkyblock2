@@ -14,7 +14,6 @@ import java.util.AbstractCollection;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -439,7 +438,8 @@ public class Location2ObjectMap<V> extends AbstractMap<Location, V> {
     private abstract class Itr<T> implements Iterator<T> {
 
         protected final Iterator<Entry<ChunkPosition, ChunkMap<V>>> worldsIterator;
-        protected Iterator<Int2ObjectMap.Entry<V>> currChunkIterator = Collections.emptyIterator();
+        @Nullable
+        protected Iterator<Int2ObjectMap.Entry<V>> currChunkIterator = null;
         protected String currWorld;
         protected long currChunk;
         protected ChunkMap<V> currChunkMap;
@@ -452,12 +452,12 @@ public class Location2ObjectMap<V> extends AbstractMap<Location, V> {
 
         @Override
         public final boolean hasNext() {
-            return this.currChunkIterator.hasNext() || this.worldsIterator.hasNext();
+            return (this.currChunkIterator != null && this.currChunkIterator.hasNext()) || this.worldsIterator.hasNext();
         }
 
         @Override
         public final T next() {
-            if (!this.currChunkIterator.hasNext()) {
+            if (this.currChunkIterator == null || !this.currChunkIterator.hasNext()) {
                 Entry<ChunkPosition, ChunkMap<V>> nextChunk = this.worldsIterator.next();
                 this.currWorld = nextChunk.getKey().getWorldName();
                 this.currChunk = nextChunk.getKey().asPair();

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.world.schematic;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
@@ -8,7 +9,6 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +37,7 @@ public abstract class BaseSchematic implements Schematic {
 
     @Override
     public Map<Key, Integer> getBlockCounts() {
-        return Collections.unmodifiableMap(cachedCounts);
+        return Maps.unmodifiable(cachedCounts);
     }
 
     public abstract List<ChunkPosition> getAffectedChunks();

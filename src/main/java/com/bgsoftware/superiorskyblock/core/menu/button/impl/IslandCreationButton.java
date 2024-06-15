@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
@@ -17,7 +18,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -137,9 +137,9 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
             super(accessItem == null ? TemplateItem.AIR : accessItem, null, null, requiredPermission,
                     lackPermissionSound, IslandCreationButton.class, IslandCreationButton::new);
             this.accessSound = accessSound;
-            this.accessCommands = accessCommands == null ? Collections.emptyList() : accessCommands;
+            this.accessCommands = accessCommands == null ? Lists.emptyList() : accessCommands;
             this.lackPermissionItem = lackPermissionItem == null ? TemplateItem.AIR : lackPermissionItem;
-            this.lackPermissionCommands = lackPermissionCommands == null ? Collections.emptyList() : lackPermissionCommands;
+            this.lackPermissionCommands = lackPermissionCommands == null ? Lists.emptyList() : lackPermissionCommands;
             this.biome = Objects.requireNonNull(biome, "biome cannot be null");
             this.bonusWorth = bonusWorth == null ? BigDecimal.ZERO : bonusWorth;
             this.bonusLevel = bonusLevel == null ? BigDecimal.ZERO : bonusLevel;

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.type;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
@@ -11,7 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockGrowEvent;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class UpgradeTypeCropGrowth implements IUpgradeType {
@@ -27,7 +27,7 @@ public class UpgradeTypeCropGrowth implements IUpgradeType {
 
     @Override
     public List<Listener> getListeners() {
-        return Collections.singletonList(new CropGrowthListener());
+        return Lists.singleton(new CropGrowthListener());
     }
 
     @Override

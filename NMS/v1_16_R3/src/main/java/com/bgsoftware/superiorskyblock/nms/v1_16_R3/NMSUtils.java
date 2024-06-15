@@ -35,7 +35,6 @@ import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldServer;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -153,7 +152,7 @@ public class NMSUtils {
     }
 
     public static List<CompletableFuture<Void>> getPendingChunkActions() {
-        return Collections.unmodifiableList(PENDING_CHUNK_ACTIONS);
+        return Lists.unmodifiable(PENDING_CHUNK_ACTIONS);
     }
 
     public static ProtoChunk createProtoChunk(ChunkCoordIntPair chunkCoord, World world) {

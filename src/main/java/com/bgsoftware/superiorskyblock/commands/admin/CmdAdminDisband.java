@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -12,14 +13,13 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 
 public class CmdAdminDisband implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("disband");
+        return Lists.singleton("disband");
     }
 
     @Override
@@ -62,7 +62,7 @@ public class CmdAdminDisband implements IAdminIslandCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
         if (plugin.getEventsBus().callIslandDisbandEvent(targetPlayer, island)) {
-            IslandUtils.sendMessage(island, Message.DISBAND_ANNOUNCEMENT, Collections.emptyList(), sender.getName());
+            IslandUtils.sendMessage(island, Message.DISBAND_ANNOUNCEMENT, Lists.emptyList(), sender.getName());
 
             if (targetPlayer == null)
                 Message.DISBANDED_ISLAND_OTHER_NAME.send(sender, island.getName());

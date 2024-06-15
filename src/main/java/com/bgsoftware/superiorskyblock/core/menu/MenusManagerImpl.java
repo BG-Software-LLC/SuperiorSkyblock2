@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -31,9 +32,7 @@ import com.bgsoftware.superiorskyblock.core.menu.layout.PagedMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 
@@ -521,7 +520,7 @@ public class MenusManagerImpl extends Manager implements MenusManager {
 
     @Override
     public Map<String, Menu<?, ?>> getMenus() {
-        return Collections.unmodifiableMap(this.registeredMenus);
+        return Maps.unmodifiable(this.registeredMenus);
     }
 
     @Override

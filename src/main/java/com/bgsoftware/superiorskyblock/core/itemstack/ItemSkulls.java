@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.itemstack;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -14,7 +15,6 @@ import com.bgsoftware.superiorskyblock.tag.ListTag;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
@@ -78,7 +78,7 @@ public class ItemSkulls {
 
         CompoundTag properties = new CompoundTag();
 
-        ListTag textures = new ListTag(CompoundTag.class, Collections.emptyList());
+        ListTag textures = new ListTag(CompoundTag.class, Lists.emptyList());
         CompoundTag signature = new CompoundTag();
         signature.setString("Value", texture);
         textures.addTag(signature);

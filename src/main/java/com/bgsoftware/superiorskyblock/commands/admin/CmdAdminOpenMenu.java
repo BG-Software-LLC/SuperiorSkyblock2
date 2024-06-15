@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -12,7 +13,6 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class CmdAdminOpenMenu implements IAdminPlayerCommand {
@@ -68,7 +68,7 @@ public class CmdAdminOpenMenu implements IAdminPlayerCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getMenus(plugin, args[3]) : Collections.emptyList();
+        return args.length == 4 ? CommandTabCompletes.getMenus(plugin, args[3]) : Lists.emptyList();
     }
 
 }

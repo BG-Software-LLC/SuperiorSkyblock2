@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.player;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
@@ -24,7 +26,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -235,7 +236,7 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public List<Island> getInvites() {
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
     @Override
@@ -542,11 +543,11 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public List<Mission<?>> getCompletedMissions() {
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
     @Override
     public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 }

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
@@ -18,7 +19,6 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 
 public class DisbandButton extends AbstractMenuViewButton<IslandMenuView> {
@@ -38,7 +38,7 @@ public class DisbandButton extends AbstractMenuViewButton<IslandMenuView> {
         Island targetIsland = menuView.getIsland();
 
         if (getTemplate().disbandIsland && plugin.getEventsBus().callIslandDisbandEvent(inventoryViewer, targetIsland)) {
-            IslandUtils.sendMessage(targetIsland, Message.DISBAND_ANNOUNCEMENT, Collections.emptyList(), inventoryViewer.getName());
+            IslandUtils.sendMessage(targetIsland, Message.DISBAND_ANNOUNCEMENT, Lists.emptyList(), inventoryViewer.getName());
 
             Message.DISBANDED_ISLAND.send(inventoryViewer);
 

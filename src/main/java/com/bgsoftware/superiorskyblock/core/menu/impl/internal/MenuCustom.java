@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl.internal;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
@@ -20,7 +21,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -145,7 +145,7 @@ public class MenuCustom extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
 
         @Override
         public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-            return Collections.emptyList();
+            return Lists.emptyList();
         }
 
     }

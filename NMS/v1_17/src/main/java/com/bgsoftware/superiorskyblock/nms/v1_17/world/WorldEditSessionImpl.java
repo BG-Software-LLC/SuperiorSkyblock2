@@ -53,7 +53,6 @@ import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
@@ -81,7 +80,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private final Long2ObjectMap<ChunkData> chunks = Maps.newLong2ObjectArrayMap();
     private final List<Pair<BlockPos, BlockState>> blocksToUpdate = Lists.newLinkedList();
     private final List<Pair<BlockPos, CompoundTag>> blockEntities = Lists.newLinkedList();
-    private final Set<ChunkPos> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
+    private final Set<ChunkPos> lightenChunks = isStarLightInterface ? new HashSet<>() : Sets.emptySet();
     private final ServerLevel serverLevel;
 
     public WorldEditSessionImpl(ServerLevel serverLevel) {
@@ -309,7 +308,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
                     serverLevel.getChunkSource().getGenerator(),
                     bukkitGenerator);
 
-            WorldGenRegion region = new WorldGenRegion(serverLevel, Collections.singletonList(tempChunk),
+            WorldGenRegion region = new WorldGenRegion(serverLevel, Lists.singleton(tempChunk),
                     ChunkStatus.SURFACE, 0);
 
             chunkGenerator.buildSurface(region,

@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -411,7 +410,7 @@ public class SettingsContainer {
             for (String container : config.getConfigurationSection("default-containers.containers").getKeys(false)) {
                 try {
                     InventoryType containerType = InventoryType.valueOf(container.toUpperCase(Locale.ENGLISH));
-                    ListTag items = new ListTag(CompoundTag.class, Collections.emptyList());
+                    ListTag items = new ListTag(CompoundTag.class, Lists.emptyList());
                     defaultContainersContents.put(containerType, items);
 
                     ConfigurationSection containerSection = config.getConfigurationSection("default-containers.containers." + container);

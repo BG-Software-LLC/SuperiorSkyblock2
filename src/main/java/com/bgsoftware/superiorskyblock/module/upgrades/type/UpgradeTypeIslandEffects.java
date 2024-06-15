@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.type;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
@@ -12,7 +13,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class UpgradeTypeIslandEffects implements IUpgradeType {
@@ -29,8 +29,8 @@ public class UpgradeTypeIslandEffects implements IUpgradeType {
     @Override
     public List<Listener> getListeners() {
         return ServerVersion.isAtLeast(ServerVersion.v1_15) ?
-                Collections.singletonList(new IslandEffectsListener()) :
-                Collections.emptyList();
+                Lists.singleton(new IslandEffectsListener()) :
+                Lists.emptyList();
     }
 
     @Override

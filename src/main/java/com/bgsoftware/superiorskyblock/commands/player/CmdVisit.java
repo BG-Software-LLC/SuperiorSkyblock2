@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -14,14 +15,13 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 
 import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
 
 public class CmdVisit implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("visit");
+        return Lists.singleton("visit");
     }
 
     @Override
@@ -106,7 +106,7 @@ public class CmdVisit implements ISuperiorCommand {
                 (onlinePlayer, onlineIsland) -> onlineIsland != null && (
                         (!plugin.getSettings().getVisitorsSign().isRequiredForVisit() || onlineIsland.getVisitorsLocation(null /* unused */) != null) ||
                                 superiorPlayer.hasBypassModeEnabled()) && (!onlineIsland.isLocked() ||
-                        onlineIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS))) : Collections.emptyList();
+                        onlineIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS))) : Lists.emptyList();
     }
 
     private void teleportPlayerNoWarmup(SuperiorPlayer superiorPlayer, Island island, Location visitLocation, boolean checkIslandLock) {

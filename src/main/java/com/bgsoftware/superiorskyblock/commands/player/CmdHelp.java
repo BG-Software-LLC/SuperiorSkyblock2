@@ -9,14 +9,13 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 
-import java.util.Collections;
 import java.util.List;
 
 public class CmdHelp implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("help");
+        return Lists.singleton("help");
     }
 
     @Override
@@ -121,7 +120,7 @@ public class CmdHelp implements ISuperiorCommand {
                 list.add(i + "");
         }
 
-        return Collections.unmodifiableList(list);
+        return Lists.unmodifiable(list);
     }
 
 }

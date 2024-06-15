@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Sets;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
@@ -42,8 +44,6 @@ import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
@@ -54,7 +54,6 @@ import org.bukkit.block.Block;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -515,7 +514,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         Preconditions.checkNotNull(chunk, "chunk argument cannot be null");
 
         if (!plugin.getGrid().isIslandsWorld(chunk.getWorld()))
-            return Collections.emptyList();
+            return Lists.emptyList();
 
         Set<Island> islands = new LinkedHashSet<>();
 
@@ -543,7 +542,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         if ((island = getIslandAt(cornerLocation)) != null)
             islands.add(island);
 
-        return islands.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(new LinkedList<>(islands));
+        return islands.isEmpty() ? Lists.emptyList() : Lists.unmodifiable(new LinkedList<>(islands));
     }
 
     @Override

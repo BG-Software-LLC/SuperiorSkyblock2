@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.view;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
@@ -8,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.google.common.base.Preconditions;
 
-import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractPagedMenuView<V extends MenuView<V, A>, A extends ViewArgs, E>
@@ -44,7 +44,7 @@ public abstract class AbstractPagedMenuView<V extends MenuView<V, A>, A extends 
         if (this.objects == null)
             updatePagedObjects();
 
-        return Collections.unmodifiableList(this.objects);
+        return Lists.unmodifiable(this.objects);
     }
 
     @Override

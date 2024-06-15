@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.module.generators.commands;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -17,14 +18,13 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
 import java.util.List;
 
 public class CmdAdminAddGenerator implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("addgenerator");
+        return Lists.singleton("addgenerator");
     }
 
     @Override
@@ -138,7 +138,7 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
         return args.length == 4 ? CommandTabCompletes.getMaterialsForGenerators(args[3]) :
-                args.length == 6 ? CommandTabCompletes.getEnvironments(args[5]) : Collections.emptyList();
+                args.length == 6 ? CommandTabCompletes.getEnvironments(args[5]) : Lists.emptyList();
     }
 
 }

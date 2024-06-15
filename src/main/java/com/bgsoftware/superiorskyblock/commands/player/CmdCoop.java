@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -12,7 +13,6 @@ import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class CmdCoop implements IPermissibleCommand {
@@ -99,7 +99,7 @@ public class CmdCoop implements IPermissibleCommand {
 
         island.addCoop(targetPlayer);
 
-        IslandUtils.sendMessage(island, Message.COOP_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(), targetPlayer.getName());
+        IslandUtils.sendMessage(island, Message.COOP_ANNOUNCEMENT, Lists.emptyList(), superiorPlayer.getName(), targetPlayer.getName());
 
         if (island.getName().isEmpty())
             Message.JOINED_ISLAND_AS_COOP.send(targetPlayer, superiorPlayer.getName());
@@ -112,7 +112,7 @@ public class CmdCoop implements IPermissibleCommand {
         return args.length == 2 ? CommandTabCompletes.getOnlinePlayers(plugin, args[1],
                 plugin.getSettings().isTabCompleteHideVanished(), onlinePlayer ->
                         !island.isMember(onlinePlayer) && !island.isBanned(onlinePlayer) && !island.isCoop(onlinePlayer))
-                : Collections.emptyList();
+                : Lists.emptyList();
     }
 
 }

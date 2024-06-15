@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -14,7 +15,6 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class CmdDisband implements IPermissibleCommand {
@@ -74,7 +74,7 @@ public class CmdDisband implements IPermissibleCommand {
         if (plugin.getSettings().isDisbandConfirm()) {
             plugin.getMenus().openConfirmDisband(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
         } else if (plugin.getEventsBus().callIslandDisbandEvent(superiorPlayer, island)) {
-            IslandUtils.sendMessage(island, Message.DISBAND_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
+            IslandUtils.sendMessage(island, Message.DISBAND_ANNOUNCEMENT, Lists.emptyList(), superiorPlayer.getName());
 
             Message.DISBANDED_ISLAND.send(superiorPlayer);
 

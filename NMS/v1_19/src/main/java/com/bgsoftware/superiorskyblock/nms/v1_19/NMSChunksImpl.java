@@ -67,7 +67,6 @@ import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -214,7 +213,7 @@ public class NMSChunksImpl implements NMSChunks {
                         CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(serverLevel,
                                 serverLevel.getChunkSource().getGenerator(), serverLevel.generator);
 
-                        WorldGenRegion region = new WorldGenRegion(serverLevel, Collections.singletonList(protoChunk),
+                        WorldGenRegion region = new WorldGenRegion(serverLevel, Lists.singleton(protoChunk),
                                 ChunkStatus.SURFACE, 0);
 
                         customChunkGenerator.buildSurface(region,
@@ -396,7 +395,7 @@ public class NMSChunksImpl implements NMSChunks {
 
         KeyMap<Counter> chunkEntities = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
 
-        NMSUtils.runActionOnEntityChunks(serverLevel, Collections.singletonList(chunkPos), new NMSUtils.ChunkCallback() {
+        NMSUtils.runActionOnEntityChunks(serverLevel, Lists.singleton(chunkPos), new NMSUtils.ChunkCallback() {
             @Override
             public void onLoadedChunk(LevelChunk levelChunk) {
                 for (org.bukkit.entity.Entity bukkitEntity : new CraftChunk(levelChunk).getEntities()) {
@@ -571,7 +570,7 @@ public class NMSChunksImpl implements NMSChunks {
                     serverLevel.getChunkSource().getGenerator(),
                     bukkitGenerator);
 
-            WorldGenRegion region = new WorldGenRegion(serverLevel, Collections.singletonList(chunk),
+            WorldGenRegion region = new WorldGenRegion(serverLevel, Lists.singleton(chunk),
                     ChunkStatus.SURFACE, 0);
 
             chunkGenerator.buildSurface(region,

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.algorithm;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
@@ -17,7 +18,6 @@ import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import com.google.common.base.Preconditions;
 
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.Map;
 
 public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerAlgorithm {
@@ -122,7 +122,7 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
 
     @Override
     public Map<Key, BigInteger> getBlockCounts() {
-        return Collections.unmodifiableMap(this.blockCounts);
+        return Maps.unmodifiable(this.blockCounts);
     }
 
     @Override

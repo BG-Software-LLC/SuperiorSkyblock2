@@ -32,7 +32,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -69,7 +68,7 @@ public class OraxenHook {
             }));
         }
 
-        AVAILABLE_MECHANICS = Collections.unmodifiableList(availableMechanics);
+        AVAILABLE_MECHANICS = Lists.unmodifiable(availableMechanics);
     }
 
     private static final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {

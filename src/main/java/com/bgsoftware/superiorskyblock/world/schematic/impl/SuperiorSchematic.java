@@ -34,7 +34,6 @@ import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -65,7 +64,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         List<SchematicBlockData> blocks;
         ListTag blocksList = compoundTag.getList("blocks");
         if (blocksList == null) {
-            blocks = Collections.emptyList();
+            blocks = Lists.emptyList();
         } else {
             List<SchematicBlockData> schematicBlocks = Lists.newLinkedList();
 
@@ -85,7 +84,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         List<SchematicEntity> entities;
         ListTag entitiesList = compoundTag.getList("entities");
         if (entitiesList == null) {
-            entities = Collections.emptyList();
+            entities = Lists.emptyList();
         } else {
             entities = Lists.newLinkedList();
 
@@ -238,7 +237,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
     @Override
     public List<ChunkPosition> getAffectedChunks() {
-        return affectedChunks == null ? Collections.emptyList() : Collections.unmodifiableList(affectedChunks);
+        return affectedChunks == null ? Lists.emptyList() : Lists.unmodifiable(affectedChunks);
     }
 
     public SuperiorSchematic copy(String newName) {
@@ -262,8 +261,8 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
             this.offset = offset;
             this.yaw = yaw;
             this.pitch = pitch;
-            this.blocks = Collections.unmodifiableList(blocks);
-            this.entities = Collections.unmodifiableList(entities);
+            this.blocks = Lists.unmodifiable(blocks);
+            this.entities = Lists.unmodifiable(entities);
         }
 
     }

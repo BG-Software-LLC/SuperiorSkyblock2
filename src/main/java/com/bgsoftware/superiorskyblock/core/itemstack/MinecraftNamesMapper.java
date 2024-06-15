@@ -11,7 +11,6 @@ import com.google.gson.JsonObject;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -98,7 +97,7 @@ public class MinecraftNamesMapper {
             Log.error(error, "Failed to fetch minecraft names mapper:");
         }
 
-        return mappedNames.isEmpty() ? Collections.emptyMap() : mappedNames;
+        return mappedNames.isEmpty() ? Maps.emptyMap() : mappedNames;
     }
 
     private static JsonElement ensureFieldExists(JsonObject object, String fieldName) throws MappingFormatException {

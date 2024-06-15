@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
@@ -23,7 +24,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -155,9 +155,9 @@ public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
             super(buttonItem, null, null, requiredPermission, lackPermissionSound,
                     BiomeButton.class, BiomeButton::new);
             this.accessSound = accessSound;
-            this.accessCommands = accessCommands == null ? Collections.emptyList() : accessCommands;
+            this.accessCommands = accessCommands == null ? Lists.emptyList() : accessCommands;
             this.lackPermissionItem = lackPermissionItem;
-            this.lackPermissionCommands = lackPermissionCommands == null ? Collections.emptyList() : lackPermissionCommands;
+            this.lackPermissionCommands = lackPermissionCommands == null ? Lists.emptyList() : lackPermissionCommands;
             this.biome = Objects.requireNonNull(biome, "biome cannot be null");
         }
 

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.button;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuViewButton;
@@ -11,7 +12,6 @@ import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractMenuTemplateButton<V extends MenuView<V, ?>> implements MenuTemplateButton<V> {
@@ -30,7 +30,7 @@ public abstract class AbstractMenuTemplateButton<V extends MenuView<V, ?>> imple
                                       @Nullable GameSound lackPermissionSound, Class<?> viewButtonType) {
         this.buttonItem = buttonItem;
         this.clickSound = clickSound;
-        this.commands = commands == null ? Collections.emptyList() : Collections.unmodifiableList(commands);
+        this.commands = commands == null ? Lists.emptyList() : Lists.unmodifiable(commands);
         this.requiredPermission = requiredPermission;
         this.lackPermissionSound = lackPermissionSound;
         this.viewButtonType = viewButtonType;

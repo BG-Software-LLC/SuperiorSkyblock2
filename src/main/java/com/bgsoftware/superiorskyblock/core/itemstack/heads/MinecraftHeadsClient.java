@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.itemstack.heads;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.core.DynamicArray;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 
@@ -10,7 +11,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -67,7 +67,7 @@ public class MinecraftHeadsClient {
             Log.error(error, "Failed to obtain heads from minecraft-heads:");
         }
 
-        return addedAnyHead ? heads.toList() : Collections.emptyList();
+        return addedAnyHead ? heads.toList() : Lists.emptyList();
     }
 
 }

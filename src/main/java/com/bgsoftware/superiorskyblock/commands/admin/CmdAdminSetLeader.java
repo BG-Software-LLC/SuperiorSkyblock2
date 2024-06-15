@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -10,13 +11,12 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.command.CommandSender;
 
-import java.util.Collections;
 import java.util.List;
 
 public class CmdAdminSetLeader implements IAdminPlayerCommand {
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("setleader");
+        return Lists.singleton("setleader");
     }
 
     @Override
@@ -89,14 +89,14 @@ public class CmdAdminSetLeader implements IAdminPlayerCommand {
 
         if (island.transferIsland(newLeader)) {
             Message.TRANSFER_ADMIN.send(sender, leader.getName(), newLeader.getName());
-            IslandUtils.sendMessage(island, Message.TRANSFER_BROADCAST, Collections.emptyList(), newLeader.getName());
+            IslandUtils.sendMessage(island, Message.TRANSFER_BROADCAST, Lists.emptyList(), newLeader.getName());
         }
     }
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
         Island playerIsland = targetPlayer.getIsland();
-        return args.length != 4 ? Collections.emptyList() : CommandTabCompletes.getOnlinePlayers(plugin, args[2], false, onlinePlayer -> {
+        return args.length != 4 ? Lists.emptyList() : CommandTabCompletes.getOnlinePlayers(plugin, args[2], false, onlinePlayer -> {
             Island onlineIsland = onlinePlayer.getIsland();
             return !onlinePlayer.equals(targetPlayer) && onlineIsland != null && !onlineIsland.equals(playerIsland) &&
                     onlineIsland.getOwner().equals(onlinePlayer);

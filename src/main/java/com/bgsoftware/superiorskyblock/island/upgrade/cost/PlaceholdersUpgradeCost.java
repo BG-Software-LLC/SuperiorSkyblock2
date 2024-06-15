@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.upgrade.cost;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
@@ -8,7 +9,6 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import org.bukkit.Bukkit;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 
 public class PlaceholdersUpgradeCost extends UpgradeCostAbstract {
@@ -27,7 +27,7 @@ public class PlaceholdersUpgradeCost extends UpgradeCostAbstract {
     public PlaceholdersUpgradeCost(BigDecimal cost, String placeholder, List<String> withdrawCommands) {
         super(cost, "placeholders");
         this.placeholder = placeholder;
-        this.withdrawCommands = Collections.unmodifiableList(withdrawCommands);
+        this.withdrawCommands = Lists.unmodifiable(withdrawCommands);
     }
 
     @Override

@@ -27,7 +27,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -107,7 +106,7 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
 
         @Override
         protected List<IslandFlagInfo> requestObjects() {
-            return Collections.unmodifiableList(islandFlags);
+            return Lists.unmodifiable(islandFlags);
         }
 
     }

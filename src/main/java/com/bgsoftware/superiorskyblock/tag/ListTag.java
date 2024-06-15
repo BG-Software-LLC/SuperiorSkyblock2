@@ -41,7 +41,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -111,7 +110,7 @@ public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
 
     @Override
     public List<Tag<?>> getValue() {
-        return Collections.unmodifiableList(value);
+        return Lists.unmodifiable(value);
     }
 
     @NotNull

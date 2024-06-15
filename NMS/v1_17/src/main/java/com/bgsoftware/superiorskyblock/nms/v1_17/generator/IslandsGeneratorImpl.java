@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17.generator;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -15,7 +16,6 @@ import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
 import org.bukkit.generator.BlockPopulator;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -51,7 +51,7 @@ public class IslandsGeneratorImpl extends IslandsGenerator {
 
     @Override
     public List<BlockPopulator> getDefaultPopulators(World world) {
-        return Collections.emptyList();
+        return Lists.emptyList();
     }
 
     @Override

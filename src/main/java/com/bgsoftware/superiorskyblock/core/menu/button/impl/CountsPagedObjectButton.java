@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
@@ -24,7 +25,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.Optional;
 
 public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.View, MenuCounts.BlockCount> {
@@ -224,7 +224,7 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
 
         return itemBuilder
                 .withName(currentMeta.hasDisplayName() ? currentMeta.getDisplayName() : "")
-                .withLore(currentMeta.hasLore() ? currentMeta.getLore() : Collections.emptyList())
+                .withLore(currentMeta.hasLore() ? currentMeta.getLore() : Lists.emptyList())
                 .withAmount(BigInteger.ONE.max(MAX_STACK.min(amount.toBigInteger())).intValue())
                 .replaceAll("{0}", Formatters.CAPITALIZED_FORMATTER.format(materialName))
                 .replaceAll("{1}", amount + "")

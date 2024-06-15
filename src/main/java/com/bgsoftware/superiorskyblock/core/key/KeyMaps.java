@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.core.key;
 
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
+import com.bgsoftware.common.collections.Sets;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.key.collections.EntityTypeKeyMap;
@@ -10,7 +12,6 @@ import com.bgsoftware.superiorskyblock.core.key.collections.LazyLoadedKeyMap;
 import com.bgsoftware.superiorskyblock.core.key.collections.MaterialKeyMap;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -109,19 +110,19 @@ public class KeyMaps {
         @NotNull
         @Override
         public Set<Key> keySet() {
-            return Collections.emptySet();
+            return Sets.emptySet();
         }
 
         @NotNull
         @Override
         public Collection<V> values() {
-            return Collections.emptyList();
+            return Lists.emptyList();
         }
 
         @NotNull
         @Override
         public Set<Entry<Key, V>> entrySet() {
-            return Collections.emptySet();
+            return Sets.emptySet();
         }
 
         @Override

@@ -4,7 +4,6 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.collections.Lists;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -122,12 +121,12 @@ public class SequentialListBuilder<E> {
 
     private static <E> List<E> completeBuild(List<E> sequentialList, @Nullable Comparator<? super E> comparator, boolean mutable) {
         if (sequentialList.isEmpty())
-            return mutable ? sequentialList : Collections.emptyList();
+            return mutable ? sequentialList : Lists.emptyList();
 
         if (comparator != null)
             sequentialList.sort(comparator);
 
-        return mutable ? sequentialList : Collections.unmodifiableList(sequentialList);
+        return mutable ? sequentialList : Lists.unmodifiable(sequentialList);
     }
 
 

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
@@ -12,7 +13,6 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.MenuTopIslands;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collections;
 import java.util.List;
 
 public class TopIslandsPagedObjectButton extends AbstractPagedMenuButton<MenuTopIslands.View, Island> {
@@ -94,9 +94,9 @@ public class TopIslandsPagedObjectButton extends AbstractPagedMenuButton<MenuTop
                     buttonIndex, TopIslandsPagedObjectButton.class, TopIslandsPagedObjectButton::new);
             this.islandItem = islandItem;
             this.islandSound = islandSound;
-            this.islandCommands = islandCommands == null ? Collections.emptyList() : islandCommands;
+            this.islandCommands = islandCommands == null ? Lists.emptyList() : islandCommands;
             this.noIslandSound = noIslandSound;
-            this.noIslandCommands = noIslandCommands == null ? Collections.emptyList() : noIslandCommands;
+            this.noIslandCommands = noIslandCommands == null ? Lists.emptyList() : noIslandCommands;
             if (this.getNullTemplateItem() != null)
                 this.getNullTemplateItem().getEditableBuilder().asSkullOf((SuperiorPlayer) null);
         }

@@ -28,7 +28,6 @@ import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -94,7 +93,7 @@ public class RawDeserializer implements IDeserializer {
             }
         }
 
-        return Collections.unmodifiableList(playerAttributesList);
+        return Lists.unmodifiable(playerAttributesList);
     }
 
     @Override
@@ -222,7 +221,7 @@ public class RawDeserializer implements IDeserializer {
             }
         }
 
-        return Collections.unmodifiableList(warpAttributes);
+        return Lists.unmodifiable(warpAttributes);
     }
 
     @Override
@@ -320,7 +319,7 @@ public class RawDeserializer implements IDeserializer {
             }
         }
 
-        return Collections.unmodifiableList(visitors);
+        return Lists.unmodifiable(visitors);
     }
 
     @Override
@@ -371,7 +370,7 @@ public class RawDeserializer implements IDeserializer {
                     .setValue(IslandChestAttributes.Field.CONTENTS, islandChestsSections[i]));
         }
 
-        return Collections.unmodifiableList(islandChestAttributes);
+        return Lists.unmodifiable(islandChestAttributes);
     }
 
     @Override
@@ -415,7 +414,7 @@ public class RawDeserializer implements IDeserializer {
             }
         }
 
-        return Collections.unmodifiableList(warpCategoryAttributes);
+        return Lists.unmodifiable(warpCategoryAttributes);
     }
 
     @Override

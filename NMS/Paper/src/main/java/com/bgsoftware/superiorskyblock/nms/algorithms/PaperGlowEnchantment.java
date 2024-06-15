@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.nms.algorithms;
 
+import com.bgsoftware.common.collections.Sets;
 import io.papermc.paper.enchantments.EnchantmentRarity;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.EntityCategory;
 import org.bukkit.inventory.EquipmentSlot;
 
-import java.util.Collections;
 import java.util.Set;
 
 public class PaperGlowEnchantment extends SpigotGlowEnchantment {
@@ -41,7 +41,7 @@ public class PaperGlowEnchantment extends SpigotGlowEnchantment {
 
     @Override
     public Set<EquipmentSlot> getActiveSlots() {
-        return Collections.emptySet();
+        return Sets.emptySet();
     }
 
 }

@@ -26,7 +26,6 @@ import com.google.gson.JsonObject;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -80,7 +79,7 @@ public class JsonDeserializer implements IDeserializer {
             if (_playerAttributes != null)
                 playerAttributes.add(_playerAttributes);
         });
-        return Collections.unmodifiableList(playerAttributes);
+        return Lists.unmodifiable(playerAttributes);
     }
 
     public Map<UUID, PlayerPrivilegeNode> deserializePlayerPerms(String permissionNodes) {
@@ -167,7 +166,7 @@ public class JsonDeserializer implements IDeserializer {
                     .setValue(IslandWarpAttributes.Field.ICON, icon));
         });
 
-        return Collections.unmodifiableList(islandWarpList);
+        return Lists.unmodifiable(islandWarpList);
     }
 
     public KeyMap<Integer> deserializeBlockLimits(String blocks) {
@@ -255,7 +254,7 @@ public class JsonDeserializer implements IDeserializer {
             }
         });
 
-        return Collections.unmodifiableList(visitorsList);
+        return Lists.unmodifiable(visitorsList);
     }
 
     public KeyMap<Integer> deserializeEntityLimits(String entities) {
@@ -302,7 +301,7 @@ public class JsonDeserializer implements IDeserializer {
                     .setValue(IslandChestAttributes.Field.CONTENTS, contents));
         });
 
-        return Collections.unmodifiableList(islandChestList);
+        return Lists.unmodifiable(islandChestList);
     }
 
     public Map<PlayerRole, Integer> deserializeRoleLimits(String roles) {
@@ -336,7 +335,7 @@ public class JsonDeserializer implements IDeserializer {
                     .setValue(WarpCategoryAttributes.Field.ICON, icon));
         });
 
-        return Collections.unmodifiableList(warpCategories);
+        return Lists.unmodifiable(warpCategories);
     }
 
     @Override

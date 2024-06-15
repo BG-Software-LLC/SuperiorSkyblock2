@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.island.algorithm;
 
+import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 
-import java.util.Collections;
 import java.util.Map;
 
 public class SpawnIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrackerAlgorithm {
@@ -34,7 +34,7 @@ public class SpawnIslandEntitiesTrackerAlgorithm implements IslandEntitiesTracke
 
     @Override
     public Map<Key, Integer> getEntitiesCounts() {
-        return Collections.emptyMap();
+        return Maps.emptyMap();
     }
 
     @Override

@@ -1,11 +1,10 @@
 package com.bgsoftware.superiorskyblock.island.notifications;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
-
-import java.util.Collections;
 
 public class IslandNotifications {
 
@@ -21,7 +20,7 @@ public class IslandNotifications {
         if (island == null)
             return;
 
-        IslandUtils.sendMessage(island, Message.PLAYER_QUIT_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
+        IslandUtils.sendMessage(island, Message.PLAYER_QUIT_ANNOUNCEMENT, Lists.singleton(superiorPlayer.getUniqueId()), superiorPlayer.getName());
 
         boolean anyOnline = island.getIslandMembers(true).stream().anyMatch(islandMember ->
                 islandMember != superiorPlayer && islandMember.isOnline());
@@ -39,7 +38,7 @@ public class IslandNotifications {
         if (island == null)
             return;
 
-        IslandUtils.sendMessage(island, Message.PLAYER_JOIN_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
+        IslandUtils.sendMessage(island, Message.PLAYER_JOIN_ANNOUNCEMENT, Lists.singleton(superiorPlayer.getUniqueId()), superiorPlayer.getName());
         island.updateLastTime();
         island.setCurrentlyActive(true);
     }

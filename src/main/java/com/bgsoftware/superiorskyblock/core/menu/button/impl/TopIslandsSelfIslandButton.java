@@ -26,7 +26,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -236,9 +235,9 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
             this.islandItem = islandItem == null ? TemplateItem.AIR : islandItem;
             this.noIslandItem = noIslandItem == null ? TemplateItem.AIR : noIslandItem;
             this.islandSound = islandSound;
-            this.islandCommands = islandCommands == null ? Collections.emptyList() : islandCommands;
+            this.islandCommands = islandCommands == null ? Lists.emptyList() : islandCommands;
             this.noIslandSound = noIslandSound;
-            this.noIslandCommands = noIslandCommands == null ? Collections.emptyList() : noIslandCommands;
+            this.noIslandCommands = noIslandCommands == null ? Lists.emptyList() : noIslandCommands;
             if (noIslandItem != null)
                 noIslandItem.getEditableBuilder().asSkullOf((SuperiorPlayer) null);
         }

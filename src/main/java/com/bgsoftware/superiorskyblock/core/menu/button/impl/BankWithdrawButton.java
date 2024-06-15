@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
@@ -15,7 +16,6 @@ import com.bgsoftware.superiorskyblock.core.menu.view.IslandMenuView;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 
 public class BankWithdrawButton extends AbstractMenuViewButton<IslandMenuView> {
@@ -94,7 +94,7 @@ public class BankWithdrawButton extends AbstractMenuViewButton<IslandMenuView> {
             this.successSound = successSound;
             this.failSound = failSound;
             this.withdrawValue = BigDecimal.valueOf(withdrawValue / 100D);
-            this.withdrawCommands = withdrawCommands == null ? Collections.emptyList() : withdrawCommands;
+            this.withdrawCommands = withdrawCommands == null ? Lists.emptyList() : withdrawCommands;
         }
 
     }

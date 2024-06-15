@@ -14,7 +14,6 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -109,7 +108,7 @@ public class CmdAdminUnlockWorld implements IAdminIslandCommand {
             return CommandTabCompletes.getCustomComplete(args[3], "true", "false");
 
         if (args.length != 4)
-            return Collections.emptyList();
+            return Lists.emptyList();
 
         List<String> environments = Lists.newArrayList();
         for (World.Environment environment : World.Environment.values()) {

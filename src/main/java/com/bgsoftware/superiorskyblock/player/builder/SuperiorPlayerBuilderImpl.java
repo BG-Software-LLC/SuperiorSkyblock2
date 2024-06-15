@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.google.common.base.Preconditions;
 
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -186,7 +185,7 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
                 completedMissions.put(mission.getMission(), finishCount.get());
         });
 
-        return completedMissions.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(completedMissions);
+        return completedMissions.isEmpty() ? Maps.emptyMap() : Maps.unmodifiable(completedMissions);
     }
 
     @Override
