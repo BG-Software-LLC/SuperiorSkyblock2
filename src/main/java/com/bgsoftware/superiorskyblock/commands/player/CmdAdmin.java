@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
@@ -16,25 +17,25 @@ import org.bukkit.entity.Player;
 import java.util.List;
 import java.util.Locale;
 
-public class CmdAdmin implements ISuperiorCommand {
+public class CmdAdmin extends BaseCommand implements ISuperiorCommand {
 
     @Override
-    public List<String> getAliases() {
+    protected List<String> aliases() {
         return Lists.singleton("admin");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.admin";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "admin [" + Message.COMMAND_ARGUMENT_PAGE.getMessage(locale) + "]";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN.getMessage(locale);
     }
 
@@ -150,9 +151,10 @@ public class CmdAdmin implements ISuperiorCommand {
             String arg = args[1].toLowerCase(Locale.ENGLISH);
             for (SuperiorCommand subCommand : plugin.getCommands().getAdminSubCommands()) {
                 if (subCommand.displayCommand() && (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission()))) {
-                    addTabCompletesFromOptions(arg, list, subCommand.getAliases());
-                    addTabCompletesFromOptions(arg, list, plugin.getSettings().getCommandAliases()
-                            .get(subCommand.getAliases().get(0).toLowerCase(Locale.ENGLISH)));
+                    List<String> aliases = subCommand.getAliases();
+                    addTabCompletesFromOptions(arg, list, aliases);
+                    addTabCompletesFromOptions(arg, list, plugin.getSettings().getCommandAliases().get(
+                            aliases.get(0).toLowerCase(Locale.ENGLISH)));
                 }
             }
         }

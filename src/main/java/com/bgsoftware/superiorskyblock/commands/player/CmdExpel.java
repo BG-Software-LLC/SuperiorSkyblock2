@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
@@ -16,25 +17,25 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class CmdExpel implements IPermissibleCommand {
+public class CmdExpel extends BaseCommand implements IPermissibleCommand {
 
     @Override
-    public List<String> getAliases() {
+    protected List<String> aliases() {
         return Lists.singleton("expel");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.island.expel";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "expel <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_EXPEL.getMessage(locale);
     }
 

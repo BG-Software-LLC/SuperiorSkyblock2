@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
@@ -19,20 +20,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-public class CmdAdminResetWorld implements IAdminIslandCommand {
+public class CmdAdminResetWorld extends BaseCommand implements IAdminIslandCommand {
 
     @Override
-    public List<String> getAliases() {
-        return Arrays.asList("resetworld", "rworld");
+    protected List<String> aliases() {
+        return Lists.newLinkedList("resetworld", "rworld");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.admin.resetworld";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "admin resetworld <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
@@ -40,7 +41,7 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_RESET_WORLD.getMessage(locale);
     }
 

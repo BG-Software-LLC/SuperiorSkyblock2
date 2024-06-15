@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
@@ -13,20 +14,20 @@ import org.bukkit.command.CommandSender;
 import java.util.List;
 import java.util.Map;
 
-public class CmdAdminTitle implements IAdminPlayerCommand {
+public class CmdAdminTitle extends BaseCommand implements IAdminPlayerCommand {
 
     @Override
-    public List<String> getAliases() {
+    protected List<String> aliases() {
         return Lists.singleton("title");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.admin.title";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "admin title <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
                 Message.COMMAND_ARGUMENT_TITLE_FADE_IN.getMessage(locale) + "> <" +
@@ -37,7 +38,7 @@ public class CmdAdminTitle implements IAdminPlayerCommand {
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_TITLE.getMessage(locale);
     }
 

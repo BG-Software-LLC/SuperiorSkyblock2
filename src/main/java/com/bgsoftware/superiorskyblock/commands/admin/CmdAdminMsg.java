@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -10,27 +11,27 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class CmdAdminMsg implements IAdminPlayerCommand {
+public class CmdAdminMsg extends BaseCommand implements IAdminPlayerCommand {
 
     @Override
-    public List<String> getAliases() {
+    protected List<String> aliases() {
         return Lists.singleton("msg");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.admin.msg";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "admin msg <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
                 Message.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_MSG.getMessage(locale);
     }
 

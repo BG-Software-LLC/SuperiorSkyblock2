@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -15,25 +16,25 @@ import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
-public class CmdAdminModules implements ISuperiorCommand {
+public class CmdAdminModules extends BaseCommand implements ISuperiorCommand {
 
     @Override
-    public List<String> getAliases() {
+    protected List<String> aliases() {
         return Lists.singleton("modules");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.admin.modules";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "admin modules [<" + Message.COMMAND_ARGUMENT_MODULE_NAME.getMessage(locale) + "> [load/unload]]";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_MODULES.getMessage(locale);
     }
 

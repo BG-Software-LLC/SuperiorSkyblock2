@@ -4,6 +4,7 @@ import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
@@ -13,25 +14,25 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class CmdVisitors implements ISuperiorCommand {
+public class CmdVisitors extends BaseCommand implements ISuperiorCommand {
 
     @Override
-    public List<String> getAliases() {
+    protected List<String> aliases() {
         return Lists.singleton("visitors");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.island.panel";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "visitors";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_VISITORS.getMessage(locale);
     }
 

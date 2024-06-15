@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
@@ -15,25 +16,25 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import java.util.Arrays;
 import java.util.List;
 
-public class CmdPardon implements IPermissibleCommand {
+public class CmdPardon extends BaseCommand implements IPermissibleCommand {
 
     @Override
-    public List<String> getAliases() {
-        return Arrays.asList("pardon", "unban");
+    protected List<String> aliases() {
+        return Lists.newLinkedList("pardon", "unban");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.island.pardon";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "pardon <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_PARDON.getMessage(locale);
     }
 

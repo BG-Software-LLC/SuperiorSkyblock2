@@ -1,9 +1,11 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -11,25 +13,25 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import java.util.Arrays;
 import java.util.List;
 
-public class CmdOpen implements IPermissibleCommand {
+public class CmdOpen extends BaseCommand implements IPermissibleCommand {
 
     @Override
-    public List<String> getAliases() {
-        return Arrays.asList("open", "unlock");
+    protected List<String> aliases() {
+        return Lists.newLinkedList("open", "unlock");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.island.open";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "open";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_OPEN.getMessage(locale);
     }
 

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
@@ -15,25 +16,25 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import java.util.Arrays;
 import java.util.List;
 
-public class CmdCoop implements IPermissibleCommand {
+public class CmdCoop extends BaseCommand implements IPermissibleCommand {
 
     @Override
-    public List<String> getAliases() {
-        return Arrays.asList("coop", "trust");
+    protected List<String> aliases() {
+        return Lists.newLinkedList("coop", "trust");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.island.coop";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "coop <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_COOP.getMessage(locale);
     }
 

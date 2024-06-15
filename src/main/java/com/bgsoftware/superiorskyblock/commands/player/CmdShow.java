@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
@@ -23,27 +24,27 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-public class CmdShow implements ISuperiorCommand {
+public class CmdShow extends BaseCommand implements ISuperiorCommand {
 
     @Override
-    public List<String> getAliases() {
-        return Arrays.asList("show", "info");
+    protected List<String> aliases() {
+        return Lists.newLinkedList("show", "info");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.island.show";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "show [" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_SHOW.getMessage(locale);
     }
 

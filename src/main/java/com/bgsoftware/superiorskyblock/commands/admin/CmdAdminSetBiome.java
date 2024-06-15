@@ -5,6 +5,7 @@ import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
@@ -16,20 +17,20 @@ import org.bukkit.command.CommandSender;
 import java.util.Arrays;
 import java.util.List;
 
-public class CmdAdminSetBiome implements IAdminIslandCommand {
+public class CmdAdminSetBiome extends BaseCommand implements IAdminIslandCommand {
 
     @Override
-    public List<String> getAliases() {
-        return Arrays.asList("setbiome", "biome");
+    protected List<String> aliases() {
+        return Lists.newLinkedList("setbiome", "biome");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.admin.setbiome";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "admin setbiome <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
@@ -38,7 +39,7 @@ public class CmdAdminSetBiome implements IAdminIslandCommand {
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_SET_BIOME.getMessage(locale);
     }
 

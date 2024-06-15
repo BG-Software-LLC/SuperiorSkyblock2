@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
@@ -15,27 +16,27 @@ import org.bukkit.entity.Player;
 import java.util.Arrays;
 import java.util.List;
 
-public class CmdAdminSetBlockAmount implements ISuperiorCommand {
+public class CmdAdminSetBlockAmount extends BaseCommand implements ISuperiorCommand {
 
     @Override
-    public List<String> getAliases() {
-        return Arrays.asList("setblockamount", "setblocksize");
+    protected List<String> aliases() {
+        return Lists.newLinkedList("setblockamount", "setblocksize");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.admin.setblockamount";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "admin setblockamount <" +
                 Message.COMMAND_ARGUMENT_WORLD.getMessage(locale) + "> <x> <y> <z> <" +
                 Message.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT.getMessage(locale);
     }
 

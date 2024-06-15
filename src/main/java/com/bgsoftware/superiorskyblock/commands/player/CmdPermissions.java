@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
@@ -17,25 +18,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-public class CmdPermissions implements IPermissibleCommand {
+public class CmdPermissions extends BaseCommand implements IPermissibleCommand {
 
     @Override
-    public List<String> getAliases() {
-        return Arrays.asList("permissions", "perms", "setpermission", "setperm");
+    protected List<String> aliases() {
+        return Lists.newLinkedList("permissions", "perms", "setpermission", "setperm");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.island.permissions";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "permissions [" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "] [reset]";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_PERMISSIONS.getMessage(locale);
     }
 

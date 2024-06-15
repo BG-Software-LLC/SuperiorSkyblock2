@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.player;
 import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -11,25 +12,25 @@ import org.bukkit.command.CommandSender;
 import java.util.Arrays;
 import java.util.List;
 
-public class CmdLang implements ISuperiorCommand {
+public class CmdLang extends BaseCommand implements ISuperiorCommand {
 
     @Override
-    public List<String> getAliases() {
-        return Arrays.asList("lang", "language");
+    protected List<String> aliases() {
+        return Lists.newLinkedList("lang", "language");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.island.lang";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "lang";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_LANG.getMessage(locale);
     }
 

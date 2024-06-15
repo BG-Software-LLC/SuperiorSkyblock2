@@ -4,6 +4,7 @@ import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
@@ -16,25 +17,25 @@ import org.bukkit.entity.Player;
 import java.util.Arrays;
 import java.util.List;
 
-public class CmdTeamChat implements ISuperiorCommand {
+public class CmdTeamChat extends BaseCommand implements ISuperiorCommand {
 
     @Override
-    public List<String> getAliases() {
-        return Arrays.asList("teamchat", "chat", "tc");
+    protected List<String> aliases() {
+        return Lists.newLinkedList("teamchat", "chat", "tc");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.island.teamchat";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "teamchat [" + Message.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + "]";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_TEAM_CHAT.getMessage(locale);
     }
 

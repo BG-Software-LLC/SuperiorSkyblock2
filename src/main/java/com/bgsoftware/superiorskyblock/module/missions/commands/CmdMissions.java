@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.module.missions.commands;
 import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -11,25 +12,25 @@ import org.bukkit.command.CommandSender;
 import java.util.Arrays;
 import java.util.List;
 
-public class CmdMissions implements ISuperiorCommand {
+public class CmdMissions extends BaseCommand implements ISuperiorCommand {
 
     @Override
-    public List<String> getAliases() {
-        return Arrays.asList("missions", "challenges");
+    protected List<String> aliases() {
+        return Lists.newLinkedList("missions", "challenges");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.island.missions";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "missions";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_MISSIONS.getMessage(locale);
     }
 

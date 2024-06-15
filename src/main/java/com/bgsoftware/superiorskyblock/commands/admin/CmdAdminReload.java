@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.PluginReloadReason;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
@@ -11,25 +12,25 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class CmdAdminReload implements ISuperiorCommand {
+public class CmdAdminReload extends BaseCommand implements ISuperiorCommand {
 
     @Override
-    public List<String> getAliases() {
+    protected List<String> aliases() {
         return Lists.singleton("reload");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.admin.reload";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "admin reload";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_RELOAD.getMessage(locale);
     }
 

@@ -4,6 +4,7 @@ import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.Text;
@@ -20,25 +21,25 @@ import org.bukkit.inventory.ItemStack;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class CmdValue implements ISuperiorCommand {
+public class CmdValue extends BaseCommand implements ISuperiorCommand {
 
     @Override
-    public List<String> getAliases() {
+    protected List<String> aliases() {
         return Lists.singleton("value");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.island.value";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "value [" + Message.COMMAND_ARGUMENT_MATERIAL.getMessage(locale) + "]";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_VALUE.getMessage(locale);
     }
 

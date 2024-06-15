@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -16,22 +17,22 @@ import org.bukkit.Location;
 
 import java.util.List;
 
-public class CmdSetWarp implements IPermissibleCommand {
+public class CmdSetWarp extends BaseCommand implements IPermissibleCommand {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Override
-    public List<String> getAliases() {
+    protected List<String> aliases() {
         return Lists.singleton("setwarp");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.island.setwarp";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         StringBuilder usage = new StringBuilder("setwarp <")
                 .append(Message.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale)).append(">");
 
@@ -42,7 +43,7 @@ public class CmdSetWarp implements IPermissibleCommand {
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_SET_WARP.getMessage(locale);
     }
 

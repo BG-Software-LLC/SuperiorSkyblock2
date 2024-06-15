@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -16,20 +17,20 @@ import org.bukkit.command.CommandSender;
 import java.util.Arrays;
 import java.util.List;
 
-public class CmdAdminRemoveBlockLimit implements IAdminIslandCommand {
+public class CmdAdminRemoveBlockLimit extends BaseCommand implements IAdminIslandCommand {
 
     @Override
-    public List<String> getAliases() {
-        return Arrays.asList("removeblocklimit", "remblocklimit");
+    protected List<String> aliases() {
+        return Lists.newLinkedList("removeblocklimit", "remblocklimit");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.admin.removeblocklimit";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "admin removeblocklimit <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
@@ -38,7 +39,7 @@ public class CmdAdminRemoveBlockLimit implements IAdminIslandCommand {
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT.getMessage(locale);
     }
 

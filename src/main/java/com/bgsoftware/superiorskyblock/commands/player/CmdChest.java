@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
@@ -18,25 +19,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class CmdChest implements IPermissibleCommand {
+public class CmdChest extends BaseCommand implements IPermissibleCommand {
 
     @Override
-    public List<String> getAliases() {
-        return Arrays.asList("chest", "vault");
+    protected List<String> aliases() {
+        return Lists.newLinkedList("chest", "vault");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.island.chest";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "chest [" + Message.COMMAND_ARGUMENT_PAGE.getMessage(locale) + "]";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_CHEST.getMessage(locale);
     }
 

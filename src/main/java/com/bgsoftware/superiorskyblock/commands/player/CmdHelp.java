@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.player;
 import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -11,25 +12,25 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class CmdHelp implements ISuperiorCommand {
+public class CmdHelp extends BaseCommand implements ISuperiorCommand {
 
     @Override
-    public List<String> getAliases() {
+    protected List<String> aliases() {
         return Lists.singleton("help");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.island.help";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "help [" + Message.COMMAND_ARGUMENT_PAGE.getMessage(locale) + "]";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_HELP.getMessage(locale);
     }
 

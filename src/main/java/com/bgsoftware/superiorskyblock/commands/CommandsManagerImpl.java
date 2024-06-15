@@ -357,9 +357,10 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
             for (SuperiorCommand subCommand : getSubCommands()) {
                 if (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission())) {
-                    addTabCompletesFromOptions(arg, list, subCommand.getAliases());
-                    addTabCompletesFromOptions(arg, list, plugin.getSettings().getCommandAliases()
-                            .get(subCommand.getAliases().get(0).toLowerCase(Locale.ENGLISH)));
+                    List<String> aliases = subCommand.getAliases();
+                    addTabCompletesFromOptions(arg, list, aliases);
+                    addTabCompletesFromOptions(arg, list, plugin.getSettings().getCommandAliases().get(
+                            aliases.get(0).toLowerCase(Locale.ENGLISH)));
                 }
             }
 

@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
@@ -16,25 +17,25 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import java.util.Arrays;
 import java.util.List;
 
-public class CmdUncoop implements IPermissibleCommand {
+public class CmdUncoop extends BaseCommand implements IPermissibleCommand {
 
     @Override
-    public List<String> getAliases() {
-        return Arrays.asList("uncoop", "untrust");
+    protected List<String> aliases() {
+        return Lists.newLinkedList("uncoop", "untrust");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.island.uncoop";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "uncoop <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_UNCOOP.getMessage(locale);
     }
 

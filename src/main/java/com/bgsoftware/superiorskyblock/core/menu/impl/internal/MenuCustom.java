@@ -6,6 +6,7 @@ import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -89,7 +90,7 @@ public class MenuCustom extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
 
     }
 
-    private class CustomMenuCommand implements ISuperiorCommand {
+    private class CustomMenuCommand extends BaseCommand implements ISuperiorCommand {
 
         private final CommandArgs args;
 
@@ -98,22 +99,22 @@ public class MenuCustom extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
         }
 
         @Override
-        public List<String> getAliases() {
+        protected List<String> aliases() {
             return this.args.aliases;
         }
 
         @Override
-        public String getPermission() {
+        protected String permission() {
             return this.args.permission;
         }
 
         @Override
-        public String getUsage(Locale locale) {
+        public String usage(Locale locale) {
             return this.args.aliases.get(0);
         }
 
         @Override
-        public String getDescription(Locale locale) {
+        public String description(Locale locale) {
             return this.args.descriptions.getOrDefault(locale, "");
         }
 

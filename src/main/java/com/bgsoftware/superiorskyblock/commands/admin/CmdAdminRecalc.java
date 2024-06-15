@@ -1,9 +1,11 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BaseCommand;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -12,20 +14,20 @@ import org.bukkit.entity.Player;
 import java.util.Arrays;
 import java.util.List;
 
-public class CmdAdminRecalc implements IAdminIslandCommand {
+public class CmdAdminRecalc extends BaseCommand implements IAdminIslandCommand {
 
     @Override
-    public List<String> getAliases() {
-        return Arrays.asList("recalc", "recalculate", "level");
+    protected List<String> aliases() {
+        return Lists.newLinkedList("recalc", "recalculate", "level");
     }
 
     @Override
-    public String getPermission() {
+    protected String permission() {
         return "superior.admin.recalc";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
+    protected String usage(java.util.Locale locale) {
         return "admin recalc <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
@@ -33,7 +35,7 @@ public class CmdAdminRecalc implements IAdminIslandCommand {
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    protected String description(java.util.Locale locale) {
         return Message.COMMAND_DESCRIPTION_ADMIN_RECALC.getMessage(locale);
     }
 
