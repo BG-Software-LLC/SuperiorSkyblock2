@@ -14,8 +14,6 @@ import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.KeySets;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
-import com.bgsoftware.superiorskyblock.core.key.collections.KeySetStrategy;
-import com.bgsoftware.superiorskyblock.core.key.collections.MaterialKeySet;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.values.container.BlockValuesContainer;
@@ -281,7 +279,7 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
     private void convertWorthValuesToLevels() {
         blockValuesContainer.forEach((blockKey, blockCount) -> {
             BlockValue realBlockValue = blockValuesContainer.getBlockValue(blockKey);
-            if (realBlockValue != null) {
+            if (realBlockValue != null && realBlockValue.getLevel().compareTo(BigDecimal.ZERO) == 0) {
                 BlockValue newBlockValue = realBlockValue.setLevel(convertWorthToLevel(realBlockValue.getWorth()));
                 blockValuesContainer.setBlockValue(blockKey, newBlockValue);
             }
