@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuCustom;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.command.CommandSender;
@@ -161,10 +162,13 @@ public class CommandTabCompletes {
 
     public static List<String> getMaterials(String argument) {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
-        return new SequentialListBuilder<String>().build(Materials.getBlocksNonLegacy().stream()
-                .filter(material -> material.isBlock() && !Materials.isLegacy(material))
-                .map(material -> material.name().toLowerCase(Locale.ENGLISH))
-                .filter(materialName -> materialName.contains(lowerArgument)));
+        List<String> arguments = Lists.newLinkedList();
+        for (Material material : Materials.getBlocksNonLegacy()) {
+            String name = material.name().toLowerCase(Locale.ENGLISH);
+            if (name.contains(lowerArgument))
+                arguments.add(name);
+        }
+        return arguments;
     }
 
     public static List<String> getPotionEffects(String argument) {
@@ -190,9 +194,13 @@ public class CommandTabCompletes {
 
     public static List<String> getMaterialsForGenerators(String argument) {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
-        return new SequentialListBuilder<String>().build(Materials.getSolids().stream()
-                .map(material -> material.name().toLowerCase(Locale.ENGLISH))
-                .filter(materialName -> materialName.contains(lowerArgument)));
+        List<String> arguments = Lists.newLinkedList();
+        for (Material material : Materials.getSolids()) {
+            String name = material.name().toLowerCase(Locale.ENGLISH);
+            if (lowerArgument.contains(name))
+                arguments.add(name);
+        }
+        return arguments;
     }
 
     public static List<String> getAllMissions(SuperiorSkyblockPlugin plugin) {

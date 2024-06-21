@@ -109,10 +109,7 @@ public class OraxenHook {
                 return;
             }
 
-            Pair<MechanicFactory, SetBlockModelFunction> mechanic = AVAILABLE_MECHANICS.stream()
-                    .filter(pair -> pair.getKey() != null && !pair.getKey().isNotImplementedIn(itemId))
-                    .findFirst().orElse(null);
-
+            Pair<MechanicFactory, SetBlockModelFunction> mechanic = findMechanicForItem(itemId);
             if (mechanic == null) {
                 event.setCancelled(true);
                 return;
@@ -122,6 +119,16 @@ public class OraxenHook {
             mechanic.getValue().setBlockModel(event.getLocation().getBlock(), itemId);
         }
 
+    }
+
+    @Nullable
+    private static Pair<MechanicFactory, SetBlockModelFunction> findMechanicForItem(String itemId) {
+        for (Pair<MechanicFactory, SetBlockModelFunction> mechanic : AVAILABLE_MECHANICS) {
+            if (mechanic.getKey() != null && !mechanic.getKey().isNotImplementedIn(itemId))
+                return mechanic;
+        }
+
+        return null;
     }
 
     private static class OraxenKeyParser implements CustomKeyParser {

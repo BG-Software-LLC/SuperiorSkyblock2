@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_12_R1.dragon;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.common.collections.Sets;
+import com.bgsoftware.common.collections.ints.IntSet;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -37,7 +38,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.lang.reflect.Modifier;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -305,7 +305,7 @@ public class IslandEnderDragonBattle extends EnderDragonBattle {
     }
 
     private void updateBattlePlayers() {
-        Set<EntityPlayer> nearbyPlayers = Sets.newHashSet();
+        IntSet nearbyPlayers = Sets.newIntHashSet();
 
         for (SuperiorPlayer superiorPlayer : island.getAllPlayersInside()) {
             Player player = superiorPlayer.asPlayer();
@@ -313,13 +313,15 @@ public class IslandEnderDragonBattle extends EnderDragonBattle {
             if (((CraftWorld) player.getWorld()).getHandle() == this.worldServer) {
                 EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
                 this.bossBattleServer.addPlayer(entityPlayer);
-                nearbyPlayers.add(entityPlayer);
+                nearbyPlayers.add(entityPlayer.getId());
             }
         }
 
-        new HashSet<>(this.bossBattleServer.getPlayers()).stream()
-                .filter(entityPlayer -> !nearbyPlayers.contains(entityPlayer))
-                .forEach(this.bossBattleServer::removePlayer);
+        Set<EntityPlayer> battlePlayers = Sets.newLinkedHashSet(this.bossBattleServer.getPlayers());
+        for (EntityPlayer battlePlayer : battlePlayers) {
+            if (!nearbyPlayers.contains(battlePlayer.getId()))
+                this.bossBattleServer.removePlayer(battlePlayer);
+        }
     }
 
 }

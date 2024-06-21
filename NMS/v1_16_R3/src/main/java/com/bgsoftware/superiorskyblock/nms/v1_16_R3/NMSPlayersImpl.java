@@ -28,6 +28,7 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -76,8 +77,9 @@ public class NMSPlayersImpl implements NMSPlayers {
         Player player = superiorPlayer.asPlayer();
         if (player != null) {
             EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
-            Optional<Property> optional = entityPlayer.getProfile().getProperties().get("textures").stream().findFirst();
-            optional.ifPresent(property -> setSkinTexture(superiorPlayer, property));
+            Collection<Property> properties = entityPlayer.getProfile().getProperties().get("textures");
+            if (!properties.isEmpty())
+                setSkinTexture(superiorPlayer, properties.iterator().next());
         }
     }
 

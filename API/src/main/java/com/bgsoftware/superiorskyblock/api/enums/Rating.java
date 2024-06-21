@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.api.enums;
 
-import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -16,13 +15,19 @@ public enum Rating {
     FOUR_STARS,
     FIVE_STARS;
 
+    private static String VALUES_STRING;
+
     /**
      * Get a string of all the rating names.
      */
     public static String getValuesString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        Arrays.stream(values()).forEach(rating -> stringBuilder.append(", ").append(rating.toString().toLowerCase(Locale.ENGLISH)));
-        return stringBuilder.substring(2);
+        if (VALUES_STRING == null) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (Rating rating : Rating.values())
+                stringBuilder.append(", ").append(rating.toString().toLowerCase(Locale.ENGLISH));
+            VALUES_STRING = stringBuilder.substring(2);
+        }
+        return VALUES_STRING;
     }
 
     /**

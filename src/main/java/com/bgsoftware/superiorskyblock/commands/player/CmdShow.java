@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.common.collections.Lists;
-import com.bgsoftware.common.collections.Maps;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -13,16 +12,15 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.messages.MessagesCache;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 public class CmdShow extends BaseCommand implements ISuperiorCommand {
 
@@ -107,16 +105,12 @@ public class CmdShow extends BaseCommand implements ISuperiorCommand {
             infoMessage.append(Message.ISLAND_INFO_VISITORS_COUNT.getMessage(locale, island.getUniqueVisitorsWithTimes().size())).append("\n");
 
         if (!Message.ISLAND_INFO_ROLES.isEmpty(locale)) {
-            Map<PlayerRole, StringBuilder> rolesStrings = Maps.newArrayMap();
-            plugin.getRoles().getRoles().stream().filter(playerRole -> playerRole.isRoleLadder() && !playerRole.isLastRole())
-                    .forEach(playerRole -> rolesStrings.put(playerRole, new StringBuilder()));
-
             List<SuperiorPlayer> members = island.getIslandMembers(false);
 
             if (!Message.ISLAND_INFO_PLAYER_LINE.isEmpty(locale)) {
                 members.forEach(superiorPlayer -> {
                     try {
-                        rolesStrings.get(superiorPlayer.getPlayerRole())
+                        MessagesCache.ISLAND_INFO_ROLE_LINE.get(superiorPlayer.getPlayerRole())
                                 .append(Message.ISLAND_INFO_PLAYER_LINE.getMessage(locale, superiorPlayer.getName())).append("\n");
                     } catch (NullPointerException ex) {
                         Log.warn("It seems like ", superiorPlayer.getName(), " isn't part of the island of "
@@ -125,10 +119,10 @@ public class CmdShow extends BaseCommand implements ISuperiorCommand {
                 });
             }
 
-            rolesStrings.keySet().stream()
+            plugin.getRoles().getRoles().stream()
                     .sorted(Collections.reverseOrder(Comparator.comparingInt(PlayerRole::getWeight)))
-                    .forEach(playerRole ->
-                            infoMessage.append(Message.ISLAND_INFO_ROLES.getMessage(locale, playerRole, rolesStrings.get(playerRole))));
+                    .forEach(playerRole -> infoMessage.append(Message.ISLAND_INFO_ROLES.getMessage(locale, playerRole,
+                            MessagesCache.ISLAND_INFO_ROLE_LINE.get(playerRole))));
         }
 
         if (!Message.ISLAND_INFO_FOOTER.isEmpty(locale))

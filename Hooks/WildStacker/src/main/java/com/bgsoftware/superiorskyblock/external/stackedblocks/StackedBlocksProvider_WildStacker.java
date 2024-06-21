@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.external.stackedblocks;
 
+import com.bgsoftware.common.collections.Lists;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksSnapshotProvider;
@@ -35,7 +36,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.List;
 
 public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_AutoDetect, StackedBlocksSnapshotProvider {
 
@@ -75,16 +76,21 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
     public Collection<Pair<Key, Integer>> getBlocks(World world, int chunkX, int chunkZ) {
         StackedSnapshot stackedSnapshot = WildStackerSnapshotsContainer.getSnapshot(ChunkPosition.of(world, chunkX, chunkZ));
 
+        List<Pair<Key, Integer>> stackedBlocks = Lists.newLinkedList();
+
         try {
-            return stackedSnapshot.getAllBarrelsItems().values().stream()
-                    .filter(entry -> entry.getValue() != null)
-                    .map(entry -> new Pair<>(Key.of(entry.getValue()), entry.getKey()))
-                    .collect(Collectors.toSet());
+            stackedSnapshot.getAllBarrelsItems().values().forEach(entry -> {
+                if (entry.getValue() != null)
+                    stackedBlocks.add(new Pair<>(Key.of(entry.getValue()), entry.getKey()));
+            });
         } catch (Throwable ex) {
-            return stackedSnapshot.getAllBarrels().values().stream()
-                    .map(entry -> new Pair<>(Key.of(entry.getValue(), (short) 0), entry.getKey()))
-                    .collect(Collectors.toSet());
+            stackedSnapshot.getAllBarrels().values().forEach(entry -> {
+                if (entry.getValue() != null)
+                    stackedBlocks.add(new Pair<>(Key.of(entry.getValue(), (short) 0), entry.getKey()));
+            });
         }
+
+        return Lists.unmodifiable(stackedBlocks);
     }
 
     @Override
@@ -185,5 +191,6 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
         ItemStack barrelItem = barrel.getBarrelItem(1);
         return ServerVersion.isLegacy() ? Key.of(barrelItem) : Key.of(barrelItem.getType());
     }
+
 
 }

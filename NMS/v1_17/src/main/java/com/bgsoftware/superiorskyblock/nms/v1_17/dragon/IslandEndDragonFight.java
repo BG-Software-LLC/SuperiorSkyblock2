@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17.dragon;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Sets;
+import com.bgsoftware.common.collections.ints.IntSet;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -30,10 +32,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.lang.reflect.Modifier;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 public class IslandEndDragonFight extends EndDragonFight {
 
@@ -164,7 +164,7 @@ public class IslandEndDragonFight extends EndDragonFight {
     }
 
     private void updateBattlePlayers() {
-        Set<UUID> nearbyPlayers = new HashSet<>();
+        IntSet nearbyPlayers = Sets.newIntHashSet();
 
         for (SuperiorPlayer superiorPlayer : island.getAllPlayersInside()) {
             Player bukkitPlayer = superiorPlayer.asPlayer();
@@ -172,17 +172,16 @@ public class IslandEndDragonFight extends EndDragonFight {
                 ServerPlayer serverPlayer = ((CraftPlayer) bukkitPlayer).getHandle();
                 if (serverPlayer.level.equals(this.serverLevel)) {
                     this.dragonEvent.addPlayer(serverPlayer);
-                    nearbyPlayers.add(serverPlayer.getUUID());
+                    nearbyPlayers.add(serverPlayer.getId());
                 }
             }
         }
 
-        List<ServerPlayer> dragonEventPlayers = new SequentialListBuilder<ServerPlayer>()
-                .build(this.dragonEvent.getPlayers());
-
-        dragonEventPlayers.stream()
-                .filter(entityPlayer -> !nearbyPlayers.contains(entityPlayer.getUUID()))
-                .forEach(this.dragonEvent::removePlayer);
+        Set<ServerPlayer> battlePlayers = Sets.newLinkedHashSet(this.dragonEvent.getPlayers());
+        for (ServerPlayer battlePlayer : battlePlayers) {
+            if (!nearbyPlayers.contains(battlePlayer.getId()))
+                this.dragonEvent.removePlayer(battlePlayer);
+        }
     }
 
     private IslandEntityEnderDragon spawnEnderDragon() {

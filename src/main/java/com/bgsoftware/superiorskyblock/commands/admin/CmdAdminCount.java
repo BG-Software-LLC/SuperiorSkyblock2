@@ -87,10 +87,11 @@ public class CmdAdminCount extends BaseCommand implements IAdminIslandCommand {
 
             if (island != null) {
                 String materialArgument = args[3].toLowerCase(Locale.ENGLISH);
-                Materials.getBlocksNonLegacy().stream()
-                        .map(material -> material.name().toLowerCase(Locale.ENGLISH))
-                        .filter(materialName -> materialName.contains(materialArgument))
-                        .forEach(list::add);
+                for (Material material : Materials.getBlocksNonLegacy()) {
+                    String name = material.name().toLowerCase(Locale.ENGLISH);
+                    if (name.contains(materialArgument))
+                        list.add(name);
+                }
                 if ("*".contains(materialArgument))
                     list.add("*");
             }

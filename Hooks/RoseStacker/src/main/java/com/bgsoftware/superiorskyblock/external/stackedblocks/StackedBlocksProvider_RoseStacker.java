@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.external.stackedblocks;
 
 import com.bgsoftware.common.collections.Maps;
+import com.bgsoftware.common.collections.Sets;
+import com.bgsoftware.common.collections.transform.Transformer;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -9,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
@@ -26,11 +29,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class StackedBlocksProvider_RoseStacker implements StackedBlocksProvider_AutoDetect {
+
+    private static final TransformerImpl STAKCED_BLOCKS_TRANSFORMER = new TransformerImpl();
 
     private static boolean registered = false;
 
@@ -60,15 +63,14 @@ public class StackedBlocksProvider_RoseStacker implements StackedBlocksProvider_
             return null;
 
         ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ);
+        Map<Key, Counter> stackedBlocks = Maps.newLinkedHashMap();
 
-        Map<Key, Integer> blockKeys = Maps.newHashMap();
-        RoseStackerAPI.getInstance().getStackedBlocks().entrySet().stream()
-                .filter(entry -> chunkPosition.isInsideChunk(entry.getKey().getLocation()))
-                .forEach(entry -> {
-                    Key blockKey = Key.of(entry.getKey());
-                    blockKeys.put(blockKey, blockKeys.getOrDefault(blockKey, 0) + entry.getValue().getStackSize());
-                });
-        return blockKeys.entrySet().stream().map(entry -> new Pair<>(entry.getKey(), entry.getValue())).collect(Collectors.toSet());
+        RoseStackerAPI.getInstance().getStackedBlocks().forEach((block, stackedBlock) -> {
+            if (chunkPosition.isInsideChunk(block.getLocation()))
+                stackedBlocks.computeIfAbsent(Key.of(block), k -> new Counter(0)).inc(stackedBlock.getStackSize());
+        });
+
+        return Sets.transform(stackedBlocks.entrySet(), STAKCED_BLOCKS_TRANSFORMER);
     }
 
     private class StackerListener implements Listener {
@@ -124,6 +126,35 @@ public class StackedBlocksProvider_RoseStacker implements StackedBlocksProvider_
                 e.setCancelled(true);
         }
 
+    }
+
+    private static class TransformerImpl extends Transformer<Map.Entry<Key, Counter>, Pair<Key, Integer>> {
+        @Override
+        public Pair<Key, Integer> transformA(Map.Entry<Key, Counter> entry) {
+            return new Pair<>(entry.getKey(), entry.getValue().get());
+        }
+
+        @Override
+        public Map.Entry<Key, Counter> transformB(Pair<Key, Integer> pair) {
+            return new Map.Entry<Key, Counter>() {
+                private final Counter value = new Counter(pair.getValue());
+
+                @Override
+                public Key getKey() {
+                    return pair.getKey();
+                }
+
+                @Override
+                public Counter getValue() {
+                    return value;
+                }
+
+                @Override
+                public Counter setValue(Counter value) {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        }
     }
 
 }

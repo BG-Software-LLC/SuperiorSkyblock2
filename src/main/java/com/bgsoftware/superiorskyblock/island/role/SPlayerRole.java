@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.island.privilege.RolePrivilegeNode;
 import com.google.common.base.Preconditions;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 public class SPlayerRole implements PlayerRole {
@@ -60,12 +59,6 @@ public class SPlayerRole implements PlayerRole {
 
     public static PlayerRole of(String name) {
         return plugin.getRoles().getPlayerRole(name);
-    }
-
-    public static String getValuesString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        plugin.getRoles().getRoles().forEach(playerRole -> stringBuilder.append(", ").append(playerRole.toString().toLowerCase(Locale.ENGLISH)));
-        return stringBuilder.substring(2);
     }
 
     @Override

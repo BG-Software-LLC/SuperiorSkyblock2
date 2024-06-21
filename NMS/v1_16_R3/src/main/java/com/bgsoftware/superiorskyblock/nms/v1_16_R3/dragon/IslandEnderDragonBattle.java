@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3.dragon;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.collections.Sets;
+import com.bgsoftware.common.collections.ints.IntSet;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -29,9 +31,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.lang.reflect.Modifier;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 public class IslandEnderDragonBattle extends EnderDragonBattle {
 
@@ -159,7 +159,7 @@ public class IslandEnderDragonBattle extends EnderDragonBattle {
     }
 
     private void updateBattlePlayers() {
-        Set<UUID> nearbyPlayers = new HashSet<>();
+        IntSet nearbyPlayers = Sets.newIntHashSet();
 
         for (SuperiorPlayer superiorPlayer : island.getAllPlayersInside()) {
             Player bukkitPlayer = superiorPlayer.asPlayer();
@@ -169,13 +169,15 @@ public class IslandEnderDragonBattle extends EnderDragonBattle {
 
             if (entityPlayer.getWorld().equals(this.world)) {
                 this.bossBattle.addPlayer(entityPlayer);
-                nearbyPlayers.add(entityPlayer.getUniqueID());
+                nearbyPlayers.add(entityPlayer.getId());
             }
         }
 
-        this.bossBattle.getPlayers().stream()
-                .filter(entityPlayer -> !nearbyPlayers.contains(entityPlayer.getUniqueID()))
-                .forEach(this.bossBattle::removePlayer);
+        Set<EntityPlayer> battlePlayers = Sets.newLinkedHashSet(this.bossBattle.getPlayers());
+        for (EntityPlayer battlePlayer : battlePlayers) {
+            if (!nearbyPlayers.contains(battlePlayer.getId()))
+                this.bossBattle.removePlayer(battlePlayer);
+        }
     }
 
     private IslandEntityEnderDragon spawnEnderDragon() {
