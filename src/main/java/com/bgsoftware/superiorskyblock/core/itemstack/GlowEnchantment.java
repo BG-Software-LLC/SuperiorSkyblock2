@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.itemstack;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.enchantments.Enchantment;
 
@@ -15,6 +16,7 @@ public class GlowEnchantment {
         glowEnchant = plugin.getNMSAlgorithms().createGlowEnchantment();
     }
 
+    @Nullable
     public static Enchantment getGlowEnchant() {
         return glowEnchant;
     }

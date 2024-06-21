@@ -338,7 +338,9 @@ public class MenuParserImpl implements MenuParser {
         }
 
         if (section.getBoolean("glow", false)) {
-            itemBuilder.withEnchant(GlowEnchantment.getGlowEnchant(), 1);
+            Enchantment glowEnchant = GlowEnchantment.getGlowEnchant();
+            if (glowEnchant != null)
+                itemBuilder.withEnchant(glowEnchant, 1);
         }
 
         if (section.contains("flags")) {

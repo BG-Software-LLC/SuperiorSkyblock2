@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -62,7 +63,13 @@ public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
         if (island == null || island.getBiome() != getTemplate().biome)
             return buttonItem;
 
-        return new ItemBuilder(buttonItem).withEnchant(GlowEnchantment.getGlowEnchant(), 1).build();
+        ItemBuilder itemBuilder = new ItemBuilder(buttonItem);
+
+        Enchantment glowEnchant = GlowEnchantment.getGlowEnchant();
+        if (glowEnchant != null)
+            itemBuilder.withEnchant(glowEnchant, 1);
+
+        return itemBuilder.build();
     }
 
     @Override
