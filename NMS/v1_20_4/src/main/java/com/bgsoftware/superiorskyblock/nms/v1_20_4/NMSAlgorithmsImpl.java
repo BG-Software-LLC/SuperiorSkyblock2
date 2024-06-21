@@ -5,7 +5,8 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
-import com.bgsoftware.superiorskyblock.nms.v1_20_4.algorithms.GlowEnchantment;
+import com.bgsoftware.superiorskyblock.nms.v1_20_3.algorithms.PaperGlowEnchantment;
+import com.bgsoftware.superiorskyblock.nms.v1_20_3.algorithms.SpigotGlowEnchantment;
 import com.bgsoftware.superiorskyblock.nms.v1_20_4.menu.MenuBrewingStandBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_20_4.menu.MenuDispenserBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_20_4.menu.MenuFurnaceBlockEntity;
@@ -156,7 +157,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public Enchantment getGlowEnchant() {
-        return new GlowEnchantment("superior_glowing_enchant");
+        try {
+            return new PaperGlowEnchantment("superior_glowing_enchant");
+        } catch (Throwable error) {
+            return new SpigotGlowEnchantment("superior_glowing_enchant");
+        }
     }
 
     @Override

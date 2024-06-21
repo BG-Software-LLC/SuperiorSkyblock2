@@ -1,15 +1,15 @@
-package com.bgsoftware.superiorskyblock.nms.v1_20_4.algorithms;
+package com.bgsoftware.superiorskyblock.nms.v1_20_3.algorithms;
 
-import net.minecraft.world.item.enchantment.Enchantments;
 import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.enchantments.CraftEnchantment;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 
-public class GlowEnchantment extends CraftEnchantment {
+public class SpigotGlowEnchantment extends Enchantment {
 
-    public GlowEnchantment(String name) {
-        super(NamespacedKey.minecraft(name), Enchantments.UNBREAKING);
+    private final NamespacedKey key;
+
+    public SpigotGlowEnchantment(String name) {
+        this.key = NamespacedKey.minecraft(name);
     }
 
     @Override
@@ -48,6 +48,11 @@ public class GlowEnchantment extends CraftEnchantment {
     @Override
     public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
         return true;
+    }
+
+    @Override
+    public NamespacedKey getKey() {
+        return this.key;
     }
 
 }
