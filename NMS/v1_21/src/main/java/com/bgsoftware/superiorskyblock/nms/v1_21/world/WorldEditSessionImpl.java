@@ -70,7 +70,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final boolean isStarLightInterface = ((Supplier<Boolean>) () -> {
         try {
-            Class.forName("ca.spottedleaf.starlight.common.light.StarLightInterface");
+            Class.forName("ca.spottedleaf.moonrise.patches.starlight.light.StarLightInterface");
             return true;
         } catch (ClassNotFoundException error) {
             return false;
