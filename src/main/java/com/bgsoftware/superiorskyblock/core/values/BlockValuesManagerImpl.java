@@ -279,7 +279,7 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
     private void convertWorthValuesToLevels() {
         blockValuesContainer.forEach((blockKey, blockCount) -> {
             BlockValue realBlockValue = blockValuesContainer.getBlockValue(blockKey);
-            if (realBlockValue != null && realBlockValue.getLevel().compareTo(BigDecimal.ZERO) == 0) {
+            if (realBlockValue != null && !realBlockValue.hasLevel()) {
                 BlockValue newBlockValue = realBlockValue.setLevel(convertWorthToLevel(realBlockValue.getWorth()));
                 blockValuesContainer.setBlockValue(blockKey, newBlockValue);
             }

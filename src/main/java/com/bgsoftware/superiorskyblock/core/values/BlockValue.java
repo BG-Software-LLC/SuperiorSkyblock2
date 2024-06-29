@@ -5,9 +5,11 @@ import java.math.BigDecimal;
 
 public class BlockValue {
 
-    public static final BlockValue ZERO = new BlockValue(BigDecimal.ZERO, BigDecimal.ZERO);
+    public static final BlockValue ZERO = new BlockValue(null, null);
 
+    @Nullable
     private final BigDecimal worth;
+    @Nullable
     private final BigDecimal level;
 
     private static boolean isZero(@Nullable BigDecimal value) {
@@ -27,12 +29,16 @@ public class BlockValue {
     }
 
     private BlockValue(@Nullable BigDecimal worth, @Nullable BigDecimal level) {
-        this.worth = worth == null ? BigDecimal.ZERO : worth;
-        this.level = level == null ? BigDecimal.ZERO : level;
+        this.worth = worth;
+        this.level = level;
     }
 
     public BigDecimal getWorth() {
-        return this.worth;
+        return this.worth == null ? BigDecimal.ZERO : this.worth;
+    }
+
+    public boolean hasWorth() {
+        return this.worth != null;
     }
 
     public BlockValue setWorth(@Nullable BigDecimal worth) {
@@ -40,7 +46,11 @@ public class BlockValue {
     }
 
     public BigDecimal getLevel() {
-        return this.level;
+        return this.level == null ? BigDecimal.ZERO : this.level;
+    }
+
+    public boolean hasLevel() {
+        return this.level != null;
     }
 
     public BlockValue setLevel(@Nullable BigDecimal level) {
