@@ -20,12 +20,10 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
-import net.minecraft.server.level.GenerationChunkHolder;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.StaticCache2D;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.BedBlock;
@@ -42,6 +40,7 @@ import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.chunk.status.ChunkPyramid;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.chunk.status.ChunkStep;
 import net.minecraft.world.level.chunk.storage.EntityStorage;
 import net.minecraft.world.level.chunk.storage.SimpleRegionStorage;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
@@ -364,14 +363,13 @@ public class NMSUtils {
         CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(serverLevel,
                 serverLevel.getChunkSource().getGenerator(), serverLevel.generator);
 
-        ChunkPos chunkPos = chunkAccess.getPos();
+        ChunkStep surfaceStep = ChunkPyramid.GENERATION_PYRAMID.getStepTo(ChunkStatus.SURFACE);
 
-        StaticCache2D<GenerationChunkHolder> cache = StaticCache2D.create(chunkPos.x, chunkPos.z, 0,
-                (x, z) -> serverLevel.moonrise$getChunkTaskScheduler().chunkHolderManager
-                        .getChunkHolder(chunkPos.longKey).vanillaChunkHolder);
-
-        WorldGenRegion region = new WorldGenRegion(serverLevel, cache,
-                ChunkPyramid.GENERATION_PYRAMID.getStepTo(ChunkStatus.SURFACE), chunkAccess);
+        // Unsafe: we do not provide chunks cache, even tho it is required.
+        // Should be fine in normal flow, as the only method that access the chunsk cache
+        // is WorldGenRegion#getChunk. Mimic`ing the cache seems to result an error:
+        // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/2121
+        WorldGenRegion region = new WorldGenRegion(serverLevel, null, surfaceStep, chunkAccess);
 
         customChunkGenerator.buildSurface(region,
                 serverLevel.structureManager().forWorldGenRegion(region),
