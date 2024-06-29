@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.world.KeyBlocksCache;
+import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockDoubleStep;
@@ -219,7 +220,8 @@ public class NMSChunksImpl implements NMSChunks {
             @Override
             public void onChunk(Chunk chunk, boolean isLoaded) {
                 for (org.bukkit.entity.Entity bukkitEntity : chunk.bukkitChunk.getEntities()) {
-                    chunkEntities.computeIfAbsent(Keys.of(bukkitEntity), i -> new Counter(0)).inc(1);
+                    if (!BukkitEntities.canBypassEntityLimit(bukkitEntity))
+                        chunkEntities.computeIfAbsent(Keys.of(bukkitEntity), i -> new Counter(0)).inc(1);
                 }
             }
 

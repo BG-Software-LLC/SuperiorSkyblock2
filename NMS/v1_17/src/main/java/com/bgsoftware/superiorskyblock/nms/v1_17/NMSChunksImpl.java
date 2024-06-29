@@ -18,11 +18,13 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_17.chunks.CropsBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_17.world.KeyBlocksCache;
+import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacket;
 import net.minecraft.network.protocol.game.ClientboundLightUpdatePacket;
@@ -296,19 +298,30 @@ public class NMSChunksImpl implements NMSChunks {
             @Override
             public void onLoadedChunk(LevelChunk levelChunk) {
                 for (org.bukkit.entity.Entity bukkitEntity : new CraftChunk(levelChunk).getEntities()) {
-                    chunkEntities.computeIfAbsent(Keys.of(bukkitEntity), i -> new Counter(0)).inc(1);
+                    if (!BukkitEntities.canBypassEntityLimit(bukkitEntity))
+                        chunkEntities.computeIfAbsent(Keys.of(bukkitEntity), i -> new Counter(0)).inc(1);
                 }
             }
 
             @Override
             public void onUnloadedChunk(ChunkPos currChunkPos, CompoundTag entityData) {
-                entityData.getList("Entities", 10).forEach(entityTag -> {
-                    EntityType.by((CompoundTag) entityTag).ifPresent(entityType -> {
-                        org.bukkit.entity.EntityType bukkitEntityType = org.bukkit.Registry.ENTITY_TYPE.get(
-                                CraftNamespacedKey.fromMinecraft(EntityType.getKey(entityType)));
-                        chunkEntities.computeIfAbsent(Keys.of(bukkitEntityType), k -> new Counter(0)).inc(1);
-                    });
-                });
+                for (Tag entityTag : entityData.getList("Entities", 10)) {
+                    EntityType<?> entityType = EntityType.by((CompoundTag) entityTag).orElse(null);
+                    if (entityType == null)
+                        continue;
+
+                    Entity fakeEntity = EntityType.create((CompoundTag) entityTag, serverLevel).orElse(null);
+                    if (fakeEntity != null) {
+                        fakeEntity.valid = false;
+                        if (BukkitEntities.canBypassEntityLimit(fakeEntity.getBukkitEntity()))
+                            continue;
+                    }
+
+                    Key entityKey = Keys.of(org.bukkit.Registry.ENTITY_TYPE.get(
+                            CraftNamespacedKey.fromMinecraft(EntityType.getKey(entityType))));
+
+                    chunkEntities.computeIfAbsent(entityKey, k -> new Counter(0)).inc(1);
+                }
             }
 
             @Override
