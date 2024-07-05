@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.config.SettingsManagerImpl;
 import com.bgsoftware.superiorskyblock.core.PluginLoadingStage;
 import com.bgsoftware.superiorskyblock.core.PluginReloadReason;
 import com.bgsoftware.superiorskyblock.core.database.DataManager;
+import com.bgsoftware.superiorskyblock.core.database.transaction.DatabaseTransactionsExecutor;
 import com.bgsoftware.superiorskyblock.core.engine.EnginesFactory;
 import com.bgsoftware.superiorskyblock.core.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
@@ -186,6 +187,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         new Metrics(this, 4119);
 
         loadingStage = PluginLoadingStage.LOADED;
+
+        DatabaseTransactionsExecutor.init();
     }
 
     @Override
@@ -368,6 +371,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             if (loadingStage.isAtLeast(PluginLoadingStage.START_ENABLE)) {
                 Log.info("Shutting down executor");
                 BukkitExecutor.close();
+                Log.info("Shutting down database executor");
+                DatabaseTransactionsExecutor.stop();
             }
 
             if (loadingStage.isAtLeast(PluginLoadingStage.MANAGERS_INITIALIZED)) {

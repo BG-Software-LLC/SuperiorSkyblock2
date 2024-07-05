@@ -8,8 +8,8 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.core.database.transaction.DatabaseTransactionsExecutor;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.SQLDatabase;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.BankTransactionsAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.GridAttributes;
@@ -26,9 +26,10 @@ import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deser
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deserializer.RawDeserializer;
 import com.bgsoftware.superiorskyblock.core.database.sql.ResultSetMapBridge;
 import com.bgsoftware.superiorskyblock.core.database.sql.SQLHelper;
-import com.bgsoftware.superiorskyblock.core.database.sql.StatementHolder;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
+import com.bgsoftware.superiorskyblock.core.database.sql.transaction.CustomSQLDatabaseTransaction;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.World;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
@@ -184,17 +186,23 @@ public class DatabaseConverter {
     private static void savePlayers() {
         Log.info("[Database-Converter] Converting players...");
 
-        StatementHolder playersQuery = new StatementHolder("REPLACE INTO {prefix}players VALUES(?,?,?,?,?)");
-        StatementHolder playersMissionsQuery = new StatementHolder("REPLACE INTO {prefix}players_missions VALUES(?,?,?)");
-        StatementHolder playersSettingsQuery = new StatementHolder("REPLACE INTO {prefix}players_settings VALUES(?,?,?,?,?,?)");
+        CustomSQLDatabaseTransaction playersTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}players VALUES(?,?,?,?,?)");
+        CustomSQLDatabaseTransaction playersMissionsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}players_missions VALUES(?,?,?)");
+        CustomSQLDatabaseTransaction playersSettingsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}players_settings VALUES(?,?,?,?,?,?)");
 
         for (PlayerAttributes playerAttributes : loadedPlayers) {
-            insertPlayer(playerAttributes, playersQuery, playersMissionsQuery, playersSettingsQuery);
+            insertPlayer(playerAttributes, playersTransaction, playersMissionsTransaction, playersSettingsTransaction);
         }
 
-        playersQuery.executeBatch(false);
-        playersMissionsQuery.executeBatch(false);
-        playersSettingsQuery.executeBatch(false);
+        try {
+            DatabaseTransactionsExecutor.addTransactions(playersTransaction,
+                    playersMissionsTransaction, playersSettingsTransaction).get();
+        } catch (InterruptedException | ExecutionException error) {
+            error.printStackTrace();
+        }
     }
 
     private static void saveIslands() {
@@ -202,96 +210,134 @@ public class DatabaseConverter {
 
         Log.info("[Database-Converter] Converting islands...");
 
-        StatementHolder islandsQuery = new StatementHolder("REPLACE INTO {prefix}islands VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-        StatementHolder islandsBanksQuery = new StatementHolder("REPLACE INTO {prefix}islands_banks VALUES(?,?,?)");
-        StatementHolder islandsBansQuery = new StatementHolder("REPLACE INTO {prefix}islands_bans VALUES(?,?,?,?)");
-        StatementHolder islandsBlockLimitsQuery = new StatementHolder("REPLACE INTO {prefix}islands_block_limits VALUES(?,?,?)");
-        StatementHolder islandsChestsQuery = new StatementHolder("REPLACE INTO {prefix}islands_chests VALUES(?,?,?)");
-        StatementHolder islandsEffectsQuery = new StatementHolder("REPLACE INTO {prefix}islands_effects VALUES(?,?,?)");
-        StatementHolder islandsEntityLimitsQuery = new StatementHolder("REPLACE INTO {prefix}islands_entity_limits VALUES(?,?,?)");
-        StatementHolder islandsFlagsQuery = new StatementHolder("REPLACE INTO {prefix}islands_flags VALUES(?,?,?)");
-        StatementHolder islandsGeneratorsQuery = new StatementHolder("REPLACE INTO {prefix}islands_generators VALUES(?,?,?,?)");
-        StatementHolder islandsHomesQuery = new StatementHolder("REPLACE INTO {prefix}islands_homes VALUES(?,?,?)");
-        StatementHolder islandsMembersQuery = new StatementHolder("REPLACE INTO {prefix}islands_members VALUES(?,?,?,?)");
-        StatementHolder islandsMissionsQuery = new StatementHolder("REPLACE INTO {prefix}islands_missions VALUES(?,?,?)");
-        StatementHolder islandsPlayerPermissionsQuery = new StatementHolder("REPLACE INTO {prefix}islands_player_permissions VALUES(?,?,?,?)");
-        StatementHolder islandsRatingsQuery = new StatementHolder("REPLACE INTO {prefix}islands_ratings VALUES(?,?,?,?)");
-        StatementHolder islandsRoleLimitsQuery = new StatementHolder("REPLACE INTO {prefix}islands_role_limits VALUES(?,?,?)");
-        StatementHolder islandsRolePermissionsQuery = new StatementHolder("REPLACE INTO {prefix}islands_role_permissions VALUES(?,?,?)");
-        StatementHolder islandsSettingsQuery = new StatementHolder("REPLACE INTO {prefix}islands_settings VALUES(?,?,?,?,?,?,?,?,?)");
-        StatementHolder islandsUpgradesQuery = new StatementHolder("REPLACE INTO {prefix}islands_upgrades VALUES(?,?,?)");
-        StatementHolder islandsVisitorHomesQuery = new StatementHolder("REPLACE INTO {prefix}islands_visitor_homes VALUES(?,?,?)");
-        StatementHolder islandsVisitorsQuery = new StatementHolder("REPLACE INTO {prefix}islands_visitors VALUES(?,?,?)");
-        StatementHolder islandsWarpCategoriesQuery = new StatementHolder("REPLACE INTO {prefix}islands_warp_categories VALUES(?,?,?,?)");
-        StatementHolder islandsWarpsQuery = new StatementHolder("REPLACE INTO {prefix}islands_warps VALUES(?,?,?,?,?,?)");
+        CustomSQLDatabaseTransaction islandsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        CustomSQLDatabaseTransaction islandsBanksTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_banks VALUES(?,?,?)");
+        CustomSQLDatabaseTransaction islandsBansTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_bans VALUES(?,?,?,?)");
+        CustomSQLDatabaseTransaction islandsBlockLimitsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_block_limits VALUES(?,?,?)");
+        CustomSQLDatabaseTransaction islandsChestsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_chests VALUES(?,?,?)");
+        CustomSQLDatabaseTransaction islandsEffectsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_effects VALUES(?,?,?)");
+        CustomSQLDatabaseTransaction islandsEntityLimitsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_entity_limits VALUES(?,?,?)");
+        CustomSQLDatabaseTransaction islandsFlagsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_flags VALUES(?,?,?)");
+        CustomSQLDatabaseTransaction islandsGeneratorsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_generators VALUES(?,?,?,?)");
+        CustomSQLDatabaseTransaction islandsHomesTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_homes VALUES(?,?,?)");
+        CustomSQLDatabaseTransaction islandsMembersTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_members VALUES(?,?,?,?)");
+        CustomSQLDatabaseTransaction islandsMissionsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_missions VALUES(?,?,?)");
+        CustomSQLDatabaseTransaction islandsPlayerPermissionsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_player_permissions VALUES(?,?,?,?)");
+        CustomSQLDatabaseTransaction islandsRatingsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_ratings VALUES(?,?,?,?)");
+        CustomSQLDatabaseTransaction islandsRoleLimitsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_role_limits VALUES(?,?,?)");
+        CustomSQLDatabaseTransaction islandsRolePermissionsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_role_permissions VALUES(?,?,?)");
+        CustomSQLDatabaseTransaction islandsSettingsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_settings VALUES(?,?,?,?,?,?,?,?,?)");
+        CustomSQLDatabaseTransaction islandsUpgradesTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_upgrades VALUES(?,?,?)");
+        CustomSQLDatabaseTransaction islandsVisitorHomesTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_visitor_homes VALUES(?,?,?)");
+        CustomSQLDatabaseTransaction islandsVisitorsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_visitors VALUES(?,?,?)");
+        CustomSQLDatabaseTransaction islandsWarpCategoriesTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_warp_categories VALUES(?,?,?,?)");
+        CustomSQLDatabaseTransaction islandsWarpsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}islands_warps VALUES(?,?,?,?,?,?)");
 
         for (IslandAttributes islandAttributes : loadedIslands) {
-            insertIsland(islandAttributes, currentTime, islandsQuery, islandsBanksQuery, islandsBansQuery,
-                    islandsBlockLimitsQuery, islandsChestsQuery, islandsEffectsQuery, islandsEntityLimitsQuery,
-                    islandsFlagsQuery, islandsGeneratorsQuery, islandsHomesQuery, islandsMembersQuery,
-                    islandsMissionsQuery, islandsPlayerPermissionsQuery, islandsRatingsQuery, islandsRoleLimitsQuery,
-                    islandsRolePermissionsQuery, islandsSettingsQuery, islandsUpgradesQuery, islandsVisitorHomesQuery,
-                    islandsVisitorsQuery, islandsWarpCategoriesQuery, islandsWarpsQuery);
+            insertIsland(islandAttributes, currentTime, islandsTransaction, islandsBanksTransaction, islandsBansTransaction,
+                    islandsBlockLimitsTransaction, islandsChestsTransaction, islandsEffectsTransaction, islandsEntityLimitsTransaction,
+                    islandsFlagsTransaction, islandsGeneratorsTransaction, islandsHomesTransaction, islandsMembersTransaction,
+                    islandsMissionsTransaction, islandsPlayerPermissionsTransaction, islandsRatingsTransaction, islandsRoleLimitsTransaction,
+                    islandsRolePermissionsTransaction, islandsSettingsTransaction, islandsUpgradesTransaction, islandsVisitorHomesTransaction,
+                    islandsVisitorsTransaction, islandsWarpCategoriesTransaction, islandsWarpsTransaction);
         }
 
-        islandsQuery.executeBatch(false);
-        islandsBanksQuery.executeBatch(false);
-        islandsBansQuery.executeBatch(false);
-        islandsBlockLimitsQuery.executeBatch(false);
-        islandsChestsQuery.executeBatch(false);
-        islandsEffectsQuery.executeBatch(false);
-        islandsEntityLimitsQuery.executeBatch(false);
-        islandsFlagsQuery.executeBatch(false);
-        islandsGeneratorsQuery.executeBatch(false);
-        islandsHomesQuery.executeBatch(false);
-        islandsMembersQuery.executeBatch(false);
-        islandsMissionsQuery.executeBatch(false);
-        islandsPlayerPermissionsQuery.executeBatch(false);
-        islandsRatingsQuery.executeBatch(false);
-        islandsRoleLimitsQuery.executeBatch(false);
-        islandsRolePermissionsQuery.executeBatch(false);
-        islandsSettingsQuery.executeBatch(false);
-        islandsUpgradesQuery.executeBatch(false);
-        islandsVisitorHomesQuery.executeBatch(false);
-        islandsVisitorsQuery.executeBatch(false);
-        islandsWarpCategoriesQuery.executeBatch(false);
-        islandsWarpsQuery.executeBatch(false);
+        try {
+            DatabaseTransactionsExecutor.addTransactions(
+                    islandsTransaction,
+                    islandsBanksTransaction,
+                    islandsBansTransaction,
+                    islandsBlockLimitsTransaction,
+                    islandsChestsTransaction,
+                    islandsEffectsTransaction,
+                    islandsEntityLimitsTransaction,
+                    islandsFlagsTransaction,
+                    islandsGeneratorsTransaction,
+                    islandsHomesTransaction,
+                    islandsMembersTransaction,
+                    islandsMissionsTransaction,
+                    islandsPlayerPermissionsTransaction,
+                    islandsRatingsTransaction,
+                    islandsRoleLimitsTransaction,
+                    islandsRolePermissionsTransaction,
+                    islandsSettingsTransaction,
+                    islandsUpgradesTransaction,
+                    islandsVisitorHomesTransaction,
+                    islandsVisitorsTransaction,
+                    islandsWarpCategoriesTransaction,
+                    islandsWarpsTransaction
+            ).get();
+        } catch (InterruptedException | ExecutionException error) {
+            error.printStackTrace();
+        }
     }
 
     private static void saveStackedBlocks() {
         Log.info("[Database-Converter] Converting stacked blocks...");
 
-        StatementHolder insertQuery = new StatementHolder("REPLACE INTO {prefix}stacked_blocks VALUES(?,?,?)");
+        CustomSQLDatabaseTransaction stackedBlocksTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}stacked_blocks VALUES(?,?,?)");
 
         for (StackedBlockAttributes stackedBlockAttributes : loadedBlocks) {
-            insertQuery
-                    .setObject(stackedBlockAttributes.getValue(StackedBlockAttributes.Field.LOCATION))
-                    .setObject(stackedBlockAttributes.getValue(StackedBlockAttributes.Field.BLOCK_TYPE))
-                    .setObject(stackedBlockAttributes.getValue(StackedBlockAttributes.Field.AMOUNT))
-                    .addBatch();
+            stackedBlocksTransaction
+                    .bindObject(stackedBlockAttributes.getValue(StackedBlockAttributes.Field.LOCATION))
+                    .bindObject(stackedBlockAttributes.getValue(StackedBlockAttributes.Field.BLOCK_TYPE))
+                    .bindObject(stackedBlockAttributes.getValue(StackedBlockAttributes.Field.AMOUNT))
+                    .newBatch();
         }
 
-        insertQuery.executeBatch(false);
+        try {
+            stackedBlocksTransaction.execute().get();
+        } catch (InterruptedException | ExecutionException error) {
+            error.printStackTrace();
+        }
     }
 
     private static void saveBankTransactions() {
         Log.info("[Database-Converter] Converting bank transactions...");
 
-        StatementHolder insertQuery = new StatementHolder("REPLACE INTO {prefix}bank_transactions VALUES(?,?,?,?,?,?,?)");
+        CustomSQLDatabaseTransaction bankTransactionsTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}bank_transactions VALUES(?,?,?,?,?,?,?)");
 
         for (BankTransactionsAttributes bankTransactionsAttributes : loadedBankTransactions) {
-            insertQuery
-                    .setObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.ISLAND))
-                    .setObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.PLAYER))
-                    .setObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.BANK_ACTION))
-                    .setObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.POSITION))
-                    .setObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.TIME))
-                    .setObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.FAILURE_REASON))
-                    .setObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.AMOUNT))
-                    .addBatch();
+            bankTransactionsTransaction
+                    .bindObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.ISLAND))
+                    .bindObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.PLAYER))
+                    .bindObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.BANK_ACTION))
+                    .bindObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.POSITION))
+                    .bindObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.TIME))
+                    .bindObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.FAILURE_REASON))
+                    .bindObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.AMOUNT))
+                    .newBatch();
         }
 
-        insertQuery.executeBatch(false);
+        try {
+            bankTransactionsTransaction.execute().get();
+        } catch (InterruptedException | ExecutionException error) {
+            error.printStackTrace();
+        }
     }
 
     private static void saveGrid() {
@@ -300,195 +346,218 @@ public class DatabaseConverter {
 
         Log.info("[Database-Converter] Converting grid data...");
 
-        new StatementHolder("DELETE FROM {prefix}grid;").execute(false);
-        new StatementHolder("REPLACE INTO {prefix}grid VALUES(?,?,?)")
-                .setObject(gridAttributes.getValue(GridAttributes.Field.LAST_ISLAND))
-                .setObject(gridAttributes.getValue(GridAttributes.Field.MAX_ISLAND_SIZE))
-                .setObject(gridAttributes.getValue(GridAttributes.Field.WORLD))
-                .execute(false);
+        CustomSQLDatabaseTransaction deleteGridTransaction = new CustomSQLDatabaseTransaction("DELETE FROM {prefix}grid;");
+        try {
+            deleteGridTransaction.execute().get();
+        } catch (InterruptedException | ExecutionException error) {
+            error.printStackTrace();
+        }
+
+        CustomSQLDatabaseTransaction insertGridTransaction = new CustomSQLDatabaseTransaction(
+                "REPLACE INTO {prefix}grid VALUES(?,?,?)");
+        insertGridTransaction
+                .bindObject(gridAttributes.getValue(GridAttributes.Field.LAST_ISLAND))
+                .bindObject(gridAttributes.getValue(GridAttributes.Field.MAX_ISLAND_SIZE))
+                .bindObject(gridAttributes.getValue(GridAttributes.Field.WORLD));
+        try {
+            insertGridTransaction.execute().get();
+        } catch (InterruptedException | ExecutionException error) {
+            error.printStackTrace();
+        }
     }
 
     @SuppressWarnings("unchecked")
     private static void insertPlayer(PlayerAttributes playerAttributes,
-                                     StatementHolder playersQuery,
-                                     StatementHolder playersMissionsQuery,
-                                     StatementHolder playersSettingsQuery) {
+                                     CustomSQLDatabaseTransaction playersTransaction,
+                                     CustomSQLDatabaseTransaction playersMissionsTransaction,
+                                     CustomSQLDatabaseTransaction playersSettingsTransaction) {
         String playerUUID = playerAttributes.getValue(PlayerAttributes.Field.UUID);
-        playersQuery.setObject(playerUUID)
-                .setObject(playerAttributes.getValue(PlayerAttributes.Field.LAST_USED_NAME))
-                .setObject(playerAttributes.getValue(PlayerAttributes.Field.LAST_USED_SKIN))
-                .setObject(playerAttributes.getValue(PlayerAttributes.Field.DISBANDS))
-                .setObject(playerAttributes.getValue(PlayerAttributes.Field.LAST_TIME_UPDATED))
-                .addBatch();
+        playersTransaction.bindObject(playerUUID)
+                .bindObject(playerAttributes.getValue(PlayerAttributes.Field.LAST_USED_NAME))
+                .bindObject(playerAttributes.getValue(PlayerAttributes.Field.LAST_USED_SKIN))
+                .bindObject(playerAttributes.getValue(PlayerAttributes.Field.DISBANDS))
+                .bindObject(playerAttributes.getValue(PlayerAttributes.Field.LAST_TIME_UPDATED))
+                .newBatch();
         ((Map<String, Integer>) playerAttributes.getValue(PlayerAttributes.Field.COMPLETED_MISSIONS)).forEach((missionName, finishCount) ->
-                playersMissionsQuery.setObject(playerUUID)
-                        .setObject(missionName.toLowerCase(Locale.ENGLISH))
-                        .setObject(finishCount)
-                        .addBatch());
-        playersSettingsQuery.setObject(playerUUID)
-                .setObject(playerAttributes.getValue(PlayerAttributes.Field.LANGUAGE))
-                .setObject(playerAttributes.getValue(PlayerAttributes.Field.TOGGLED_PANEL))
-                .setObject(((BorderColor) playerAttributes.getValue(PlayerAttributes.Field.BORDER_COLOR)).name())
-                .setObject(playerAttributes.getValue(PlayerAttributes.Field.TOGGLED_BORDER))
-                .setObject(playerAttributes.getValue(PlayerAttributes.Field.ISLAND_FLY))
-                .addBatch();
+                playersMissionsTransaction.bindObject(playerUUID)
+                        .bindObject(missionName.toLowerCase(Locale.ENGLISH))
+                        .bindObject(finishCount)
+                        .newBatch());
+        playersSettingsTransaction.bindObject(playerUUID)
+                .bindObject(playerAttributes.getValue(PlayerAttributes.Field.LANGUAGE))
+                .bindObject(playerAttributes.getValue(PlayerAttributes.Field.TOGGLED_PANEL))
+                .bindObject(((BorderColor) playerAttributes.getValue(PlayerAttributes.Field.BORDER_COLOR)).name())
+                .bindObject(playerAttributes.getValue(PlayerAttributes.Field.TOGGLED_BORDER))
+                .bindObject(playerAttributes.getValue(PlayerAttributes.Field.ISLAND_FLY))
+                .newBatch();
     }
 
     @SuppressWarnings({"unchecked"})
     private static void insertIsland(IslandAttributes islandAttributes, long currentTime,
-                                     StatementHolder islandsQuery, StatementHolder islandsBanksQuery,
-                                     StatementHolder islandsBansQuery, StatementHolder islandsBlockLimitsQuery,
-                                     StatementHolder islandsChestsQuery, StatementHolder islandsEffectsQuery,
-                                     StatementHolder islandsEntityLimitsQuery, StatementHolder islandsFlagsQuery,
-                                     StatementHolder islandsGeneratorsQuery, StatementHolder islandsHomesQuery,
-                                     StatementHolder islandsMembersQuery, StatementHolder islandsMissionsQuery,
-                                     StatementHolder islandsPlayerPermissionsQuery, StatementHolder islandsRatingsQuery,
-                                     StatementHolder islandsRoleLimitsQuery, StatementHolder islandsRolePermissionsQuery,
-                                     StatementHolder islandsSettingsQuery, StatementHolder islandsUpgradesQuery,
-                                     StatementHolder islandsVisitorHomesQuery, StatementHolder islandsVisitorsQuery,
-                                     StatementHolder islandsWarpCategoriesQuery, StatementHolder islandsWarpsQuery) {
+                                     CustomSQLDatabaseTransaction islandsTransaction,
+                                     CustomSQLDatabaseTransaction islandsBanksTransaction,
+                                     CustomSQLDatabaseTransaction islandsBansTransaction,
+                                     CustomSQLDatabaseTransaction islandsBlockLimitsTransaction,
+                                     CustomSQLDatabaseTransaction islandsChestsTransaction,
+                                     CustomSQLDatabaseTransaction islandsEffectsTransaction,
+                                     CustomSQLDatabaseTransaction islandsEntityLimitsTransaction,
+                                     CustomSQLDatabaseTransaction islandsFlagsTransaction,
+                                     CustomSQLDatabaseTransaction islandsGeneratorsTransaction,
+                                     CustomSQLDatabaseTransaction islandsHomesTransaction,
+                                     CustomSQLDatabaseTransaction islandsMembersTransaction,
+                                     CustomSQLDatabaseTransaction islandsMissionsTransaction,
+                                     CustomSQLDatabaseTransaction islandsPlayerPermissionsTransaction,
+                                     CustomSQLDatabaseTransaction islandsRatingsTransaction,
+                                     CustomSQLDatabaseTransaction islandsRoleLimitsTransaction,
+                                     CustomSQLDatabaseTransaction islandsRolePermissionsTransaction,
+                                     CustomSQLDatabaseTransaction islandsSettingsTransaction,
+                                     CustomSQLDatabaseTransaction islandsUpgradesTransaction,
+                                     CustomSQLDatabaseTransaction islandsVisitorHomesTransaction,
+                                     CustomSQLDatabaseTransaction islandsVisitorsTransaction,
+                                     CustomSQLDatabaseTransaction islandsWarpCategoriesTransaction,
+                                     CustomSQLDatabaseTransaction islandsWarpsTransaction) {
         String islandUUID = islandAttributes.getValue(IslandAttributes.Field.UUID);
-        islandsQuery.setObject(islandUUID)
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.OWNER))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.CENTER))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.CREATION_TIME))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.ISLAND_TYPE))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.DISCORD))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.PAYPAL))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.WORTH_BONUS))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.LEVELS_BONUS))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.LOCKED))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.IGNORED))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.NAME))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.DESCRIPTION))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.GENERATED_SCHEMATICS))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.UNLOCKED_WORLDS))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.LAST_TIME_UPDATED))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.DIRTY_CHUNKS))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.BLOCK_COUNTS))
-                .addBatch();
-        islandsBanksQuery.setObject(islandUUID)
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.BANK_BALANCE))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.BANK_LAST_INTEREST))
-                .addBatch();
+        islandsTransaction.bindObject(islandUUID)
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.OWNER))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.CENTER))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.CREATION_TIME))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.ISLAND_TYPE))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.DISCORD))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.PAYPAL))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.WORTH_BONUS))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.LEVELS_BONUS))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.LOCKED))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.IGNORED))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.NAME))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.DESCRIPTION))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.GENERATED_SCHEMATICS))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.UNLOCKED_WORLDS))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.LAST_TIME_UPDATED))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.DIRTY_CHUNKS))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.BLOCK_COUNTS))
+                .newBatch();
+        islandsBanksTransaction.bindObject(islandUUID)
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.BANK_BALANCE))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.BANK_LAST_INTEREST))
+                .newBatch();
         ((List<PlayerAttributes>) islandAttributes.getValue(IslandAttributes.Field.BANS)).forEach(playerAttributes ->
-                islandsBansQuery.setObject(islandUUID)
-                        .setObject(playerAttributes.getValue(PlayerAttributes.Field.UUID))
-                        .setObject(CONSOLE_UUID.toString())
-                        .setObject(currentTime)
-                        .addBatch());
+                islandsBansTransaction.bindObject(islandUUID)
+                        .bindObject(playerAttributes.getValue(PlayerAttributes.Field.UUID))
+                        .bindObject(CONSOLE_UUID.toString())
+                        .bindObject(currentTime)
+                        .newBatch());
         ((KeyMap<Integer>) islandAttributes.getValue(IslandAttributes.Field.BLOCK_LIMITS)).forEach((key, limit) ->
-                islandsBlockLimitsQuery.setObject(islandUUID)
-                        .setObject(key.toString())
-                        .setObject(limit)
-                        .addBatch());
+                islandsBlockLimitsTransaction.bindObject(islandUUID)
+                        .bindObject(key.toString())
+                        .bindObject(limit)
+                        .newBatch());
         ((List<IslandChestAttributes>) islandAttributes.getValue(IslandAttributes.Field.ISLAND_CHESTS)).forEach(islandChestAttributes ->
-                islandsChestsQuery.setObject(islandUUID)
-                        .setObject(islandChestAttributes.getValue(IslandChestAttributes.Field.INDEX))
-                        .setObject(islandChestAttributes.getValue(IslandChestAttributes.Field.CONTENTS))
-                        .addBatch());
+                islandsChestsTransaction.bindObject(islandUUID)
+                        .bindObject(islandChestAttributes.getValue(IslandChestAttributes.Field.INDEX))
+                        .bindObject(islandChestAttributes.getValue(IslandChestAttributes.Field.CONTENTS))
+                        .newBatch());
         ((Map<PotionEffectType, Integer>) islandAttributes.getValue(IslandAttributes.Field.EFFECTS)).forEach((type, level) ->
-                islandsEffectsQuery.setObject(islandUUID)
-                        .setObject(type.getName())
-                        .setObject(level)
-                        .addBatch());
+                islandsEffectsTransaction.bindObject(islandUUID)
+                        .bindObject(type.getName())
+                        .bindObject(level)
+                        .newBatch());
         ((KeyMap<Integer>) islandAttributes.getValue(IslandAttributes.Field.ENTITY_LIMITS)).forEach((entity, limit) ->
-                islandsEntityLimitsQuery.setObject(islandUUID)
-                        .setObject(entity.toString())
-                        .setObject(limit)
-                        .addBatch());
+                islandsEntityLimitsTransaction.bindObject(islandUUID)
+                        .bindObject(entity.toString())
+                        .bindObject(limit)
+                        .newBatch());
         ((Map<IslandFlag, Byte>) islandAttributes.getValue(IslandAttributes.Field.ISLAND_FLAGS)).forEach((islandFlag, status) ->
-                islandsFlagsQuery.setObject(islandUUID)
-                        .setObject(islandFlag.getName())
-                        .setObject(status)
-                        .addBatch());
+                islandsFlagsTransaction.bindObject(islandUUID)
+                        .bindObject(islandFlag.getName())
+                        .bindObject(status)
+                        .newBatch());
         runOnEnvironments((KeyMap<Integer>[]) islandAttributes.getValue(IslandAttributes.Field.GENERATORS), (generatorRates, environment) ->
                 generatorRates.forEach((block, rate) ->
-                        islandsGeneratorsQuery.setObject(islandUUID)
-                                .setObject(environment.name())
-                                .setObject(block.toString())
-                                .setObject(rate)
-                                .addBatch()));
+                        islandsGeneratorsTransaction.bindObject(islandUUID)
+                                .bindObject(environment.name())
+                                .bindObject(block.toString())
+                                .bindObject(rate)
+                                .newBatch()));
         runOnEnvironments((String[]) islandAttributes.getValue(IslandAttributes.Field.HOMES), (islandHome, environment) ->
-                islandsHomesQuery.setObject(islandUUID)
-                        .setObject(environment.name())
-                        .setObject(islandHome)
-                        .addBatch());
+                islandsHomesTransaction.bindObject(islandUUID)
+                        .bindObject(environment.name())
+                        .bindObject(islandHome)
+                        .newBatch());
         ((List<PlayerAttributes>) islandAttributes.getValue(IslandAttributes.Field.MEMBERS)).forEach(playerAttributes ->
-                islandsMembersQuery.setObject(islandUUID)
-                        .setObject(playerAttributes.getValue(PlayerAttributes.Field.UUID))
-                        .setObject(((PlayerRole) playerAttributes.getValue(PlayerAttributes.Field.ISLAND_ROLE)).getId())
-                        .setObject(currentTime)
-                        .addBatch());
+                islandsMembersTransaction.bindObject(islandUUID)
+                        .bindObject(playerAttributes.getValue(PlayerAttributes.Field.UUID))
+                        .bindObject(((PlayerRole) playerAttributes.getValue(PlayerAttributes.Field.ISLAND_ROLE)).getId())
+                        .bindObject(currentTime)
+                        .newBatch());
         ((Map<String, Integer>) islandAttributes.getValue(IslandAttributes.Field.MISSIONS)).forEach((mission, finishCount) ->
-                islandsMissionsQuery.setObject(islandUUID)
-                        .setObject(mission)
-                        .setObject(finishCount)
-                        .addBatch());
+                islandsMissionsTransaction.bindObject(islandUUID)
+                        .bindObject(mission)
+                        .bindObject(finishCount)
+                        .newBatch());
         ((Map<UUID, PlayerPrivilegeNode>) islandAttributes.getValue(IslandAttributes.Field.PLAYER_PERMISSIONS)).forEach((playerUUID, node) -> {
             for (Map.Entry<IslandPrivilege, Boolean> playerPermission : node.getCustomPermissions().entrySet())
-                islandsPlayerPermissionsQuery.setObject(islandUUID)
-                        .setObject(playerUUID.toString())
-                        .setObject(playerPermission.getKey().getName())
-                        .setObject(playerPermission.getValue())
-                        .addBatch();
+                islandsPlayerPermissionsTransaction.bindObject(islandUUID)
+                        .bindObject(playerUUID.toString())
+                        .bindObject(playerPermission.getKey().getName())
+                        .bindObject(playerPermission.getValue())
+                        .newBatch();
         });
         ((Map<UUID, Rating>) islandAttributes.getValue(IslandAttributes.Field.RATINGS)).forEach((playerUUID, rating) ->
-                islandsRatingsQuery.setObject(islandUUID)
-                        .setObject(playerUUID.toString())
-                        .setObject(rating.getValue())
-                        .setObject(currentTime)
-                        .addBatch());
+                islandsRatingsTransaction.bindObject(islandUUID)
+                        .bindObject(playerUUID.toString())
+                        .bindObject(rating.getValue())
+                        .bindObject(currentTime)
+                        .newBatch());
         ((Map<PlayerRole, Integer>) islandAttributes.getValue(IslandAttributes.Field.ROLE_LIMITS)).forEach((role, limit) ->
-                islandsRoleLimitsQuery.setObject(islandUUID)
-                        .setObject(role.getId())
-                        .setObject(limit)
-                        .addBatch());
+                islandsRoleLimitsTransaction.bindObject(islandUUID)
+                        .bindObject(role.getId())
+                        .bindObject(limit)
+                        .newBatch());
         ((Map<IslandPrivilege, PlayerRole>) islandAttributes.getValue(IslandAttributes.Field.ROLE_PERMISSIONS)).forEach((privilege, role) ->
-                islandsRolePermissionsQuery.setObject(islandUUID)
-                        .setObject(role.getId())
-                        .setObject(privilege.getName())
-                        .addBatch());
-        islandsSettingsQuery.setObject(islandUUID)
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.ISLAND_SIZE))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.BANK_LIMIT))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.COOP_LIMIT))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.TEAM_LIMIT))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.WARPS_LIMIT))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.CROP_GROWTH_MULTIPLIER))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.SPAWNER_RATES_MULTIPLIER))
-                .setObject(islandAttributes.getValue(IslandAttributes.Field.MOB_DROPS_MULTIPLIER))
-                .addBatch();
+                islandsRolePermissionsTransaction.bindObject(islandUUID)
+                        .bindObject(role.getId())
+                        .bindObject(privilege.getName())
+                        .newBatch());
+        islandsSettingsTransaction.bindObject(islandUUID)
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.ISLAND_SIZE))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.BANK_LIMIT))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.COOP_LIMIT))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.TEAM_LIMIT))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.WARPS_LIMIT))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.CROP_GROWTH_MULTIPLIER))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.SPAWNER_RATES_MULTIPLIER))
+                .bindObject(islandAttributes.getValue(IslandAttributes.Field.MOB_DROPS_MULTIPLIER))
+                .newBatch();
         ((Map<String, Integer>) islandAttributes.getValue(IslandAttributes.Field.UPGRADES)).forEach((upgradeName, level) ->
-                islandsUpgradesQuery.setObject(islandUUID)
-                        .setObject(upgradeName)
-                        .setObject(level)
-                        .addBatch());
+                islandsUpgradesTransaction.bindObject(islandUUID)
+                        .bindObject(upgradeName)
+                        .bindObject(level)
+                        .newBatch());
         String visitorHome = islandAttributes.getValue(IslandAttributes.Field.VISITOR_HOMES);
         if (visitorHome != null && !visitorHome.isEmpty())
-            islandsVisitorHomesQuery.setObject(islandUUID)
-                    .setObject(World.Environment.NORMAL.name())
-                    .setObject(visitorHome)
-                    .addBatch();
+            islandsVisitorHomesTransaction.bindObject(islandUUID)
+                    .bindObject(World.Environment.NORMAL.name())
+                    .bindObject(visitorHome)
+                    .newBatch();
         ((List<Pair<UUID, Long>>) islandAttributes.getValue(IslandAttributes.Field.VISITORS)).forEach(visitor ->
-                islandsVisitorsQuery.setObject(islandUUID)
-                        .setObject(visitor.getKey().toString())
-                        .setObject(visitor.getValue())
-                        .addBatch());
+                islandsVisitorsTransaction.bindObject(islandUUID)
+                        .bindObject(visitor.getKey().toString())
+                        .bindObject(visitor.getValue())
+                        .newBatch());
         ((List<WarpCategoryAttributes>) islandAttributes.getValue(IslandAttributes.Field.WARP_CATEGORIES)).forEach(warpCategoryAttributes ->
-                islandsWarpCategoriesQuery.setObject(islandUUID)
-                        .setObject(warpCategoryAttributes.getValue(WarpCategoryAttributes.Field.NAME))
-                        .setObject(warpCategoryAttributes.getValue(WarpCategoryAttributes.Field.SLOT))
-                        .setObject(warpCategoryAttributes.getValue(WarpCategoryAttributes.Field.ICON))
-                        .addBatch());
+                islandsWarpCategoriesTransaction.bindObject(islandUUID)
+                        .bindObject(warpCategoryAttributes.getValue(WarpCategoryAttributes.Field.NAME))
+                        .bindObject(warpCategoryAttributes.getValue(WarpCategoryAttributes.Field.SLOT))
+                        .bindObject(warpCategoryAttributes.getValue(WarpCategoryAttributes.Field.ICON))
+                        .newBatch());
         ((List<IslandWarpAttributes>) islandAttributes.getValue(IslandAttributes.Field.WARPS)).forEach(islandWarpAttributes ->
-                islandsWarpsQuery.setObject(islandUUID)
-                        .setObject(islandWarpAttributes.getValue(IslandWarpAttributes.Field.NAME))
-                        .setObject(islandWarpAttributes.getValue(IslandWarpAttributes.Field.CATEGORY))
-                        .setObject(islandWarpAttributes.getValue(IslandWarpAttributes.Field.LOCATION))
-                        .setObject(islandWarpAttributes.getValue(IslandWarpAttributes.Field.PRIVATE_STATUS))
-                        .setObject(islandWarpAttributes.getValue(IslandWarpAttributes.Field.ICON))
-                        .addBatch());
+                islandsWarpsTransaction.bindObject(islandUUID)
+                        .bindObject(islandWarpAttributes.getValue(IslandWarpAttributes.Field.NAME))
+                        .bindObject(islandWarpAttributes.getValue(IslandWarpAttributes.Field.CATEGORY))
+                        .bindObject(islandWarpAttributes.getValue(IslandWarpAttributes.Field.LOCATION))
+                        .bindObject(islandWarpAttributes.getValue(IslandWarpAttributes.Field.PRIVATE_STATUS))
+                        .bindObject(islandWarpAttributes.getValue(IslandWarpAttributes.Field.ICON))
+                        .newBatch());
     }
 
     private static <T> void runOnEnvironments(T[] arr, BiConsumer<T, World.Environment> consumer) {

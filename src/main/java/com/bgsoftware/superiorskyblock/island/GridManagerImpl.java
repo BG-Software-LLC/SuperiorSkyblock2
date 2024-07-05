@@ -426,11 +426,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         this.islandsContainer.removeIsland(island);
 
         // Delete island from database
-        if (pluginDisable) {
-            IslandsDatabaseBridge.deleteIsland(island);
-        } else {
-            BukkitExecutor.data(() -> IslandsDatabaseBridge.deleteIsland(island));
-        }
+        IslandsDatabaseBridge.deleteIsland(island);
 
         this.dragonBattleService.get().stopEnderDragonBattle(island);
     }
