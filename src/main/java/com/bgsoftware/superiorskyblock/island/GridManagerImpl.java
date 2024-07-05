@@ -219,9 +219,12 @@ public class GridManagerImpl extends Manager implements GridManager {
         pendingCreationTasks.add(builder.owner.getUniqueId());
 
         this.islandCreationAlgorithm.createIsland(builder, this.lastIsland).whenComplete((islandCreationResult, error) -> {
+
             pendingCreationTasks.remove(builder.owner.getUniqueId());
 
             if (error == null && islandCreationResult != null) {
+                Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Successfully created island");
+
                 try {
                     createIslandInternalOnSuccessCallback(builder, biome, offset, schematic,
                             updateGamemode, startTime, islandCreationResult);
@@ -230,6 +233,8 @@ public class GridManagerImpl extends Manager implements GridManager {
                     error = runtimeError;
                 }
             }
+
+            Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Failed to create island");
 
             Log.entering(builder.owner.getName(), builder.bonusWorth, builder.bonusLevel, builder.islandName,
                     offset, biome, schematic.getName());
@@ -251,6 +256,7 @@ public class GridManagerImpl extends Manager implements GridManager {
             case NAME_OCCUPIED:
                 builder.owner.setIsland(null);
                 Message.ISLAND_ALREADY_EXIST.send(builder.owner);
+                Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Island already exists");
                 return;
             case SUCCESS:
                 break;
@@ -264,6 +270,8 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         List<ChunkPosition> affectedChunks = schematic instanceof BaseSchematic ?
                 ((BaseSchematic) schematic).getAffectedChunks() : null;
+
+        Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Registering new island");
 
         this.islandsContainer.addIsland(island);
         setLastIsland(new SBlockPosition(islandLocation));
@@ -290,6 +298,8 @@ public class GridManagerImpl extends Manager implements GridManager {
         BukkitExecutor.sync(() -> builder.owner.runIfOnline(player -> {
             if (updateGamemode)
                 player.setGameMode(GameMode.SURVIVAL);
+
+            Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Teleporting player");
 
             if (!teleportPlayer) {
                 Message.CREATE_ISLAND.send(builder.owner, Formatters.LOCATION_FORMATTER.format(
