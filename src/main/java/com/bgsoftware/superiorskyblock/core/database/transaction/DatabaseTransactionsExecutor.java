@@ -86,6 +86,10 @@ public class DatabaseTransactionsExecutor {
             }
         }
 
+        // Handle all pending transactions
+        while (!pendingTransactions.isEmpty())
+            handleNextTransactionSafe();
+
         STOP_CONDITION.complete(null);
     }
 
