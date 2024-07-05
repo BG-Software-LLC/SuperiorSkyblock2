@@ -102,7 +102,13 @@ public class Keys {
     }
 
     public static Key of(Material type, short data) {
-        return of(new ItemStack(type, 1, data));
+        try {
+            return of(new ItemStack(type, 1, data));
+        } catch (IllegalArgumentException error) {
+            // In 1.21, you cannot create ItemStack out of Material types that are not an item
+            // If this occurs, then we manually create a new MaterialKey here.
+            return MaterialKey.of(type, data, MaterialKeySource.ITEM);
+        }
     }
 
     public static Key of(Material type) {
