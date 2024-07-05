@@ -532,7 +532,20 @@ public class SettingsContainer {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        return cfg.getStringList("interactables");
+        List<String> interactablesList = cfg.getStringList("interactables");
+
+        // Warn about interactables that the default file contains but the current
+        // file does not.
+        YamlConfiguration defaultInteractablesConfig = CommentedConfiguration.loadConfiguration(plugin.getResource("interactables.yml"));
+        List<String> defaultInteractables = defaultInteractablesConfig.getStringList("interactables");
+        if (defaultInteractables != null) {
+            for (String interactableBlock : defaultInteractables) {
+                if (!interactablesList.contains(interactableBlock))
+                    Log.warn("Potentially missing interactable block ", interactableBlock);
+            }
+        }
+
+        return interactablesList;
     }
 
     private KeySet loadSafeBlocks(SuperiorSkyblockPlugin plugin) {
