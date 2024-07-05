@@ -5,12 +5,12 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.database.transaction.DatabaseTransactionsExecutor;
-import com.bgsoftware.superiorskyblock.core.database.transaction.IDatabaseTransaction;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.database.sql.transaction.DeleteSQLDatabaseTransaction;
 import com.bgsoftware.superiorskyblock.core.database.sql.transaction.InsertSQLDatabaseTransaction;
 import com.bgsoftware.superiorskyblock.core.database.sql.transaction.UpdateSQLDatabaseTransaction;
+import com.bgsoftware.superiorskyblock.core.database.transaction.DatabaseTransactionsExecutor;
+import com.bgsoftware.superiorskyblock.core.database.transaction.IDatabaseTransaction;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 
@@ -68,7 +68,10 @@ public class SQLDatabaseBridge implements DatabaseBridge {
         }
 
         if (filter != null) {
-            filter.forEach((column, value) -> filteredColumns.add(column));
+            filter.forEach((column, value) -> {
+                filteredColumns.add(column);
+                values.add(value);
+            });
         }
 
         UpdateSQLDatabaseTransaction transaction = new UpdateSQLDatabaseTransaction(table, columnNames, filteredColumns);
