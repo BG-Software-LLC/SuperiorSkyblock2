@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
@@ -159,6 +160,19 @@ public class GridManagerImpl extends Manager implements GridManager {
         Preconditions.checkNotNull(bonusLevel, "bonusLevel parameter cannot be null.");
         Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
+        createIsland(superiorPlayer, schemName, bonusWorth, bonusLevel, biome, islandName, offset, null);
+    }
+
+    @Override
+    public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonusWorth,
+                             BigDecimal bonusLevel, Biome biome, String islandName, boolean offset,
+                             @Nullable BlockOffset spawnOffset) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
+        Preconditions.checkNotNull(bonusWorth, "bonusWorth parameter cannot be null.");
+        Preconditions.checkNotNull(bonusLevel, "bonusLevel parameter cannot be null.");
+        Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
+        Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
         Island.Builder builder = Island.newBuilder()
                 .setOwner(superiorPlayer)
                 .setSchematicName(schemName)
@@ -169,11 +183,19 @@ public class GridManagerImpl extends Manager implements GridManager {
                     .setBonusLevel(bonusLevel);
         }
 
-        createIsland(builder, biome, offset);
+        createIsland(builder, biome, offset, spawnOffset);
     }
 
     @Override
     public void createIsland(Island.Builder builderParam, Biome biome, boolean offset) {
+        Preconditions.checkNotNull(builderParam, "builder parameter cannot be null.");
+        Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
+        Preconditions.checkArgument(builderParam instanceof IslandBuilderImpl, "Cannot create islands out of a custom builder.");
+        createIsland(builderParam, biome, offset, null);
+    }
+
+    @Override
+    public void createIsland(Island.Builder builderParam, Biome biome, boolean offset, @Nullable BlockOffset spawnOffset) {
         Preconditions.checkNotNull(builderParam, "builder parameter cannot be null.");
         Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
         Preconditions.checkArgument(builderParam instanceof IslandBuilderImpl, "Cannot create islands out of a custom builder.");
@@ -188,9 +210,9 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         try {
             if (!Bukkit.isPrimaryThread()) {
-                BukkitExecutor.sync(() -> createIslandInternalAsync(builder, biome, offset, schematic));
+                BukkitExecutor.sync(() -> createIslandInternalAsync(builder, biome, offset, schematic, spawnOffset));
             } else {
-                createIslandInternalAsync(builder, biome, offset, schematic);
+                createIslandInternalAsync(builder, biome, offset, schematic, spawnOffset);
             }
         } catch (Throwable error) {
             Log.entering("ENTER", builder.owner.getName(), builder.islandType, biome, offset);
@@ -200,7 +222,8 @@ public class GridManagerImpl extends Manager implements GridManager {
         }
     }
 
-    private void createIslandInternalAsync(IslandBuilderImpl builder, Biome biome, boolean offset, Schematic schematic) {
+    private void createIslandInternalAsync(IslandBuilderImpl builder, Biome biome, boolean offset,
+                                           Schematic schematic, @Nullable BlockOffset spawnOffset) {
         assert builder.owner != null;
 
         Log.debug(Debug.CREATE_ISLAND, builder.owner.getName(), builder.bonusWorth, builder.bonusLevel,
@@ -226,8 +249,8 @@ public class GridManagerImpl extends Manager implements GridManager {
                 Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Successfully created island");
 
                 try {
-                    createIslandInternalOnSuccessCallback(builder, biome, offset, schematic,
-                            updateGamemode, startTime, islandCreationResult);
+                    createIslandInternalOnSuccessCallback(builder, biome, offset, spawnOffset,
+                            schematic, updateGamemode, startTime, islandCreationResult);
                     return;
                 } catch (Throwable runtimeError) {
                     error = runtimeError;
@@ -248,8 +271,8 @@ public class GridManagerImpl extends Manager implements GridManager {
         });
     }
 
-    private void createIslandInternalOnSuccessCallback(IslandBuilderImpl builder,
-                                                       Biome biome, boolean offset, Schematic schematic,
+    private void createIslandInternalOnSuccessCallback(IslandBuilderImpl builder, Biome biome, boolean offset,
+                                                       @Nullable BlockOffset spawnOffset, Schematic schematic,
                                                        boolean updateGamemode, long startTime,
                                                        IslandCreationAlgorithm.IslandCreationResult islandCreationResult) {
         switch (islandCreationResult.getStatus()) {
@@ -293,7 +316,11 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         IslandsDatabaseBridge.insertIsland(island, affectedChunks);
 
-        island.setIslandHome(schematic.adjustRotation(islandLocation));
+        Location homeLocation = schematic.adjustRotation(islandLocation);
+        if (spawnOffset != null)
+            homeLocation = spawnOffset.applyToLocation(homeLocation);
+
+        island.setIslandHome(homeLocation);
 
         BukkitExecutor.sync(() -> builder.owner.runIfOnline(player -> {
             if (updateGamemode)

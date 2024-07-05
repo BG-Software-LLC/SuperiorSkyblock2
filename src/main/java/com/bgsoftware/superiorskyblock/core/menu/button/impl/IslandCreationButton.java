@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
@@ -63,6 +64,7 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
         private BigDecimal bonusWorth;
         private BigDecimal bonusLevel;
         private boolean isOffset;
+        private BlockOffset spawnOffset = null;
 
         public Builder(Schematic schematic) {
             this.schematic = schematic;
@@ -108,10 +110,14 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
             this.isOffset = isOffset;
         }
 
+        public void setSpawnOffset(BlockOffset spawnOffset) {
+            this.spawnOffset = spawnOffset;
+        }
+
         @Override
         public MenuTemplateButton<MenuIslandCreation.View> build() {
-            return new Template(requiredPermission, lackPermissionSound, clickSound, commands,
-                    noAccessItem, noAccessCommands, biome, bonusWorth, bonusLevel, isOffset, buttonItem, schematic);
+            return new Template(requiredPermission, lackPermissionSound, clickSound, commands, noAccessItem,
+                    noAccessCommands, biome, bonusWorth, bonusLevel, isOffset, buttonItem, spawnOffset, schematic);
         }
 
     }
@@ -128,12 +134,14 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
         private final BigDecimal bonusLevel;
         private final boolean isOffset;
         private final Schematic schematic;
+        @Nullable
+        private final BlockOffset spawnOffset;
 
         Template(@Nullable String requiredPermission, @Nullable GameSound lackPermissionSound,
                  @Nullable GameSound accessSound, @Nullable List<String> accessCommands,
                  @Nullable TemplateItem lackPermissionItem, @Nullable List<String> lackPermissionCommands,
                  Biome biome, @Nullable BigDecimal bonusWorth, @Nullable BigDecimal bonusLevel, boolean isOffset,
-                 @Nullable TemplateItem accessItem, Schematic schematic) {
+                 @Nullable TemplateItem accessItem, @Nullable BlockOffset spawnOffset, Schematic schematic) {
             super(accessItem == null ? TemplateItem.AIR : accessItem, null, null, requiredPermission,
                     lackPermissionSound, IslandCreationButton.class, IslandCreationButton::new);
             this.accessSound = accessSound;
@@ -144,6 +152,7 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
             this.bonusWorth = bonusWorth == null ? BigDecimal.ZERO : bonusWorth;
             this.bonusLevel = bonusLevel == null ? BigDecimal.ZERO : bonusLevel;
             this.isOffset = isOffset;
+            this.spawnOffset = spawnOffset;
             this.schematic = Objects.requireNonNull(schematic, "schematic cannot be null");
         }
 
@@ -178,6 +187,10 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
 
         public Schematic getSchematic() {
             return schematic;
+        }
+
+        public BlockOffset getSpawnOffset() {
+            return spawnOffset;
         }
     }
 

@@ -17,6 +17,7 @@ items:
   '@':
     schematic: 'normal'
     biome: PLAINS
+    spawn-offset: '0, 0, 0'
     access:
       type: SKULL_ITEM
       data: 3
@@ -38,6 +39,7 @@ items:
   '^':
     schematic: 'mycel'
     biome: MUSHROOM_ISLAND
+    spawn-offset: '0, 0, 0'
     access:
       type: SKULL_ITEM
       data: 3
@@ -59,6 +61,7 @@ items:
   '$':
     schematic: 'desert'
     biome: DESERT
+    spawn-offset: '0, 0, 0'
     access:
       type: SKULL_ITEM
       data: 3
