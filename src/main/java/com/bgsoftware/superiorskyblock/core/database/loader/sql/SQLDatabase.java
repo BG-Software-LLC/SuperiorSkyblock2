@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.database.loader.sql;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.DatabaseUpgrade_V0;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v1.DatabaseUpgrade_V1;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v2.DatabaseUpgrade_V2;
 import com.bgsoftware.superiorskyblock.core.database.sql.SQLHelper;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableInt;
@@ -13,7 +14,8 @@ public class SQLDatabase {
 
     private static final Runnable[] DATABASE_UPGRADES = new Runnable[]{
             DatabaseUpgrade_V0.INSTANCE,
-            DatabaseUpgrade_V1.INSTANCE
+            DatabaseUpgrade_V1.INSTANCE,
+            DatabaseUpgrade_V2.INSTANCE
     };
 
     private SQLDatabase() {

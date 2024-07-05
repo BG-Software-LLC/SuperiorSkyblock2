@@ -428,7 +428,7 @@ public class SettingsContainer {
                             itemStack.setAmount(containerSection.getInt(slot + ".amount", 1));
 
                             // Parsing it into compound tag
-                            CompoundTag itemCompound = plugin.getNMSTags().convertToNBT(itemStack);
+                            CompoundTag itemCompound = plugin.getNMSTags().serializeItem(itemStack);
                             itemCompound.setByte("Slot", Byte.parseByte(slot));
 
                             items.addTag(itemCompound);
