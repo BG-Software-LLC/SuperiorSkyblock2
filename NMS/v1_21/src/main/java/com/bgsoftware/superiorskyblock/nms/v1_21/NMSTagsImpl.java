@@ -59,14 +59,8 @@ public class NMSTagsImpl implements NMSTags {
         int currentVersion = CraftMagicNumbers.INSTANCE.getDataVersion();
         int itemVersion = tagCompound.getInt("DataVersion");
         if (itemVersion < currentVersion) {
-            if (false) {
-//                tagCompound = ca.spottedleaf.dataconverter.minecraft.MCDataConverter.convertTag(
-//                        ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry.ITEM_STACK,
-//                        tagCompound, itemVersion, currentVersion);
-            } else {
-                tagCompound = (net.minecraft.nbt.CompoundTag) DataFixers.getDataFixer().update(References.ITEM_STACK,
-                        new Dynamic<>(NbtOps.INSTANCE, tagCompound), itemVersion, currentVersion).getValue();
-            }
+            tagCompound = (net.minecraft.nbt.CompoundTag) DataFixers.getDataFixer().update(References.ITEM_STACK,
+                    new Dynamic<>(NbtOps.INSTANCE, tagCompound), itemVersion, currentVersion).getValue();
         }
 
         ItemStack itemStack = ItemStack.parse(MinecraftServer.getServer().registryAccess(), tagCompound).orElseThrow();

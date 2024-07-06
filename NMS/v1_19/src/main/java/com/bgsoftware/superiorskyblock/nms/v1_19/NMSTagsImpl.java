@@ -24,19 +24,9 @@ import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers;
 
 import java.util.Set;
-import java.util.function.Supplier;
 
 @SuppressWarnings({"unused"})
 public class NMSTagsImpl implements NMSTags {
-
-    private static final boolean HAS_PAPER_SUPPORT = ((Supplier<Boolean>) () -> {
-        try {
-            Class.forName("ca.spottedleaf.dataconverter.minecraft.MCDataConverter");
-            return true;
-        } catch (ClassNotFoundException error) {
-            return false;
-        }
-    }).get();
 
     @Override
     public CompoundTag serializeItem(org.bukkit.inventory.ItemStack bukkitItem) {
@@ -60,14 +50,8 @@ public class NMSTagsImpl implements NMSTags {
         int currentVersion = CraftMagicNumbers.INSTANCE.getDataVersion();
         int itemVersion = tagCompound.getInt("DataVersion");
         if (itemVersion < currentVersion) {
-            if (HAS_PAPER_SUPPORT) {
-                tagCompound = ca.spottedleaf.dataconverter.minecraft.MCDataConverter.convertTag(
-                        ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry.ITEM_STACK,
-                        tagCompound, itemVersion, currentVersion);
-            } else {
-                tagCompound = (net.minecraft.nbt.CompoundTag) DataFixers.getDataFixer().update(References.ITEM_STACK,
-                        new Dynamic<>(NbtOps.INSTANCE, tagCompound), itemVersion, currentVersion).getValue();
-            }
+            tagCompound = (net.minecraft.nbt.CompoundTag) DataFixers.getDataFixer().update(References.ITEM_STACK,
+                    new Dynamic<>(NbtOps.INSTANCE, tagCompound), itemVersion, currentVersion).getValue();
         }
 
         ItemStack itemStack = ItemStack.of(tagCompound);
