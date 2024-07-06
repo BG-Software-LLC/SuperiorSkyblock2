@@ -59,8 +59,8 @@ public class CropsBlockEntity extends BlockEntity {
         });
     }
 
-    public static CropsBlockEntity remove(ChunkPos chunkPos) {
-        return tickingChunks.remove(chunkPos.toLong());
+    public static CropsBlockEntity remove(long chunkPos) {
+        return tickingChunks.remove(chunkPos);
     }
 
     public static void forEachChunk(List<ChunkPosition> chunkPositions, Consumer<CropsBlockEntity> cropsBlockEntityConsumer) {

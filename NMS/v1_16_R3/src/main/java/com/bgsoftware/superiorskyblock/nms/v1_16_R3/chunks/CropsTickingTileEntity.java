@@ -64,8 +64,8 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
         tickingChunks.computeIfAbsent(chunkPair, i -> new CropsTickingTileEntity(island, chunk));
     }
 
-    public static CropsTickingTileEntity remove(ChunkCoordIntPair chunkCoords) {
-        return tickingChunks.remove(chunkCoords.pair());
+    public static CropsTickingTileEntity remove(long chunkCoords) {
+        return tickingChunks.remove(chunkCoords);
     }
 
     public static void forEachChunk(List<ChunkPosition> chunkPositions, Consumer<CropsTickingTileEntity> cropsTickingTileEntityConsumer) {

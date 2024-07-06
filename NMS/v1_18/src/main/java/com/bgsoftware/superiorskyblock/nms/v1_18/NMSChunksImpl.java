@@ -456,13 +456,13 @@ public class NMSChunksImpl implements NMSChunks {
         if (plugin.getSettings().getCropsInterval() <= 0)
             return;
 
-        LevelChunk levelChunk = ((CraftChunk) chunk).getHandle();
 
         if (stop) {
-            CropsBlockEntity cropsBlockEntity = CropsBlockEntity.remove(levelChunk.getPos());
+            CropsBlockEntity cropsBlockEntity = CropsBlockEntity.remove(ChunkPos.asLong(chunk.getX(), chunk.getZ()));
             if (cropsBlockEntity != null)
                 cropsBlockEntity.remove();
         } else {
+            LevelChunk levelChunk = ((CraftChunk) chunk).getHandle();
             CropsBlockEntity.create(island, levelChunk);
         }
     }

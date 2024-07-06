@@ -51,8 +51,8 @@ public class CropsTickingTileEntity extends TileEntity implements IUpdatePlayerL
         this.cachedCropGrowthMultiplier = island.getCropGrowthMultiplier() - 1;
     }
 
-    public static CropsTickingTileEntity remove(ChunkCoordIntPair chunkCoords) {
-        return tickingChunks.remove(ChunkCoordIntPair.a(chunkCoords.x, chunkCoords.z));
+    public static CropsTickingTileEntity remove(long chunkCoords) {
+        return tickingChunks.remove(chunkCoords);
     }
 
     public static void create(Island island, Chunk chunk) {

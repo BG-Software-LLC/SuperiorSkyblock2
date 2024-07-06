@@ -347,7 +347,8 @@ public class NMSChunksImpl implements NMSChunks {
             return;
 
         if (stop) {
-            CropsTickingTileEntity cropsTickingTileEntity = CropsTickingTileEntity.remove(((CraftChunk) chunk).getHandle().getPos());
+            CropsTickingTileEntity cropsTickingTileEntity = CropsTickingTileEntity.remove(
+                    ChunkCoordIntPair.pair(chunk.getX(), chunk.getZ()));
             World world = cropsTickingTileEntity == null ? null : cropsTickingTileEntity.getWorld();
             if (cropsTickingTileEntity != null && world != null)
                 world.tileEntityListTick.remove(cropsTickingTileEntity);
