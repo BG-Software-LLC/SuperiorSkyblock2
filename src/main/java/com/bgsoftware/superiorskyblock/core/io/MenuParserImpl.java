@@ -329,7 +329,7 @@ public class MenuParserImpl implements MenuParser {
                     enchantment = getMinecraftEnum(Enchantment.class, _enchantment, Enchantment::getByName);
                 } catch (IllegalArgumentException ex) {
                     Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
-                            ".enchants.", _enchantment, " into an enchantment, skipping...");
+                            ".enchants.", _enchantment.toUpperCase(Locale.ENGLISH), " into an enchantment, skipping...");
                     continue;
                 }
 
@@ -365,7 +365,7 @@ public class MenuParserImpl implements MenuParser {
                     potionEffectType = getMinecraftEnum(PotionEffectType.class, _effect, PotionEffectType::getByName);
                 } catch (IllegalArgumentException error) {
                     Log.warnFromFile(fileName, "Couldn't convert ", effectsSection.getCurrentPath(),
-                            ".", _effect, " into a potion effect, skipping...");
+                            ".", _effect.toUpperCase(Locale.ENGLISH), " into a potion effect, skipping...");
                     continue;
                 }
 
