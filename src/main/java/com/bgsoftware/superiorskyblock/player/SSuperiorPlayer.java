@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Counter;
@@ -28,6 +29,7 @@ import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
+import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -409,26 +411,38 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void teleport(Island island, World.Environment environment) {
-        this.teleport(island, environment, null);
+    public void teleport(Island island, Dimension dimension) {
+        this.teleport(island, dimension, null);
     }
 
     @Override
     public void teleport(Island island, @Nullable Consumer<Boolean> teleportResult) {
-        this.teleport(island, plugin.getSettings().getWorlds().getDefaultWorld(), teleportResult);
+        this.teleport(island, plugin.getSettings().getWorlds().getDefaultWorldDimension(), teleportResult);
     }
 
     @Override
-    public void teleport(Island island, World.Environment environment, @Nullable Consumer<Boolean> teleportResult) {
+    public void teleport(Island island, Dimension dimension, @Nullable Consumer<Boolean> teleportResult) {
         Player player = asPlayer();
         if (player != null) {
-            playerTeleportAlgorithm.teleport(player, island, environment).whenComplete((result, error) -> {
+            playerTeleportAlgorithm.teleport(player, island, dimension).whenComplete((result, error) -> {
                 if (teleportResult != null)
                     teleportResult.accept(error == null && result);
             });
         } else if (teleportResult != null) {
             teleportResult.accept(false);
         }
+    }
+
+    @Override
+    @Deprecated
+    public void teleport(Island island, World.Environment environment) {
+        teleport(island, Dimensions.fromEnvironment(environment));
+    }
+
+    @Override
+    @Deprecated
+    public void teleport(Island island, World.Environment environment, @Nullable Consumer<Boolean> teleportResult) {
+        teleport(island, Dimensions.fromEnvironment(environment), teleportResult);
     }
 
     @Override

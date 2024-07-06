@@ -25,10 +25,6 @@ import com.bgsoftware.superiorskyblock.core.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.factory.FactoriesManagerImpl;
-import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
-import com.bgsoftware.superiorskyblock.core.io.JarFiles;
-import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
-import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookupFactory;
 import com.bgsoftware.superiorskyblock.core.itemstack.GlowEnchantment;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
 import com.bgsoftware.superiorskyblock.core.key.KeysManagerImpl;
@@ -75,6 +71,8 @@ import com.bgsoftware.superiorskyblock.player.PlayersManagerImpl;
 import com.bgsoftware.superiorskyblock.player.container.DefaultPlayersContainer;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
 import com.bgsoftware.superiorskyblock.service.ServicesHandler;
+import com.bgsoftware.superiorskyblock.world.Dimensions;
+import com.bgsoftware.superiorskyblock.world.WorldGenerator;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
@@ -174,6 +172,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         SortingTypes.registerSortingTypes();
         IslandFlags.registerFlags();
         RespawnActions.registerActions();
+        Dimensions.registerDimensions();
 
         try {
             SortingComparators.initializeTopIslandMembersSorting();
@@ -384,7 +383,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
-        return getGenerator();
+        return WorldGenerator.getWorldGenerator(settingsHandler.getWorlds().getDefaultWorldDimension());
     }
 
     public Updater getUpdater() {
@@ -415,66 +414,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             return false;
         }
-    }
-
-    public ChunkGenerator getGenerator() {
-        if (worldGenerator == null) {
-            loadGeneratorFromFile();
-            if (worldGenerator == null) {
-                worldGenerator = nmsWorld.createGenerator(plugin);
-            }
-        }
-
-        return worldGenerator;
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void loadGeneratorFromFile() {
-        File generatorFolder = new File(plugin.getDataFolder(), "world-generator");
-
-        if (!generatorFolder.isDirectory()) {
-            generatorFolder.delete();
-        }
-
-        if (!generatorFolder.exists()) {
-            generatorFolder.mkdirs();
-            return;
-        }
-
-        File[] generatorsFilesList = generatorFolder.listFiles();
-        if (generatorsFilesList == null || generatorsFilesList.length == 0) {
-            return;
-        }
-
-        try (FilesLookup filesLookup = FilesLookupFactory.getInstance().lookupFolder(generatorFolder)) {
-            for (File file : generatorsFilesList) {
-                String fileName = file.getName();
-                if (!fileName.endsWith(".jar"))
-                    continue;
-
-                file = filesLookup.getFile(fileName);
-
-                FileClassLoader classLoader = new FileClassLoader(file, plugin.getPluginClassLoader());
-
-                //noinspection deprecation
-                Class<?> generatorClass = JarFiles.getClass(file.toURL(), ChunkGenerator.class, classLoader).getLeft();
-
-                if (generatorClass != null) {
-                    for (Constructor<?> constructor : generatorClass.getConstructors()) {
-                        if (constructor.getParameterCount() == 0) {
-                            worldGenerator = (ChunkGenerator) generatorClass.newInstance();
-                            return;
-                        } else if (constructor.getParameterTypes()[0].equals(JavaPlugin.class) || constructor.getParameterTypes()[0].equals(SuperiorSkyblock.class)) {
-                            worldGenerator = (ChunkGenerator) constructor.newInstance(this);
-                            return;
-                        }
-                    }
-                }
-            }
-        } catch (Exception error) {
-            Log.error(error, "An unexpected error occurred while loading the generator:");
-        }
-
     }
 
     private boolean checkScriptEngine() {

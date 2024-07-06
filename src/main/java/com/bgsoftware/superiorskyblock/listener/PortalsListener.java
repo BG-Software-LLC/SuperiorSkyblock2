@@ -96,11 +96,11 @@ public class PortalsListener implements Listener {
                 teleportedPlayer.setPlayerStatus(PlayerStatus.LEAVING_ISLAND);
 
             BukkitExecutor.sync(() -> {
-                Location teleportLocation = island.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorld());
-                EntityTeleports.teleportUntilSuccess(e.getEntity(), teleportLocation, 5, () -> {
-                    if (teleportedPlayer != null)
-                        teleportedPlayer.removePlayerStatus(PlayerStatus.LEAVING_ISLAND);
-                });
+                EntityTeleports.teleportUntilSuccess(e.getEntity(),
+                        island.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension()), 5, () -> {
+                            if (teleportedPlayer != null)
+                                teleportedPlayer.removePlayerStatus(PlayerStatus.LEAVING_ISLAND);
+                        });
             }, 5L);
         }
 

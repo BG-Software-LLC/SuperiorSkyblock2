@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_18.generator;
 
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import org.bukkit.Location;
@@ -18,17 +19,18 @@ import java.util.Random;
 
 public class IslandsGeneratorImpl extends IslandsGenerator {
 
-    private final SuperiorSkyblockPlugin plugin;
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    public IslandsGeneratorImpl(SuperiorSkyblockPlugin plugin) {
-        this.plugin = plugin;
+    private final Dimension dimension;
+
+    public IslandsGeneratorImpl(Dimension dimension) {
+        this.dimension = dimension;
     }
 
     @Override
     public void generateSurface(@NotNull WorldInfo worldInfo, @NotNull Random random, int chunkX, int chunkZ,
                                 @NotNull ChunkData chunkData) {
-        if (chunkX == 0 && chunkZ == 0 && worldInfo.getEnvironment() ==
-                plugin.getSettings().getWorlds().getDefaultWorld()) {
+        if (chunkX == 0 && chunkZ == 0 && this.dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
             chunkData.setBlock(0, 99, 0, Material.BEDROCK);
         }
     }
@@ -39,7 +41,7 @@ public class IslandsGeneratorImpl extends IslandsGenerator {
             @Override
             public @NotNull
             Biome getBiome(@NotNull WorldInfo worldInfo, int x, int y, int z) {
-                return IslandUtils.getDefaultWorldBiome(worldInfo.getEnvironment());
+                return IslandUtils.getDefaultWorldBiome(IslandsGeneratorImpl.this.dimension);
             }
 
             @Override

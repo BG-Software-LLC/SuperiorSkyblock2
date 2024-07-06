@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
@@ -174,16 +175,28 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void teleport(Island island, World.Environment environment) {
-        this.handle.teleport(island, environment);
-    }
-
-    @Override
     public void teleport(Island island, @Nullable Consumer<Boolean> teleportResult) {
         this.handle.teleport(island, teleportResult);
     }
 
     @Override
+    public void teleport(Island island, Dimension dimension) {
+        this.handle.teleport(island, dimension);
+    }
+
+    @Override
+    public void teleport(Island island, Dimension dimension, Consumer<Boolean> teleportResult) {
+        this.handle.teleport(island, dimension, teleportResult);
+    }
+
+    @Override
+    @Deprecated
+    public void teleport(Island island, World.Environment environment) {
+        this.handle.teleport(island, environment);
+    }
+
+    @Override
+    @Deprecated
     public void teleport(Island island, World.Environment environment, @Nullable Consumer<Boolean> teleportResult) {
         this.handle.teleport(island, environment, teleportResult);
     }

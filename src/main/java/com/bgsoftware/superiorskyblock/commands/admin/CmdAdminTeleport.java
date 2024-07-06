@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.portals.PortalsManagerService;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
@@ -74,40 +75,40 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
-        World.Environment environment;
+        Dimension dimension;
 
         if (args.length != 4) {
-            environment = plugin.getSettings().getWorlds().getDefaultWorld();
+            dimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
         } else {
-            environment = CommandArguments.getEnvironment(sender, args[3]);
-            if (environment == null)
+            dimension = CommandArguments.getDimension(sender, args[3]);
+            if (dimension == null)
                 return;
         }
 
-        if (plugin.getGrid().getIslandsWorld(island, environment) == null) {
+        if (plugin.getGrid().getIslandsWorld(island, dimension) == null) {
             Message.WORLD_NOT_ENABLED.send(sender);
             return;
         }
 
-        if (environment != plugin.getSettings().getWorlds().getDefaultWorld()) {
-            if (!island.wasSchematicGenerated(environment)) {
-                PortalType portalType = environment == World.Environment.NETHER ? PortalType.NETHER : PortalType.ENDER;
+        if (dimension != plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
+            if (!island.wasSchematicGenerated(dimension)) {
+                PortalType portalType = dimension.getEnvironment() == World.Environment.NETHER ? PortalType.NETHER : PortalType.ENDER;
                 portalsManager.get().handlePlayerPortalFromIsland(superiorPlayer, island, superiorPlayer.getLocation(),
                         portalType, false);
                 return;
             }
         }
 
-        superiorPlayer.teleport(island, environment, result -> {
+        superiorPlayer.teleport(island, dimension, result -> {
             if (!result) {
-                superiorPlayer.teleport(island.getIslandHome(environment));
+                superiorPlayer.teleport(island.getIslandHome(dimension));
             }
         });
     }
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getEnvironments(args[3]) : Collections.emptyList();
+        return args.length == 4 ? CommandTabCompletes.getDimensions(args[3]) : Collections.emptyList();
     }
 
 }

@@ -7,17 +7,19 @@ import com.bgsoftware.superiorskyblock.api.events.IslandChangeWorthBonusEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import org.bukkit.World;
+import com.bgsoftware.superiorskyblock.world.Dimensions;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class CmdAdminSyncBonus implements IAdminIslandCommand {
@@ -116,24 +118,13 @@ public class CmdAdminSyncBonus implements IAdminIslandCommand {
 
         String generatedSchematic = island.getSchematicName();
 
-        if (island.wasSchematicGenerated(World.Environment.NORMAL)) {
-            Schematic schematic = plugin.getSchematics().getSchematic(generatedSchematic);
-            if (schematic != null) {
-                value = value.add(_calculateValues(schematic.getBlockCounts(), calculateWorth));
-            }
-        }
-
-        if (island.wasSchematicGenerated(World.Environment.NETHER)) {
-            Schematic schematic = plugin.getSchematics().getSchematic(generatedSchematic + "_nether");
-            if (schematic != null) {
-                value = value.add(_calculateValues(schematic.getBlockCounts(), calculateWorth));
-            }
-        }
-
-        if (island.wasSchematicGenerated(World.Environment.THE_END)) {
-            Schematic schematic = plugin.getSchematics().getSchematic(generatedSchematic + "_the_end");
-            if (schematic != null) {
-                value = value.add(_calculateValues(schematic.getBlockCounts(), calculateWorth));
+        for (Dimension dimension : Dimension.values()) {
+            if (island.wasSchematicGenerated(dimension)) {
+                String suffix = dimension == Dimensions.NORMAL ? "" : "_" + dimension.getName().toLowerCase(Locale.ENGLISH);
+                Schematic schematic = plugin.getSchematics().getSchematic(generatedSchematic + suffix);
+                if (schematic != null) {
+                    value = value.add(_calculateValues(schematic.getBlockCounts(), calculateWorth));
+                }
             }
         }
 

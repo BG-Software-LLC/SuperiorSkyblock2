@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.listener;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
@@ -108,11 +109,12 @@ public class ChunksListener implements Listener {
     private void handleIslandChunkLoad(Island island, Chunk chunk, boolean isNewChunk) {
         ChunkPosition chunkPosition = ChunkPosition.of(chunk);
 
-        World world = chunk.getWorld();
-        World.Environment environment = world.getEnvironment();
 
-        if (isNewChunk && environment == plugin.getSettings().getWorlds().getDefaultWorld()) {
-            Biome defaultWorldBiome = IslandUtils.getDefaultWorldBiome(environment);
+        World world = chunk.getWorld();
+        Dimension dimension = plugin.getGrid().getIslandsWorldDimension(world);
+
+        if (isNewChunk && dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
+            Biome defaultWorldBiome = IslandUtils.getDefaultWorldBiome(dimension);
             // We want to update the biome for new island chunks.
             if (island.getBiome() != defaultWorldBiome) {
                 List<Player> playersToUpdate = new SequentialListBuilder<Player>()
@@ -134,13 +136,13 @@ public class ChunksListener implements Listener {
         if (!plugin.getNMSChunks().isChunkEmpty(chunk))
             island.markChunkDirty(world, chunk.getX(), chunk.getZ(), true);
 
-        Location islandCenter = island.getCenter(environment);
+        Location islandCenter = island.getCenter(dimension);
 
         boolean entityLimitsEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class);
         MutableBoolean recalculateEntities = new MutableBoolean(false);
 
         if (chunk.getX() == (islandCenter.getBlockX() >> 4) && chunk.getZ() == (islandCenter.getBlockZ() >> 4)) {
-            if (environment == plugin.getSettings().getWorlds().getDefaultWorld()) {
+            if (dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
                 Block chunkBlock = chunk.getBlock(0, 100, 0);
                 island.setBiome(world.getBiome(chunkBlock.getX(), chunkBlock.getZ()), false);
             }

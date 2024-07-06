@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
@@ -40,6 +41,7 @@ import com.bgsoftware.superiorskyblock.island.preview.IslandPreviews;
 import com.bgsoftware.superiorskyblock.island.preview.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.purge.IslandsPurger;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import com.google.common.base.Preconditions;
@@ -303,7 +305,7 @@ public class GridManagerImpl extends Manager implements GridManager {
             island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
 
             island.setBiome(biome);
-            island.setSchematicGenerate(plugin.getSettings().getWorlds().getDefaultWorld());
+            island.setSchematicGenerate(plugin.getSettings().getWorlds().getDefaultWorldDimension());
             island.setCurrentlyActive(true);
 
             if (offset) {
@@ -339,9 +341,12 @@ public class GridManagerImpl extends Manager implements GridManager {
                     if (result) {
                         if (affectedChunks != null)
                             BukkitExecutor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, affectedChunks), 10L);
-                        if (plugin.getSettings().getWorlds().getDefaultWorld() == World.Environment.THE_END) {
+
+                        Dimension defaultDimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
+
+                        if (defaultDimension.getEnvironment() == World.Environment.THE_END) {
                             plugin.getNMSDragonFight().awardTheEndAchievement(player);
-                            this.dragonBattleService.get().resetEnderDragonBattle(island);
+                            this.dragonBattleService.get().resetEnderDragonBattle(island, defaultDimension);
                         }
                     }
                 });
@@ -455,7 +460,10 @@ public class GridManagerImpl extends Manager implements GridManager {
         // Delete island from database
         IslandsDatabaseBridge.deleteIsland(island);
 
-        this.dragonBattleService.get().stopEnderDragonBattle(island);
+        for (Dimension dimension : Dimension.values()) {
+            if (dimension.getEnvironment() == World.Environment.THE_END)
+                this.dragonBattleService.get().stopEnderDragonBattle(island, dimension);
+        }
     }
 
     @Override
@@ -629,33 +637,58 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     @Override
-    public World getIslandsWorld(Island island, World.Environment environment) {
+    public World getIslandsWorld(Island island, Dimension dimension) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
         if (island.isSpawn()) {
-            return island.getIslandHome(environment).getWorld();
+            return island.getIslandHome(dimension).getWorld();
         }
 
-        return plugin.getProviders().getWorldsProvider().getIslandsWorld(island, environment);
+        return plugin.getProviders().getWorldsProvider().getIslandsWorld(island, dimension);
     }
 
     @Override
-    public WorldInfo getIslandsWorldInfo(Island island, World.Environment environment) {
+    public Dimension getIslandsWorldDimension(World world) {
+        Preconditions.checkNotNull(world, "world parameter cannot be null.");
+
+        if (!isIslandsWorld(world))
+            return null;
+
+        if (customWorlds.contains(world.getUID()))
+            return Dimension.getByName(world.getName().toUpperCase(Locale.ENGLISH));
+
+        return plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(world);
+    }
+
+    @Override
+    @Deprecated
+    public World getIslandsWorld(Island island, World.Environment environment) {
+        return getIslandsWorld(island, Dimensions.fromEnvironment(environment));
+    }
+
+    @Override
+    public WorldInfo getIslandsWorldInfo(Island island, Dimension dimension) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
         if (island.isSpawn()) {
-            return WorldInfo.of(island.getIslandHome(environment).getWorld());
+            return WorldInfo.of(island.getIslandHome(dimension).getWorld());
         }
 
         WorldsProvider worldsProvider = plugin.getProviders().getWorldsProvider();
 
         if (worldsProvider instanceof LazyWorldsProvider)
-            return ((LazyWorldsProvider) worldsProvider).getIslandsWorldInfo(island, environment);
+            return ((LazyWorldsProvider) worldsProvider).getIslandsWorldInfo(island, dimension);
 
-        World world = this.getIslandsWorld(island, environment);
+        World world = this.getIslandsWorld(island, dimension);
         return world == null ? null : WorldInfo.of(world);
+    }
+
+    @Override
+    @Deprecated
+    public WorldInfo getIslandsWorldInfo(Island island, World.Environment environment) {
+        return getIslandsWorldInfo(island, Dimensions.fromEnvironment(environment));
     }
 
     @Nullable
@@ -665,7 +698,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null.");
 
         if (island.isSpawn()) {
-            return WorldInfo.of(island.getIslandHome(World.Environment.NORMAL).getWorld());
+            return WorldInfo.of(island.getIslandHome(Dimensions.NORMAL).getWorld());
         }
 
         WorldsProvider worldsProvider = plugin.getProviders().getWorldsProvider();
@@ -686,6 +719,14 @@ public class GridManagerImpl extends Manager implements GridManager {
     @Override
     public void registerIslandWorld(World world) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
+
+        String dimensionName = world.getName().toUpperCase(Locale.ENGLISH);
+        try {
+            Dimension.register(dimensionName, world.getEnvironment());
+        } catch (Exception error) {
+            throw new IllegalArgumentException("Dimension with the name " + dimensionName + " already exists.");
+        }
+
         customWorlds.add(world.getUID());
     }
 

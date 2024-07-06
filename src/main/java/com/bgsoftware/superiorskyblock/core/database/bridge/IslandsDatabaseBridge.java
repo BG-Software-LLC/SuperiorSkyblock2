@@ -16,13 +16,15 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.LegacyMasks;
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
+import com.bgsoftware.superiorskyblock.world.Dimensions;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
@@ -90,38 +92,38 @@ public class IslandsDatabaseBridge {
         ));
     }
 
-    public static void saveIslandHome(Island island, World.Environment environment, Location location) {
+    public static void saveIslandHome(Island island, Dimension dimension, Location location) {
         if (location == null) {
             runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_homes",
-                    createFilter("island", island, new Pair<>("environment", environment.name()))
+                    createFilter("island", island, new Pair<>("environment", dimension.getName()))
             ));
         } else {
             runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("islands_homes",
                     new Pair<>("island", island.getUniqueId().toString()),
-                    new Pair<>("environment", environment.name()),
+                    new Pair<>("environment", dimension.getName()),
                     new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(location))
             ));
         }
     }
 
-    public static void saveVisitorLocation(Island island, World.Environment environment, Location location) {
+    public static void saveVisitorLocation(Island island, Dimension dimension, Location location) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("islands_visitor_homes",
                 new Pair<>("island", island.getUniqueId().toString()),
-                new Pair<>("environment", environment.name()),
+                new Pair<>("environment", dimension.getName()),
                 new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(location))
         ));
     }
 
-    public static void removeVisitorLocation(Island island, World.Environment environment) {
+    public static void removeVisitorLocation(Island island, Dimension dimension) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_visitor_homes",
-                createFilter("island", island, new Pair<>("environment", environment.name()))
+                createFilter("island", island, new Pair<>("environment", dimension.getName()))
         ));
     }
 
     public static void saveUnlockedWorlds(Island island) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands",
                 createFilter("uuid", island),
-                new Pair<>("unlocked_worlds", island.getUnlockedWorldsFlag())
+                new Pair<>("unlocked_worlds", LegacyMasks.convertUnlockedWorldsMask(island.getUnlockedWorlds()))
         ));
     }
 
@@ -436,33 +438,33 @@ public class IslandsDatabaseBridge {
         ));
     }
 
-    public static void saveGeneratorRate(Island island, World.Environment environment, Key blockKey, int rate) {
+    public static void saveGeneratorRate(Island island, Dimension dimension, Key blockKey, int rate) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("islands_generators",
                 new Pair<>("island", island.getUniqueId().toString()),
-                new Pair<>("environment", environment.name()),
+                new Pair<>("environment", dimension.getName()),
                 new Pair<>("block", blockKey.toString()),
                 new Pair<>("rate", rate)
         ));
     }
 
-    public static void removeGeneratorRate(Island island, World.Environment environment, Key blockKey) {
+    public static void removeGeneratorRate(Island island, Dimension dimension, Key blockKey) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_generators",
                 createFilter("island", island,
-                        new Pair<>("environment", environment.name()),
+                        new Pair<>("environment", dimension.getName()),
                         new Pair<>("block", blockKey.toString()))
         ));
     }
 
-    public static void clearGeneratorRates(Island island, World.Environment environment) {
+    public static void clearGeneratorRates(Island island, Dimension dimension) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_generators",
-                createFilter("island", island, new Pair<>("environment", environment.name()))
+                createFilter("island", island, new Pair<>("environment", dimension.getName()))
         ));
     }
 
     public static void saveGeneratedSchematics(Island island) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands",
                 createFilter("uuid", island),
-                new Pair<>("generated_schematics", island.getGeneratedSchematicsFlag())
+                new Pair<>("generated_schematics", LegacyMasks.convertGeneratedSchematicsMask(island.getGeneratedSchematics()))
         ));
     }
 
@@ -597,7 +599,7 @@ public class IslandsDatabaseBridge {
             databaseBridge.insertObject("islands",
                     new Pair<>("uuid", island.getUniqueId().toString()),
                     new Pair<>("owner", island.getOwner().getUniqueId().toString()),
-                    new Pair<>("center", Serializers.LOCATION_SERIALIZER.serialize(island.getCenter(World.Environment.NORMAL))),
+                    new Pair<>("center", Serializers.LOCATION_SERIALIZER.serialize(island.getCenter(Dimensions.NORMAL))),
                     new Pair<>("creation_time", island.getCreationTime()),
                     new Pair<>("island_type", island.getSchematicName()),
                     new Pair<>("discord", island.getDiscord()),
@@ -608,8 +610,8 @@ public class IslandsDatabaseBridge {
                     new Pair<>("ignored", island.isIgnored()),
                     new Pair<>("name", island.getName()),
                     new Pair<>("description", island.getDescription()),
-                    new Pair<>("generated_schematics", island.getGeneratedSchematicsFlag()),
-                    new Pair<>("unlocked_worlds", island.getUnlockedWorldsFlag()),
+                    new Pair<>("generated_schematics", LegacyMasks.convertGeneratedSchematicsMask(island.getGeneratedSchematics())),
+                    new Pair<>("unlocked_worlds", LegacyMasks.convertUnlockedWorldsMask(island.getUnlockedWorlds())),
                     new Pair<>("last_time_updated", System.currentTimeMillis() / 1000L),
                     new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunkPositions(dirtyChunks)),
                     new Pair<>("block_counts", IslandsSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger())),
@@ -659,13 +661,13 @@ public class IslandsDatabaseBridge {
                 databaseBridge.deleteObject("islands_entity_limits", islandFilter);
             if (!island.getAllSettings().isEmpty())
                 databaseBridge.deleteObject("islands_flags", islandFilter);
-            for (World.Environment environment : World.Environment.values()) {
-                if (!island.getCustomGeneratorAmounts(environment).isEmpty()) {
+            for (Dimension dimension : Dimension.values()) {
+                if (!island.getCustomGeneratorAmounts(dimension).isEmpty()) {
                     databaseBridge.deleteObject("islands_generators", islandFilter);
                     break;
                 }
             }
-            if (!island.getIslandHomes().isEmpty())
+            if (!island.getIslandHomesAsDimensions().isEmpty())
                 databaseBridge.deleteObject("islands_homes", islandFilter);
             if (!island.getIslandMembers(false).isEmpty())
                 databaseBridge.deleteObject("islands_members", islandFilter);
@@ -681,8 +683,8 @@ public class IslandsDatabaseBridge {
                 databaseBridge.deleteObject("islands_role_permissions", islandFilter);
             if (!island.getUpgrades().isEmpty())
                 databaseBridge.deleteObject("islands_upgrades", islandFilter);
-            for (World.Environment environment : World.Environment.values()) {
-                if (island.getVisitorsLocation(environment) != null) {
+            for (Dimension dimension : Dimension.values()) {
+                if (island.getVisitorsLocation(dimension) != null) {
                     databaseBridge.deleteObject("islands_visitor_homes", islandFilter);
                     break;
                 }

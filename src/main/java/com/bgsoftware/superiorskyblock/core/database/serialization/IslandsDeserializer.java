@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
@@ -486,9 +487,8 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<Integer> environment = generators.getEnum("environment", World.Environment.class)
-                    .map(Enum::ordinal);
-            if (!environment.isPresent()) {
+            Optional<Dimension> dimension = generators.getString("environment").map(Dimension::getByName);
+            if (!dimension.isPresent()) {
                 Log.warn("Cannot load generator rates with invalid environment for ", uuid.get(), ", skipping...");
                 return;
             }
@@ -506,7 +506,7 @@ public class IslandsDeserializer {
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-            builder.setGeneratorRate(block.get(), rate.get(), World.Environment.values()[environment.get()]);
+            builder.setGeneratorRate(block.get(), rate.get(), dimension.get());
         });
     }
 
@@ -520,9 +520,8 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<Integer> environment = islandHomes.getEnum("environment", World.Environment.class)
-                    .map(Enum::ordinal);
-            if (!environment.isPresent()) {
+            Optional<Dimension> dimension = islandHomes.getString("environment").map(Dimension::getByName);
+            if (!dimension.isPresent()) {
                 Log.warn("Cannot load island homes with invalid environment for ", uuid.get(), ", skipping...");
                 return;
             }
@@ -534,7 +533,7 @@ public class IslandsDeserializer {
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-            builder.setIslandHome(location.get(), World.Environment.values()[environment.get()]);
+            builder.setIslandHome(location.get(), dimension.get());
         });
     }
 
@@ -548,9 +547,8 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<Integer> environment = islandVisitorHomes.getEnum("environment", World.Environment.class)
-                    .map(Enum::ordinal);
-            if (!environment.isPresent()) {
+            Optional<Dimension> dimension = islandVisitorHomes.getString("environment").map(Dimension::getByName);
+            if (!dimension.isPresent()) {
                 Log.warn("Cannot load island homes with invalid environment for ", uuid.get(), ", skipping...");
                 return;
             }
@@ -562,7 +560,7 @@ public class IslandsDeserializer {
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-            builder.setVisitorHome(location.get(), World.Environment.values()[environment.get()]);
+            builder.setVisitorHome(location.get(), dimension.get());
         });
     }
 

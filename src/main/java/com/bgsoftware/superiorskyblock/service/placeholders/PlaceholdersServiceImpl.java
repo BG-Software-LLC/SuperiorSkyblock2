@@ -87,15 +87,15 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Map<String, IslandPlaceholderParser> ISLAND_PARSES =
             new ImmutableMap.Builder<String, IslandPlaceholderParser>()
                     .put("center", (island, superiorPlayer) ->
-                            Formatters.LOCATION_FORMATTER.format(island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld())))
+                            Formatters.LOCATION_FORMATTER.format(island.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension())))
                     .put("x", (island, superiorPlayer) ->
-                            island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlockX() + "")
+                            island.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension()).getBlockX() + "")
                     .put("y", (island, superiorPlayer) ->
-                            island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlockY() + "")
+                            island.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension()).getBlockY() + "")
                     .put("z", (island, superiorPlayer) ->
-                            island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlockZ() + "")
+                            island.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension()).getBlockZ() + "")
                     .put("world", (island, superiorPlayer) ->
-                            island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld().getName())
+                            island.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension()).getWorld().getName())
                     .put("team_size", (island, superiorPlayer) -> island.getIslandMembers(true).size() + "")
                     .put("team_size_online", (island, superiorPlayer) ->
                             island.getIslandMembers(true).stream().filter(SuperiorPlayer::isShownAsOnline).count() + "")
@@ -165,7 +165,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             Formatters.RATING_FORMATTER.format(island.getTotalRating(), superiorPlayer.getUserLocale()))
                     .put("warps_limit", (island, superiorPlayer) -> island.getWarpsLimit() + "")
                     .put("warps", (island, superiorPlayer) -> island.getIslandWarps().size() + "")
-                    .put("creation_time", (island, superiorPlayer) -> island.getCreationTimeDate() + "")
+                    .put("creation_time", (island, superiorPlayer) -> island.getCreationTimeDate())
                     .put("total_worth", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(plugin.getGrid().getTotalWorth()))
                     .put("total_worth_format", (island, superiorPlayer) ->

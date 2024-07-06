@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.hooks;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -15,14 +16,34 @@ public interface WorldsProvider {
     void prepareWorlds();
 
     /**
+     * Get the world of an island by the dimension.
+     * If the world is not loaded, this method should load the world before returning.
+     *
+     * @param dimension The world dimension.
+     * @param island    The island to check.
+     */
+    @Nullable
+    World getIslandsWorld(Island island, Dimension dimension);
+
+    /**
      * Get the world of an island by the environment.
      * If the world is not loaded, this method should load the world before returning.
      *
      * @param environment The world environment.
      * @param island      The island to check.
      */
+    @Deprecated
     @Nullable
     World getIslandsWorld(Island island, World.Environment environment);
+
+    /**
+     * Get the dimension of an islands world.
+     * If the island is not an islands world, null will be returned.
+     *
+     * @param world The world to check.
+     */
+    @Nullable
+    Dimension getIslandsWorldDimension(World world);
 
     /**
      * Checks if the given world is an islands world.
@@ -89,5 +110,17 @@ public interface WorldsProvider {
      * Check whether or not end worlds are unlocked for islands by default.
      */
     boolean isEndUnlocked();
+
+    /**
+     * Check whether a dimension is enabled on the server.
+     *
+     * @param dimension The dimension to check.
+     */
+    boolean isDimensionEnabled(Dimension dimension);
+
+    /**
+     * Check whether a dimension is unlocked for islands by default.
+     */
+    boolean isDimensionUnlocked(Dimension dimension);
 
 }

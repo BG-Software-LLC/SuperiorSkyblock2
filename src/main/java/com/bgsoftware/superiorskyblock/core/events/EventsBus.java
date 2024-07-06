@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
@@ -29,7 +30,6 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.PortalType;
-import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -135,13 +135,13 @@ public class EventsBus {
     }
 
     public EventResult<Integer> callIslandChangeGeneratorRateEvent(CommandSender commandSender, Island island, Key block,
-                                                                   World.Environment environment, int generatorRate) {
-        return callIslandChangeGeneratorRateEvent(getSuperiorPlayer(commandSender), island, block, environment, generatorRate);
+                                                                   Dimension dimension, int generatorRate) {
+        return callIslandChangeGeneratorRateEvent(getSuperiorPlayer(commandSender), island, block, dimension, generatorRate);
     }
 
     public EventResult<Integer> callIslandChangeGeneratorRateEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Key block,
-                                                                   World.Environment environment, int generatorRate) {
-        return callEvent(() -> new IslandChangeGeneratorRateEvent(superiorPlayer, island, block, environment, generatorRate),
+                                                                   Dimension dimension, int generatorRate) {
+        return callEvent(() -> new IslandChangeGeneratorRateEvent(superiorPlayer, island, block, dimension, generatorRate),
                 "islandchangegeneratorrateevent", generatorRate, IslandChangeGeneratorRateEvent::getGeneratorRate);
     }
 
@@ -239,8 +239,8 @@ public class EventsBus {
         }
     }
 
-    public boolean callIslandClearGeneratorRatesEvent(CommandSender commandSender, Island island, World.Environment environment) {
-        return callEvent(() -> new IslandClearGeneratorRatesEvent(getSuperiorPlayer(commandSender), island, environment),
+    public boolean callIslandClearGeneratorRatesEvent(CommandSender commandSender, Island island, Dimension dimension) {
+        return callEvent(() -> new IslandClearGeneratorRatesEvent(getSuperiorPlayer(commandSender), island, dimension),
                 "islandcleargeneratorratesevent");
     }
 
@@ -337,7 +337,7 @@ public class EventsBus {
     }
 
     public EventResult<PortalEventResult> callIslandEnterPortalEvent(SuperiorPlayer superiorPlayer, Island island,
-                                                                     PortalType portalType, World.Environment destination,
+                                                                     PortalType portalType, Dimension destination,
                                                                      @Nullable Schematic schematic, boolean ignoreInvalidSchematic) {
         return callEvent(() -> new IslandEnterPortalEvent(island, superiorPlayer, portalType, destination, schematic, ignoreInvalidSchematic),
                 "islandenterportalevent", new PortalEventResult(destination, schematic, ignoreInvalidSchematic), PortalEventResult::new);
@@ -384,8 +384,8 @@ public class EventsBus {
                 "islandleaveprotectedevent");
     }
 
-    public boolean callIslandLockWorldEvent(Island island, World.Environment environment) {
-        return callEvent(() -> new IslandLockWorldEvent(island, environment), "islandlockworldevent");
+    public boolean callIslandLockWorldEvent(Island island, Dimension dimension) {
+        return callEvent(() -> new IslandLockWorldEvent(island, dimension), "islandlockworldevent");
     }
 
     public boolean callIslandOpenEvent(Island island, CommandSender commandSender) {
@@ -423,13 +423,13 @@ public class EventsBus {
     }
 
     public boolean callIslandRemoveGeneratorRateEvent(CommandSender commandSender, Island island, Key block,
-                                                      World.Environment environment) {
-        return callIslandRemoveGeneratorRateEvent(getSuperiorPlayer(commandSender), island, block, environment);
+                                                      Dimension dimension) {
+        return callIslandRemoveGeneratorRateEvent(getSuperiorPlayer(commandSender), island, block, dimension);
     }
 
     public boolean callIslandRemoveGeneratorRateEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Key block,
-                                                      World.Environment environment) {
-        return callEvent(() -> new IslandRemoveGeneratorRateEvent(superiorPlayer, island, block, environment),
+                                                      Dimension dimension) {
+        return callEvent(() -> new IslandRemoveGeneratorRateEvent(superiorPlayer, island, block, dimension),
                 "islandremovegeneratorrateevent");
     }
 
@@ -509,8 +509,8 @@ public class EventsBus {
         return callEvent(() -> new IslandUncoopPlayerEvent(island, player, target, uncoopReason), "islanduncoopplayerevent");
     }
 
-    public boolean callIslandUnlockWorldEvent(Island island, World.Environment environment) {
-        return callEvent(() -> new IslandUnlockWorldEvent(island, environment), "islandunlockworldevent");
+    public boolean callIslandUnlockWorldEvent(Island island, Dimension dimension) {
+        return callEvent(() -> new IslandUnlockWorldEvent(island, dimension), "islandunlockworldevent");
     }
 
     public EventResult<UpgradeResult> callIslandUpgradeEvent(CommandSender commandSender, Island island,
@@ -534,8 +534,8 @@ public class EventsBus {
                 "islandupgradeevent", new UpgradeResult(commands, upgradeCost), UpgradeResult::new);
     }
 
-    public boolean callIslandWorldResetEvent(CommandSender sender, Island island, World.Environment environment) {
-        return callEvent(() -> new IslandWorldResetEvent(getSuperiorPlayer(sender), island, environment),
+    public boolean callIslandWorldResetEvent(CommandSender sender, Island island, Dimension dimension) {
+        return callEvent(() -> new IslandWorldResetEvent(getSuperiorPlayer(sender), island, dimension),
                 "islandworldresetevent");
     }
 
@@ -801,22 +801,22 @@ public class EventsBus {
 
     public static class PortalEventResult {
 
-        private final World.Environment destination;
+        private final Dimension destination;
         @Nullable
         private final Schematic schematic;
         private final boolean isIgnoreInvalidSchematic;
 
         public PortalEventResult(IslandEnterPortalEvent event) {
-            this(event.getDestination(), event.getSchematic(), event.isIgnoreInvalidSchematic());
+            this(event.getDestinationDimension(), event.getSchematic(), event.isIgnoreInvalidSchematic());
         }
 
-        public PortalEventResult(World.Environment destination, @Nullable Schematic schematic, boolean isIgnoreInvalidSchematic) {
+        public PortalEventResult(Dimension destination, @Nullable Schematic schematic, boolean isIgnoreInvalidSchematic) {
             this.destination = destination;
             this.schematic = schematic;
             this.isIgnoreInvalidSchematic = isIgnoreInvalidSchematic;
         }
 
-        public World.Environment getDestination() {
+        public Dimension getDestination() {
             return destination;
         }
 

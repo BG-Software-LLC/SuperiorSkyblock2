@@ -2,7 +2,9 @@ package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.common.nmsloader.NMSLoadException;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -26,8 +28,8 @@ public class NMSDragonFightChooser implements NMSDragonFight {
     }
 
     @Override
-    public EnderDragon getEnderDragon(Island island) {
-        return getDelegate().getEnderDragon(island);
+    public EnderDragon getEnderDragon(Island island, Dimension dimension) {
+        return getDelegate().getEnderDragon(island, dimension);
     }
 
     @Override
@@ -36,8 +38,8 @@ public class NMSDragonFightChooser implements NMSDragonFight {
     }
 
     @Override
-    public void removeDragonBattle(Island island) {
-        getDelegate().removeDragonBattle(island);
+    public void removeDragonBattle(Island island, Dimension dimension) {
+        getDelegate().removeDragonBattle(island, dimension);
     }
 
     @Override
@@ -50,13 +52,24 @@ public class NMSDragonFightChooser implements NMSDragonFight {
             if (plugin.getSettings() == null)
                 throw new RuntimeException("Called NMSDragonFightChooser#getDelegate before settings initialized");
 
-            try {
-                this.delegate = plugin.getSettings().getWorlds().getEnd().isDragonFight() ?
-                        this.enabledInstanceSupplier.get() : new NMSDragonFightImpl();
-            } catch (NMSLoadException error) {
-                Log.error(error, "Failed to load NMSDragonFight, disabling it...");
-                this.delegate = new NMSDragonFightImpl();
+            for (Dimension dimension : Dimension.values()) {
+                if (dimension.getEnvironment() == World.Environment.THE_END) {
+                    SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(dimension);
+                    if (dimensionConfig instanceof SettingsManager.Worlds.End &&
+                            ((SettingsManager.Worlds.End) dimensionConfig).isDragonFight()) {
+                        try {
+                            this.delegate = this.enabledInstanceSupplier.get();
+                        } catch (NMSLoadException error) {
+                            Log.error(error, "Failed to load NMSDragonFight, disabling it...");
+                            this.delegate = new NMSDragonFightImpl();
+                        }
+
+                        return this.delegate;
+                    }
+                }
             }
+
+            this.delegate = new NMSDragonFightImpl();
         }
 
 

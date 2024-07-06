@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
@@ -13,7 +14,6 @@ import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -88,37 +88,37 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
             return;
         }
 
-        World.Environment environment = args.length == 5 ? plugin.getSettings().getWorlds().getDefaultWorld() :
-                CommandArguments.getEnvironment(sender, args[5]);
+        Dimension dimension = args.length == 5 ? plugin.getSettings().getWorlds().getDefaultWorldDimension() :
+                CommandArguments.getDimension(sender, args[5]);
 
-        if (environment == null)
+        if (dimension == null)
             return;
 
         boolean anyIslandChanged = false;
 
         for (Island island : islands) {
             if (percentage) {
-                int ratePercentage = Math.max(0, Math.min(100, island.getGeneratorPercentage(material, environment) + amount));
-                if (!island.setGeneratorPercentage(material, ratePercentage, environment,
+                int ratePercentage = Math.max(0, Math.min(100, island.getGeneratorPercentage(material, dimension) + amount));
+                if (!island.setGeneratorPercentage(material, ratePercentage, dimension,
                         sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null, true)) {
                     continue;
                 }
             } else {
-                int generatorRate = island.getGeneratorAmount(material, environment) + amount;
+                int generatorRate = island.getGeneratorAmount(material, dimension) + amount;
 
                 if (generatorRate <= 0) {
-                    if (!plugin.getEventsBus().callIslandRemoveGeneratorRateEvent(sender, island, material, environment))
+                    if (!plugin.getEventsBus().callIslandRemoveGeneratorRateEvent(sender, island, material, dimension))
                         continue;
 
-                    island.removeGeneratorAmount(material, environment);
+                    island.removeGeneratorAmount(material, dimension);
                 } else {
                     EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeGeneratorRateEvent(sender,
-                            island, material, environment, island.getGeneratorAmount(material, environment) + amount);
+                            island, material, dimension, island.getGeneratorAmount(material, dimension) + amount);
 
                     if (eventResult.isCancelled())
                         continue;
 
-                    island.setGeneratorAmount(material, eventResult.getResult(), environment);
+                    island.setGeneratorAmount(material, eventResult.getResult(), dimension);
                 }
             }
             anyIslandChanged = true;
@@ -138,7 +138,7 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
         return args.length == 4 ? CommandTabCompletes.getMaterialsForGenerators(args[3]) :
-                args.length == 6 ? CommandTabCompletes.getEnvironments(args[5]) : Collections.emptyList();
+                args.length == 6 ? CommandTabCompletes.getDimensions(args[5]) : Collections.emptyList();
     }
 
 }

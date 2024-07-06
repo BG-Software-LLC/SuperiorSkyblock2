@@ -28,6 +28,7 @@ import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -53,6 +54,7 @@ import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
+import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.google.common.base.Preconditions;
 import org.bukkit.Chunk;
@@ -67,6 +69,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -118,14 +121,14 @@ public class SpawnIsland implements Island {
 
         this.center = new SBlockPosition(worldName, smartCenter.getBlockX(), smartCenter.getBlockY(), smartCenter.getBlockZ());
         this.islandArea = new IslandArea(this.center, this.islandSize);
-        this.spawnWorldInfo = new WorldInfoImpl(this.spawnWorld.getName(), this.spawnWorld.getEnvironment());
+        this.spawnWorldInfo = new WorldInfoImpl(this.spawnWorld.getName(), Dimensions.fromEnvironment(this.spawnWorld.getEnvironment()));
 
         this.homeYaw = smartCenter.getYaw();
         this.homePitch = smartCenter.getPitch();
 
         this.dirtyChunksContainer = new DirtyChunksContainer(this);
 
-        BukkitExecutor.sync(() -> biome = getCenter(null /* unused */).getBlock().getBiome());
+        BukkitExecutor.sync(() -> biome = getCenter((Dimension) null /* unused */).getBlock().getBiome());
     }
 
     @Override
@@ -292,8 +295,14 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public Location getCenter(World.Environment unused) {
+    public Location getCenter(Dimension unused) {
         return center.parse(this.spawnWorld).add(0.5, 0, 0.5);
+    }
+
+    @Override
+    @Deprecated
+    public Location getCenter(World.Environment environment) {
+        return getCenter((Dimension) null /* unused */);
     }
 
     @Override
@@ -302,36 +311,56 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public Location getTeleportLocation(World.Environment environment) {
-        return this.getIslandHome(environment);
+    @Deprecated
+    public Location getTeleportLocation(World.Environment unused) {
+        return this.getIslandHome((Dimension) null /*unused*/);
     }
 
     @Override
+    @Deprecated
     public Map<World.Environment, Location> getTeleportLocations() {
-        return this.getIslandHomes();
+        return Collections.emptyMap();
     }
 
     @Override
+    @Deprecated
     public void setTeleportLocation(Location teleportLocation) {
-        this.setIslandHome(teleportLocation);
+        // Do nothing.
     }
 
     @Override
+    @Deprecated
     public void setTeleportLocation(World.Environment environment, @Nullable Location teleportLocation) {
-        this.setIslandHome(environment, teleportLocation);
+        // Do nothing.
     }
 
     @Override
-    public Location getIslandHome(World.Environment unused) {
-        Location center = getCenter(null /*unused*/);
+    public Location getIslandHome(Dimension unused) {
+        Location center = getCenter((Dimension) null /*unused*/);
         center.setYaw(this.homeYaw);
         center.setPitch(this.homePitch);
         return center;
     }
 
     @Override
+    @Deprecated
+    public Location getIslandHome(World.Environment environment) {
+        return getIslandHome((Dimension) null /*unused*/);
+    }
+
+    @Override
+    public Map<Dimension, Location> getIslandHomesAsDimensions() {
+        return Collections.singletonMap(
+                plugin.getSettings().getWorlds().getDefaultWorldDimension(),
+                getIslandHome((Dimension) null /*unused*/));
+    }
+
+    @Override
+    @Deprecated
     public Map<World.Environment, Location> getIslandHomes() {
-        return Collections.singletonMap(plugin.getSettings().getWorlds().getDefaultWorld(), getIslandHome(null /*unused*/));
+        return Collections.singletonMap(
+                plugin.getSettings().getWorlds().getDefaultWorldDimension().getEnvironment(),
+                getIslandHome((Dimension) null /*unused*/));
     }
 
     @Override
@@ -340,19 +369,31 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void setIslandHome(Dimension dimension, Location homeLocation) {
+        // Do nothing.
+    }
+
+    @Override
+    @Deprecated
     public void setIslandHome(World.Environment environment, @Nullable Location homeLocation) {
         // Do nothing.
     }
 
     @Override
     public Location getVisitorsLocation() {
-        return getVisitorsLocation(null /* unused */);
+        return getVisitorsLocation((Dimension) null /* unused */);
+    }
+
+    @Override
+    public Location getVisitorsLocation(Dimension dimension) {
+        return this.getIslandHome((Dimension) null /*unused*/);
     }
 
     @Nullable
     @Override
+    @Deprecated
     public Location getVisitorsLocation(World.Environment unused) {
-        return this.getIslandHome(null /* unused */);
+        return this.getIslandHome((Dimension) null /*unused*/);
     }
 
     @Override
@@ -407,17 +448,17 @@ public class SpawnIsland implements Island {
 
     @Override
     public List<Chunk> getAllChunks(@IslandChunkFlags int flags) {
-        return getAllChunks(plugin.getSettings().getWorlds().getDefaultWorld(), flags);
+        return getAllChunks(plugin.getSettings().getWorlds().getDefaultWorldDimension(), flags);
     }
 
     @Override
     @Deprecated
-    public List<Chunk> getAllChunks(World.Environment environment) {
-        return getAllChunks(environment, 0);
+    public List<Chunk> getAllChunks(Dimension unused) {
+        return getAllChunks((Dimension) null /*unused*/, 0);
     }
 
     @Override
-    public List<Chunk> getAllChunks(World.Environment environment, @IslandChunkFlags int flags) {
+    public List<Chunk> getAllChunks(Dimension unused, @IslandChunkFlags int flags) {
         boolean onlyProtected = (flags & IslandChunkFlags.ONLY_PROTECTED) != 0;
         boolean noEmptyChunks = (flags & IslandChunkFlags.NO_EMPTY_CHUNKS) != 0;
 
@@ -441,6 +482,18 @@ public class SpawnIsland implements Island {
 
     @Override
     @Deprecated
+    public List<Chunk> getAllChunks(World.Environment environment) {
+        return getAllChunks((Dimension) null /*unused*/, 0);
+    }
+
+    @Override
+    @Deprecated
+    public List<Chunk> getAllChunks(World.Environment environment, @IslandChunkFlags int flags) {
+        return getAllChunks((Dimension) null /*unused*/, flags);
+    }
+
+    @Override
+    @Deprecated
     public List<Chunk> getAllChunks(boolean onlyProtected) {
         return getAllChunks(onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0);
     }
@@ -448,7 +501,7 @@ public class SpawnIsland implements Island {
     @Override
     @Deprecated
     public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
-        return getAllChunks(environment, onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0);
+        return getAllChunks(Dimensions.fromEnvironment(environment), onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0);
     }
 
     @Override
@@ -457,7 +510,7 @@ public class SpawnIsland implements Island {
         int flags = 0;
         if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
         if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
-        return getAllChunks(environment, flags);
+        return getAllChunks(Dimensions.fromEnvironment(environment), flags);
     }
 
     @Override
@@ -467,16 +520,16 @@ public class SpawnIsland implements Island {
 
     @Override
     public List<Chunk> getLoadedChunks(@IslandChunkFlags int flags) {
-        return getLoadedChunks(plugin.getSettings().getWorlds().getDefaultWorld(), flags);
+        return getLoadedChunks(plugin.getSettings().getWorlds().getDefaultWorldDimension(), flags);
     }
 
     @Override
-    public List<Chunk> getLoadedChunks(World.Environment environment) {
-        return getLoadedChunks(environment, 0);
+    public List<Chunk> getLoadedChunks(Dimension unused) {
+        return getLoadedChunks((Dimension) null /*unused*/, 0);
     }
 
     @Override
-    public List<Chunk> getLoadedChunks(World.Environment environment, @IslandChunkFlags int flags) {
+    public List<Chunk> getLoadedChunks(Dimension unused, @IslandChunkFlags int flags) {
         boolean onlyProtected = (flags & IslandChunkFlags.ONLY_PROTECTED) != 0;
         boolean noEmptyChunks = (flags & IslandChunkFlags.NO_EMPTY_CHUNKS) != 0;
 
@@ -498,6 +551,17 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public List<Chunk> getLoadedChunks(World.Environment unused) {
+        return getLoadedChunks((Dimension) null /*unused*/, 0);
+    }
+
+    @Override
+    public List<Chunk> getLoadedChunks(World.Environment unused, @IslandChunkFlags int flags) {
+        return getLoadedChunks((Dimension) null /*unused*/, flags);
+    }
+
+    @Override
+    @Deprecated
     public List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks) {
         int flags = 0;
         if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
@@ -506,50 +570,75 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
+    @Deprecated
+    public List<Chunk> getLoadedChunks(World.Environment unused, boolean onlyProtected, boolean noEmptyChunks) {
         int flags = 0;
         if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
         if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
-        return getLoadedChunks(environment, flags);
+        return getLoadedChunks((Dimension) null /*unused*/, flags);
     }
 
     @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment) {
-        return getAllChunksAsync(environment, 0);
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension unused) {
+        return getAllChunksAsync((Dimension) null /*unused*/, 0);
     }
 
     @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, @IslandChunkFlags int flags) {
-        return getAllChunksAsync(environment, flags, null);
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension unused, @IslandChunkFlags int flags) {
+        return getAllChunksAsync((Dimension) null /*unused*/, flags, null);
     }
 
     @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment,
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension unused,
                                                             @Nullable Consumer<Chunk> onChunkLoad) {
-        return getAllChunksAsync(environment, 0, onChunkLoad);
+        return getAllChunksAsync((Dimension) null /*unused*/, 0, onChunkLoad);
     }
 
     @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment,
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension unused,
                                                             @IslandChunkFlags int flags,
                                                             @Nullable Consumer<Chunk> onChunkLoad) {
         return IslandUtils.getAllChunksAsync(this, center.getWorld(), flags, ChunkLoadReason.API_REQUEST, onChunkLoad);
     }
 
     @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected,
-                                                            @Nullable Consumer<Chunk> onChunkLoad) {
-        return getAllChunksAsync(environment, onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0, onChunkLoad);
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment unused) {
+        return getAllChunksAsync((Dimension) null /*unused*/);
     }
 
     @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment,
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment unused, @IslandChunkFlags int flags) {
+        return getAllChunksAsync((Dimension) null /*unused*/, flags);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment unused,
+                                                            @Nullable Consumer<Chunk> onChunkLoad) {
+        return getAllChunksAsync((Dimension) null /*unused*/, onChunkLoad);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment unused, @IslandChunkFlags int flags,
+                                                            @Nullable Consumer<Chunk> onChunkLoad) {
+        return getAllChunksAsync((Dimension) null /*unused*/, flags, onChunkLoad);
+    }
+
+    @Override
+    @Deprecated
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment unused, boolean onlyProtected,
+                                                            @Nullable Consumer<Chunk> onChunkLoad) {
+        return getAllChunksAsync((Dimension) null /*unused*/, onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0, onChunkLoad);
+    }
+
+    @Override
+    @Deprecated
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment unused,
                                                             boolean onlyProtected, boolean noEmptyChunks,
                                                             @Nullable Consumer<Chunk> onChunkLoad) {
         int flags = 0;
         if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
         if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
-        return getAllChunksAsync(environment, flags, onChunkLoad);
+        return getAllChunksAsync((Dimension) null /*unused*/, flags, onChunkLoad);
     }
 
     @Override
@@ -563,12 +652,12 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public void resetChunks(World.Environment environment) {
+    public void resetChunks(Dimension dimension) {
         // Do nothing.
     }
 
     @Override
-    public void resetChunks(World.Environment environment, @Nullable Runnable onFinish) {
+    public void resetChunks(Dimension dimension, @Nullable Runnable onFinish) {
         // Do nothing.
     }
 
@@ -579,6 +668,26 @@ public class SpawnIsland implements Island {
 
     @Override
     public void resetChunks(@IslandChunkFlags int flags, @Nullable Runnable onFinish) {
+        // Do nothing.
+    }
+
+    @Override
+    public void resetChunks(Dimension dimension, @IslandChunkFlags int flags) {
+        // Do nothing.
+    }
+
+    @Override
+    public void resetChunks(Dimension dimension, @IslandChunkFlags int flags, @Nullable Runnable onFinish) {
+        // Do nothing.
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment) {
+        // Do nothing.
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment, @Nullable Runnable onFinish) {
         // Do nothing.
     }
 
@@ -686,6 +795,22 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public boolean isDimensionEnabled(Dimension dimension) {
+        return false;
+    }
+
+    @Override
+    public void setDimensionEnabled(Dimension dimension, boolean enabled) {
+        // Do nothing.
+    }
+
+    @Override
+    public Collection<Dimension> getUnlockedWorlds() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    @Deprecated
     public int getUnlockedWorldsFlag() {
         return 0;
     }
@@ -1711,57 +1836,124 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void setGeneratorPercentage(Key key, int percentage, Dimension dimension) {
+        // Do nothing.
+    }
+
+    @Override
+    public boolean setGeneratorPercentage(Key key, int percentage, Dimension dimension,
+                                          @Nullable SuperiorPlayer caller, boolean callEvent) {
+        return true;
+    }
+
+    @Override
+    @Deprecated
     public void setGeneratorPercentage(Key key, int percentage, World.Environment environment) {
         // Do nothing.
     }
 
     @Override
+    @Deprecated
     public boolean setGeneratorPercentage(Key key, int percentage, World.Environment environment,
                                           @Nullable SuperiorPlayer caller, boolean callEvent) {
         return true;
     }
 
     @Override
+    public int getGeneratorPercentage(Key key, Dimension dimension) {
+        return 0;
+    }
+
+    @Override
+    @Deprecated
     public int getGeneratorPercentage(Key key, World.Environment environment) {
         return 0;
     }
 
     @Override
+    public Map<String, Integer> getGeneratorPercentages(Dimension dimension) {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    @Deprecated
     public Map<String, Integer> getGeneratorPercentages(World.Environment environment) {
         return Collections.emptyMap();
     }
 
     @Override
-    public void setGeneratorAmount(Key key, @Size int amount, World.Environment environment) {
+    public void setGeneratorAmount(Key key, @Size int amount, Dimension dimension) {
         // Do nothing.
     }
 
     @Override
+    @Deprecated
+    public void setGeneratorAmount(Key key, int amount, World.Environment environment) {
+        // Do nothing.
+    }
+
+    @Override
+    public void removeGeneratorAmount(Key key, Dimension dimension) {
+        // Do nothing.
+    }
+
+    @Override
+    @Deprecated
     public void removeGeneratorAmount(Key key, World.Environment environment) {
         // Do nothing.
     }
 
     @Override
+    public int getGeneratorAmount(Key key, Dimension dimension) {
+        return 0;
+    }
+
+    @Override
+    @Deprecated
     public int getGeneratorAmount(Key key, World.Environment environment) {
         return 0;
     }
 
     @Override
+    public int getGeneratorTotalAmount(Dimension dimension) {
+        return 0;
+    }
+
+    @Override
+    @Deprecated
     public int getGeneratorTotalAmount(World.Environment environment) {
         return 0;
     }
 
     @Override
+    public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    @Deprecated
     public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
         return Collections.emptyMap();
     }
 
     @Override
+    public Map<Key, Integer> getCustomGeneratorAmounts(Dimension dimension) {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    @Deprecated
     public Map<Key, Integer> getCustomGeneratorAmounts(World.Environment environment) {
         return Collections.emptyMap();
     }
 
     @Override
+    public void clearGeneratorAmounts(Dimension dimension) {
+        // Do nothing.
+    }
+
+    @Override
+    @Deprecated
     public void clearGeneratorAmounts(World.Environment environment) {
         // Do nothing.
     }
@@ -1772,28 +1964,58 @@ public class SpawnIsland implements Island {
         return null;
     }
 
+    @Override
+    public Key generateBlock(Location location, Dimension dimension, boolean optimizeCobblestone) {
+        return null;
+    }
+
     @Nullable
     @Override
+    @Deprecated
     public Key generateBlock(Location location, World.Environment environment, boolean optimizeCobblestone) {
         return null;
     }
 
     @Override
+    public boolean wasSchematicGenerated(Dimension dimension) {
+        return false;
+    }
+
+    @Override
+    @Deprecated
     public boolean wasSchematicGenerated(World.Environment environment) {
         return true;
     }
 
     @Override
+    public void setSchematicGenerate(Dimension dimension) {
+        // Do nothing.
+    }
+
+    @Override
+    public void setSchematicGenerate(Dimension dimension, boolean generated) {
+        // Do nothing.
+    }
+
+    @Override
+    @Deprecated
     public void setSchematicGenerate(World.Environment environment) {
         // Do nothing.
     }
 
     @Override
+    @Deprecated
     public void setSchematicGenerate(World.Environment environment, boolean generated) {
         // Do nothing.
     }
 
     @Override
+    public Collection<Dimension> getGeneratedSchematics() {
+        return Collections.emptySet();
+    }
+
+    @Override
+    @Deprecated
     public int getGeneratedSchematicsFlag() {
         return 0;
     }

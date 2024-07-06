@@ -14,10 +14,14 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.DirtyChunk;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.core.LegacyMasks;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
@@ -26,6 +30,7 @@ import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
+import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -37,6 +42,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -66,13 +72,13 @@ public class IslandBuilderImpl implements Island.Builder {
     public boolean isLocked = false;
     public boolean isIgnored = false;
     public String description = "";
-    public int generatedSchematicsMask = 0;
-    public int unlockedWorldsMask = 0;
+    public EnumerateSet<Dimension> generatedSchematics = new EnumerateSet<>(Dimension.values());
+    public EnumerateSet<Dimension> unlockedWorlds = new EnumerateSet<>(Dimension.values());
     public long lastTimeUpdated = System.currentTimeMillis() / 1000;
     public final Set<DirtyChunk> dirtyChunks = new LinkedHashSet<>();
     public final KeyMap<BigInteger> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
     public final KeyMap<BigInteger> entityCounts = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
-    public final EnumMap<World.Environment, Location> islandHomes = new EnumMap<>(World.Environment.class);
+    public final EnumerateMap<Dimension, Location> islandHomes = new EnumerateMap<>(Dimension.values());
     public final List<SuperiorPlayer> members = new LinkedList<>();
     public final List<SuperiorPlayer> bannedPlayers = new LinkedList<>();
     public final Map<SuperiorPlayer, PlayerPrivilegeNode> playerPermissions = new LinkedHashMap<>();
@@ -82,13 +88,13 @@ public class IslandBuilderImpl implements Island.Builder {
     public final Map<UUID, Rating> ratings = new LinkedHashMap<>();
     public final Map<MissionReference, Counter> completedMissions = new LinkedHashMap<>();
     public final Map<IslandFlag, Byte> islandFlags = new LinkedHashMap<>();
-    public final EnumMap<World.Environment, KeyMap<IntValue>> cobbleGeneratorValues = new EnumMap<>(World.Environment.class);
+    public final EnumerateMap<Dimension, KeyMap<IntValue>> cobbleGeneratorValues = new EnumerateMap<>(Dimension.values());
     public final List<SIsland.UniqueVisitor> uniqueVisitors = new LinkedList<>();
     public final KeyMap<IntValue> entityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
     public final Map<PotionEffectType, IntValue> islandEffects = new LinkedHashMap<>();
     public final List<ItemStack[]> islandChests = new ArrayList<>(plugin.getSettings().getIslandChests().getDefaultPages());
     public final Map<PlayerRole, IntValue> roleLimits = new LinkedHashMap<>();
-    public final EnumMap<World.Environment, Location> visitorHomes = new EnumMap<>(World.Environment.class);
+    public final EnumerateMap<Dimension, Location> visitorHomes = new EnumerateMap<>(Dimension.values());
     public IntValue islandSize = IntValue.syncedFixed(-1);
     public IntValue warpsLimit = IntValue.syncedFixed(-1);
     public IntValue teamLimit = IntValue.syncedFixed(-1);
@@ -265,25 +271,51 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public Island.Builder setGeneratedSchematic(Dimension dimension) {
+        this.generatedSchematics.add(dimension);
+        return this;
+    }
+
+    @Override
+    @Deprecated
     public Island.Builder setGeneratedSchematics(int generatedSchematicsMask) {
-        this.generatedSchematicsMask = generatedSchematicsMask;
+        this.generatedSchematics.addAll(LegacyMasks.convertGeneratedSchematicsMask(generatedSchematicsMask));
         return this;
     }
 
     @Override
+    public Set<Dimension> getGeneratedSchematics() {
+        return Collections.unmodifiableSet(this.generatedSchematics.collect(Dimension.values()));
+    }
+
+    @Override
+    @Deprecated
     public int getGeneratedSchematicsMask() {
-        return this.generatedSchematicsMask;
+        return LegacyMasks.convertGeneratedSchematicsMask(this.generatedSchematics);
     }
 
     @Override
-    public Island.Builder setUnlockedWorlds(int unlockedWorldsMask) {
-        this.unlockedWorldsMask = unlockedWorldsMask;
+    public Island.Builder setUnlockedWorld(Dimension dimension) {
+        this.unlockedWorlds.add(dimension);
         return this;
     }
 
     @Override
+    @Deprecated
+    public Island.Builder setUnlockedWorlds(int unlockedWorldsMask) {
+        this.unlockedWorlds.addAll(LegacyMasks.convertUnlockedWorldsMask(unlockedWorldsMask));
+        return this;
+    }
+
+    @Override
+    public Set<Dimension> getUnlockedWorlds() {
+        return Collections.unmodifiableSet(this.unlockedWorlds.collect(Dimension.values()));
+    }
+
+    @Override
+    @Deprecated
     public int getUnlockedWorldsMask() {
-        return this.unlockedWorldsMask;
+        return LegacyMasks.convertUnlockedWorldsMask(this.unlockedWorlds);
     }
 
     @Override
@@ -336,16 +368,40 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
-    public Island.Builder setIslandHome(Location location, World.Environment environment) {
+    public Island.Builder setIslandHome(Location location, Dimension dimension) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
-        this.islandHomes.put(environment, location);
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+        this.islandHomes.put(dimension, location);
         return this;
     }
 
     @Override
+    @Deprecated
+    public Island.Builder setIslandHome(Location location, World.Environment environment) {
+        return setIslandHome(location, Dimensions.fromEnvironment(environment));
+    }
+
+    @Override
+    public Map<Dimension, Location> getIslandHomesAsDimensions() {
+        return Collections.unmodifiableMap(this.islandHomes.collect(Dimension.values()));
+    }
+
+    @Override
+    @Deprecated
     public Map<World.Environment, Location> getIslandHomes() {
-        return Collections.unmodifiableMap(this.islandHomes);
+        EnumMap<World.Environment, Location> islandHomes = new EnumMap<>(World.Environment.class);
+
+        for (Dimension dimension : Dimension.values()) {
+            Location islandHome = this.islandHomes.get(dimension);
+            if (islandHome != null) {
+                Object oldValue = islandHomes.put(dimension.getEnvironment(), islandHome);
+                if (oldValue != null)
+                    throw new IllegalStateException("Called getIslandHomes but there are multiple environments. " +
+                            "Use getIslandHomesAsDimensions instead.");
+            }
+        }
+
+        return Collections.unmodifiableMap(islandHomes);
     }
 
     @Override
@@ -477,20 +533,53 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
-    public Island.Builder setGeneratorRate(Key block, int rate, World.Environment environment) {
+    public Island.Builder setGeneratorRate(Key block, int rate, Dimension dimension) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
-        this.cobbleGeneratorValues.computeIfAbsent(environment, e -> KeyMaps.createArrayMap(KeyIndicator.MATERIAL))
+        Preconditions.checkNotNull(dimension, "dimension dimension cannot be null.");
+        this.cobbleGeneratorValues.computeIfAbsent(dimension, e -> KeyMaps.createArrayMap(KeyIndicator.MATERIAL))
                 .put(block, rate < 0 ? IntValue.syncedFixed(rate) : IntValue.fixed(rate));
         return this;
     }
 
     @Override
-    public Map<World.Environment, KeyMap<Integer>> getGeneratorRates() {
-        Map<World.Environment, KeyMap<Integer>> result = new EnumMap<>(World.Environment.class);
+    @Deprecated
+    public Island.Builder setGeneratorRate(Key block, int rate, World.Environment environment) {
+        return setGeneratorRate(block, rate, Dimensions.fromEnvironment(environment));
+    }
 
-        this.cobbleGeneratorValues.forEach(((environment, generatorRates) ->
-                result.put(environment, KeyMap.createKeyMap(IntValue.unboxMap(generatorRates)))));
+    @Override
+    public Map<Dimension, KeyMap<Integer>> getGeneratorRatesAsDimensions() {
+        Map<Dimension, KeyMap<Integer>> result = new IdentityHashMap<>();
+
+        for (Dimension dimension : Dimension.values()) {
+            KeyMap<IntValue> generatorRates = this.cobbleGeneratorValues.get(dimension);
+            if (generatorRates != null) {
+                if (generatorRates.isEmpty()) {
+                    result.put(dimension, KeyMaps.createEmptyMap());
+                } else {
+                    result.put(dimension, KeyMap.createKeyMap(IntValue.unboxMap(generatorRates)));
+                }
+            }
+        }
+
+        return Collections.unmodifiableMap(result);
+    }
+
+    @Override
+    @Deprecated
+    public Map<World.Environment, KeyMap<Integer>> getGeneratorRates() {
+        EnumMap<World.Environment, KeyMap<Integer>> result = new EnumMap<>(World.Environment.class);
+
+        for (Dimension dimension : Dimension.values()) {
+            KeyMap<IntValue> dimensionGeneratorValues = this.cobbleGeneratorValues.get(dimension);
+            if (dimensionGeneratorValues != null) {
+                KeyMap<Integer> oldValue = result.put(dimension.getEnvironment(),
+                        KeyMap.createKeyMap(IntValue.unboxMap(dimensionGeneratorValues)));
+                if (oldValue != null)
+                    throw new IllegalStateException("Called getGeneratorRates but there are multiple environments. " +
+                            "Use getGeneratorRatesAsDimensions instead.");
+            }
+        }
 
         return Collections.unmodifiableMap(result);
     }
@@ -569,15 +658,39 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
-    public Island.Builder setVisitorHome(Location location, World.Environment environment) {
+    public Island.Builder setVisitorHome(Location location, Dimension dimension) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
-        this.visitorHomes.put(environment, location);
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+        this.visitorHomes.put(dimension, location);
         return this;
     }
 
     @Override
+    @Deprecated
+    public Island.Builder setVisitorHome(Location location, World.Environment environment) {
+        return setVisitorHome(location, Dimensions.fromEnvironment(environment));
+    }
+
+    @Override
+    public Map<Dimension, Location> getVisitorHomesAsDimensions() {
+        return Collections.unmodifiableMap(this.visitorHomes.collect(Dimension.values()));
+    }
+
+    @Override
+    @Deprecated
     public Map<World.Environment, Location> getVisitorHomes() {
+        EnumMap<World.Environment, Location> visitorHomes = new EnumMap<>(World.Environment.class);
+
+        for (Dimension dimension : Dimension.values()) {
+            Location visitorHome = this.visitorHomes.get(dimension);
+            if (visitorHome != null) {
+                Object oldValue = visitorHomes.put(dimension.getEnvironment(), visitorHome);
+                if (oldValue != null)
+                    throw new IllegalStateException("Called getVisitorHomes but there are multiple environments. " +
+                            "Use getVisitorHomesAsDimensions instead.");
+            }
+        }
+
         return Collections.unmodifiableMap(visitorHomes);
     }
 

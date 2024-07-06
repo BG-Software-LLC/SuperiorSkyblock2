@@ -5,6 +5,7 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -21,6 +22,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_18.world.PropertiesMapper;
 import com.bgsoftware.superiorskyblock.nms.v1_18.world.WorldEditSessionImpl;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.destroystokyo.paper.antixray.ChunkPacketBlockController;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -148,8 +150,11 @@ public class NMSWorldImpl implements NMSWorld {
             worldBorder = new WorldBorder();
             worldBorder.world = serverLevel;
 
-            org.bukkit.World.Environment environment = world.getEnvironment();
-            Location center = island.getCenter(environment);
+            Dimension dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(world);
+            if (dimension == null)
+                return;
+
+            Location center = island.getCenter(dimension);
 
             worldBorder.setWarningBlocks(0);
             worldBorder.setSize((islandSize * 2) + 1);
@@ -375,8 +380,8 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public ChunkGenerator createGenerator(SuperiorSkyblockPlugin plugin) {
-        return new IslandsGeneratorImpl(plugin);
+    public IslandsGenerator createGenerator(Dimension dimension) {
+        return new IslandsGeneratorImpl(dimension);
     }
 
     @Override

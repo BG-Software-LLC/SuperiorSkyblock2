@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.island.signs;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
@@ -145,7 +146,7 @@ public class IslandSigns {
         for (int i = 1; i <= 3; i++)
             warpLines[i] = Formatters.COLOR_FORMATTER.format(warpLines[i]);
 
-        Location islandVisitorsLocation = island.getVisitorsLocation(null /* unused */);
+        Location islandVisitorsLocation = island.getVisitorsLocation((Dimension) null /* unused */);
         Block oldWelcomeSignBlock = islandVisitorsLocation == null ? null : islandVisitorsLocation.getBlock();
 
         if (oldWelcomeSignBlock != null && Materials.isSign(oldWelcomeSignBlock.getType())) {

@@ -7,9 +7,11 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -18,6 +20,7 @@ import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
 import com.bgsoftware.superiorskyblock.core.value.IntValue;
 import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -27,7 +30,6 @@ import org.bukkit.potion.PotionEffectType;
 import javax.script.ScriptException;
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -59,7 +61,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final IntValue borderSize;
     private final KeyMap<Integer> blockLimits;
     private final KeyMap<Integer> entityLimits;
-    private final Map<World.Environment, Map<Key, Integer>> generatorRates;
+    private final EnumerateMap<Dimension, Map<Key, Integer>> generatorRates;
     private final Map<PotionEffectType, Integer> islandEffects;
     private final Value<BigDecimal> bankLimit;
     private final Int2IntMapView roleLimits;
@@ -70,7 +72,7 @@ public class SUpgradeLevel implements UpgradeLevel {
                          DoubleValue cropGrowth, DoubleValue spawnerRates, DoubleValue mobDrops,
                          IntValue teamLimit, IntValue warpsLimit, IntValue coopLimit,
                          IntValue borderSize, KeyMap<Integer> blockLimits,
-                         KeyMap<Integer> entityLimits, Map<World.Environment, Map<Key, Integer>> generatorRates,
+                         KeyMap<Integer> entityLimits, EnumerateMap<Dimension, Map<Key, Integer>> generatorRates,
                          Map<PotionEffectType, Integer> islandEffects, Value<BigDecimal> bankLimit,
                          Int2IntMapView roleLimits) {
         this.level = level;
@@ -209,20 +211,32 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     @Override
-    public int getGeneratorAmount(Key key, World.Environment environment) {
+    public int getGeneratorAmount(Key key, Dimension dimension) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
-        Map<Key, Integer> generatorRates = this.generatorRates.get(environment);
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+        Map<Key, Integer> generatorRates = this.generatorRates.get(dimension);
         return (generatorRates == null ? 0 : generatorRates.getOrDefault(key, 0));
     }
 
     @Override
-    public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
-        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
-        Map<Key, Integer> generatorRates = this.generatorRates.get(environment);
+    @Deprecated
+    public int getGeneratorAmount(Key key, World.Environment environment) {
+        return getGeneratorAmount(key, Dimensions.fromEnvironment(environment));
+    }
+
+    @Override
+    public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+        Map<Key, Integer> generatorRates = this.generatorRates.get(dimension);
         return generatorRates == null ? Collections.emptyMap() : generatorRates.entrySet().stream().collect(Collectors.toMap(
                 entry -> entry.getKey().toString(),
                 Map.Entry::getValue));
+    }
+
+    @Override
+    @Deprecated
+    public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
+        return getGeneratorAmounts(Dimensions.fromEnvironment(environment));
     }
 
     @Override
@@ -307,17 +321,20 @@ public class SUpgradeLevel implements UpgradeLevel {
         return borderSize;
     }
 
-    public Map<World.Environment, Map<Key, IntValue>> getGeneratorUpgradeValue() {
-        EnumMap<World.Environment, Map<Key, IntValue>> generatorRates = new EnumMap<>(World.Environment.class);
+    public EnumerateMap<Dimension, Map<Key, IntValue>> getGeneratorUpgradeValue() {
+        EnumerateMap<Dimension, Map<Key, IntValue>> generatorRates = new EnumerateMap<>(Dimension.values());
 
-        this.generatorRates.forEach(((environment, worldGeneratorRates) -> {
-            Map<Key, IntValue> result = worldGeneratorRates.entrySet().stream().collect(Collectors.toMap(
-                    Map.Entry::getKey,
-                    entry -> IntValue.syncedFixed(entry.getValue())));
-            generatorRates.put(environment, result);
-        }));
+        for (Dimension dimension : Dimension.values()) {
+            Map<Key, Integer> worldGeneratorRates = this.generatorRates.get(dimension);
+            if (worldGeneratorRates != null) {
+                Map<Key, IntValue> result = worldGeneratorRates.entrySet().stream().collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> IntValue.syncedFixed(entry.getValue())));
+                generatorRates.put(dimension, result);
+            }
+        }
 
-        return Collections.unmodifiableMap(generatorRates);
+        return generatorRates;
     }
 
     public Map<PotionEffectType, IntValue> getPotionEffectsUpgradeValue() {

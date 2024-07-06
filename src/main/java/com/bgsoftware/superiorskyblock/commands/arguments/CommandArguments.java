@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -352,18 +353,18 @@ public class CommandArguments {
         return islandFlag;
     }
 
-    public static World.Environment getEnvironment(CommandSender sender, String argument) {
-        World.Environment environment = null;
+    public static Dimension getDimension(CommandSender sender, String argument) {
+        Dimension dimension = null;
 
         try {
-            environment = World.Environment.valueOf(argument.toUpperCase(Locale.ENGLISH));
+            dimension = Dimension.getByName(argument.toUpperCase(Locale.ENGLISH));
         } catch (Exception ignored) {
         }
 
-        if (environment == null)
+        if (dimension == null)
             Message.INVALID_ENVIRONMENT.send(sender, argument);
 
-        return environment;
+        return dimension;
     }
 
     public static NumberArgument<Integer> getInterval(CommandSender sender, String argument) {

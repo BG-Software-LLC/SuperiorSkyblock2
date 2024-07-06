@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.events;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.PortalType;
 import org.bukkit.World;
@@ -15,7 +16,7 @@ public class IslandEnterPortalEvent extends IslandEvent implements Cancellable {
 
     private final SuperiorPlayer superiorPlayer;
     private final PortalType portalType;
-    private World.Environment destination;
+    private Dimension destination;
     @Nullable
     private Schematic schematic;
     private boolean ignoreInvalidSchematic;
@@ -32,8 +33,26 @@ public class IslandEnterPortalEvent extends IslandEvent implements Cancellable {
      * @param schematic              The schematic to be placed, if exists.
      * @param ignoreInvalidSchematic Whether to ignore invalid schematics.
      */
+    @Deprecated
     public IslandEnterPortalEvent(Island island, SuperiorPlayer superiorPlayer, PortalType portalType,
                                   World.Environment destination, @Nullable Schematic schematic,
+                                  boolean ignoreInvalidSchematic) {
+        this(island, superiorPlayer, portalType, Dimension.getByName(destination.name()),
+                schematic, ignoreInvalidSchematic);
+    }
+
+    /**
+     * Constructor of the event
+     *
+     * @param island                 The island that the player entered the portal at.
+     * @param superiorPlayer         The player that entered the portal.
+     * @param portalType             The type of the portal used.
+     * @param destination            The destination of the portal.
+     * @param schematic              The schematic to be placed, if exists.
+     * @param ignoreInvalidSchematic Whether to ignore invalid schematics.
+     */
+    public IslandEnterPortalEvent(Island island, SuperiorPlayer superiorPlayer, PortalType portalType,
+                                  Dimension destination, @Nullable Schematic schematic,
                                   boolean ignoreInvalidSchematic) {
         super(island);
         this.superiorPlayer = superiorPlayer;
@@ -60,7 +79,15 @@ public class IslandEnterPortalEvent extends IslandEvent implements Cancellable {
     /**
      * Get the destination world of the portal.
      */
+    @Deprecated
     public World.Environment getDestination() {
+        return this.destination.getEnvironment();
+    }
+
+    /**
+     * Get the destination world of the portal.
+     */
+    public Dimension getDestinationDimension() {
         return destination;
     }
 
@@ -69,7 +96,17 @@ public class IslandEnterPortalEvent extends IslandEvent implements Cancellable {
      *
      * @param destination The destination to set.
      */
+    @Deprecated
     public void setDestination(World.Environment destination) {
+        this.setDestination(Dimension.getByName(destination.name()));
+    }
+
+    /**
+     * Set the destination of the teleportation.
+     *
+     * @param destination The destination to set.
+     */
+    public void setDestination(Dimension destination) {
         this.destination = destination;
     }
 

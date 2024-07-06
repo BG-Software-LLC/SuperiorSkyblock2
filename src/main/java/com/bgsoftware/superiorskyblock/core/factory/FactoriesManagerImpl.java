@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
@@ -42,6 +43,7 @@ import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.algorithm.DefaultPlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
+import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -173,10 +175,16 @@ public class FactoriesManagerImpl implements FactoriesManager {
     }
 
     @Override
-    public WorldInfo createWorldInfo(String worldName, World.Environment environment) {
+    public WorldInfo createWorldInfo(String worldName, Dimension dimension) {
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null");
-        Preconditions.checkNotNull(environment, "environment parameter cannot be null");
-        return new WorldInfoImpl(worldName, environment);
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null");
+        return new WorldInfoImpl(worldName, dimension);
+    }
+
+    @Override
+    @Deprecated
+    public WorldInfo createWorldInfo(String worldName, World.Environment environment) {
+        return createWorldInfo(worldName, Dimensions.fromEnvironment(environment));
     }
 
     @Override

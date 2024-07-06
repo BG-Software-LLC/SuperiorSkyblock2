@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
@@ -162,33 +163,46 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Location location) {
-        teleport(location, null);
+        // Do nothing.
     }
 
     @Override
-    public void teleport(Location location, @Nullable Consumer<Boolean> teleportResult) {
+    public void teleport(Location unused, @Nullable Consumer<Boolean> teleportResult) {
         if (teleportResult != null)
             teleportResult.accept(false);
     }
 
     @Override
     public void teleport(Island island) {
-        this.teleport(island, (Consumer<Boolean>) null);
+        // Do nothing.
     }
 
     @Override
-    public void teleport(Island island, World.Environment environment) {
-        this.teleport(island, environment, null);
+    public void teleport(Island island, Dimension dimension) {
+        // Do nothing.
     }
 
     @Override
-    public void teleport(Island island, @Nullable Consumer<Boolean> teleportResult) {
+    public void teleport(Island unused, Dimension unused2, @Nullable Consumer<Boolean> teleportResult) {
         if (teleportResult != null)
             teleportResult.accept(false);
     }
 
     @Override
-    public void teleport(Island island, World.Environment environment, @Nullable Consumer<Boolean> teleportResult) {
+    public void teleport(Island unused, @Nullable Consumer<Boolean> teleportResult) {
+        if (teleportResult != null)
+            teleportResult.accept(false);
+    }
+
+    @Override
+    @Deprecated
+    public void teleport(Island island, World.Environment environment) {
+        // Do nothing.
+    }
+
+    @Override
+    @Deprecated
+    public void teleport(Island unused, World.Environment unused2, @Nullable Consumer<Boolean> teleportResult) {
         if (teleportResult != null)
             teleportResult.accept(false);
     }

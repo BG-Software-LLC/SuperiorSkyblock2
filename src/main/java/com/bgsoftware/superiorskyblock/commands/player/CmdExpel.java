@@ -100,7 +100,7 @@ public class CmdExpel implements IPermissibleCommand {
 
         targetPlayer.teleport(plugin.getGrid().getSpawnIsland());
         target.getLocation().setDirection(plugin.getGrid().getSpawnIsland()
-                .getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getDirection());
+                .getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension()).getDirection());
         Message.EXPELLED_PLAYER.send(sender, targetPlayer.getName());
         Message.GOT_EXPELLED.send(targetPlayer, sender.getName());
     }
