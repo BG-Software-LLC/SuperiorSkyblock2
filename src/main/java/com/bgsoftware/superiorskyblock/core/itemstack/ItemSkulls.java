@@ -64,7 +64,9 @@ public class ItemSkulls {
     public static ItemStack getPlayerHeadNoNMS(ItemStack itemStack, String texture) {
         CompoundTag compoundTag = Serializers.ITEM_STACK_TO_TAG_SERIALIZER.serialize(itemStack);
 
-        CompoundTag skullOwner = compoundTag.getCompound("SkullOwner", new CompoundTag());
+        CompoundTag tagCompound = compoundTag.getCompound("tag", new CompoundTag());
+
+        CompoundTag skullOwner = tagCompound.getCompound("SkullOwner", new CompoundTag());
 
         UUID ownerUUID = new UUID(texture.hashCode(), texture.hashCode());
 
@@ -85,7 +87,9 @@ public class ItemSkulls {
 
         skullOwner.setTag("Properties", properties);
 
-        compoundTag.setTag("SkullOwner", skullOwner);
+        tagCompound.setTag("SkullOwner", skullOwner);
+
+        compoundTag.setTag("nbt", tagCompound);
 
         return Serializers.ITEM_STACK_TO_TAG_SERIALIZER.deserialize(compoundTag);
     }
