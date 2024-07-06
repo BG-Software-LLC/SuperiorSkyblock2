@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
+import java.lang.ref.WeakReference;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -19,7 +20,7 @@ public class ChunkPosition {
 
     private long pairedXZ = -1;
     @Nullable
-    private World cachedBukkitWorld;
+    private WeakReference<World> cachedBukkitWorld = new WeakReference<>(null);
 
     private ChunkPosition(WorldInfo worldInfo, int x, int z) {
         this.worldInfo = worldInfo;
@@ -51,7 +52,13 @@ public class ChunkPosition {
     }
 
     public World getWorld() {
-        return this.cachedBukkitWorld == null ? (this.cachedBukkitWorld = Bukkit.getWorld(getWorldName())) : this.cachedBukkitWorld;
+        World cachedBukkitWorld = this.cachedBukkitWorld.get();
+        if (cachedBukkitWorld == null) {
+            cachedBukkitWorld = Bukkit.getWorld(getWorldName());
+            this.cachedBukkitWorld = new WeakReference<>(cachedBukkitWorld);
+        }
+
+        return cachedBukkitWorld;
     }
 
     public WorldInfo getWorldsInfo() {
@@ -109,7 +116,7 @@ public class ChunkPosition {
     }
 
     private ChunkPosition withBukkitWorld(World world) {
-        this.cachedBukkitWorld = world;
+        this.cachedBukkitWorld = new WeakReference<>(world);
         return this;
     }
 

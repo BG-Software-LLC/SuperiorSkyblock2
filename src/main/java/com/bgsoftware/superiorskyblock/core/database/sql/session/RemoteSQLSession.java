@@ -94,6 +94,13 @@ public abstract class RemoteSQLSession implements SQLSession {
     }
 
     @Override
+    public void addColumn(String tableName, String columnName, String type, QueryResult<Void> queryResult) {
+        String prefix = plugin.getSettings().getDatabase().getPrefix();
+        executeUpdate(String.format("ALTER TABLE %s%s ADD COLUMN %s %s;",
+                prefix, tableName, columnName, type), queryResult);
+    }
+
+    @Override
     public void removePrimaryKey(String tableName, String columnName, QueryResult<Void> queryResult) {
         String prefix = plugin.getSettings().getDatabase().getPrefix();
         executeUpdate(String.format("ALTER TABLE %s%s DROP PRIMARY KEY;", prefix, tableName), queryResult);

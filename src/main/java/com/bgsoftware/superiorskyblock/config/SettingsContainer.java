@@ -14,6 +14,9 @@ import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.DateFormatter;
@@ -82,7 +85,7 @@ public class SettingsContainer {
     public final double defaultSpawnerRates;
     public final double defaultMobDrops;
     public final BigDecimal defaultBankLimit;
-    public final Map<Integer, Integer> defaultRoleLimits;
+    public final Int2IntMapView defaultRoleLimits;
     public final int islandsHeight;
     public final boolean worldBordersEnabled;
     public final boolean stackedBlocksEnabled;
@@ -226,13 +229,13 @@ public class SettingsContainer {
         islandCommand = config.getString("island-command", "island,is,islands");
         maxIslandSize = config.getInt("max-island-size", 200);
         defaultIslandSize = config.getInt("default-values.island-size", 20);
-        defaultBlockLimits = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        defaultBlockLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         loadListOrSection(config, "default-values.block-limits", "block limit", (key, limit) -> {
             Key blockKey = Keys.ofMaterialAndData(key);
             defaultBlockLimits.put(blockKey, limit);
             plugin.getBlockValues().addCustomBlockKey(blockKey);
         });
-        defaultEntityLimits = KeyMaps.createIdentityHashMap(KeyIndicator.ENTITY_TYPE);
+        defaultEntityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
         loadListOrSection(config, "default-values.entity-limits", "entity limit", (entityType, limit) ->
                 defaultEntityLimits.put(Keys.ofEntityType(entityType), limit));
         defaultTeamLimit = config.getInt("default-values.team-limit", 4);
@@ -242,7 +245,7 @@ public class SettingsContainer {
         defaultSpawnerRates = config.getDouble("default-values.spawner-rates", 1D);
         defaultMobDrops = config.getDouble("default-values.mob-drops", 1D);
         defaultBankLimit = new BigDecimal(config.getString("default-values.bank-limit", "-1"));
-        defaultRoleLimits = new HashMap<>();
+        defaultRoleLimits = CollectionsFactory.createInt2IntHashMap();
         loadListOrSection(config, "default-values.role-limits", "role limit", (role, limit) -> {
             try {
                 defaultRoleLimits.put(Integer.parseInt(role), limit);
@@ -256,7 +259,7 @@ public class SettingsContainer {
         stackedBlocksDisabledWorlds = config.getStringList("stacked-blocks.disabled-worlds");
         whitelistedStackedBlocks = KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("stacked-blocks.whitelisted"));
         stackedBlocksName = Formatters.COLOR_FORMATTER.format(config.getString("stacked-blocks.custom-name"));
-        stackedBlocksLimits = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        stackedBlocksLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         loadListOrSection(config, "stacked-blocks.limits", "stacked-block limit", (key, limit) -> {
             Key blockKey = Keys.ofMaterialAndData(key);
             stackedBlocksLimits.put(blockKey, limit);
@@ -418,7 +421,7 @@ public class SettingsContainer {
                             itemStack.setAmount(containerSection.getInt(slot + ".amount", 1));
 
                             // Parsing it into compound tag
-                            CompoundTag itemCompound = plugin.getNMSTags().convertToNBT(itemStack);
+                            CompoundTag itemCompound = plugin.getNMSTags().serializeItem(itemStack);
                             itemCompound.setByte("Slot", Byte.parseByte(slot));
 
                             items.addTag(itemCompound);
@@ -522,7 +525,20 @@ public class SettingsContainer {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        return cfg.getStringList("interactables");
+        List<String> interactablesList = cfg.getStringList("interactables");
+
+        // Warn about interactables that the default file contains but the current
+        // file does not.
+        YamlConfiguration defaultInteractablesConfig = CommentedConfiguration.loadConfiguration(plugin.getResource("interactables.yml"));
+        List<String> defaultInteractables = defaultInteractablesConfig.getStringList("interactables");
+        if (defaultInteractables != null) {
+            for (String interactableBlock : defaultInteractables) {
+                if (!interactablesList.contains(interactableBlock))
+                    Log.warn("Potentially missing interactable block ", interactableBlock);
+            }
+        }
+
+        return interactablesList;
     }
 
     private KeySet loadSafeBlocks(SuperiorSkyblockPlugin plugin) {
@@ -555,7 +571,7 @@ public class SettingsContainer {
     }
 
     private void loadGenerator(YamlConfiguration config, String path, int index) {
-        defaultGenerator[index] = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        defaultGenerator[index] = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         loadListOrSection(config, path, "generator-rates", (key, percentage) -> {
             Key blockKey = Keys.ofMaterialAndData(key);
             defaultGenerator[index].put(blockKey, percentage);

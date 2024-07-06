@@ -40,7 +40,6 @@ public class IslandClearGeneratorRatesEvent extends IslandEvent implements Cance
      * @param island         The island that the generator-rates were cleared for.
      * @param dimension      The dimension of the world that the rates were cleared for.
      */
-    @Deprecated
     public IslandClearGeneratorRatesEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Dimension dimension) {
         super(island);
         this.superiorPlayer = superiorPlayer;

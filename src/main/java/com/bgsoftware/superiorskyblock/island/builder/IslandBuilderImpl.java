@@ -24,8 +24,10 @@ import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
+import com.bgsoftware.superiorskyblock.core.value.IntValue;
+import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.island.container.value.Value;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
@@ -74,31 +76,32 @@ public class IslandBuilderImpl implements Island.Builder {
     public EnumerateSet<Dimension> unlockedWorlds = new EnumerateSet<>(Dimension.values());
     public long lastTimeUpdated = System.currentTimeMillis() / 1000;
     public final Set<DirtyChunk> dirtyChunks = new LinkedHashSet<>();
-    public final KeyMap<BigInteger> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+    public final KeyMap<BigInteger> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
+    public final KeyMap<BigInteger> entityCounts = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
     public final EnumerateMap<Dimension, Location> islandHomes = new EnumerateMap<>(Dimension.values());
     public final List<SuperiorPlayer> members = new LinkedList<>();
     public final List<SuperiorPlayer> bannedPlayers = new LinkedList<>();
     public final Map<SuperiorPlayer, PlayerPrivilegeNode> playerPermissions = new LinkedHashMap<>();
     public final Map<IslandPrivilege, PlayerRole> rolePermissions = new LinkedHashMap<>();
     public final Map<String, Integer> upgrades = new LinkedHashMap<>();
-    public final KeyMap<Value<Integer>> blockLimits = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+    public final KeyMap<IntValue> blockLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
     public final Map<UUID, Rating> ratings = new LinkedHashMap<>();
     public final Map<MissionReference, Counter> completedMissions = new LinkedHashMap<>();
     public final Map<IslandFlag, Byte> islandFlags = new LinkedHashMap<>();
-    public final EnumerateMap<Dimension, KeyMap<Value<Integer>>> cobbleGeneratorValues = new EnumerateMap<>(Dimension.values());
+    public final EnumerateMap<Dimension, KeyMap<IntValue>> cobbleGeneratorValues = new EnumerateMap<>(Dimension.values());
     public final List<SIsland.UniqueVisitor> uniqueVisitors = new LinkedList<>();
-    public final KeyMap<Value<Integer>> entityLimits = KeyMaps.createIdentityHashMap(KeyIndicator.ENTITY_TYPE);
-    public final Map<PotionEffectType, Value<Integer>> islandEffects = new LinkedHashMap<>();
+    public final KeyMap<IntValue> entityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
+    public final Map<PotionEffectType, IntValue> islandEffects = new LinkedHashMap<>();
     public final List<ItemStack[]> islandChests = new ArrayList<>(plugin.getSettings().getIslandChests().getDefaultPages());
-    public final Map<PlayerRole, Value<Integer>> roleLimits = new LinkedHashMap<>();
+    public final Map<PlayerRole, IntValue> roleLimits = new LinkedHashMap<>();
     public final EnumerateMap<Dimension, Location> visitorHomes = new EnumerateMap<>(Dimension.values());
-    public Value<Integer> islandSize = Value.syncedFixed(-1);
-    public Value<Integer> warpsLimit = Value.syncedFixed(-1);
-    public Value<Integer> teamLimit = Value.syncedFixed(-1);
-    public Value<Integer> coopLimit = Value.syncedFixed(-1);
-    public Value<Double> cropGrowth = Value.syncedFixed(-1D);
-    public Value<Double> spawnerRates = Value.syncedFixed(-1D);
-    public Value<Double> mobDrops = Value.syncedFixed(-1D);
+    public IntValue islandSize = IntValue.syncedFixed(-1);
+    public IntValue warpsLimit = IntValue.syncedFixed(-1);
+    public IntValue teamLimit = IntValue.syncedFixed(-1);
+    public IntValue coopLimit = IntValue.syncedFixed(-1);
+    public DoubleValue cropGrowth = DoubleValue.syncedFixed(-1D);
+    public DoubleValue spawnerRates = DoubleValue.syncedFixed(-1D);
+    public DoubleValue mobDrops = DoubleValue.syncedFixed(-1D);
     public Value<BigDecimal> bankLimit = Value.syncedFixed(SYNCED_BANK_LIMIT_VALUE);
     public BigDecimal balance = BigDecimal.ZERO;
     public long lastInterestTime = System.currentTimeMillis() / 1000;
@@ -352,6 +355,19 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public Island.Builder setEntityCount(Key entity, BigInteger count) {
+        Preconditions.checkNotNull(entity, "entity parameter cannot be null.");
+        Preconditions.checkNotNull(count, "count parameter cannot be null.");
+        this.entityCounts.put(entity, count);
+        return this;
+    }
+
+    @Override
+    public KeyMap<BigInteger> getEntityCounts() {
+        return KeyMaps.unmodifiableKeyMap(this.entityCounts);
+    }
+
+    @Override
     public Island.Builder setIslandHome(Location location, Dimension dimension) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
@@ -457,13 +473,13 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public Island.Builder setBlockLimit(Key block, int limit) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        this.blockLimits.put(block, limit < 0 ? Value.syncedFixed(limit) : Value.fixed(limit));
+        this.blockLimits.put(block, limit < 0 ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
         return this;
     }
 
     @Override
     public KeyMap<Integer> getBlockLimits() {
-        return KeyMap.createKeyMap(convertFromValuesToRaw(this.blockLimits));
+        return KeyMap.createKeyMap(IntValue.unboxMap(this.blockLimits));
     }
 
     @Override
@@ -519,9 +535,9 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public Island.Builder setGeneratorRate(Key block, int rate, Dimension dimension) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-        this.cobbleGeneratorValues.computeIfAbsent(dimension, e -> KeyMaps.createHashMap(KeyIndicator.MATERIAL))
-                .put(block, rate < 0 ? Value.syncedFixed(rate) : Value.fixed(rate));
+        Preconditions.checkNotNull(dimension, "dimension dimension cannot be null.");
+        this.cobbleGeneratorValues.computeIfAbsent(dimension, e -> KeyMaps.createArrayMap(KeyIndicator.MATERIAL))
+                .put(block, rate < 0 ? IntValue.syncedFixed(rate) : IntValue.fixed(rate));
         return this;
     }
 
@@ -536,12 +552,12 @@ public class IslandBuilderImpl implements Island.Builder {
         Map<Dimension, KeyMap<Integer>> result = new IdentityHashMap<>();
 
         for (Dimension dimension : Dimension.values()) {
-            KeyMap<Value<Integer>> generatorRates = this.cobbleGeneratorValues.get(dimension);
+            KeyMap<IntValue> generatorRates = this.cobbleGeneratorValues.get(dimension);
             if (generatorRates != null) {
                 if (generatorRates.isEmpty()) {
                     result.put(dimension, KeyMaps.createEmptyMap());
                 } else {
-                    result.put(dimension, KeyMap.createKeyMap(convertFromValuesToRaw(generatorRates)));
+                    result.put(dimension, KeyMap.createKeyMap(IntValue.unboxMap(generatorRates)));
                 }
             }
         }
@@ -555,15 +571,10 @@ public class IslandBuilderImpl implements Island.Builder {
         EnumMap<World.Environment, KeyMap<Integer>> result = new EnumMap<>(World.Environment.class);
 
         for (Dimension dimension : Dimension.values()) {
-            KeyMap<Value<Integer>> generatorRates = this.cobbleGeneratorValues.get(dimension);
-            if (generatorRates != null) {
-                Object oldValue;
-                if (generatorRates.isEmpty()) {
-                    oldValue = result.put(dimension.getEnvironment(), KeyMaps.createEmptyMap());
-                } else {
-                    oldValue = result.put(dimension.getEnvironment(), KeyMap.createKeyMap(convertFromValuesToRaw(generatorRates)));
-                }
-
+            KeyMap<IntValue> dimensionGeneratorValues = this.cobbleGeneratorValues.get(dimension);
+            if (dimensionGeneratorValues != null) {
+                KeyMap<Integer> oldValue = result.put(dimension.getEnvironment(),
+                        KeyMap.createKeyMap(IntValue.unboxMap(dimensionGeneratorValues)));
                 if (oldValue != null)
                     throw new IllegalStateException("Called getGeneratorRates but there are multiple environments. " +
                             "Use getGeneratorRatesAsDimensions instead.");
@@ -591,25 +602,25 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public Island.Builder setEntityLimit(Key entity, int limit) {
         Preconditions.checkNotNull(entity, "entity parameter cannot be null.");
-        this.entityLimits.put(entity, limit < 0 ? Value.syncedFixed(limit) : Value.fixed(limit));
+        this.entityLimits.put(entity, limit < 0 ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
         return this;
     }
 
     @Override
     public KeyMap<Integer> getEntityLimits() {
-        return KeyMap.createKeyMap(convertFromValuesToRaw(this.entityLimits));
+        return KeyMap.createKeyMap(IntValue.unboxMap(this.entityLimits));
     }
 
     @Override
     public Island.Builder setIslandEffect(PotionEffectType potionEffectType, int level) {
         Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
-        this.islandEffects.put(potionEffectType, level < 0 ? Value.syncedFixed(level) : Value.fixed(level));
+        this.islandEffects.put(potionEffectType, level < 0 ? IntValue.syncedFixed(level) : IntValue.fixed(level));
         return this;
     }
 
     @Override
     public Map<PotionEffectType, Integer> getIslandEffects() {
-        return Collections.unmodifiableMap(convertFromValuesToRaw(this.islandEffects));
+        return Collections.unmodifiableMap(IntValue.unboxMap(this.islandEffects));
     }
 
     @Override
@@ -637,13 +648,13 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public Island.Builder setRoleLimit(PlayerRole playerRole, int limit) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-        this.roleLimits.put(playerRole, limit < 0 ? Value.syncedFixed(limit) : Value.fixed(limit));
+        this.roleLimits.put(playerRole, limit < 0 ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
         return this;
     }
 
     @Override
     public Map<PlayerRole, Integer> getRoleLimits() {
-        return Collections.unmodifiableMap(convertFromValuesToRaw(this.roleLimits));
+        return Collections.unmodifiableMap(IntValue.unboxMap(this.roleLimits));
     }
 
     @Override
@@ -685,7 +696,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Island.Builder setIslandSize(int islandSize) {
-        this.islandSize = islandSize < 0 ? Value.syncedFixed(islandSize) : Value.fixed(islandSize);
+        this.islandSize = islandSize < 0 ? IntValue.syncedFixed(islandSize) : IntValue.fixed(islandSize);
         return this;
     }
 
@@ -696,7 +707,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Island.Builder setTeamLimit(int teamLimit) {
-        this.teamLimit = teamLimit < 0 ? Value.syncedFixed(teamLimit) : Value.fixed(teamLimit);
+        this.teamLimit = teamLimit < 0 ? IntValue.syncedFixed(teamLimit) : IntValue.fixed(teamLimit);
         return this;
     }
 
@@ -707,7 +718,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Island.Builder setWarpsLimit(int warpsLimit) {
-        this.warpsLimit = warpsLimit < 0 ? Value.syncedFixed(warpsLimit) : Value.fixed(warpsLimit);
+        this.warpsLimit = warpsLimit < 0 ? IntValue.syncedFixed(warpsLimit) : IntValue.fixed(warpsLimit);
         return this;
     }
 
@@ -718,7 +729,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Island.Builder setCropGrowth(double cropGrowth) {
-        this.cropGrowth = cropGrowth < 0 ? Value.syncedFixed(cropGrowth) : Value.fixed(cropGrowth);
+        this.cropGrowth = cropGrowth < 0 ? DoubleValue.syncedFixed(cropGrowth) : DoubleValue.fixed(cropGrowth);
         return this;
     }
 
@@ -729,7 +740,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Island.Builder setSpawnerRates(double spawnerRates) {
-        this.spawnerRates = spawnerRates < 0 ? Value.syncedFixed(spawnerRates) : Value.fixed(spawnerRates);
+        this.spawnerRates = spawnerRates < 0 ? DoubleValue.syncedFixed(spawnerRates) : DoubleValue.fixed(spawnerRates);
         return this;
     }
 
@@ -740,7 +751,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Island.Builder setMobDrops(double mobDrops) {
-        this.mobDrops = mobDrops < 0 ? Value.syncedFixed(mobDrops) : Value.fixed(mobDrops);
+        this.mobDrops = mobDrops < 0 ? DoubleValue.syncedFixed(mobDrops) : DoubleValue.fixed(mobDrops);
         return this;
     }
 
@@ -751,7 +762,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Island.Builder setCoopLimit(int coopLimit) {
-        this.coopLimit = coopLimit < 0 ? Value.syncedFixed(coopLimit) : Value.fixed(coopLimit);
+        this.coopLimit = coopLimit < 0 ? IntValue.syncedFixed(coopLimit) : IntValue.fixed(coopLimit);
         return this;
     }
 
@@ -886,13 +897,6 @@ public class IslandBuilderImpl implements Island.Builder {
         int maxIslandSize = plugin.getSettings().getMaxIslandSize() * 3;
         return center.getBlockX() % maxIslandSize == 0 && center.getBlockZ() % maxIslandSize == 0 &&
                 plugin.getGrid().getIslandAt(center) == null;
-    }
-
-    private static <K, V extends Number> Map<K, V> convertFromValuesToRaw(Map<K, Value<V>> input) {
-        return input.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                entry -> entry.getValue().get()
-        ));
     }
 
 }

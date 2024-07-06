@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
@@ -22,6 +23,7 @@ import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
@@ -87,8 +89,10 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
         boolean offset = template.isOffset() ||
                 plugin.getSettings().getWorlds().getDimensionConfig(dimension).isSchematicOffset();
 
+        BlockOffset spawnOffset = template.getSpawnOffset();
+
         plugin.getGrid().createIsland(clickedPlayer, schematic, template.getBonusWorth(),
-                template.getBonusLevel(), template.getBiome(), islandName, offset);
+                template.getBonusLevel(), template.getBiome(), islandName, offset, spawnOffset);
     }
 
     public void openMenu(SuperiorPlayer superiorPlayer, @Nullable MenuView<?, ?> previousMenu, String islandName) {
@@ -179,6 +183,10 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
                 }
 
                 buttonBuilder.setOffset(itemSection.getBoolean("offset", false));
+
+                if (itemSection.isString("spawn-offset"))
+                    buttonBuilder.setSpawnOffset(Serializers.OFFSET_SPACED_SERIALIZER.deserialize(itemSection.getString("spawn-offset")));
+
                 buttonBuilder.setAccessItem(MenuParserImpl.getInstance().getItemStack("island-creation.yml",
                         itemSection.getConfigurationSection("access")));
                 buttonBuilder.setNoAccessItem(MenuParserImpl.getInstance().getItemStack("island-creation.yml",

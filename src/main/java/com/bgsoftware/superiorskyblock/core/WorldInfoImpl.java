@@ -37,7 +37,7 @@ public class WorldInfoImpl implements WorldInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         WorldInfoImpl worldInfo = (WorldInfoImpl) o;
-        return worldName.equals(worldInfo.worldName) && dimension.equals(worldInfo.dimension);
+        return dimension.equals(worldInfo.dimension) && worldName.equals(worldInfo.worldName);
     }
 
     @Override

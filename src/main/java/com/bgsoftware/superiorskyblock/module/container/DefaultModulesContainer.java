@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.module.ModuleData;
 import com.google.common.base.Preconditions;
@@ -19,7 +20,7 @@ import java.util.Map;
 public class DefaultModulesContainer implements ModulesContainer {
 
     private final Map<String, PluginModule> modulesMap = new HashMap<>();
-    private final Map<PluginModule, ModuleData> modulesData = new HashMap<>();
+    private final Map<PluginModule, ModuleData> modulesData = new ArrayMap<>();
 
     private final SuperiorSkyblockPlugin plugin;
 

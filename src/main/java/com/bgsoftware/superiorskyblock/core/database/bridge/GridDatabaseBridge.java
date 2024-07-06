@@ -24,6 +24,8 @@ public class GridDatabaseBridge {
     }
 
     public static void updateVersion(GridManager gridManager, int version) {
+        runOperationIfRunning(gridManager.getDatabaseBridge(), databaseBridge ->
+                databaseBridge.deleteObject("ssb_metadata", null));
         runOperationIfRunning(gridManager.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("ssb_metadata",
                 new Pair<>("version", version)
         ));

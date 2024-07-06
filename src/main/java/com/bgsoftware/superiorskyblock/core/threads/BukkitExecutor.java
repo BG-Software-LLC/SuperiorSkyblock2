@@ -1,24 +1,17 @@
 package com.bgsoftware.superiorskyblock.core.threads;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class BukkitExecutor {
 
     private static SuperiorSkyblockPlugin plugin;
-    private static ExecutorService databaseExecutor;
     private static boolean shutdown = false;
-    private static boolean syncDatabaseCalls = false;
     private static boolean syncBukkitCalls = false;
 
     private BukkitExecutor() {
@@ -27,7 +20,6 @@ public class BukkitExecutor {
 
     public static void init(SuperiorSkyblockPlugin plugin) {
         BukkitExecutor.plugin = plugin;
-        databaseExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Database Thread").build());
     }
 
     public static void ensureMain(Runnable runnable) {
@@ -55,21 +47,6 @@ public class BukkitExecutor {
         } else {
             return Bukkit.getScheduler().runTaskLater(plugin, runnable, delay);
         }
-    }
-
-    public static void data(Runnable runnable) {
-        if (ensureNotShudown())
-            return;
-
-        if (syncDatabaseCalls) {
-            runnable.run();
-        } else {
-            databaseExecutor.execute(runnable);
-        }
-    }
-
-    public static boolean isDataThread() {
-        return syncDatabaseCalls || Thread.currentThread().getName().equals("SuperiorSkyblock Database Thread");
     }
 
     public static void async(Runnable runnable) {
@@ -113,18 +90,11 @@ public class BukkitExecutor {
     }
 
     public static void prepareDisable() {
-        syncDatabaseCalls = true;
         syncBukkitCalls = true;
     }
 
     public static void close() {
-        try {
-            shutdown = true;
-            Log.info("Shutting down database executor");
-            shutdownAndAwaitTermination();
-        } catch (Exception error) {
-            Log.error(error, "An unexpected error occurred while shutting down database executor:");
-        }
+        shutdown = true;
     }
 
     private static boolean ensureNotShudown() {
@@ -134,24 +104,6 @@ public class BukkitExecutor {
         }
 
         return false;
-    }
-
-    private static void shutdownAndAwaitTermination() {
-        databaseExecutor.shutdown(); // Disable new tasks from being submitted
-        try {
-            // Wait a while for existing tasks to terminate
-            if (!databaseExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
-                databaseExecutor.shutdownNow(); // Cancel currently executing tasks
-                // Wait a while for tasks to respond to being cancelled
-                if (!databaseExecutor.awaitTermination(60, TimeUnit.SECONDS))
-                    System.err.println("Pool did not terminate");
-            }
-        } catch (InterruptedException ie) {
-            // (Re-)Cancel if current thread also interrupted
-            databaseExecutor.shutdownNow();
-            // Preserve interrupt status
-            Thread.currentThread().interrupt();
-        }
     }
 
     public static class NestedTask<T> {

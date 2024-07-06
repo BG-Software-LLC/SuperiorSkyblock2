@@ -19,10 +19,15 @@ public abstract class BaseSchematic implements Schematic {
 
     protected final String name;
 
-    protected final KeyMap<Integer> cachedCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+    protected final KeyMap<Integer> cachedCounts;
 
     protected BaseSchematic(String name) {
+        this(name, KeyMaps.createArrayMap(KeyIndicator.MATERIAL));
+    }
+
+    protected BaseSchematic(String name, KeyMap<Integer> cachedCounts) {
         this.name = name;
+        this.cachedCounts = cachedCounts;
     }
 
     @Override

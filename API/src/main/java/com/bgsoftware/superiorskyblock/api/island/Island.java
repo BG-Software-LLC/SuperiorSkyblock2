@@ -2845,6 +2845,10 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
         KeyMap<BigInteger> getBlockCounts();
 
+        Builder setEntityCount(Key entity, BigInteger count);
+
+        KeyMap<BigInteger> getEntityCounts();
+
         Builder setIslandHome(Location location, Dimension dimension);
 
         @Deprecated

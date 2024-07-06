@@ -329,7 +329,7 @@ public class MenuParserImpl implements MenuParser {
                     enchantment = getMinecraftEnum(Enchantment.class, _enchantment, Enchantment::getByName);
                 } catch (IllegalArgumentException ex) {
                     Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
-                            ".enchants.", _enchantment, " into an enchantment, skipping...");
+                            ".enchants.", _enchantment.toUpperCase(Locale.ENGLISH), " into an enchantment, skipping...");
                     continue;
                 }
 
@@ -338,7 +338,9 @@ public class MenuParserImpl implements MenuParser {
         }
 
         if (section.getBoolean("glow", false)) {
-            itemBuilder.withEnchant(GlowEnchantment.getGlowEnchant(), 1);
+            Enchantment glowEnchant = GlowEnchantment.getGlowEnchant();
+            if (glowEnchant != null)
+                itemBuilder.withEnchant(glowEnchant, 1);
         }
 
         if (section.contains("flags")) {
@@ -363,7 +365,7 @@ public class MenuParserImpl implements MenuParser {
                     potionEffectType = getMinecraftEnum(PotionEffectType.class, _effect, PotionEffectType::getByName);
                 } catch (IllegalArgumentException error) {
                     Log.warnFromFile(fileName, "Couldn't convert ", effectsSection.getCurrentPath(),
-                            ".", _effect, " into a potion effect, skipping...");
+                            ".", _effect.toUpperCase(Locale.ENGLISH), " into a potion effect, skipping...");
                     continue;
                 }
 

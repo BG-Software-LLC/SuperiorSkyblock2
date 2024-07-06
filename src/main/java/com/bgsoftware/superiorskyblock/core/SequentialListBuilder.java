@@ -1,13 +1,16 @@
 package com.bgsoftware.superiorskyblock.core;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.core.collections.view.LongIterator;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.LongFunction;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -58,6 +61,18 @@ public class SequentialListBuilder<E> {
         return completeBuild(sequentialList, null, this.mutable);
     }
 
+    public <O> List<O> map(Iterator<E> iterator, Function<E, O> mapper) {
+        LinkedList<O> sequentialList = new LinkedList<>();
+
+        while (iterator.hasNext()) {
+            E next = iterator.next();
+            if (predicate == null || predicate.test(next))
+                sequentialList.add(mapper.apply(next));
+        }
+
+        return completeBuild(sequentialList, null, this.mutable);
+    }
+
     public List<E> build(Stream<E> stream) {
         LinkedList<E> sequentialList = new LinkedList<>();
 
@@ -80,6 +95,23 @@ public class SequentialListBuilder<E> {
                 if (predicate.test(element))
                     sequentialList.add(element);
             });
+        }
+
+        return completeBuild(sequentialList);
+    }
+
+    public List<E> build(Iterator<E> iterator) {
+        LinkedList<E> sequentialList = new LinkedList<>();
+
+        if (predicate == null) {
+            while (iterator.hasNext())
+                sequentialList.add(iterator.next());
+        } else {
+            while (iterator.hasNext()) {
+                E next = iterator.next();
+                if (predicate.test(next))
+                    sequentialList.add(next);
+            }
         }
 
         return completeBuild(sequentialList);

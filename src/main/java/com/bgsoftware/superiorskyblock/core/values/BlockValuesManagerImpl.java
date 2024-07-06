@@ -12,22 +12,27 @@ import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
-import com.bgsoftware.superiorskyblock.core.key.collections.MaterialKeySet;
+import com.bgsoftware.superiorskyblock.core.key.KeySets;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.values.container.BlockValuesContainer;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
 import javax.script.Bindings;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class BlockValuesManagerImpl extends Manager implements BlockValuesManager {
 
@@ -54,25 +59,19 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
 
     private static final Bindings bindings = createBindings();
 
-    private static final KeyMap<CustomKeyParser> customKeyParsers = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
-    private static final KeySet valuesMenuBlocks = MaterialKeySet.createHashSet();
-    private static final KeySet customBlockKeys = MaterialKeySet.createHashSet();
+    private static final KeyMap<CustomKeyParser> customKeyParsers = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
+    private static final KeySet valuesMenuBlocks = KeySets.createHashSet(KeyIndicator.MATERIAL);
+    private static final KeySet customBlockKeys = KeySets.createHashSet(KeyIndicator.MATERIAL);
 
-    private final BlockValuesContainer blockWorthValues;
-    private final BlockValuesContainer blockLevels;
-    private final BlockValuesContainer customBlockWorthValues;
-    private final BlockValuesContainer customBlockLevels;
+    private final BlockValuesContainer blockValuesContainer;
+    private final BlockValuesContainer customValuesContainer;
 
     public BlockValuesManagerImpl(SuperiorSkyblockPlugin plugin,
-                                  BlockValuesContainer blockWorthValuesContainer,
-                                  BlockValuesContainer blockLevelsContainer,
-                                  BlockValuesContainer customBlockWorthValuesContainer,
-                                  BlockValuesContainer customBlockLevelsContainer) {
+                                  BlockValuesContainer blockValuesContainer,
+                                  BlockValuesContainer customValuesContainer) {
         super(plugin);
-        this.blockWorthValues = blockWorthValuesContainer;
-        this.blockLevels = blockLevelsContainer;
-        this.customBlockWorthValues = customBlockWorthValuesContainer;
-        this.customBlockLevels = customBlockLevelsContainer;
+        this.blockValuesContainer = blockValuesContainer;
+        this.customValuesContainer = customValuesContainer;
     }
 
     private static Bindings createBindings() {
@@ -83,78 +82,69 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
 
     @Override
     public void loadData() {
-        this.blockWorthValues.clear();
-        this.blockLevels.clear();
+        this.blockValuesContainer.clear();
+        this.customValuesContainer.clear();
 
-        this.blockWorthValues.loadDefaultValues(plugin);
-        this.blockLevels.loadDefaultValues(plugin);
-        plugin.getProviders().addPricesLoadCallback(this::convertValuesToLevels);
+        loadDefaultValues();
+        plugin.getProviders().addPricesLoadCallback(this::convertWorthValuesToLevels);
     }
 
     @Override
     public BigDecimal getBlockWorth(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-
-        Log.debug(Debug.GET_WORTH, key);
-
-        BigDecimal customBlockValue = customBlockWorthValues.getBlockValue(key);
-        if (customBlockValue != null) {
-            Log.debugResult(Debug.GET_WORTH, "Return Custom Block Worth", customBlockValue);
-            return customBlockValue;
-        }
-
-        if (blockWorthValues.containsKeyRaw(key)) {
-            BigDecimal value = blockWorthValues.getBlockValue(key);
-
-            if (value != null) {
-                Log.debugResult(Debug.GET_WORTH, "Return Worth File", value);
-                return value;
-            }
-        }
-
-        if (plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
-            BigDecimal price = plugin.getProviders().getPricesProvider().getPrice(key);
-            if (price.compareTo(BigDecimal.ZERO) >= 0) {
-                Log.debugResult(Debug.GET_WORTH, "Return Price", price);
-                return price;
-            }
-        }
-
-        BigDecimal value = blockWorthValues.getBlockValue(key);
-
-        if (value != null) {
-            Log.debugResult(Debug.GET_WORTH, "Return Worth File", value);
-            return value;
-        }
-
-        Log.debugResult(Debug.GET_WORTH, "Return Worth File", 0);
-
-        return BigDecimal.ZERO;
+        return getBlockValue(key, true).getWorth();
     }
 
     @Override
     public BigDecimal getBlockLevel(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        return getBlockValue(key, false).getLevel();
+    }
 
-        Log.debug(Debug.GET_LEVEL, key);
+    public BlockValue getBlockValue(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        return getBlockValue(key, true);
+    }
 
-        BigDecimal customBlockLevel = customBlockLevels.getBlockValue(key);
-        if (customBlockLevel != null) {
-            Log.debugResult(Debug.GET_LEVEL, "Return Custom Block Level", customBlockLevel);
-            return customBlockLevel;
+    private BlockValue getBlockValue(Key key, boolean checkPrices) {
+        Log.debug(Debug.GET_VALUE, key);
+
+        BlockValue customBlockValue = customValuesContainer.getBlockValue(key);
+        if (customBlockValue != null) {
+            Log.debugResult(Debug.GET_VALUE, "Return Custom Block Value", customBlockValue);
+            return customBlockValue;
         }
 
-        BigDecimal level = blockLevels.getBlockValue(key);
+        if (checkPrices) {
+            if (blockValuesContainer.containsKeyRaw(key)) {
+                BlockValue value = blockValuesContainer.getBlockValue(key);
 
-        if (level == null) {
-            level = convertValueToLevel(getBlockWorth(key));
-            blockLevels.setBlockValue(key, level);
-            Log.debugResult(Debug.GET_LEVEL, "Return Converted From Worth", level);
-        } else {
-            Log.debugResult(Debug.GET_LEVEL, "Return Levels File", level);
+                if (value != null) {
+                    Log.debugResult(Debug.GET_VALUE, "Return File", value);
+                    return value;
+                }
+            }
+
+            if (plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
+                BigDecimal price = plugin.getProviders().getPricesProvider().getPrice(key);
+                if (price.compareTo(BigDecimal.ZERO) >= 0) {
+                    BlockValue blockValue = BlockValue.ofWorth(price);
+                    Log.debugResult(Debug.GET_VALUE, "Return Price", blockValue);
+                    return blockValue;
+                }
+            }
         }
 
-        return level;
+        BlockValue value = blockValuesContainer.getBlockValue(key);
+
+        if (value != null) {
+            Log.debugResult(Debug.GET_VALUE, "Return File", value);
+            return value;
+        }
+
+        Log.debugResult(Debug.GET_VALUE, "Return File", 0);
+
+        return BlockValue.ZERO;
     }
 
     @Override
@@ -163,33 +153,31 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
 
         if (((BaseKey<?>) key).isAPIKey() || isValuesMenu(key)) {
             return getValuesKey(key);
-        } else if (customBlockKeys.contains(key)) {
-            return customBlockKeys.getKey(key);
-        } else if (blockWorthValues.containsKeyRaw(key)) {
-            return key;
-        } else if (blockLevels.containsKeyRaw(key)) {
-            return key;
-        } else {
-            if (plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
-                Key newKey = plugin.getProviders().getPricesProvider().getBlockKey(key);
-                if (newKey != null) {
-                    return newKey;
-                }
-            }
-
-            return blockWorthValues.containsKey(key) ? blockWorthValues.getBlockValueKey(key) :
-                    blockLevels.getBlockValueKey(key);
         }
+
+        if (customBlockKeys.contains(key)) {
+            return customBlockKeys.getKey(key);
+        }
+
+        if (blockValuesContainer.containsKeyRaw(key)) {
+            return key;
+        }
+
+        if (plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
+            Key newKey = plugin.getProviders().getPricesProvider().getBlockKey(key);
+            if (newKey != null) {
+                return newKey;
+            }
+        }
+
+        return blockValuesContainer.getBlockValueKey(key);
     }
 
     @Override
     public void registerCustomKey(Key key, @Nullable BigDecimal worthValue, @Nullable BigDecimal levelValue) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        if (worthValue != null && !customBlockWorthValues.hasBlockValue(key)) {
-            customBlockWorthValues.setBlockValue(key, worthValue);
-        }
-        if (levelValue != null && !customBlockLevels.hasBlockValue(key)) {
-            customBlockLevels.setBlockValue(key, levelValue);
+        if (!customValuesContainer.containsKey(key)) {
+            customValuesContainer.setBlockValue(key, BlockValue.ofWorthAndLevel(worthValue, levelValue));
         }
     }
 
@@ -264,7 +252,7 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
         return new Pair<>(original, null);
     }
 
-    public BigDecimal convertValueToLevel(BigDecimal value) {
+    private BigDecimal convertWorthToLevel(BigDecimal value) {
         // If the formula contains no mathematical operations or the placeholder for the worth value,
         // we can directly create the BigDecimal instance from it.
         try {
@@ -288,12 +276,58 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
         }
     }
 
-    private void convertValuesToLevels() {
-        blockWorthValues.forEach((blockKey, blockCount) -> {
-            if (!blockLevels.hasBlockValue(blockKey)) {
-                blockLevels.setBlockValue(blockKey, convertValueToLevel(blockCount));
+    private void convertWorthValuesToLevels() {
+        blockValuesContainer.forEach((blockKey, blockCount) -> {
+            BlockValue realBlockValue = blockValuesContainer.getBlockValue(blockKey);
+            if (realBlockValue != null && !realBlockValue.hasLevel()) {
+                BlockValue newBlockValue = realBlockValue.setLevel(convertWorthToLevel(realBlockValue.getWorth()));
+                blockValuesContainer.setBlockValue(blockKey, newBlockValue);
             }
         });
+    }
+
+    private void loadDefaultValues() {
+        // First, convert old file
+        File blockValuesFile = new File(plugin.getDataFolder(), "blockvalues.yml");
+        if (blockValuesFile.exists()) {
+            File worthFile = new File("block-values/worth.yml");
+            if (!worthFile.getParentFile().mkdirs() || !blockValuesFile.renameTo(worthFile))
+                Log.error("Failed to convert old block values to the new format.");
+        }
+
+        // Load level and worth values
+        loadValuesFromFile("block-values/worth.yml", (key, worth) -> {
+            blockValuesContainer.setBlockValue(key, BlockValue.ofWorth(worth));
+        });
+
+        loadValuesFromFile("block-values/levels.yml", (key, level) -> {
+            BlockValue currValue = blockValuesContainer.getBlockValue(key);
+            BlockValue newValue = currValue == null ? BlockValue.ofLevel(level) : currValue.setLevel(level);
+            blockValuesContainer.setBlockValue(key, newValue);
+        });
+    }
+
+    private void loadValuesFromFile(String fileName, BiConsumer<Key, BigDecimal> consumer) {
+        File file = new File(plugin.getDataFolder(), fileName);
+
+        if (!file.exists())
+            plugin.saveResource(fileName, true);
+
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+
+        ConfigurationSection valuesSection = cfg.isConfigurationSection("block-values") ?
+                cfg.getConfigurationSection("block-values") :
+                cfg.getConfigurationSection("");
+
+        for (String key : valuesSection.getKeys(false)) {
+            String value = valuesSection.getString(key);
+            try {
+                consumer.accept(Keys.ofMaterialAndData(key), new BigDecimal(value));
+            } catch (Exception ex) {
+                Log.warnFromFile("levels.yml", "Cannot parse value for ", key, " in file ", fileName, ", skipping...");
+            }
+        }
+
     }
 
     private static BigDecimal fastBigDecimalFromString(String value) {

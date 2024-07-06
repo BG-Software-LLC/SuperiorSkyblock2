@@ -135,13 +135,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
             if (!standingIsland.hasSettingsEnabled(IslandFlags.PVP))
                 return target ? HitActionResult.TARGET_ISLAND_PVP_DISABLE : HitActionResult.ISLAND_PVP_DISABLE;
 
-            // Checks for coop damage
-            if (standingIsland.isCoop(player) && !plugin.getSettings().isCoopDamage())
+            if (!plugin.getSettings().isCoopDamage() && standingIsland.isCoop(player)) {
+                // Checks for coop damage
                 return target ? HitActionResult.TARGET_COOP_DAMAGE : HitActionResult.COOP_DAMAGE;
-
-            // Checks for visitors damage
-            if (standingIsland.isVisitor(player, false) && !plugin.getSettings().isVisitorsDamage())
+            } else if (!plugin.getSettings().isVisitorsDamage() && standingIsland.isVisitor(player, true)) {
+                // Checks for visitors damage
                 return target ? HitActionResult.TARGET_VISITOR_DAMAGE : HitActionResult.VISITOR_DAMAGE;
+            }
         }
 
         return HitActionResult.SUCCESS;
@@ -943,25 +943,28 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        Preconditions.checkArgument(!mission.getIslandMission(), "mission parameter must be player-mission.");
         this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(1));
     }
 
     @Override
     public void resetMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        Preconditions.checkArgument(!mission.getIslandMission(), "mission parameter must be player-mission.");
         this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(-1));
     }
 
     @Override
     public boolean hasCompletedMission(Mission<?> mission) {
-        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        Counter finishCount = completedMissions.get(new MissionReference(mission));
-        return finishCount != null && finishCount.get() > 0;
+        return getAmountMissionCompleted(mission) > 0;
     }
 
     @Override
     public boolean canCompleteMissionAgain(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        if (mission.getIslandMission())
+            return false;
+
         Optional<MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
         return missionDataOptional.isPresent() && getAmountMissionCompleted(mission) <
                 missionDataOptional.get().getResetAmount();
@@ -970,13 +973,14 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public int getAmountMissionCompleted(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        Counter finishCount = completedMissions.get(new MissionReference(mission));
+        Counter finishCount = mission.getIslandMission() ? null : completedMissions.get(new MissionReference(mission));
         return finishCount == null ? 0 : finishCount.get();
     }
 
     @Override
     public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        Preconditions.checkArgument(!mission.getIslandMission(), "mission parameter must be player-mission.");
         this.changeAmountMissionsCompletedInternal(mission, counter -> counter.set(finishCount));
     }
 

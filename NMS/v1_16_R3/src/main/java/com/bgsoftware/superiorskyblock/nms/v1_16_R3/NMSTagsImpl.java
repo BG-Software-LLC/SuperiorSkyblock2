@@ -21,6 +21,7 @@ import net.minecraft.server.v1_16_R3.NBTTagLong;
 import net.minecraft.server.v1_16_R3.NBTTagShort;
 import net.minecraft.server.v1_16_R3.NBTTagString;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
@@ -32,22 +33,39 @@ import java.util.Set;
 public class NMSTagsImpl implements NMSTags {
 
     @Override
-    public CompoundTag getNBTTag(org.bukkit.inventory.ItemStack bukkitStack) {
-        ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitStack);
-        NBTTagCompound nbtTagCompound = itemStack.getOrCreateTag();
-        return CompoundTag.fromNBT(nbtTagCompound);
+    public CompoundTag serializeItem(org.bukkit.inventory.ItemStack bukkitItem) {
+        ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitItem);
+
+        NBTTagCompound tagCompound = itemStack.save(new NBTTagCompound());
+
+        return CompoundTag.fromNBT(tagCompound);
     }
 
     @Override
-    public CompoundTag convertToNBT(org.bukkit.inventory.ItemStack bukkitItem) {
-        return CompoundTag.fromNBT(CraftItemStack.asNMSCopy(bukkitItem).save(new NBTTagCompound()));
+    public org.bukkit.inventory.ItemStack deserializeItem(CompoundTag compoundTag) {
+        if (compoundTag.containsKey("NBT")) {
+            // Old compound version, deserialize it accordingly
+            return deserializeItemOld(compoundTag);
+        }
+
+        NBTTagCompound tagCompound = (NBTTagCompound) compoundTag.toNBT();
+        ItemStack itemStack = ItemStack.a(tagCompound);
+
+        return CraftItemStack.asCraftMirror(itemStack);
     }
 
-    @Override
-    public org.bukkit.inventory.ItemStack getFromNBTTag(org.bukkit.inventory.ItemStack bukkitStack, CompoundTag compoundTag) {
-        ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitStack);
-        itemStack.setTag((NBTTagCompound) compoundTag.toNBT());
-        return CraftItemStack.asBukkitCopy(itemStack);
+    private static org.bukkit.inventory.ItemStack deserializeItemOld(CompoundTag compoundTag) {
+        String typeName = compoundTag.getString("type");
+        Material type = Material.valueOf(typeName);
+        int amount = compoundTag.getInt("amount");
+        short data = compoundTag.getShort("data");
+        CompoundTag nbtData = compoundTag.getCompound("NBT");
+
+        org.bukkit.inventory.ItemStack bukkitItem = new org.bukkit.inventory.ItemStack(type, amount, data);
+        ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitItem);
+        itemStack.setTag((NBTTagCompound) nbtData.toNBT());
+
+        return CraftItemStack.asCraftMirror(itemStack);
     }
 
     @Override

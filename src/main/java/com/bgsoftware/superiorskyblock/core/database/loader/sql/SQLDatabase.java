@@ -1,17 +1,21 @@
 package com.bgsoftware.superiorskyblock.core.database.loader.sql;
 
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.Mutable;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.DatabaseUpgrade_V0;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v1.DatabaseUpgrade_V1;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v2.DatabaseUpgrade_V2;
 import com.bgsoftware.superiorskyblock.core.database.sql.SQLHelper;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableInt;
 
 import java.sql.ResultSet;
 
 public class SQLDatabase {
 
     private static final Runnable[] DATABASE_UPGRADES = new Runnable[]{
-            DatabaseUpgrade_V0.INSTANCE
+            DatabaseUpgrade_V0.INSTANCE,
+            DatabaseUpgrade_V1.INSTANCE,
+            DatabaseUpgrade_V2.INSTANCE
     };
 
     private SQLDatabase() {
@@ -28,19 +32,19 @@ public class SQLDatabase {
     }
 
     public static UpgradeResult upgradeDatabase() {
-        Mutable<Integer> databaseVersionMutable = new Mutable<>(0);
+        MutableInt databaseVersionMutable = new MutableInt(0);
 
         SQLHelper.select("ssb_metadata", "", new QueryResult<ResultSet>()
-                .onSuccess(result -> databaseVersionMutable.setValue(result.getInt("version")))
+                .onSuccess(result -> databaseVersionMutable.set(result.getInt("version")))
                 .onFail(error -> {
                 }));
 
-        int databaseVersion = databaseVersionMutable.getValue();
+        int databaseVersion = databaseVersionMutable.get();
         while (databaseVersion < DATABASE_UPGRADES.length) {
             DATABASE_UPGRADES[databaseVersion++].run();
         }
 
-        return new UpgradeResult(databaseVersion > databaseVersionMutable.getValue(), databaseVersion);
+        return new UpgradeResult(databaseVersion > databaseVersionMutable.get(), databaseVersion);
     }
 
     public static int getCurrentDatabaseVersion() {
@@ -49,15 +53,15 @@ public class SQLDatabase {
 
     @SuppressWarnings("unchecked")
     private static void createMetadataTable() {
-        Mutable<Integer> databaseVersion = new Mutable<>(0);
+        MutableInt databaseVersion = new MutableInt(0);
 
         // We check if "islands" table exists. If not, it's a new database,
         // therefore the DB version should be latest. Otherwise, 0.
         SQLHelper.select("islands", "", new QueryResult<ResultSet>()
-                .onFail(error -> databaseVersion.setValue(getCurrentDatabaseVersion())));
+                .onFail(error -> databaseVersion.set(getCurrentDatabaseVersion())));
 
         SQLHelper.createTable("ssb_metadata",
-                new Pair<>("version", "INTEGER DEFAULT " + databaseVersion.getValue())
+                new Pair<>("version", "INTEGER DEFAULT " + databaseVersion.get())
         );
     }
 
@@ -81,7 +85,8 @@ public class SQLDatabase {
                 new Pair<>("unlocked_worlds", "INTEGER"),
                 new Pair<>("last_time_updated", "BIGINT"),
                 new Pair<>("dirty_chunks", "LONGTEXT"),
-                new Pair<>("block_counts", "LONGTEXT")
+                new Pair<>("block_counts", "LONGTEXT"),
+                new Pair<>("entity_counts", "LONGTEXT")
         );
 
         SQLHelper.createTable("islands_banks",

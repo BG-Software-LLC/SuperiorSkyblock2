@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
-import com.bgsoftware.superiorskyblock.core.Mutable;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -40,16 +39,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.util.Collections;
@@ -128,15 +118,12 @@ public class PlayersListener implements Listener {
         if (superiorPlayer.isShownAsOnline())
             IslandNotifications.notifyPlayerJoin(superiorPlayer);
 
-        Mutable<Boolean> teleportToSpawn = new Mutable<>(false);
-
         Location playerLocation = e.getPlayer().getLocation();
         Island island = plugin.getGrid().getIslandAt(playerLocation);
 
+
         MoveResult moveResult = this.regionManagerService.get().handlePlayerJoin(superiorPlayer, playerLocation);
-        if (moveResult != MoveResult.SUCCESS) {
-            teleportToSpawn.setValue(true);
-        }
+        boolean teleportToSpawn = moveResult != MoveResult.SUCCESS;
 
         BukkitExecutor.sync(() -> {
             if (!e.getPlayer().isOnline())
@@ -149,10 +136,10 @@ public class PlayersListener implements Listener {
             if (!superiorPlayer.hasBypassModeEnabled()) {
                 Island delayedIsland = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
                 // Checking if the player is in the islands world, not inside an island.
-                if ((delayedIsland == island && teleportToSpawn.getValue()) ||
+                if ((delayedIsland == island && teleportToSpawn) ||
                         (plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld()) && delayedIsland == null)) {
                     superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-                    if (!teleportToSpawn.getValue())
+                    if (!teleportToSpawn)
                         Message.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
                 }
             }

@@ -482,6 +482,13 @@ public class IslandsDatabaseBridge {
         ));
     }
 
+    public static void saveEntityCounts(Island island) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("entity_counts", IslandsSerializer.serializeEntityCounts(island.getEntitiesTracker().getEntitiesCounts()))
+        ));
+    }
+
     public static void saveIslandChest(Island island, IslandChest islandChest) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("islands_chests",
                 new Pair<>("island", island.getUniqueId().toString()),
@@ -607,7 +614,8 @@ public class IslandsDatabaseBridge {
                     new Pair<>("unlocked_worlds", LegacyMasks.convertUnlockedWorldsMask(island.getUnlockedWorlds())),
                     new Pair<>("last_time_updated", System.currentTimeMillis() / 1000L),
                     new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunkPositions(dirtyChunks)),
-                    new Pair<>("block_counts", IslandsSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger()))
+                    new Pair<>("block_counts", IslandsSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger())),
+                    new Pair<>("entity_counts", IslandsSerializer.serializeEntityCounts(island.getEntitiesTracker().getEntitiesCounts()))
             );
 
             databaseBridge.insertObject("islands_banks",
@@ -633,29 +641,60 @@ public class IslandsDatabaseBridge {
     public static void deleteIsland(Island island) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
             DatabaseFilter islandFilter = createFilter("island", island);
+
             databaseBridge.deleteObject("islands", createFilter("uuid", island));
             databaseBridge.deleteObject("islands_banks", islandFilter);
-            databaseBridge.deleteObject("islands_bans", islandFilter);
-            databaseBridge.deleteObject("islands_block_limits", islandFilter);
-            databaseBridge.deleteObject("islands_custom_data", islandFilter);
-            databaseBridge.deleteObject("islands_chests", islandFilter);
-            databaseBridge.deleteObject("islands_effects", islandFilter);
-            databaseBridge.deleteObject("islands_entity_limits", islandFilter);
-            databaseBridge.deleteObject("islands_flags", islandFilter);
-            databaseBridge.deleteObject("islands_generators", islandFilter);
-            databaseBridge.deleteObject("islands_homes", islandFilter);
-            databaseBridge.deleteObject("islands_members", islandFilter);
-            databaseBridge.deleteObject("islands_missions", islandFilter);
-            databaseBridge.deleteObject("islands_player_permissions", islandFilter);
-            databaseBridge.deleteObject("islands_ratings", islandFilter);
-            databaseBridge.deleteObject("islands_role_limits", islandFilter);
-            databaseBridge.deleteObject("islands_role_permissions", islandFilter);
             databaseBridge.deleteObject("islands_settings", islandFilter);
-            databaseBridge.deleteObject("islands_upgrades", islandFilter);
-            databaseBridge.deleteObject("islands_visitor_homes", islandFilter);
-            databaseBridge.deleteObject("islands_visitors", islandFilter);
-            databaseBridge.deleteObject("islands_warp_categories", islandFilter);
-            databaseBridge.deleteObject("islands_warps", islandFilter);
+
+
+            if (!island.getBannedPlayers().isEmpty())
+                databaseBridge.deleteObject("islands_bans", islandFilter);
+            if (!island.getBlocksLimits().isEmpty())
+                databaseBridge.deleteObject("islands_block_limits", islandFilter);
+            if (!island.isPersistentDataContainerEmpty())
+                databaseBridge.deleteObject("islands_custom_data", islandFilter);
+            if (island.getChest().length > 0)
+                databaseBridge.deleteObject("islands_chests", islandFilter);
+            if (!island.getPotionEffects().isEmpty())
+                databaseBridge.deleteObject("islands_effects", islandFilter);
+            if (!island.getEntitiesLimitsAsKeys().isEmpty())
+                databaseBridge.deleteObject("islands_entity_limits", islandFilter);
+            if (!island.getAllSettings().isEmpty())
+                databaseBridge.deleteObject("islands_flags", islandFilter);
+            for (Dimension dimension : Dimension.values()) {
+                if (!island.getCustomGeneratorAmounts(dimension).isEmpty()) {
+                    databaseBridge.deleteObject("islands_generators", islandFilter);
+                    break;
+                }
+            }
+            if (!island.getIslandHomesAsDimensions().isEmpty())
+                databaseBridge.deleteObject("islands_homes", islandFilter);
+            if (!island.getIslandMembers(false).isEmpty())
+                databaseBridge.deleteObject("islands_members", islandFilter);
+            if (!island.getCompletedMissions().isEmpty())
+                databaseBridge.deleteObject("islands_missions", islandFilter);
+            if (!island.getPlayerPermissions().isEmpty())
+                databaseBridge.deleteObject("islands_player_permissions", islandFilter);
+            if (!island.getRatings().isEmpty())
+                databaseBridge.deleteObject("islands_ratings", islandFilter);
+            if (!island.getCustomRoleLimits().isEmpty())
+                databaseBridge.deleteObject("islands_role_limits", islandFilter);
+            if (!island.getRolePermissions().isEmpty())
+                databaseBridge.deleteObject("islands_role_permissions", islandFilter);
+            if (!island.getUpgrades().isEmpty())
+                databaseBridge.deleteObject("islands_upgrades", islandFilter);
+            for (Dimension dimension : Dimension.values()) {
+                if (island.getVisitorsLocation(dimension) != null) {
+                    databaseBridge.deleteObject("islands_visitor_homes", islandFilter);
+                    break;
+                }
+            }
+            if (!island.getUniqueVisitors().isEmpty())
+                databaseBridge.deleteObject("islands_visitors", islandFilter);
+            if (!island.getWarpCategories().isEmpty()) {
+                databaseBridge.deleteObject("islands_warp_categories", islandFilter);
+                databaseBridge.deleteObject("islands_warps", islandFilter);
+            }
         });
     }
 

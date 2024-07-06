@@ -48,7 +48,6 @@ public class IslandChangeGeneratorRateEvent extends IslandEvent implements Cance
      * @param dimension      The dimension of the world that the rate was changed for.
      * @param generatorRate  The new generator-rate of the block.
      */
-    @Deprecated
     public IslandChangeGeneratorRateEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Key block,
                                           Dimension dimension, int generatorRate) {
         super(island);

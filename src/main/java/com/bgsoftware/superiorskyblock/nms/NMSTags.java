@@ -12,11 +12,9 @@ import java.util.Set;
 
 public interface NMSTags {
 
-    CompoundTag getNBTTag(ItemStack itemStack);
+    CompoundTag serializeItem(ItemStack itemStack);
 
-    CompoundTag convertToNBT(ItemStack itemStack);
-
-    ItemStack getFromNBTTag(ItemStack itemStack, CompoundTag compoundTag);
+    ItemStack deserializeItem(CompoundTag compoundTag);
 
     default ItemStack getSkullWithTexture(ItemStack itemStack, String texture) {
         return ItemSkulls.getPlayerHeadNoNMS(itemStack, texture);

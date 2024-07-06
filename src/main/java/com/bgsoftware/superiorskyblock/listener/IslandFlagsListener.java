@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.listener;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
-import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
@@ -74,6 +73,9 @@ public class IslandFlagsListener implements Listener {
             case "NATURAL":
             case "TRAP":
             case "MOUNT":
+            case "VILLAGE_INVASION":
+            case "VILLAGE_DEFENSE":
+            case "PATROL":
             case "BEEHIVE": {
                 switch (BukkitEntities.getCategory(entityType)) {
                     case ANIMAL:
@@ -187,8 +189,8 @@ public class IslandFlagsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     private void onBlockFlow(BlockFromToEvent e) {
-        IslandFlag islandFlag = Materials.isWater(e.getBlock().getType()) ||
-                plugin.getNMSWorld().isWaterLogged(e.getBlock()) ? IslandFlags.WATER_FLOW : IslandFlags.LAVA_FLOW;
+        IslandFlag islandFlag = plugin.getNMSWorld().isWaterLogged(e.getBlock()) ?
+                IslandFlags.WATER_FLOW : IslandFlags.LAVA_FLOW;
         if (preventAction(e.getToBlock().getLocation(), islandFlag))
             e.setCancelled(true);
     }

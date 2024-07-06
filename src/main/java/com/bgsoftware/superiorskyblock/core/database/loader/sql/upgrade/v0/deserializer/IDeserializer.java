@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deserializer;
+ package com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deserializer;
 
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;

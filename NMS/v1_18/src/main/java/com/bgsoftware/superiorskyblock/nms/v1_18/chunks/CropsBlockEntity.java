@@ -3,6 +3,8 @@ package com.bgsoftware.superiorskyblock.nms.v1_18.chunks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -16,9 +18,7 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
@@ -26,7 +26,7 @@ public class CropsBlockEntity extends BlockEntity {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final Map<Long, CropsBlockEntity> tickingChunks = new HashMap<>();
+    private static final Long2ObjectMapView<CropsBlockEntity> tickingChunks = CollectionsFactory.createLong2ObjectHashMap();
     private static int random = ThreadLocalRandom.current().nextInt();
 
     private final WeakReference<Island> island;
@@ -53,14 +53,14 @@ public class CropsBlockEntity extends BlockEntity {
     public static void create(Island island, LevelChunk levelChunk) {
         ChunkPos chunkPos = levelChunk.getPos();
         long chunkPair = chunkPos.toLong();
-        if (!tickingChunks.containsKey(chunkPair)) {
-            BlockPos blockPosition = new BlockPos(chunkPos.x << 4, 1, chunkPos.z << 4);
-            tickingChunks.put(chunkPair, new CropsBlockEntity(island, levelChunk, blockPosition));
-        }
+        tickingChunks.computeIfAbsent(chunkPair, p -> {
+            BlockPos blockPos = new BlockPos(chunkPos.x << 4, 1, chunkPos.z << 4);
+            return new CropsBlockEntity(island, levelChunk, blockPos);
+        });
     }
 
-    public static CropsBlockEntity remove(ChunkPos chunkPos) {
-        return tickingChunks.remove(chunkPos.toLong());
+    public static CropsBlockEntity remove(long chunkPos) {
+        return tickingChunks.remove(chunkPos);
     }
 
     public static void forEachChunk(List<ChunkPosition> chunkPositions, Consumer<CropsBlockEntity> cropsBlockEntityConsumer) {

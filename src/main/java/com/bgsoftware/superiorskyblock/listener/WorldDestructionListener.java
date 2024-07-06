@@ -34,7 +34,7 @@ public class WorldDestructionListener implements Listener {
     //Checking for chorus flower spread outside island.
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onBlockSpread(BlockSpreadEvent e) {
-        if (preventDestruction(e.getSource().getLocation()))
+        if (preventDestruction(e.getSource().getLocation()) || preventDestruction(e.getBlock().getLocation()))
             e.setCancelled(true);
     }
 

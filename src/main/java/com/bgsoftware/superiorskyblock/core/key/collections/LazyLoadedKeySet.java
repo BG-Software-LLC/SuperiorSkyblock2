@@ -11,20 +11,15 @@ import com.google.common.collect.Iterators;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.function.Supplier;
 
 public class LazyLoadedKeySet extends AbstractSet<Key> implements KeySet {
 
-    private final Supplier<Set> setCreator;
+    private final KeySetStrategy strategy;
     @Nullable
     private KeySet delegate;
 
-    public static LazyLoadedKeySet createSet(Supplier<Set> setCreator) {
-        return new LazyLoadedKeySet(setCreator);
-    }
-
-    private LazyLoadedKeySet(Supplier<Set> setCreator) {
-        this.setCreator = setCreator;
+    public LazyLoadedKeySet(KeySetStrategy strategy) {
+        this.strategy = strategy;
     }
 
     @Override
@@ -47,14 +42,18 @@ public class LazyLoadedKeySet extends AbstractSet<Key> implements KeySet {
         if (this.delegate != null)
             return this.delegate.add(key);
 
+        return addNoDelegate(key);
+    }
+
+    public boolean addNoDelegate(Key key) {
         if (key instanceof LazyKey) {
-            return add(((LazyKey<?>) key).getBaseKey());
+            return addNoDelegate(((LazyKey<?>) key).getBaseKey());
         }
 
         if (key instanceof EntityTypeKey) {
-            this.delegate = EntityTypeKeySet.createSet(this.setCreator);
+            this.delegate = new EntityTypeKeySet(this.strategy);
         } else if (key instanceof MaterialKey) {
-            this.delegate = MaterialKeySet.createSet(this.setCreator);
+            this.delegate = new MaterialKeySet(this.strategy);
         } else {
             throw new IllegalArgumentException("Cannot insert key of type " + key.getClass());
         }
@@ -76,7 +75,7 @@ public class LazyLoadedKeySet extends AbstractSet<Key> implements KeySet {
     @Nullable
     @Override
     public Key getKey(Key original) {
-        return getKey(original, null);
+        return this.delegate == null ? null : this.delegate.getKey(original);
     }
 
     @Override
@@ -91,7 +90,7 @@ public class LazyLoadedKeySet extends AbstractSet<Key> implements KeySet {
 
     @Override
     public Set<Key> asSet() {
-        return this;
+        return this.delegate == null ? this : this.delegate.asSet();
     }
 
 }

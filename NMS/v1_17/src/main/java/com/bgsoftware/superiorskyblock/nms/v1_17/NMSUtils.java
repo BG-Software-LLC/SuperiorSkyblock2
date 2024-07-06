@@ -3,6 +3,8 @@ package com.bgsoftware.superiorskyblock.nms.v1_17;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.v1_17.world.PropertiesMapper;
@@ -33,6 +35,8 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.UpgradeData;
+import net.minecraft.world.level.chunk.storage.EntityStorage;
+import net.minecraft.world.level.chunk.storage.IOWorker;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.lang.reflect.Modifier;
@@ -43,6 +47,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public class NMSUtils {
 
@@ -54,6 +59,10 @@ public class NMSUtils {
             ChunkMap.class, Map.class, Modifier.PUBLIC | Modifier.VOLATILE, 1);
     private static final ReflectMethod<LevelChunk> CHUNK_CACHE_SERVER_GET_CHUNK_IF_CACHED = new ReflectMethod<>(
             ServerChunkCache.class, "getChunkAtIfCachedImmediately", int.class, int.class);
+    private static final ReflectField<IOWorker> ENTITY_STORAGE_WORKER = new ReflectField<>(
+            EntityStorage.class, IOWorker.class, Modifier.PRIVATE | Modifier.FINAL, 1);
+    private static final ReflectMethod<CompletableFuture<net.minecraft.nbt.CompoundTag>> WORKER_LOAD_ASYNC = new ReflectMethod<>(
+            IOWorker.class, CompletableFuture.class, 1, ChunkPos.class);
 
     private static final List<CompletableFuture<Void>> PENDING_CHUNK_ACTIONS = new LinkedList<>();
 
@@ -61,8 +70,20 @@ public class NMSUtils {
 
     }
 
+    public static void runActionOnEntityChunks(ServerLevel serverLevel, Collection<ChunkPos> chunksCoords,
+                                               ChunkCallback chunkCallback) {
+        runActionOnChunksInternal(serverLevel, chunksCoords, chunkCallback, unloadedChunks ->
+                runActionOnUnloadedEntityChunks(serverLevel, unloadedChunks, chunkCallback));
+    }
+
     public static void runActionOnChunks(ServerLevel serverLevel, Collection<ChunkPos> chunksCoords,
                                          boolean saveChunks, ChunkCallback chunkCallback) {
+        runActionOnChunksInternal(serverLevel, chunksCoords, chunkCallback, unloadedChunks ->
+                runActionOnUnloadedChunks(serverLevel, unloadedChunks, saveChunks, chunkCallback));
+    }
+
+    private static void runActionOnChunksInternal(ServerLevel serverLevel, Collection<ChunkPos> chunksCoords,
+                                                  ChunkCallback chunkCallback, Consumer<List<ChunkPos>> onUnloadChunkAction) {
         List<ChunkPos> unloadedChunks = new LinkedList<>();
         List<LevelChunk> loadedChunks = new LinkedList<>();
 
@@ -88,18 +109,18 @@ public class NMSUtils {
             runActionOnLoadedChunks(loadedChunks, chunkCallback);
 
         if (hasUnloadedChunks) {
-            runActionOnUnloadedChunks(serverLevel, unloadedChunks, saveChunks, chunkCallback);
+            onUnloadChunkAction.accept(unloadedChunks);
         } else {
             chunkCallback.onFinish();
         }
     }
 
-    public static void runActionOnLoadedChunks(Collection<LevelChunk> chunks, ChunkCallback chunkCallback) {
+    private static void runActionOnLoadedChunks(Collection<LevelChunk> chunks, ChunkCallback chunkCallback) {
         chunks.forEach(chunkCallback::onLoadedChunk);
     }
 
-    public static void runActionOnUnloadedChunks(ServerLevel serverLevel, Collection<ChunkPos> chunks,
-                                                 boolean saveChunks, ChunkCallback chunkCallback) {
+    private static void runActionOnUnloadedChunks(ServerLevel serverLevel, Collection<ChunkPos> chunks,
+                                                  boolean saveChunks, ChunkCallback chunkCallback) {
         ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
 
         if (CHUNK_CACHE_SERVER_GET_CHUNK_IF_CACHED.isValid()) {
@@ -148,6 +169,30 @@ public class NMSUtils {
             pendingTask.complete(null);
             PENDING_CHUNK_ACTIONS.remove(pendingTask);
         });
+    }
+
+    private static void runActionOnUnloadedEntityChunks(ServerLevel serverLevel, Collection<ChunkPos> chunks,
+                                                        ChunkCallback chunkCallback) {
+        IOWorker worker = ENTITY_STORAGE_WORKER.get(serverLevel.entityManager.permanentStorage);
+        CompletableFutureList<Pair<ChunkPos, net.minecraft.nbt.CompoundTag>> workerChunks = new CompletableFutureList<>(-1);
+        chunks.forEach(chunkPos -> {
+            CompletableFuture<Pair<ChunkPos, net.minecraft.nbt.CompoundTag>> completableFuture = new CompletableFuture<>();
+            workerChunks.add(completableFuture);
+            WORKER_LOAD_ASYNC.invoke(worker, chunkPos).whenComplete((entityData, error) -> {
+                if (error != null) {
+                    completableFuture.completeExceptionally(error);
+                } else {
+                    completableFuture.complete(new Pair<>(chunkPos, entityData));
+                }
+            });
+        });
+        workerChunks.forEachCompleted(pair -> {
+            if (pair.getValue() != null)
+                chunkCallback.onUnloadedChunk(pair.getKey(), pair.getValue());
+        }, error -> {
+            Log.error(error, "An unexpected error occurred while interacting with an unloaded chunk:");
+        });
+        chunkCallback.onFinish();
     }
 
     public static List<CompletableFuture<Void>> getPendingChunkActions() {

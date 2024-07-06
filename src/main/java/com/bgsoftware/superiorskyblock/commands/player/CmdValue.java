@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.CustomKey;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -98,8 +99,10 @@ public class CmdValue implements ISuperiorCommand {
 
         StringBuilder stringBuilder = new StringBuilder();
 
+        BlockValue blockValue = plugin.getBlockValues().getBlockValue(toCheck);
+
         {
-            BigDecimal blockWorth = plugin.getBlockValues().getBlockWorth(toCheck);
+            BigDecimal blockWorth = blockValue.getWorth();
             if (blockWorth.doubleValue() == 0) {
                 if (!Message.BLOCK_VALUE_WORTHLESS.isEmpty(locale))
                     stringBuilder.append(Message.BLOCK_VALUE_WORTHLESS.getMessage(locale, keyName)).append("\n");
@@ -111,7 +114,7 @@ public class CmdValue implements ISuperiorCommand {
         }
 
         {
-            BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(toCheck);
+            BigDecimal blockLevel = blockValue.getLevel();
             if (blockLevel.doubleValue() == 0) {
                 if (!Message.BLOCK_LEVEL_WORTHLESS.isEmpty(locale)) {
                     stringBuilder.append(Message.BLOCK_LEVEL_WORTHLESS.getMessage(locale, keyName)).append("\n");
