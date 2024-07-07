@@ -13,6 +13,11 @@ public enum PlayerStatus {
     PORTALS_IMMUNED,
 
     /**
+     * The player cannot take damage from fall damage.
+     */
+    FALL_DAMAGE_IMMUNED,
+
+    /**
      * The player recently left an island.
      */
     LEAVING_ISLAND,

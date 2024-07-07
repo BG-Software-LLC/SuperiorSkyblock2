@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridg
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
@@ -424,9 +425,16 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void teleport(Island island, Dimension dimension, @Nullable Consumer<Boolean> teleportResult) {
         Player player = asPlayer();
         if (player != null) {
+            setPlayerStatus(PlayerStatus.FALL_DAMAGE_IMMUNED);
             playerTeleportAlgorithm.teleport(player, island, dimension).whenComplete((result, error) -> {
+                boolean successful = error == null && result;
+
+                if(successful) {
+                    BukkitExecutor.sync(() -> removePlayerStatus(PlayerStatus.FALL_DAMAGE_IMMUNED), 40L);
+                }
+
                 if (teleportResult != null)
-                    teleportResult.accept(error == null && result);
+                    teleportResult.accept(successful);
             });
         } else if (teleportResult != null) {
             teleportResult.accept(false);

@@ -447,7 +447,7 @@ public class PlayersListener implements Listener {
             return;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getEntity());
-        if (superiorPlayer.hasPlayerStatus(PlayerStatus.VOID_TELEPORT)) {
+        if (superiorPlayer.hasPlayerStatus(PlayerStatus.FALL_DAMAGE_IMMUNED)) {
             e.setCancelled(true);
         }
 
