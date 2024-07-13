@@ -352,11 +352,13 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         return handleInteractionInternal(superiorPlayer, location, island, islandPrivilege, 0, true, false);
     }
 
-    private InteractionResult handleInteractionInternal(SuperiorPlayer superiorPlayer, Location location, @Nullable Island island, @Nullable IslandPrivilege islandPrivilege, int extraRadius, boolean checkIslandBoundaries, boolean checkRecalculation) {
+    private InteractionResult handleInteractionInternal(SuperiorPlayer superiorPlayer, Location location,
+                                                        @Nullable Island island, @Nullable IslandPrivilege islandPrivilege,
+                                                        int extraRadius, boolean checkIslandBoundaries, boolean checkRecalculation) {
         if (superiorPlayer.hasBypassModeEnabled())
             return InteractionResult.SUCCESS;
 
-        if (checkIslandBoundaries && !plugin.getSettings().getWorldPermissions().contains(islandPrivilege.getName())) {
+        if (checkIslandBoundaries && islandPrivilege != null && !plugin.getSettings().getWorldPermissions().contains(islandPrivilege.getName())) {
             if (island == null && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld()))
                 return InteractionResult.OUTSIDE_ISLAND;
 
