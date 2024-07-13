@@ -72,7 +72,7 @@ public class WorldsSection extends SettingsContainerHolder implements SettingsMa
         private final String name;
 
         public DefaultDimensionConfig(ConfigurationSection section, String defaultName) {
-            this(section.getBoolean("enabled"), section.getBoolean("unlocked"),
+            this(section.getBoolean("enabled"), section.getBoolean("unlock"),
                     section.getBoolean("schematic-offset"), section.getString("biome"),
                     section.getString("name"), defaultName);
         }
