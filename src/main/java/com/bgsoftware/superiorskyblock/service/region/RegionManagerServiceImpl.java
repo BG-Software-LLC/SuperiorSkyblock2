@@ -123,8 +123,12 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Location blockLocation = block.getLocation();
         Material blockType = block.getType();
 
+        boolean isInteractableItem = BukkitItems.isInteractableItem(usedItem);
+
         int stackedBlockAmount = plugin.getStackedBlocks().getStackedBlockAmount(blockLocation);
-        if (stackedBlockAmount <= 1 && !plugin.getSettings().getInteractables().contains(blockType.name()))
+
+        if (!isInteractableItem && stackedBlockAmount <= 1 &&
+                !plugin.getSettings().getInteractables().contains(blockType.name()))
             return InteractionResult.SUCCESS;
 
         Island island = plugin.getGrid().getIslandAt(blockLocation);

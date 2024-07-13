@@ -114,8 +114,21 @@ public class BukkitItems {
             toDrop.getWorld().dropItemNaturally(toDrop, additionalItem);
     }
 
-    public static boolean isValidAndSpawnEgg(ItemStack itemStack) {
-        return !itemStack.getType().isBlock() && itemStack.getType().name().contains(ServerVersion.isLegacy() ? "MONSTER_EGG" : "SPAWN_EGG");
+    public static boolean isValidAndSpawnEgg(@Nullable ItemStack itemStack) {
+        return itemStack != null && isValidAndSpawnEgg(itemStack.getType());
+    }
+
+    public static boolean isValidAndSpawnEgg(Material itemType) {
+        return !itemType.isBlock() && itemType.name().contains(ServerVersion.isLegacy() ? "MONSTER_EGG" : "SPAWN_EGG");
+    }
+
+    public static boolean isInteractableItem(@Nullable ItemStack itemStack) {
+        if (itemStack == null)
+            return false;
+
+        Material itemType = itemStack.getType();
+
+        return itemType == Material.ARMOR_STAND || isValidAndSpawnEgg(itemType);
     }
 
 }
