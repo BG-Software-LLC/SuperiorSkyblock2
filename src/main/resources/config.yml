@@ -379,6 +379,11 @@ spawn:
   # Should players get damage in the spawn?
   players-damage: false
 
+# A list of permissions players will have in the islands world, outside of islands.
+# By adding permissions to this list, players will be able to grief the world, but not
+# other islands, so use this in caution.
+world-permissions: [ ]
+
 # When enabled, players will get teleported upon void fall.
 # If they fall not in an island, they will be teleported to spawn.
 void-teleport:

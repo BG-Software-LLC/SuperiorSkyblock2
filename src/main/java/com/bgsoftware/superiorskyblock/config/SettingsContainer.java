@@ -13,9 +13,8 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
-import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
-import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -50,11 +49,13 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -120,6 +121,7 @@ public class SettingsContainer {
     public final boolean spawnWorldBorder;
     public final int spawnSize;
     public final boolean spawnDamage;
+    public final Set<String> worldPermissions;
     public final boolean voidTeleportMembers;
     public final boolean voidTeleportVisitors;
     public final List<String> interactables;
@@ -334,6 +336,8 @@ public class SettingsContainer {
         spawnWorldBorder = config.getBoolean("spawn.world-border", false);
         spawnSize = config.getInt("spawn.size", 200);
         spawnDamage = config.getBoolean("spawn.players-damage", false);
+        worldPermissions = config.getStringList("world-permissions")
+                .stream().map(str -> str.toUpperCase(Locale.ENGLISH)).collect(Collectors.toSet());
         voidTeleportMembers = config.getBoolean("void-teleport.members", true);
         voidTeleportVisitors = config.getBoolean("void-teleport.visitors", true);
         interactables = loadInteractables(plugin);

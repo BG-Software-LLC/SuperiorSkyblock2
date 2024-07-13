@@ -174,6 +174,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public Collection<String> getWorldPermissions() {
+        return this.global.getWorldPermissions();
+    }
+
+    @Override
     public VoidTeleport getVoidTeleport() {
         return this.voidTeleport;
     }

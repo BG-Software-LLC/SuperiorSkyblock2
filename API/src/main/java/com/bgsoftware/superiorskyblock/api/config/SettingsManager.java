@@ -133,6 +133,12 @@ public interface SettingsManager {
     Spawn getSpawn();
 
     /**
+     * A list of permissions players will have in the islands world, outside of islands.
+     * Config path: world-permissions
+     */
+    Collection<String> getWorldPermissions();
+
+    /**
      * All settings related to the void teleportation.
      * Config path: void-teleport
      */
