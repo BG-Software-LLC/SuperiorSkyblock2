@@ -182,7 +182,7 @@ public class Location2ObjectMap<V> extends AbstractMap<Location, V> {
     }
 
     private static long computeChunkPair(int chunkX, int chunkZ) {
-        return ((chunkX & 0xFFFFFFFFL) << 32) | (chunkZ & 0xFFFFFFFFL);
+        return ((chunkZ & 0xFFFFFFFFL) << 32) | (chunkX & 0xFFFFFFFFL);
     }
 
     private static int computeBlockIndex(int relativeX, int blockY, int relativeZ) {
