@@ -29,6 +29,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,9 +39,9 @@ import java.util.concurrent.TimeUnit;
 
 public class UpgradeTypeEntityLimits implements IUpgradeType {
 
-    private final Map<EntityType, Player> entityBreederPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
-    private final Map<LocationKey, Player> vehiclesOwners = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
-    private final Map<EntityType, Player> spawnEggPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
+    private final Map<EntityType, SpawningPlayerData> entityBreederPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
+    private final Map<LocationKey, SpawningPlayerData> vehiclesOwners = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
+    private final Map<EntityType, SpawningPlayerData> spawnEggPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -89,7 +90,8 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            Player spawningPlayer = getSpawningPlayerFromSpawnEvent(e);
+            SpawningPlayerData spawningPlayerData = getSpawningPlayerFromSpawnEvent(e);
+            Player spawningPlayer = spawningPlayerData == null ? null : spawningPlayerData.player.get();
 
             boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
 
@@ -97,6 +99,9 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
                 e.setCancelled(true);
                 if (spawningPlayer != null && spawningPlayer.isOnline()) {
                     Message.REACHED_ENTITY_LIMIT.send(spawningPlayer, Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
+                    ItemStack itemToGiveBack = spawningPlayerData.itemStack;
+                    if (itemToGiveBack != null && itemToGiveBack.getType() != Material.AIR && itemToGiveBack.getAmount() > 0)
+                        BukkitItems.addItem(itemToGiveBack, spawningPlayer.getInventory(), spawningPlayer.getLocation());
                 }
             }
         }
@@ -156,7 +161,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
                     blockLocation.getZ()
             );
 
-            vehiclesOwners.put(futureEntitySpawnLocation, e.getPlayer());
+            vehiclesOwners.put(futureEntitySpawnLocation, new SpawningPlayerData(e.getPlayer()));
         }
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -181,7 +186,8 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
                     entityLocation.getBlockZ()
             );
 
-            Player vehicleOwner = vehiclesOwners.remove(entityBlockLocation);
+            SpawningPlayerData vehicleOwnerData = vehiclesOwners.remove(entityBlockLocation);
+            Player vehicleOwner = vehicleOwnerData == null ? null : vehicleOwnerData.player.get();
 
             boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
 
@@ -212,11 +218,11 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            spawnEggPlayers.put(spawnEggEntityType, e.getPlayer());
+            spawnEggPlayers.put(spawnEggEntityType, new SpawningPlayerData(e.getPlayer()));
         }
 
         @Nullable
-        private Player getSpawningPlayerFromSpawnEvent(CreatureSpawnEvent event) {
+        private SpawningPlayerData getSpawningPlayerFromSpawnEvent(CreatureSpawnEvent event) {
             EntityType entityType = event.getEntityType();
 
             if (entityType == EntityType.ARMOR_STAND) {
@@ -250,7 +256,24 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            entityBreederPlayers.put(childEntityType, (Player) e.getBreeder());
+            entityBreederPlayers.put(childEntityType, new SpawningPlayerData((Player) e.getBreeder(), e.getBredWith()));
+        }
+
+    }
+
+    private static class SpawningPlayerData {
+
+        private final WeakReference<Player> player;
+        @Nullable
+        private final ItemStack itemStack;
+
+        SpawningPlayerData(Player player) {
+            this(player, null);
+        }
+
+        SpawningPlayerData(Player player, @Nullable ItemStack itemStack) {
+            this.player = new WeakReference<>(player);
+            this.itemStack = itemStack;
         }
 
     }
