@@ -225,7 +225,7 @@ public class UpgradesModule extends BuiltinModule {
 
         Value<BigDecimal> bankLimit = Value.syncedFixed(new BigDecimal(levelSection.getString("bank-limit", "-1")));
         KeyMap<Integer> blockLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
-        if (levelSection.contains("block-limits")) {
+        if (levelSection.isConfigurationSection("block-limits")) {
             for (String block : levelSection.getConfigurationSection("block-limits").getKeys(false)) {
                 Key blockKey = Keys.ofMaterialAndData(block);
                 blockLimits.put(blockKey, levelSection.getInt("block-limits." + block));
@@ -233,12 +233,12 @@ public class UpgradesModule extends BuiltinModule {
             }
         }
         KeyMap<Integer> entityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
-        if (levelSection.contains("entity-limits")) {
+        if (levelSection.isConfigurationSection("entity-limits")) {
             for (String entity : levelSection.getConfigurationSection("entity-limits").getKeys(false))
                 entityLimits.put(Keys.ofEntityType(entity), levelSection.getInt("entity-limits." + entity));
         }
         EnumerateMap<Dimension, Map<Key, Integer>> generatorRates = new EnumerateMap<>(Dimension.values());
-        if (levelSection.contains("generator-rates")) {
+        if (levelSection.isConfigurationSection("generator-rates")) {
             for (String blockOrEnv : levelSection.getConfigurationSection("generator-rates").getKeys(false)) {
                 try {
                     Dimension dimension = Dimension.getByName(blockOrEnv.toUpperCase(Locale.ENGLISH));
@@ -253,7 +253,7 @@ public class UpgradesModule extends BuiltinModule {
             }
         }
         Map<PotionEffectType, Integer> islandEffects = new ArrayMap<>();
-        if (levelSection.contains("island-effects")) {
+        if (levelSection.isConfigurationSection("island-effects")) {
             for (String effect : levelSection.getConfigurationSection("island-effects").getKeys(false)) {
                 PotionEffectType potionEffectType = PotionEffectType.getByName(effect);
                 if (potionEffectType != null)
@@ -261,7 +261,7 @@ public class UpgradesModule extends BuiltinModule {
             }
         }
         Int2IntMapView rolesLimits = CollectionsFactory.createInt2IntArrayMap();
-        if (levelSection.contains("role-limits")) {
+        if (levelSection.isConfigurationSection("role-limits")) {
             for (String roleId : levelSection.getConfigurationSection("role-limits").getKeys(false)) {
                 try {
                     rolesLimits.put(Integer.parseInt(roleId), levelSection.getInt("role-limits." + roleId));
