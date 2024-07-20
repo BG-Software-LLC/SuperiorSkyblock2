@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.KeyBlocksCache;
@@ -283,6 +284,7 @@ public class NMSChunksImpl implements NMSChunks {
         ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
 
         KeyMap<Counter> chunkEntities = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
+        NBTTagList unloadedEntityTags = new NBTTagList();
 
         NMSUtils.runActionOnChunks(worldServer, Collections.singletonList(chunkCoord), false, new NMSUtils.ChunkCallback() {
             @Override
@@ -295,28 +297,32 @@ public class NMSChunksImpl implements NMSChunks {
 
             @Override
             public void onUnloadedChunk(ChunkCoordIntPair currChunkPos, NBTTagCompound entityData) {
-                for (NBTBase entityTag : entityData.getList("Entities", 10)) {
-                    EntityTypes<?> entityType = EntityTypes.a((NBTTagCompound) entityTag).orElse(null);
-                    if (entityType == null)
-                        continue;
-
-                    Entity fakeEntity = EntityTypes.a((NBTTagCompound) entityTag, worldServer).orElse(null);
-                    if (fakeEntity != null) {
-                        fakeEntity.valid = false;
-                        if (BukkitEntities.canBypassEntityLimit(fakeEntity.getBukkitEntity()))
-                            continue;
-                    }
-
-                    Key entityKey = Keys.of(Registry.ENTITY_TYPE.get(
-                            CraftNamespacedKey.fromMinecraft(EntityTypes.getName(entityType))));
-
-                    chunkEntities.computeIfAbsent(entityKey, k -> new Counter(0)).inc(1);
-                }
+                unloadedEntityTags.addAll(entityData.getList("Entities", 10));
             }
 
             @Override
             public void onFinish() {
-                completableFuture.complete(chunkEntities);
+                BukkitExecutor.sync(() -> {
+                    for (NBTBase entityTag : unloadedEntityTags) {
+                        EntityTypes<?> entityType = EntityTypes.a((NBTTagCompound) entityTag).orElse(null);
+                        if (entityType == null)
+                            continue;
+
+                        Entity fakeEntity = EntityTypes.a((NBTTagCompound) entityTag, worldServer).orElse(null);
+                        if (fakeEntity != null) {
+                            fakeEntity.valid = false;
+                            if (BukkitEntities.canBypassEntityLimit(fakeEntity.getBukkitEntity()))
+                                continue;
+                        }
+
+                        Key entityKey = Keys.of(Registry.ENTITY_TYPE.get(
+                                CraftNamespacedKey.fromMinecraft(EntityTypes.getName(entityType))));
+
+                        chunkEntities.computeIfAbsent(entityKey, k -> new Counter(0)).inc(1);
+                    }
+
+                    completableFuture.complete(chunkEntities);
+                });
             }
         });
 
