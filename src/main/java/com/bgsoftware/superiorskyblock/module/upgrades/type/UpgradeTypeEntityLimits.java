@@ -8,13 +8,17 @@ import com.bgsoftware.superiorskyblock.core.LocationKey;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -25,6 +29,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.inventory.ItemStack;
@@ -99,9 +104,10 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
                 e.setCancelled(true);
                 if (spawningPlayer != null && spawningPlayer.isOnline()) {
                     Message.REACHED_ENTITY_LIMIT.send(spawningPlayer, Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
-                    ItemStack itemToGiveBack = spawningPlayerData.itemStack;
-                    if (itemToGiveBack != null && itemToGiveBack.getType() != Material.AIR && itemToGiveBack.getAmount() > 0)
-                        BukkitItems.addItem(itemToGiveBack, spawningPlayer.getInventory(), spawningPlayer.getLocation());
+                    List<ItemStack> itemsToGiveBack = spawningPlayerData.itemStacks;
+                    for (ItemStack itemStack : itemsToGiveBack) {
+                        BukkitItems.addItem(itemStack, spawningPlayer.getInventory(), spawningPlayer.getLocation());
+                    }
                 }
             }
         }
@@ -243,6 +249,8 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
     private class EntityLimitsBreedListener implements Listener {
 
+        private final Int2ObjectMapView<ItemStack> trackedBreedItems = CollectionsFactory.createInt2ObjectArrayMap();
+
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onEntityBreed(EntityBreedEvent e) {
             Entity child = e.getEntity();
@@ -256,7 +264,50 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            entityBreederPlayers.put(childEntityType, new SpawningPlayerData((Player) e.getBreeder(), e.getBredWith()));
+            ItemStack fatherBreedItem = trackedBreedItems.remove(e.getFather().getEntityId());
+            ItemStack motherBreedItem = e.getFather().equals(e.getMother()) ? null :
+                    trackedBreedItems.remove(e.getMother().getEntityId());
+
+            entityBreederPlayers.put(childEntityType, new SpawningPlayerData((Player) e.getBreeder(), fatherBreedItem, motherBreedItem));
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onEntityFeed(PlayerInteractAtEntityEvent e) {
+            if (!(e.getRightClicked() instanceof Animals))
+                return;
+
+            PlayerHand usedHand = BukkitItems.getHand(e);
+            ItemStack usedItem = BukkitItems.getHandItem(e.getPlayer(), usedHand);
+
+            if (usedItem == null || !plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) e.getRightClicked()))
+                return;
+
+            // We want to calculate the amount of items consumed by breeding this animal.
+            // We do that by checking the held item one tick later, and subtracting the
+            // amount after 1 tick of the item from the original amount.
+            int mainHandSlot = e.getPlayer().getInventory().getHeldItemSlot();
+            int originalAmount = usedItem.getAmount();
+            ItemStack breedItem = usedItem.clone();
+
+            BukkitExecutor.sync(() -> {
+                ItemStack inventoryItem = usedHand == PlayerHand.MAIN_HAND ?
+                        e.getPlayer().getInventory().getItem(mainHandSlot) :
+                        BukkitItems.getHandItem(e.getPlayer(), PlayerHand.OFF_HAND);
+
+                boolean isInventoryItemEmpty = inventoryItem == null || inventoryItem.getType() == Material.AIR;
+
+                if (!isInventoryItemEmpty && !inventoryItem.isSimilar(usedItem))
+                    return;
+
+                int currAmount = isInventoryItemEmpty ? 0 : inventoryItem.getAmount();
+
+                int consumedAmount = originalAmount - currAmount;
+                if (consumedAmount <= 0)
+                    return;
+
+                breedItem.setAmount(consumedAmount);
+                trackedBreedItems.put(e.getRightClicked().getEntityId(), breedItem);
+            }, 5L);
         }
 
     }
@@ -264,16 +315,26 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
     private static class SpawningPlayerData {
 
         private final WeakReference<Player> player;
-        @Nullable
-        private final ItemStack itemStack;
+        private final List<ItemStack> itemStacks = new LinkedList<>();
 
         SpawningPlayerData(Player player) {
-            this(player, null);
+            this(player, (ItemStack) null);
         }
 
         SpawningPlayerData(Player player, @Nullable ItemStack itemStack) {
             this.player = new WeakReference<>(player);
-            this.itemStack = itemStack;
+            addItem(itemStack);
+        }
+
+        SpawningPlayerData(Player player, ItemStack... itemStacks) {
+            this.player = new WeakReference<>(player);
+            for (ItemStack itemStack : itemStacks)
+                addItem(itemStack);
+        }
+
+        private void addItem(@Nullable ItemStack itemStack) {
+            if (itemStack != null && itemStack.getType() != Material.AIR && itemStack.getAmount() > 0)
+                this.itemStacks.add(itemStack);
         }
 
     }

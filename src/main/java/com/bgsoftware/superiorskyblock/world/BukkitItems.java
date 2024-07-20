@@ -11,6 +11,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -23,6 +24,7 @@ public class BukkitItems {
 
     private static final ReflectMethod<EquipmentSlot> GET_HAND_BLOCK_PLACE = new ReflectMethod<>(BlockPlaceEvent.class, "getHand");
     private static final ReflectMethod<EquipmentSlot> GET_HAND_PLAYER_INTERACT = new ReflectMethod<>(PlayerInteractEvent.class, "getHand");
+    private static final ReflectMethod<EquipmentSlot> GET_HAND_PLAYER_INTERACT_ENTITY = new ReflectMethod<>(PlayerInteractEntityEvent.class, "getHand");
     private static final ReflectMethod<ItemStack> GET_ITEM_IN_OFF_HAND = new ReflectMethod<>(PlayerInventory.class, "getItemInOffHand");
     private static final ReflectMethod<ItemStack> SET_ITEM_IN_OFF_HAND = new ReflectMethod<>(PlayerInventory.class, "setItemInOffHand", ItemStack.class);
 
@@ -57,6 +59,8 @@ public class BukkitItems {
             reflectMethod = GET_HAND_BLOCK_PLACE;
         } else if (event instanceof PlayerInteractEvent) {
             reflectMethod = GET_HAND_PLAYER_INTERACT;
+        } else if (event instanceof PlayerInteractEntityEvent) {
+            reflectMethod = GET_HAND_PLAYER_INTERACT_ENTITY;
         } else {
             throw new IllegalArgumentException("Cannot get hand of event: " + event.getClass());
         }
