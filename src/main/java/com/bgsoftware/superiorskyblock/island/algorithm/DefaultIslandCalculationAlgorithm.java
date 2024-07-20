@@ -26,6 +26,7 @@ import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -63,9 +64,14 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
         Log.debug(Debug.CHUNK_CALCULATION, island.getOwner().getName());
 
         if (!plugin.getProviders().hasSnapshotsSupport()) {
-            IslandUtils.getChunkCoords(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS).values()
-                    .forEach(worldChunks -> CACHED_CALCULATED_CHUNKS.write(cache ->
-                            chunksToLoad.add(plugin.getNMSChunks().calculateChunks(worldChunks, cache))));
+            IslandUtils.getChunkCoords(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS)
+                    .forEach((worldInfo, worldChunks) -> {
+                        // Load the world.
+                        World world = plugin.getProviders().getWorldsProvider().getIslandsWorld(island, worldInfo.getDimension());
+                        if (world != null)
+                            CACHED_CALCULATED_CHUNKS.write(cache ->
+                                    chunksToLoad.add(plugin.getNMSChunks().calculateChunks(worldChunks, cache)));
+                    });
         } else {
             IslandUtils.getAllChunksAsync(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS,
                     ChunkLoadReason.BLOCKS_RECALCULATE, plugin.getProviders()::takeSnapshots).forEach(completableFuture -> {

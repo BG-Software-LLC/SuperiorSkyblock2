@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.google.common.base.Preconditions;
+import org.bukkit.World;
 
 import java.util.Collections;
 import java.util.Map;
@@ -125,8 +126,12 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
             CompletableFutureList<KeyMap<Counter>> chunkEntities = new CompletableFutureList<>(-1);
 
             IslandUtils.getChunkCoords(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS)
-                    .forEach(((worldInfo, worldChunks) -> worldChunks.forEach(chunkPosition ->
-                            chunkEntities.add(plugin.getNMSChunks().calculateChunkEntities(chunkPosition)))));
+                    .forEach(((worldInfo, worldChunks) -> {
+                        // Load the world.
+                        World world = plugin.getProviders().getWorldsProvider().getIslandsWorld(island, worldInfo.getDimension());
+                        if (world != null)
+                            chunkEntities.add(plugin.getNMSChunks().calculateChunkEntities(worldChunks));
+                    }));
 
             BukkitExecutor.async(() -> {
                 try {

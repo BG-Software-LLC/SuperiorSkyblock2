@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.BlockStatesMapper;
@@ -32,6 +33,7 @@ import net.minecraft.server.v1_16_R3.ProtoChunk;
 import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldServer;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -58,29 +60,31 @@ public class NMSUtils {
 
     }
 
-    public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
+    public static void runActionOnChunks(Collection<ChunkPosition> chunksCoords,
                                          boolean saveChunks, ChunkCallback chunkCallback) {
-        runActionOnChunksInternal(worldServer, chunksCoords, saveChunks, chunkCallback);
+        runActionOnChunksInternal(chunksCoords, saveChunks, chunkCallback);
     }
 
-    private static void runActionOnChunksInternal(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
+    private static void runActionOnChunksInternal(Collection<ChunkPosition> chunksCoords,
                                                   boolean saveChunks, ChunkCallback chunkCallback) {
-        List<ChunkCoordIntPair> unloadedChunks = new LinkedList<>();
+        List<ChunkPosition> unloadedChunks = new LinkedList<>();
         List<Chunk> loadedChunks = new LinkedList<>();
 
-        chunksCoords.forEach(chunkCoords -> {
+        chunksCoords.forEach(chunkPosition -> {
+            WorldServer worldServer = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+
             IChunkAccess chunkAccess;
 
             try {
-                chunkAccess = worldServer.getChunkIfLoadedImmediately(chunkCoords.x, chunkCoords.z);
+                chunkAccess = worldServer.getChunkIfLoadedImmediately(chunkPosition.getX(), chunkPosition.getZ());
             } catch (Throwable ex) {
-                chunkAccess = worldServer.getChunkIfLoaded(chunkCoords.x, chunkCoords.z);
+                chunkAccess = worldServer.getChunkIfLoaded(chunkPosition.getX(), chunkPosition.getZ());
             }
 
             if (chunkAccess instanceof Chunk) {
                 loadedChunks.add((Chunk) chunkAccess);
             } else {
-                unloadedChunks.add(chunkCoords);
+                unloadedChunks.add(chunkPosition);
             }
         });
 
@@ -90,7 +94,7 @@ public class NMSUtils {
             runActionOnLoadedChunks(loadedChunks, chunkCallback);
 
         if (hasUnloadedChunks) {
-            runActionOnUnloadedChunks(worldServer, unloadedChunks, saveChunks, chunkCallback);
+            runActionOnUnloadedChunks(unloadedChunks, saveChunks, chunkCallback);
         } else {
             chunkCallback.onFinish();
         }
@@ -100,15 +104,17 @@ public class NMSUtils {
         chunks.forEach(chunkCallback::onLoadedChunk);
     }
 
-    private static void runActionOnUnloadedChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunks,
+    private static void runActionOnUnloadedChunks(Collection<ChunkPosition> chunks,
                                                   boolean saveChunks, ChunkCallback chunkCallback) {
-        PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
-
         if (CHUNK_PROVIDER_SERVER_GET_CHUNK_IF_CACHED.isValid()) {
-            Iterator<ChunkCoordIntPair> chunksIterator = chunks.iterator();
+            Iterator<ChunkPosition> chunksIterator = chunks.iterator();
             while (chunksIterator.hasNext()) {
-                ChunkCoordIntPair chunkPos = chunksIterator.next();
-                Chunk cachedUnloadedChunk = worldServer.getChunkProvider().getChunkAtIfCachedImmediately(chunkPos.x, chunkPos.z);
+                ChunkPosition chunkPosition = chunksIterator.next();
+
+                WorldServer worldServer = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+
+                Chunk cachedUnloadedChunk = worldServer.getChunkProvider().getChunkAtIfCachedImmediately(
+                        chunkPosition.getX(), chunkPosition.getZ());
                 if (cachedUnloadedChunk != null) {
                     chunkCallback.onLoadedChunk(cachedUnloadedChunk);
                     chunksIterator.remove();
@@ -125,7 +131,12 @@ public class NMSUtils {
         PENDING_CHUNK_ACTIONS.add(pendingTask);
 
         BukkitExecutor.createTask().runAsync(v -> {
-            chunks.forEach(chunkCoords -> {
+            chunks.forEach(chunkPosition -> {
+                WorldServer worldServer = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+                PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
+
+                ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
+
                 try {
                     NBTTagCompound chunkCompound = playerChunkMap.read(chunkCoords);
 
@@ -136,12 +147,12 @@ public class NMSUtils {
                             Suppliers.ofInstance(worldServer.getWorldPersistentData()), chunkCompound, chunkCoords, worldServer);
 
                     if (chunkDataCompound.hasKeyOfType("Level", 10)) {
-                        chunkCallback.onUnloadedChunk(chunkCoords, chunkDataCompound.getCompound("Level"));
+                        chunkCallback.onUnloadedChunk(chunkPosition, chunkDataCompound.getCompound("Level"));
                         if (saveChunks)
                             playerChunkMap.a(chunkCoords, chunkDataCompound);
                     }
                 } catch (Exception error) {
-                    Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkCoords, ":");
+                    Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkPosition, ":");
                 }
             });
         }).runSync(v -> {
@@ -284,7 +295,7 @@ public class NMSUtils {
 
         void onLoadedChunk(Chunk chunk);
 
-        void onUnloadedChunk(ChunkCoordIntPair chunkPos, NBTTagCompound unloadedChunk);
+        void onUnloadedChunk(ChunkPosition chunkPosition, NBTTagCompound unloadedChunk);
 
         void onFinish();
 

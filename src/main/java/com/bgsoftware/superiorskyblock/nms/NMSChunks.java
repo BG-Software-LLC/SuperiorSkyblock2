@@ -25,7 +25,7 @@ public interface NMSChunks {
     CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
                                                              Map<ChunkPosition, CalculatedChunk> unloadedChunksCache);
 
-    CompletableFuture<KeyMap<Counter>> calculateChunkEntities(ChunkPosition chunkPosition);
+    CompletableFuture<KeyMap<Counter>> calculateChunkEntities(Collection<ChunkPosition> chunkPositions);
 
     void injectChunkSections(Chunk chunk);
 

@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_19;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -43,6 +43,7 @@ import net.minecraft.world.level.chunk.storage.IOWorker;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.bukkit.craftbukkit.v1_19_R3.CraftChunk;
+import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -79,36 +80,39 @@ public class NMSUtils {
 
     }
 
-    public static void runActionOnEntityChunks(ServerLevel serverLevel, Collection<ChunkPos> chunksCoords,
+    public static void runActionOnEntityChunks(Collection<ChunkPosition> chunksCoords,
                                                ChunkCallback chunkCallback) {
-        runActionOnChunksInternal(serverLevel, chunksCoords, chunkCallback, unloadedChunks ->
-                runActionOnUnloadedEntityChunks(serverLevel, unloadedChunks, chunkCallback));
+        runActionOnChunksInternal(chunksCoords, chunkCallback, unloadedChunks ->
+                runActionOnUnloadedEntityChunks(unloadedChunks, chunkCallback));
     }
 
-    public static void runActionOnChunks(ServerLevel serverLevel, Collection<ChunkPos> chunksCoords,
+    public static void runActionOnChunks(Collection<ChunkPosition> chunksCoords,
                                          boolean saveChunks, ChunkCallback chunkCallback) {
-        runActionOnChunksInternal(serverLevel, chunksCoords, chunkCallback, unloadedChunks ->
-                runActionOnUnloadedChunks(serverLevel, unloadedChunks, saveChunks, chunkCallback));
+        runActionOnChunksInternal(chunksCoords, chunkCallback, unloadedChunks ->
+                runActionOnUnloadedChunks(unloadedChunks, saveChunks, chunkCallback));
     }
 
-    private static void runActionOnChunksInternal(ServerLevel serverLevel, Collection<ChunkPos> chunksCoords,
-                                                  ChunkCallback chunkCallback, Consumer<List<ChunkPos>> onUnloadChunkAction) {
-        List<ChunkPos> unloadedChunks = new LinkedList<>();
+    private static void runActionOnChunksInternal(Collection<ChunkPosition> chunksCoords,
+                                                  ChunkCallback chunkCallback,
+                                                  Consumer<List<ChunkPosition>> onUnloadChunkAction) {
+        List<ChunkPosition> unloadedChunks = new LinkedList<>();
         List<LevelChunk> loadedChunks = new LinkedList<>();
 
-        chunksCoords.forEach(chunkPos -> {
+        chunksCoords.forEach(chunkPosition -> {
+            ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+
             ChunkAccess chunkAccess;
 
             try {
-                chunkAccess = serverLevel.getChunkIfLoadedImmediately(chunkPos.x, chunkPos.z);
+                chunkAccess = serverLevel.getChunkIfLoadedImmediately(chunkPosition.getX(), chunkPosition.getZ());
             } catch (Throwable ex) {
-                chunkAccess = serverLevel.getChunkIfLoaded(chunkPos.x, chunkPos.z);
+                chunkAccess = serverLevel.getChunkIfLoaded(chunkPosition.getX(), chunkPosition.getZ());
             }
 
             if (chunkAccess instanceof LevelChunk levelChunk) {
                 loadedChunks.add(levelChunk);
             } else {
-                unloadedChunks.add(chunkPos);
+                unloadedChunks.add(chunkPosition);
             }
         });
 
@@ -128,17 +132,18 @@ public class NMSUtils {
         chunks.forEach(chunkCallback::onLoadedChunk);
     }
 
-    private static void runActionOnUnloadedChunks(ServerLevel serverLevel,
-                                                  Collection<ChunkPos> chunks,
+    private static void runActionOnUnloadedChunks(Collection<ChunkPosition> chunks,
                                                   boolean saveChunks,
                                                   ChunkCallback chunkCallback) {
-        ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
-
         if (CHUNK_CACHE_SERVER_GET_CHUNK_IF_CACHED.isValid()) {
-            Iterator<ChunkPos> chunksIterator = chunks.iterator();
+            Iterator<ChunkPosition> chunksIterator = chunks.iterator();
             while (chunksIterator.hasNext()) {
-                ChunkPos chunkPos = chunksIterator.next();
-                LevelChunk cachedUnloadedChunk = serverLevel.getChunkSource().getChunkAtIfCachedImmediately(chunkPos.x, chunkPos.z);
+                ChunkPosition chunkPosition = chunksIterator.next();
+
+                ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+
+                LevelChunk cachedUnloadedChunk = serverLevel.getChunkSource().getChunkAtIfCachedImmediately(
+                        chunkPosition.getX(), chunkPosition.getZ());
                 if (cachedUnloadedChunk != null) {
                     chunkCallback.onLoadedChunk(cachedUnloadedChunk);
                     chunksIterator.remove();
@@ -155,36 +160,43 @@ public class NMSUtils {
         PENDING_CHUNK_ACTIONS.add(pendingTask);
 
         BukkitExecutor.createTask().runAsync(v -> {
-            List<Pair<ChunkPos, net.minecraft.nbt.CompoundTag>> chunkCompounds = new LinkedList<>();
+            List<UnloadedChunkCompound> chunkCompounds = new LinkedList<>();
 
-            chunks.forEach(chunkCoords -> {
+            chunks.forEach(chunkPosition -> {
+                ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+                ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
+
+                ChunkPos chunkPos = new ChunkPos(chunkPosition.getX(), chunkPosition.getZ());
+
                 try {
-                    net.minecraft.nbt.CompoundTag chunkCompound = chunkMap.read(chunkCoords).join().orElse(null);
+                    net.minecraft.nbt.CompoundTag chunkCompound = chunkMap.read(chunkPos).join().orElse(null);
 
                     if (chunkCompound == null)
                         return;
 
                     net.minecraft.nbt.CompoundTag chunkDataCompound = chunkMap.upgradeChunkTag(serverLevel.getTypeKey(),
                             Suppliers.ofInstance(serverLevel.getDataStorage()), chunkCompound,
-                            Optional.empty(), chunkCoords, serverLevel);
+                            Optional.empty(), chunkPos, serverLevel);
 
-                    UnloadedChunkCompound unloadedChunkCompound = new UnloadedChunkCompound(chunkDataCompound, chunkCoords);
+                    UnloadedChunkCompound unloadedChunkCompound = new UnloadedChunkCompound(chunkPosition, chunkDataCompound);
                     chunkCallback.onUnloadedChunk(unloadedChunkCompound);
 
                     if (saveChunks)
-                        chunkCompounds.add(new Pair<>(chunkCoords, chunkDataCompound));
+                        chunkCompounds.add(unloadedChunkCompound);
                 } catch (Exception error) {
-                    Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkCoords, ":");
+                    Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkPos, ":");
                 }
             });
 
             return chunkCompounds;
         }).runSync(chunkCompounds -> {
-            chunkCompounds.forEach(chunkCompoundPair -> {
+            chunkCompounds.forEach(unloadedChunkCompound -> {
+                ChunkMap chunkMap = unloadedChunkCompound.serverLevel().getChunkSource().chunkMap;
+
                 try {
-                    chunkMap.write(chunkCompoundPair.getKey(), chunkCompoundPair.getValue());
+                    chunkMap.write(unloadedChunkCompound.chunkPos(), unloadedChunkCompound.chunkCompound);
                 } catch (IOException error) {
-                    Log.error(error, "An unexpected error occurred while saving unloaded chunk ", chunkCompoundPair.getKey(), ":");
+                    Log.error(error, "An unexpected error occurred while saving unloaded chunk ", unloadedChunkCompound.chunkPosition, ":");
                 }
             });
 
@@ -195,44 +207,57 @@ public class NMSUtils {
         });
     }
 
-    private static void runActionOnUnloadedEntityChunks(ServerLevel serverLevel, Collection<ChunkPos> chunks,
+    private static void runActionOnUnloadedEntityChunks(Collection<ChunkPosition> chunks,
                                                         ChunkCallback chunkCallback) {
         if (SERVER_LEVEL_ENTITY_MANAGER.isValid()) {
-            PersistentEntitySectionManager<Entity> entityManager = SERVER_LEVEL_ENTITY_MANAGER.get(serverLevel);
-            IOWorker worker = ENTITY_STORAGE_WORKER.get(entityManager.permanentStorage);
-            CompletableFutureList<Pair<ChunkPos, net.minecraft.nbt.CompoundTag>> workerChunks = new CompletableFutureList<>(-1);
-            chunks.forEach(chunkPos -> {
-                CompletableFuture<Pair<ChunkPos, net.minecraft.nbt.CompoundTag>> completableFuture = new CompletableFuture<>();
+            CompletableFutureList<Void> workerChunks = new CompletableFutureList<>(-1);
+            chunks.forEach(chunkPosition -> {
+                ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+                PersistentEntitySectionManager<Entity> entityManager = SERVER_LEVEL_ENTITY_MANAGER.get(serverLevel);
+                IOWorker worker = ENTITY_STORAGE_WORKER.get(entityManager.permanentStorage);
+
+                ChunkPos chunkPos = new ChunkPos(chunkPosition.getX(), chunkPosition.getZ());
+
+                CompletableFuture<Void> completableFuture = new CompletableFuture<>();
                 workerChunks.add(completableFuture);
+
                 worker.loadAsync(chunkPos).whenComplete((entityDataOptional, error) -> {
                     if (error != null) {
                         completableFuture.completeExceptionally(error);
                     } else {
                         net.minecraft.nbt.CompoundTag entityData = entityDataOptional.orElse(null);
-                        completableFuture.complete(new Pair<>(chunkPos, entityData));
+
+                        if (entityData != null) {
+                            UnloadedChunkCompound unloadedChunkCompound = new UnloadedChunkCompound(chunkPosition, entityData);
+                            chunkCallback.onUnloadedChunk(unloadedChunkCompound);
+                        }
+
+                        completableFuture.complete(null);
                     }
                 });
             });
+
             workerChunks.forEachCompleted(pair -> {
-                if (pair.getValue() != null) {
-                    UnloadedChunkCompound unloadedChunkCompound = new UnloadedChunkCompound(pair.getValue(), pair.getKey());
-                    chunkCallback.onUnloadedChunk(unloadedChunkCompound);
-                }
+                // Wait for all chunks to load.
             }, error -> {
                 Log.error(error, "An unexpected error occurred while interacting with an unloaded chunk:");
             });
+
             chunkCallback.onFinish();
         } else {
             BukkitExecutor.async(() -> {
-                chunks.forEach(chunkPos -> {
+                chunks.forEach(chunkPosition -> {
+                    ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+
                     try {
-                        net.minecraft.nbt.CompoundTag entityData = serverLevel.entityDataControllerNew.readData(chunkPos.x, chunkPos.z);
+                        net.minecraft.nbt.CompoundTag entityData = serverLevel.entityDataControllerNew.readData(
+                                chunkPosition.getX(), chunkPosition.getZ());
                         if (entityData != null) {
-                            UnloadedChunkCompound unloadedChunkCompound = new UnloadedChunkCompound(entityData, chunkPos);
+                            UnloadedChunkCompound unloadedChunkCompound = new UnloadedChunkCompound(chunkPosition, entityData);
                             chunkCallback.onUnloadedChunk(unloadedChunkCompound);
                         }
                     } catch (IOException error) {
-                        Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkPos, ":");
+                        Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkPosition, ":");
                     }
                 });
                 chunkCallback.onFinish();
@@ -365,7 +390,8 @@ public class NMSUtils {
         return serverLevel.getChunk(craftChunk.getX(), craftChunk.getZ());
     }
 
-    public record UnloadedChunkCompound(net.minecraft.nbt.CompoundTag chunkCompound, ChunkPos chunkPos) {
+    public record UnloadedChunkCompound(ChunkPosition chunkPosition,
+                                        net.minecraft.nbt.CompoundTag chunkCompound) {
 
         public ListTag getSections() {
             return chunkCompound.getList("sections", 10);
@@ -387,10 +413,13 @@ public class NMSUtils {
             chunkCompound.put("block_entities", blockEntitiesList);
         }
 
-        public ChunkPos getChunkPos() {
-            return chunkPos;
+        public ServerLevel serverLevel() {
+            return ((CraftWorld) chunkPosition.getWorld()).getHandle();
         }
 
+        public ChunkPos chunkPos() {
+            return new ChunkPos(chunkPosition.getX(), chunkPosition.getZ());
+        }
     }
 
     private static boolean isValidPosition(ServerLevel serverLevel, BlockPos blockPos) {
