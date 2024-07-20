@@ -453,7 +453,7 @@ public enum Message {
     ISLAND_BANK_SHOW,
     ISLAND_BANK_SHOW_OTHER,
     ISLAND_BANK_SHOW_OTHER_NAME,
-    ISLAND_BEING_CALCULATED,
+    ISLAND_BEING_CALCULATED(3, TimeUnit.SECONDS),
     ISLAND_CLOSED,
     ISLAND_CREATE_PROCCESS_REQUEST,
     ISLAND_CREATE_PROCESS_FAIL,
@@ -792,19 +792,22 @@ public enum Message {
             if (!(sender instanceof Player))
                 return;
 
-            if (noInteractMessages == null)
-                noInteractMessages = AutoRemovalCollection.newHashSet(plugin.getSettings().getProtectedMessageDelay() * 50, TimeUnit.MILLISECONDS);
+            if (plugin.getSettings().getProtectedMessageDelay() > 0) {
+                if (noInteractMessages == null)
+                    noInteractMessages = AutoRemovalCollection.newHashSet(plugin.getSettings().getProtectedMessageDelay() * 50, TimeUnit.MILLISECONDS);
 
-            UUID playerUUID = ((Player) sender).getUniqueId();
+                UUID playerUUID = ((Player) sender).getUniqueId();
 
-            if (noInteractMessages.add(playerUUID)) {
-                Message.ISLAND_PROTECTED.send(sender, locale, args);
-
-                SuperiorCommand bypassCommand = plugin.getCommands().getAdminCommand("bypass");
-
-                if (bypassCommand != null && sender.hasPermission(bypassCommand.getPermission()))
-                    Message.ISLAND_PROTECTED_OPPED.send(sender, locale, args);
+                if (!noInteractMessages.add(playerUUID))
+                    return;
             }
+
+            Message.ISLAND_PROTECTED.send(sender, locale, args);
+
+            SuperiorCommand bypassCommand = plugin.getCommands().getAdminCommand("bypass");
+
+            if (bypassCommand != null && sender.hasPermission(bypassCommand.getPermission()))
+                Message.ISLAND_PROTECTED_OPPED.send(sender, locale, args);
         }
     },
 
@@ -830,22 +833,30 @@ public enum Message {
     private final String defaultMessage;
     private final boolean isCustom;
     private final Map<Locale, IMessageComponent> messages = new ArrayMap<>();
+    @Nullable
+    private Collection<UUID> delayedMessages;
 
     Message() {
         this(null);
     }
 
     Message(boolean isCustom) {
-        this(null, isCustom);
+        this(null, isCustom, 0L, null);
     }
 
     Message(String defaultMessage) {
-        this(defaultMessage, false);
+        this(defaultMessage, false, 0L, null);
     }
 
-    Message(String defaultMessage, boolean isCustom) {
+    Message(long delay, TimeUnit delayUnit) {
+        this(null, false, delay, delayUnit);
+    }
+
+    Message(String defaultMessage, boolean isCustom, long delay, @Nullable TimeUnit delayUnit) {
         this.defaultMessage = defaultMessage;
         this.isCustom = isCustom;
+        if (delay > 0 && delayUnit != null)
+            delayedMessages = AutoRemovalCollection.newHashSet(delay, delayUnit);
     }
 
     public static void reload() {
@@ -950,9 +961,12 @@ public enum Message {
     public void send(CommandSender sender, Locale locale, Object... objects) {
         IMessageComponent messageComponent = getComponent(locale);
         if (messageComponent != null) {
-            EventResult<IMessageComponent> eventResult = plugin.getEventsBus().callSendMessageEvent(sender, name(), messageComponent, objects);
-            if (!eventResult.isCancelled())
-                eventResult.getResult().sendMessage(sender, objects);
+            UUID playerUUID = ((Player) sender).getUniqueId();
+            if (delayedMessages == null || delayedMessages.add(playerUUID)) {
+                EventResult<IMessageComponent> eventResult = plugin.getEventsBus().callSendMessageEvent(sender, name(), messageComponent, objects);
+                if (!eventResult.isCancelled())
+                    eventResult.getResult().sendMessage(sender, objects);
+            }
         }
     }
 
