@@ -1,0 +1,33 @@
+group 'Hooks:MiniMessage'
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly("net.kyori:adventure-text-minimessage:4.17.0")
+    compileOnly "org.spigotmc:v1_16_R3-Tuinity:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+// Configurer l'encodage en UTF-8 pour la compilation Java
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+// Configurer l'encodage en UTF-8 pour les tâches de test
+tasks.withType(Test).configureEach {
+    systemProperty 'file.encoding', 'UTF-8'
+}
+
+if (project.hasProperty('hook.compile_minimessage') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_minimessage").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}
