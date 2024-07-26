@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.nms.v1_21;
 
-import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.nms.NMSEntities;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.PortalProcessor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.entity.CraftAnimals;
 import org.bukkit.craftbukkit.entity.CraftEntity;
@@ -11,12 +11,7 @@ import org.bukkit.entity.Animals;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
-import java.lang.reflect.Modifier;
-
 public class NMSEntitiesImpl implements NMSEntities {
-
-    private static final ReflectField<Integer> PORTAL_TICKS = new ReflectField<>(
-            Entity.class, int.class, Modifier.PROTECTED, 2);
 
     @Override
     public ItemStack[] getEquipment(EntityEquipment entityEquipment) {
@@ -39,8 +34,10 @@ public class NMSEntitiesImpl implements NMSEntities {
     }
 
     @Override
-    public int getPortalTicks(org.bukkit.entity.Entity entity) {
-        return PORTAL_TICKS.get(((CraftEntity) entity).getHandle());
+    public int getPortalTicks(org.bukkit.entity.Entity bukkitEntity) {
+        Entity entity = ((CraftEntity) bukkitEntity).getHandle();
+        PortalProcessor portalProcessor = entity.portalProcess;
+        return portalProcessor == null ? 0 : portalProcessor.getPortalTime();
     }
 
 }
