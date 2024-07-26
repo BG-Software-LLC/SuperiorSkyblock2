@@ -41,6 +41,11 @@ public class GlowEnchantment extends CraftEnchantment {
         MinecraftServer.getServer().registryAccess().registry(Registries.ENCHANTMENT).ifPresent(registry -> {
             try {
                 REGISTRY_FROZEN.set(registry, false);
+                try {
+                    // This may throw IllegalStateException which we don't care about.
+                    registry.createIntrusiveHolder(handle);
+                } catch (Throwable ignored) {
+                }
                 Registry.register(registry, ResourceLocation.withDefaultNamespace(GLOW_ENCHANTMENT_NAME), handle);
             } finally {
                 registry.freeze();
