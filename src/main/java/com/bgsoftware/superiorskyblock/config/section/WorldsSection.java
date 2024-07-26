@@ -144,7 +144,7 @@ public class WorldsSection extends SettingsContainerHolder implements SettingsMa
         private final BlockOffset portalOffset;
 
         public EndDimensionConfig(ConfigurationSection section, String defaultName) {
-            super(section, defaultName + "_end");
+            super(section, defaultName + "_the_end");
             this.isDragonFlight = section.getBoolean("dragon-fight.enabled") && ServerVersion.isAtLeast(ServerVersion.v1_9);
             String portalOffset = section.getString("dragon-fight.portal-offset");
             BlockOffset endDragonFightPortalOffset = Serializers.OFFSET_SPACED_SERIALIZER.deserialize(portalOffset);
@@ -159,7 +159,7 @@ public class WorldsSection extends SettingsContainerHolder implements SettingsMa
         public EndDimensionConfig(boolean isEnabled, boolean isUnlocked, boolean isSchematicOffset,
                                   String biome, String name, String defaultName, boolean isDragonFlight,
                                   BlockOffset portalOffset) {
-            super(isEnabled, isUnlocked, isSchematicOffset, biome, name, defaultName + "_end");
+            super(isEnabled, isUnlocked, isSchematicOffset, biome, name, defaultName + "_the_end");
             this.isDragonFlight = isDragonFlight && ServerVersion.isAtLeast(ServerVersion.v1_9);
             this.portalOffset = portalOffset;
         }
