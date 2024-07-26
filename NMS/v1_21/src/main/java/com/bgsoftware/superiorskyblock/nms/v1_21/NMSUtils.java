@@ -175,8 +175,10 @@ public class NMSUtils {
 
                     net.minecraft.nbt.CompoundTag chunkCompound = chunkMap.read(chunkPos).join().orElse(null);
 
-                    if (chunkCompound == null)
+                    if (chunkCompound == null) {
+                        chunkCallback.onChunkNotExist(chunkPosition);
                         return;
+                    }
 
                     net.minecraft.nbt.CompoundTag chunkDataCompound = chunkMap.upgradeChunkTag(serverLevel.getTypeKey(),
                             Suppliers.ofInstance(serverLevel.getDataStorage()), chunkCompound,
@@ -446,6 +448,10 @@ public class NMSUtils {
         void onLoadedChunk(LevelChunk levelChunk);
 
         void onUnloadedChunk(UnloadedChunkCompound unloadedChunkCompound);
+
+        default void onChunkNotExist(ChunkPosition chunkPosition) {
+
+        }
 
         void onFinish();
 
