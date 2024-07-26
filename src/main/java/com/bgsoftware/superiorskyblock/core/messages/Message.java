@@ -960,14 +960,18 @@ public enum Message {
 
     public void send(CommandSender sender, Locale locale, Object... objects) {
         IMessageComponent messageComponent = getComponent(locale);
-        if (messageComponent != null) {
+        if (messageComponent == null)
+            return;
+
+        if (sender instanceof Player) {
             UUID playerUUID = ((Player) sender).getUniqueId();
-            if (delayedMessages == null || delayedMessages.add(playerUUID)) {
-                EventResult<IMessageComponent> eventResult = plugin.getEventsBus().callSendMessageEvent(sender, name(), messageComponent, objects);
-                if (!eventResult.isCancelled())
-                    eventResult.getResult().sendMessage(sender, objects);
-            }
+            if (delayedMessages != null && !delayedMessages.add(playerUUID))
+                return;
         }
+
+        EventResult<IMessageComponent> eventResult = plugin.getEventsBus().callSendMessageEvent(sender, name(), messageComponent, objects);
+        if (!eventResult.isCancelled())
+            eventResult.getResult().sendMessage(sender, objects);
     }
 
     private void setMessage(Locale locale, IMessageComponent messageComponent) {
