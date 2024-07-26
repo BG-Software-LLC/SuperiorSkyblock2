@@ -48,6 +48,7 @@ import org.bukkit.craftbukkit.v1_12_R1.block.CraftSign;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.material.MaterialData;
 
 import java.lang.reflect.Modifier;
 import java.util.function.IntFunction;
@@ -227,7 +228,19 @@ public class NMSWorldImpl implements NMSWorld {
         Location blockLocation = block.getLocation();
         IBlockData blockData = ((CraftWorld) block.getWorld()).getHandle().getType(new BlockPosition(
                 blockLocation.getBlockX(), blockLocation.getBlockY(), blockLocation.getBlockZ()));
-        net.minecraft.server.v1_12_R1.Block nmsBlock = blockData.getBlock();
+        return getDefaultAmount(blockData);
+    }
+
+    @Override
+    public int getDefaultAmount(org.bukkit.block.BlockState bukkitBlockState) {
+        MaterialData materialData = bukkitBlockState.getData();
+        // noinspection deprecation
+        int combinedId = materialData.getItemType().getId() + (materialData.getData() << 12);
+        return getDefaultAmount(Block.getByCombinedId(combinedId));
+    }
+
+    private int getDefaultAmount(IBlockData blockData) {
+        Block nmsBlock = blockData.getBlock();
 
         // Checks for double slabs
         if (nmsBlock instanceof BlockDoubleStep) {

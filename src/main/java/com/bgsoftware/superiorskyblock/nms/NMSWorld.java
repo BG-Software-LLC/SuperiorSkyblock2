@@ -12,6 +12,7 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.event.block.SignChangeEvent;
 
 import java.util.function.IntFunction;
@@ -41,6 +42,8 @@ public interface NMSWorld {
     PistonPushReaction getPistonReaction(Block block);
 
     int getDefaultAmount(Block block);
+
+    int getDefaultAmount(BlockState blockState);
 
     void placeSign(Island island, Location location);
 

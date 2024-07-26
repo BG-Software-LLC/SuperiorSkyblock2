@@ -118,7 +118,7 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
                 oldBlockKey = ConstantKeys.WATER;
             } else {
                 oldBlockKey = Keys.of(oldBlockState);
-                oldBlockCount = plugin.getNMSWorld().getDefaultAmount(oldBlockState.getBlock());
+                oldBlockCount = plugin.getNMSWorld().getDefaultAmount(oldBlockState);
             }
 
             recordBlockBreakInternal(island, oldBlockKey, blockLocation, oldBlockCount, flags);

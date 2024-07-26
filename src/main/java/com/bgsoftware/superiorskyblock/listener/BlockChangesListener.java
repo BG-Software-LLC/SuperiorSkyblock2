@@ -101,7 +101,7 @@ public class BlockChangesListener implements Listener {
     private void onBlockPlace(BlockPlaceEvent e) {
         boolean shouldAvoidReplacedState = e.getBlockReplacedState().equals(e.getBlock().getState());
         this.worldRecordService.get().recordBlockPlace(Keys.of(e.getBlock()),
-                e.getBlock().getLocation(), 1,
+                e.getBlock().getLocation(), plugin.getNMSWorld().getDefaultAmount(e.getBlock()),
                 shouldAvoidReplacedState ? null : e.getBlockReplacedState(),
                 REGULAR_RECORD_FLAGS);
     }

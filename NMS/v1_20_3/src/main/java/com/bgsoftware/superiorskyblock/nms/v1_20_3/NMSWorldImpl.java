@@ -52,6 +52,7 @@ import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.BubbleColumn;
 import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlockState;
 import org.bukkit.craftbukkit.v1_20_R3.block.CraftSign;
 import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
@@ -291,7 +292,15 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public int getDefaultAmount(org.bukkit.block.Block bukkitBlock) {
-        BlockState blockState = ((CraftBlock) bukkitBlock).getNMS();
+        return getDefaultAmount(((CraftBlock) bukkitBlock).getNMS());
+    }
+
+    @Override
+    public int getDefaultAmount(org.bukkit.block.BlockState bukkitBlockState) {
+        return getDefaultAmount(((CraftBlockState) bukkitBlockState).getHandle());
+    }
+
+    private int getDefaultAmount(BlockState blockState) {
         Block block = blockState.getBlock();
         return NMSUtils.isDoubleBlock(block, blockState) ? 2 : 1;
     }
