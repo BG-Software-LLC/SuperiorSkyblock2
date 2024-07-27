@@ -304,7 +304,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         try {
             island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
 
-            island.setBiome(biome);
+            island.setBiome(biome, false);
             island.setSchematicGenerate(plugin.getSettings().getWorlds().getDefaultWorldDimension());
             island.setCurrentlyActive(true);
 
@@ -344,6 +344,8 @@ public class GridManagerImpl extends Manager implements GridManager {
                             islandLocation), System.currentTimeMillis() - startTime);
 
                     if (result) {
+                        island.setBiome(biome, true);
+
                         if (affectedChunks != null)
                             BukkitExecutor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, affectedChunks), 10L);
 
