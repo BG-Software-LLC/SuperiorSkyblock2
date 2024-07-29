@@ -379,7 +379,14 @@ public class NMSChunksImpl implements NMSChunks {
 
                 CalculatedChunk calculatedChunk = calculateChunk(chunkPosition, serverLevel, chunkSections);
                 allCalculatedChunks.add(calculatedChunk);
-                unloadedChunksCache.put(chunkPosition, calculatedChunk);
+
+                try {
+                    unloadedChunksCache.put(chunkPosition, calculatedChunk);
+                } catch (Throwable error) {
+                    Log.warn("An unexpected error occurred while calculating chunk pos: ", chunkPosition);
+                    Log.warn("cacheSize= ", unloadedChunksCache.size());
+                    throw error;
+                }
             }
 
             @Override
