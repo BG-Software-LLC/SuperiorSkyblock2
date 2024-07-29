@@ -23,9 +23,11 @@ import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Minecart;
@@ -137,6 +139,11 @@ public class BlockChangesListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private void onPlayerInteract(PlayerInteractEvent e) {
+        onMinecartPlace(e);
+        onSpawnerChange(e);
+    }
+
     private void onMinecartPlace(PlayerInteractEvent e) {
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK || !Materials.isRail(e.getClickedBlock().getType()))
             return;
@@ -158,6 +165,38 @@ public class BlockChangesListener implements Listener {
         if (minecartBlockKey != null)
             this.worldRecordService.get().recordBlockPlace(minecartBlockKey, e.getClickedBlock().getLocation(),
                     1, null, REGULAR_RECORD_FLAGS);
+    }
+
+    private void onSpawnerChange(PlayerInteractEvent e) {
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK ||
+                e.getClickedBlock().getType() != Materials.SPAWNER.toBukkitType())
+            return;
+
+        PlayerHand playerHand = BukkitItems.getHand(e);
+        ItemStack handItem = BukkitItems.getHandItem(e.getPlayer(), playerHand);
+
+        if (handItem == null)
+            return;
+
+        Material handItemType = handItem.getType();
+        if (!Materials.isSpawnEgg(handItemType))
+            return;
+
+        Block block = e.getClickedBlock();
+        Chunk chunk = block.getChunk();
+        BlockState oldBlockState = block.getState();
+        Key oldSpawnerKey = Keys.of(oldBlockState);
+
+        BukkitExecutor.sync(() -> {
+            if (!chunk.isLoaded())
+                return;
+
+            Key newSpawnerKey = Keys.of(block);
+            if (!oldSpawnerKey.equals(newSpawnerKey)) {
+                this.worldRecordService.get().recordBlockPlace(newSpawnerKey, block.getLocation(),
+                        1, oldBlockState, REGULAR_RECORD_FLAGS);
+            }
+        }, 1L);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

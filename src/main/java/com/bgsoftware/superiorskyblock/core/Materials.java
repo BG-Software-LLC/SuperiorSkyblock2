@@ -95,6 +95,10 @@ public enum Materials {
         return MATERIAL_TAGS.get(material) instanceof DyeMaterialTag;
     }
 
+    public static boolean isSpawnEgg(Material material) {
+        return MATERIAL_TAGS.get(material) instanceof SpawnEggMaterialTag;
+    }
+
     public static Set<Material> getBlocksNonLegacy() {
         return Collections.unmodifiableSet(BLOCK_NON_LEGACY_MATERIALS);
     }
@@ -139,6 +143,8 @@ public enum Materials {
                 enumMap.put(material, SignMaterialTag.INSTANCE);
             else if (ServerVersion.isLegacy() ? material == Material.INK_SACK : materialName.contains("_DYE"))
                 enumMap.put(material, DyeMaterialTag.INSTANCE);
+            else if (ServerVersion.isLegacy() ? material == Material.MONSTER_EGG : materialName.contains("_SPAWN_EGG"))
+                enumMap.put(material, SpawnEggMaterialTag.INSTANCE);
         });
         return enumMap;
     }
@@ -204,6 +210,12 @@ public enum Materials {
     private static class DyeMaterialTag implements MaterialTag {
 
         private static final DyeMaterialTag INSTANCE = new DyeMaterialTag();
+
+    }
+
+    private static class SpawnEggMaterialTag implements MaterialTag {
+
+        private static final SpawnEggMaterialTag INSTANCE = new SpawnEggMaterialTag();
 
     }
 
