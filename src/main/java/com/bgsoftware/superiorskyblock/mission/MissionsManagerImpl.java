@@ -91,6 +91,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                 Log.error(error, "An error occurred while unloading mission jar ", missionJarName, ":");
             }
         });
+        this.missionTypesClassLoaders.clear();
 
         // This is an attempt to force Windows to free the handles of the file.
         System.gc();
