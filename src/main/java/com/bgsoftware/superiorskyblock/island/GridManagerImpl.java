@@ -344,10 +344,12 @@ public class GridManagerImpl extends Manager implements GridManager {
                             islandLocation), System.currentTimeMillis() - startTime);
 
                     if (result) {
-                        island.setBiome(biome, true);
-
-                        if (affectedChunks != null)
-                            BukkitExecutor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, affectedChunks), 10L);
+                        if (affectedChunks != null) {
+                            BukkitExecutor.sync(() -> {
+                                IslandUtils.resetChunksExcludedFromList(island, affectedChunks);
+                                island.setBiome(biome, true);
+                            }, 10L);
+                        }
 
                         Dimension defaultDimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
 
