@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
@@ -970,8 +971,12 @@ public enum Message {
         }
 
         EventResult<IMessageComponent> eventResult = plugin.getEventsBus().callSendMessageEvent(sender, name(), messageComponent, objects);
-        if (!eventResult.isCancelled())
+        if (!eventResult.isCancelled()) {
             eventResult.getResult().sendMessage(sender, objects);
+            if (!(sender instanceof Player) && Log.isDebugged(Debug.SHOW_STACKTRACE)) {
+                Thread.dumpStack();
+            }
+        }
     }
 
     private void setMessage(Locale locale, IMessageComponent messageComponent) {
