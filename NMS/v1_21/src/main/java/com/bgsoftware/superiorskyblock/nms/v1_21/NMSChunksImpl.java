@@ -144,11 +144,6 @@ public class NMSChunksImpl implements NMSChunks {
             }
 
             @Override
-            public void onChunkNotExist(ChunkPosition chunkPosition) {
-                Log.warn("Setting biome ", bukkitBiome, " to non-existing chunk: ", chunkPosition);
-            }
-
-            @Override
             public void onFinish() {
                 // Do nothing.
             }
