@@ -123,8 +123,12 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Location blockLocation = block.getLocation();
         Material blockType = block.getType();
 
+        boolean isInteractableItem = BukkitItems.isInteractableItem(usedItem);
+
         int stackedBlockAmount = plugin.getStackedBlocks().getStackedBlockAmount(blockLocation);
-        if (stackedBlockAmount <= 1 && !plugin.getSettings().getInteractables().contains(blockType.name()))
+
+        if (!isInteractableItem && stackedBlockAmount <= 1 &&
+                !plugin.getSettings().getInteractables().contains(blockType.name()))
             return InteractionResult.SUCCESS;
 
         Island island = plugin.getGrid().getIslandAt(blockLocation);
@@ -348,21 +352,26 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         return handleInteractionInternal(superiorPlayer, location, island, islandPrivilege, 0, true, false);
     }
 
-    private InteractionResult handleInteractionInternal(SuperiorPlayer superiorPlayer, Location location, @Nullable Island island, @Nullable IslandPrivilege islandPrivilege, int extraRadius, boolean checkIslandBoundaries, boolean checkRecalculation) {
-        if (superiorPlayer.hasBypassModeEnabled()) return InteractionResult.SUCCESS;
+    private InteractionResult handleInteractionInternal(SuperiorPlayer superiorPlayer, Location location,
+                                                        @Nullable Island island, @Nullable IslandPrivilege islandPrivilege,
+                                                        int extraRadius, boolean checkIslandBoundaries, boolean checkRecalculation) {
+        if (superiorPlayer.hasBypassModeEnabled())
+            return InteractionResult.SUCCESS;
 
-        if (checkIslandBoundaries) {
+        if (checkIslandBoundaries && islandPrivilege != null && !plugin.getSettings().getWorldPermissions().contains(islandPrivilege.getName())) {
             if (island == null && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld()))
                 return InteractionResult.OUTSIDE_ISLAND;
 
-            if (island != null && !island.isInsideRange(location, extraRadius)) return InteractionResult.OUTSIDE_ISLAND;
+            if (island != null && !island.isInsideRange(location, extraRadius))
+                return InteractionResult.OUTSIDE_ISLAND;
         }
 
         if (island != null) {
             if (islandPrivilege != null && !island.hasPermission(superiorPlayer, islandPrivilege))
                 return InteractionResult.MISSING_PRIVILEGE;
 
-            if (checkRecalculation && island.isBeingRecalculated()) return InteractionResult.ISLAND_RECALCULATE;
+            if (checkRecalculation && island.isBeingRecalculated())
+                return InteractionResult.ISLAND_RECALCULATE;
         }
 
         return InteractionResult.SUCCESS;

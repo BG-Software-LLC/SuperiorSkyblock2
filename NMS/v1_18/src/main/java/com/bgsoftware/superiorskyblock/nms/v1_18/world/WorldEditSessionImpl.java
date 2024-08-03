@@ -4,9 +4,12 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.collections.view.LongIterator;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
@@ -50,7 +53,6 @@ import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,14 +72,16 @@ public class WorldEditSessionImpl implements WorldEditSession {
         }
     }).get();
 
-    private final Map<Long, ChunkData> chunks = new HashMap<>();
+    private final Long2ObjectMapView<ChunkData> chunks = CollectionsFactory.createLong2ObjectArrayMap();
     private final List<Pair<BlockPos, BlockState>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPos, CompoundTag>> blockEntities = new LinkedList<>();
     private final Set<ChunkPos> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
     private final ServerLevel serverLevel;
+    private final Dimension dimension;
 
     public WorldEditSessionImpl(ServerLevel serverLevel) {
         this.serverLevel = serverLevel;
+        this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(serverLevel.getWorld());
     }
 
     @Override
@@ -146,11 +150,15 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     @Override
     public List<ChunkPosition> getAffectedChunks() {
+        List<ChunkPosition> chunkPositions = new LinkedList<>();
         World bukkitWorld = serverLevel.getWorld();
-        return new SequentialListBuilder<Long>().map(chunks.keySet(), chunkKey -> {
+        LongIterator iterator = chunks.keyIterator();
+        while (iterator.hasNext()) {
+            long chunkKey = iterator.next();
             ChunkPos chunkPos = new ChunkPos(chunkKey);
-            return ChunkPosition.of(bukkitWorld, chunkPos.x, chunkPos.z);
-        });
+            chunkPositions.add(ChunkPosition.of(bukkitWorld, chunkPos.x, chunkPos.z));
+        }
+        return chunkPositions;
     }
 
     @Override
@@ -253,7 +261,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
         private void createChunkSections(Registry<Biome> biomesRegistry) {
             Holder<Biome> biome = CraftBlock.biomeToBiomeBase(biomesRegistry,
-                    IslandUtils.getDefaultWorldBiome(serverLevel.getWorld().getEnvironment()));
+                    IslandUtils.getDefaultWorldBiome(WorldEditSessionImpl.this.dimension));
 
             for (int i = 0; i < this.chunkSections.length; ++i) {
                 int chunkSectionPos = serverLevel.getSectionYFromSectionIndex(i);
@@ -285,7 +293,12 @@ public class WorldEditSessionImpl implements WorldEditSession {
                     tempChunk);
 
             // We want to copy the level chunk sections back
-            System.arraycopy(tempChunk.getSections(), 0, this.chunkSections, 0, this.chunkSections.length);
+            LevelChunkSection[] tempChunkSections = tempChunk.getSections();
+            for (int i = 0; i < Math.min(this.chunkSections.length, tempChunkSections.length); ++i) {
+                LevelChunkSection chunkSection = tempChunkSections[i];
+                if (chunkSection != null)
+                    this.chunkSections[i] = chunkSection;
+            }
         }
 
         private void createHeightmaps(ProtoChunk tempChunk) {

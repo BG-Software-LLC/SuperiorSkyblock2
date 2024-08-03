@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCounts;
+import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -215,8 +216,9 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
             }
         }
 
-        BigDecimal worthValue = plugin.getBlockValues().getBlockWorth(rawKey);
-        BigDecimal levelValue = plugin.getBlockValues().getBlockLevel(rawKey);
+        BlockValue blockValue = plugin.getBlockValues().getBlockValue(rawKey);
+        BigDecimal worthValue = blockValue.getWorth();
+        BigDecimal levelValue = blockValue.getLevel();
 
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
 

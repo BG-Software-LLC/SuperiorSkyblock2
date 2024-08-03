@@ -8,13 +8,13 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.world.KeyBlocksCache;
+import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockDoubleStep;
@@ -61,13 +61,9 @@ public class NMSChunksImpl implements NMSChunks {
         if (chunkPositions.isEmpty())
             return;
 
-        List<ChunkCoordIntPair> chunksCoords = new SequentialListBuilder<ChunkCoordIntPair>()
-                .build(chunkPositions, chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()));
-
-        WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
         byte biomeBase = (byte) CraftBlock.biomeToBiomeBase(biome).id;
 
-        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, new NMSUtils.ChunkCallback() {
+        NMSUtils.runActionOnChunks(chunkPositions, true, new NMSUtils.ChunkCallback() {
             @Override
             public void onChunk(Chunk chunk, boolean isLoaded) {
                 Arrays.fill(chunk.getBiomeIndex(), biomeBase);
@@ -86,15 +82,10 @@ public class NMSChunksImpl implements NMSChunks {
         if (chunkPositions.isEmpty())
             return;
 
-        List<ChunkCoordIntPair> chunksCoords = new SequentialListBuilder<ChunkCoordIntPair>()
-                .build(chunkPositions, chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()));
-
         chunkPositions.forEach(chunkPosition -> island.markChunkEmpty(chunkPosition.getWorld(),
                 chunkPosition.getX(), chunkPosition.getZ(), false));
 
-        WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
-
-        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, new NMSUtils.ChunkCallback() {
+        NMSUtils.runActionOnChunks(chunkPositions, true, new NMSUtils.ChunkCallback() {
             @Override
             public void onChunk(Chunk chunk, boolean isLoaded) {
                 Arrays.fill(chunk.getSections(), null);
@@ -102,13 +93,13 @@ public class NMSChunksImpl implements NMSChunks {
                 removeEntities(chunk);
 
                 for (Map.Entry<BlockPosition, TileEntity> tileEntityEntry : chunk.tileEntities.entrySet()) {
-                    worldServer.tileEntityList.remove(tileEntityEntry.getValue());
+                    chunk.world.tileEntityList.remove(tileEntityEntry.getValue());
                     try {
                         // This field doesn't exist in Taco 1.8
-                        worldServer.h.remove(tileEntityEntry.getValue());
+                        chunk.world.h.remove(tileEntityEntry.getValue());
                     } catch (Throwable ignored) {
                     }
-                    worldServer.capturedTileEntities.remove(tileEntityEntry.getKey());
+                    chunk.world.capturedTileEntities.remove(tileEntityEntry.getKey());
                 }
 
                 chunk.tileEntities.clear();
@@ -128,7 +119,7 @@ public class NMSChunksImpl implements NMSChunks {
     public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
                                                                     Map<ChunkPosition, CalculatedChunk> unloadedChunksCache) {
         List<CalculatedChunk> allCalculatedChunks = new LinkedList<>();
-        List<ChunkCoordIntPair> chunksCoords = new LinkedList<>();
+        List<ChunkPosition> chunkPositionsToCalculate = new LinkedList<>();
 
         Iterator<ChunkPosition> chunkPositionsIterator = chunkPositions.iterator();
         while (chunkPositionsIterator.hasNext()) {
@@ -138,7 +129,7 @@ public class NMSChunksImpl implements NMSChunks {
                 allCalculatedChunks.add(cachedCalculatedChunk);
                 chunkPositionsIterator.remove();
             } else {
-                chunksCoords.add(new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()));
+                chunkPositionsToCalculate.add(chunkPosition);
             }
         }
 
@@ -147,14 +138,13 @@ public class NMSChunksImpl implements NMSChunks {
 
         CompletableFuture<List<CalculatedChunk>> completableFuture = new CompletableFuture<>();
 
-        WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
-
-        NMSUtils.runActionOnChunks(worldServer, chunksCoords, false, new NMSUtils.ChunkCallback() {
+        NMSUtils.runActionOnChunks(chunkPositions, false, new NMSUtils.ChunkCallback() {
             @Override
             public void onChunk(Chunk chunk, boolean isLoaded) {
-                ChunkPosition chunkPosition = ChunkPosition.of(worldServer.getWorld(), chunk.locX, chunk.locZ);
+                World bukkitWorld = chunk.world.getWorld();
+                ChunkPosition chunkPosition = ChunkPosition.of(bukkitWorld, chunk.locX, chunk.locZ);
 
-                KeyMap<Counter> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+                KeyMap<Counter> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
                 List<Location> spawnersLocations = new LinkedList<>();
 
                 for (ChunkSection chunkSection : chunk.getSections()) {
@@ -163,7 +153,7 @@ public class NMSChunksImpl implements NMSChunks {
                             IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
                             Block block = blockData.getBlock();
                             if (block != Blocks.AIR) {
-                                Location location = new Location(worldServer.getWorld(),
+                                Location location = new Location(bukkitWorld,
                                         (chunkPosition.getX() << 4) + bp.getX(),
                                         chunkSection.getYPosition() + bp.getY(),
                                         (chunkPosition.getZ() << 4) + bp.getZ());
@@ -205,6 +195,34 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     @Override
+    public CompletableFuture<KeyMap<Counter>> calculateChunkEntities(Collection<ChunkPosition> chunkPositions) {
+        if (chunkPositions.isEmpty())
+            return CompletableFuture.completedFuture(KeyMaps.createEmptyMap());
+
+        CompletableFuture<KeyMap<Counter>> completableFuture = new CompletableFuture<>();
+
+        KeyMap<Counter> chunkEntities = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
+
+        NMSUtils.runActionOnChunks(chunkPositions, false, new NMSUtils.ChunkCallback() {
+
+            @Override
+            public void onChunk(Chunk chunk, boolean isLoaded) {
+                for (org.bukkit.entity.Entity bukkitEntity : chunk.bukkitChunk.getEntities()) {
+                    if (!BukkitEntities.canBypassEntityLimit(bukkitEntity))
+                        chunkEntities.computeIfAbsent(Keys.of(bukkitEntity), i -> new Counter(0)).inc(1);
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                completableFuture.complete(chunkEntities);
+            }
+        });
+
+        return completableFuture;
+    }
+
+    @Override
     public void injectChunkSections(org.bukkit.Chunk chunk) {
         // No implementation
     }
@@ -228,8 +246,8 @@ public class NMSChunksImpl implements NMSChunks {
             return;
 
         if (stop) {
-            ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunk.getX(), chunk.getZ());
-            CropsTickingTileEntity cropsTickingTileEntity = CropsTickingTileEntity.remove(chunkCoords);
+            CropsTickingTileEntity cropsTickingTileEntity = CropsTickingTileEntity.remove(
+                    ChunkCoordIntPair.a(chunk.getX(), chunk.getZ()));
             if (cropsTickingTileEntity != null) {
                 try {
                     cropsTickingTileEntity.getWorld().tileEntityList.remove(cropsTickingTileEntity);

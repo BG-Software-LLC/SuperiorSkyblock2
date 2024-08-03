@@ -14,14 +14,17 @@ import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.PortalType;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
+import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
@@ -47,34 +50,33 @@ public class PortalsListener implements Listener {
         if (superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
-        // TODO - do we really need this? Why not use EntityPortalEnterEvent below?
-
-        PortalType portalType = (e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ? PortalType.NETHER : PortalType.ENDER;
+        PortalType portalType = (e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ?
+                PortalType.NETHER : PortalType.ENDER;
 
         EntityPortalResult portalResult = this.portalsManager.get().handlePlayerPortal(superiorPlayer, e.getFrom(),
                 portalType, e.getTo(), true);
+        handleEntityPortal(portalResult, e);
+    }
 
-        switch (portalResult) {
-            case DESTINATION_WORLD_DISABLED:
-            case PORTAL_NOT_IN_ISLAND:
-                return;
-            case PLAYER_IMMUNED_TO_PORTAL:
-            case SCHEMATIC_GENERATING_COOLDOWN:
-            case DESTINATION_NOT_ISLAND_WORLD:
-            case PORTAL_EVENT_CANCELLED:
-            case INVALID_SCHEMATIC:
-            case WORLD_NOT_UNLOCKED:
-            case DESTINATION_ISLAND_NOT_PERMITTED:
-            case SUCCEED:
-                e.setCancelled(true);
-                return;
-            default:
-                throw new IllegalStateException("No handling for result: " + portalResult);
-        }
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntityPortal(EntityPortalEvent e) {
+        if (e.getTo() == null || e.getTo().getWorld() == null || e.getFrom() == null || e.getFrom().getWorld() == null)
+            return;
+
+        PortalType portalType = e.getTo().getWorld().getEnvironment() == World.Environment.THE_END ||
+                e.getFrom().getWorld().getEnvironment() == World.Environment.THE_END ? PortalType.ENDER : PortalType.NETHER;
+
+        EntityPortalResult portalResult = this.portalsManager.get().handleEntityPortal(e.getEntity(), e.getFrom(),
+                portalType, e.getTo());
+        handleEntityPortal(portalResult, e);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityPortalEnter(EntityPortalEnterEvent e) {
+        // Simulate portals in the following cases:
+        //  - Using an end portal in the end
+        //  - The target world is disabled
+
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if (island == null)
@@ -83,24 +85,23 @@ public class PortalsListener implements Listener {
         World world = e.getLocation().getWorld();
 
         // Simulate end portal
-        if (world.getEnvironment() == World.Environment.THE_END && plugin.getGrid().isIslandsWorld(world)) {
-            if (island.wasSchematicGenerated(World.Environment.NORMAL)) {
-                /* We teleport the player to his island instead of cancelling the event.
-                Therefore, we must prevent the player from acting like he entered another island or left his island.*/
+        if (world.getEnvironment() == World.Environment.THE_END) {
+            /* We teleport the player to his island instead of cancelling the event.
+            Therefore, we must prevent the player from acting like he entered another island or left his island.*/
 
-                SuperiorPlayer teleportedPlayer = e.getEntity() instanceof Player ?
-                        plugin.getPlayers().getSuperiorPlayer((Player) e.getEntity()) : null;
+            SuperiorPlayer teleportedPlayer = e.getEntity() instanceof Player ?
+                    plugin.getPlayers().getSuperiorPlayer((Player) e.getEntity()) : null;
 
-                if (teleportedPlayer != null)
-                    teleportedPlayer.setPlayerStatus(PlayerStatus.LEAVING_ISLAND);
+            if (teleportedPlayer != null)
+                teleportedPlayer.setPlayerStatus(PlayerStatus.LEAVING_ISLAND);
 
-                BukkitExecutor.sync(() -> {
-                    EntityTeleports.teleportUntilSuccess(e.getEntity(), island.getIslandHome(World.Environment.NORMAL), 5, () -> {
-                        if (teleportedPlayer != null)
-                            teleportedPlayer.removePlayerStatus(PlayerStatus.LEAVING_ISLAND);
-                    });
-                }, 5L);
-            }
+            BukkitExecutor.sync(() -> {
+                EntityTeleports.teleportUntilSuccess(e.getEntity(),
+                        island.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension()), 5, () -> {
+                            if (teleportedPlayer != null)
+                                teleportedPlayer.removePlayerStatus(PlayerStatus.LEAVING_ISLAND);
+                        });
+            }, 5L);
         }
 
         if (ServerVersion.isLessThan(ServerVersion.v1_16))
@@ -127,6 +128,26 @@ public class PortalsListener implements Listener {
             this.portalsManager.get().handlePlayerPortalFromIsland(superiorPlayer, island, e.getLocation(), portalType, true);
         } else {
             this.portalsManager.get().handleEntityPortalFromIsland(e.getEntity(), island, e.getLocation(), portalType);
+        }
+    }
+
+    private void handleEntityPortal(EntityPortalResult portalResult, Cancellable event) {
+        switch (portalResult) {
+            case PORTAL_NOT_IN_ISLAND:
+                return;
+            case DESTINATION_WORLD_DISABLED:
+            case PLAYER_IMMUNED_TO_PORTAL:
+            case SCHEMATIC_GENERATING_COOLDOWN:
+            case DESTINATION_NOT_ISLAND_WORLD:
+            case PORTAL_EVENT_CANCELLED:
+            case INVALID_SCHEMATIC:
+            case WORLD_NOT_UNLOCKED:
+            case DESTINATION_ISLAND_NOT_PERMITTED:
+            case SUCCEED:
+                event.setCancelled(true);
+                return;
+            default:
+                throw new IllegalStateException("No handling for result: " + portalResult);
         }
     }
 

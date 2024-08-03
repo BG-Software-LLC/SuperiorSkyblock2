@@ -4,15 +4,17 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LegacyMasks;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.core.database.loader.DatabaseLoader;
 import com.bgsoftware.superiorskyblock.core.database.loader.backup.BackupDatabase;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.SQLDatabaseLoader;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.DatabaseLoader_V1;
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsDeserializer;
 import com.bgsoftware.superiorskyblock.core.database.serialization.PlayersDeserializer;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
@@ -102,7 +104,6 @@ public class DataManager extends Manager {
 
     private void loadDatabaseLoaders() {
         addDatabaseLoader(new CopyOldDatabase());
-        addDatabaseLoader(new DatabaseLoader_V1());
         addDatabaseLoader(new BackupDatabase(plugin));
         addDatabaseLoader(new SQLDatabaseLoader(plugin));
     }
@@ -224,9 +225,18 @@ public class DataManager extends Manager {
                     .setLocked(databaseResult.getBoolean("locked").orElse(false))
                     .setIgnored(databaseResult.getBoolean("ignored").orElse(false))
                     .setDescription(databaseResult.getString("description").orElse(""))
-                    .setGeneratedSchematics(databaseResult.getInt("generated_schematics").orElse(0))
-                    .setUnlockedWorlds(databaseResult.getInt("unlocked_worlds").orElse(0))
                     .setLastTimeUpdated(databaseResult.getLong("last_time_updated").orElse(System.currentTimeMillis() / 1000L));
+
+
+            EnumerateSet<Dimension> generatedSchematics = LegacyMasks.convertGeneratedSchematicsMask(
+                    databaseResult.getInt("generated_schematics").orElse(0));
+            EnumerateSet<Dimension> unlockedWorlds = LegacyMasks.convertUnlockedWorldsMask(
+                    databaseResult.getInt("unlocked_worlds").orElse(0));
+
+            for (Dimension dimension : Dimension.values()) {
+                if (generatedSchematics.contains(dimension)) builder.setGeneratedSchematic(dimension);
+                if (unlockedWorlds.contains(dimension)) builder.setUnlockedWorld(dimension);
+            }
 
             databaseResult.getString("dirty_chunks").ifPresent(dirtyChunks -> {
                 IslandsDeserializer.deserializeDirtyChunks(builder, dirtyChunks);
@@ -234,6 +244,10 @@ public class DataManager extends Manager {
 
             databaseResult.getString("block_counts").ifPresent(blockCounts -> {
                 IslandsDeserializer.deserializeBlockCounts(builder, blockCounts);
+            });
+
+            databaseResult.getString("entity_counts").ifPresent(entityCounts -> {
+                IslandsDeserializer.deserializeEntityCounts(builder, entityCounts);
             });
 
             plugin.getGrid().getIslandsContainer().addIsland(builder.build());

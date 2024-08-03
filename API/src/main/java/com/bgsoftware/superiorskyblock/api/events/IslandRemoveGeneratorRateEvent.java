@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.events;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.World;
 import org.bukkit.event.Cancellable;
@@ -16,7 +17,7 @@ public class IslandRemoveGeneratorRateEvent extends IslandEvent implements Cance
     @Nullable
     private final SuperiorPlayer superiorPlayer;
     private final Key block;
-    private final World.Environment environment;
+    private final Dimension dimension;
 
     private boolean cancelled = false;
 
@@ -29,12 +30,27 @@ public class IslandRemoveGeneratorRateEvent extends IslandEvent implements Cance
      * @param block          The block that the rate was removed for.
      * @param environment    The environment of the world that the rate was removed for.
      */
+    @Deprecated
     public IslandRemoveGeneratorRateEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Key block,
                                           World.Environment environment) {
+        this(superiorPlayer, island, block, Dimension.getByName(environment.name()));
+    }
+
+    /**
+     * The constructor of the event.
+     *
+     * @param superiorPlayer The player that removed the generator-rate of an island.
+     *                       If set to null, it means the rate was removed via the console.
+     * @param island         The island that the generator-rate was removed for.
+     * @param block          The block that the rate was removed for.
+     * @param dimension      The dimension of the world that the rate was removed for.
+     */
+    public IslandRemoveGeneratorRateEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Key block,
+                                          Dimension dimension) {
         super(island);
         this.superiorPlayer = superiorPlayer;
         this.block = block;
-        this.environment = environment;
+        this.dimension = dimension;
     }
 
     /**
@@ -56,8 +72,16 @@ public class IslandRemoveGeneratorRateEvent extends IslandEvent implements Cance
     /**
      * Get the environment of the world that the rate was removed for.
      */
+    @Deprecated
     public World.Environment getEnvironment() {
-        return environment;
+        return this.dimension.getEnvironment();
+    }
+
+    /**
+     * Get the environment of the world that the rate was removed for.
+     */
+    public Dimension getDimension() {
+        return dimension;
     }
 
     @Override

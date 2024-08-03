@@ -23,9 +23,11 @@ import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Minecart;
@@ -101,7 +103,7 @@ public class BlockChangesListener implements Listener {
     private void onBlockPlace(BlockPlaceEvent e) {
         boolean shouldAvoidReplacedState = e.getBlockReplacedState().equals(e.getBlock().getState());
         this.worldRecordService.get().recordBlockPlace(Keys.of(e.getBlock()),
-                e.getBlock().getLocation(), 1,
+                e.getBlock().getLocation(), plugin.getNMSWorld().getDefaultAmount(e.getBlock()),
                 shouldAvoidReplacedState ? null : e.getBlockReplacedState(),
                 REGULAR_RECORD_FLAGS);
     }
@@ -115,7 +117,7 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onStructureGrow(StructureGrowEvent e) {
-        KeyMap<Integer> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         e.getBlocks().forEach(blockState -> {
             Key blockKey = Keys.of(blockState);
             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
@@ -137,6 +139,11 @@ public class BlockChangesListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private void onPlayerInteract(PlayerInteractEvent e) {
+        onMinecartPlace(e);
+        onSpawnerChange(e);
+    }
+
     private void onMinecartPlace(PlayerInteractEvent e) {
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK || !Materials.isRail(e.getClickedBlock().getType()))
             return;
@@ -158,6 +165,38 @@ public class BlockChangesListener implements Listener {
         if (minecartBlockKey != null)
             this.worldRecordService.get().recordBlockPlace(minecartBlockKey, e.getClickedBlock().getLocation(),
                     1, null, REGULAR_RECORD_FLAGS);
+    }
+
+    private void onSpawnerChange(PlayerInteractEvent e) {
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK ||
+                e.getClickedBlock().getType() != Materials.SPAWNER.toBukkitType())
+            return;
+
+        PlayerHand playerHand = BukkitItems.getHand(e);
+        ItemStack handItem = BukkitItems.getHandItem(e.getPlayer(), playerHand);
+
+        if (handItem == null)
+            return;
+
+        Material handItemType = handItem.getType();
+        if (!Materials.isSpawnEgg(handItemType))
+            return;
+
+        Block block = e.getClickedBlock();
+        Chunk chunk = block.getChunk();
+        BlockState oldBlockState = block.getState();
+        Key oldSpawnerKey = Keys.of(oldBlockState);
+
+        BukkitExecutor.sync(() -> {
+            if (!chunk.isLoaded())
+                return;
+
+            Key newSpawnerKey = Keys.of(block);
+            if (!oldSpawnerKey.equals(newSpawnerKey)) {
+                this.worldRecordService.get().recordBlockPlace(newSpawnerKey, block.getLocation(),
+                        1, oldBlockState, REGULAR_RECORD_FLAGS);
+            }
+        }, 1L);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -277,7 +316,7 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onEntityExplode(EntityExplodeEvent e) {
-        KeyMap<Integer> blockCounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         e.blockList().forEach(block -> {
             Key blockKey = Keys.of(block);
             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);

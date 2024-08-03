@@ -1,38 +1,32 @@
 package com.bgsoftware.superiorskyblock.core.database.sql;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.Mutable;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
+import com.bgsoftware.superiorskyblock.core.database.sql.transaction.DeleteSQLDatabaseTransaction;
+import com.bgsoftware.superiorskyblock.core.database.sql.transaction.InsertSQLDatabaseTransaction;
+import com.bgsoftware.superiorskyblock.core.database.sql.transaction.UpdateSQLDatabaseTransaction;
+import com.bgsoftware.superiorskyblock.core.database.transaction.DatabaseTransactionsExecutor;
+import com.bgsoftware.superiorskyblock.core.database.transaction.IDatabaseTransaction;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 
 import java.sql.ResultSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
 public class SQLDatabaseBridge implements DatabaseBridge {
 
     private DatabaseBridgeMode databaseBridgeMode = DatabaseBridgeMode.IDLE;
-    private StatementHolder batchStatementHolder;
+    private List<IDatabaseTransaction> batchTransactions = null;
 
     public SQLDatabaseBridge() {
 
-    }
-
-    private static String getColumnFilter(DatabaseFilter filter) {
-        StringBuilder columnIdentifier = new StringBuilder();
-        if (filter != null) {
-            filter.forEach((column, value) -> {
-                if (columnIdentifier.length() == 0) {
-                    columnIdentifier.append(String.format(" WHERE %s=?", column));
-                } else {
-                    columnIdentifier.append(String.format(" AND %s=?", column));
-                }
-            });
-        }
-        return columnIdentifier.toString();
     }
 
     @Override
@@ -52,40 +46,37 @@ public class SQLDatabaseBridge implements DatabaseBridge {
     @Override
     public void batchOperations(boolean batchOperations) {
         if (batchOperations) {
-            batchStatementHolder = new StatementHolder("");
-        } else if (batchStatementHolder != null) {
-            batchStatementHolder.executeBatch(true);
-            batchStatementHolder = null;
+            batchTransactions = new LinkedList<>();
+        } else if (batchTransactions != null) {
+            DatabaseTransactionsExecutor.addTransactions(batchTransactions);
+            batchTransactions = null;
         }
     }
 
     @Override
-    public void updateObject(String table, DatabaseFilter filter, Pair<String, Object>[] columns) {
+    public void updateObject(String table, @Nullable DatabaseFilter filter, Pair<String, Object>[] columns) {
         if (databaseBridgeMode != DatabaseBridgeMode.SAVE_DATA)
             return;
 
-        StringBuilder columnsBuilder = new StringBuilder();
+        List<String> filteredColumns = filter == null ? null : new LinkedList<>();
+        List<String> columnNames = new LinkedList<>();
+        List<Object> values = new LinkedList<>();
 
         for (Pair<String, Object> column : columns) {
-            if (columnsBuilder.length() != 0)
-                columnsBuilder.append(",");
-            columnsBuilder.append(column.getKey()).append("=?");
-        }
-
-        String columnFilter = getColumnFilter(filter);
-
-        String query = String.format("UPDATE {prefix}%s SET %s%s;", table, columnsBuilder, columnFilter);
-        StatementHolder statementHolder = buildStatementHolder(query);
-
-        for (Pair<String, Object> column : columns) {
-            statementHolder.setObject(column.getValue());
+            columnNames.add(column.getKey());
+            values.add(column.getValue());
         }
 
         if (filter != null) {
-            filter.forEach((column, value) -> statementHolder.setObject(value + ""));
+            filter.forEach((column, value) -> {
+                filteredColumns.add(column);
+                values.add(value);
+            });
         }
 
-        executeStatementHolder(statementHolder);
+        UpdateSQLDatabaseTransaction transaction = new UpdateSQLDatabaseTransaction(table, columnNames, filteredColumns);
+        transaction.bindObjects(values);
+        submitTransaction(transaction);
     }
 
     @Override
@@ -93,47 +84,43 @@ public class SQLDatabaseBridge implements DatabaseBridge {
         if (databaseBridgeMode != DatabaseBridgeMode.SAVE_DATA)
             return;
 
-        StringBuilder columnsBuilder = new StringBuilder();
-        StringBuilder valuesBuilder = new StringBuilder();
+        List<String> columnNames = new LinkedList<>();
+        List<Object> values = new LinkedList<>();
 
         for (Pair<String, Object> column : columns) {
-            if (columnsBuilder.length() != 0)
-                columnsBuilder.append(",");
-            if (valuesBuilder.length() != 0)
-                valuesBuilder.append(",");
-            columnsBuilder.append("`").append(column.getKey()).append("`");
-            valuesBuilder.append("?");
+            columnNames.add(column.getKey());
+            values.add(column.getValue());
         }
 
-        String query = String.format("REPLACE INTO {prefix}%s (%s) VALUES(%s);", table, columnsBuilder, valuesBuilder);
-        StatementHolder statementHolder = buildStatementHolder(query);
-
-        for (Pair<String, Object> column : columns) {
-            statementHolder.setObject(column.getValue());
-        }
-
-        executeStatementHolder(statementHolder);
+        InsertSQLDatabaseTransaction transaction = new InsertSQLDatabaseTransaction(table, columnNames);
+        transaction.bindObjects(values);
+        submitTransaction(transaction);
     }
 
     @Override
-    public void deleteObject(String table, DatabaseFilter filter) {
+    public void deleteObject(String table, @Nullable DatabaseFilter filter) {
         if (databaseBridgeMode != DatabaseBridgeMode.SAVE_DATA)
             return;
 
-        String columnFilter = getColumnFilter(filter);
-        String query = String.format("DELETE FROM {prefix}%s%s;", table, columnFilter);
-        StatementHolder statementHolder = buildStatementHolder(query);
+        List<String> filteredColumns = filter == null ? null : new LinkedList<>();
+        List<Object> values = new LinkedList<>();
 
         if (filter != null) {
-            filter.forEach((column, value) -> statementHolder.setObject(value + ""));
+            filter.forEach((column, value) -> {
+                filteredColumns.add(column);
+                values.add(value + "");
+            });
         }
 
-        executeStatementHolder(statementHolder);
+        DeleteSQLDatabaseTransaction transaction = new DeleteSQLDatabaseTransaction(table, filteredColumns);
+        transaction.bindObjects(values);
+
+        submitTransaction(transaction);
     }
 
     @Override
     public void loadObject(String table, DatabaseFilter filter, Consumer<Map<String, Object>> resultConsumer) {
-        Mutable<String> columnFilter = new Mutable<>(getColumnFilter(filter));
+        MutableObject<String> columnFilter = new MutableObject<>(SQLHelper.getColumnFilter(filter));
 
         filter.forEach((column, value) -> {
             columnFilter.setValue(columnFilter.getValue().replaceFirst("\\?", value instanceof String ?
@@ -162,20 +149,11 @@ public class SQLDatabaseBridge implements DatabaseBridge {
         return this.databaseBridgeMode;
     }
 
-    private StatementHolder buildStatementHolder(String query) {
-        if (batchStatementHolder == null) {
-            return new StatementHolder(query);
+    private void submitTransaction(IDatabaseTransaction transaction) {
+        if (batchTransactions != null) {
+            batchTransactions.add(transaction);
         } else {
-            batchStatementHolder.setQuery(query);
-            return batchStatementHolder;
-        }
-    }
-
-    private void executeStatementHolder(StatementHolder statementHolder) {
-        if (batchStatementHolder == statementHolder) {
-            statementHolder.addBatch();
-        } else {
-            statementHolder.execute(true);
+            DatabaseTransactionsExecutor.addTransaction(transaction);
         }
     }
 

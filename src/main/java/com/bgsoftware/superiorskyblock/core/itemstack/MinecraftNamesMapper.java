@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.itemstack;
 
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -42,7 +43,7 @@ public class MinecraftNamesMapper {
     }
 
     private static Map<Class<?>, Map<String, String>> fetchEnumNamesMapping() {
-        Map<Class<?>, Map<String, String>> mappedNames = new HashMap<>();
+        Map<Class<?>, Map<String, String>> mappedNames = new ArrayMap<>();
 
         try {
             HttpsURLConnection connection = (HttpsURLConnection) new URL(ServerVersion.isLegacy() ?

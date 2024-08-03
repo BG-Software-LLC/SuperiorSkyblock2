@@ -1,7 +1,9 @@
 package com.bgsoftware.superiorskyblock.nms.v1_12_R1.dragon;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.EnderDragonBattle;
 import net.minecraft.server.v1_12_R1.EntityEnderDragon;
@@ -16,17 +18,21 @@ public class IslandEntityEnderDragon extends EntityEnderDragon {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    private final Dimension dimension;
+
     private BlockPosition islandBlockPosition;
 
     public IslandEntityEnderDragon(World world) {
         // Used when loading entities to the world.
         super(world);
         this.islandBlockPosition = BlockPosition.ZERO;
+        this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(world.getWorld());
     }
 
     public IslandEntityEnderDragon(WorldServer worldServer, BlockPosition islandBlockPosition) {
         super(worldServer);
         this.islandBlockPosition = islandBlockPosition;
+        this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(worldServer.getWorld());
     }
 
     @Override
@@ -49,8 +55,13 @@ public class IslandEntityEnderDragon extends EntityEnderDragon {
         if (island == null)
             return;
 
-        Location middleBlock = plugin.getSettings().getWorlds().getEnd().getPortalOffset()
-                .applyToLocation(island.getCenter(org.bukkit.World.Environment.THE_END));
+        Location middleBlock = island.getCenter(dimension);
+
+        SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(dimension);
+        if (dimensionConfig instanceof SettingsManager.Worlds.End) {
+            middleBlock = ((SettingsManager.Worlds.End) dimensionConfig).getPortalOffset().applyToLocation(middleBlock);
+        }
+
         this.islandBlockPosition = new BlockPosition(middleBlock.getX(), middleBlock.getY(), middleBlock.getZ());
 
         dragonBattleHandler.addDragonBattle(island.getUniqueId(), new IslandEnderDragonBattle(island,

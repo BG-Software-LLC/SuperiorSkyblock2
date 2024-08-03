@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.database.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.SQLSession;
@@ -65,6 +66,11 @@ public class SQLHelper {
             globalSession.modifyColumnType(tableName, columnName, newType, QueryResult.EMPTY_VOID_QUERY_RESULT);
     }
 
+    public static void addColumn(String tableName, String columnName, String type) {
+        if (isReady())
+            globalSession.addColumn(tableName, columnName, type, QueryResult.EMPTY_VOID_QUERY_RESULT);
+    }
+
     public static void removePrimaryKey(String tableName, String columnName) {
         if (isReady())
             globalSession.removePrimaryKey(tableName, columnName, QueryResult.EMPTY_VOID_QUERY_RESULT);
@@ -88,6 +94,20 @@ public class SQLHelper {
     public static void close() {
         if (isReady())
             globalSession.closeConnection();
+    }
+
+    public static String getColumnFilter(DatabaseFilter filter) {
+        StringBuilder columnIdentifier = new StringBuilder();
+        if (filter != null) {
+            filter.forEach((column, value) -> {
+                if (columnIdentifier.length() == 0) {
+                    columnIdentifier.append(String.format(" WHERE %s=?", column));
+                } else {
+                    columnIdentifier.append(String.format(" AND %s=?", column));
+                }
+            });
+        }
+        return columnIdentifier.toString();
     }
 
 }

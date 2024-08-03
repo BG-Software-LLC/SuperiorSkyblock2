@@ -8,13 +8,17 @@ import com.bgsoftware.superiorskyblock.core.LocationKey;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -25,10 +29,12 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,9 +44,9 @@ import java.util.concurrent.TimeUnit;
 
 public class UpgradeTypeEntityLimits implements IUpgradeType {
 
-    private final Map<EntityType, Player> entityBreederPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
-    private final Map<LocationKey, Player> vehiclesOwners = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
-    private final Map<EntityType, Player> spawnEggPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
+    private final Map<EntityType, SpawningPlayerData> entityBreederPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
+    private final Map<LocationKey, SpawningPlayerData> vehiclesOwners = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
+    private final Map<EntityType, SpawningPlayerData> spawnEggPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -89,7 +95,8 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            Player spawningPlayer = getSpawningPlayerFromSpawnEvent(e);
+            SpawningPlayerData spawningPlayerData = getSpawningPlayerFromSpawnEvent(e);
+            Player spawningPlayer = spawningPlayerData == null ? null : spawningPlayerData.player.get();
 
             boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
 
@@ -97,6 +104,10 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
                 e.setCancelled(true);
                 if (spawningPlayer != null && spawningPlayer.isOnline()) {
                     Message.REACHED_ENTITY_LIMIT.send(spawningPlayer, Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
+                    List<ItemStack> itemsToGiveBack = spawningPlayerData.itemStacks;
+                    for (ItemStack itemStack : itemsToGiveBack) {
+                        BukkitItems.addItem(itemStack, spawningPlayer.getInventory(), spawningPlayer.getLocation());
+                    }
                 }
             }
         }
@@ -156,7 +167,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
                     blockLocation.getZ()
             );
 
-            vehiclesOwners.put(futureEntitySpawnLocation, e.getPlayer());
+            vehiclesOwners.put(futureEntitySpawnLocation, new SpawningPlayerData(e.getPlayer()));
         }
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -181,7 +192,8 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
                     entityLocation.getBlockZ()
             );
 
-            Player vehicleOwner = vehiclesOwners.remove(entityBlockLocation);
+            SpawningPlayerData vehicleOwnerData = vehiclesOwners.remove(entityBlockLocation);
+            Player vehicleOwner = vehicleOwnerData == null ? null : vehicleOwnerData.player.get();
 
             boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
 
@@ -212,11 +224,11 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            spawnEggPlayers.put(spawnEggEntityType, e.getPlayer());
+            spawnEggPlayers.put(spawnEggEntityType, new SpawningPlayerData(e.getPlayer()));
         }
 
         @Nullable
-        private Player getSpawningPlayerFromSpawnEvent(CreatureSpawnEvent event) {
+        private SpawningPlayerData getSpawningPlayerFromSpawnEvent(CreatureSpawnEvent event) {
             EntityType entityType = event.getEntityType();
 
             if (entityType == EntityType.ARMOR_STAND) {
@@ -237,6 +249,8 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
     private class EntityLimitsBreedListener implements Listener {
 
+        private final Int2ObjectMapView<ItemStack> trackedBreedItems = CollectionsFactory.createInt2ObjectArrayMap();
+
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onEntityBreed(EntityBreedEvent e) {
             Entity child = e.getEntity();
@@ -250,7 +264,77 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            entityBreederPlayers.put(childEntityType, (Player) e.getBreeder());
+            ItemStack fatherBreedItem = trackedBreedItems.remove(e.getFather().getEntityId());
+            ItemStack motherBreedItem = e.getFather().equals(e.getMother()) ? null :
+                    trackedBreedItems.remove(e.getMother().getEntityId());
+
+            entityBreederPlayers.put(childEntityType, new SpawningPlayerData((Player) e.getBreeder(), fatherBreedItem, motherBreedItem));
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onEntityFeed(PlayerInteractAtEntityEvent e) {
+            if (!(e.getRightClicked() instanceof Animals))
+                return;
+
+            PlayerHand usedHand = BukkitItems.getHand(e);
+            ItemStack usedItem = BukkitItems.getHandItem(e.getPlayer(), usedHand);
+
+            if (usedItem == null || !plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) e.getRightClicked()))
+                return;
+
+            // We want to calculate the amount of items consumed by breeding this animal.
+            // We do that by checking the held item one tick later, and subtracting the
+            // amount after 1 tick of the item from the original amount.
+            int mainHandSlot = e.getPlayer().getInventory().getHeldItemSlot();
+            int originalAmount = usedItem.getAmount();
+            ItemStack breedItem = usedItem.clone();
+
+            BukkitExecutor.sync(() -> {
+                ItemStack inventoryItem = usedHand == PlayerHand.MAIN_HAND ?
+                        e.getPlayer().getInventory().getItem(mainHandSlot) :
+                        BukkitItems.getHandItem(e.getPlayer(), PlayerHand.OFF_HAND);
+
+                boolean isInventoryItemEmpty = inventoryItem == null || inventoryItem.getType() == Material.AIR;
+
+                if (!isInventoryItemEmpty && !inventoryItem.isSimilar(usedItem))
+                    return;
+
+                int currAmount = isInventoryItemEmpty ? 0 : inventoryItem.getAmount();
+
+                int consumedAmount = originalAmount - currAmount;
+                if (consumedAmount <= 0)
+                    return;
+
+                breedItem.setAmount(consumedAmount);
+                trackedBreedItems.put(e.getRightClicked().getEntityId(), breedItem);
+            }, 5L);
+        }
+
+    }
+
+    private static class SpawningPlayerData {
+
+        private final WeakReference<Player> player;
+        private final List<ItemStack> itemStacks = new LinkedList<>();
+
+        SpawningPlayerData(Player player) {
+            this(player, (ItemStack) null);
+        }
+
+        SpawningPlayerData(Player player, @Nullable ItemStack itemStack) {
+            this.player = new WeakReference<>(player);
+            addItem(itemStack);
+        }
+
+        SpawningPlayerData(Player player, ItemStack... itemStacks) {
+            this.player = new WeakReference<>(player);
+            for (ItemStack itemStack : itemStacks)
+                addItem(itemStack);
+        }
+
+        private void addItem(@Nullable ItemStack itemStack) {
+            if (itemStack != null && itemStack.getType() != Material.AIR && itemStack.getAmount() > 0)
+                this.itemStacks.add(itemStack);
         }
 
     }

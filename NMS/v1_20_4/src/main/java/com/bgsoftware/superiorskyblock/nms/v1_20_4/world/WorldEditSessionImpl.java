@@ -4,9 +4,12 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.collections.view.LongIterator;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.nms.v1_20_4.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
@@ -36,12 +39,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.UpgradeData;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.ticks.ProtoChunkTicks;
 import org.bukkit.Chunk;
@@ -56,7 +59,6 @@ import org.bukkit.generator.ChunkGenerator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -76,14 +78,16 @@ public class WorldEditSessionImpl implements WorldEditSession {
         }
     }).get();
 
-    private final Map<Long, ChunkData> chunks = new HashMap<>();
+    private final Long2ObjectMapView<ChunkData> chunks = CollectionsFactory.createLong2ObjectArrayMap();
     private final List<Pair<BlockPos, BlockState>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPos, CompoundTag>> blockEntities = new LinkedList<>();
     private final Set<ChunkPos> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
     private final ServerLevel serverLevel;
+    private final Dimension dimension;
 
     public WorldEditSessionImpl(ServerLevel serverLevel) {
         this.serverLevel = serverLevel;
+        this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(serverLevel.getWorld());
     }
 
     @Override
@@ -152,11 +156,15 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     @Override
     public List<ChunkPosition> getAffectedChunks() {
+        List<ChunkPosition> chunkPositions = new LinkedList<>();
         World bukkitWorld = serverLevel.getWorld();
-        return new SequentialListBuilder<Long>().map(chunks.keySet(), chunkKey -> {
+        LongIterator iterator = chunks.keyIterator();
+        while (iterator.hasNext()) {
+            long chunkKey = iterator.next();
             ChunkPos chunkPos = new ChunkPos(chunkKey);
-            return ChunkPosition.of(bukkitWorld, chunkPos.x, chunkPos.z);
-        });
+            chunkPositions.add(ChunkPosition.of(bukkitWorld, chunkPos.x, chunkPos.z));
+        }
+        return chunkPositions;
     }
 
     @Override
@@ -277,7 +285,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
         private void createChunkSections(Registry<Biome> biomesRegistry) {
             Holder<Biome> biome = CraftBiome.bukkitToMinecraftHolder(
-                    IslandUtils.getDefaultWorldBiome(serverLevel.getWorld().getEnvironment()));
+                    IslandUtils.getDefaultWorldBiome(WorldEditSessionImpl.this.dimension));
 
             for (int i = 0; i < this.chunkSections.length; ++i) {
                 PalettedContainer<Holder<Biome>> biomesContainer = new PalettedContainer<>(biomesRegistry.asHolderIdMap(),

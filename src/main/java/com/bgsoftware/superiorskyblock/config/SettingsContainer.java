@@ -2,16 +2,20 @@ package com.bgsoftware.superiorskyblock.config;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
-import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
-import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.DateFormatter;
@@ -28,6 +32,7 @@ import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
+import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -44,11 +49,13 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -79,7 +86,7 @@ public class SettingsContainer {
     public final double defaultSpawnerRates;
     public final double defaultMobDrops;
     public final BigDecimal defaultBankLimit;
-    public final Map<Integer, Integer> defaultRoleLimits;
+    public final Int2IntMapView defaultRoleLimits;
     public final int islandsHeight;
     public final boolean worldBordersEnabled;
     public final boolean stackedBlocksEnabled;
@@ -102,25 +109,10 @@ public class SettingsContainer {
     public final String visitorsSignLine;
     public final String visitorsSignActive;
     public final String visitorsSignInactive;
-    public final World.Environment defaultWorldEnvironment;
+    public final Dimension defaultWorldDimension;
     public final String defaultWorldName;
     public final String islandWorldName;
-    public final boolean normalWorldEnabled;
-    public final boolean normalWorldUnlocked;
-    public final boolean normalSchematicOffset;
-    public final String normalBiome;
-    public final boolean netherWorldEnabled;
-    public final boolean netherWorldUnlocked;
-    public final String netherWorldName;
-    public final boolean netherSchematicOffset;
-    public final String netherBiome;
-    public final boolean endWorldEnabled;
-    public final boolean endWorldUnlocked;
-    public final String endWorldName;
-    public final boolean endSchematicOffset;
-    public final String endBiome;
-    public final boolean endDragonFightEnabled;
-    public final BlockOffset endDragonFightPortalOffset;
+    public final EnumerateMap<Dimension, SettingsManager.Worlds.DimensionConfig> dimensionConfigs = new EnumerateMap<>(Dimension.values());
     public final String worldsDifficulty;
     public final String spawnLocation;
     public final boolean spawnProtection;
@@ -129,6 +121,7 @@ public class SettingsContainer {
     public final boolean spawnWorldBorder;
     public final int spawnSize;
     public final boolean spawnDamage;
+    public final Set<String> worldPermissions;
     public final boolean voidTeleportMembers;
     public final boolean voidTeleportVisitors;
     public final List<String> interactables;
@@ -238,13 +231,13 @@ public class SettingsContainer {
         islandCommand = config.getString("island-command", "island,is,islands");
         maxIslandSize = config.getInt("max-island-size", 200);
         defaultIslandSize = config.getInt("default-values.island-size", 20);
-        defaultBlockLimits = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        defaultBlockLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         loadListOrSection(config, "default-values.block-limits", "block limit", (key, limit) -> {
             Key blockKey = Keys.ofMaterialAndData(key);
             defaultBlockLimits.put(blockKey, limit);
             plugin.getBlockValues().addCustomBlockKey(blockKey);
         });
-        defaultEntityLimits = KeyMaps.createIdentityHashMap(KeyIndicator.ENTITY_TYPE);
+        defaultEntityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
         loadListOrSection(config, "default-values.entity-limits", "entity limit", (entityType, limit) ->
                 defaultEntityLimits.put(Keys.ofEntityType(entityType), limit));
         defaultTeamLimit = config.getInt("default-values.team-limit", 4);
@@ -254,7 +247,7 @@ public class SettingsContainer {
         defaultSpawnerRates = config.getDouble("default-values.spawner-rates", 1D);
         defaultMobDrops = config.getDouble("default-values.mob-drops", 1D);
         defaultBankLimit = new BigDecimal(config.getString("default-values.bank-limit", "-1"));
-        defaultRoleLimits = new HashMap<>();
+        defaultRoleLimits = CollectionsFactory.createInt2IntHashMap();
         loadListOrSection(config, "default-values.role-limits", "role limit", (role, limit) -> {
             try {
                 defaultRoleLimits.put(Integer.parseInt(role), limit);
@@ -268,7 +261,7 @@ public class SettingsContainer {
         stackedBlocksDisabledWorlds = config.getStringList("stacked-blocks.disabled-worlds");
         whitelistedStackedBlocks = KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("stacked-blocks.whitelisted"));
         stackedBlocksName = Formatters.COLOR_FORMATTER.format(config.getString("stacked-blocks.custom-name"));
-        stackedBlocksLimits = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        stackedBlocksLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         loadListOrSection(config, "stacked-blocks.limits", "stacked-block limit", (key, limit) -> {
             Key blockKey = Keys.ofMaterialAndData(key);
             stackedBlocksLimits.put(blockKey, limit);
@@ -290,45 +283,49 @@ public class SettingsContainer {
         visitorsSignActive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.active", "&a[Welcome]"));
         visitorsSignInactive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.inactive", "&c[Welcome]"));
         islandWorldName = config.getString("worlds.world-name", "SuperiorWorld");
-        normalWorldEnabled = config.getBoolean("worlds.normal.enabled", true);
-        normalWorldUnlocked = config.getBoolean("worlds.normal.unlock", true);
-        normalSchematicOffset = config.getBoolean("worlds.normal.schematic-offset", true);
-        normalBiome = config.getString("worlds.normal.biome", "PLAINS");
-        netherWorldEnabled = config.getBoolean("worlds.nether.enabled", false);
-        netherWorldUnlocked = config.getBoolean("worlds.nether.unlock", true);
-        String netherWorldName = config.getString("worlds.nether.name", "");
-        this.netherWorldName = netherWorldName.isEmpty() ? islandWorldName + "_nether" : netherWorldName;
-        netherSchematicOffset = config.getBoolean("worlds.nether.schematic-offset", true);
-        netherBiome = config.getString("worlds.nether.biome", "NETHER_WASTES").toUpperCase(Locale.ENGLISH);
-        endWorldEnabled = config.getBoolean("worlds.end.enabled", false);
-        endWorldUnlocked = config.getBoolean("worlds.end.unlock", false);
-        String endWorldName = config.getString("worlds.end.name", "");
-        this.endWorldName = endWorldName.isEmpty() ? islandWorldName + "_the_end" : endWorldName;
-        endSchematicOffset = config.getBoolean("worlds.end.schematic-offset", true);
-        endBiome = config.getString("worlds.end.biome", "THE_END");
-        endDragonFightEnabled = endWorldEnabled && config.getBoolean("worlds.end.dragon-fight.enabled", false) && ServerVersion.isAtLeast(ServerVersion.v1_9);
-        BlockOffset endDragonFightPortalOffset = null;
-        if (endDragonFightEnabled) {
-            String portalOffset = config.getString("worlds.end.dragon-fight.portal-offset");
-            endDragonFightPortalOffset = Serializers.OFFSET_SPACED_SERIALIZER.deserialize(portalOffset);
-            if (endDragonFightPortalOffset == null) {
-                Log.warnFromFile("config.yml", "Cannot parse portal-offset '", portalOffset, "' to a valid offset, skipping...");
+
+        {
+            ConfigurationSection normalWorldSection = config.getConfigurationSection("worlds.normal");
+            if (normalWorldSection != null) {
+                dimensionConfigs.put(Dimensions.NORMAL, new WorldsSection.NormalDimensionConfig(normalWorldSection, islandWorldName));
+            } else {
+                dimensionConfigs.put(Dimensions.NORMAL, new WorldsSection.NormalDimensionConfig(
+                        true, true, true, "PLAINS", "", islandWorldName));
             }
         }
-        this.endDragonFightPortalOffset = endDragonFightPortalOffset == null ? SBlockOffset.ZERO : endDragonFightPortalOffset;
-        String defaultWorldEnvironment = config.getString("worlds.default-world");
-        if (defaultWorldEnvironment.equalsIgnoreCase("normal") && normalWorldEnabled) {
-            this.defaultWorldEnvironment = World.Environment.NORMAL;
-            this.defaultWorldName = this.islandWorldName;
-        } else if (defaultWorldEnvironment.equalsIgnoreCase("nether") && netherWorldEnabled) {
-            this.defaultWorldEnvironment = World.Environment.NETHER;
-            this.defaultWorldName = this.netherWorldName;
-        } else if (defaultWorldEnvironment.equalsIgnoreCase("the_end") && endWorldEnabled) {
-            this.defaultWorldEnvironment = World.Environment.THE_END;
-            this.defaultWorldName = this.endWorldName;
-        } else {
+
+        {
+            ConfigurationSection netherWorldSection = config.getConfigurationSection("worlds.nether");
+            if (netherWorldSection != null) {
+                dimensionConfigs.put(Dimensions.NETHER, new WorldsSection.NetherDimensionConfig(netherWorldSection, islandWorldName));
+            } else {
+                dimensionConfigs.put(Dimensions.NETHER, new WorldsSection.NetherDimensionConfig(
+                        false, true, true, "NETHER_WASTES", "", islandWorldName));
+            }
+        }
+
+        {
+            ConfigurationSection endWorldSection = config.getConfigurationSection("worlds.end");
+            if (endWorldSection != null) {
+                dimensionConfigs.put(Dimensions.THE_END, new WorldsSection.EndDimensionConfig(endWorldSection, islandWorldName));
+            } else {
+                dimensionConfigs.put(Dimensions.THE_END, new WorldsSection.EndDimensionConfig(
+                        false, false, true, "THE_END", "", islandWorldName,
+                        false, SBlockOffset.ZERO));
+            }
+        }
+
+        try {
+            Dimension defaultWorld = Dimension.getByName(config.getString("worlds.default-world"));
+            SettingsManager.Worlds.DimensionConfig dimensionConfig = this.dimensionConfigs.get(defaultWorld);
+            if (dimensionConfig == null || !dimensionConfig.isEnabled())
+                throw new Exception();
+            this.defaultWorldDimension = defaultWorld;
+            this.defaultWorldName = dimensionConfig.getName();
+        } catch (Exception error) {
             throw new ManagerLoadException("Cannot find a default islands world.", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
+
         worldsDifficulty = config.getString("worlds.difficulty", "EASY").toUpperCase(Locale.ENGLISH);
         spawnLocation = config.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");
         spawnProtection = config.getBoolean("spawn.protection", true);
@@ -339,6 +336,8 @@ public class SettingsContainer {
         spawnWorldBorder = config.getBoolean("spawn.world-border", false);
         spawnSize = config.getInt("spawn.size", 200);
         spawnDamage = config.getBoolean("spawn.players-damage", false);
+        worldPermissions = config.getStringList("world-permissions")
+                .stream().map(str -> str.toUpperCase(Locale.ENGLISH)).collect(Collectors.toSet());
         voidTeleportMembers = config.getBoolean("void-teleport.members", true);
         voidTeleportVisitors = config.getBoolean("void-teleport.visitors", true);
         interactables = loadInteractables(plugin);
@@ -373,7 +372,7 @@ public class SettingsContainer {
         rateOwnIsland = config.getBoolean("rate-own-island", false);
         defaultSettings = config.getStringList("default-settings")
                 .stream().map(str -> str.toUpperCase(Locale.ENGLISH)).collect(Collectors.toList());
-        defaultGenerator = new KeyMap[World.Environment.values().length];
+        defaultGenerator = new KeyMap[Dimension.values().size()];
         if (config.isConfigurationSection("default-values.generator")) {
             for (String env : config.getConfigurationSection("default-values.generator").getKeys(false)) {
                 try {
@@ -426,7 +425,7 @@ public class SettingsContainer {
                             itemStack.setAmount(containerSection.getInt(slot + ".amount", 1));
 
                             // Parsing it into compound tag
-                            CompoundTag itemCompound = plugin.getNMSTags().convertToNBT(itemStack);
+                            CompoundTag itemCompound = plugin.getNMSTags().serializeItem(itemStack);
                             itemCompound.setByte("Slot", Byte.parseByte(slot));
 
                             items.addTag(itemCompound);
@@ -530,7 +529,20 @@ public class SettingsContainer {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        return cfg.getStringList("interactables");
+        List<String> interactablesList = cfg.getStringList("interactables");
+
+        // Warn about interactables that the default file contains but the current
+        // file does not.
+        YamlConfiguration defaultInteractablesConfig = CommentedConfiguration.loadConfiguration(plugin.getResource("interactables.yml"));
+        List<String> defaultInteractables = defaultInteractablesConfig.getStringList("interactables");
+        if (defaultInteractables != null) {
+            for (String interactableBlock : defaultInteractables) {
+                if (!interactablesList.contains(interactableBlock))
+                    Log.warn("Potentially missing interactable block ", interactableBlock);
+            }
+        }
+
+        return interactablesList;
     }
 
     private KeySet loadSafeBlocks(SuperiorSkyblockPlugin plugin) {
@@ -563,7 +575,7 @@ public class SettingsContainer {
     }
 
     private void loadGenerator(YamlConfiguration config, String path, int index) {
-        defaultGenerator[index] = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        defaultGenerator[index] = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         loadListOrSection(config, path, "generator-rates", (key, percentage) -> {
             Key blockKey = Keys.ofMaterialAndData(key);
             defaultGenerator[index].put(blockKey, percentage);

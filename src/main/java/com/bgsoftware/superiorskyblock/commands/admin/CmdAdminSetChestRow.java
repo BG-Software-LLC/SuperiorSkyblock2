@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -84,7 +83,7 @@ public class CmdAdminSetChestRow implements IAdminIslandCommand {
             return;
         }
 
-        BukkitExecutor.data(() -> islands.forEach(island -> island.setChestRows(page - 1, rows)));
+        islands.forEach(island -> island.setChestRows(page - 1, rows));
 
         if (islands.size() > 1)
             Message.CHANGED_CHEST_SIZE_ALL.send(sender, page, rows);

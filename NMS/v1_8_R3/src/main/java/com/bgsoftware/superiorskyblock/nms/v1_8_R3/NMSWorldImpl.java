@@ -4,6 +4,7 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -17,6 +18,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_8_R3.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.world.WorldEditSessionImpl;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockDoubleStep;
 import net.minecraft.server.v1_8_R3.BlockPosition;
@@ -45,7 +47,7 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.material.MaterialData;
 
 import java.lang.reflect.Modifier;
 import java.util.function.IntFunction;
@@ -131,11 +133,13 @@ public class NMSWorldImpl implements NMSWorld {
             worldBorder.world = worldServer;
             worldBorder.setSize((islandSize * 2) + 1);
 
-            World.Environment environment = world.getEnvironment();
+            Dimension dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(world);
+            if (dimension == null)
+                return;
 
-            Location center = island.getCenter(environment);
+            Location center = island.getCenter(dimension);
 
-            if (environment == World.Environment.NETHER) {
+            if (dimension.getEnvironment() == World.Environment.NETHER) {
                 worldBorder.setCenter(center.getX() * 8, center.getZ() * 8);
             } else {
                 worldBorder.setCenter(center.getX(), center.getZ());
@@ -228,7 +232,19 @@ public class NMSWorldImpl implements NMSWorld {
         Location blockLocation = block.getLocation();
         IBlockData blockData = ((CraftWorld) block.getWorld()).getHandle().getType(new BlockPosition(
                 blockLocation.getBlockX(), blockLocation.getBlockY(), blockLocation.getBlockZ()));
-        net.minecraft.server.v1_8_R3.Block nmsBlock = blockData.getBlock();
+        return getDefaultAmount(blockData);
+    }
+
+    @Override
+    public int getDefaultAmount(org.bukkit.block.BlockState bukkitBlockState) {
+        MaterialData materialData = bukkitBlockState.getData();
+        // noinspection deprecation
+        int combinedId = materialData.getItemType().getId() + (materialData.getData() << 12);
+        return getDefaultAmount(Block.getByCombinedId(combinedId));
+    }
+
+    private int getDefaultAmount(IBlockData blockData) {
+        Block nmsBlock = blockData.getBlock();
 
         // Checks for double slabs
         if (nmsBlock instanceof BlockDoubleStep) {
@@ -311,8 +327,8 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public ChunkGenerator createGenerator(SuperiorSkyblockPlugin plugin) {
-        return new IslandsGeneratorImpl(plugin);
+    public IslandsGenerator createGenerator(Dimension dimension) {
+        return new IslandsGeneratorImpl(dimension);
     }
 
     @Override

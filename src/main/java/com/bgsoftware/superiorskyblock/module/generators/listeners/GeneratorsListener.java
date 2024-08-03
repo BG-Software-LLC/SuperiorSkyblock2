@@ -3,10 +3,12 @@ package com.bgsoftware.superiorskyblock.module.generators.listeners;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.module.generators.GeneratorsModule;
+import com.bgsoftware.superiorskyblock.world.Dimensions;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -52,11 +54,14 @@ public class GeneratorsListener implements Listener {
         if (e.getBlock().getType() != LAVA_MATERIAL || e.getNewState().getType() != BASALT_MATERIAL)
             return;
 
-        World.Environment worldEnvironment = module.isMatchGeneratorWorld() &&
-                e.getNewState().getType() == BASALT_MATERIAL ? World.Environment.NETHER :
-                blockLocation.getWorld().getEnvironment();
+        Dimension dimension = Dimensions.NORMAL;
+        if (module.isMatchGeneratorWorld()) {
+            Dimension blockDimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(blockLocation.getWorld());
+            if (blockDimension.getEnvironment() != World.Environment.NETHER || e.getNewState().getType() == BASALT_MATERIAL)
+                dimension = blockDimension;
+        }
 
-        Key generatedBlock = island.generateBlock(blockLocation, worldEnvironment, true);
+        Key generatedBlock = island.generateBlock(blockLocation, dimension, true);
 
         if (generatedBlock != null && !generatedBlock.equals(ConstantKeys.COBBLESTONE))
             e.setCancelled(true);
@@ -89,11 +94,14 @@ public class GeneratorsListener implements Listener {
         if (generatorType == GeneratorType.NONE)
             return;
 
-        World.Environment worldEnvironment = module.isMatchGeneratorWorld() &&
-                generatorType == GeneratorType.BASALT ? World.Environment.NETHER :
-                blockLocation.getWorld().getEnvironment();
+        Dimension dimension = Dimensions.NORMAL;
+        if (module.isMatchGeneratorWorld()) {
+            Dimension blockDimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(blockLocation.getWorld());
+            if (blockDimension.getEnvironment() != World.Environment.NETHER || generatorType == GeneratorType.BASALT)
+                dimension = blockDimension;
+        }
 
-        Key generatedBlock = island.generateBlock(blockLocation, worldEnvironment, true);
+        Key generatedBlock = island.generateBlock(blockLocation, dimension, true);
 
         if (generatedBlock != null && !generatedBlock.equals(ConstantKeys.COBBLESTONE))
             e.setCancelled(true);

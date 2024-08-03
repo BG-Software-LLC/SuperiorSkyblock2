@@ -5,13 +5,18 @@ import com.bgsoftware.superiorskyblock.api.hooks.SpawnersSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
+import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.external.WildStackerSnapshotsContainer;
 import com.bgsoftware.superiorskyblock.module.upgrades.listeners.WildStackerListener;
+import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.wildstacker.api.events.SpawnerPlaceEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerPlaceInventoryEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerStackEvent;
@@ -33,6 +38,12 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
     private static boolean registered = false;
 
     private final SuperiorSkyblockPlugin plugin;
+    private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
+        @Override
+        protected RegionManagerService create() {
+            return plugin.getServices().getService(RegionManagerService.class);
+        }
+    };
 
     public SpawnersProvider_WildStacker(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
@@ -109,7 +120,7 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onSpawnerPlaceInventory(SpawnerPlaceInventoryEvent e) {
+        public void onSpawnerPlaceInventoryMonitor(SpawnerPlaceInventoryEvent e) {
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
 
             if (island == null)
@@ -124,6 +135,21 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
             } else {
                 island.handleBlockPlace(blockKey, increaseAmount);
             }
+        }
+
+        /* Protection Listener */
+        @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+        public void onSpawnerPlaceInventoryNormal(SpawnerPlaceInventoryEvent e) {
+            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
+
+            if (island == null)
+                return;
+
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+
+            InteractionResult interactionResult = protectionManager.get().handleBlockPlace(superiorPlayer, e.getSpawner().getLocation().getBlock());
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
+                e.setCancelled(true);
         }
 
     }

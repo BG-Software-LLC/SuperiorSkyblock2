@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -214,10 +215,10 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     /**
      * Teleport the player to an island.
      *
-     * @param island      The island to teleport the player to.
-     * @param environment The environment to teleport the player to.
+     * @param island    The island to teleport the player to.
+     * @param dimension The dimension to teleport the player to.
      */
-    void teleport(Island island, World.Environment environment);
+    void teleport(Island island, Dimension dimension);
 
     /**
      * Teleport the player to an island.
@@ -231,9 +232,30 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * Teleport the player to an island.
      *
      * @param island         The island to teleport the player to.
-     * @param environment    The environment to teleport the player to.
+     * @param dimension      The dimension to teleport the player to.
      * @param teleportResult Consumer that will be ran when task is finished.
      */
+    void teleport(Island island, Dimension dimension, @Nullable Consumer<Boolean> teleportResult);
+
+    /**
+     * Teleport the player to an island.
+     *
+     * @param island      The island to teleport the player to.
+     * @param environment The environment to teleport the player to.
+     * @deprecated See {@link #teleport(Island, Dimension)}
+     */
+    @Deprecated
+    void teleport(Island island, World.Environment environment);
+
+    /**
+     * Teleport the player to an island.
+     *
+     * @param island         The island to teleport the player to.
+     * @param environment    The environment to teleport the player to.
+     * @param teleportResult Consumer that will be ran when task is finished.
+     * @deprecated See {@link #teleport(Island, Dimension, Consumer)}
+     */
+    @Deprecated
     void teleport(Island island, World.Environment environment, @Nullable Consumer<Boolean> teleportResult);
 
     /**

@@ -2,9 +2,11 @@ package com.bgsoftware.superiorskyblock.island.chunk;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import org.bukkit.World;
 
@@ -18,7 +20,7 @@ public class DirtyChunksContainer {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final EnumMap<World.Environment, BitSet> dirtyChunks = new EnumMap<>(World.Environment.class);
+    private final EnumerateMap<Dimension, BitSet> dirtyChunks = new EnumerateMap<>(Dimension.values());
 
     private final Island island;
     private final int minChunkX;
@@ -55,7 +57,7 @@ public class DirtyChunksContainer {
         if (chunkIndex < 0)
             throw new IllegalStateException("Chunk is not inside island boundaries: " + chunkPosition);
 
-        BitSet dirtyChunksBitset = this.dirtyChunks.get(chunkPosition.getWorldsInfo().getEnvironment());
+        BitSet dirtyChunksBitset = this.dirtyChunks.get(chunkPosition.getWorldsInfo().getDimension());
 
         return dirtyChunksBitset != null && !dirtyChunksBitset.isEmpty() && dirtyChunksBitset.get(chunkIndex);
     }
@@ -66,7 +68,7 @@ public class DirtyChunksContainer {
         if (chunkIndex < 0)
             throw new IllegalStateException("Chunk is not inside island boundaries: " + chunkPosition);
 
-        BitSet dirtyChunksBitset = this.dirtyChunks.get(chunkPosition.getWorldsInfo().getEnvironment());
+        BitSet dirtyChunksBitset = this.dirtyChunks.get(chunkPosition.getWorldsInfo().getDimension());
 
         boolean isMarkedDirty = dirtyChunksBitset != null && !dirtyChunksBitset.isEmpty() && dirtyChunksBitset.get(chunkIndex);
 
@@ -83,7 +85,7 @@ public class DirtyChunksContainer {
         if (chunkIndex < 0)
             throw new IllegalStateException("Chunk is not inside island boundaries: " + chunkPosition);
 
-        BitSet dirtyChunksBitset = this.dirtyChunks.computeIfAbsent(chunkPosition.getWorldsInfo().getEnvironment(),
+        BitSet dirtyChunksBitset = this.dirtyChunks.computeIfAbsent(chunkPosition.getWorldsInfo().getDimension(),
                 e -> new BitSet(this.totalChunksCount));
 
         boolean isMarkedDirty = !dirtyChunksBitset.isEmpty() && dirtyChunksBitset.get(chunkIndex);
@@ -101,9 +103,10 @@ public class DirtyChunksContainer {
 
         List<ChunkPosition> dirtyChunkPositions = new LinkedList<>();
 
-        this.dirtyChunks.forEach(((environment, dirtyChunks) -> {
-            if (!dirtyChunks.isEmpty()) {
-                WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, environment);
+        for (Dimension dimension : Dimension.values()) {
+            BitSet dirtyChunks = this.dirtyChunks.get(dimension);
+            if (dirtyChunks != null && !dirtyChunks.isEmpty()) {
+                WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
                 if (worldInfo != null) {
                     for (int j = dirtyChunks.nextSetBit(0); j >= 0; j = dirtyChunks.nextSetBit(j + 1)) {
                         int deltaX = j / this.chunksInXAxis;
@@ -112,7 +115,7 @@ public class DirtyChunksContainer {
                     }
                 }
             }
-        }));
+        }
 
         return dirtyChunkPositions;
     }

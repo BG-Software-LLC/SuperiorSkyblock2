@@ -5,12 +5,12 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.key.collections.EntityTypeKeySet;
+import com.bgsoftware.superiorskyblock.core.key.collections.KeySetStrategy;
 import com.bgsoftware.superiorskyblock.core.key.collections.LazyLoadedKeySet;
 import com.bgsoftware.superiorskyblock.core.key.collections.MaterialKeySet;
 import com.google.common.collect.Iterators;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Spliterator;
@@ -18,7 +18,6 @@ import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 public class KeySets {
 
@@ -37,18 +36,18 @@ public class KeySets {
     }
 
     public static KeySet createHashSet(KeyIndicator keyIndicator) {
-        return createSet(keyIndicator, () -> new HashSet());
+        return createSet(keyIndicator, KeySetStrategy.HASH_SET);
     }
 
-    public static KeySet createSet(KeyIndicator keyIndicator, Supplier<Set> setSupplier) {
+    public static KeySet createSet(KeyIndicator keyIndicator, KeySetStrategy strategy) {
         switch (keyIndicator) {
             case MATERIAL:
-                return MaterialKeySet.createSet(setSupplier);
+                return new MaterialKeySet(strategy);
             case ENTITY_TYPE:
-                return EntityTypeKeySet.createSet(setSupplier);
+                return new EntityTypeKeySet(strategy);
         }
 
-        return LazyLoadedKeySet.createSet(setSupplier);
+        return new LazyLoadedKeySet(strategy);
     }
 
     public static KeySet createHashSet(KeyIndicator keyIndicator, Collection<String> rawKeys) {

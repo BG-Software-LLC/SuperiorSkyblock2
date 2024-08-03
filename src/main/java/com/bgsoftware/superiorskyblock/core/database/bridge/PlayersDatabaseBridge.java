@@ -165,18 +165,26 @@ public class PlayersDatabaseBridge {
         DatabaseFilter playerFilter = createFilter("player", originalPlayer);
 
         // We go through all possible tables (both island and players) and replace the player uuids.
+        playersReplacer.updateObject("players", uuidFilter, uuidColumn);
+        playersReplacer.updateObject("players_settings", playerFilter, playerColumn);
+
+
         playersReplacer.updateObject("bank_transactions", playerFilter, playerColumn);
-        playersReplacer.updateObject("islands", createFilter("owner", originalPlayer), new Pair<>("owner", newPlayer.getUniqueId().toString()));
         playersReplacer.updateObject("islands_bans", playerFilter, playerColumn);
         playersReplacer.updateObject("islands_bans", createFilter("banned_by", originalPlayer), new Pair<>("banned_by", newPlayer.getUniqueId().toString()));
-        playersReplacer.updateObject("islands_members", playerFilter, playerColumn);
         playersReplacer.updateObject("islands_player_permissions", playerFilter, playerColumn);
         playersReplacer.updateObject("islands_ratings", playerFilter, playerColumn);
         playersReplacer.updateObject("islands_visitors", playerFilter, playerColumn);
-        playersReplacer.updateObject("players", uuidFilter, uuidColumn);
-        playersReplacer.updateObject("players_custom_data", playerFilter, playerColumn);
-        playersReplacer.updateObject("players_settings", playerFilter, playerColumn);
-        playersReplacer.updateObject("players_missions", playerFilter, playerColumn);
+
+        if (newPlayer.hasIsland()) {
+            playersReplacer.updateObject("islands", createFilter("owner", originalPlayer), new Pair<>("owner", newPlayer.getUniqueId().toString()));
+            playersReplacer.updateObject("islands_members", playerFilter, playerColumn);
+        }
+
+        if (!newPlayer.isPersistentDataContainerEmpty())
+            playersReplacer.updateObject("players_custom_data", playerFilter, playerColumn);
+        if (!newPlayer.getCompletedMissions().isEmpty())
+            playersReplacer.updateObject("players_missions", playerFilter, playerColumn);
     }
 
     public static void deletePlayer(SuperiorPlayer superiorPlayer) {
@@ -185,19 +193,25 @@ public class PlayersDatabaseBridge {
         DatabaseFilter uuidFilter = createFilter("uuid", superiorPlayer);
         DatabaseFilter playerFilter = createFilter("player", superiorPlayer);
 
-        // We go through all possible tables (both island and players) and replace the player uuids.
+        // We go through all possible tables (both island and players) and delete the player record.
+        playersReplacer.deleteObject("players", uuidFilter);
+        playersReplacer.deleteObject("players_settings", playerFilter);
+
         playersReplacer.deleteObject("bank_transactions", playerFilter);
-        playersReplacer.deleteObject("islands", createFilter("owner", superiorPlayer));
         playersReplacer.deleteObject("islands_bans", playerFilter);
         playersReplacer.deleteObject("islands_bans", createFilter("banned_by", superiorPlayer));
-        playersReplacer.deleteObject("islands_members", playerFilter);
         playersReplacer.deleteObject("islands_player_permissions", playerFilter);
         playersReplacer.deleteObject("islands_ratings", playerFilter);
         playersReplacer.deleteObject("islands_visitors", playerFilter);
-        playersReplacer.deleteObject("players", uuidFilter);
-        playersReplacer.deleteObject("players_custom_data", playerFilter);
-        playersReplacer.deleteObject("players_settings", playerFilter);
-        playersReplacer.deleteObject("players_missions", playerFilter);
+
+        if (superiorPlayer.hasIsland()) {
+            playersReplacer.deleteObject("islands", createFilter("owner", superiorPlayer));
+            playersReplacer.deleteObject("islands_members", playerFilter);
+        }
+        if (!superiorPlayer.isPersistentDataContainerEmpty())
+            playersReplacer.deleteObject("players_custom_data", playerFilter);
+        if (!superiorPlayer.getCompletedMissions().isEmpty())
+            playersReplacer.deleteObject("players_missions", playerFilter);
     }
 
     public static void markPersistentDataContainerToBeSaved(SuperiorPlayer superiorPlayer) {

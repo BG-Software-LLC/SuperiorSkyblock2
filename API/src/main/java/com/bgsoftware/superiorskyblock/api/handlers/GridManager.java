@@ -6,8 +6,10 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -61,11 +63,36 @@ public interface GridManager extends IDatabaseBridgeHolder {
     /**
      * Create a new island.
      *
+     * @param superiorPlayer The new owner for the island.
+     * @param schemName      The schematic that should be used.
+     * @param bonusWorth     A starting worth for the island.
+     * @param bonusLevel     A starting level for the island.
+     * @param biome          A starting biome for the island.
+     * @param islandName     The name of the new island.
+     * @param offset         Should the island have an offset for it's values? If disabled, the bonus will be given.
+     * @param spawnOffset    The offset to teleport the player to from the center of the schematic
+     */
+    void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonusWorth, BigDecimal bonusLevel,
+                      Biome biome, String islandName, boolean offset, @Nullable BlockOffset spawnOffset);
+
+    /**
+     * Create a new island.
+     *
      * @param builder The builder for the island.
      * @param biome   A starting biome for the island.
      * @param offset  Should the island have an offset for its values? If disabled, the bonus will be given.
      */
     void createIsland(Island.Builder builder, Biome biome, boolean offset);
+
+    /**
+     * Create a new island.
+     *
+     * @param builder     The builder for the island.
+     * @param biome       A starting biome for the island.
+     * @param offset      Should the island have an offset for its values? If disabled, the bonus will be given.
+     * @param spawnOffset The offset to teleport the player to from the center of the schematic
+     */
+    void createIsland(Island.Builder builder, Biome biome, boolean offset, @Nullable BlockOffset spawnOffset);
 
     /**
      * Set the creation algorithm of islands.
@@ -247,14 +274,45 @@ public interface GridManager extends IDatabaseBridgeHolder {
     Island getSpawnIsland();
 
     /**
+     * Get the world of an island by the dimension.
+     * If the dimension is disabled in config, null will be returned.
+     *
+     * @param dimension The world dimension.
+     * @param island    The island to check.
+     */
+    @Nullable
+    World getIslandsWorld(Island island, Dimension dimension);
+
+    /**
+     * Get the dimension of an islands world.
+     * If the island is not an islands world, null will be returned.
+     *
+     * @param world The world to check.
+     */
+    @Nullable
+    Dimension getIslandsWorldDimension(World world);
+
+    /**
      * Get the world of an island by the environment.
      * If the environment is not the normal and that environment is disabled in config, null will be returned.
      *
      * @param environment The world environment.
      * @param island      The island to check.
      */
+    @Deprecated
     @Nullable
     World getIslandsWorld(Island island, World.Environment environment);
+
+    /**
+     * Get the {@link WorldInfo} of the world of an island by the dimension.
+     * The world might not be loaded at the time of calling this method.
+     *
+     * @param island    The island to check.
+     * @param dimension The world dimension.
+     * @return The world info for the given dimension, or null if this dimension is not enabled.
+     */
+    @Nullable
+    WorldInfo getIslandsWorldInfo(Island island, Dimension dimension);
 
     /**
      * Get the {@link WorldInfo} of the world of an island by the environment.
@@ -265,6 +323,7 @@ public interface GridManager extends IDatabaseBridgeHolder {
      * @return The world info for the given environment, or null if this environment is not enabled.
      */
     @Nullable
+    @Deprecated
     WorldInfo getIslandsWorldInfo(Island island, World.Environment environment);
 
     /**
@@ -289,6 +348,7 @@ public interface GridManager extends IDatabaseBridgeHolder {
      * This will add all protections to that world, however - no islands will by physically there.
      *
      * @param world The world to register as an islands world.
+     * @throws IllegalArgumentException if the world couldn't be registered
      */
     void registerIslandWorld(World world);
 

@@ -10,14 +10,11 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.IDeserializer;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.JsonDeserializer;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.MultipleDeserializer;
-import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.RawDeserializer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -31,7 +28,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
@@ -45,11 +41,8 @@ import java.util.UUID;
 public class IslandsDeserializer {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final Gson gson = new GsonBuilder().create();
-    private static final IDeserializer oldDataDeserializer = new MultipleDeserializer(
-            new JsonDeserializer(null), new RawDeserializer(null, plugin)
-    );
 
+    private static final Gson GSON = new GsonBuilder().create();
     private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
 
     private IslandsDeserializer() {
@@ -284,65 +277,44 @@ public class IslandsDeserializer {
         if (Text.isBlank(dirtyChunks))
             return;
 
-        try {
-            JsonObject dirtyChunksObject = gson.fromJson(dirtyChunks, JsonObject.class);
-            dirtyChunksObject.entrySet().forEach(dirtyChunkEntry -> {
-                String worldName = dirtyChunkEntry.getKey();
-                JsonArray dirtyChunksArray = dirtyChunkEntry.getValue().getAsJsonArray();
+        JsonObject dirtyChunksObject = GSON.fromJson(dirtyChunks, JsonObject.class);
+        dirtyChunksObject.entrySet().forEach(dirtyChunkEntry -> {
+            String worldName = dirtyChunkEntry.getKey();
+            JsonArray dirtyChunksArray = dirtyChunkEntry.getValue().getAsJsonArray();
 
-                dirtyChunksArray.forEach(dirtyChunkElement -> {
-                    String[] chunkPositionSections = dirtyChunkElement.getAsString().split(",");
-                    builder.setDirtyChunk(worldName, Integer.parseInt(chunkPositionSections[0]),
-                            Integer.parseInt(chunkPositionSections[1]));
-                });
+            dirtyChunksArray.forEach(dirtyChunkElement -> {
+                String[] chunkPositionSections = dirtyChunkElement.getAsString().split(",");
+                builder.setDirtyChunk(worldName, Integer.parseInt(chunkPositionSections[0]),
+                        Integer.parseInt(chunkPositionSections[1]));
             });
-        } catch (JsonSyntaxException ex) {
-            if (dirtyChunks.contains("|")) {
-                String[] serializedSections = dirtyChunks.split("\\|");
-
-                for (String section : serializedSections) {
-                    String[] worldSections = section.split("=");
-                    if (worldSections.length == 2) {
-                        String[] dirtyChunkSections = worldSections[1].split(";");
-                        for (String dirtyChunk : dirtyChunkSections) {
-                            String[] dirtyChunkSection = dirtyChunk.split(",");
-                            if (dirtyChunkSection.length == 2) {
-                                builder.setDirtyChunk(worldSections[0],
-                                        Integer.parseInt(dirtyChunkSection[0]), Integer.parseInt(dirtyChunkSection[1]));
-                            }
-                        }
-                    }
-                }
-            } else {
-                String[] dirtyChunkSections = dirtyChunks.split(";");
-                for (String dirtyChunk : dirtyChunkSections) {
-                    String[] dirtyChunkSection = dirtyChunk.split(",");
-                    if (dirtyChunkSection.length == 3) {
-                        builder.setDirtyChunk(dirtyChunkSection[0],
-                                Integer.parseInt(dirtyChunkSection[1]), Integer.parseInt(dirtyChunkSection[2]));
-                    }
-                }
-            }
-        }
+        });
     }
 
     public static void deserializeBlockCounts(Island.Builder builder, String blocks) {
         if (Text.isBlank(blocks))
             return;
 
-        JsonArray blockCounts;
-
-        try {
-            blockCounts = gson.fromJson(blocks, JsonArray.class);
-        } catch (JsonSyntaxException error) {
-            blockCounts = gson.fromJson(oldDataDeserializer.deserializeBlockCounts(blocks), JsonArray.class);
-        }
+        JsonArray blockCounts = GSON.fromJson(blocks, JsonArray.class);
 
         blockCounts.forEach(blockCountElement -> {
             JsonObject blockCountObject = blockCountElement.getAsJsonObject();
             Key blockKey = Keys.ofMaterialAndData(blockCountObject.get("id").getAsString());
             BigInteger amount = new BigInteger(blockCountObject.get("amount").getAsString());
             builder.setBlockCount(blockKey, amount);
+        });
+    }
+
+    public static void deserializeEntityCounts(Island.Builder builder, String entities) {
+        if (Text.isBlank(entities))
+            return;
+
+        JsonArray entityCounts = GSON.fromJson(entities, JsonArray.class);
+
+        entityCounts.forEach(entityCountElement -> {
+            JsonObject entityCountObject = entityCountElement.getAsJsonObject();
+            Key entityKey = Keys.ofEntityType(entityCountObject.get("id").getAsString());
+            BigInteger amount = new BigInteger(entityCountObject.get("amount").getAsString());
+            builder.setEntityCount(entityKey, amount);
         });
     }
 
@@ -515,9 +487,8 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<Integer> environment = generators.getEnum("environment", World.Environment.class)
-                    .map(Enum::ordinal);
-            if (!environment.isPresent()) {
+            Optional<Dimension> dimension = generators.getString("environment").map(Dimension::getByName);
+            if (!dimension.isPresent()) {
                 Log.warn("Cannot load generator rates with invalid environment for ", uuid.get(), ", skipping...");
                 return;
             }
@@ -535,7 +506,7 @@ public class IslandsDeserializer {
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-            builder.setGeneratorRate(block.get(), rate.get(), World.Environment.values()[environment.get()]);
+            builder.setGeneratorRate(block.get(), rate.get(), dimension.get());
         });
     }
 
@@ -549,9 +520,8 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<Integer> environment = islandHomes.getEnum("environment", World.Environment.class)
-                    .map(Enum::ordinal);
-            if (!environment.isPresent()) {
+            Optional<Dimension> dimension = islandHomes.getString("environment").map(Dimension::getByName);
+            if (!dimension.isPresent()) {
                 Log.warn("Cannot load island homes with invalid environment for ", uuid.get(), ", skipping...");
                 return;
             }
@@ -563,7 +533,7 @@ public class IslandsDeserializer {
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-            builder.setIslandHome(location.get(), World.Environment.values()[environment.get()]);
+            builder.setIslandHome(location.get(), dimension.get());
         });
     }
 
@@ -577,9 +547,8 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<Integer> environment = islandVisitorHomes.getEnum("environment", World.Environment.class)
-                    .map(Enum::ordinal);
-            if (!environment.isPresent()) {
+            Optional<Dimension> dimension = islandVisitorHomes.getString("environment").map(Dimension::getByName);
+            if (!dimension.isPresent()) {
                 Log.warn("Cannot load island homes with invalid environment for ", uuid.get(), ", skipping...");
                 return;
             }
@@ -591,7 +560,7 @@ public class IslandsDeserializer {
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-            builder.setVisitorHome(location.get(), World.Environment.values()[environment.get()]);
+            builder.setVisitorHome(location.get(), dimension.get());
         });
     }
 

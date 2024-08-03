@@ -13,9 +13,9 @@ import com.bgsoftware.superiorskyblock.core.key.MaterialKeySource;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import com.google.common.base.Preconditions;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Map;
@@ -45,16 +45,8 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
                 ((MaterialKey) key).getMaterialKeySource() == MaterialKeySource.ITEM)
             key = ((MaterialKey) key).toGlobalKey();
 
-        BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
-        BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
-
-        boolean increaseAmount = false;
-
-        if (blockValue.compareTo(BigDecimal.ZERO) != 0) {
-            increaseAmount = true;
-        } else if (blockLevel.compareTo(BigDecimal.ZERO) != 0) {
-            increaseAmount = true;
-        }
+        BlockValue blockValue = plugin.getBlockValues().getBlockValue(key);
+        boolean increaseAmount = blockValue != BlockValue.ZERO;
 
         boolean hasBlockLimit = island.getBlockLimit(key) != -1;
         boolean valuesMenu = plugin.getBlockValues().isValuesMenu(key);
@@ -82,18 +74,9 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
                 ((MaterialKey) key).getMaterialKeySource() == MaterialKeySource.ITEM)
             key = ((MaterialKey) key).toGlobalKey();
 
-        BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
-        BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
+        BlockValue blockValue = plugin.getBlockValues().getBlockValue(key);
 
-        boolean decreaseAmount = false;
-
-        if (blockValue.compareTo(BigDecimal.ZERO) != 0) {
-            decreaseAmount = true;
-        }
-
-        if (blockLevel.compareTo(BigDecimal.ZERO) != 0) {
-            decreaseAmount = true;
-        }
+        boolean decreaseAmount = blockValue != BlockValue.ZERO;
 
         boolean hasBlockLimit = island.getBlockLimit(key) != -1;
         boolean valuesMenu = plugin.getBlockValues().isValuesMenu(key);
@@ -113,10 +96,10 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
                 limitCount = true;
             }
 
-            if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
-                    (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() != 0 ||
-                            plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() != 0)) {
-                removeCounts(globalKey, amount);
+            if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey))) {
+                blockValue = plugin.getBlockValues().getBlockValue(globalKey);
+                if (blockValue != BlockValue.ZERO)
+                    removeCounts(globalKey, amount);
             }
 
             return true;
@@ -174,12 +157,13 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
             limitCount = true;
         }
 
-        if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
-                (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() != 0 ||
-                        plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() != 0)) {
-            Log.debugResult(Debug.BLOCK_COUNT_INCREASE, "Global Key", globalKey);
-            currentAmount = blockCounts.getRaw(globalKey, BigInteger.ZERO);
-            blockCounts.put(globalKey, currentAmount.add(amount));
+        if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey))) {
+            BlockValue blockValue = plugin.getBlockValues().getBlockValue(globalKey);
+            if (blockValue != BlockValue.ZERO) {
+                Log.debugResult(Debug.BLOCK_COUNT_INCREASE, "Global Key", globalKey);
+                currentAmount = blockCounts.getRaw(globalKey, BigInteger.ZERO);
+                blockCounts.put(globalKey, currentAmount.add(amount));
+            }
         }
     }
 

@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -38,7 +39,7 @@ import java.util.Optional;
 
 public class FeaturesListener implements Listener {
 
-    private final Map<Class<? extends Event>, EventMethods> CACHED_EVENT_METHODS = new HashMap<>();
+    private final Map<Class<? extends Event>, EventMethods> CACHED_EVENT_METHODS = new ArrayMap<>();
 
     private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {

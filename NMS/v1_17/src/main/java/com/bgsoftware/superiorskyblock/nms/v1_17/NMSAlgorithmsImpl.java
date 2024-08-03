@@ -170,6 +170,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         return Bukkit.getTPS()[0];
     }
 
+    @Override
+    public int getDataVersion() {
+        return CraftMagicNumbers.INSTANCE.getDataVersion();
+    }
+
     private interface MenuCreator extends BiFunction<InventoryHolder, String, Container> {
 
     }

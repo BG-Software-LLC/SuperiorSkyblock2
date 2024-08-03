@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.upgrades;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
@@ -127,16 +128,33 @@ public interface UpgradeLevel {
     /**
      * Get the generator rate of a block for this level in a specific world.
      *
+     * @param key       The block to check.
+     * @param dimension The world dimension.
+     */
+    int getGeneratorAmount(Key key, Dimension dimension);
+
+    /**
+     * Get the generator rate of a block for this level in a specific world.
+     *
      * @param key         The block to check.
      * @param environment The world environment
      */
+    @Deprecated
     int getGeneratorAmount(Key key, World.Environment environment);
+
+    /**
+     * Get all the generator rates for this level in a specific world.
+     *
+     * @param dimension The world dimension
+     */
+    Map<String, Integer> getGeneratorAmounts(Dimension dimension);
 
     /**
      * Get all the generator rates for this level in a specific world.
      *
      * @param environment The world environment
      */
+    @Deprecated
     Map<String, Integer> getGeneratorAmounts(World.Environment environment);
 
     /**

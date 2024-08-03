@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import org.bukkit.World;
 import org.bukkit.event.Cancellable;
 
@@ -9,7 +10,7 @@ import org.bukkit.event.Cancellable;
  */
 public class IslandLockWorldEvent extends IslandEvent implements Cancellable {
 
-    private final World.Environment environment;
+    private final Dimension dimension;
 
     private boolean cancelled = false;
 
@@ -19,16 +20,35 @@ public class IslandLockWorldEvent extends IslandEvent implements Cancellable {
      * @param island      The island that the world was locked for.
      * @param environment The environment of the world that is locked.
      */
+    @Deprecated
     public IslandLockWorldEvent(Island island, World.Environment environment) {
+        this(island, Dimension.getByName(environment.name()));
+    }
+
+    /**
+     * The constructor of the event.
+     *
+     * @param island    The island that the world was locked for.
+     * @param dimension The dimension of the world that is locked.
+     */
+    public IslandLockWorldEvent(Island island, Dimension dimension) {
         super(island);
-        this.environment = environment;
+        this.dimension = dimension;
     }
 
     /**
      * Get the environment of the world that is being locked.
      */
+    @Deprecated
     public World.Environment getEnvironment() {
-        return environment;
+        return this.dimension.getEnvironment();
+    }
+
+    /**
+     * Get the environment of the world that is being locked.
+     */
+    public Dimension getDimension() {
+        return this.dimension;
     }
 
     @Override

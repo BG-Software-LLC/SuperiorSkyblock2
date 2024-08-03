@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -23,6 +24,7 @@ import net.minecraft.server.v1_12_R1.PlayerChunkMap;
 import net.minecraft.server.v1_12_R1.TileEntity;
 import net.minecraft.server.v1_12_R1.World;
 import net.minecraft.server.v1_12_R1.WorldServer;
+import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public class NMSUtils {
 
@@ -51,18 +54,33 @@ public class NMSUtils {
 
     }
 
-    public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
+    public static void runActionOnEntityChunks(Collection<ChunkPosition> chunksCoords,
+                                               ChunkCallback chunkCallback) {
+        runActionOnChunksInternal(chunksCoords, chunkCallback, unloadedChunks ->
+                runActionOnUnloadedEntityChunks(unloadedChunks, chunkCallback));
+    }
+
+    public static void runActionOnChunks(Collection<ChunkPosition> chunksCoords,
                                          boolean saveChunks, ChunkCallback chunkCallback) {
-        List<ChunkCoordIntPair> unloadedChunks = new LinkedList<>();
+        runActionOnChunksInternal(chunksCoords, chunkCallback, unloadedChunks ->
+                runActionOnUnloadedChunks(unloadedChunks, saveChunks, chunkCallback));
+    }
+
+    private static void runActionOnChunksInternal(Collection<ChunkPosition> chunksCoords,
+                                                  ChunkCallback chunkCallback,
+                                                  Consumer<List<ChunkPosition>> onUnloadChunkAction) {
+        List<ChunkPosition> unloadedChunks = new LinkedList<>();
         List<Chunk> loadedChunks = new LinkedList<>();
 
-        chunksCoords.forEach(chunkCoords -> {
-            Chunk chunk = worldServer.getChunkIfLoaded(chunkCoords.x, chunkCoords.z);
+        chunksCoords.forEach(chunkPosition -> {
+            WorldServer worldServer = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+
+            Chunk chunk = worldServer.getChunkIfLoaded(chunkPosition.getX(), chunkPosition.getZ());
 
             if (chunk != null) {
                 loadedChunks.add(chunk);
             } else {
-                unloadedChunks.add(chunkCoords);
+                unloadedChunks.add(chunkPosition);
             }
         });
 
@@ -74,27 +92,29 @@ public class NMSUtils {
         });
 
         if (hasUnloadedChunks) {
-            runActionOnUnloadedChunks(worldServer, unloadedChunks, saveChunks, chunkCallback);
+            onUnloadChunkAction.accept(unloadedChunks);
         } else {
             chunkCallback.onFinish();
         }
     }
 
-    public static void runActionOnUnloadedChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunks,
+    public static void runActionOnUnloadedChunks(Collection<ChunkPosition> chunks,
                                                  boolean saveChunks, ChunkCallback chunkCallback) {
-        IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(worldServer.getDataManager().getUUID(),
-                uuid -> CHUNK_LOADER.get(worldServer.getChunkProvider()));
-
         CompletableFuture<Void> pendingTask = new CompletableFuture<>();
         PENDING_CHUNK_ACTIONS.add(pendingTask);
 
         BukkitExecutor.createTask().runAsync(v -> {
-            chunks.forEach(chunkCoords -> {
-                if (!chunkLoader.chunkExists(chunkCoords.x, chunkCoords.z))
+            chunks.forEach(chunkPosition -> {
+                WorldServer worldServer = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+
+                IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(worldServer.getDataManager().getUUID(),
+                        uuid -> CHUNK_LOADER.get(worldServer.getChunkProvider()));
+
+                if (!chunkLoader.chunkExists(chunkPosition.getX(), chunkPosition.getZ()))
                     return;
 
                 try {
-                    Chunk loadedChunk = chunkLoader.a(worldServer, chunkCoords.x, chunkCoords.z);
+                    Chunk loadedChunk = chunkLoader.a(worldServer, chunkPosition.getX(), chunkPosition.getZ());
 
                     if (loadedChunk != null) {
                         chunkCallback.onChunk(loadedChunk, false);
@@ -108,7 +128,7 @@ public class NMSUtils {
                         }
                     }
                 } catch (Exception error) {
-                    Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkCoords, ":");
+                    Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkPosition, ":");
                 }
             });
         }).runSync(v -> {
@@ -117,6 +137,11 @@ public class NMSUtils {
             pendingTask.complete(null);
             PENDING_CHUNK_ACTIONS.remove(pendingTask);
         });
+    }
+
+    private static void runActionOnUnloadedEntityChunks(Collection<ChunkPosition> chunks,
+                                                        ChunkCallback chunkCallback) {
+
     }
 
     public static List<CompletableFuture<Void>> getPendingChunkActions() {

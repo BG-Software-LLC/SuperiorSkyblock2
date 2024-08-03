@@ -2,13 +2,14 @@ package com.bgsoftware.superiorskyblock.island.upgrade;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.island.container.value.Value;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
+import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
+import com.bgsoftware.superiorskyblock.core.value.IntValue;
+import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.island.upgrade.cost.EmptyUpgradeCost;
-import org.bukkit.World;
 
 import java.util.Collections;
-import java.util.EnumMap;
-import java.util.Map;
 
 public class DefaultUpgradeLevel extends SUpgradeLevel {
 
@@ -17,19 +18,19 @@ public class DefaultUpgradeLevel extends SUpgradeLevel {
 
     private DefaultUpgradeLevel() {
         super(-1, EmptyUpgradeCost.getInstance(), Collections.emptyList(), "", Collections.emptySet(),
-                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getCropGrowth()),
-                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getSpawnerRates()),
-                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getMobDrops()),
-                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getTeamLimit()),
-                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getWarpsLimit()),
-                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getCoopLimit()),
-                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getIslandSize()),
+                DoubleValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getCropGrowth()),
+                DoubleValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getSpawnerRates()),
+                DoubleValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getMobDrops()),
+                IntValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getTeamLimit()),
+                IntValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getWarpsLimit()),
+                IntValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getCoopLimit()),
+                IntValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getIslandSize()),
                 (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getBlockLimits(),
                 (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getEntityLimits(),
                 convertFromArray(plugin.getSettings().getDefaultValues().getGenerators()),
                 Collections.emptyMap(),
                 Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getBankLimit()),
-                plugin.getSettings().getDefaultValues().getRoleLimits()
+                plugin.getSettings().getDefaultValues().getRoleLimitsAsView()
         );
     }
 
@@ -37,18 +38,8 @@ public class DefaultUpgradeLevel extends SUpgradeLevel {
         return INSTANCE;
     }
 
-    private static <V> Map<World.Environment, V> convertFromArray(V[] arr) {
-        EnumMap<World.Environment, V> result = new EnumMap<>(World.Environment.class);
-
-        int environmentLength = World.Environment.values().length;
-        for (int i = 0; i < arr.length && i < environmentLength; ++i) {
-            if (arr[i] != null) {
-                World.Environment environment = World.Environment.values()[i];
-                result.put(environment, arr[i]);
-            }
-        }
-
-        return result.isEmpty() ? Collections.emptyMap() : result;
+    private static <V> EnumerateMap<Dimension, V> convertFromArray(V[] arr) {
+        return new EnumerateMap<>(arr);
     }
 
 }

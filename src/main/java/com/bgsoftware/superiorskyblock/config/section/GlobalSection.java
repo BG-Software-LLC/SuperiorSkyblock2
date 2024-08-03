@@ -68,6 +68,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().safeBlocks;
     }
 
+    public Collection<String> getWorldPermissions() {
+        return getContainer().worldPermissions;
+    }
+
     public boolean isVisitorsDamage() {
         return getContainer().visitorsDamage;
     }

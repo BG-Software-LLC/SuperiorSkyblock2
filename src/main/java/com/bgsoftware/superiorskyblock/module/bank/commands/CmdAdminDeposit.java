@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
@@ -68,7 +67,7 @@ public class CmdAdminDeposit implements IAdminIslandCommand {
         if (amount == null)
             return;
 
-        BukkitExecutor.data(() -> islands.forEach(island -> island.getIslandBank().depositAdminMoney(sender, amount)));
+        islands.forEach(island -> island.getIslandBank().depositAdminMoney(sender, amount));
 
         if (targetPlayer == null)
             Message.ADMIN_DEPOSIT_MONEY_NAME.send(sender, Formatters.NUMBER_FORMATTER.format(amount), islands.size() == 1 ? islands.get(0).getName() : "all");

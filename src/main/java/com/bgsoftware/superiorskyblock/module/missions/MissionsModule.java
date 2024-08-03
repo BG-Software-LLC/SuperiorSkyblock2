@@ -4,11 +4,12 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
-import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookupFactory;
 import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
+import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookupFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
@@ -27,7 +28,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -211,7 +211,7 @@ public class MissionsModule extends BuiltinModule {
             return false;
         }
 
-        Map<Mission<?>, Integer> missionWeights = new HashMap<>();
+        Map<Mission<?>, Integer> missionWeights = new ArrayMap<>();
 
         try (FilesLookup filesLookup = FilesLookupFactory.getInstance().lookupFolder(getModuleFolder())) {
             for (File missionFile : missionFiles) {

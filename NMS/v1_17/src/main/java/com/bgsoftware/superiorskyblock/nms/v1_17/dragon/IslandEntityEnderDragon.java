@@ -2,7 +2,9 @@ package com.bgsoftware.superiorskyblock.nms.v1_17.dragon;
 
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -23,6 +25,7 @@ public class IslandEntityEnderDragon extends EnderDragon {
     }
 
     private final ServerLevel serverLevel;
+    private final Dimension dimension;
     private BlockPos islandBlockPos;
 
     public IslandEntityEnderDragon(Level level, BlockPos islandBlockPos) {
@@ -33,6 +36,7 @@ public class IslandEntityEnderDragon extends EnderDragon {
     private IslandEntityEnderDragon(Level level) {
         super(EntityType.ENDER_DRAGON, level);
         this.serverLevel = (ServerLevel) level;
+        this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(level.getWorld());
     }
 
     @Override
@@ -48,8 +52,13 @@ public class IslandEntityEnderDragon extends EnderDragon {
         if (island == null)
             return;
 
-        Location middleBlock = plugin.getSettings().getWorlds().getEnd().getPortalOffset()
-                .applyToLocation(island.getCenter(org.bukkit.World.Environment.THE_END));
+        Location middleBlock = island.getCenter(dimension);
+
+        SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(dimension);
+        if (dimensionConfig instanceof SettingsManager.Worlds.End) {
+            middleBlock = ((SettingsManager.Worlds.End) dimensionConfig).getPortalOffset().applyToLocation(middleBlock);
+        }
+
         this.islandBlockPos = new BlockPos(middleBlock.getX(), middleBlock.getY(), middleBlock.getZ());
 
         IslandEndDragonFight dragonBattle = new IslandEndDragonFight(island, this.serverLevel, this.islandBlockPos, this);

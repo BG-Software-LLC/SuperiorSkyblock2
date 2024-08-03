@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -26,6 +28,7 @@ public enum Materials {
     private static final EnumMap<Material, MaterialTag> MATERIAL_TAGS = setupMaterialTags();
     private static final EnumSet<Material> BLOCK_NON_LEGACY_MATERIALS = allOf(material -> material.isBlock() && !isLegacy(material));
     private static final EnumSet<Material> SOLID_MATERIALS = allOf(Material::isSolid);
+    private static final Map<String, String> PATCHED_MATERIAL_NAMES = setupPatchedMaterialNames();
 
     private final String bukkitType;
     private final short bukkitData;
@@ -95,12 +98,20 @@ public enum Materials {
         return MATERIAL_TAGS.get(material) instanceof DyeMaterialTag;
     }
 
+    public static boolean isSpawnEgg(Material material) {
+        return MATERIAL_TAGS.get(material) instanceof SpawnEggMaterialTag;
+    }
+
     public static Set<Material> getBlocksNonLegacy() {
         return Collections.unmodifiableSet(BLOCK_NON_LEGACY_MATERIALS);
     }
 
     public static Set<Material> getSolids() {
         return Collections.unmodifiableSet(SOLID_MATERIALS);
+    }
+
+    public static String patchOldMaterialName(String type) {
+        return PATCHED_MATERIAL_NAMES.getOrDefault(type, type);
     }
 
     public static void init() {
@@ -139,8 +150,20 @@ public enum Materials {
                 enumMap.put(material, SignMaterialTag.INSTANCE);
             else if (ServerVersion.isLegacy() ? material == Material.INK_SACK : materialName.contains("_DYE"))
                 enumMap.put(material, DyeMaterialTag.INSTANCE);
+            else if (ServerVersion.isLegacy() ? material == Material.MONSTER_EGG : materialName.contains("_SPAWN_EGG"))
+                enumMap.put(material, SpawnEggMaterialTag.INSTANCE);
         });
         return enumMap;
+    }
+
+    private static Map<String, String> setupPatchedMaterialNames() {
+        Map<String, String> map = new HashMap<>();
+        try {
+            Material.valueOf("GRASS");
+        } catch (IllegalArgumentException error) {
+            map.put("GRASS", "GRASS_BLOCK");
+        }
+        return map.isEmpty() ? Collections.emptyMap() : map;
     }
 
     private interface MaterialTag {
@@ -204,6 +227,12 @@ public enum Materials {
     private static class DyeMaterialTag implements MaterialTag {
 
         private static final DyeMaterialTag INSTANCE = new DyeMaterialTag();
+
+    }
+
+    private static class SpawnEggMaterialTag implements MaterialTag {
+
+        private static final SpawnEggMaterialTag INSTANCE = new SpawnEggMaterialTag();
 
     }
 

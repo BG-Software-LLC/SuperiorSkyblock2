@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.factory.IslandsFactory;
 import com.bgsoftware.superiorskyblock.api.factory.PlayersFactory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
@@ -148,9 +149,18 @@ public interface FactoriesManager {
     /**
      * Create a new world info.
      *
+     * @param worldName The name of the world.
+     * @param dimension The dimension of the world.
+     */
+    WorldInfo createWorldInfo(String worldName, Dimension dimension);
+
+    /**
+     * Create a new world info.
+     *
      * @param worldName   The name of the world.
      * @param environment The environment of the world.
      */
+    @Deprecated
     WorldInfo createWorldInfo(String worldName, World.Environment environment);
 
     /**

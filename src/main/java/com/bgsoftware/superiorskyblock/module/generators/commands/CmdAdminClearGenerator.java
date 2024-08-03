@@ -3,11 +3,11 @@ package com.bgsoftware.superiorskyblock.module.generators.commands;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -61,21 +61,21 @@ public class CmdAdminClearGenerator implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        World.Environment environment = args.length == 3 ? plugin.getSettings().getWorlds().getDefaultWorld() :
-                CommandArguments.getEnvironment(sender, args[3]);
+        Dimension dimension = args.length == 3 ? plugin.getSettings().getWorlds().getDefaultWorldDimension() :
+                CommandArguments.getDimension(sender, args[3]);
 
-        if (environment == null)
+        if (dimension == null)
             return;
 
         boolean anyIslandChanged = false;
 
         for (Island island : islands) {
-            if (!plugin.getEventsBus().callIslandClearGeneratorRatesEvent(sender, island, environment))
+            if (!plugin.getEventsBus().callIslandClearGeneratorRatesEvent(sender, island, dimension))
                 continue;
 
             anyIslandChanged = true;
 
-            island.clearGeneratorAmounts(environment);
+            island.clearGeneratorAmounts(dimension);
         }
 
         if (!anyIslandChanged)

@@ -16,7 +16,7 @@ public class SpawnerKey extends MaterialKey {
 
     private static final Material SPAWNER_TYPE = Materials.SPAWNER.toBukkitType();
 
-    private static final KeyMap<SpawnerKey> SPAWNER_KEYS_CACHE = KeyMaps.createIdentityHashMap(KeyIndicator.ENTITY_TYPE);
+    private static final KeyMap<SpawnerKey> SPAWNER_KEYS_CACHE = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
     public static final SpawnerKey GLOBAL_KEY = new SpawnerKey(null);
 
     static {

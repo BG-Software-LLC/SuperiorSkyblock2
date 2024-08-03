@@ -1,19 +1,19 @@
 package com.bgsoftware.superiorskyblock.nms;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.CreatureSpawner;
+import org.bukkit.block.BlockState;
 import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.generator.ChunkGenerator;
 
 import java.util.function.IntFunction;
 
@@ -43,6 +43,8 @@ public interface NMSWorld {
 
     int getDefaultAmount(Block block);
 
+    int getDefaultAmount(BlockState blockState);
+
     void placeSign(Island island, Location location);
 
     void setSignLines(SignChangeEvent signChangeEvent, String[] lines);
@@ -57,7 +59,7 @@ public interface NMSWorld {
 
     void removeAntiXray(World world);
 
-    ChunkGenerator createGenerator(SuperiorSkyblockPlugin plugin);
+    IslandsGenerator createGenerator(Dimension dimension);
 
     WorldEditSession createEditSession(World world);
 

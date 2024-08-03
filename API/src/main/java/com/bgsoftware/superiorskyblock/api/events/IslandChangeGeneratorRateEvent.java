@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.events;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.google.common.base.Preconditions;
 import org.bukkit.World;
@@ -16,7 +17,7 @@ public class IslandChangeGeneratorRateEvent extends IslandEvent implements Cance
     @Nullable
     private final SuperiorPlayer superiorPlayer;
     private final Key block;
-    private final World.Environment environment;
+    private final Dimension dimension;
 
     private int generatorRate;
     private boolean cancelled = false;
@@ -31,12 +32,28 @@ public class IslandChangeGeneratorRateEvent extends IslandEvent implements Cance
      * @param environment    The environment of the world that the rate was changed for.
      * @param generatorRate  The new generator-rate of the block.
      */
+    @Deprecated
     public IslandChangeGeneratorRateEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Key block,
                                           World.Environment environment, int generatorRate) {
+        this(superiorPlayer, island, block, Dimension.getByName(environment.name()), generatorRate);
+    }
+
+    /**
+     * The constructor of the event.
+     *
+     * @param superiorPlayer The player that changed the generator-rate of an island.
+     *                       If set to null, it means the rate was changed via the console.
+     * @param island         The island that the generator-rate was changed for.
+     * @param block          The block that the rate was changed for.
+     * @param dimension      The dimension of the world that the rate was changed for.
+     * @param generatorRate  The new generator-rate of the block.
+     */
+    public IslandChangeGeneratorRateEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Key block,
+                                          Dimension dimension, int generatorRate) {
         super(island);
         this.superiorPlayer = superiorPlayer;
         this.block = block;
-        this.environment = environment;
+        this.dimension = dimension;
         this.generatorRate = generatorRate;
     }
 
@@ -59,8 +76,16 @@ public class IslandChangeGeneratorRateEvent extends IslandEvent implements Cance
     /**
      * Get the environment of the world that the rate was changed for.
      */
+    @Deprecated
     public World.Environment getEnvironment() {
-        return environment;
+        return this.dimension.getEnvironment();
+    }
+
+    /**
+     * Get the environment of the world that the rate was changed for.
+     */
+    public Dimension getDimension() {
+        return this.dimension;
     }
 
     /**

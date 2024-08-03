@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -18,7 +19,6 @@ import org.bukkit.command.CommandSender;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -81,7 +81,7 @@ public class CmdShow implements ISuperiorCommand {
             infoMessage.append(Message.ISLAND_INFO_NAME.getMessage(locale, island.getName())).append("\n");
         if (!Message.ISLAND_INFO_LOCATION.isEmpty(locale))
             infoMessage.append(Message.ISLAND_INFO_LOCATION.getMessage(locale, Formatters.LOCATION_FORMATTER.format(
-                    island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld())))).append("\n");
+                    island.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension())))).append("\n");
         if (!Message.ISLAND_INFO_CREATION_TIME.isEmpty(locale))
             infoMessage.append(Message.ISLAND_INFO_CREATION_TIME.getMessage(locale, island.getCreationTimeDate())).append("\n");
         if (!Message.ISLAND_INFO_RATE.isEmpty(locale)) {
@@ -105,7 +105,7 @@ public class CmdShow implements ISuperiorCommand {
             infoMessage.append(Message.ISLAND_INFO_VISITORS_COUNT.getMessage(locale, island.getUniqueVisitorsWithTimes().size())).append("\n");
 
         if (!Message.ISLAND_INFO_ROLES.isEmpty(locale)) {
-            Map<PlayerRole, StringBuilder> rolesStrings = new HashMap<>();
+            Map<PlayerRole, StringBuilder> rolesStrings = new ArrayMap<>();
             plugin.getRoles().getRoles().stream().filter(playerRole -> playerRole.isRoleLadder() && !playerRole.isLastRole())
                     .forEach(playerRole -> rolesStrings.put(playerRole, new StringBuilder()));
 

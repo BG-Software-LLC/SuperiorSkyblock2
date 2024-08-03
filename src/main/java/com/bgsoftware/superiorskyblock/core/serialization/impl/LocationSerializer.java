@@ -45,7 +45,7 @@ public class LocationSerializer implements ISerializer<Location, String> {
             return new LazyWorldLocation(sections[0], x, y, z, yaw, pitch);
         } catch (Exception error) {
             Log.entering("ENTER", element);
-            Log.error(error, "An unexpected error occurred while deserializing location:");
+            Log.error(error, "An unexpected error occurred while deserializing location '" + element + "':");
             return null;
         }
     }

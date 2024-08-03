@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -70,7 +71,7 @@ public class SuperiorSkyblockAPI {
      * Everytime a change is made to the API, the version of it changes.
      */
     public static int getAPIVersion() {
-        return 10;
+        return 11;
     }
 
     /*
@@ -180,10 +181,21 @@ public class SuperiorSkyblockAPI {
 
     /**
      * Get the world of an island by the world's environment.
+     *
+     * @deprecated See {@link #getIslandsWorld(Island, Dimension)}
      */
     @Nullable
+    @Deprecated
     public static World getIslandsWorld(Island island, World.Environment environment) {
         return plugin.getGrid().getIslandsWorld(island, environment);
+    }
+
+    /**
+     * Get the world of an island by the world's dimension.
+     */
+    @Nullable
+    public static World getIslandsWorld(Island island, Dimension dimension) {
+        return plugin.getGrid().getIslandsWorld(island, dimension);
     }
 
     /**

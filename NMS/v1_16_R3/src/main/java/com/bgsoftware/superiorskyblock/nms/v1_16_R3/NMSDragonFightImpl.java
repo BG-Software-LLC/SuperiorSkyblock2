@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.dragon.EndWorldEnderDragonBattleHandler;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.dragon.IslandEnderDragonBattle;
@@ -59,8 +60,8 @@ public class NMSDragonFightImpl implements NMSDragonFight {
 
     @Nullable
     @Override
-    public EnderDragon getEnderDragon(Island island) {
-        WorldServer worldServer = ((CraftWorld) island.getCenter(World.Environment.THE_END).getWorld()).getHandle();
+    public EnderDragon getEnderDragon(Island island, Dimension dimension) {
+        WorldServer worldServer = ((CraftWorld) island.getCenter(dimension).getWorld()).getHandle();
 
         if (!(worldServer.getDragonBattle() instanceof EndWorldEnderDragonBattleHandler))
             return null;
@@ -88,8 +89,8 @@ public class NMSDragonFightImpl implements NMSDragonFight {
     }
 
     @Override
-    public void removeDragonBattle(Island island) {
-        World bukkitWorld = island.getCenter(World.Environment.THE_END).getWorld();
+    public void removeDragonBattle(Island island, Dimension dimension) {
+        World bukkitWorld = island.getCenter(dimension).getWorld();
 
         if (bukkitWorld == null)
             return;

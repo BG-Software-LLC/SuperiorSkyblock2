@@ -2,8 +2,10 @@ package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.Counter;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
@@ -22,6 +24,8 @@ public interface NMSChunks {
 
     CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
                                                              Map<ChunkPosition, CalculatedChunk> unloadedChunksCache);
+
+    CompletableFuture<KeyMap<Counter>> calculateChunkEntities(Collection<ChunkPosition> chunkPositions);
 
     void injectChunkSections(Chunk chunk);
 

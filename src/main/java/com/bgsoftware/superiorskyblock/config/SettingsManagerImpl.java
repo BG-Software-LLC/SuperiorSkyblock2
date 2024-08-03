@@ -104,7 +104,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
-    public DefaultValues getDefaultValues() {
+    public DefaultValuesSection getDefaultValues() {
         return this.defaultValues;
     }
 
@@ -171,6 +171,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     @Override
     public Spawn getSpawn() {
         return this.spawn;
+    }
+
+    @Override
+    public Collection<String> getWorldPermissions() {
+        return this.global.getWorldPermissions();
     }
 
     @Override

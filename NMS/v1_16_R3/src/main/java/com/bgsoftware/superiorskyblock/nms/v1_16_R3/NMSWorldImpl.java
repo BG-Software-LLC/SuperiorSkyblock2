@@ -5,6 +5,7 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -25,6 +26,7 @@ import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
+import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.destroystokyo.paper.antixray.ChunkPacketBlockController;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
@@ -54,14 +56,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.block.data.Waterlogged;
+import org.bukkit.block.data.type.BubbleColumn;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlockState;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftSign;
 import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Map;
 import java.util.function.IntFunction;
@@ -143,9 +146,11 @@ public class NMSWorldImpl implements NMSWorld {
             worldBorder.world = worldServer;
             worldBorder.setSize((islandSize * 2) + 1);
 
-            org.bukkit.World.Environment environment = world.getEnvironment();
+            Dimension dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(world);
+            if (dimension == null)
+                return;
 
-            Location center = island.getCenter(environment);
+            Location center = island.getCenter(dimension);
             worldBorder.setCenter(center.getX(), center.getZ());
 
             switch (superiorPlayer.getBorderColor()) {
@@ -249,7 +254,8 @@ public class NMSWorldImpl implements NMSWorld {
 
         org.bukkit.block.data.BlockData blockData = block.getBlockData();
 
-        return blockData instanceof Waterlogged && ((Waterlogged) blockData).isWaterlogged();
+        return blockData instanceof BubbleColumn ||
+                (blockData instanceof Waterlogged && ((Waterlogged) blockData).isWaterlogged());
     }
 
     @Override
@@ -259,8 +265,16 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public int getDefaultAmount(org.bukkit.block.Block block) {
-        IBlockData blockData = ((CraftBlock) block).getNMS();
+    public int getDefaultAmount(org.bukkit.block.Block bukkitBlock) {
+        return getDefaultAmount(((CraftBlock) bukkitBlock).getNMS());
+    }
+
+    @Override
+    public int getDefaultAmount(org.bukkit.block.BlockState bukkitBlockState) {
+        return getDefaultAmount(((CraftBlockState) bukkitBlockState).getHandle());
+    }
+
+    private int getDefaultAmount(IBlockData blockData) {
         Block nmsBlock = blockData.getBlock();
 
         // Checks for double slabs
@@ -351,8 +365,8 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public ChunkGenerator createGenerator(SuperiorSkyblockPlugin plugin) {
-        return new IslandsGeneratorImpl(plugin);
+    public IslandsGenerator createGenerator(Dimension dimension) {
+        return new IslandsGeneratorImpl(dimension);
     }
 
     @Override

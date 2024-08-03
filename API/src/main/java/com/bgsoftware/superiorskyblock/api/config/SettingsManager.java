@@ -1,10 +1,12 @@
 package com.bgsoftware.superiorskyblock.api.config;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -129,6 +131,12 @@ public interface SettingsManager {
      * Config path: spawn
      */
     Spawn getSpawn();
+
+    /**
+     * A list of permissions players will have in the islands world, outside of islands.
+     * Config path: world-permissions
+     */
+    Collection<String> getWorldPermissions();
 
     /**
      * All settings related to the void teleportation.
@@ -773,7 +781,7 @@ public interface SettingsManager {
         /**
          * The default generator-rates for new islands.
          * Represented by an array of maps with keys as the blocks, and values as the rates.
-         * The maps are sorted by the {@link World.Environment} they belong to.
+         * The maps are sorted by the {@link Dimension} they belong to.
          * Config-path: default-values.generator
          */
         Map<Key, Integer>[] getGenerators();
@@ -892,9 +900,18 @@ public interface SettingsManager {
     interface Worlds {
 
         /**
-         * The default world environment.
+         * The default world dimension.
          * Config-path: worlds.default-world
          */
+        Dimension getDefaultWorldDimension();
+
+        /**
+         * The default world environment.
+         * Config-path: worlds.default-world
+         *
+         * @deprecated See {@link #getDefaultWorldDimension()}
+         */
+        @Deprecated
         World.Environment getDefaultWorld();
 
         /**
@@ -927,101 +944,60 @@ public interface SettingsManager {
         End getEnd();
 
         /**
+         * All settings related to a dimension.
+         * Config-path: worlds.<dimension>
+         */
+        @Nullable
+        DimensionConfig getDimensionConfig(Dimension dimension);
+
+        /**
          * The difficulty of the islands worlds.
          * Config-path: worlds.difficulty
          */
         String getDifficulty();
 
-        interface Normal {
+        interface DimensionConfig {
 
             /**
-             * Whether the overworld world is enabled or not.
-             * Config-path: worlds.normal.enabled
+             * Whether this dimension is enabled or not.
+             * Config-path: worlds.<dimension>.enabled
              */
             boolean isEnabled();
 
             /**
-             * Whether the overworld world is unlocked by default or not.
-             * Config-path: worlds.normal.unlock
+             * Whether this dimension is unlocked by default or not.
+             * Config-path: worlds.<dimension>.unlock
              */
             boolean isUnlocked();
 
             /**
-             * Whether the schematic for the overworld world should be offset or not.
-             * Config-path: worlds.normal.schematic-offset
+             * Whether the schematic for this dimension should be offset or not.
+             * Config-path: worlds.<dimension>.schematic-offset
              */
             boolean isSchematicOffset();
 
             /**
-             * Get the default biome for the world.
+             * Get the default biome for this dimension.
              */
             String getBiome();
 
-        }
-
-        interface Nether {
-
             /**
-             * Whether the nether world is enabled or not.
-             * Config-path: worlds.nether.enabled
-             */
-            boolean isEnabled();
-
-            /**
-             * Whether the nether world is unlocked by default or not.
-             * Config-path: worlds.nether.unlock
-             */
-            boolean isUnlocked();
-
-            /**
-             * Custom name for the nether world.
-             * Config-path: worlds.nether.name
+             * Get the world's name for this dimension.
+             * Config-path: worlds.<dimension>.name
              */
             String getName();
 
-            /**
-             * Whether the schematic for the nether world should be offset or not.
-             * Config-path: worlds.nether.schematic-offset
-             */
-            boolean isSchematicOffset();
+        }
 
-            /**
-             * Get the default biome for the world.
-             */
-            String getBiome();
+        interface Normal extends DimensionConfig {
 
         }
 
-        interface End {
+        interface Nether extends DimensionConfig {
 
-            /**
-             * Whether the end world is enabled or not.
-             * Config-path: worlds.end.enabled
-             */
-            boolean isEnabled();
+        }
 
-            /**
-             * Whether the end world is unlocked by default or not.
-             * Config-path: worlds.end.unlock
-             */
-            boolean isUnlocked();
-
-            /**
-             * Custom name for the end world.
-             * Config-path: worlds.end.name
-             */
-            String getName();
-
-            /**
-             * Whether the schematic for the end world should be offset or not.
-             * Config-path: worlds.end.schematic-offset
-             */
-            boolean isSchematicOffset();
-
-            /**
-             * Get the default biome for the world.
-             */
-            String getBiome();
+        interface End extends DimensionConfig {
 
             /**
              * Whether ender-dragon fights should be enabled for islands or not.

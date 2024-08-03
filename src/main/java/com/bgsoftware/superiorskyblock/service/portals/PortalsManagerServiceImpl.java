@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.service.portals;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeLevelBonusEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeWorthBonusEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -9,7 +11,7 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.service.portals.EntityPortalResult;
 import com.bgsoftware.superiorskyblock.api.service.portals.PortalsManagerService;
-import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
@@ -19,6 +21,7 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.service.IService;
+import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import com.google.common.base.Preconditions;
 import org.bukkit.ChatColor;
@@ -33,7 +36,6 @@ import java.math.BigDecimal;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 public class PortalsManagerServiceImpl implements PortalsManagerService, IService {
 
@@ -43,12 +45,6 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         @Override
         protected DragonBattleService create() {
             return plugin.getServices().getService(DragonBattleService.class);
-        }
-    };
-    private final LazyReference<RegionManagerService> regionManagerService = new LazyReference<RegionManagerService>() {
-        @Override
-        protected RegionManagerService create() {
-            return plugin.getServices().getService(RegionManagerService.class);
         }
     };
 
@@ -73,8 +69,18 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         Preconditions.checkArgument(!(superiorPlayer instanceof SuperiorNPCPlayer), "superiorPlayer cannot be an NPC.");
         Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
 
-        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, checkImmunedPortalsStatus,
-                () -> simulatePlayerPortal(superiorPlayer, portalLocation, portalType));
+        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, checkImmunedPortalsStatus, null);
+    }
+
+    @Override
+    public EntityPortalResult handleEntityPortal(Entity entity, Location portalLocation,
+                                                 PortalType portalType, Location unused) {
+        Preconditions.checkNotNull(entity, "entity cannot be null.");
+        Preconditions.checkNotNull(portalLocation, "portalLocation cannot be null.");
+        Preconditions.checkNotNull(portalType, "portalType cannot be null.");
+        Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
+
+        return handleEntityPortalInternal(entity, portalLocation, portalType, null);
     }
 
     @Override
@@ -89,31 +95,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
         Preconditions.checkArgument(island.isInside(portalLocation), "portalLocation is not inside the island.");
 
-        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, checkImmunedPortalsStatus,
-                () -> simulateEntityPortalFromIsland(superiorPlayer.asPlayer(), island, portalLocation, portalType));
-    }
-
-    private EntityPortalResult handlePlayerPortalInternal(SuperiorPlayer superiorPlayer, Location portalLocation,
-                                                          PortalType portalType, boolean checkImmunedPortalsStatus,
-                                                          Supplier<EntityPortalResult> entityPortalResultSupplier) {
-        World.Environment targetDestination = getTargetWorld(portalLocation, portalType);
-        if (targetDestination == World.Environment.NETHER && !plugin.getSettings().getWorlds().getNether().isEnabled())
-            return EntityPortalResult.DESTINATION_WORLD_DISABLED;
-        if (targetDestination == World.Environment.THE_END && !plugin.getSettings().getWorlds().getEnd().isEnabled())
-            return EntityPortalResult.DESTINATION_WORLD_DISABLED;
-
-        if (checkImmunedPortalsStatus && superiorPlayer.hasPlayerStatus(PlayerStatus.PORTALS_IMMUNED))
-            return EntityPortalResult.PLAYER_IMMUNED_TO_PORTAL;
-
-        EntityPortalResult portalResult = entityPortalResultSupplier.get();
-
-        if (portalResult == EntityPortalResult.WORLD_NOT_UNLOCKED && !Message.WORLD_NOT_UNLOCKED.isEmpty(superiorPlayer.getUserLocale())) {
-            World.Environment originalDestination = getTargetWorld(portalLocation, portalType);
-            Message.SCHEMATICS.send(superiorPlayer, Message.WORLD_NOT_UNLOCKED.getMessage(
-                    superiorPlayer.getUserLocale(), Formatters.CAPITALIZED_FORMATTER.format(originalDestination.name())));
-        }
-
-        return portalResult;
+        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, checkImmunedPortalsStatus, island);
     }
 
     @Override
@@ -126,27 +108,60 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
         Preconditions.checkArgument(island.isInside(portalLocation), "portalLocation is not inside the island.");
 
-        return simulateEntityPortalFromIsland(entity, island, portalLocation, portalType);
+        return handleEntityPortalInternal(entity, portalLocation, portalType, island);
     }
 
-    private EntityPortalResult simulatePlayerPortal(SuperiorPlayer superiorPlayer, Location portalLocation, PortalType portalType) {
-        Island island = plugin.getGrid().getIslandAt(portalLocation);
+    private EntityPortalResult handlePlayerPortalInternal(SuperiorPlayer superiorPlayer, Location portalLocation,
+                                                          PortalType portalType, boolean checkImmunedPortalsStatus,
+                                                          @Nullable Island island) {
+        if (island == null) {
+            island = plugin.getGrid().getIslandAt(portalLocation);
 
-        if (island == null)
-            return EntityPortalResult.PORTAL_NOT_IN_ISLAND;
+            if (island == null)
+                return EntityPortalResult.PORTAL_NOT_IN_ISLAND;
+        }
 
-        return simulateEntityPortalFromIsland(superiorPlayer.asPlayer(), island, portalLocation, portalType);
+        if (checkImmunedPortalsStatus && superiorPlayer.hasPlayerStatus(PlayerStatus.PORTALS_IMMUNED))
+            return EntityPortalResult.PLAYER_IMMUNED_TO_PORTAL;
+
+        EntityPortalResult portalResult = simulateEntityPortalFromIsland(superiorPlayer.asPlayer(), island,
+                portalLocation, portalType);
+
+        if (portalResult == EntityPortalResult.WORLD_NOT_UNLOCKED && !Message.WORLD_NOT_UNLOCKED.isEmpty(superiorPlayer.getUserLocale())) {
+            Dimension originalDestination = getTargetWorld(portalLocation, portalType);
+            Message.SCHEMATICS.send(superiorPlayer, Message.WORLD_NOT_UNLOCKED.getMessage(
+                    superiorPlayer.getUserLocale(), Formatters.CAPITALIZED_FORMATTER.format(originalDestination.getName())));
+        }
+
+        return portalResult;
+    }
+
+    private EntityPortalResult handleEntityPortalInternal(Entity entity, Location portalLocation,
+                                                          PortalType portalType, @Nullable Island island) {
+        if (island == null) {
+            island = plugin.getGrid().getIslandAt(portalLocation);
+
+            if (island == null)
+                return EntityPortalResult.PORTAL_NOT_IN_ISLAND;
+        }
+
+        return simulateEntityPortalFromIsland(entity, island, portalLocation, portalType);
     }
 
     private EntityPortalResult simulateEntityPortalFromIsland(Entity entity, Island island, Location portalLocation,
                                                               PortalType portalType) {
-        World.Environment originalDestination = getTargetWorld(portalLocation, portalType);
+        Dimension originalDestination = getTargetWorld(portalLocation, portalType);
+
+        SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(originalDestination);
+        if (dimensionConfig != null && !dimensionConfig.isEnabled()) {
+            return EntityPortalResult.DESTINATION_WORLD_DISABLED;
+        }
 
         if (plugin.getGrid().getIslandsWorld(island, originalDestination) == null) {
             return EntityPortalResult.DESTINATION_NOT_ISLAND_WORLD;
         }
 
-        if (!isIslandWorldEnabled(originalDestination, island)) {
+        if (!island.isDimensionEnabled(originalDestination)) {
             return EntityPortalResult.WORLD_NOT_UNLOCKED;
         }
 
@@ -155,7 +170,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
             if (generatingSchematicsIslands.contains(island.getUniqueId()))
                 return EntityPortalResult.SCHEMATIC_GENERATING_COOLDOWN;
 
-            String destinationEnvironmentName = originalDestination.name().toLowerCase(Locale.ENGLISH);
+            String destinationEnvironmentName = originalDestination.getName().toLowerCase(Locale.ENGLISH);
             String islandSchematic = island.getSchematicName();
 
             Schematic originalSchematic = plugin.getSchematics().getSchematic(islandSchematic.isEmpty() ?
@@ -165,7 +180,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
             boolean schematicGenerated = island.wasSchematicGenerated(originalDestination);
             SuperiorPlayer superiorPlayer = entity instanceof Player ? plugin.getPlayers().getSuperiorPlayer(entity) : null;
 
-            World.Environment destination;
+            Dimension destination;
             Schematic schematic;
             boolean ignoreInvalidSchematic;
 
@@ -226,7 +241,8 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                 generatingSchematicsIslands.remove(island.getUniqueId());
                 island.setSchematicGenerate(destination);
 
-                if (shouldOffsetSchematic(destination)) {
+                SettingsManager.Worlds.DimensionConfig destinationConfig = plugin.getSettings().getWorlds().getDimensionConfig(destination);
+                if (destinationConfig != null && destinationConfig.isSchematicOffset()) {
                     {
                         BigDecimal schematicWorth = island.getRawWorth().subtract(originalWorth);
                         EventResult<BigDecimal> bonusEventResult = plugin.getEventsBus().callIslandChangeWorthBonusEvent(null, island,
@@ -245,9 +261,9 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
 
                 Location destinationLocation = island.getIslandHome(destination);
 
-                if (destination == World.Environment.THE_END && superiorPlayer != null) {
+                if (destination.getEnvironment() == World.Environment.THE_END && superiorPlayer != null) {
                     plugin.getNMSDragonFight().awardTheEndAchievement((Player) entity);
-                    this.dragonBattleService.get().resetEnderDragonBattle(island);
+                    this.dragonBattleService.get().resetEnderDragonBattle(island, destination);
                 }
 
                 if (superiorPlayer != null) {
@@ -268,20 +284,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         return EntityPortalResult.SUCCEED;
     }
 
-    private boolean shouldOffsetSchematic(World.Environment environment) {
-        switch (environment) {
-            case NORMAL:
-                return plugin.getSettings().getWorlds().getNormal().isSchematicOffset();
-            case NETHER:
-                return plugin.getSettings().getWorlds().getNether().isSchematicOffset();
-            case THE_END:
-                return plugin.getSettings().getWorlds().getEnd().isSchematicOffset();
-            default:
-                return false;
-        }
-    }
-
-    private static World.Environment getTargetWorld(Location portalLocation, PortalType portalType) {
+    private static Dimension getTargetWorld(Location portalLocation, PortalType portalType) {
         World.Environment portalEnvironment = portalLocation.getWorld().getEnvironment();
         World.Environment environment;
 
@@ -297,20 +300,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                 break;
         }
 
-        return environment == portalEnvironment ? World.Environment.NORMAL : environment;
-    }
-
-    private static boolean isIslandWorldEnabled(World.Environment environment, Island island) {
-        switch (environment) {
-            case NORMAL:
-                return island.isNormalEnabled();
-            case NETHER:
-                return island.isNetherEnabled();
-            case THE_END:
-                return island.isEndEnabled();
-            default:
-                return true;
-        }
+        return environment == portalEnvironment ? Dimensions.NORMAL : Dimensions.fromEnvironment(environment);
     }
 
 }

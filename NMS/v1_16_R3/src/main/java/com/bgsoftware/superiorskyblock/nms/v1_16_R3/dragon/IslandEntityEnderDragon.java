@@ -1,7 +1,9 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3.dragon;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.EntityEnderDragon;
 import net.minecraft.server.v1_16_R3.EntityTypes;
@@ -20,6 +22,7 @@ public class IslandEntityEnderDragon extends EntityEnderDragon {
                 new EntityEnderDragon(entityTypes, world);
     }
 
+    private final Dimension dimension;
     private BlockPosition islandBlockPosition;
 
     public IslandEntityEnderDragon(WorldServer worldServer, BlockPosition islandBlockPosition) {
@@ -29,6 +32,7 @@ public class IslandEntityEnderDragon extends EntityEnderDragon {
 
     private IslandEntityEnderDragon(World world) {
         super(EntityTypes.ENDER_DRAGON, world);
+        this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(world.getWorld());
     }
 
     @Override
@@ -46,8 +50,13 @@ public class IslandEntityEnderDragon extends EntityEnderDragon {
         if (island == null)
             return;
 
-        Location middleBlock = plugin.getSettings().getWorlds().getEnd().getPortalOffset()
-                .applyToLocation(island.getCenter(org.bukkit.World.Environment.THE_END));
+        Location middleBlock = island.getCenter(dimension);
+
+        SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(dimension);
+        if (dimensionConfig instanceof SettingsManager.Worlds.End) {
+            middleBlock = ((SettingsManager.Worlds.End) dimensionConfig).getPortalOffset().applyToLocation(middleBlock);
+        }
+
         this.islandBlockPosition = new BlockPosition(middleBlock.getX(), middleBlock.getY(), middleBlock.getZ());
 
         dragonBattleHandler.addDragonBattle(island.getUniqueId(), new IslandEnderDragonBattle(island,

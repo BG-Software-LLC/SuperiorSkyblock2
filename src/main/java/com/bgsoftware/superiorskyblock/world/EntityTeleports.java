@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandSetHomeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
@@ -65,17 +66,17 @@ public class EntityTeleports {
         });
     }
 
-    public static CompletableFuture<Location> findIslandSafeLocation(Island island, World.Environment environment) {
-        Location homeLocation = island.getIslandHome(environment);
+    public static CompletableFuture<Location> findIslandSafeLocation(Island island, Dimension dimension) {
+        Location homeLocation = island.getIslandHome(dimension);
 
         Preconditions.checkNotNull(homeLocation, "Cannot find a suitable home location for island " +
                 island.getUniqueId());
 
-        World islandsWorld = Objects.requireNonNull(plugin.getGrid().getIslandsWorld(island, environment), "world is null");
+        World islandsWorld = Objects.requireNonNull(plugin.getGrid().getIslandsWorld(island, dimension), "world is null");
         float rotationYaw = homeLocation.getYaw();
         float rotationPitch = homeLocation.getPitch();
 
-        Log.debug(Debug.FIND_SAFE_TELEPORT, island.getOwner().getName(), environment);
+        Log.debug(Debug.FIND_SAFE_TELEPORT, island.getOwner().getName(), dimension.getName());
 
         // We first check that the home location is safe. If it is, we can return.
         {
@@ -99,7 +100,7 @@ public class EntityTeleports {
 
         // The teleport location is not safe. We check for a safe spot in the center of the island.
 
-        Location islandCenterLocation = island.getCenter(environment);
+        Location islandCenterLocation = island.getCenter(dimension);
 
         if (!islandCenterLocation.equals(homeLocation)) {
             ChunksProvider.loadChunk(ChunkPosition.of(islandCenterLocation), ChunkLoadReason.FIND_SAFE_SPOT, chunk -> {

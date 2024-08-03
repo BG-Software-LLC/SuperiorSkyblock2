@@ -14,8 +14,10 @@ import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
@@ -39,6 +41,7 @@ import com.bgsoftware.superiorskyblock.island.preview.IslandPreviews;
 import com.bgsoftware.superiorskyblock.island.preview.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.purge.IslandsPurger;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import com.google.common.base.Preconditions;
@@ -159,6 +162,19 @@ public class GridManagerImpl extends Manager implements GridManager {
         Preconditions.checkNotNull(bonusLevel, "bonusLevel parameter cannot be null.");
         Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
+        createIsland(superiorPlayer, schemName, bonusWorth, bonusLevel, biome, islandName, offset, null);
+    }
+
+    @Override
+    public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonusWorth,
+                             BigDecimal bonusLevel, Biome biome, String islandName, boolean offset,
+                             @Nullable BlockOffset spawnOffset) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
+        Preconditions.checkNotNull(bonusWorth, "bonusWorth parameter cannot be null.");
+        Preconditions.checkNotNull(bonusLevel, "bonusLevel parameter cannot be null.");
+        Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
+        Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
         Island.Builder builder = Island.newBuilder()
                 .setOwner(superiorPlayer)
                 .setSchematicName(schemName)
@@ -169,11 +185,19 @@ public class GridManagerImpl extends Manager implements GridManager {
                     .setBonusLevel(bonusLevel);
         }
 
-        createIsland(builder, biome, offset);
+        createIsland(builder, biome, offset, spawnOffset);
     }
 
     @Override
     public void createIsland(Island.Builder builderParam, Biome biome, boolean offset) {
+        Preconditions.checkNotNull(builderParam, "builder parameter cannot be null.");
+        Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
+        Preconditions.checkArgument(builderParam instanceof IslandBuilderImpl, "Cannot create islands out of a custom builder.");
+        createIsland(builderParam, biome, offset, null);
+    }
+
+    @Override
+    public void createIsland(Island.Builder builderParam, Biome biome, boolean offset, @Nullable BlockOffset spawnOffset) {
         Preconditions.checkNotNull(builderParam, "builder parameter cannot be null.");
         Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
         Preconditions.checkArgument(builderParam instanceof IslandBuilderImpl, "Cannot create islands out of a custom builder.");
@@ -188,9 +212,9 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         try {
             if (!Bukkit.isPrimaryThread()) {
-                BukkitExecutor.sync(() -> createIslandInternalAsync(builder, biome, offset, schematic));
+                BukkitExecutor.sync(() -> createIslandInternalAsync(builder, biome, offset, schematic, spawnOffset));
             } else {
-                createIslandInternalAsync(builder, biome, offset, schematic);
+                createIslandInternalAsync(builder, biome, offset, schematic, spawnOffset);
             }
         } catch (Throwable error) {
             Log.entering("ENTER", builder.owner.getName(), builder.islandType, biome, offset);
@@ -200,7 +224,8 @@ public class GridManagerImpl extends Manager implements GridManager {
         }
     }
 
-    private void createIslandInternalAsync(IslandBuilderImpl builder, Biome biome, boolean offset, Schematic schematic) {
+    private void createIslandInternalAsync(IslandBuilderImpl builder, Biome biome, boolean offset,
+                                           Schematic schematic, @Nullable BlockOffset spawnOffset) {
         assert builder.owner != null;
 
         Log.debug(Debug.CREATE_ISLAND, builder.owner.getName(), builder.bonusWorth, builder.bonusLevel,
@@ -219,91 +244,123 @@ public class GridManagerImpl extends Manager implements GridManager {
         pendingCreationTasks.add(builder.owner.getUniqueId());
 
         this.islandCreationAlgorithm.createIsland(builder, this.lastIsland).whenComplete((islandCreationResult, error) -> {
+
             pendingCreationTasks.remove(builder.owner.getUniqueId());
 
-            switch (islandCreationResult.getStatus()) {
-                case NAME_OCCUPIED:
-                    builder.owner.setIsland(null);
-                    Message.ISLAND_ALREADY_EXIST.send(builder.owner);
-                    return;
-                case SUCCESS:
-                    break;
-                default:
-                    Log.warn("Cannot handle creation status: " + islandCreationResult.getStatus());
-                    builder.owner.setIsland(null);
-                    Message.CREATE_ISLAND_FAILURE.send(builder.owner);
-                    return;
-            }
+            if (error == null && islandCreationResult != null) {
+                Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Successfully created island");
 
-            if (error == null) {
                 try {
-                    Island island = islandCreationResult.getIsland();
-                    Location islandLocation = islandCreationResult.getIslandLocation();
-                    boolean teleportPlayer = islandCreationResult.shouldTeleportPlayer();
-
-                    List<ChunkPosition> affectedChunks = schematic instanceof BaseSchematic ?
-                            ((BaseSchematic) schematic).getAffectedChunks() : null;
-
-                    this.islandsContainer.addIsland(island);
-                    setLastIsland(new SBlockPosition(islandLocation));
-
-                    try {
-                        island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
-
-                        island.setBiome(biome);
-                        island.setSchematicGenerate(plugin.getSettings().getWorlds().getDefaultWorld());
-                        island.setCurrentlyActive(true);
-
-                        if (offset) {
-                            island.setBonusWorth(island.getRawWorth().negate());
-                            island.setBonusLevel(island.getRawLevel().negate());
-                        }
-                    } finally {
-                        island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
-                    }
-
-                    IslandsDatabaseBridge.insertIsland(island, affectedChunks);
-
-                    island.setIslandHome(schematic.adjustRotation(islandLocation));
-
-                    BukkitExecutor.sync(() -> builder.owner.runIfOnline(player -> {
-                        if (updateGamemode)
-                            player.setGameMode(GameMode.SURVIVAL);
-
-                        if (!teleportPlayer) {
-                            Message.CREATE_ISLAND.send(builder.owner, Formatters.LOCATION_FORMATTER.format(
-                                    islandLocation), System.currentTimeMillis() - startTime);
-                        } else {
-                            builder.owner.teleport(island, result -> {
-                                Message.CREATE_ISLAND.send(builder.owner, Formatters.LOCATION_FORMATTER.format(
-                                        islandLocation), System.currentTimeMillis() - startTime);
-
-                                if (result) {
-                                    if (affectedChunks != null)
-                                        BukkitExecutor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, affectedChunks), 10L);
-                                    if (plugin.getSettings().getWorlds().getDefaultWorld() == World.Environment.THE_END) {
-                                        plugin.getNMSDragonFight().awardTheEndAchievement(player);
-                                        this.dragonBattleService.get().resetEnderDragonBattle(island);
-                                    }
-                                }
-                            });
-                        }
-                    }), 1L);
-
+                    createIslandInternalOnSuccessCallback(builder, biome, offset, spawnOffset,
+                            schematic, updateGamemode, startTime, islandCreationResult);
                     return;
                 } catch (Throwable runtimeError) {
                     error = runtimeError;
                 }
             }
 
+            Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Failed to create island");
+
             Log.entering(builder.owner.getName(), builder.bonusWorth, builder.bonusLevel, builder.islandName,
                     offset, biome, schematic.getName());
-            Log.error(error, "An unexpected error occurred while creating an island:");
+
+            if (error != null)
+                Log.error(error, "An unexpected error occurred while creating an island:");
 
             builder.owner.setIsland(null);
 
             Message.CREATE_ISLAND_FAILURE.send(builder.owner);
         });
+    }
+
+    private void createIslandInternalOnSuccessCallback(IslandBuilderImpl builder, Biome biome, boolean offset,
+                                                       @Nullable BlockOffset spawnOffset, Schematic schematic,
+                                                       boolean updateGamemode, long startTime,
+                                                       IslandCreationAlgorithm.IslandCreationResult islandCreationResult) {
+        switch (islandCreationResult.getStatus()) {
+            case NAME_OCCUPIED:
+                builder.owner.setIsland(null);
+                Message.ISLAND_ALREADY_EXIST.send(builder.owner);
+                Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Island already exists");
+                return;
+            case SUCCESS:
+                break;
+            default:
+                throw new RuntimeException("Cannot handle creation status: " + islandCreationResult.getStatus());
+        }
+
+        Island island = islandCreationResult.getIsland();
+        Location islandLocation = islandCreationResult.getIslandLocation();
+        boolean teleportPlayer = islandCreationResult.shouldTeleportPlayer();
+
+        List<ChunkPosition> affectedChunks = schematic instanceof BaseSchematic ?
+                ((BaseSchematic) schematic).getAffectedChunks() : null;
+
+        Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Registering new island");
+
+        this.islandsContainer.addIsland(island);
+        setLastIsland(new SBlockPosition(islandLocation));
+
+        try {
+            island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
+
+            island.setBiome(biome, false);
+            island.setSchematicGenerate(plugin.getSettings().getWorlds().getDefaultWorldDimension());
+            island.setCurrentlyActive(true);
+
+            if (offset) {
+                island.setBonusWorth(island.getRawWorth().negate());
+                island.setBonusLevel(island.getRawLevel().negate());
+            }
+        } finally {
+            island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
+        }
+
+        IslandsDatabaseBridge.insertIsland(island, affectedChunks);
+
+        Location homeLocation = schematic.adjustRotation(islandLocation);
+        if (spawnOffset != null)
+            homeLocation = spawnOffset.applyToLocation(homeLocation);
+
+        island.setIslandHome(homeLocation);
+
+        BukkitExecutor.sync(() -> builder.owner.runIfOnline(player -> {
+            if (updateGamemode)
+                player.setGameMode(GameMode.SURVIVAL);
+
+            if (!teleportPlayer) {
+                Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Do not teleport player");
+
+                Message.CREATE_ISLAND.send(builder.owner, Formatters.LOCATION_FORMATTER.format(
+                        islandLocation), System.currentTimeMillis() - startTime);
+            } else {
+                Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Teleporting player");
+
+                builder.owner.teleport(island, result -> {
+                    Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback",
+                            "Teleported player. Result: " + result);
+
+                    Message.CREATE_ISLAND.send(builder.owner, Formatters.LOCATION_FORMATTER.format(
+                            islandLocation), System.currentTimeMillis() - startTime);
+
+                    if (result) {
+                        if (affectedChunks != null) {
+                            BukkitExecutor.sync(() -> {
+                                IslandUtils.resetChunksExcludedFromList(island, affectedChunks);
+                                island.setBiome(biome, true);
+                            }, 10L);
+                        }
+
+                        Dimension defaultDimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
+
+                        if (defaultDimension.getEnvironment() == World.Environment.THE_END) {
+                            plugin.getNMSDragonFight().awardTheEndAchievement(player);
+                            this.dragonBattleService.get().resetEnderDragonBattle(island, defaultDimension);
+                        }
+                    }
+                });
+            }
+        }), 1L);
     }
 
     @Override
@@ -410,13 +467,12 @@ public class GridManagerImpl extends Manager implements GridManager {
         this.islandsContainer.removeIsland(island);
 
         // Delete island from database
-        if (pluginDisable) {
-            IslandsDatabaseBridge.deleteIsland(island);
-        } else {
-            BukkitExecutor.data(() -> IslandsDatabaseBridge.deleteIsland(island));
-        }
+        IslandsDatabaseBridge.deleteIsland(island);
 
-        this.dragonBattleService.get().stopEnderDragonBattle(island);
+        for (Dimension dimension : Dimension.values()) {
+            if (dimension.getEnvironment() == World.Environment.THE_END)
+                this.dragonBattleService.get().stopEnderDragonBattle(island, dimension);
+        }
     }
 
     @Override
@@ -590,33 +646,58 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     @Override
-    public World getIslandsWorld(Island island, World.Environment environment) {
+    public World getIslandsWorld(Island island, Dimension dimension) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
         if (island.isSpawn()) {
-            return island.getIslandHome(environment).getWorld();
+            return island.getIslandHome(dimension).getWorld();
         }
 
-        return plugin.getProviders().getWorldsProvider().getIslandsWorld(island, environment);
+        return plugin.getProviders().getWorldsProvider().getIslandsWorld(island, dimension);
     }
 
     @Override
-    public WorldInfo getIslandsWorldInfo(Island island, World.Environment environment) {
+    public Dimension getIslandsWorldDimension(World world) {
+        Preconditions.checkNotNull(world, "world parameter cannot be null.");
+
+        if (!isIslandsWorld(world))
+            return null;
+
+        if (customWorlds.contains(world.getUID()))
+            return Dimension.getByName(world.getName().toUpperCase(Locale.ENGLISH));
+
+        return plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(world);
+    }
+
+    @Override
+    @Deprecated
+    public World getIslandsWorld(Island island, World.Environment environment) {
+        return getIslandsWorld(island, Dimensions.fromEnvironment(environment));
+    }
+
+    @Override
+    public WorldInfo getIslandsWorldInfo(Island island, Dimension dimension) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
         if (island.isSpawn()) {
-            return WorldInfo.of(island.getIslandHome(environment).getWorld());
+            return WorldInfo.of(island.getIslandHome(dimension).getWorld());
         }
 
         WorldsProvider worldsProvider = plugin.getProviders().getWorldsProvider();
 
         if (worldsProvider instanceof LazyWorldsProvider)
-            return ((LazyWorldsProvider) worldsProvider).getIslandsWorldInfo(island, environment);
+            return ((LazyWorldsProvider) worldsProvider).getIslandsWorldInfo(island, dimension);
 
-        World world = this.getIslandsWorld(island, environment);
+        World world = this.getIslandsWorld(island, dimension);
         return world == null ? null : WorldInfo.of(world);
+    }
+
+    @Override
+    @Deprecated
+    public WorldInfo getIslandsWorldInfo(Island island, World.Environment environment) {
+        return getIslandsWorldInfo(island, Dimensions.fromEnvironment(environment));
     }
 
     @Nullable
@@ -626,7 +707,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null.");
 
         if (island.isSpawn()) {
-            return WorldInfo.of(island.getIslandHome(World.Environment.NORMAL).getWorld());
+            return WorldInfo.of(island.getIslandHome(Dimensions.NORMAL).getWorld());
         }
 
         WorldsProvider worldsProvider = plugin.getProviders().getWorldsProvider();
@@ -647,6 +728,14 @@ public class GridManagerImpl extends Manager implements GridManager {
     @Override
     public void registerIslandWorld(World world) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
+
+        String dimensionName = world.getName().toUpperCase(Locale.ENGLISH);
+        try {
+            Dimension.register(dimensionName, world.getEnvironment());
+        } catch (Exception error) {
+            throw new IllegalArgumentException("Dimension with the name " + dimensionName + " already exists.");
+        }
+
         customWorlds.add(world.getUID());
     }
 
@@ -844,7 +933,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         resultSet.getString("last_island").map(Serializers.LOCATION_SPACED_SERIALIZER::deserialize)
                 .ifPresent(lastIsland -> this.lastIsland = new SBlockPosition((LazyWorldLocation) lastIsland));
 
-        if (!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().getWorlds().getDefaultWorldName())) {
+        if (!plugin.getSettings().getWorlds().getDefaultWorldName().equals(lastIsland.getWorldName())) {
             lastIsland = new SBlockPosition(plugin.getSettings().getWorlds().getDefaultWorldName(),
                     lastIsland.getX(), lastIsland.getY(), lastIsland.getZ());
         }

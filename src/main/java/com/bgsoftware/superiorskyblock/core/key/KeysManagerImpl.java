@@ -6,6 +6,8 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.key.collections.KeyMapStrategy;
+import com.bgsoftware.superiorskyblock.core.key.collections.KeySetStrategy;
 import com.bgsoftware.superiorskyblock.core.key.types.EntityTypeKey;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.google.common.base.Preconditions;
@@ -126,26 +128,26 @@ public class KeysManagerImpl extends Manager implements KeysManager {
 
     @Override
     public KeySet createKeySet(Supplier<Set<String>> setCreator) {
-        return KeySets.createSet(KeyIndicator.CUSTOM, setCreator::get);
+        return KeySets.createSet(KeyIndicator.CUSTOM, KeySetStrategy.custom(setCreator));
     }
 
     @Override
     public KeySet createKeySet(Supplier<Set<String>> setCreator, Collection<Key> collection) {
         if (collection instanceof KeySet) return (KeySet) collection;
-        KeySet keySet = KeySets.createSet(KeyIndicator.CUSTOM, setCreator::get);
+        KeySet keySet = KeySets.createSet(KeyIndicator.CUSTOM, KeySetStrategy.custom(setCreator));
         keySet.addAll(collection);
         return keySet;
     }
 
     @Override
     public <V> KeyMap<V> createKeyMap(Supplier<Map<String, V>> mapCreator) {
-        return KeyMaps.createMap(KeyIndicator.CUSTOM, mapCreator::get);
+        return KeyMaps.createMap(KeyIndicator.CUSTOM, KeyMapStrategy.custom(mapCreator));
     }
 
     @Override
     public <V> KeyMap<V> createKeyMap(Supplier<Map<String, V>> mapCreator, Map<Key, V> map) {
         if (map instanceof KeyMap) return (KeyMap<V>) map;
-        KeyMap<V> keyMap = KeyMaps.createMap(KeyIndicator.CUSTOM, mapCreator::get);
+        KeyMap<V> keyMap = KeyMaps.createMap(KeyIndicator.CUSTOM, KeyMapStrategy.custom(mapCreator));
         keyMap.putAll(map);
         return keyMap;
     }

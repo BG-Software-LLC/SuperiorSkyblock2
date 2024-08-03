@@ -13,22 +13,15 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 public class LazyLoadedKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V> {
 
-    private final Supplier<Map> mapCreator;
-    private final boolean identityMap;
+    private final KeyMapStrategy strategy;
     @Nullable
     private KeyMap<V> delegate;
 
-    public static <V> LazyLoadedKeyMap<V> createMap(Supplier<Map> mapCreator, boolean identityMap) {
-        return new LazyLoadedKeyMap<>(mapCreator, identityMap);
-    }
-
-    private LazyLoadedKeyMap(Supplier<Map> mapCreator, boolean identityMap) {
-        this.mapCreator = mapCreator;
-        this.identityMap = identityMap;
+    public LazyLoadedKeyMap(KeyMapStrategy strategy) {
+        this.strategy = strategy;
     }
 
     @Override
@@ -38,7 +31,7 @@ public class LazyLoadedKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V
 
     @Override
     public boolean containsKey(Object o) {
-        return this.get(o) != null;
+        return this.delegate != null && this.delegate.containsKey(o);
     }
 
     @Override
@@ -51,14 +44,18 @@ public class LazyLoadedKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V
         if (this.delegate != null)
             return this.delegate.put(key, value);
 
+        return putNoDelegate(key, value);
+    }
+
+    private V putNoDelegate(Key key, V value) {
         if (key instanceof LazyKey) {
-            return put(((LazyKey<?>) key).getBaseKey(), value);
+            return putNoDelegate(((LazyKey<?>) key).getBaseKey(), value);
         }
 
         if (key instanceof EntityTypeKey) {
-            this.delegate = EntityTypeKeyMap.createMap(this.mapCreator, false);
+            this.delegate = new EntityTypeKeyMap<>(this.strategy);
         } else if (key instanceof MaterialKey) {
-            this.delegate = MaterialKeyMap.createMap(this.mapCreator);
+            this.delegate = new MaterialKeyMap<>(this.strategy);
         } else {
             throw new IllegalArgumentException("Cannot insert key of type " + key.getClass());
         }
@@ -91,7 +88,7 @@ public class LazyLoadedKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V
     @Nullable
     @Override
     public Key getKey(Key original) {
-        return this.getKey(original, null);
+        return this.delegate == null ? null : this.delegate.getKey(original);
     }
 
     @Override
@@ -117,7 +114,7 @@ public class LazyLoadedKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V
 
     @Override
     public Map<Key, V> asMap() {
-        return this;
+        return this.delegate == null ? this : this.delegate.asMap();
     }
 
 }

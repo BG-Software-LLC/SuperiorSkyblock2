@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
@@ -243,8 +244,10 @@ public class CommandTabCompletes {
                 .build(IslandFlag.values(), islandFlag -> islandFlag.getName().toLowerCase(Locale.ENGLISH));
     }
 
-    public static List<String> getEnvironments(String argument) {
-        return getFromEnum(Arrays.asList(World.Environment.values()), argument.toLowerCase(Locale.ENGLISH));
+    public static List<String> getDimensions(String argument) {
+        return filterByArgument(Dimension.values(),
+                dimension -> dimension.getName().toLowerCase(Locale.ENGLISH),
+                argument.toLowerCase(Locale.ENGLISH));
     }
 
     public static List<String> getBorderColors(String argument) {

@@ -157,22 +157,14 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public Enchantment getGlowEnchant() {
-        try {
-            return new PaperGlowEnchantment("superior_glowing_enchant");
-        } catch (Throwable error) {
-            return new SpigotGlowEnchantment("superior_glowing_enchant");
-        }
+        // Not supported anymore
+        return null;
     }
 
     @Override
     public Enchantment createGlowEnchantment() {
-        Enchantment enchantment = getGlowEnchant();
-
-        Map<NamespacedKey, Enchantment> registryCache = REGISTRY_CACHE.get(Registry.ENCHANTMENT);
-
-        registryCache.put(enchantment.getKey(), enchantment);
-
-        return enchantment;
+        // Not supported anymore
+        return null;
     }
 
     @Nullable
@@ -190,6 +182,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public double getCurrentTps() {
         return MinecraftServer.getServer().tps1.getAverage();
+    }
+
+    @Override
+    public int getDataVersion() {
+        return CraftMagicNumbers.INSTANCE.getDataVersion();
     }
 
     private interface MenuCreator extends BiFunction<InventoryHolder, String, Container> {

@@ -41,22 +41,26 @@ public interface NMSAlgorithms {
 
     String getMinecraftKey(ItemStack itemStack);
 
+    @Nullable
     Enchantment getGlowEnchant();
 
+    @Nullable
     default Enchantment createGlowEnchantment() {
         Enchantment glowEnchant = getGlowEnchant();
 
-        try {
-            Field field = Enchantment.class.getDeclaredField("acceptingNew");
-            field.setAccessible(true);
-            field.set(null, true);
-            field.setAccessible(false);
-        } catch (Exception ignored) {
-        }
+        if (glowEnchant != null) {
+            try {
+                Field field = Enchantment.class.getDeclaredField("acceptingNew");
+                field.setAccessible(true);
+                field.set(null, true);
+                field.setAccessible(false);
+            } catch (Exception ignored) {
+            }
 
-        try {
-            Enchantment.registerEnchantment(glowEnchant);
-        } catch (Exception ignored) {
+            try {
+                Enchantment.registerEnchantment(glowEnchant);
+            } catch (Exception ignored) {
+            }
         }
 
         return glowEnchant;
@@ -68,5 +72,7 @@ public interface NMSAlgorithms {
     int getMaxWorldSize();
 
     double getCurrentTps();
+
+    int getDataVersion();
 
 }

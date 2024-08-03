@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
+import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
@@ -21,9 +22,11 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
 import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -34,11 +37,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgorithm {
 
-    public static final Map<ChunkPosition, CalculatedChunk> CACHED_CALCULATED_CHUNKS = new ConcurrentHashMap<>();
+    public static final Synchronized<Chunk2ObjectMap<CalculatedChunk>> CACHED_CALCULATED_CHUNKS =
+            Synchronized.of(new Chunk2ObjectMap<>());
 
     private static final List<Pair<Key, Key>> MINECART_BLOCK_TYPES = createMinecartBlockTypes();
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -55,21 +58,30 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
 
     @Override
     public CompletableFuture<IslandCalculationResult> calculateIsland(Island island) {
-        CompletableFutureList<List<CalculatedChunk>> chunksToLoad = new CompletableFutureList<>();
+        CompletableFutureList<List<CalculatedChunk>> chunksToLoad = new CompletableFutureList<>(plugin.getSettings().getRecalcTaskTimeout());
 
         long profiler = Profiler.start(ProfileType.CALCULATE_ISLAND);
         Log.debug(Debug.CHUNK_CALCULATION, island.getOwner().getName());
 
         if (!plugin.getProviders().hasSnapshotsSupport()) {
-            IslandUtils.getChunkCoords(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS).values()
-                    .forEach(worldChunks -> chunksToLoad.add(plugin.getNMSChunks().calculateChunks(worldChunks, CACHED_CALCULATED_CHUNKS)));
+            IslandUtils.getChunkCoords(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS)
+                    .forEach((worldInfo, worldChunks) -> {
+                        // Load the world.
+                        World world = plugin.getProviders().getWorldsProvider().getIslandsWorld(island, worldInfo.getDimension());
+                        if (world != null)
+                            CACHED_CALCULATED_CHUNKS.write(cache ->
+                                    chunksToLoad.add(plugin.getNMSChunks().calculateChunks(worldChunks, cache)));
+                    });
         } else {
             IslandUtils.getAllChunksAsync(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS,
                     ChunkLoadReason.BLOCKS_RECALCULATE, plugin.getProviders()::takeSnapshots).forEach(completableFuture -> {
                 CompletableFuture<List<CalculatedChunk>> calculateCompletable = new CompletableFuture<>();
-                completableFuture.whenComplete((chunk, ex) -> plugin.getNMSChunks()
-                        .calculateChunks(Collections.singletonList(ChunkPosition.of(chunk)), CACHED_CALCULATED_CHUNKS).whenComplete(
-                                (pair, ex2) -> calculateCompletable.complete(pair)));
+                completableFuture.whenComplete((chunk, ex) -> {
+                    CACHED_CALCULATED_CHUNKS.write(cache ->
+                            plugin.getNMSChunks().calculateChunks(Collections.singletonList(ChunkPosition.of(chunk)), cache)
+                                    .whenComplete((pair, ex2) -> calculateCompletable.complete(pair)));
+
+                });
                 chunksToLoad.add(calculateCompletable);
             });
         }

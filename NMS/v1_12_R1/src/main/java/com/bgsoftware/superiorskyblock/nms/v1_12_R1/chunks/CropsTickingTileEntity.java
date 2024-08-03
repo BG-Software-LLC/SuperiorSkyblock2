@@ -3,6 +3,8 @@ package com.bgsoftware.superiorskyblock.nms.v1_12_R1.chunks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Chunk;
@@ -14,9 +16,7 @@ import net.minecraft.server.v1_12_R1.TileEntity;
 import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
@@ -24,7 +24,7 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final Map<Long, CropsTickingTileEntity> tickingChunks = new HashMap<>();
+    private static final Long2ObjectMapView<CropsTickingTileEntity> tickingChunks = CollectionsFactory.createLong2ObjectHashMap();
     private static int random = ThreadLocalRandom.current().nextInt();
 
     private final WeakReference<Island> island;
@@ -49,13 +49,11 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
 
     public static void create(Island island, Chunk chunk) {
         long chunkKey = ChunkCoordIntPair.a(chunk.locX, chunk.locZ);
-        if (!tickingChunks.containsKey(chunkKey)) {
-            tickingChunks.put(chunkKey, new CropsTickingTileEntity(island, chunk));
-        }
+        tickingChunks.computeIfAbsent(chunkKey, i -> new CropsTickingTileEntity(island, chunk));
     }
 
-    public static CropsTickingTileEntity remove(ChunkCoordIntPair chunkCoords) {
-        return tickingChunks.remove(ChunkCoordIntPair.a(chunkCoords.x, chunkCoords.z));
+    public static CropsTickingTileEntity remove(long chunkCoords) {
+        return tickingChunks.remove(chunkCoords);
     }
 
     public static void forEachChunk(List<ChunkPosition> chunkPositions, Consumer<CropsTickingTileEntity> cropsTickingTileEntityConsumer) {

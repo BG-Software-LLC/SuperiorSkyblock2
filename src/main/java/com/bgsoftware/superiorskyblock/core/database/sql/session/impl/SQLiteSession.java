@@ -133,6 +133,11 @@ public class SQLiteSession implements SQLSession {
     }
 
     @Override
+    public void addColumn(String tableName, String columnName, String type, QueryResult<Void> queryResult) {
+        executeUpdate(String.format("ALTER TABLE %s ADD COLUMN %s %s;", tableName, columnName, type), queryResult);
+    }
+
+    @Override
     public void removePrimaryKey(String tableName, String columnName, QueryResult<Void> queryResult) {
         executeQuery(String.format("PRAGMA table_info('%s')", tableName), new QueryResult<ResultSet>()
                 .onSuccess(resultSet -> {

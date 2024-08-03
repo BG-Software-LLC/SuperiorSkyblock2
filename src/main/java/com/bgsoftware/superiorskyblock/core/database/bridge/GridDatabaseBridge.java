@@ -23,6 +23,14 @@ public class GridDatabaseBridge {
                 databaseBridge.updateObject("grid", null, new Pair<>("last_island", lastIsland.toString())));
     }
 
+    public static void updateVersion(GridManager gridManager, int version) {
+        runOperationIfRunning(gridManager.getDatabaseBridge(), databaseBridge ->
+                databaseBridge.deleteObject("ssb_metadata", null));
+        runOperationIfRunning(gridManager.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("ssb_metadata",
+                new Pair<>("version", version)
+        ));
+    }
+
     public static void insertGrid(GridManager gridManager) {
         runOperationIfRunning(gridManager.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("grid",
                 new Pair<>("last_island", Serializers.LOCATION_SPACED_SERIALIZER.serialize(gridManager.getLastIslandLocation())),

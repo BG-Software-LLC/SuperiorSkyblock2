@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Chunk;
@@ -30,6 +31,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -210,8 +212,14 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public Location getCenter(World.Environment environment) {
         return this.handle.getCenter(environment);
+    }
+
+    @Override
+    public Location getCenter(Dimension dimension) {
+        return this.handle.getCenter(dimension);
     }
 
     @Override
@@ -221,34 +229,50 @@ public class DelegateIsland implements Island {
 
     @Nullable
     @Override
+    @Deprecated
     public Location getTeleportLocation(World.Environment environment) {
         return this.handle.getTeleportLocation(environment);
     }
 
     @Override
+    @Deprecated
     public Map<World.Environment, Location> getTeleportLocations() {
         return this.handle.getTeleportLocations();
     }
 
     @Override
+    @Deprecated
     public void setTeleportLocation(Location teleportLocation) {
         this.handle.setTeleportLocation(teleportLocation);
     }
 
     @Override
+    @Deprecated
     public void setTeleportLocation(World.Environment environment, @Nullable Location teleportLocation) {
         this.handle.setTeleportLocation(environment, teleportLocation);
     }
 
     @Nullable
     @Override
+    @Deprecated
     public Location getIslandHome(World.Environment environment) {
         return this.handle.getIslandHome(environment);
     }
 
     @Override
+    public Location getIslandHome(Dimension dimension) {
+        return this.handle.getIslandHome(dimension);
+    }
+
+    @Override
+    @Deprecated
     public Map<World.Environment, Location> getIslandHomes() {
         return this.handle.getIslandHomes();
+    }
+
+    @Override
+    public Map<Dimension, Location> getIslandHomesAsDimensions() {
+        return this.handle.getIslandHomesAsDimensions();
     }
 
     @Override
@@ -257,8 +281,14 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public void setIslandHome(World.Environment environment, @Nullable Location homeLocation) {
         this.handle.setIslandHome(environment, homeLocation);
+    }
+
+    @Override
+    public void setIslandHome(Dimension dimension, Location homeLocation) {
+        this.handle.setIslandHome(dimension, homeLocation);
     }
 
     @Nullable
@@ -270,8 +300,14 @@ public class DelegateIsland implements Island {
 
     @Nullable
     @Override
+    @Deprecated
     public Location getVisitorsLocation(World.Environment environment) {
         return this.handle.getVisitorsLocation(environment);
+    }
+
+    @Override
+    public Location getVisitorsLocation(Dimension dimension) {
+        return this.handle.getVisitorsLocation(dimension);
     }
 
     @Override
@@ -330,13 +366,25 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public List<Chunk> getAllChunks(World.Environment environment) {
         return this.handle.getAllChunks(environment);
     }
 
     @Override
+    public List<Chunk> getAllChunks(Dimension dimension) {
+        return this.handle.getAllChunks(dimension);
+    }
+
+    @Override
+    @Deprecated
     public List<Chunk> getAllChunks(World.Environment environment, @IslandChunkFlags int flags) {
         return this.handle.getAllChunks(environment, flags);
+    }
+
+    @Override
+    public List<Chunk> getAllChunks(Dimension dimension, @IslandChunkFlags int flags) {
+        return this.handle.getAllChunks(dimension, flags);
     }
 
     @Override
@@ -368,13 +416,25 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public List<Chunk> getLoadedChunks(World.Environment environment) {
         return this.handle.getLoadedChunks(environment);
     }
 
     @Override
+    public List<Chunk> getLoadedChunks(Dimension dimension) {
+        return this.handle.getLoadedChunks(dimension);
+    }
+
+    @Override
+    @Deprecated
     public List<Chunk> getLoadedChunks(World.Environment environment, @IslandChunkFlags int flags) {
         return this.handle.getLoadedChunks(environment, flags);
+    }
+
+    @Override
+    public List<Chunk> getLoadedChunks(Dimension dimension, @IslandChunkFlags int flags) {
+        return this.handle.getLoadedChunks(dimension, flags);
     }
 
     @Override
@@ -390,22 +450,41 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment) {
-        return getAllChunksAsync(environment, 0);
+        return this.handle.getAllChunksAsync(environment);
     }
 
     @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, int flags) {
-        return getAllChunksAsync(environment, flags, null);
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension dimension) {
+        return this.handle.getAllChunksAsync(dimension);
     }
 
     @Override
+    @Deprecated
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, @IslandChunkFlags int flags) {
+        return this.handle.getAllChunksAsync(environment, flags);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension dimension, @IslandChunkFlags int flags) {
+        return this.handle.getAllChunksAsync(dimension, flags);
+    }
+
+    @Override
+    @Deprecated
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment,
                                                             @Nullable Consumer<Chunk> onChunkLoad) {
         return this.handle.getAllChunksAsync(environment, onChunkLoad);
     }
 
     @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension dimension, Consumer<Chunk> onChunkLoad) {
+        return this.handle.getAllChunksAsync(dimension, onChunkLoad);
+    }
+
+    @Override
+    @Deprecated
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment,
                                                             @IslandChunkFlags int flags,
                                                             @Nullable Consumer<Chunk> onChunkLoad) {
@@ -413,14 +492,23 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension dimension,
+                                                            @IslandChunkFlags int flags,
+                                                            Consumer<Chunk> onChunkLoad) {
+        return this.handle.getAllChunksAsync(dimension, flags, onChunkLoad);
+    }
+
+    @Override
     @Deprecated
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, @Nullable Consumer<Chunk> onChunkLoad) {
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected,
+                                                            @Nullable Consumer<Chunk> onChunkLoad) {
         return this.handle.getAllChunksAsync(environment, onlyProtected, onChunkLoad);
     }
 
     @Override
     @Deprecated
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, @Nullable Consumer<Chunk> onChunkLoad) {
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected,
+                                                            boolean noEmptyChunks, @Nullable Consumer<Chunk> onChunkLoad) {
         return this.handle.getAllChunksAsync(environment, onlyProtected, noEmptyChunks, onChunkLoad);
     }
 
@@ -435,13 +523,25 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public void resetChunks(World.Environment environment) {
         this.handle.resetChunks(environment);
     }
 
     @Override
+    public void resetChunks(Dimension dimension) {
+        this.handle.resetChunks(dimension);
+    }
+
+    @Override
+    @Deprecated
     public void resetChunks(World.Environment environment, @Nullable Runnable onFinish) {
         this.handle.resetChunks(environment, onFinish);
+    }
+
+    @Override
+    public void resetChunks(Dimension dimension, Runnable onFinish) {
+        this.handle.resetChunks(dimension, onFinish);
     }
 
     @Override
@@ -455,13 +555,25 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public void resetChunks(World.Environment environment, @IslandChunkFlags int flags) {
         this.handle.resetChunks(environment, flags);
     }
 
     @Override
+    public void resetChunks(Dimension dimension, @IslandChunkFlags int flags) {
+        this.handle.resetChunks(dimension, flags);
+    }
+
+    @Override
+    @Deprecated
     public void resetChunks(World.Environment environment, @IslandChunkFlags int flags, @Nullable Runnable onFinish) {
         this.handle.resetChunks(environment, flags, onFinish);
+    }
+
+    @Override
+    public void resetChunks(Dimension dimension, @IslandChunkFlags int flags, Runnable onFinish) {
+        this.handle.resetChunks(dimension, flags, onFinish);
     }
 
     @Override
@@ -544,6 +656,22 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public boolean isDimensionEnabled(Dimension dimension) {
+        return this.handle.isDimensionEnabled(dimension);
+    }
+
+    @Override
+    public void setDimensionEnabled(Dimension dimension, boolean enabled) {
+        this.handle.setDimensionEnabled(dimension, enabled);
+    }
+
+    @Override
+    public Collection<Dimension> getUnlockedWorlds() {
+        return this.handle.getUnlockedWorlds();
+    }
+
+    @Override
+    @Deprecated
     public int getUnlockedWorldsFlag() {
         return this.handle.getUnlockedWorldsFlag();
     }
@@ -1009,7 +1137,7 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public Map<Key, BlockChangeResult> handleBlocksPlaceWithResult(Map<Key, Integer> blocks, int flags) {
+    public Map<Key, BlockChangeResult> handleBlocksPlaceWithResult(Map<Key, Integer> blocks, @IslandBlockFlags int flags) {
         return this.handle.handleBlocksPlaceWithResult(blocks, flags);
     }
 
@@ -1621,58 +1749,126 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public void setGeneratorPercentage(Key key, int percentage, World.Environment environment) {
         this.handle.setGeneratorPercentage(key, percentage, environment);
     }
 
     @Override
-    public boolean setGeneratorPercentage(Key key, int percentage, World.Environment environment, @Nullable SuperiorPlayer caller, boolean callEvent) {
+    public void setGeneratorPercentage(Key key, int percentage, Dimension dimension) {
+        this.handle.setGeneratorPercentage(key, percentage, dimension);
+    }
+
+    @Override
+    @Deprecated
+    public boolean setGeneratorPercentage(Key key, int percentage, World.Environment environment,
+                                          @Nullable SuperiorPlayer caller, boolean callEvent) {
         return this.handle.setGeneratorPercentage(key, percentage, environment, caller, callEvent);
     }
 
     @Override
+    public boolean setGeneratorPercentage(Key key, int percentage, Dimension dimension,
+                                          @Nullable SuperiorPlayer caller, boolean callEvent) {
+        return this.handle.setGeneratorPercentage(key, percentage, dimension, caller, callEvent);
+    }
+
+    @Override
+    @Deprecated
     public int getGeneratorPercentage(Key key, World.Environment environment) {
         return this.handle.getGeneratorPercentage(key, environment);
     }
 
     @Override
+    public int getGeneratorPercentage(Key key, Dimension dimension) {
+        return this.handle.getGeneratorPercentage(key, dimension);
+    }
+
+    @Override
+    @Deprecated
     public Map<String, Integer> getGeneratorPercentages(World.Environment environment) {
         return this.handle.getGeneratorPercentages(environment);
     }
 
     @Override
+    public Map<String, Integer> getGeneratorPercentages(Dimension dimension) {
+        return this.handle.getGeneratorPercentages(dimension);
+    }
+
+    @Override
+    @Deprecated
     public void setGeneratorAmount(Key key, @Size int amount, World.Environment environment) {
         this.handle.setGeneratorAmount(key, amount, environment);
     }
 
     @Override
+    public void setGeneratorAmount(Key key, int amount, Dimension dimension) {
+        this.handle.setGeneratorAmount(key, amount, dimension);
+    }
+
+    @Override
+    @Deprecated
     public void removeGeneratorAmount(Key key, World.Environment environment) {
         this.handle.removeGeneratorAmount(key, environment);
     }
 
     @Override
+    public void removeGeneratorAmount(Key key, Dimension dimension) {
+        this.handle.removeGeneratorAmount(key, dimension);
+    }
+
+    @Override
+    @Deprecated
     public int getGeneratorAmount(Key key, World.Environment environment) {
         return this.handle.getGeneratorAmount(key, environment);
     }
 
     @Override
+    public int getGeneratorAmount(Key key, Dimension dimension) {
+        return this.handle.getGeneratorAmount(key, dimension);
+    }
+
+    @Override
+    @Deprecated
     public int getGeneratorTotalAmount(World.Environment environment) {
         return this.handle.getGeneratorTotalAmount(environment);
     }
 
     @Override
+    public int getGeneratorTotalAmount(Dimension dimension) {
+        return this.handle.getGeneratorTotalAmount(dimension);
+    }
+
+    @Override
+    @Deprecated
     public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
         return this.handle.getGeneratorAmounts(environment);
     }
 
     @Override
+    public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
+        return this.handle.getGeneratorAmounts(dimension);
+    }
+
+    @Override
+    @Deprecated
     public Map<Key, Integer> getCustomGeneratorAmounts(World.Environment environment) {
         return this.handle.getCustomGeneratorAmounts(environment);
     }
 
     @Override
+    public Map<Key, Integer> getCustomGeneratorAmounts(Dimension dimension) {
+        return this.handle.getCustomGeneratorAmounts(dimension);
+    }
+
+    @Override
+    @Deprecated
     public void clearGeneratorAmounts(World.Environment environment) {
         this.handle.clearGeneratorAmounts(environment);
+    }
+
+    @Override
+    public void clearGeneratorAmounts(Dimension dimension) {
+        this.handle.clearGeneratorAmounts(dimension);
     }
 
     @Nullable
@@ -1683,28 +1879,58 @@ public class DelegateIsland implements Island {
 
     @Nullable
     @Override
+    @Deprecated
     public Key generateBlock(Location location, World.Environment environment, boolean optimizeCobblestone) {
         return this.handle.generateBlock(location, environment, optimizeCobblestone);
     }
 
     @Override
+    public Key generateBlock(Location location, Dimension dimension, boolean optimizeCobblestone) {
+        return this.handle.generateBlock(location, dimension, optimizeCobblestone);
+    }
+
+    @Override
+    @Deprecated
     public boolean wasSchematicGenerated(World.Environment environment) {
         return this.handle.wasSchematicGenerated(environment);
     }
 
     @Override
+    public boolean wasSchematicGenerated(Dimension dimension) {
+        return this.handle.wasSchematicGenerated(dimension);
+    }
+
+    @Override
+    @Deprecated
     public void setSchematicGenerate(World.Environment environment) {
         this.handle.setSchematicGenerate(environment);
     }
 
     @Override
+    public void setSchematicGenerate(Dimension dimension) {
+        this.handle.setSchematicGenerate(dimension);
+    }
+
+    @Override
+    @Deprecated
     public void setSchematicGenerate(World.Environment environment, boolean generated) {
         this.handle.setSchematicGenerate(environment, generated);
     }
 
     @Override
+    public void setSchematicGenerate(Dimension dimension, boolean generated) {
+        this.handle.setSchematicGenerate(dimension, generated);
+    }
+
+    @Override
+    @Deprecated
     public int getGeneratedSchematicsFlag() {
         return this.handle.getGeneratedSchematicsFlag();
+    }
+
+    @Override
+    public Collection<Dimension> getGeneratedSchematics() {
+        return this.handle.getGeneratedSchematics();
     }
 
     @Override

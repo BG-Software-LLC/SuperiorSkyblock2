@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
@@ -67,12 +68,12 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        World.Environment environment = CommandArguments.getEnvironment(sender, args[3]);
+        Dimension dimension = CommandArguments.getDimension(sender, args[3]);
 
-        if (environment == null)
+        if (dimension == null)
             return;
 
-        if (environment == plugin.getSettings().getWorlds().getDefaultWorld()) {
+        if (dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
             Message.INVALID_ENVIRONMENT.send(sender, args[3]);
             return;
         }
@@ -83,14 +84,14 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
             World world;
 
             try {
-                world = island.getCenter(environment).getWorld();
+                world = island.getCenter(dimension).getWorld();
             } catch (NullPointerException error) {
-                Log.entering("ENTER", island.getOwner().getName(), environment);
+                Log.entering("ENTER", island.getOwner().getName(), dimension.getName());
                 Log.error(error, "An unexpected error occurred while resetting world:");
                 return;
             }
 
-            if (!plugin.getEventsBus().callIslandWorldResetEvent(sender, island, environment))
+            if (!plugin.getEventsBus().callIslandWorldResetEvent(sender, island, dimension))
                 continue;
 
             anyIslandChanged = true;
@@ -104,9 +105,9 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
             }
 
             // Resetting the chunks
-            island.resetChunks(environment, IslandChunkFlags.ONLY_PROTECTED, () -> island.calcIslandWorth(null));
+            island.resetChunks(dimension, IslandChunkFlags.ONLY_PROTECTED, () -> island.calcIslandWorth(null));
 
-            island.setSchematicGenerate(environment, false);
+            island.setSchematicGenerate(dimension, false);
         }
 
         if (!anyIslandChanged)
@@ -127,22 +128,10 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
 
         List<String> environments = new ArrayList<>();
 
-        for (World.Environment environment : World.Environment.values()) {
-            if (environment != plugin.getSettings().getWorlds().getDefaultWorld()) {
-                boolean addEnvironment = false;
-                switch (environment) {
-                    case NORMAL:
-                        addEnvironment = plugin.getProviders().getWorldsProvider().isNormalEnabled();
-                        break;
-                    case NETHER:
-                        addEnvironment = plugin.getProviders().getWorldsProvider().isNetherEnabled();
-                        break;
-                    case THE_END:
-                        addEnvironment = plugin.getProviders().getWorldsProvider().isEndEnabled();
-                        break;
-                }
-                if (addEnvironment)
-                    environments.add(environment.name().toLowerCase(Locale.ENGLISH));
+        for (Dimension dimension : Dimension.values()) {
+            if (dimension != plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
+                if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension))
+                    environments.add(dimension.getName().toLowerCase(Locale.ENGLISH));
             }
         }
 

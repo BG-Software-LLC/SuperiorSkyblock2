@@ -1,21 +1,28 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17;
 
+import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
+import com.mojang.serialization.Dynamic;
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.IntArrayTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NumericTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixers;
+import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
 
 import java.util.Set;
 
@@ -23,22 +30,48 @@ import java.util.Set;
 public class NMSTagsImpl implements NMSTags {
 
     @Override
-    public CompoundTag getNBTTag(org.bukkit.inventory.ItemStack bukkitStack) {
-        ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitStack);
-        return CompoundTag.fromNBT(itemStack.getOrCreateTag());
-    }
-
-    @Override
-    public CompoundTag convertToNBT(org.bukkit.inventory.ItemStack bukkitItem) {
+    public CompoundTag serializeItem(org.bukkit.inventory.ItemStack bukkitItem) {
         ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitItem);
-        return CompoundTag.fromNBT(itemStack.save(new net.minecraft.nbt.CompoundTag()));
+
+        net.minecraft.nbt.CompoundTag tagCompound = itemStack.save(new net.minecraft.nbt.CompoundTag());
+        tagCompound.putInt("DataVersion", CraftMagicNumbers.INSTANCE.getDataVersion());
+
+        return CompoundTag.fromNBT(tagCompound);
     }
 
     @Override
-    public org.bukkit.inventory.ItemStack getFromNBTTag(org.bukkit.inventory.ItemStack bukkitStack, CompoundTag compoundTag) {
-        ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitStack);
-        itemStack.setTag((net.minecraft.nbt.CompoundTag) compoundTag.toNBT());
-        return CraftItemStack.asBukkitCopy(itemStack);
+    public org.bukkit.inventory.ItemStack deserializeItem(CompoundTag compoundTag) {
+        if (compoundTag.containsKey("NBT")) {
+            // Old compound version, deserialize it accordingly
+            return deserializeItemOld(compoundTag);
+        }
+
+        net.minecraft.nbt.CompoundTag tagCompound = (net.minecraft.nbt.CompoundTag) compoundTag.toNBT();
+
+        int currentVersion = CraftMagicNumbers.INSTANCE.getDataVersion();
+        int itemVersion = tagCompound.getInt("DataVersion");
+        if (itemVersion < currentVersion) {
+            tagCompound = (net.minecraft.nbt.CompoundTag) DataFixers.getDataFixer().update(References.ITEM_STACK,
+                    new Dynamic<>(NbtOps.INSTANCE, tagCompound), itemVersion, currentVersion).getValue();
+        }
+
+        ItemStack itemStack = ItemStack.of(tagCompound);
+
+        return CraftItemStack.asCraftMirror(itemStack);
+    }
+
+    private static org.bukkit.inventory.ItemStack deserializeItemOld(CompoundTag compoundTag) {
+        String typeName = Materials.patchOldMaterialName(compoundTag.getString("type"));
+        Material type = Material.valueOf(typeName);
+        int amount = compoundTag.getInt("amount");
+        short data = compoundTag.getShort("data");
+        CompoundTag nbtData = compoundTag.getCompound("NBT");
+
+        org.bukkit.inventory.ItemStack bukkitItem = new org.bukkit.inventory.ItemStack(type, amount, data);
+        ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitItem);
+        itemStack.setTag((net.minecraft.nbt.CompoundTag) nbtData.toNBT());
+
+        return CraftItemStack.asCraftMirror(itemStack);
     }
 
     @Override

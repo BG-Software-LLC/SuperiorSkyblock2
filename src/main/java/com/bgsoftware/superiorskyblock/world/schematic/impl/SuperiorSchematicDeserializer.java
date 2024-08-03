@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.world.schematic.impl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
-import com.bgsoftware.superiorskyblock.core.schematic.SchematicBlockData;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.schematic.SchematicBlockData;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
@@ -85,7 +85,7 @@ public class SuperiorSchematicDeserializer {
                     if (item.getValue() instanceof CompoundTag) {
                         try {
                             ItemStack itemStack = Serializers.ITEM_STACK_TO_TAG_SERIALIZER.deserialize((CompoundTag) item.getValue());
-                            CompoundTag itemCompound = plugin.getNMSTags().convertToNBT(itemStack);
+                            CompoundTag itemCompound = plugin.getNMSTags().serializeItem(itemStack);
                             itemCompound.setByte("Slot", Byte.parseByte(item.getKey()));
                             items.addTag(itemCompound);
                         } catch (Exception ignored) {
@@ -173,7 +173,7 @@ public class SuperiorSchematicDeserializer {
     }
 
     @Nullable
-    public static SchematicBlockData deserializeSchematicBlock(CompoundTag compoundTag) {
+    public static SchematicBlockData deserializeSchematicBlock(CompoundTag compoundTag, int dataVersion) {
         BlockOffset blockOffset = Serializers.OFFSET_SERIALIZER.deserialize(compoundTag.getString("blockPosition"));
         int combinedId;
 
@@ -207,8 +207,42 @@ public class SuperiorSchematicDeserializer {
 
         CompoundTag statesTag = compoundTag.getCompound("states");
         CompoundTag tileEntity = compoundTag.getCompound("tileEntity");
+        tileEntity = SuperiorSchematicDeserializer.upgradeTileEntity(tileEntity, dataVersion);
 
         return new SchematicBlockData(combinedId, blockOffset, skyLightLevel, blockLightLevel, statesTag, tileEntity);
+    }
+
+    @Nullable
+    private static CompoundTag upgradeTileEntity(@Nullable CompoundTag compoundTag, int dataVersion) {
+        if (compoundTag == null || dataVersion == -1)
+            return compoundTag;
+
+        int currentDataVersion = plugin.getNMSAlgorithms().getDataVersion();
+        if (currentDataVersion <= dataVersion)
+            return compoundTag;
+
+        // Convert chest contents
+        ListTag itemsTag = compoundTag.getList("Items");
+        if (itemsTag != null && itemsTag.size() > 0) {
+            ListTag newItemsTag = new ListTag(CompoundTag.class, Collections.emptyList());
+
+            for (Tag<?> tag : itemsTag) {
+                if (tag instanceof CompoundTag) {
+                    CompoundTag itemTag = (CompoundTag) tag;
+                    int slot = itemTag.getInt("Slot");
+                    itemTag.setInt("DataVersion", dataVersion);
+                    ItemStack itemStack = Serializers.ITEM_STACK_TO_TAG_SERIALIZER.deserialize(itemTag);
+                    CompoundTag newItemTag = Serializers.ITEM_STACK_TO_TAG_SERIALIZER.serialize(itemStack);
+                    newItemTag.setInt("Slot", slot);
+                    newItemsTag.addTag(newItemTag);
+                }
+            }
+
+            if (newItemsTag.size() > 0)
+                compoundTag.setTag("Items", newItemsTag);
+        }
+
+        return compoundTag;
     }
 
 }

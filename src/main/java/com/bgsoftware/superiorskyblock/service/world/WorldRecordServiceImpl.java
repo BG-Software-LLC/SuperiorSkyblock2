@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.service.world.RecordResult;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
@@ -117,7 +118,7 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
                 oldBlockKey = ConstantKeys.WATER;
             } else {
                 oldBlockKey = Keys.of(oldBlockState);
-                oldBlockCount = plugin.getNMSWorld().getDefaultAmount(oldBlockState.getBlock());
+                oldBlockCount = plugin.getNMSWorld().getDefaultAmount(oldBlockState);
             }
 
             recordBlockBreakInternal(island, oldBlockKey, blockLocation, oldBlockCount, flags);
@@ -272,6 +273,9 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
             return RecordResult.NOT_IN_ISLAND;
 
         island.getEntitiesTracker().trackEntity(Keys.of(entityType), 1);
+        // TODO: elsewhere
+        IslandsDatabaseBridge.saveEntityCounts(island);
+
 
         return RecordResult.SUCCESS;
     }
@@ -320,6 +324,8 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
             return RecordResult.NOT_IN_ISLAND;
 
         island.getEntitiesTracker().untrackEntity(Keys.of(entityType), 1);
+        // TODO: not here
+        IslandsDatabaseBridge.saveEntityCounts(island);
 
         return RecordResult.SUCCESS;
     }
