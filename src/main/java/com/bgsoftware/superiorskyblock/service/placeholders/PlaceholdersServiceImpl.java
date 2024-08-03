@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.IslandPlaceholderParser;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
@@ -313,6 +314,12 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
         if (island != null) {
             if ((matcher = PERMISSION_ROLE_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                 return handlePermissionRolesPlaceholder(island, matcher.group(1));
+            }
+
+            if ((matcher = MISSIONS_COMPLETED_PATTERN.matcher(subPlaceholder)).matches()) {
+                String categoryName = matcher.group(1);
+                return Optional.of(island.getCompletedMissions().stream().filter(mission ->
+                        mission.getMissionCategory().getName().equalsIgnoreCase(categoryName)).count() + "");
             }
 
             if (superiorPlayer != null) {
