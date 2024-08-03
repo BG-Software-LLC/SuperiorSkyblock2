@@ -28,7 +28,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
-import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
@@ -52,7 +51,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftChunk;
 import org.bukkit.craftbukkit.block.CraftBiome;
-import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.generator.ChunkGenerator;
 
@@ -306,7 +304,12 @@ public class WorldEditSessionImpl implements WorldEditSession {
             NMSUtils.buildSurfaceForChunk(serverLevel, tempChunk);
 
             // We want to copy the level chunk sections back
-            System.arraycopy(tempChunk.getSections(), 0, this.chunkSections, 0, this.chunkSections.length);
+            LevelChunkSection[] tempChunkSections = tempChunk.getSections();
+            for (int i = 0; i < Math.min(this.chunkSections.length, tempChunkSections.length); ++i) {
+                LevelChunkSection chunkSection = tempChunkSections[i];
+                if (chunkSection != null)
+                    this.chunkSections[i] = chunkSection;
+            }
         }
 
         private void createHeightmaps(ProtoChunk tempChunk) {

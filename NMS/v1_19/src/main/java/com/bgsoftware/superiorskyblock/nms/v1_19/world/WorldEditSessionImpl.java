@@ -298,7 +298,12 @@ public class WorldEditSessionImpl implements WorldEditSession {
                     tempChunk);
 
             // We want to copy the level chunk sections back
-            System.arraycopy(tempChunk.getSections(), 0, this.chunkSections, 0, this.chunkSections.length);
+            LevelChunkSection[] tempChunkSections = tempChunk.getSections();
+            for (int i = 0; i < Math.min(this.chunkSections.length, tempChunkSections.length); ++i) {
+                LevelChunkSection chunkSection = tempChunkSections[i];
+                if (chunkSection != null)
+                    this.chunkSections[i] = chunkSection;
+            }
         }
 
         private void createHeightmaps(ProtoChunk tempChunk) {

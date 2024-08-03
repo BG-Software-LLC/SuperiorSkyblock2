@@ -205,8 +205,11 @@ public class WorldEditSessionImpl implements WorldEditSession {
             CustomChunkGenerator chunkGenerator = new CustomChunkGenerator(worldServer, worldServer.getSeed(), bukkitGenerator);
             Chunk generatedChunk = chunkGenerator.getOrCreateChunk(chunkCoord.x, chunkCoord.z);
 
-            for (int i = 0; i < this.chunkSections.length; ++i)
-                this.chunkSections[i] = generatedChunk.getSections()[i];
+            for (int i = 0; i < this.chunkSections.length; ++i) {
+                ChunkSection generatorChunkSection = generatedChunk.getSections()[i];
+                if (generatorChunkSection != null)
+                    this.chunkSections[i] = generatorChunkSection;
+            }
         }
 
     }
