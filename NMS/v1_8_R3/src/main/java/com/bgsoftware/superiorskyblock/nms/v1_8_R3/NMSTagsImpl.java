@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
+import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
@@ -55,7 +56,7 @@ public class NMSTagsImpl implements NMSTags {
     }
 
     private static org.bukkit.inventory.ItemStack deserializeItemOld(CompoundTag compoundTag) {
-        String typeName = compoundTag.getString("type");
+        String typeName = Materials.patchOldMaterialName(compoundTag.getString("type"));
         Material type = Material.valueOf(typeName);
         int amount = compoundTag.getInt("amount");
         short data = compoundTag.getShort("data");
