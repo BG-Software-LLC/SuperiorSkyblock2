@@ -187,6 +187,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         return MinecraftServer.getServer().tps1.getAverage();
     }
 
+    @Override
+    public int getDataVersion() {
+        return CraftMagicNumbers.INSTANCE.getDataVersion();
+    }
+
     private interface MenuCreator extends BiFunction<InventoryHolder, String, Container> {
     }
 

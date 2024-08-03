@@ -173,7 +173,7 @@ public class SuperiorSchematicDeserializer {
     }
 
     @Nullable
-    public static SchematicBlockData deserializeSchematicBlock(CompoundTag compoundTag) {
+    public static SchematicBlockData deserializeSchematicBlock(CompoundTag compoundTag, int dataVersion) {
         BlockOffset blockOffset = Serializers.OFFSET_SERIALIZER.deserialize(compoundTag.getString("blockPosition"));
         int combinedId;
 
@@ -207,8 +207,42 @@ public class SuperiorSchematicDeserializer {
 
         CompoundTag statesTag = compoundTag.getCompound("states");
         CompoundTag tileEntity = compoundTag.getCompound("tileEntity");
+        tileEntity = SuperiorSchematicDeserializer.upgradeTileEntity(tileEntity, dataVersion);
 
         return new SchematicBlockData(combinedId, blockOffset, skyLightLevel, blockLightLevel, statesTag, tileEntity);
+    }
+
+    @Nullable
+    private static CompoundTag upgradeTileEntity(@Nullable CompoundTag compoundTag, int dataVersion) {
+        if (compoundTag == null || dataVersion == -1)
+            return compoundTag;
+
+        int currentDataVersion = plugin.getNMSAlgorithms().getDataVersion();
+        if (currentDataVersion <= dataVersion)
+            return compoundTag;
+
+        // Convert chest contents
+        ListTag itemsTag = compoundTag.getList("Items");
+        if (itemsTag != null && itemsTag.size() > 0) {
+            ListTag newItemsTag = new ListTag(CompoundTag.class, Collections.emptyList());
+
+            for (Tag<?> tag : itemsTag) {
+                if (tag instanceof CompoundTag) {
+                    CompoundTag itemTag = (CompoundTag) tag;
+                    int slot = itemTag.getInt("Slot");
+                    itemTag.setInt("DataVersion", dataVersion);
+                    ItemStack itemStack = Serializers.ITEM_STACK_TO_TAG_SERIALIZER.deserialize(itemTag);
+                    CompoundTag newItemTag = Serializers.ITEM_STACK_TO_TAG_SERIALIZER.serialize(itemStack);
+                    newItemTag.setInt("Slot", slot);
+                    newItemsTag.addTag(newItemTag);
+                }
+            }
+
+            if (newItemsTag.size() > 0)
+                compoundTag.setTag("Items", newItemsTag);
+        }
+
+        return compoundTag;
     }
 
 }

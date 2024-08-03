@@ -243,6 +243,8 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
         compoundValue.put("yaw", new FloatTag(yaw));
         compoundValue.put("pitch", new FloatTag(pitch));
         compoundValue.put("version", new StringTag(ServerVersion.getBukkitVersion()));
+        if (!ServerVersion.isLegacy())
+            compoundValue.put("minecraftDataVersion", new IntTag(plugin.getNMSAlgorithms().getDataVersion()));
 
         CompoundTag schematicTag = new CompoundTag(compoundValue);
         SuperiorSchematic schematic = new SuperiorSchematic(schematicName, schematicTag);

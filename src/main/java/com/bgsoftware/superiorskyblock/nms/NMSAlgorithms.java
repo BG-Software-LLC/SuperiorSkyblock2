@@ -73,4 +73,6 @@ public interface NMSAlgorithms {
 
     double getCurrentTps();
 
+    int getDataVersion();
+
 }

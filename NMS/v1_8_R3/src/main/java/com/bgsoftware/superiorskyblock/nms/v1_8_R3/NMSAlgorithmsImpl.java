@@ -127,4 +127,9 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         return MinecraftServer.getServer().recentTps[0];
     }
 
+    @Override
+    public int getDataVersion() {
+        return -1;
+    }
+
 }

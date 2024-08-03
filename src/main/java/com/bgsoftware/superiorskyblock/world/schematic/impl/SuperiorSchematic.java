@@ -60,6 +60,8 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         float yaw = compoundTag.getFloat("yaw");
         float pitch = compoundTag.getFloat("pitch");
 
+        int dataVersion = compoundTag.getInt("minecraftDataVersion", -1);
+
         List<SchematicBlockData> blocks;
         ListTag blocksList = compoundTag.getList("blocks");
         if (blocksList == null) {
@@ -68,7 +70,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
             LinkedList<SchematicBlockData> schematicBlocks = new LinkedList<>();
 
             for (Tag<?> tag : blocksList) {
-                SchematicBlockData schematicBlock = SuperiorSchematicDeserializer.deserializeSchematicBlock((CompoundTag) tag);
+                SchematicBlockData schematicBlock = SuperiorSchematicDeserializer.deserializeSchematicBlock((CompoundTag) tag, dataVersion);
                 if (schematicBlock != null && schematicBlock.getCombinedId() > 0) {
                     schematicBlocks.add(schematicBlock);
                     readBlock(schematicBlock);
