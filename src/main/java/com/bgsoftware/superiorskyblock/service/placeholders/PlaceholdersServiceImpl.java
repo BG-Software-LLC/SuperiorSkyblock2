@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
-import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
+import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.IslandPlaceholderParser;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
@@ -63,6 +63,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN = Pattern.compile("visitor_last_join_(.+)");
     private static final Pattern ISLAND_FLAG_PLACEHOLDER_PATTERN = Pattern.compile("flag_(.+)");
     private static final Pattern MISSIONS_COMPLETED_PATTERN = Pattern.compile("missions_completed_(.+)");
+    private static final Pattern MISSION_STATUS_PATTERN = Pattern.compile("mission_status_(.+)");
 
     private static final Map<String, PlayerPlaceholderParser> PLAYER_PARSES =
             new ImmutableMap.Builder<String, PlayerPlaceholderParser>()
@@ -320,6 +321,16 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 String categoryName = matcher.group(1);
                 return Optional.of(island.getCompletedMissions().stream().filter(mission ->
                         mission.getMissionCategory().getName().equalsIgnoreCase(categoryName)).count() + "");
+            }
+
+            if ((matcher = MISSION_STATUS_PATTERN.matcher(subPlaceholder)).matches()) {
+                String missionName = matcher.group(1);
+                Mission<?> mission = plugin.getMissions().getMission(missionName);
+                if (mission == null || (!mission.getIslandMission() && superiorPlayer == null))
+                    return Optional.empty();
+                boolean completedMission = mission.getIslandMission() ? island.hasCompletedMission(mission) :
+                        superiorPlayer.hasCompletedMission(mission);
+                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(completedMission, superiorPlayer.getUserLocale()));
             }
 
             if (superiorPlayer != null) {
