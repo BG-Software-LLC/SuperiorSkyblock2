@@ -69,12 +69,6 @@ public class WorldsProvider_Default implements WorldsProvider {
     }
 
     @Override
-    @Deprecated
-    public World getIslandsWorld(Island island, World.Environment environment) {
-        return getIslandsWorld(island, Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
     public Dimension getIslandsWorldDimension(World world) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         return islandWorldsToDimensions.get(world.getUID());
@@ -137,31 +131,6 @@ public class WorldsProvider_Default implements WorldsProvider {
     @Override
     public void prepareTeleport(Island island, Location location, Runnable finishCallback) {
         finishCallback.run();
-    }
-
-    @Override
-    public boolean isNormalEnabled() {
-        return isDimensionEnabled(Dimensions.NORMAL);
-    }
-
-    @Override
-    public boolean isNormalUnlocked() {
-        return isDimensionUnlocked(Dimensions.NORMAL);
-    }
-
-    @Override
-    public boolean isNetherEnabled() {
-        return isDimensionEnabled(Dimensions.NETHER);
-    }
-
-    @Override
-    public boolean isNetherUnlocked() {
-        return isDimensionUnlocked(Dimensions.NETHER);
-    }
-
-    @Override
-    public boolean isEndEnabled() {
-        return isDimensionEnabled(Dimensions.THE_END);
     }
 
     @Override

@@ -34,7 +34,9 @@ public interface WorldsProvider {
      */
     @Deprecated
     @Nullable
-    World getIslandsWorld(Island island, World.Environment environment);
+    default World getIslandsWorld(Island island, World.Environment environment) {
+        return getIslandsWorld(island, Dimension.getByName(environment.name()));
+    }
 
     /**
      * Get the dimension of an islands world.
@@ -84,32 +86,44 @@ public interface WorldsProvider {
     /**
      * Check whether or not normal worlds are enabled.
      */
-    boolean isNormalEnabled();
+    default boolean isNormalEnabled() {
+        return isDimensionEnabled(Dimension.getByName("NORMAL"));
+    }
 
     /**
      * Check whether or not normal worlds are unlocked for islands by default.
      */
-    boolean isNormalUnlocked();
+    default boolean isNormalUnlocked() {
+        return isDimensionUnlocked(Dimension.getByName("NORMAL"));
+    }
 
     /**
      * Check whether or not nether worlds are enabled.
      */
-    boolean isNetherEnabled();
+    default boolean isNetherEnabled() {
+        return isDimensionEnabled(Dimension.getByName("NETHER"));
+    }
 
     /**
      * Check whether or not nether worlds are unlocked for islands by default.
      */
-    boolean isNetherUnlocked();
+    default boolean isNetherUnlocked() {
+        return isDimensionUnlocked(Dimension.getByName("NETHER"));
+    }
 
     /**
      * Check whether or not end worlds are enabled.
      */
-    boolean isEndEnabled();
+    default boolean isEndEnabled() {
+        return isDimensionEnabled(Dimension.getByName("THE_END"));
+    }
 
     /**
      * Check whether or not end worlds are unlocked for islands by default.
      */
-    boolean isEndUnlocked();
+    default boolean isEndUnlocked() {
+        return isDimensionUnlocked(Dimension.getByName("THE_END"));
+    }
 
     /**
      * Check whether a dimension is enabled on the server.
