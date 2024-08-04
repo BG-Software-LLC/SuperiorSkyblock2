@@ -32,7 +32,7 @@ allprojects {
     }
 
     dependencies {
-        compileOnly 'com.bgsoftware.common.reflection:ReflectionUtils:b6'
+        compileOnly 'com.bgsoftware.common.reflection:ReflectionUtils:b8'
         compileOnly 'com.bgsoftware.common.annotations:Annotations:b2'
     }
 
@@ -68,7 +68,7 @@ dependencies {
 
     implementation 'com.bgsoftware.common.config:CommentedConfiguration:b1'
     implementation 'com.bgsoftware.common.updater:Updater:b1'
-    implementation 'com.bgsoftware.common.reflection:ReflectionUtils:b6'
+    implementation 'com.bgsoftware.common.reflection:ReflectionUtils:b8'
     implementation 'com.bgsoftware.common.executors:Executors:b3'
     implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:b11:all@jar'
     implementation 'com.bgsoftware.common.dependencies:DependenciesManager:b2'
