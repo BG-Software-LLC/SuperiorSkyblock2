@@ -27,6 +27,7 @@ import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
+import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuCustom;
 import com.bgsoftware.superiorskyblock.core.menu.layout.PagedMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
@@ -34,6 +35,7 @@ import com.google.common.base.Preconditions;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -522,6 +524,18 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     @Override
     public Map<String, Menu<?, ?>> getMenus() {
         return Collections.unmodifiableMap(this.registeredMenus);
+    }
+
+    @Override
+    public Map<String, Menu<?, ?>> getCustomMenus() {
+        Map<String, Menu<?, ?>> customMenus = new LinkedHashMap<>();
+
+        this.registeredMenus.forEach((menuName, menu) -> {
+            if (menu instanceof MenuCustom)
+                customMenus.put(menuName, menu);
+        });
+
+        return customMenus.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(customMenus);
     }
 
     @Override

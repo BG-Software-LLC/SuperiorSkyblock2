@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
+import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuCustom;
 import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -62,13 +63,13 @@ public class CmdAdminOpenMenu implements IAdminPlayerCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
         Menu<BaseMenuView, EmptyViewArgs> menu = plugin.getMenus().getMenu(MenuIdentifiers.MENU_CUSTOM_PREFIX + args[3]);
-        if (menu != null)
+        if (menu instanceof MenuCustom)
             menu.createView(targetPlayer, EmptyViewArgs.INSTANCE);
     }
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getMenus(plugin, args[3]) : Collections.emptyList();
+        return args.length == 4 ? CommandTabCompletes.getCustomMenus(plugin, args[3]) : Collections.emptyList();
     }
 
 }

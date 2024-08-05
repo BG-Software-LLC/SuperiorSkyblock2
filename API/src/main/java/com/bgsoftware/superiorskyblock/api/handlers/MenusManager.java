@@ -848,6 +848,11 @@ public interface MenusManager {
     Map<String, Menu<?, ?>> getMenus();
 
     /**
+     * Get all the custom menus that were registered.
+     */
+    Map<String, Menu<?, ?>> getCustomMenus();
+
+    /**
      * Create a new pattern builder for building a menu.
      */
     <V extends MenuView<V, ?>> MenuLayout.Builder<V> createPatternBuilder();
