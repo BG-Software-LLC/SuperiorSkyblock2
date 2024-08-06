@@ -357,6 +357,8 @@ public class GridManagerImpl extends Manager implements GridManager {
                             plugin.getNMSDragonFight().awardTheEndAchievement(player);
                             this.dragonBattleService.get().resetEnderDragonBattle(island, defaultDimension);
                         }
+
+                        plugin.getEventsBus().callPostIslandCreateEvent(builder.owner, island);
                     }
                 });
             }
