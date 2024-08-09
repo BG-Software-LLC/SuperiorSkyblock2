@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 public class CropsBlockEntity extends BlockEntity {
 
     private static final ReflectMethod<Boolean> BLOCK_IS_RANDOMLY_TICKING = new ReflectMethod<>(
-            BlockBehaviour.class, boolean.class, 4, BlockState.class);
+            BlockBehaviour.class, boolean.class, "d_", BlockState.class);
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
