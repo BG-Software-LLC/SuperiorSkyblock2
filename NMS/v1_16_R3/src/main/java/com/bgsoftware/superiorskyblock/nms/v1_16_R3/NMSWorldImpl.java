@@ -32,7 +32,6 @@ import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.BlockPropertySlabType;
 import net.minecraft.server.v1_16_R3.BlockStateBoolean;
-import net.minecraft.server.v1_16_R3.BlockStateEnum;
 import net.minecraft.server.v1_16_R3.BlockStateInteger;
 import net.minecraft.server.v1_16_R3.BlockStepAbstract;
 import net.minecraft.server.v1_16_R3.EnumSkyBlock;
@@ -200,7 +199,7 @@ public class NMSWorldImpl implements NMSWorld {
 
             Tag<?> value;
             Class<?> keyClass = entry.getKey().getClass();
-            String name = entry.getKey().getName();
+            String name = BlockStatesMapper.getBlockStateName(entry.getKey());
 
             if (keyClass.equals(BlockStateBoolean.class)) {
                 value = new ByteTag((Boolean) entry.getValue() ? (byte) 1 : 0);
@@ -208,8 +207,6 @@ public class NMSWorldImpl implements NMSWorld {
                 BlockStateInteger key = (BlockStateInteger) entry.getKey();
                 value = new IntArrayTag(new int[]{(Integer) entry.getValue(), key.min, key.max});
             } else {
-                BlockStateEnum<?> key = (BlockStateEnum<?>) entry.getKey();
-                name = BlockStatesMapper.getBlockStateName(key);
                 value = new StringTag(((Enum<?>) entry.getValue()).name());
             }
 
