@@ -8,11 +8,13 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
+import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_18.chunks.CropsBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_18.world.KeyBlocksCache;
@@ -68,7 +70,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class NMSChunksImpl implements NMSChunks {
@@ -278,14 +279,14 @@ public class NMSChunksImpl implements NMSChunks {
 
     @Override
     public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
-                                                                    Map<ChunkPosition, CalculatedChunk> unloadedChunksCache) {
+                                                                    Synchronized<Chunk2ObjectMap<CalculatedChunk>> unloadedChunksCache) {
         List<CalculatedChunk> allCalculatedChunks = new LinkedList<>();
         List<ChunkPosition> chunkPositionsToCalculate = new LinkedList<>();
 
         Iterator<ChunkPosition> chunkPositionsIterator = chunkPositions.iterator();
         while (chunkPositionsIterator.hasNext()) {
             ChunkPosition chunkPosition = chunkPositionsIterator.next();
-            CalculatedChunk cachedCalculatedChunk = unloadedChunksCache.get(chunkPosition);
+            CalculatedChunk cachedCalculatedChunk = unloadedChunksCache.readAndGet(m -> m.get(chunkPosition));
             if (cachedCalculatedChunk != null) {
                 allCalculatedChunks.add(cachedCalculatedChunk);
                 chunkPositionsIterator.remove();
@@ -366,7 +367,7 @@ public class NMSChunksImpl implements NMSChunks {
 
                 CalculatedChunk calculatedChunk = calculateChunk(chunkPosition, chunkSections);
                 allCalculatedChunks.add(calculatedChunk);
-                unloadedChunksCache.put(chunkPosition, calculatedChunk);
+                unloadedChunksCache.write(m -> m.put(chunkPosition, calculatedChunk));
             }
 
             @Override

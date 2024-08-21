@@ -6,6 +6,8 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
+import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
+import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
@@ -23,7 +25,7 @@ public interface NMSChunks {
     void deleteChunks(Island island, List<ChunkPosition> chunkPositions, @Nullable Runnable onFinish);
 
     CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
-                                                             Map<ChunkPosition, CalculatedChunk> unloadedChunksCache);
+                                                             Synchronized<Chunk2ObjectMap<CalculatedChunk>> unloadedChunksCache);
 
     CompletableFuture<KeyMap<Counter>> calculateChunkEntities(Collection<ChunkPosition> chunkPositions);
 
