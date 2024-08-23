@@ -79,7 +79,8 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
         loadDefaultSchematicParsers();
 
         for (File schemFile : schematicsFolder.listFiles()) {
-            String schemName = schemFile.getName().replace(".schematic", "").replace(".schem", "").toLowerCase(Locale.ENGLISH);
+            String schemName = getRealFileName(schemFile).toLowerCase(Locale.ENGLISH);
+            System.out.println(schemFile.getName() + " -> " + schemName);
             Schematic schematic = loadFromFile(schemName, schemFile);
             if (schematic != null) {
                 this.schematicsContainer.addSchematic(schematic);
@@ -348,6 +349,11 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
         return location.getBlockX() >= min.getBlockX() && location.getBlockX() <= max.getBlockX() &&
                 location.getBlockY() >= min.getBlockY() && location.getBlockY() <= max.getBlockY() &&
                 location.getBlockZ() >= min.getBlockZ() && location.getBlockZ() <= max.getBlockZ();
+    }
+
+    private static String getRealFileName(File file) {
+        String[] fileNameSections = file.getName().split("\\.");
+        return fileNameSections.length == 1 ? fileNameSections[0] : file.getName().replace("." + fileNameSections[fileNameSections.length - 1], "");
     }
 
 }
