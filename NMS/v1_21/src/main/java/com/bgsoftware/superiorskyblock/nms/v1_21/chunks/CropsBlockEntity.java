@@ -80,6 +80,11 @@ public class CropsBlockEntity extends BlockEntity {
         });
     }
 
+    @Override
+    public boolean isValidBlockState(BlockState state) {
+        return true;
+    }
+
     public void remove() {
         this.remove = true;
     }
