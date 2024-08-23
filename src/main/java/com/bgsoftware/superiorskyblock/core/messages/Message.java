@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
@@ -884,7 +885,7 @@ public enum Message {
         int messagesAmount = 0;
         boolean countMessages = true;
 
-        for (File langFile : Objects.requireNonNull(langFolder.listFiles())) {
+        for (File langFile : Files.listFolderFiles(langFolder, false)) {
             String fileName = langFile.getName().split("\\.")[0];
             Locale fileLocale;
 

@@ -360,7 +360,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
         newDataFolder.mkdirs();
 
-        for (File file : oldDataFolder.listFiles()) {
+        for (File file : Files.listFolderFiles(oldDataFolder, false)) {
             File targetFile = new File(newDataFolder, file.getName());
             if (!file.renameTo(targetFile))
                 return false;
@@ -450,7 +450,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
         // Convert the data in the data files as well
         BukkitExecutor.async(() -> {
-            for (File file : dataFolder.listFiles()) {
+            for (File file : Files.listFolderFiles(dataFolder, false)) {
                 synchronized (DATA_FOLDER_MUTEX) {
                     Files.replaceString(file, oldPlayer.getUniqueId() + "", newPlayer.getUniqueId() + "");
                 }

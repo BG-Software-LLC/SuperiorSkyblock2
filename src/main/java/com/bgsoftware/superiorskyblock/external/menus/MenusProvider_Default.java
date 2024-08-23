@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmBan;
@@ -74,11 +75,8 @@ public class MenusProvider_Default implements MenusProvider {
             return;
         }
 
-        File[] customMenuFiles = customMenusFolder.listFiles();
-        if (customMenuFiles != null) {
-            for (File menuFile : customMenuFiles) {
-                handleExceptions(() -> plugin.getMenus().registerMenu(MenuCustom.createInstance(menuFile)));
-            }
+        for (File menuFile : Files.listFolderFiles(customMenusFolder, false)) {
+            handleExceptions(() -> plugin.getMenus().registerMenu(MenuCustom.createInstance(menuFile)));
         }
     }
 

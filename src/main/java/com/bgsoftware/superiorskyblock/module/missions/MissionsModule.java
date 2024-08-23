@@ -347,13 +347,8 @@ public class MissionsModule extends BuiltinModule {
                 oldMissionsFile.delete();
             }
 
-            File[] oldMissionsFiles = oldMissionsFolder.listFiles();
-
-            if (oldMissionsFiles != null) {
-                for (File jarFile : oldMissionsFiles) {
-                    if (jarFile.getName().endsWith(".jar"))
-                        jarFile.renameTo(new File(getModuleFolder(), jarFile.getName()));
-                }
+            for (File jarFile : Files.listFolderFiles(oldMissionsFolder, false, f -> f.getName().endsWith(".jar"))) {
+                jarFile.renameTo(new File(getModuleFolder(), jarFile.getName()));
             }
 
             File oldDataFile = new File(oldMissionsFolder, "_data.yml");
