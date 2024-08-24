@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.core.value;
 
 public class IntValueFixedSynced implements IntValue {
-    
-    private static final ValuesCache<IntValueFixedSynced> CACHE = new ValuesCache<>(-1, IntValueFixedSynced::new);
+
+    private static final ValuesCache<IntValueFixedSynced> CACHE = new ValuesCache<>(IntValueFixedSynced::new);
 
     private final int value;
 

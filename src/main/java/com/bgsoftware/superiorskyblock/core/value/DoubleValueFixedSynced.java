@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.core.value;
 
 public class DoubleValueFixedSynced implements DoubleValue {
 
-    private static final ValuesCache<DoubleValueFixedSynced> CACHE = new ValuesCache<>(-1, DoubleValueFixedSynced::new);
+    private static final ValuesCache<DoubleValueFixedSynced> CACHE = new ValuesCache<>(DoubleValueFixedSynced::new);
 
     private final double value;
 

@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.core.value;
 
 public class IntValueFixed implements IntValue {
 
-    private static final ValuesCache<IntValueFixed> CACHE = new ValuesCache<>(0, IntValueFixed::new);
+    private static final ValuesCache<IntValueFixed> CACHE = new ValuesCache<>(IntValueFixed::new);
 
     private final int value;
 

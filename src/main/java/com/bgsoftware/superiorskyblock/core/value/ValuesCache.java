@@ -1,36 +1,39 @@
 package com.bgsoftware.superiorskyblock.core.value;
 
+import java.util.Objects;
 import java.util.function.IntFunction;
 
 public class ValuesCache<T> {
 
-    private static final int BASE_SIZE = 64;
+    private static final int CACHE_SIZE = 32;
 
-    private final int minimumCacheValue;
+    private final int[] indexes = new int[CACHE_SIZE];
+    private final Object[] cache = new Object[CACHE_SIZE];
+    private int capacity = 0;
+
     private final IntFunction<T> creator;
-    private final Object[] cache;
+
 
     public ValuesCache(IntFunction<T> creator) {
-        this(-1, creator);
-    }
-
-    public ValuesCache(int minimumCacheValue, IntFunction<T> creator) {
-        this.minimumCacheValue = minimumCacheValue;
         this.creator = creator;
-        this.cache = new Object[BASE_SIZE - minimumCacheValue];
     }
 
     public T fetch(int value) {
-        int cacheIndex = value - this.minimumCacheValue;
-        if (cacheIndex >= 0 && cacheIndex < this.cache.length) {
-            Object cachedValue = this.cache[cacheIndex];
-            if (cachedValue == null)
-                cachedValue = this.cache[cacheIndex] = this.creator.apply(value);
-
-            return (T) cachedValue;
+        for (int i = 0; i < this.capacity; ++i) {
+            if (this.indexes[i] == value) {
+                return Objects.requireNonNull((T) this.cache[i]);
+            }
         }
 
-        return this.creator.apply(value);
+        T cachedValue = this.creator.apply(value);
+        if (cachedValue != null) {
+            this.indexes[this.capacity] = value;
+            this.cache[this.capacity] = cachedValue;
+
+            ++this.capacity;
+        }
+
+        return cachedValue;
     }
 
 }
