@@ -482,7 +482,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
     }
 
     @SuppressWarnings("deprecation")
-    public Mission<?> loadMission(String missionName, FilesLookup filesLookup, ConfigurationSection missionSection) {
+    public Mission<?> loadMission(String missionName, String missionCategoryName, FilesLookup filesLookup, ConfigurationSection missionSection) {
         Mission<?> newMission = null;
 
         try {
@@ -527,7 +527,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                 newMission = mission;
             }
 
-            this.missionsContainer.addMissionData(new MissionData(mission, missionSection));
+            this.missionsContainer.addMissionData(new MissionData(mission, missionCategoryName, missionSection));
 
             Log.info("Registered mission " + missionName);
         } catch (Exception error) {

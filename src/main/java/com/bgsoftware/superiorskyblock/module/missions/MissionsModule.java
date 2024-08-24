@@ -234,7 +234,7 @@ public class MissionsModule extends BuiltinModule {
 
                 ConfigurationSection missionSection = missionConfigFile.getConfigurationSection("");
 
-                Mission<?> mission = plugin.getMissions().loadMission(missionName, filesLookup, missionSection);
+                Mission<?> mission = plugin.getMissions().loadMission(missionName, categoryName, filesLookup, missionSection);
 
                 if (mission != null) {
                     categoryMissions.add(mission);

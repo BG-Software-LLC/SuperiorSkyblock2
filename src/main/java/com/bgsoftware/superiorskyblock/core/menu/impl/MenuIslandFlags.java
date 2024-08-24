@@ -80,9 +80,9 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
         GameSound clickSound = null;
 
         if (islandFlagSection != null) {
-            enabledIslandFlagItem = MenuParserImpl.getInstance().getItemStack("settings.yml",
+            enabledIslandFlagItem = MenuParserImpl.getInstance().getItemStack("menus/settings.yml",
                     islandFlagSection.getConfigurationSection("settings-enabled"));
-            disabledIslandFlagItem = MenuParserImpl.getInstance().getItemStack("settings.yml",
+            disabledIslandFlagItem = MenuParserImpl.getInstance().getItemStack("menus/settings.yml",
                     islandFlagSection.getConfigurationSection("settings-disabled"));
             clickSound = MenuParserImpl.getInstance().getSound(islandFlagSection.getConfigurationSection("sound"));
         }

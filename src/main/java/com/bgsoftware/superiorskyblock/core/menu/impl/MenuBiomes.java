@@ -81,11 +81,11 @@ public class MenuBiomes extends AbstractMenu<IslandMenuView, IslandViewArgs> {
                 BiomeButton.Builder buttonBuilder = new BiomeButton.Builder(biome);
 
                 if (itemSection.contains("access")) {
-                    buttonBuilder.setAccessItem(MenuParserImpl.getInstance().getItemStack("biomes.yml",
+                    buttonBuilder.setAccessItem(MenuParserImpl.getInstance().getItemStack("menus/biomes.yml",
                             itemSection.getConfigurationSection("access")));
                 }
                 if (itemSection.contains("no-access")) {
-                    buttonBuilder.setNoAccessItem(MenuParserImpl.getInstance().getItemStack("biomes.yml",
+                    buttonBuilder.setNoAccessItem(MenuParserImpl.getInstance().getItemStack("menus/biomes.yml",
                             itemSection.getConfigurationSection("no-access")));
                 }
                 if (soundSection != null) {

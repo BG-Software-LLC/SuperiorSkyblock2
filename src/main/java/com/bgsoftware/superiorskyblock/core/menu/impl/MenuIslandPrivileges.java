@@ -114,11 +114,11 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
         List<String> noAccessCommands = null;
 
         if (islandPrivilegeSection != null) {
-            enabledIslandPrivilegeItem = MenuParserImpl.getInstance().getItemStack("permissions.yml",
+            enabledIslandPrivilegeItem = MenuParserImpl.getInstance().getItemStack("menus/permissions.yml",
                     islandPrivilegeSection.getConfigurationSection("permission-enabled"));
-            disabledIslandPrivilegeItem = MenuParserImpl.getInstance().getItemStack("permissions.yml",
+            disabledIslandPrivilegeItem = MenuParserImpl.getInstance().getItemStack("menus/permissions.yml",
                     islandPrivilegeSection.getConfigurationSection("permission-disabled"));
-            rolePrivilegeItem = MenuParserImpl.getInstance().getItemStack("permissions.yml",
+            rolePrivilegeItem = MenuParserImpl.getInstance().getItemStack("menus/permissions.yml",
                     islandPrivilegeSection.getConfigurationSection("role-permission"));
             accessSound = MenuParserImpl.getInstance().getSound(islandPrivilegeSection.getConfigurationSection("has-access.sound"));
             noAccessSound = MenuParserImpl.getInstance().getSound(islandPrivilegeSection.getConfigurationSection("no-access.sound"));

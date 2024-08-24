@@ -90,14 +90,14 @@ public class MenuIslandUpgrades extends AbstractMenu<IslandMenuView, IslandViewA
                     SUpgradeLevel upgradeLevel = (SUpgradeLevel) upgrade.getUpgradeLevel(level);
 
                     if (upgradeLevel != null) {
-                        TemplateItem hasNextLevel = MenuParserImpl.getInstance().getItemStack("upgrades.yml",
+                        TemplateItem hasNextLevel = MenuParserImpl.getInstance().getItemStack("menus/upgrades.yml",
                                 upgradeSection.getConfigurationSection(level + ".has-next-level"));
                         if (hasNextLevel == null) {
                             Log.warnFromFile("upgrades.yml", "The upgrade ", upgrade.getName(),
                                     " (level ", level, ") is missing has-next-level item.");
                         }
 
-                        TemplateItem noNextLevel = MenuParserImpl.getInstance().getItemStack("upgrades.yml",
+                        TemplateItem noNextLevel = MenuParserImpl.getInstance().getItemStack("menus/upgrades.yml",
                                 upgradeSection.getConfigurationSection(level + ".no-next-level"));
                         if (noNextLevel == null) {
                             Log.warnFromFile("upgrades.yml", "&cThe upgrade ", upgrade.getName(),
