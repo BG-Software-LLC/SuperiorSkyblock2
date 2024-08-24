@@ -344,8 +344,15 @@ public class MenuParserImpl implements MenuParser {
         }
 
         if (section.contains("flags")) {
-            for (String flag : section.getStringList("flags"))
-                itemBuilder.withFlags(ItemFlag.valueOf(flag));
+            for (String flag : section.getStringList("flags")) {
+                String flagName = flag.toUpperCase(Locale.ENGLISH);
+                try {
+                    itemBuilder.withFlags(ItemFlag.valueOf(flagName));
+                } catch (IllegalArgumentException error) {
+                    Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
+                            " (", flagName, ") into an ItemFlag, skipping...");
+                }
+            }
         }
 
         if (section.contains("skull")) {
