@@ -497,7 +497,8 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
                 FileClassLoader missionClassLoader = this.missionTypesClassLoaders.computeIfAbsent(missionJarName, n -> {
                     try {
-                        return new FileClassLoader(missionJar, plugin.getPluginClassLoader());
+                        return new FileClassLoader(missionJar, plugin.getPluginClassLoader(),
+                                plugin.getNMSAlgorithms().getClassProcessor());
                     } catch (IOException error) {
                         throw new RuntimeException(error);
                     }

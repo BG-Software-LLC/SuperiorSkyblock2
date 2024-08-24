@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.core.io.ClassProcessor;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.algorithms.PaperGlowEnchantment;
 import com.bgsoftware.superiorskyblock.nms.algorithms.SpigotGlowEnchantment;
@@ -55,6 +56,13 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         MENUS_HOLDER_CREATORS.put(InventoryType.BLAST_FURNACE, MenuTileEntityFurnace::new);
         MENUS_HOLDER_CREATORS.put(InventoryType.SMOKER, MenuTileEntityFurnace::new);
     }
+
+    private final ClassProcessor CLASS_PROCESSOR = new ClassProcessor() {
+        @Override
+        public byte[] processClass(byte[] classBytes, String path) {
+            return Bukkit.getUnsafe().processClass(plugin.getDescription(), path, classBytes);
+        }
+    };
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -161,6 +169,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public int getDataVersion() {
         return CraftMagicNumbers.INSTANCE.getDataVersion();
+    }
+
+    @Override
+    public ClassProcessor getClassProcessor() {
+        return CLASS_PROCESSOR;
     }
 
     @Override

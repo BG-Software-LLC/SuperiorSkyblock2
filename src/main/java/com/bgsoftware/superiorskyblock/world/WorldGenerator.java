@@ -65,7 +65,8 @@ public class WorldGenerator {
                 String fileName = file.getName();
                 file = filesLookup.getFile(fileName);
 
-                FileClassLoader classLoader = new FileClassLoader(file, plugin.getPluginClassLoader());
+                FileClassLoader classLoader = new FileClassLoader(file, plugin.getPluginClassLoader(),
+                        plugin.getNMSAlgorithms().getClassProcessor());
 
                 //noinspection deprecation
                 Class<?> generatorClass = JarFiles.getClass(file.toURL(), ChunkGenerator.class, classLoader).getLeft();

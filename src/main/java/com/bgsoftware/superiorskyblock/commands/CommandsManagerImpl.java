@@ -198,7 +198,8 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                     String fileName = file.getName();
                     file = filesLookup.getFile(fileName);
 
-                    FileClassLoader classLoader = new FileClassLoader(file, plugin.getPluginClassLoader());
+                    FileClassLoader classLoader = new FileClassLoader(file, plugin.getPluginClassLoader(),
+                            plugin.getNMSAlgorithms().getClassProcessor());
 
                     //noinspection deprecation
                     Class<?> commandClass = JarFiles.getClass(file.toURL(), SuperiorCommand.class, classLoader).getLeft();

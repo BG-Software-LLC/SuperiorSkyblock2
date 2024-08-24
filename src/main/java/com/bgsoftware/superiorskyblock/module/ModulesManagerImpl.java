@@ -65,7 +65,8 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
         Preconditions.checkArgument(moduleFile.exists(), "The file " + moduleFile.getName() + " does not exist.");
         Preconditions.checkArgument(moduleFile.getName().endsWith(".jar"), "The file " + moduleFile.getName() + " is not a valid jar file.");
 
-        FileClassLoader moduleClassLoader = new FileClassLoader(moduleFile, plugin.getPluginClassLoader());
+        FileClassLoader moduleClassLoader = new FileClassLoader(moduleFile, plugin.getPluginClassLoader(),
+                plugin.getNMSAlgorithms().getClassProcessor());
 
         Either<Class<?>, Throwable> moduleClassLookup = JarFiles.getClass(moduleFile.toURL(), PluginModule.class, moduleClassLoader);
 
