@@ -88,15 +88,6 @@ public class BlockChangesListener implements Listener {
         this.registerBlockDestroyListener();
     }
 
-    @IntType({BlockTrackFlags.DIRTY_CHUNKS, BlockTrackFlags.SAVE_BLOCK_COUNT, BlockTrackFlags.HANDLE_NEARBY_BLOCKS})
-    public @interface BlockTrackFlags {
-
-        int DIRTY_CHUNKS = (1 << 0);
-        int SAVE_BLOCK_COUNT = (1 << 1);
-        int HANDLE_NEARBY_BLOCKS = (1 << 2);
-
-    }
-
     /* BLOCK PLACES */
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
