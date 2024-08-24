@@ -594,6 +594,20 @@ public class IslandsDatabaseBridge {
                 databaseBridge.deleteObject("islands_custom_data", createFilter("island", island)));
     }
 
+    public static void clearIslandSettings(Island island) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands_settings",
+                createFilter("island", island),
+                new Pair<>("size", -1),
+                new Pair<>("bank_limit", "-2"),
+                new Pair<>("coops_limit", -1),
+                new Pair<>("members_limit", -1),
+                new Pair<>("warps_limit", -1),
+                new Pair<>("crop_growth_multiplier", -1D),
+                new Pair<>("spawner_rates_multiplier", -1D),
+                new Pair<>("mob_drops_multiplier", -1D)
+        ));
+    }
+
     public static void insertIsland(Island island, List<ChunkPosition> dirtyChunks) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
             databaseBridge.insertObject("islands",

@@ -4722,16 +4722,11 @@ public class SIsland implements Island {
 
     private void clearUpgrades(boolean overrideCustom) {
         if (overrideCustom || this.islandSize.get().isSynced()) {
-            if (overrideCustom)
-                IslandsDatabaseBridge.saveSize(this);
-
             setIslandSizeInternal(IntValue.syncedFixed(-1));
         }
 
         warpsLimit.set(warpsLimit -> {
             if (overrideCustom || warpsLimit.isSynced()) {
-                if (overrideCustom)
-                    IslandsDatabaseBridge.saveWarpsLimit(this);
                 return IntValue.syncedFixed(-1);
             }
             return warpsLimit;
@@ -4739,8 +4734,6 @@ public class SIsland implements Island {
 
         teamLimit.set(teamLimit -> {
             if (overrideCustom || teamLimit.isSynced()) {
-                if (overrideCustom)
-                    IslandsDatabaseBridge.saveTeamLimit(this);
                 return IntValue.syncedFixed(-1);
             }
             return teamLimit;
@@ -4748,8 +4741,6 @@ public class SIsland implements Island {
 
         coopLimit.set(coopLimit -> {
             if (overrideCustom || coopLimit.isSynced()) {
-                if (overrideCustom)
-                    IslandsDatabaseBridge.saveCoopLimit(this);
                 return IntValue.syncedFixed(-1);
             }
             return coopLimit;
@@ -4757,9 +4748,6 @@ public class SIsland implements Island {
 
         cropGrowth.set(cropGrowth -> {
             if (overrideCustom || cropGrowth.isSynced()) {
-                if (overrideCustom)
-                    IslandsDatabaseBridge.saveCropGrowth(this);
-
                 notifyCropGrowthChange(-1D);
 
                 return DoubleValue.syncedFixed(-1D);
@@ -4770,8 +4758,6 @@ public class SIsland implements Island {
 
         spawnerRates.set(spawnerRates -> {
             if (overrideCustom || spawnerRates.isSynced()) {
-                if (overrideCustom)
-                    IslandsDatabaseBridge.saveSpawnerRates(this);
                 return DoubleValue.syncedFixed(-1D);
             }
             return spawnerRates;
@@ -4779,8 +4765,6 @@ public class SIsland implements Island {
 
         mobDrops.set(mobDrops -> {
             if (overrideCustom || mobDrops.isSynced()) {
-                if (overrideCustom)
-                    IslandsDatabaseBridge.saveMobDrops(this);
                 return DoubleValue.syncedFixed(-1D);
             }
             return mobDrops;
@@ -4788,8 +4772,6 @@ public class SIsland implements Island {
 
         bankLimit.set(bankLimit -> {
             if (overrideCustom || bankLimit.isSynced()) {
-                if (overrideCustom)
-                    IslandsDatabaseBridge.saveBankLimit(this);
                 return Value.syncedFixed(SYNCED_BANK_LIMIT_VALUE);
             }
             return bankLimit;
@@ -4818,6 +4800,9 @@ public class SIsland implements Island {
         roleLimits.entrySet().stream()
                 .filter(entry -> overrideCustom || entry.getValue().isSynced())
                 .forEach(entry -> entry.setValue(IntValue.syncedFixed(-1)));
+
+        if (overrideCustom)
+            IslandsDatabaseBridge.clearIslandSettings(this);
     }
 
     private void syncUpgrade(SUpgradeLevel upgradeLevel, boolean overrideCustom) {
