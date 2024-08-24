@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.listener;
 
-import com.bgsoftware.common.annotations.IntType;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -111,7 +110,8 @@ public class BlockChangesListener implements Listener {
         KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         e.getBlocks().forEach(blockState -> {
             Key blockKey = Keys.of(blockState);
-            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
+            if (!Keys.of(blockState.getBlock()).equals(blockKey))
+                blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
         });
         this.worldRecordService.get().recordMultiBlocksPlace(blockCounts, e.getLocation(), WorldRecordFlags.DIRTY_CHUNKS);
     }
