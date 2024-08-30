@@ -107,13 +107,20 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onStructureGrow(StructureGrowEvent e) {
-        KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
+        KeyMap<Integer> placedBlockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
+        KeyMap<Integer> brokenBlockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         e.getBlocks().forEach(blockState -> {
-            Key blockKey = Keys.of(blockState);
-            if (!Keys.of(blockState.getBlock()).equals(blockKey))
-                blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
+            Key placedBlockKey = Keys.of(blockState);
+            Key brokenBlockKey = Keys.of(blockState.getBlock());
+            if (!placedBlockKey.equals(brokenBlockKey)) {
+                if (!placedBlockKey.equals(ConstantKeys.AIR))
+                    placedBlockCounts.put(placedBlockKey, placedBlockCounts.getOrDefault(placedBlockKey, 0) + 1);
+                if (!brokenBlockKey.equals(ConstantKeys.AIR))
+                    brokenBlockCounts.put(brokenBlockKey, brokenBlockCounts.getOrDefault(brokenBlockKey, 0) + 1);
+            }
         });
-        this.worldRecordService.get().recordMultiBlocksPlace(blockCounts, e.getLocation(), WorldRecordFlags.DIRTY_CHUNKS);
+        this.worldRecordService.get().recordMultiBlocksPlace(placedBlockCounts, e.getLocation(), WorldRecordFlags.DIRTY_CHUNKS);
+        this.worldRecordService.get().recordMultiBlocksBreak(brokenBlockCounts, e.getLocation(), WorldRecordFlags.DIRTY_CHUNKS);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
