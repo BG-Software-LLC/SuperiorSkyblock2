@@ -1330,7 +1330,7 @@ public class SIsland implements Island {
     public boolean isInside(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
 
-        if (location.getWorld() == null || !plugin.getGrid().isIslandsWorld(location.getWorld()))
+        if (!isIslandWorld(location.getWorld()))
             return false;
 
         int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
@@ -1344,7 +1344,7 @@ public class SIsland implements Island {
     public boolean isInside(World world, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
 
-        if (!plugin.getGrid().isIslandsWorld(world))
+        if (!isIslandWorld(world))
             return false;
 
         int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
@@ -1371,7 +1371,7 @@ public class SIsland implements Island {
     }
 
     public boolean isInsideRange(Location location, int extra) {
-        if (location.getWorld() == null || !plugin.getGrid().isIslandsWorld(location.getWorld()))
+        if (!isIslandWorld(location.getWorld()))
             return false;
 
         IslandArea islandArea = new IslandArea(center, getIslandSize());
@@ -1384,13 +1384,28 @@ public class SIsland implements Island {
     public boolean isInsideRange(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "chunk parameter cannot be null.");
 
-        if (chunk.getWorld() == null || !plugin.getGrid().isIslandsWorld(chunk.getWorld()))
+        if (!isIslandWorld(chunk.getWorld()))
             return false;
 
         IslandArea islandArea = new IslandArea(center, getIslandSize());
         islandArea.rshift(4);
 
         return islandArea.intercepts(chunk.getX(), chunk.getZ());
+    }
+
+    private boolean isIslandWorld(@Nullable World world) {
+        if (world == null)
+            return false;
+
+        Dimension dimension = plugin.getGrid().getIslandsWorldDimension(world);
+        if (dimension == null)
+            return false;
+
+        World islandWorld = plugin.getGrid().getIslandsWorld(this, dimension);
+        if (!Objects.equals(world, islandWorld))
+            return false;
+
+        return true;
     }
 
     @Override
