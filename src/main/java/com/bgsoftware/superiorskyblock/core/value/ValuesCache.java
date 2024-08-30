@@ -26,7 +26,7 @@ public class ValuesCache<T> {
         }
 
         T cachedValue = this.creator.apply(value);
-        if (cachedValue != null) {
+        if (cachedValue != null && this.capacity < CACHE_SIZE) {
             this.indexes[this.capacity] = value;
             this.cache[this.capacity] = cachedValue;
 
