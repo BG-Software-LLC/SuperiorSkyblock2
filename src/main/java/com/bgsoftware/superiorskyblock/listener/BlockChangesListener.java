@@ -42,6 +42,7 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -140,6 +141,12 @@ public class BlockChangesListener implements Listener {
     private void onPlayerInteract(PlayerInteractEvent e) {
         onMinecartPlace(e);
         onSpawnerChange(e);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockSpread(BlockSpreadEvent e) {
+        this.worldRecordService.get().recordBlockPlace(Keys.of(e.getNewState()), e.getBlock().getLocation(),
+                1, e.getBlock().getState(), REGULAR_RECORD_FLAGS);
     }
 
     private void onMinecartPlace(PlayerInteractEvent e) {
