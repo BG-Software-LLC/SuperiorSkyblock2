@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.database.sql;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.database.sql.transaction.SQLDatabaseTransaction;
 import com.bgsoftware.superiorskyblock.core.database.transaction.IDatabaseTransaction;
@@ -13,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SQLTransactionProcessor {
@@ -48,7 +50,7 @@ public class SQLTransactionProcessor {
     private static void executeBatchTransaction(PreparedStatement preparedStatement,
                                                 List<SQLDatabaseTransaction.DatabaseValues> allBatchValues,
                                                 String query) throws SQLException {
-        MutableObject<String> fullQuery = new MutableObject<>(query);
+        MutableObject<String> fullQuery = Log.isDebugged(Debug.DATABASE_QUERY) ? new MutableObject<>(query) : null;
 
         Connection connection = preparedStatement.getConnection();
 
@@ -56,11 +58,13 @@ public class SQLTransactionProcessor {
             connection.setAutoCommit(false);
 
             for (SQLDatabaseTransaction.DatabaseValues batchValues : allBatchValues) {
-                fullQuery.setValue(query);
+                if (fullQuery != null)
+                    fullQuery.setValue(query);
 
                 populateStatement(preparedStatement, batchValues, fullQuery);
 
-                Log.debug(Debug.DATABASE_QUERY, fullQuery.getValue());
+                if (fullQuery != null)
+                    Log.debug(Debug.DATABASE_QUERY, fullQuery.getValue());
 
                 preparedStatement.addBatch();
             }
@@ -79,18 +83,19 @@ public class SQLTransactionProcessor {
     private static void executeTransaction(PreparedStatement preparedStatement,
                                            SQLDatabaseTransaction.DatabaseValues values,
                                            String query) throws SQLException {
-        MutableObject<String> fullQuery = new MutableObject<>(query);
+        MutableObject<String> fullQuery = Log.isDebugged(Debug.DATABASE_QUERY) ? new MutableObject<>(query) : null;
 
         populateStatement(preparedStatement, values, fullQuery);
 
-        Log.debug(Debug.DATABASE_QUERY, fullQuery.getValue());
+        if (fullQuery != null)
+            Log.debug(Debug.DATABASE_QUERY, fullQuery.getValue());
 
         preparedStatement.executeUpdate();
     }
 
     private static void populateStatement(PreparedStatement preparedStatement,
                                           SQLDatabaseTransaction.DatabaseValues values,
-                                          MutableObject<String> fullQuery) throws SQLException {
+                                          @Nullable MutableObject<String> fullQuery) throws SQLException {
         MutableInt index = new MutableInt(1);
         for (Object value : values.values) {
             addObject(preparedStatement, index, value, fullQuery);
@@ -98,11 +103,14 @@ public class SQLTransactionProcessor {
     }
 
     private static void addObject(PreparedStatement preparedStatement, MutableInt index, Object value,
-                                  MutableObject<String> fullQuery) throws SQLException {
+                                  @Nullable MutableObject<String> fullQuery) throws SQLException {
         int curr = index.get();
         preparedStatement.setObject(curr, value);
         index.set(curr + 1);
-        fullQuery.setValue(QUERY_VALUE_PATTERN.matcher(fullQuery.getValue()).replaceFirst(value + ""));
+        if (fullQuery != null) {
+            fullQuery.setValue(QUERY_VALUE_PATTERN.matcher(fullQuery.getValue())
+                    .replaceFirst(Matcher.quoteReplacement(value + "")));
+        }
     }
 
     private static void executeQuery(String query, QueryResult<PreparedStatement> callback) {
