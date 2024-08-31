@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -40,7 +41,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -78,8 +78,8 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
         loadDefaultSchematicParsers();
 
-        for (File schemFile : schematicsFolder.listFiles()) {
-            String schemName = schemFile.getName().replace(".schematic", "").replace(".schem", "").toLowerCase(Locale.ENGLISH);
+        for (File schemFile : Files.listFolderFiles(schematicsFolder, false)) {
+            String schemName = Files.getFileName(schemFile).toLowerCase(Locale.ENGLISH);
             Schematic schematic = loadFromFile(schemName, schemFile);
             if (schematic != null) {
                 this.schematicsContainer.addSchematic(schematic);
@@ -267,7 +267,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
     private Schematic parseSchematic(File file, String schemName, SchematicParser schematicParser,
                                      Consumer<SchematicParseException> onSchematicParseError) {
-        try (DataInputStream reader = new DataInputStream(new GZIPInputStream(Files.newInputStream(file.toPath())))) {
+        try (DataInputStream reader = new DataInputStream(new GZIPInputStream(java.nio.file.Files.newInputStream(file.toPath())))) {
             return schematicParser.parseSchematic(reader, schemName);
         } catch (SchematicParseException error) {
             onSchematicParseError.accept(error);
@@ -317,7 +317,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             file.getParentFile().mkdirs();
             file.createNewFile();
 
-            try (DataOutputStream writer = new DataOutputStream(new GZIPOutputStream(Files.newOutputStream(file.toPath())))) {
+            try (DataOutputStream writer = new DataOutputStream(new GZIPOutputStream(java.nio.file.Files.newOutputStream(file.toPath())))) {
                 schematicTag.write(writer);
             }
         } catch (IOException error) {

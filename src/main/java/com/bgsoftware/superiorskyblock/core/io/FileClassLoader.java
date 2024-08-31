@@ -23,13 +23,16 @@ public class FileClassLoader extends URLClassLoader {
     private JarFile jar;
     private final Manifest manifest;
     private final URL url;
+    @Nullable
+    private final ClassProcessor classProcessor;
 
-    public FileClassLoader(File file, ClassLoader pluginClassLoader) throws IOException {
+    public FileClassLoader(File file, ClassLoader pluginClassLoader, @Nullable ClassProcessor classProcessor) throws IOException {
         super(new URL[]{file.toURI().toURL()}, pluginClassLoader);
 
         this.jar = new JarFile(file);
         this.manifest = jar.getManifest();
         this.url = file.toURI().toURL();
+        this.classProcessor = classProcessor;
     }
 
     @Nullable
@@ -66,6 +69,9 @@ public class FileClassLoader extends URLClassLoader {
                 } catch (IOException ex) {
                     throw new ClassNotFoundException(name, ex);
                 }
+
+                if (classProcessor != null)
+                    classBytes = classProcessor.processClass(classBytes, path);
 
                 int dot = name.lastIndexOf('.');
                 if (dot != -1) {

@@ -212,14 +212,14 @@ public class NMSWorldImpl implements NMSWorld {
         CompoundTag compoundTag = new CompoundTag();
 
         blockState.getValues().forEach((property, value) -> {
-            String name = property.getName();
+            String name = PropertiesMapper.getPropertyName(property);
 
             if (property instanceof BooleanProperty) {
                 compoundTag.setByte(name, (Boolean) value ? (byte) 1 : 0);
             } else if (property instanceof IntegerProperty integerProperty) {
                 compoundTag.setIntArray(name, new int[]{(Integer) value, integerProperty.min, integerProperty.max});
             } else if (property instanceof EnumProperty<?>) {
-                compoundTag.setString(PropertiesMapper.getPropertyName(property), ((Enum<?>) value).name());
+                compoundTag.setString(name, ((Enum<?>) value).name());
             }
         });
 

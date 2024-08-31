@@ -234,7 +234,7 @@ public class MissionsModule extends BuiltinModule {
 
                 ConfigurationSection missionSection = missionConfigFile.getConfigurationSection("");
 
-                Mission<?> mission = plugin.getMissions().loadMission(missionName, filesLookup, missionSection);
+                Mission<?> mission = plugin.getMissions().loadMission(missionName, categoryName, filesLookup, missionSection);
 
                 if (mission != null) {
                     categoryMissions.add(mission);
@@ -347,13 +347,8 @@ public class MissionsModule extends BuiltinModule {
                 oldMissionsFile.delete();
             }
 
-            File[] oldMissionsFiles = oldMissionsFolder.listFiles();
-
-            if (oldMissionsFiles != null) {
-                for (File jarFile : oldMissionsFiles) {
-                    if (jarFile.getName().endsWith(".jar"))
-                        jarFile.renameTo(new File(getModuleFolder(), jarFile.getName()));
-                }
+            for (File jarFile : Files.listFolderFiles(oldMissionsFolder, false, f -> f.getName().endsWith(".jar"))) {
+                jarFile.renameTo(new File(getModuleFolder(), jarFile.getName()));
             }
 
             File oldDataFile = new File(oldMissionsFolder, "_data.yml");

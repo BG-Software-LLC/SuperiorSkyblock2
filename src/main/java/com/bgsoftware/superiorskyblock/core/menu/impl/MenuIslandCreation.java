@@ -187,9 +187,9 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
                 if (itemSection.isString("spawn-offset"))
                     buttonBuilder.setSpawnOffset(Serializers.OFFSET_SPACED_SERIALIZER.deserialize(itemSection.getString("spawn-offset")));
 
-                buttonBuilder.setAccessItem(MenuParserImpl.getInstance().getItemStack("island-creation.yml",
+                buttonBuilder.setAccessItem(MenuParserImpl.getInstance().getItemStack("menus/island-creation.yml",
                         itemSection.getConfigurationSection("access")));
-                buttonBuilder.setNoAccessItem(MenuParserImpl.getInstance().getItemStack("island-creation.yml",
+                buttonBuilder.setNoAccessItem(MenuParserImpl.getInstance().getItemStack("menus/island-creation.yml",
                         itemSection.getConfigurationSection("no-access")));
 
                 patternBuilder.mapButtons(menuPatternSlots.getSlots(itemSectionName), buttonBuilder);

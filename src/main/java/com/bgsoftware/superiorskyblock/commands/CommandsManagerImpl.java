@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
+import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
 import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
 import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookupFactory;
@@ -187,20 +188,18 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
             return;
         }
 
-        File[] folderFiles = commandsFolder.listFiles();
-        if (folderFiles == null || folderFiles.length == 0)
+        List<File> folderFiles = Files.listFolderFiles(commandsFolder, false, file -> file.getName().endsWith(".jar"));
+        if (folderFiles.isEmpty())
             return;
 
         try (FilesLookup filesLookup = FilesLookupFactory.getInstance().lookupFolder(commandsFolder)) {
             for (File file : folderFiles) {
-                String fileName = file.getName();
-                if (!fileName.endsWith(".jar"))
-                    continue;
-
                 try {
+                    String fileName = file.getName();
                     file = filesLookup.getFile(fileName);
 
-                    FileClassLoader classLoader = new FileClassLoader(file, plugin.getPluginClassLoader());
+                    FileClassLoader classLoader = new FileClassLoader(file, plugin.getPluginClassLoader(),
+                            plugin.getNMSAlgorithms().getClassProcessor());
 
                     //noinspection deprecation
                     Class<?> commandClass = JarFiles.getClass(file.toURL(), SuperiorCommand.class, classLoader).getLeft();

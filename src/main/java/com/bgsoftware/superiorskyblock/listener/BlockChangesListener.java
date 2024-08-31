@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.listener;
 
-import com.bgsoftware.common.annotations.IntType;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -43,6 +42,7 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -88,15 +88,6 @@ public class BlockChangesListener implements Listener {
         this.registerBlockDestroyListener();
     }
 
-    @IntType({BlockTrackFlags.DIRTY_CHUNKS, BlockTrackFlags.SAVE_BLOCK_COUNT, BlockTrackFlags.HANDLE_NEARBY_BLOCKS})
-    public @interface BlockTrackFlags {
-
-        int DIRTY_CHUNKS = (1 << 0);
-        int SAVE_BLOCK_COUNT = (1 << 1);
-        int HANDLE_NEARBY_BLOCKS = (1 << 2);
-
-    }
-
     /* BLOCK PLACES */
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -117,12 +108,20 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onStructureGrow(StructureGrowEvent e) {
-        KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
+        KeyMap<Integer> placedBlockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
+        KeyMap<Integer> brokenBlockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         e.getBlocks().forEach(blockState -> {
-            Key blockKey = Keys.of(blockState);
-            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
+            Key placedBlockKey = Keys.of(blockState);
+            Key brokenBlockKey = Keys.of(blockState.getBlock());
+            if (!placedBlockKey.equals(brokenBlockKey)) {
+                if (!placedBlockKey.equals(ConstantKeys.AIR))
+                    placedBlockCounts.put(placedBlockKey, placedBlockCounts.getOrDefault(placedBlockKey, 0) + 1);
+                if (!brokenBlockKey.equals(ConstantKeys.AIR))
+                    brokenBlockCounts.put(brokenBlockKey, brokenBlockCounts.getOrDefault(brokenBlockKey, 0) + 1);
+            }
         });
-        this.worldRecordService.get().recordMultiBlocksPlace(blockCounts, e.getLocation(), WorldRecordFlags.DIRTY_CHUNKS);
+        this.worldRecordService.get().recordMultiBlocksPlace(placedBlockCounts, e.getLocation(), WorldRecordFlags.DIRTY_CHUNKS);
+        this.worldRecordService.get().recordMultiBlocksBreak(brokenBlockCounts, e.getLocation(), WorldRecordFlags.DIRTY_CHUNKS);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -142,6 +141,12 @@ public class BlockChangesListener implements Listener {
     private void onPlayerInteract(PlayerInteractEvent e) {
         onMinecartPlace(e);
         onSpawnerChange(e);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockSpread(BlockSpreadEvent e) {
+        this.worldRecordService.get().recordBlockPlace(Keys.of(e.getNewState()), e.getBlock().getLocation(),
+                1, e.getBlock().getState(), REGULAR_RECORD_FLAGS);
     }
 
     private void onMinecartPlace(PlayerInteractEvent e) {

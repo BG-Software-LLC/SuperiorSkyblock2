@@ -32,7 +32,7 @@ public class MissionData {
     private final TemplateItem completed;
     private final int resetAmount;
 
-    MissionData(Mission<?> mission, ConfigurationSection section) {
+    MissionData(Mission<?> mission, String missionCategoryName, ConfigurationSection section) {
         this.index = currentIndex++;
         this.missionName = mission.getName();
         this.islandMission = section.getBoolean("island", false);
@@ -54,9 +54,11 @@ public class MissionData {
 
         this.commandRewards.addAll(section.getStringList("rewards.commands"));
 
-        this.notCompleted = MenuParserImpl.getInstance().getItemStack("config.yml", section.getConfigurationSection("icons.not-completed"));
-        this.canComplete = MenuParserImpl.getInstance().getItemStack("config.yml", section.getConfigurationSection("icons.can-complete"));
-        this.completed = MenuParserImpl.getInstance().getItemStack("config.yml", section.getConfigurationSection("icons.completed"));
+        String missionFilePath = "modules/missions/categories/" + missionCategoryName + "/" + this.missionName + ".yml";
+
+        this.notCompleted = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.not-completed"));
+        this.canComplete = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.can-complete"));
+        this.completed = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.completed"));
     }
 
     public boolean isAutoReward() {

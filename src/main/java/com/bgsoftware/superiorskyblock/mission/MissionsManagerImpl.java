@@ -360,7 +360,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
         newDataFolder.mkdirs();
 
-        for (File file : oldDataFolder.listFiles()) {
+        for (File file : Files.listFolderFiles(oldDataFolder, false)) {
             File targetFile = new File(newDataFolder, file.getName());
             if (!file.renameTo(targetFile))
                 return false;
@@ -450,7 +450,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
         // Convert the data in the data files as well
         BukkitExecutor.async(() -> {
-            for (File file : dataFolder.listFiles()) {
+            for (File file : Files.listFolderFiles(dataFolder, false)) {
                 synchronized (DATA_FOLDER_MUTEX) {
                     Files.replaceString(file, oldPlayer.getUniqueId() + "", newPlayer.getUniqueId() + "");
                 }
@@ -482,7 +482,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
     }
 
     @SuppressWarnings("deprecation")
-    public Mission<?> loadMission(String missionName, FilesLookup filesLookup, ConfigurationSection missionSection) {
+    public Mission<?> loadMission(String missionName, String missionCategoryName, FilesLookup filesLookup, ConfigurationSection missionSection) {
         Mission<?> newMission = null;
 
         try {
@@ -497,7 +497,8 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
                 FileClassLoader missionClassLoader = this.missionTypesClassLoaders.computeIfAbsent(missionJarName, n -> {
                     try {
-                        return new FileClassLoader(missionJar, plugin.getPluginClassLoader());
+                        return new FileClassLoader(missionJar, plugin.getPluginClassLoader(),
+                                plugin.getNMSAlgorithms().getClassProcessor());
                     } catch (IOException error) {
                         throw new RuntimeException(error);
                     }
@@ -526,7 +527,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                 newMission = mission;
             }
 
-            this.missionsContainer.addMissionData(new MissionData(mission, missionSection));
+            this.missionsContainer.addMissionData(new MissionData(mission, missionCategoryName, missionSection));
 
             Log.info("Registered mission " + missionName);
         } catch (Exception error) {

@@ -125,8 +125,8 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
                     continue;
 
                 TopIslandsPagedObjectButton.Builder slotsBuilder = new TopIslandsPagedObjectButton.Builder();
-                slotsBuilder.setIslandItem(MenuParserImpl.getInstance().getItemStack("top-islands.yml", itemsSection.getConfigurationSection("island")));
-                slotsBuilder.setNoIslandItem(MenuParserImpl.getInstance().getItemStack("top-islands.yml", itemsSection.getConfigurationSection("no-island")));
+                slotsBuilder.setIslandItem(MenuParserImpl.getInstance().getItemStack("menus/top-islands.yml", itemsSection.getConfigurationSection("island")));
+                slotsBuilder.setNoIslandItem(MenuParserImpl.getInstance().getItemStack("menus/top-islands.yml", itemsSection.getConfigurationSection("no-island")));
                 slotsBuilder.setIslandSound(MenuParserImpl.getInstance().getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")));
                 slotsBuilder.setNoIslandSound(MenuParserImpl.getInstance().getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")));
                 slotsBuilder.setIslandCommands(cfg.getStringList("commands." + slotsChar + ".island"));
@@ -138,8 +138,8 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
                     configuredSelfPlayerButton = true;
 
                     TopIslandsSelfIslandButton.Builder selfIslandBuilder = new TopIslandsSelfIslandButton.Builder();
-                    selfIslandBuilder.setIslandItem(MenuParserImpl.getInstance().getItemStack("top-islands.yml", itemsSection.getConfigurationSection("island")));
-                    selfIslandBuilder.setNoIslandItem(MenuParserImpl.getInstance().getItemStack("top-islands.yml", itemsSection.getConfigurationSection("no-island")));
+                    selfIslandBuilder.setIslandItem(MenuParserImpl.getInstance().getItemStack("menus/top-islands.yml", itemsSection.getConfigurationSection("island")));
+                    selfIslandBuilder.setNoIslandItem(MenuParserImpl.getInstance().getItemStack("menus/top-islands.yml", itemsSection.getConfigurationSection("no-island")));
                     selfIslandBuilder.setIslandSound(MenuParserImpl.getInstance().getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")));
                     selfIslandBuilder.setNoIslandSound(MenuParserImpl.getInstance().getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")));
                     selfIslandBuilder.setIslandCommands(cfg.getStringList("commands." + slotsChar + ".island"));

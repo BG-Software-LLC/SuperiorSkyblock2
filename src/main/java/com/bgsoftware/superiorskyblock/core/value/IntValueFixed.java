@@ -2,20 +2,12 @@ package com.bgsoftware.superiorskyblock.core.value;
 
 public class IntValueFixed implements IntValue {
 
-    private static final IntValueFixed[] CACHE = new IntValueFixed[64];
+    private static final ValuesCache<IntValueFixed> CACHE = new ValuesCache<>(IntValueFixed::new);
 
     private final int value;
 
     public static IntValueFixed of(int value) {
-        if (value >= 0 && value < CACHE.length) {
-            IntValueFixed intValueFixed = CACHE[value];
-            if (intValueFixed == null)
-                intValueFixed = CACHE[value] = new IntValueFixed(value);
-
-            return intValueFixed;
-        }
-
-        return new IntValueFixed(value);
+        return CACHE.fetch(value);
     }
 
     private IntValueFixed(int value) {

@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
+import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
 import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
 import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookupFactory;
@@ -16,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.util.List;
 
 public class WorldGenerator {
 
@@ -54,20 +56,17 @@ public class WorldGenerator {
             return null;
         }
 
-        File[] generatorsFilesList = generatorFolder.listFiles();
-        if (generatorsFilesList == null || generatorsFilesList.length == 0) {
+        List<File> generatorsFiles = Files.listFolderFiles(generatorFolder, false, f -> f.getName().endsWith(".jar"));
+        if (generatorsFiles.isEmpty())
             return null;
-        }
 
         try (FilesLookup filesLookup = FilesLookupFactory.getInstance().lookupFolder(generatorFolder)) {
-            for (File file : generatorsFilesList) {
+            for (File file : generatorsFiles) {
                 String fileName = file.getName();
-                if (!fileName.endsWith(".jar"))
-                    continue;
-
                 file = filesLookup.getFile(fileName);
 
-                FileClassLoader classLoader = new FileClassLoader(file, plugin.getPluginClassLoader());
+                FileClassLoader classLoader = new FileClassLoader(file, plugin.getPluginClassLoader(),
+                        plugin.getNMSAlgorithms().getClassProcessor());
 
                 //noinspection deprecation
                 Class<?> generatorClass = JarFiles.getClass(file.toURL(), ChunkGenerator.class, classLoader).getLeft();

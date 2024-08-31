@@ -2,20 +2,12 @@ package com.bgsoftware.superiorskyblock.core.value;
 
 public class DoubleValueFixedSynced implements DoubleValue {
 
-    private static final DoubleValueFixedSynced[] CACHE = new DoubleValueFixedSynced[64];
+    private static final ValuesCache<DoubleValueFixedSynced> CACHE = new ValuesCache<>(DoubleValueFixedSynced::new);
 
     private final double value;
 
     public static DoubleValueFixedSynced of(double value) {
-        if (value >= 0 && value < CACHE.length && value == (int) value) {
-            DoubleValueFixedSynced intValueFixedSynced = CACHE[(int) value];
-            if (intValueFixedSynced == null)
-                intValueFixedSynced = CACHE[(int) value] = new DoubleValueFixedSynced(value);
-
-            return intValueFixedSynced;
-        }
-
-        return new DoubleValueFixedSynced(value);
+        return value == (int) value ? CACHE.fetch((int) value) : new DoubleValueFixedSynced(value);
     }
 
     private DoubleValueFixedSynced(double value) {

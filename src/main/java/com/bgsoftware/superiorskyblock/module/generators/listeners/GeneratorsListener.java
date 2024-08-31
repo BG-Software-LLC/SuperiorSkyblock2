@@ -80,6 +80,7 @@ public class GeneratorsListener implements Listener {
             return;
 
         Location blockLocation = block.getLocation();
+        World blockWorld = blockLocation.getWorld();
 
         Island island = plugin.getGrid().getIslandAt(blockLocation);
 
@@ -96,7 +97,10 @@ public class GeneratorsListener implements Listener {
 
         Dimension dimension = Dimensions.NORMAL;
         if (module.isMatchGeneratorWorld()) {
-            Dimension blockDimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(blockLocation.getWorld());
+            Dimension blockDimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(blockWorld);
+            if (blockDimension == null)
+                blockDimension = Dimensions.fromEnvironment(blockWorld.getEnvironment());
+
             if (blockDimension.getEnvironment() != World.Environment.NETHER || generatorType == GeneratorType.BASALT)
                 dimension = blockDimension;
         }

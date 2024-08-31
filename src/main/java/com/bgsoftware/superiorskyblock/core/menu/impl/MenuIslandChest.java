@@ -83,8 +83,8 @@ public class MenuIslandChest extends AbstractPagedMenu<MenuIslandChest.View, Isl
                 }
 
                 IslandChestPagedObjectButton.Builder buttonBuilder = new IslandChestPagedObjectButton.Builder();
-                buttonBuilder.setButtonItem(MenuParserImpl.getInstance().getItemStack("island-chest.yml", validPageSection));
-                buttonBuilder.setNullItem(MenuParserImpl.getInstance().getItemStack("island-chest.yml", invalidPageSection));
+                buttonBuilder.setButtonItem(MenuParserImpl.getInstance().getItemStack("menus/island-chest.yml", validPageSection));
+                buttonBuilder.setNullItem(MenuParserImpl.getInstance().getItemStack("menus/island-chest.yml", invalidPageSection));
 
                 patternBuilder.mapButtons(slots, buttonBuilder);
             }

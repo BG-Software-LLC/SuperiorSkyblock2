@@ -69,18 +69,15 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
                         // Load the world.
                         World world = plugin.getProviders().getWorldsProvider().getIslandsWorld(island, worldInfo.getDimension());
                         if (world != null)
-                            CACHED_CALCULATED_CHUNKS.write(cache ->
-                                    chunksToLoad.add(plugin.getNMSChunks().calculateChunks(worldChunks, cache)));
+                            chunksToLoad.add(plugin.getNMSChunks().calculateChunks(worldChunks, CACHED_CALCULATED_CHUNKS));
                     });
         } else {
             IslandUtils.getAllChunksAsync(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS,
                     ChunkLoadReason.BLOCKS_RECALCULATE, plugin.getProviders()::takeSnapshots).forEach(completableFuture -> {
                 CompletableFuture<List<CalculatedChunk>> calculateCompletable = new CompletableFuture<>();
                 completableFuture.whenComplete((chunk, ex) -> {
-                    CACHED_CALCULATED_CHUNKS.write(cache ->
-                            plugin.getNMSChunks().calculateChunks(Collections.singletonList(ChunkPosition.of(chunk)), cache)
-                                    .whenComplete((pair, ex2) -> calculateCompletable.complete(pair)));
-
+                    plugin.getNMSChunks().calculateChunks(Collections.singletonList(ChunkPosition.of(chunk)), CACHED_CALCULATED_CHUNKS)
+                            .whenComplete((pair, ex2) -> calculateCompletable.complete(pair));
                 });
                 chunksToLoad.add(calculateCompletable);
             });

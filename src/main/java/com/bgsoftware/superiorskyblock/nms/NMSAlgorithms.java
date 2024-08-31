@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.core.io.ClassProcessor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -74,5 +75,9 @@ public interface NMSAlgorithms {
     double getCurrentTps();
 
     int getDataVersion();
+
+    default ClassProcessor getClassProcessor() {
+        return null;
+    }
 
 }

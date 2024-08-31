@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.Either;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
+import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
 import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
 import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookupFactory;
@@ -24,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class ModulesManagerImpl extends Manager implements ModulesManager {
@@ -63,7 +65,8 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
         Preconditions.checkArgument(moduleFile.exists(), "The file " + moduleFile.getName() + " does not exist.");
         Preconditions.checkArgument(moduleFile.getName().endsWith(".jar"), "The file " + moduleFile.getName() + " is not a valid jar file.");
 
-        FileClassLoader moduleClassLoader = new FileClassLoader(moduleFile, plugin.getPluginClassLoader());
+        FileClassLoader moduleClassLoader = new FileClassLoader(moduleFile, plugin.getPluginClassLoader(),
+                plugin.getNMSAlgorithms().getClassProcessor());
 
         Either<Class<?>, Throwable> moduleClassLookup = JarFiles.getClass(moduleFile.toURL(), PluginModule.class, moduleClassLoader);
 
@@ -211,19 +214,17 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
     }
 
     private void registerExternalModules() {
-        File[] folderFiles = modulesFolder.listFiles();
+        List<File> folderFiles = Files.listFolderFiles(modulesFolder, false, file -> file.getName().endsWith(".jar"));
+        if (folderFiles.isEmpty())
+            return;
 
-        if (folderFiles != null && folderFiles.length > 0) {
-            try (FilesLookup filesLookup = FilesLookupFactory.getInstance().lookupFolder(this.modulesFolder)) {
-                for (File file : folderFiles) {
-                    String fileName = file.getName();
-                    if (!file.isDirectory() && fileName.endsWith(".jar")) {
-                        try {
-                            registerModule(filesLookup.getFile(fileName));
-                        } catch (Exception error) {
-                            Log.error(error, "An unexpected error occurred while registering module ", fileName, ":");
-                        }
-                    }
+        try (FilesLookup filesLookup = FilesLookupFactory.getInstance().lookupFolder(this.modulesFolder)) {
+            for (File file : folderFiles) {
+                String fileName = file.getName();
+                try {
+                    registerModule(filesLookup.getFile(fileName));
+                } catch (Exception error) {
+                    Log.error(error, "An unexpected error occurred while registering module ", fileName, ":");
                 }
             }
         }

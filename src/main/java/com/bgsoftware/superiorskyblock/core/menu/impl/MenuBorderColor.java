@@ -57,8 +57,10 @@ public class MenuBorderColor extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
 
                 patternBuilder.setButtons(menuPatternSlots.getSlots(itemsSectionName),
                         new BorderColorToggleButton.Builder()
-                                .setEnabledItem(MenuParserImpl.getInstance().getItemStack("border-color.yml", itemsSection.getConfigurationSection("disable-border")))
-                                .setDisabledItem(MenuParserImpl.getInstance().getItemStack("border-color.yml", itemsSection.getConfigurationSection("enable-border")))
+                                .setEnabledItem(MenuParserImpl.getInstance().getItemStack("menus/border-color.yml",
+                                        itemsSection.getConfigurationSection("disable-border")))
+                                .setDisabledItem(MenuParserImpl.getInstance().getItemStack("menus/border-color.yml",
+                                        itemsSection.getConfigurationSection("enable-border")))
                                 .build());
             }
         }
