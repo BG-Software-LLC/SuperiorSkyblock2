@@ -105,9 +105,11 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         InteractionResult interactionResult = handleInteractionInternal(superiorPlayer, blockLocation, island, islandPrivilege, 0, true, true);
 
-        if (interactionResult != InteractionResult.SUCCESS) return interactionResult;
+        if (interactionResult != InteractionResult.SUCCESS)
+            return interactionResult;
 
-        if (island == null) return InteractionResult.SUCCESS;
+        if (island == null)
+            return InteractionResult.SUCCESS;
 
         if (plugin.getSettings().getValuableBlocks().contains(Keys.of(block)))
             return handleInteractionInternal(superiorPlayer, blockLocation, island, IslandPrivileges.VALUABLE_BREAK, 0, false, false);
@@ -132,15 +134,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             return InteractionResult.SUCCESS;
 
         Island island = plugin.getGrid().getIslandAt(blockLocation);
-
-        InteractionResult interactionResult = handleInteractionInternal(superiorPlayer, blockLocation, island,
-                null, 0, true, false);
-
-        if (interactionResult != InteractionResult.SUCCESS)
-            return interactionResult;
-
-        if (island == null)
-            return InteractionResult.SUCCESS;
 
         BlockState blockState = block.getState();
         EntityType spawnType = usedItem == null ? EntityType.UNKNOWN : BukkitItems.getEntityType(usedItem);
@@ -175,7 +168,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             islandPrivilege = IslandPrivileges.INTERACT;
         }
 
-        return handleInteractionInternal(superiorPlayer, blockLocation, island, islandPrivilege, 0, false, false);
+        return handleInteractionInternal(superiorPlayer, blockLocation, island, islandPrivilege, 0, true, true);
     }
 
     @Override
@@ -196,12 +189,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         Location entityLocation = entity.getLocation();
         Island island = plugin.getGrid().getIslandAt(entityLocation);
-
-        InteractionResult interactionResult = handleInteractionInternal(superiorPlayer, entityLocation, island, null, 0, true, false);
-
-        if (interactionResult != InteractionResult.SUCCESS) return interactionResult;
-
-        if (island == null) return InteractionResult.SUCCESS;
 
         boolean closeInventory = false;
 
@@ -233,7 +220,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             return InteractionResult.SUCCESS;
         }
 
-        interactionResult = handleInteractionInternal(superiorPlayer, entityLocation, island, islandPrivilege, 0, false, false);
+        InteractionResult interactionResult = handleInteractionInternal(superiorPlayer, entityLocation, island, islandPrivilege, 0, true, true);
 
         if (closeInventory && interactionResult != InteractionResult.SUCCESS) {
             BukkitExecutor.sync(() -> {
@@ -256,7 +243,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         Optional<SuperiorPlayer> damagerSource = BukkitEntities.getPlayerSource(damager).map(plugin.getPlayers()::getSuperiorPlayer);
 
-        if (!damagerSource.isPresent()) return InteractionResult.SUCCESS;
+        if (!damagerSource.isPresent())
+            return InteractionResult.SUCCESS;
 
         Location entityLocation = entity.getLocation();
         Island island = plugin.getGrid().getIslandAt(entityLocation);
@@ -297,7 +285,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(item, "item cannot be null");
 
-        if (plugin.getNMSPlayers().wasThrownByPlayer(item, superiorPlayer)) return InteractionResult.SUCCESS;
+        if (plugin.getNMSPlayers().wasThrownByPlayer(item, superiorPlayer))
+            return InteractionResult.SUCCESS;
 
         Location itemLocation = item.getLocation();
         Island island = plugin.getGrid().getIslandAt(itemLocation);
@@ -353,12 +342,12 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     }
 
     private InteractionResult handleInteractionInternal(SuperiorPlayer superiorPlayer, Location location,
-                                                        @Nullable Island island, @Nullable IslandPrivilege islandPrivilege,
+                                                        @Nullable Island island, IslandPrivilege islandPrivilege,
                                                         int extraRadius, boolean checkIslandBoundaries, boolean checkRecalculation) {
         if (superiorPlayer.hasBypassModeEnabled())
             return InteractionResult.SUCCESS;
 
-        if (checkIslandBoundaries && islandPrivilege != null && !plugin.getSettings().getWorldPermissions().contains(islandPrivilege.getName())) {
+        if (checkIslandBoundaries && !plugin.getSettings().getWorldPermissions().contains(islandPrivilege.getName())) {
             if (island == null && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld()))
                 return InteractionResult.OUTSIDE_ISLAND;
 
@@ -367,7 +356,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         }
 
         if (island != null) {
-            if (islandPrivilege != null && !island.hasPermission(superiorPlayer, islandPrivilege))
+            if (!island.hasPermission(superiorPlayer, islandPrivilege))
                 return InteractionResult.MISSING_PRIVILEGE;
 
             if (checkRecalculation && island.isBeingRecalculated())
@@ -404,13 +393,15 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             Island toIsland = plugin.getGrid().getIslandAt(to);
             if (toIsland != null) {
                 moveResult = handlePlayerEnterIslandInternal(superiorPlayer, toIsland, from, to, IslandEnterEvent.EnterCause.PLAYER_MOVE);
-                if (moveResult != MoveResult.SUCCESS) return moveResult;
+                if (moveResult != MoveResult.SUCCESS)
+                    return moveResult;
             }
 
             Island fromIsland = plugin.getGrid().getIslandAt(from);
             if (fromIsland != null) {
                 moveResult = handlePlayerLeaveIslandInternal(superiorPlayer, fromIsland, from, to, IslandLeaveEvent.LeaveCause.PLAYER_MOVE);
-                if (moveResult != MoveResult.SUCCESS) return moveResult;
+                if (moveResult != MoveResult.SUCCESS)
+                    return moveResult;
             }
         }
 
@@ -502,7 +493,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
 
         Island island = plugin.getGrid().getIslandAt(location);
-        if (island == null) return MoveResult.SUCCESS;
+        if (island == null)
+            return MoveResult.SUCCESS;
 
         island.setPlayerInside(superiorPlayer, false);
         return handlePlayerLeaveIslandInternal(superiorPlayer, island, location, null, IslandLeaveEvent.LeaveCause.PLAYER_QUIT);
@@ -635,7 +627,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             }
         }
 
-        if (equalIslands) return MoveResult.SUCCESS;
+        if (equalIslands)
+            return MoveResult.SUCCESS;
 
         if (!plugin.getEventsBus().callIslandLeaveEvent(superiorPlayer, fromIsland, leaveCause, to)) {
             plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_EVENT_CANCELLED);
