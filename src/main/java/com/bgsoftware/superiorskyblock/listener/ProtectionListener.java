@@ -27,6 +27,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
@@ -40,6 +41,7 @@ import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -70,6 +72,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Iterator;
+
 public class ProtectionListener implements Listener {
 
     private static final ReflectMethod<Entity> PROJECTILE_HIT_TARGET_ENTITY = new ReflectMethod<>(
@@ -82,6 +86,10 @@ public class ProtectionListener implements Listener {
     private static final Material CHORUS_FRUIT = EnumHelper.getEnum(Material.class, "CHORUS_FRUIT");
     @Nullable
     private static final Material BRUSH = EnumHelper.getEnum(Material.class, "BRUSH");
+    @Nullable
+    private static final EntityType WIND_CHARGE = EnumHelper.getEnum(EntityType.class, "WIND_CHARGE");
+    @Nullable
+    private static final Material POINTED_DRIPSTONE = EnumHelper.getEnum(Material.class, "POINTED_DRIPSTONE");
 
     private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
@@ -502,6 +510,29 @@ public class ProtectionListener implements Listener {
                 }
             }
         });
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    private void onWindChargeExplodeEvent(EntityExplodeEvent e) {
+        if (e.getEntityType() != WIND_CHARGE)
+            return;
+
+        BukkitEntities.getPlayerSource(e.getEntity()).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(shooterPlayer -> {
+            Iterator<Block> blocksIterator = e.blockList().iterator();
+            while (blocksIterator.hasNext()) {
+                Block block = blocksIterator.next();
+                Material blockType = block.getType();
+
+                IslandPrivilege islandPrivilege = blockType == CHORUS_FLOWER || blockType == POINTED_DRIPSTONE ?
+                        IslandPrivileges.BREAK : IslandPrivileges.INTERACT;
+
+                InteractionResult interactionResult = this.protectionManager.get().handleCustomInteraction(shooterPlayer,
+                        block.getLocation(), islandPrivilege);
+                if (ProtectionHelper.shouldPreventInteraction(interactionResult, shooterPlayer, true))
+                    blocksIterator.remove();
+            }
+        });
+
     }
 
     private void registerPlayerArrowPickupListener() {
