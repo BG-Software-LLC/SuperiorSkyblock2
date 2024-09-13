@@ -76,7 +76,9 @@ public class IslandFlagsListener implements Listener {
             case "VILLAGE_INVASION":
             case "VILLAGE_DEFENSE":
             case "PATROL":
-            case "BEEHIVE": {
+            case "BEEHIVE":
+            case "LIGHTNING":
+            case "DEFAULT": {
                 switch (BukkitEntities.getCategory(entityType)) {
                     case ANIMAL:
                         actionFlag = IslandFlags.NATURAL_ANIMALS_SPAWN;
