@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
@@ -14,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.formatting.impl.ChatFormatter;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -21,12 +23,12 @@ import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
 import com.bgsoftware.superiorskyblock.island.notifications.IslandNotifications;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -67,6 +69,7 @@ public class PlayersListener implements Listener {
 
     public PlayersListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+        registerChatListener();
     }
 
     /* PLAYER NOTIFIERS */
@@ -341,37 +344,35 @@ public class PlayersListener implements Listener {
 
     /* CHAT */
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    private void onPlayerAsyncChatLowest(AsyncPlayerChatEvent e) {
-        // PlayerChat should be on LOWEST priority so other chat plugins don't conflict.
-        PlayerChat playerChat = PlayerChat.getChatListener(e.getPlayer());
-        if (playerChat != null && playerChat.supply(e.getMessage())) {
-            e.setCancelled(true);
-        }
+    private boolean checkPlayerChatListener(Player player, String message) {
+        PlayerChat playerChat = PlayerChat.getChatListener(player);
+        return playerChat != null && playerChat.supply(message);
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    private void onPlayerAsyncChat(AsyncPlayerChatEvent e) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+    @Nullable
+    private ChatEventResult handlePlayerChat(Player player, String message, String format) {
+        ChatEventResult chatEventResult = new ChatEventResult();
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
         Island island = superiorPlayer.getIsland();
 
         if (superiorPlayer.hasTeamChatEnabled()) {
             if (island == null) {
                 if (!plugin.getEventsBus().callPlayerToggleTeamChatEvent(superiorPlayer))
-                    return;
+                    return null;
 
                 superiorPlayer.toggleTeamChat();
-                return;
+                return null;
             }
 
-            e.setCancelled(true);
+            chatEventResult.cancelled = true;
 
             EventResult<String> eventResult = plugin.getEventsBus().callIslandChatEvent(island, superiorPlayer,
                     superiorPlayer.hasPermissionWithoutOP("superior.chat.color") ?
-                            Formatters.COLOR_FORMATTER.format(e.getMessage()) : e.getMessage());
+                            Formatters.COLOR_FORMATTER.format(message) : message);
 
             if (eventResult.isCancelled())
-                return;
+                return chatEventResult;
 
             IslandUtils.sendMessage(island, Message.TEAM_CHAT_FORMAT, Collections.emptyList(),
                     superiorPlayer.getPlayerRole(), superiorPlayer.getName(), eventResult.getResult());
@@ -384,26 +385,11 @@ public class PlayersListener implements Listener {
                     Message.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole().getDisplayName(),
                             superiorPlayer.getName(), eventResult.getResult());
             }
-        } else {
-            String islandNameFormat = Message.NAME_CHAT_FORMAT.getMessage(PlayerLocales.getDefaultLocale(),
-                    island == null ? "" : plugin.getSettings().getIslandNames().isColorSupport() ?
-                            Formatters.COLOR_FORMATTER.format(island.getName()) : island.getName());
-
-            e.setFormat(e.getFormat()
-                    .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevel()))
-                    .replace("{island-level-format}", String.valueOf(island == null ? 0 :
-                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandLevel(), superiorPlayer.getUserLocale())))
-                    .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorth()))
-                    .replace("{island-worth-format}", String.valueOf(island == null ? 0 :
-                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getWorth(), superiorPlayer.getUserLocale())))
-                    .replace("{island-name}", islandNameFormat == null ? "" : islandNameFormat)
-                    .replace("{island-role}", superiorPlayer.getPlayerRole().getDisplayName())
-                    .replace("{island-position-worth}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_WORTH) + 1) + "")
-                    .replace("{island-position-level}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_LEVEL) + 1) + "")
-                    .replace("{island-position-rating}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_RATING) + 1) + "")
-                    .replace("{island-position-players}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_PLAYERS) + 1) + "")
-            );
+        } else if (format != null) {
+            chatEventResult.format = Formatters.CHAT_FORMATTER.format(new ChatFormatter.ChatFormatArgs(format, superiorPlayer, island));
         }
+
+        return chatEventResult;
     }
 
     /* SCHEMATICS */
@@ -475,6 +461,73 @@ public class PlayersListener implements Listener {
                 return;
             }
         }
+
+    }
+
+    private void registerChatListener() {
+        try {
+            Class.forName("io.papermc.paper.event.player.AsyncChatEvent");
+            Bukkit.getPluginManager().registerEvents(new PaperChatListener(), plugin);
+        } catch (Exception ignored) {
+            Bukkit.getPluginManager().registerEvents(new SpigotChatListener(), plugin);
+        }
+    }
+
+    private class PaperChatListener implements Listener {
+
+        @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+        private void onPlayerAsyncChatLowest(io.papermc.paper.event.player.AsyncChatEvent e) {
+            // PlayerChat should be on LOWEST priority so other chat plugins don't conflict.
+            String message = LegacyComponentSerializer.legacyAmpersand().serialize(e.message());
+
+            if (checkPlayerChatListener(e.getPlayer(), message))
+                e.setCancelled(true);
+        }
+
+        @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+        private void onPlayerAsyncChat(io.papermc.paper.event.player.AsyncChatEvent e) {
+            String message = LegacyComponentSerializer.legacyAmpersand().serialize(e.message());
+            ChatEventResult eventResult = handlePlayerChat(e.getPlayer(), message, null);
+            if (eventResult == null)
+                return;
+
+            if (eventResult.cancelled)
+                e.setCancelled(true);
+
+            // Instead of the old AsyncPlayerChatEvent#setFormat method
+            plugin.getNMSAlgorithms().handlePaperChatRenderer(e);
+        }
+
+    }
+
+    private class SpigotChatListener implements Listener {
+
+        @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+        private void onPlayerAsyncChatLowest(AsyncPlayerChatEvent e) {
+            // PlayerChat should be on LOWEST priority so other chat plugins don't conflict.
+            if (checkPlayerChatListener(e.getPlayer(), e.getMessage()))
+                e.setCancelled(true);
+        }
+
+        @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+        private void onPlayerAsyncChat(AsyncPlayerChatEvent e) {
+            ChatEventResult eventResult = handlePlayerChat(e.getPlayer(), e.getMessage(), e.getFormat());
+            if (eventResult == null)
+                return;
+
+            if (eventResult.cancelled)
+                e.setCancelled(true);
+
+            if (eventResult.format != null)
+                e.setFormat(eventResult.format);
+        }
+
+    }
+
+    private static class ChatEventResult {
+
+        private boolean cancelled = false;
+        private String format = null;
 
     }
 

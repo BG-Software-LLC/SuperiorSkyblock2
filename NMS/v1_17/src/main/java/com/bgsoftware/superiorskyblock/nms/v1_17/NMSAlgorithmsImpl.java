@@ -1,7 +1,11 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.formatting.impl.ChatFormatter;
 import com.bgsoftware.superiorskyblock.core.io.ClassProcessor;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.algorithms.PaperGlowEnchantment;
@@ -11,6 +15,9 @@ import com.bgsoftware.superiorskyblock.nms.v1_17.menu.MenuDispenserBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_17.menu.MenuFurnaceBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_17.menu.MenuHopperBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_17.world.KeyBlocksCache;
+import io.papermc.paper.chat.ChatRenderer;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
@@ -186,6 +193,24 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public ClassProcessor getClassProcessor() {
         return CLASS_PROCESSOR;
+    }
+
+    @Override
+    public void handlePaperChatRenderer(Object event) {
+        if (!(event instanceof AsyncChatEvent))
+            return;
+
+        ChatRenderer originalRenderer = ((AsyncChatEvent) event).renderer();
+        ((AsyncChatEvent) event).renderer((source, sourceDisplayName, message, viewer) -> {
+            String originalFormat = LegacyComponentSerializer.legacyAmpersand().serialize(
+                    originalRenderer.render(source, sourceDisplayName, message, viewer));
+
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(source);
+            Island island = superiorPlayer.getIsland();
+
+            return LegacyComponentSerializer.legacyAmpersand().deserialize(
+                    Formatters.CHAT_FORMATTER.format(new ChatFormatter.ChatFormatArgs(originalFormat, superiorPlayer, island)));
+        });
     }
 
     private interface MenuCreator extends BiFunction<InventoryHolder, String, Container> {

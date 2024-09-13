@@ -80,4 +80,8 @@ public interface NMSAlgorithms {
         return null;
     }
 
+    default void handlePaperChatRenderer(Object event) {
+        throw new UnsupportedOperationException();
+    }
+
 }

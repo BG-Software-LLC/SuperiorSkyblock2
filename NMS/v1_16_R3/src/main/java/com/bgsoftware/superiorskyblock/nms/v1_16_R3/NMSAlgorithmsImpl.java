@@ -1,7 +1,11 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.formatting.impl.ChatFormatter;
 import com.bgsoftware.superiorskyblock.core.io.ClassProcessor;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.algorithms.PaperGlowEnchantment;
@@ -11,6 +15,9 @@ import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityDispenser
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityFurnace;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityHopper;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.KeyBlocksCache;
+import io.papermc.paper.chat.ChatComposer;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.EntityFallingBlock;
@@ -174,6 +181,24 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public ClassProcessor getClassProcessor() {
         return CLASS_PROCESSOR;
+    }
+
+    @Override
+    public void handlePaperChatRenderer(Object event) {
+        if (!(event instanceof AsyncChatEvent))
+            return;
+
+        ChatComposer originalComposer = ((AsyncChatEvent) event).composer();
+        ((AsyncChatEvent) event).composer((source, sourceDisplayName, message) -> {
+            String originalFormat = LegacyComponentSerializer.legacyAmpersand().serialize(
+                    originalComposer.composeChat(source, sourceDisplayName, message));
+
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(source);
+            Island island = superiorPlayer.getIsland();
+
+            return LegacyComponentSerializer.legacyAmpersand().deserialize(
+                    Formatters.CHAT_FORMATTER.format(new ChatFormatter.ChatFormatArgs(originalFormat, superiorPlayer, island)));
+        });
     }
 
     @Override

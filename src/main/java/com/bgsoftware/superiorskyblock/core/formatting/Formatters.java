@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.BooleanFormatter;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.BorderColorFormatter;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.CapitalizedFormatter;
+import com.bgsoftware.superiorskyblock.core.formatting.impl.ChatFormatter;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.ColorFormatter;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.CommaFormatter;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.DateFormatter;
@@ -38,6 +39,7 @@ public class Formatters {
     public static final ILocaleFormatter<Number> RATING_FORMATTER = RatingFormatter.getInstance();
     public static final IFormatter<String> STRIP_COLOR_FORMATTER = StripColorFormatter.getInstance();
     public static final ILocaleFormatter<Duration> TIME_FORMATTER = TimeFormatter.getInstance();
+    public static final IFormatter<ChatFormatter.ChatFormatArgs> CHAT_FORMATTER = ChatFormatter.getInstance();
 
     private Formatters() {
 
