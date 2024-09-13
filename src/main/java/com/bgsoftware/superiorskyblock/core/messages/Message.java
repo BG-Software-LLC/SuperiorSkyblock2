@@ -31,7 +31,6 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -72,7 +71,7 @@ public enum Message {
     BORDER_PLAYER_COLOR_NAME_GREEN,
     BORDER_PLAYER_COLOR_NAME_RED,
     BORDER_PLAYER_COLOR_UPDATED,
-    BUILD_OUTSIDE_ISLAND,
+    BUILD_OUTSIDE_ISLAND(3, TimeUnit.SECONDS),
     CANNOT_SET_ROLE,
     CHANGED_BANK_LIMIT,
     CHANGED_BANK_LIMIT_ALL,
