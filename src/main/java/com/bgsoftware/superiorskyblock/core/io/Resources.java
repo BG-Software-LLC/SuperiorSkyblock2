@@ -62,15 +62,21 @@ public class Resources {
     }
 
     public static InputStream getResource(String resourcePath) {
+        String[] suffixAndPath = getPathAndSuffix(resourcePath);
+        String resourcePathNoSuffix = suffixAndPath[0];
+        String suffix = suffixAndPath[1];
+
         try {
             for (ServerVersion serverVersion : ServerVersion.getByOrder()) {
                 String version = serverVersion.name().substring(1);
-                if (resourcePath.endsWith(".yml") && plugin.getResource(resourcePath.replace(".yml", version + ".yml")) != null) {
-                    resourcePath = resourcePath.replace(".yml", version + ".yml");
-                    break;
-                } else if (resourcePath.endsWith(".schematic") && plugin.getResource(resourcePath.replace(".schematic", version + ".schematic")) != null) {
-                    resourcePath = resourcePath.replace(".schematic", version + ".schematic");
-                    break;
+
+                String realPath = resourcePathNoSuffix + version + suffix;
+
+                try (InputStream resource = plugin.getResource(realPath)) {
+                    if (resource != null) {
+                        resourcePath = realPath;
+                        break;
+                    }
                 }
             }
 
@@ -80,6 +86,12 @@ public class Resources {
             Log.error(error, "An unexpected error occurred while retrieving resource:");
             return null;
         }
+    }
+
+    private static String[] getPathAndSuffix(String name) {
+        int lastIndex = name.lastIndexOf('.');
+        String suffix = lastIndex == -1 || lastIndex + 1 >= name.length() ? "" : name.substring(lastIndex + 1);
+        return suffix.isEmpty() ? new String[]{name, ""} : new String[]{name.substring(0, name.length() - suffix.length()), suffix};
     }
 
 }

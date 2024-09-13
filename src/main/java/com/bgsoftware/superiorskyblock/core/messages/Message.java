@@ -902,10 +902,9 @@ public enum Message {
                 PlayerLocales.setDefaultLocale(fileLocale);
 
             CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(langFile);
-            InputStream inputStream = plugin.getResource("lang/" + langFile.getName());
 
-            try {
-                cfg.syncWithConfig(langFile, inputStream == null ? plugin.getResource("lang/en-US.yml") : inputStream, "lang/en-US.yml");
+            try (InputStream langResourceStream = plugin.getResource("lang/" + langFile.getName())) {
+                cfg.syncWithConfig(langFile, langResourceStream == null ? plugin.getResource("lang/en-US.yml") : langResourceStream, "lang/en-US.yml");
             } catch (Exception error) {
                 Log.error(error, "An unexpected error occurred while saving lang file ", langFile.getName(), ":");
             }
