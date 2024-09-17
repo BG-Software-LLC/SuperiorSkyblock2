@@ -20,7 +20,10 @@ public class StatsClient {
     private static StatsClient INSTANCE;
 
     static {
+        STATS_COLLECTORS.add(StatsIslandsCounter.INSTANCE);
+        STATS_COLLECTORS.add(StatsPlayersCounter.INSTANCE);
         STATS_COLLECTORS.add(StatsProfilers.INSTANCE);
+        STATS_COLLECTORS.add(StatsSchematicsSizes.INSTANCE);
     }
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder()
