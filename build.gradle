@@ -29,6 +29,10 @@ allprojects {
         maven { url 'https://repo.bg-software.com/repository/api/' }
         maven { url 'https://repo.bg-software.com/repository/common/' }
         maven { url 'https://repo.bg-software.com/repository/dependencies/' }
+        repositories {
+            mavenCentral()
+            maven { url 'https://jitpack.io' }
+        }
     }
 
     dependencies {
@@ -81,6 +85,7 @@ dependencies {
     // Spigot jars
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
+    compileOnly 'com.github.Maxlego08:zMenu-API:303d4e9178'
 }
 
 jar {

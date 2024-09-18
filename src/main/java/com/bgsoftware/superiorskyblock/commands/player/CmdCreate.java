@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.zmenu.ZMenuManager;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
 import org.bukkit.command.CommandSender;
 
@@ -82,7 +83,7 @@ public class CmdCreate implements ISuperiorCommand {
             return;
         }
 
-        String islandName = "";
+        String islandName;
         String schematicName = null;
 
         if (plugin.getSettings().getIslandNames().isRequiredForCreation()) {
@@ -90,7 +91,11 @@ public class CmdCreate implements ISuperiorCommand {
                 islandName = args[1];
                 if (!IslandNames.isValidName(sender, null, islandName))
                     return;
+            } else {
+                islandName = "";
             }
+        } else {
+            islandName = "";
         }
 
         if (plugin.getSettings().isSchematicNameArgument() &&
@@ -104,7 +109,11 @@ public class CmdCreate implements ISuperiorCommand {
         }
 
         if (schematicName == null) {
-            Menus.MENU_ISLAND_CREATION.openMenu(superiorPlayer, superiorPlayer.getOpenedView(), islandName);
+            // zMenu Start
+            // Menus.MENU_ISLAND_CREATION.openMenu(superiorPlayer, superiorPlayer.getOpenedView(), islandName);
+            ZMenuManager zMenuManager = plugin.getZMenumanager();
+            zMenuManager.openInventory(superiorPlayer, "island-creation", cache -> cache.setIslandName(islandName));
+            // zMenu End
         } else {
             Menus.MENU_ISLAND_CREATION.simulateClick(superiorPlayer, islandName, schematicName, false, superiorPlayer.getOpenedView());
         }

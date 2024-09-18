@@ -39,6 +39,7 @@ import com.bgsoftware.superiorskyblock.core.task.ShutdownTask;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
 import com.bgsoftware.superiorskyblock.core.values.container.BlockValuesContainer;
+import com.bgsoftware.superiorskyblock.core.zmenu.ZMenuManager;
 import com.bgsoftware.superiorskyblock.external.ProvidersManagerImpl;
 import com.bgsoftware.superiorskyblock.island.GridManagerImpl;
 import com.bgsoftware.superiorskyblock.island.container.DefaultIslandsContainer;
@@ -83,8 +84,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.lang.reflect.Constructor;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -129,6 +128,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     private NMSPlayers nmsPlayers;
     private NMSTags nmsTags;
     private NMSWorld nmsWorld;
+    private ZMenuManager zMenuManager;
 
     private PluginLoadingStage loadingStage = PluginLoadingStage.START;
 
@@ -309,6 +309,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                         island.setPlayerInside(superiorPlayer, true);
                 }
             }, 1L);
+
+            this.zMenuManager = new ZMenuManager(this);
+            this.zMenuManager.registerButtons();
+            this.zMenuManager.loadInventories();
 
             eventsBus.callPluginInitializedEvent(this);
 
@@ -635,4 +639,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         return islandsPerSide * islandsPerSide;
     }
 
+    public ZMenuManager getZMenumanager() {
+        return zMenuManager;
+    }
 }
