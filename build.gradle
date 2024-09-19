@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'SuperiorSkyblock'
-version = "2024.3"
+version = "2024.3-zMenu"
 
 project.ext {
     archiveFolder = file("archive/")

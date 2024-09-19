@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.zmenu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandBiomeLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandCreationLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandSettingsLoader;
 import fr.maxlego08.menu.api.ButtonManager;
@@ -57,6 +58,7 @@ public class ZMenuManager implements Listener {
 
         this.buttonManager.register(new IslandCreationLoader(this.plugin));
         this.buttonManager.register(new IslandSettingsLoader(this.plugin));
+        this.buttonManager.register(new IslandBiomeLoader(this.plugin));
     }
 
     public void loadInventories() {
@@ -67,7 +69,7 @@ public class ZMenuManager implements Listener {
 
         }
         // Save inventories files
-        List<String> strings = Arrays.asList("island-creation", "settings");
+        List<String> strings = Arrays.asList("island-creation", "settings", "biomes");
         strings.forEach(inventoryName -> {
             if (!new File(plugin.getDataFolder(), "inventories/" + inventoryName + ".yml").exists()) {
                 this.plugin.saveResource("inventories/" + inventoryName + ".yml", false);
