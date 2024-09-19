@@ -248,6 +248,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             modulesHandler.runModuleLifecycle(ModuleLoadTime.NORMAL, false);
 
+            this.zMenuManager = new ZMenuManager(this);
+            this.zMenuManager.registerButtons();
+
             try {
                 reloadPlugin(PluginReloadReason.STARTUP);
             } catch (ManagerLoadException error) {
@@ -309,10 +312,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                         island.setPlayerInside(superiorPlayer, true);
                 }
             }, 1L);
-
-            this.zMenuManager = new ZMenuManager(this);
-            this.zMenuManager.registerButtons();
-            this.zMenuManager.loadInventories();
 
             eventsBus.callPluginInitializedEvent(this);
 
@@ -492,6 +491,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         CalcTask.startTask();
 
         modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_HANDLERS_LOADING, reloadReason == PluginReloadReason.COMMAND);
+
+        // zMenu Start
+        this.zMenuManager.loadInventories();
+        // zMenu End
 
         if (reloadReason == PluginReloadReason.STARTUP) {
             modulesHandler.loadModulesData(this);

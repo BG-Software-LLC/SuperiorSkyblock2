@@ -1,0 +1,342 @@
+name: '&8Island Settings'
+size: 45
+
+items:
+  decoration:
+    isPermanent: true
+    item:
+      material: CYAN_STAINED_GLASS_PANE
+      name: '&f'
+    slots:
+      - 0-9
+      - 17-18
+      - 26-27
+      - 35-44
+  next:
+    type: NEXT
+    slot: 42
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fNext Page'
+  previous:
+    type: PREVIOUS
+    slot: 38
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fPrevious Page'
+  settings:
+    type: SUPERIORSKYBLOCK_SETTINGS
+    slots:
+      - 10-16
+      - 19-25
+      - 28-34
+    settings:
+      always_day:
+        settings-enabled:
+          material: YELLOW_TERRACOTTA
+          name: '&6Always Day'
+          lore:
+            - '&7Set a day time on your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: YELLOW_TERRACOTTA
+          name: '&6Always Day'
+          lore:
+            - '&7Set a day time on your island.'
+            - '&7Currently &cDISABLED&7.'
+
+      always_middle_day:
+        settings-enabled:
+          material: ORANGE_TERRACOTTA
+          name: '&6Always Middle Day'
+          lore:
+            - '&7Set a middle day time on your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: ORANGE_TERRACOTTA
+          name: '&6Always Middle Day'
+          lore:
+            - '&7Set a middle day time on your island.'
+            - '&7Currently &cDISABLED&7.'
+
+      always_night:
+        settings-enabled:
+          material: LIGHT_BLUE_TERRACOTTA
+          name: '&6Always Night'
+          lore:
+            - '&7Set a night time on your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: LIGHT_BLUE_TERRACOTTA
+          name: '&6Always Night'
+          lore:
+            - '&7Set a night time on your island.'
+            - '&7Currently &cDISABLED&7.'
+
+      always_middle_night:
+        settings-enabled:
+          material: BLUE_TERRACOTTA
+          name: '&6Always Middle Night'
+          lore:
+            - '&7Set a middle night day time on your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: BLUE_TERRACOTTA
+          name: '&6Always Middle Night'
+          lore:
+            - '&7Set a middle night day time on your island.'
+            - '&7Currently &cDISABLED&7.'
+
+      always_rain:
+        settings-enabled:
+          material: LILY_PAD
+          name: '&6Always Rain'
+          lore:
+            - '&7Set a rainy weather on your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: LILY_PAD
+          name: '&6Always Rain'
+          lore:
+            - '&7Set a rainy weather on your island.'
+            - '&7Currently &cDISABLED&7.'
+
+      always_shiny:
+        settings-enabled:
+          material: DEAD_BUSH
+          name: '&6Always Shiny'
+          lore:
+            - '&7Set a shiny weather on your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: DEAD_BUSH
+          name: '&6Always Shiny'
+          lore:
+            - '&7Set a shiny weather on your island.'
+            - '&7Currently &cDISABLED&7.'
+
+      creeper_explosion:
+        settings-enabled:
+          material: CREEPER_HEAD
+          name: '&6Creeper Explosion'
+          lore:
+            - '&7Allow creepers to explode blocks inside your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: CREEPER_HEAD
+          name: '&6Creeper Explosion'
+          lore:
+            - '&7Allow creepers to explode blocks inside your island.'
+            - '&7Currently &cDISABLED&7.'
+
+      crops_growth:
+        settings-enabled:
+          material: WHEAT_SEEDS
+          name: '&6Crops Growth'
+          lore:
+            - '&7Allow growth of crops inside your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: WHEAT_SEEDS
+          name: '&6Crops Growth'
+          lore:
+            - '&7Allow growth of crops inside your island.'
+            - '&7Currently &cDISABLED&7.'
+
+      egg_lay:
+        settings-enabled:
+          material: EGG
+          name: '&6Egg Lay'
+          lore:
+            - '&7Allow chickens to lay eggs inside your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: EGG
+          name: '&6Egg Lay'
+          lore:
+            - '&7Allow chickens to lay eggs inside your island.'
+            - '&7Currently &cDISABLED&7.'
+
+      enderman_grief:
+        settings-enabled:
+          material: ENDER_PEARL
+          name: '&6Enderman Grief'
+          lore:
+            - '&7Allow enderman to grief blocks inside your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: ENDER_PEARL
+          name: '&6Enderman Grief'
+          lore:
+            - '&7Allow enderman to grief blocks inside your island.'
+            - '&7Currently &cDISABLED&7.'
+
+      fire_spread:
+        settings-enabled:
+          material: FLINT_AND_STEEL
+          name: '&6Fire Spread'
+          lore:
+            - '&7Allow fire to spread inside your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: FLINT_AND_STEEL
+          name: '&6Fire Spread'
+          lore:
+            - '&7Allow fire to spread inside your island.'
+            - '&7Currently &cDISABLED&7.'
+
+      ghast_fireball:
+        settings-enabled:
+          material: FIRE_CHARGE
+          name: '&6Ghast Fireball'
+          lore:
+            - '&7Allow fireballs to break blocks inside your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: FIRE_CHARGE
+          name: '&6Ghast Fireball'
+          lore:
+            - '&7Allow fireballs to break blocks inside your island.'
+            - '&7Currently &cDISABLED&7.'
+
+      lava_flow:
+        settings-enabled:
+          material: LAVA_BUCKET
+          name: '&6Lava Flow'
+          lore:
+            - '&7Allow lava to flow inside your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: LAVA_BUCKET
+          name: '&6Lava Flow'
+          lore:
+            - '&7Allow lava to flow inside your island.'
+            - '&7Currently &cDISABLED&7.'
+
+      natural_animals_spawn:
+        settings-enabled:
+          material: PIG_SPAWN_EGG
+          name: '&6Natural Animals Spawn'
+          lore:
+            - '&7Allow natural spawning of animals inside the island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: PIG_SPAWN_EGG
+          name: '&6Natural Animals Spawn'
+          lore:
+            - '&7Allow natural spawning of animals inside the island.'
+            - '&7Currently &cDISABLED&7.'
+
+      natural_monster_spawn:
+        settings-enabled:
+          material: ZOMBIE_SPAWN_EGG
+          name: '&6Natural Monster Spawn'
+          lore:
+            - '&7Allow natural spawning of monsters inside the island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: ZOMBIE_SPAWN_EGG
+          name: '&6Natural Monster Spawn'
+          lore:
+            - '&7Allow natural spawning of monsters inside the island.'
+            - '&7Currently &cDISABLED&7.'
+
+      pvp:
+        settings-enabled:
+          material: DIAMOND_SWORD
+          name: '&6PvP'
+          lore:
+            - '&7Allow players to pvp inside the island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: DIAMOND_SWORD
+          name: '&6PvP'
+          lore:
+            - '&7Allow players to pvp inside the island.'
+            - '&7Currently &cDISABLED&7.'
+
+      spawner_animals_spawn:
+        settings-enabled:
+          material: SPAWNER
+          name: '&6Spawner Animals Spawn'
+          lore:
+            - '&7Allow spawner spawning of animals inside the island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: SPAWNER
+          name: '&6Spawner Animals Spawn'
+          lore:
+            - '&7Allow spawner spawning of animals inside the island.'
+            - '&7Currently &cDISABLED&7.'
+
+      spawner_monster_spawn:
+        settings-enabled:
+          material: SPAWNER
+          name: '&6Spawner Monster Spawn'
+          lore:
+            - '&7Allow spawner spawning of monsters inside the island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: SPAWNER
+          name: '&6Spawner Monster Spawn'
+          lore:
+            - '&7Allow spawner spawning of monsters inside the island.'
+            - '&7Currently &cDISABLED&7.'
+
+      tnt_explosion:
+        settings-enabled:
+          material: TNT
+          name: '&6TNT Explosion'
+          lore:
+            - '&7Allow TNT to explode blocks inside your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: TNT
+          name: '&6TNT Explosion'
+          lore:
+            - '&7Allow TNT to explode blocks inside your island.'
+            - '&7Currently &cDISABLED&7.'
+
+      tree_growth:
+        settings-enabled:
+          material: OAK_SAPLING
+          name: '&6Tree Growth'
+          lore:
+            - '&7Allow growth of trees inside your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: OAK_SAPLING
+          name: '&6Tree Growth'
+          lore:
+            - '&7Allow growth of trees inside your island.'
+            - '&7Currently &cDISABLED&7.'
+
+      water_flow:
+        settings-enabled:
+          material: WATER_BUCKET
+          name: '&6Water Flow'
+          lore:
+            - '&7Allow water to flow inside your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: WATER_BUCKET
+          name: '&6Water Flow'
+          lore:
+            - '&7Allow water to flow inside your island.'
+            - '&7Currently &cDISABLED&7.'
+
+      wither_explosion:
+        settings-enabled:
+          material: WITHER_SKELETON_SKULL
+          name: '&6Wither Explosion'
+          lore:
+            - '&7Allow withers to explode blocks inside your island.'
+            - '&7Currently &aENABLED&7.'
+        settings-disabled:
+          material: WITHER_SKELETON_SKULL
+          name: '&6Wither Explosion'
+          lore:
+            - '&7Allow withers to explode blocks inside your island.'
+            - '&7Currently &cDISABLED&7.'
