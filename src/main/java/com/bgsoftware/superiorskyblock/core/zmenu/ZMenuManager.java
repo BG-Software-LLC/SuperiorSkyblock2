@@ -2,11 +2,19 @@ package com.bgsoftware.superiorskyblock.core.zmenu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberBanButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberInfoButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberKickButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberRoleButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMembersButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandBiomeLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandCreationLoader;
+import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandMemberRoleLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandSettingsLoader;
 import fr.maxlego08.menu.api.ButtonManager;
+import fr.maxlego08.menu.api.Inventory;
 import fr.maxlego08.menu.api.InventoryManager;
+import fr.maxlego08.menu.button.loader.NoneLoader;
 import fr.maxlego08.menu.exceptions.InventoryException;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -20,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +68,12 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new IslandCreationLoader(this.plugin));
         this.buttonManager.register(new IslandSettingsLoader(this.plugin));
         this.buttonManager.register(new IslandBiomeLoader(this.plugin));
+        this.buttonManager.register(new IslandMemberRoleLoader(this.plugin));
+
+        this.buttonManager.register(new NoneLoader(this.plugin, IslandMembersButton.class, "SUPERIORSKYBLOCK_MEMBERS"));
+        this.buttonManager.register(new NoneLoader(this.plugin, IslandMemberInfoButton.class, "SUPERIORSKYBLOCK_MEMBER_INFO"));
+        this.buttonManager.register(new NoneLoader(this.plugin, IslandMemberBanButton.class, "SUPERIORSKYBLOCK_MEMBER_BAN"));
+        this.buttonManager.register(new NoneLoader(this.plugin, IslandMemberKickButton.class, "SUPERIORSKYBLOCK_MEMBER_KICK"));
     }
 
     public void loadInventories() {
@@ -69,7 +84,7 @@ public class ZMenuManager implements Listener {
 
         }
         // Save inventories files
-        List<String> strings = Arrays.asList("island-creation", "settings", "biomes");
+        List<String> strings = Arrays.asList("island-creation", "settings", "biomes", "members", "member-manage", "member-role");
         strings.forEach(inventoryName -> {
             if (!new File(plugin.getDataFolder(), "inventories/" + inventoryName + ".yml").exists()) {
                 this.plugin.saveResource("inventories/" + inventoryName + ".yml", false);
@@ -109,7 +124,7 @@ public class ZMenuManager implements Listener {
 
     public void openInventory(Player player, String inventoryName, Consumer<PlayerCache> consumer) {
         this.cache(player, consumer);
-        this.inventoryManager.openInventory(player, plugin, inventoryName);
+        this.openInventory(player, inventoryName);
     }
 
     public void openInventory(SuperiorPlayer superiorPlayer, String inventoryName) {
@@ -117,7 +132,9 @@ public class ZMenuManager implements Listener {
     }
 
     public void openInventory(Player player, String inventoryName) {
-        this.inventoryManager.openInventory(player, plugin, inventoryName);
+        List<Inventory> inventories = new ArrayList<>();
+        this.inventoryManager.getCurrentPlayerInventory(player).ifPresent(inventories::add);
+        this.inventoryManager.getInventory(plugin, inventoryName).ifPresent(inventory -> this.inventoryManager.openInventory(player, inventory, 1, inventories));
     }
 
     public InventoryManager getInventoryManager() {

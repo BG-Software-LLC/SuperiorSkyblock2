@@ -1,0 +1,66 @@
+name: '&8%name%'
+
+matrix:
+  - '$$$$I$$$$'
+  - '$       $'
+  - '$@ % & *$'
+  - '$       $'
+  - '$$$$B$$$$'
+
+items:
+  'B':
+    type: BACK
+    item:
+      material: BARRIER
+      name: "&cBack"
+  'I':
+    type: SUPERIORSKYBLOCK_MEMBER_INFO
+    item:
+      material: PLAYER_HEAD
+      name: '&e%name%'
+      lore:
+        - '&eRole: &7%role%'
+  '$':
+    item:
+      material: BLACK_STAINED_GLASS_PANE
+      name: '&f'
+  '@':
+    type: SUPERIORSKYBLOCK_MEMBER_ROLE
+    role: 0
+    item:
+      material: LEATHER_CHESTPLATE
+      name: '&eMember'
+      lore:
+        - '&7Click to set player''s role to member.'
+      flags:
+        - HIDE_ATTRIBUTES
+  '%':
+    type: SUPERIORSKYBLOCK_MEMBER_ROLE
+    role: 1
+    item:
+      material: GOLDEN_CHESTPLATE
+      name: '&eModerator'
+      lore:
+        - '&7Click to set player''s role to moderator.'
+      flags:
+        - HIDE_ATTRIBUTES
+  '&':
+    type: SUPERIORSKYBLOCK_MEMBER_ROLE
+    role: 2
+    item:
+      material: IRON_CHESTPLATE
+      name: '&eAdmin'
+      lore:
+        - '&7Click to set player''s role to admin.'
+      flags:
+        - HIDE_ATTRIBUTES
+  '*':
+    type: SUPERIORSKYBLOCK_MEMBER_ROLE
+    role: 3
+    item:
+      material: DIAMOND_CHESTPLATE
+      name: '&eLeader'
+      lore:
+        - '&7Click to transfer leadership to player.'
+      flags:
+        - HIDE_ATTRIBUTES

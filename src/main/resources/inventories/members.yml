@@ -1,0 +1,34 @@
+name: '&8Island Members &7%page%/%maxPage%'
+size: 45
+
+items:
+  members:
+    type: SUPERIORSKYBLOCK_MEMBERS
+    slots:
+      - 0-35
+    item:
+      material: PLAYER_HEAD
+      name: '&e%name%'
+      lore:
+        - '&eRole: &7%role%'
+  next:
+    type: NEXT
+    slot: 42
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fNext Page'
+  previous:
+    type: PREVIOUS
+    slot: 38
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fPrevious Page'
+  decoration:
+    isPermanent: true
+    item:
+      material: BLACK_STAINED_GLASS_PANE
+      name: '&f'
+    slots:
+      - 36-44

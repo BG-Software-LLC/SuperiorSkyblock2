@@ -1,0 +1,51 @@
+name: '&8%name%'
+
+matrix:
+  - '$$$$I$$$$'
+  - '$       $'
+  - '$ @ % ^ $'
+  - '$       $'
+  - '$$$$B$$$$'
+
+items:
+  'B':
+    type: BACK
+    item:
+      material: BARRIER
+      name: "&cBack"
+  'I':
+    type: SUPERIORSKYBLOCK_MEMBER_INFO
+    item:
+      material: PLAYER_HEAD
+      name: '&e%name%'
+      lore:
+        - '&eRole: &7%role%'
+  '$':
+    item:
+      material: BLACK_STAINED_GLASS_PANE
+      name: '&f'
+  '@':
+    type: INVENTORY
+    inventory: "member-role"
+    plugin: "SuperiorSkyblock2"
+    item:
+      material: DIAMOND_CHESTPLATE
+      name: '&ePlayer Role'
+      lore:
+        - '&7Click to edit player''s role.'
+      flags:
+        - HIDE_ATTRIBUTES
+  '%':
+    type: SUPERIORSKYBLOCK_MEMBER_BAN
+    item:
+      material: BARRIER
+      name: '&eBan Player'
+      lore:
+        - '&7Click to ban the player from the island.'
+  '^':
+    type: SUPERIORSKYBLOCK_MEMBER_KICK
+    item:
+      material: SKELETON_SKULL
+      name: '&eKick Player'
+      lore:
+        - '&7Click to kick the player from the island.'

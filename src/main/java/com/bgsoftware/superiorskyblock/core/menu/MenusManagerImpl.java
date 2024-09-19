@@ -254,7 +254,10 @@ public class MenusManagerImpl extends Manager implements MenusManager {
 
     @Override
     public void openMembers(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
-        plugin.getProviders().getMenusProvider().openMembers(targetPlayer, previousMenu, targetIsland);
+        // zMenu Start
+        // plugin.getProviders().getMenusProvider().openMembers(targetPlayer, previousMenu, targetIsland);
+        plugin.getZMenumanager().openInventory(targetPlayer, "members");
+        // zMenu End
     }
 
     @Override
