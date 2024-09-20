@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.bukkit.Bukkit;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
@@ -26,6 +27,7 @@ public class StatsClient {
 
     private static final int VERSION = 1;
     private static final long TASK_DELAY = 1;
+    private static final byte MINIMUM_ONLINE_PLAYERS = 10;
     private static final List<IStatsCollector> STATS_COLLECTORS = new LinkedList<>();
 
     private static final String API_ENDPOINT = "https://api.bg-software.com/v1/stats/";
@@ -63,6 +65,9 @@ public class StatsClient {
     }
 
     private void collectStatsTask() {
+        if (Bukkit.getOnlinePlayers().size() < MINIMUM_ONLINE_PLAYERS)
+            return;
+
         try {
             JsonObject statsObject = new JsonObject();
             STATS_COLLECTORS.forEach(collector -> collector.collect(statsObject));
