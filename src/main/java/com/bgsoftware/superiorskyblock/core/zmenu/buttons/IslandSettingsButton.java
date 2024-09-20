@@ -7,13 +7,16 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.zmenu.utils.Setting;
+import com.bgsoftware.superiorskyblock.core.zmenu.utils.SettingOtherButton;
 import fr.maxlego08.menu.MenuItemStack;
 import fr.maxlego08.menu.api.button.PaginateButton;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.maxlego08.menu.zcore.utils.inventory.Pagination;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class IslandSettingsButton extends SuperiorButton implements PaginateButton {
 
@@ -43,7 +46,8 @@ public class IslandSettingsButton extends SuperiorButton implements PaginateButt
 
             IslandFlag islandFlag = IslandFlag.getByName(setting.getName());
             MenuItemStack menuItemStack = island.hasSettingsEnabled(islandFlag) ? setting.getItemStackEnabled() : setting.getItemStackDisabled();
-            inventory.addItem(slot, menuItemStack.build(player)).setClick(event -> {
+
+            Consumer<InventoryClickEvent> consumer = event -> {
 
                 if (island.hasSettingsEnabled(islandFlag)) {
 
@@ -58,7 +62,20 @@ public class IslandSettingsButton extends SuperiorButton implements PaginateButt
                 Message.UPDATED_SETTINGS.send(superiorPlayer, Formatters.CAPITALIZED_FORMATTER.format(islandFlag.getName()));
 
                 onRender(player, inventory); // Refresh
-            });
+            };
+
+            String name = menuItemStack.getDisplayName();
+            List<String> lore = menuItemStack.getLore();
+
+            inventory.addItem(slot, menuItemStack.build(player, false)).setClick(consumer);
+            for (SettingOtherButton settingOtherButton : setting.getSettingOtherButtons()) {
+
+                MenuItemStack localMenuItemStack = settingOtherButton.getItemStack();
+                localMenuItemStack.setDisplayName(name);
+                localMenuItemStack.setLore(lore);
+
+                inventory.addItem(slot + settingOtherButton.getSlot(), localMenuItemStack.build(player, false)).setClick(consumer);
+            }
         }
     }
 

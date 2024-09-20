@@ -4,12 +4,14 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.IslandCreationButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.IslandSettingsButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.utils.Setting;
+import com.bgsoftware.superiorskyblock.core.zmenu.utils.SettingOtherButton;
 import fr.maxlego08.menu.MenuItemStack;
 import fr.maxlego08.menu.api.button.Button;
 import fr.maxlego08.menu.api.button.DefaultButtonValue;
 import fr.maxlego08.menu.exceptions.InventoryException;
 import fr.maxlego08.menu.loader.MenuItemStackLoader;
 import fr.maxlego08.menu.zcore.utils.loader.Loader;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -63,6 +65,20 @@ public class IslandSettingsLoader extends SuperiorButtonLoader {
             exception.printStackTrace();
         }
 
-        return new Setting(islandFlagName, itemStackEnabled, itemStackDisabled, position);
+        List<SettingOtherButton> settingOtherButtons = new ArrayList<>();
+        ConfigurationSection configurationSection = configuration.getConfigurationSection(path + "other-items");
+        if (configurationSection != null) {
+            for (String key : configurationSection.getKeys(false)) {
+                try {
+                    int slot = configuration.getInt(path + "other-items." + key + ".slot");
+                    MenuItemStack menuItemStack = loader.load(configuration, path + "other-items." + key + ".", file);
+                    settingOtherButtons.add(new SettingOtherButton(menuItemStack, slot));
+                } catch (InventoryException exception) {
+                    exception.printStackTrace();
+                }
+            }
+        }
+
+        return new Setting(islandFlagName, itemStackEnabled, itemStackDisabled, position, settingOtherButtons);
     }
 }

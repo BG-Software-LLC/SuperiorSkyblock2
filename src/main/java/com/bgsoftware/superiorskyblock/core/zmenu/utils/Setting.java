@@ -2,18 +2,22 @@ package com.bgsoftware.superiorskyblock.core.zmenu.utils;
 
 import fr.maxlego08.menu.MenuItemStack;
 
+import java.util.List;
+
 public class Setting {
 
     private final String name;
     private final MenuItemStack itemStackEnabled;
     private final MenuItemStack itemStackDisabled;
     private final int position;
+    private final List<SettingOtherButton> settingOtherButtons;
 
-    public Setting(String name, MenuItemStack itemStackEnabled, MenuItemStack itemStackDisabled, int position) {
+    public Setting(String name, MenuItemStack itemStackEnabled, MenuItemStack itemStackDisabled, int position, List<SettingOtherButton> settingOtherButtons) {
         this.name = name;
         this.itemStackEnabled = itemStackEnabled;
         this.itemStackDisabled = itemStackDisabled;
         this.position = position;
+        this.settingOtherButtons = settingOtherButtons;
     }
 
     public String getName() {
@@ -30,5 +34,9 @@ public class Setting {
 
     public int getPosition() {
         return position;
+    }
+
+    public List<SettingOtherButton> getSettingOtherButtons() {
+        return settingOtherButtons;
     }
 }
