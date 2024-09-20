@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityHopper;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.KeyBlocksCache;
 import io.papermc.paper.chat.ChatComposer;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
@@ -40,17 +41,21 @@ import org.bukkit.craftbukkit.v1_16_R3.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumMap;
 import java.util.function.BiFunction;
 
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final EnumMap<InventoryType, MenuCreator> MENUS_HOLDER_CREATORS = new EnumMap<>(InventoryType.class);
 
@@ -70,12 +75,6 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
             return Bukkit.getUnsafe().processClass(plugin.getDescription(), path, classBytes);
         }
     };
-
-    private final SuperiorSkyblockPlugin plugin;
-
-    public NMSAlgorithmsImpl(SuperiorSkyblockPlugin plugin) {
-        this.plugin = plugin;
-    }
 
     @Override
     public void registerCommand(BukkitCommand command) {
@@ -189,16 +188,7 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
             return;
 
         ChatComposer originalComposer = ((AsyncChatEvent) event).composer();
-        ((AsyncChatEvent) event).composer((source, sourceDisplayName, message) -> {
-            String originalFormat = LegacyComponentSerializer.legacyAmpersand().serialize(
-                    originalComposer.composeChat(source, sourceDisplayName, message));
-
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(source);
-            Island island = superiorPlayer.getIsland();
-
-            return LegacyComponentSerializer.legacyAmpersand().deserialize(
-                    Formatters.CHAT_FORMATTER.format(new ChatFormatter.ChatFormatArgs(originalFormat, superiorPlayer, island)));
-        });
+        ((AsyncChatEvent) event).composer(new ChatComposerWrapper(originalComposer).composer);
     }
 
     @Override
@@ -208,6 +198,34 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     private interface MenuCreator extends BiFunction<InventoryHolder, String, IInventory> {
+
+    }
+
+    private static class ChatComposerWrapper {
+
+        private final ChatComposer composer = new ChatComposer() {
+
+            @Override
+            public @NotNull Component composeChat(@NotNull Player source,
+                                                  @NotNull Component sourceDisplayName,
+                                                  @NotNull Component message) {
+                String originalFormat = LegacyComponentSerializer.legacyAmpersand().serialize(
+                        originalComposer.composeChat(source, sourceDisplayName, message));
+
+                SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(source);
+                Island island = superiorPlayer.getIsland();
+
+                return LegacyComponentSerializer.legacyAmpersand().deserialize(
+                        Formatters.CHAT_FORMATTER.format(new ChatFormatter.ChatFormatArgs(originalFormat, superiorPlayer, island)));
+            }
+
+        };
+
+        private final ChatComposer originalComposer;
+
+        public ChatComposerWrapper(ChatComposer originalComposer) {
+            this.originalComposer = originalComposer;
+        }
 
     }
 
