@@ -34,6 +34,7 @@ import com.bgsoftware.superiorskyblock.core.menu.MenusManagerImpl;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.stackedblocks.StackedBlocksManagerImpl;
 import com.bgsoftware.superiorskyblock.core.stackedblocks.container.DefaultStackedBlocksContainer;
+import com.bgsoftware.superiorskyblock.core.stats.StatsClient;
 import com.bgsoftware.superiorskyblock.core.task.CalcTask;
 import com.bgsoftware.superiorskyblock.core.task.ShutdownTask;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -185,6 +186,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         this.servicesHandler.loadDefaultServices(this);
 
         new Metrics(this, 4119);
+        StatsClient client = StatsClient.getInstance();
+        client.start();
 
         loadingStage = PluginLoadingStage.LOADED;
 
@@ -360,6 +363,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while disabling the plugin:");
         } finally {
+            Log.info("Shutting down stats client...");
+            StatsClient.getIfExists().ifPresent(StatsClient::shutdown);
+
             if (loadingStage.isAtLeast(PluginLoadingStage.MANAGERS_INITIALIZED)) {
                 Log.info("Shutting down calculation task...");
                 CalcTask.cancelTask();

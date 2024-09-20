@@ -53,7 +53,9 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -90,6 +92,8 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     private Island spawnIsland;
     private SBlockPosition lastIsland;
+    @Nullable
+    private UUID serverUUID;
 
     private BigDecimal totalWorth = BigDecimal.ZERO;
     private long lastTimeWorthUpdate = 0;
@@ -117,6 +121,8 @@ public class GridManagerImpl extends Manager implements GridManager {
         if (this.islandCreationAlgorithm == null)
             this.islandCreationAlgorithm = DefaultIslandCreationAlgorithm.getInstance();
 
+        loadServerUuid();
+
         this.lastIsland = new SBlockPosition(plugin.getSettings().getWorlds().getDefaultWorldName(), 0, 100, 0);
         BukkitExecutor.sync(this::updateSpawn);
     }
@@ -131,6 +137,10 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     public void syncUpgrades() {
         getIslands().forEach(Island::updateUpgrades);
+    }
+
+    public UUID getServerUUID() {
+        return serverUUID;
     }
 
     @Override
@@ -988,6 +998,21 @@ public class GridManagerImpl extends Manager implements GridManager {
     private void initializeDatabaseBridge() {
         databaseBridge = plugin.getFactory().createDatabaseBridge(this);
         databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
+    }
+
+    private void loadServerUuid() {
+        File bStatsFile = new File(plugin.getDataFolder().getParentFile(), "bStats/config.yml");
+        if (!bStatsFile.exists())
+            return;
+
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(bStatsFile);
+        if (!config.isString("serverUuid"))
+            return;
+
+        try {
+            this.serverUUID = UUID.fromString(config.getString("serverUuid"));
+        } catch (Exception ignored) {
+        }
     }
 
 }

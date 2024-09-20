@@ -73,7 +73,7 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
             return CompletableFuture.completedFuture(new IslandCreationResult(IslandCreationResult.Status.NAME_OCCUPIED, null, null, false));
         }
 
-        long profiler = Profiler.start(ProfileType.CREATE_ISLAND);
+        long profiler = Profiler.start(ProfileType.CREATE_ISLAND, schematic.getName());
 
         CompletableFuture<IslandCreationResult> completableFuture = new CompletableFuture<>();
 
