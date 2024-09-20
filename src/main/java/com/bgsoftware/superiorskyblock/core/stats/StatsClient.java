@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.stats;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
@@ -16,12 +17,15 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class StatsClient {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final Gson GSON = new Gson();
 
@@ -65,23 +69,30 @@ public class StatsClient {
     }
 
     private void collectStatsTask() {
+        UUID serverUUID = plugin.getGrid().getServerUUID();
+        if (serverUUID == null) {
+            shutdown();
+            return;
+        }
+
         if (Bukkit.getOnlinePlayers().size() < MINIMUM_ONLINE_PLAYERS)
             return;
 
         try {
             JsonObject statsObject = new JsonObject();
             STATS_COLLECTORS.forEach(collector -> collector.collect(statsObject));
-            submitStats(statsObject);
+            submitStats(statsObject, serverUUID);
         } catch (Exception error) {
             Log.error(error, "An error occurred while uploading stats:");
         }
     }
 
-    private void submitStats(JsonObject statsObject) throws IOException {
+    private void submitStats(JsonObject statsObject, UUID serverUUID) throws IOException {
         if (statsObject.entrySet().isEmpty())
             return;
 
         statsObject.addProperty("version", VERSION);
+        statsObject.addProperty("server", serverUUID.toString());
 
         HttpsURLConnection conn = (HttpsURLConnection) new URL(API_ENDPOINT).openConnection();
         conn.setRequestMethod("POST");
