@@ -100,14 +100,14 @@ public class StatsClient {
         }
 
         if (response.has("error"))
-            throw new RuntimeException("Received error when submitting status: " + response.get("error").getAsString());
+            throw new RuntimeException("Received error when submitting stats: " + response.get("error").getAsString());
 
         if (!response.has("status"))
-            throw new RuntimeException("Received invalid response when submitting status: " + response);
+            throw new RuntimeException("Received invalid response when submitting stats: " + response);
 
         String status = response.get("status").getAsString();
         if (!status.equalsIgnoreCase("success"))
-            throw new RuntimeException("Received invalid status when submitting status: " + status);
+            throw new RuntimeException("Received invalid status when submitting stats: " + status);
     }
 
     public static StatsClient getInstance() {
