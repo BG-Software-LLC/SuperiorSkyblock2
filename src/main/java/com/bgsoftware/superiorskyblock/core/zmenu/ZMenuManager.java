@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMembersB
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandBiomeLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandCreationLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandMemberRoleLoader;
+import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandPermissionLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandSettingsLoader;
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.Inventory;
@@ -69,6 +70,7 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new IslandSettingsLoader(this.plugin));
         this.buttonManager.register(new IslandBiomeLoader(this.plugin));
         this.buttonManager.register(new IslandMemberRoleLoader(this.plugin));
+        this.buttonManager.register(new IslandPermissionLoader(this.plugin));
 
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMembersButton.class, "SUPERIORSKYBLOCK_MEMBERS"));
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMemberInfoButton.class, "SUPERIORSKYBLOCK_MEMBER_INFO"));
@@ -84,7 +86,7 @@ public class ZMenuManager implements Listener {
 
         }
         // Save inventories files
-        List<String> strings = Arrays.asList("island-creation", "settings", "biomes", "members", "member-manage", "member-role");
+        List<String> strings = Arrays.asList("island-creation", "settings", "biomes", "members", "member-manage", "member-role", "permissions");
         strings.forEach(inventoryName -> {
             if (!new File(plugin.getDataFolder(), "inventories/" + inventoryName + ".yml").exists()) {
                 this.plugin.saveResource("inventories/" + inventoryName + ".yml", false);

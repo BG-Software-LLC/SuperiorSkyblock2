@@ -28,9 +28,9 @@ items:
       name: '&fNext Page'
   permissions:
     type: SUPERIORSKYBLOCK_PERMISSIONS
-    no-role-permission: '&8 - &c{}'
-    exact-role-permission: '&8 - &2{}'
-    higher-role-permission: '&8 - &a{}'
+    no-role-permission: '&8 - &c%role%'
+    exact-role-permission: '&8 - &2%role%'
+    higher-role-permission: '&8 - &a%role%'
     slots:
       - 10-16
       - 19-25
@@ -56,7 +56,7 @@ items:
           name: '&6All'
           lore:
             - '&7Access to all the abilities of the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       animal_breed:
@@ -78,7 +78,7 @@ items:
           name: '&6Animal Breed'
           lore:
             - '&7Access to breed animals inside the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       animal_damage:
@@ -100,7 +100,7 @@ items:
           name: '&6Animal Damage'
           lore:
             - '&7Access to damage animals inside the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       animal_shear:
@@ -122,7 +122,7 @@ items:
           name: '&6Animal Shear'
           lore:
             - '&7Access to shear animals inside the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       animal_spawn:
@@ -144,7 +144,7 @@ items:
           name: '&6Animal Spawn'
           lore:
             - '&7Access to spawn animals inside the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       ban_member:
@@ -166,7 +166,7 @@ items:
           name: '&6Ban Member'
           lore:
             - '&7Access to ban members from the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       break:
@@ -188,7 +188,51 @@ items:
           name: '&6Break'
           lore:
             - '&7Access to break blocks inside the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      brush:
+        display-menu: true
+        permission-enabled:
+          material: BRUSH
+          name: '&6Brush'
+          lore:
+            - '&7Access to brush suspicious blocks inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: BRUSH
+          name: '&6Brush'
+          lore:
+            - '&7Access to brush suspicious blocks inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: BRUSH
+          name: '&6Brush'
+          lore:
+            - '&7Access to brush suspicious blocks inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      build:
+        display-menu: true
+        permission-enabled:
+          material: COBBLESTONE
+          name: '&6Build'
+          lore:
+            - '&7Access to place blocks inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: COBBLESTONE
+          name: '&6Build'
+          lore:
+            - '&7Access to place blocks inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: COBBLESTONE
+          name: '&6Build'
+          lore:
+            - '&7Access to place blocks inside the island.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       chest_access:
@@ -210,7 +254,29 @@ items:
           name: '&6Chest Access'
           lore:
             - '&7Access to open chests inside the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      chorus_fruit:
+        display-menu: true
+        permission-enabled:
+          material: CHORUS_FRUIT
+          name: '&6Chorus Fruit'
+          lore:
+            - '&7Access to consume chorus fruits inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: CHORUS_FRUIT
+          name: '&6Chorus Fruit'
+          lore:
+            - '&7Access to consume chorus fruits inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: CHORUS_FRUIT
+          name: '&6Chorus Fruit'
+          lore:
+            - '&7Access to consume chorus fruits inside the island.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       close_bypass:
@@ -232,7 +298,7 @@ items:
           name: '&6Locked Bypass'
           lore:
             - '&7Access to bypass the island''s lock.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       close_island:
@@ -254,7 +320,7 @@ items:
           name: '&6Lock Island'
           lore:
             - '&7Access to lock the island from public.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       coop_member:
@@ -276,7 +342,7 @@ items:
           name: '&6Coop Member'
           lore:
             - '&7Access to add a player as a co-op member.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       delete_warp:
@@ -298,7 +364,7 @@ items:
           name: '&6Delete Warp'
           lore:
             - '&7Access to delete island warps.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       demote_members:
@@ -320,10 +386,9 @@ items:
           name: '&6Demote Members'
           lore:
             - '&7Access to demote members inside the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
             - ''
 
-      # Remaining permissions
       deposit_money:
         display-menu: true
         permission-enabled:
@@ -343,7 +408,7 @@ items:
           name: '&6Deposit Money'
           lore:
             - '&7Access to deposit money into the island''s bank.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       disband_island:
@@ -365,7 +430,183 @@ items:
           name: '&6Disband Island'
           lore:
             - '&7Access to disband the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      discord_show:
+        display-menu: true
+        permission-enabled:
+          material: LIGHT_BLUE_TERRACOTTA
+          name: '&6Discord Show'
+          lore:
+            - '&7Access to check the island''s linked discord.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: LIGHT_BLUE_TERRACOTTA
+          name: '&6Discord Show'
+          lore:
+            - '&7Access to check the island''s linked discord.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: LIGHT_BLUE_TERRACOTTA
+          name: '&6Discord Show'
+          lore:
+            - '&7Access to check the island''s linked discord.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      drop_items:
+        display-menu: true
+        permission-enabled:
+          material: ARROW
+          name: '&6Drop Items'
+          lore:
+            - '&7Access to drop items inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: ARROW
+          name: '&6Drop Items'
+          lore:
+            - '&7Access to drop items inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: ARROW
+          name: '&6Drop Items'
+          lore:
+            - '&7Access to drop items inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      ender_pearl:
+        display-menu: true
+        permission-enabled:
+          material: ENDER_PEARL
+          name: '&6Ender Pearl'
+          lore:
+            - '&7Access to use ender pearls inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: ENDER_PEARL
+          name: '&6Ender Pearl'
+          lore:
+            - '&7Access to use ender pearls inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: ENDER_PEARL
+          name: '&6Ender Pearl'
+          lore:
+            - '&7Access to use ender pearls inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      expel_bypass:
+        display-menu: true
+        permission-enabled:
+          material: FEATHER
+          name: '&6Expel Bypass'
+          lore:
+            - '&7Access to bypass from being expelled.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: FEATHER
+          name: '&6Expel Bypass'
+          lore:
+            - '&7Access to bypass from being expelled.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: FEATHER
+          name: '&6Expel Bypass'
+          lore:
+            - '&7Access to bypass from being expelled.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      expel_players:
+        display-menu: true
+        permission-enabled:
+          material: DISPENSER
+          name: '&6Expel Players'
+          lore:
+            - '&7Access to expel players from the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: DISPENSER
+          name: '&6Expel Players'
+          lore:
+            - '&7Access to expel players from the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: DISPENSER
+          name: '&6Expel Players'
+          lore:
+            - '&7Access to expel players from the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      farm_tramping:
+        display-menu: true
+        permission-enabled:
+          material: FARMLAND
+          name: '&6Farm Tramping'
+          lore:
+            - '&7Access to tramp farmlands inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: FARMLAND
+          name: '&6Farm Tramping'
+          lore:
+            - '&7Access to tramp farmlands inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: FARMLAND
+          name: '&6Farm Tramping'
+          lore:
+            - '&7Access to tramp farmlands inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      fertilize:
+        display-menu: true
+        permission-enabled:
+          material: BONE_MEAL
+          name: '&6Fertilize'
+          lore:
+            - '&7Access to fertilize blocks around the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: BONE_MEAL
+          name: '&6Fertilize'
+          lore:
+            - '&7Access to fertilize blocks around the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: BONE_MEAL
+          name: '&6Fertilize'
+          lore:
+            - '&7Access to fertilize blocks around the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      fish:
+        display-menu: true
+        permission-enabled:
+          material: FISHING_ROD
+          name: '&6Fish'
+          lore:
+            - '&7Access to fish around the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: FISHING_ROD
+          name: '&6Fish'
+          lore:
+            - '&7Access to fish around the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: FISHING_ROD
+          name: '&6Fish'
+          lore:
+            - '&7Access to fish around the island.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       fly:
@@ -387,7 +628,51 @@ items:
           name: '&6Fly'
           lore:
             - '&7Access to fly around the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      horse_interact:
+        display-menu: true
+        permission-enabled:
+          material: HORSE_SPAWN_EGG
+          name: '&6Horse Interact'
+          lore:
+            - '&7Access to interact with horses inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: HORSE_SPAWN_EGG
+          name: '&6Horse Interact'
+          lore:
+            - '&7Access to interact with horses inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: HORSE_SPAWN_EGG
+          name: '&6Horse Interact'
+          lore:
+            - '&7Access to interact with horses inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      ignite_creeper:
+        display-menu: true
+        permission-enabled:
+          material: CREEPER_SPAWN_EGG
+          name: '&6Ignite Creepers'
+          lore:
+            - '&7Access to ignite creepers with flint and steel inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: CREEPER_SPAWN_EGG
+          name: '&6Ignite Creepers'
+          lore:
+            - '&7Access to ignite creepers with flint and steel inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: CREEPER_SPAWN_EGG
+          name: '&6Ignite Creepers'
+          lore:
+            - '&7Access to ignite creepers with flint and steel inside the island.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       interact:
@@ -409,7 +694,7 @@ items:
           name: '&6Interact'
           lore:
             - '&7Access to interact with blocks inside the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       invite_member:
@@ -431,29 +716,95 @@ items:
           name: '&6Invite Member'
           lore:
             - '&7Access to invite new members to the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
             - ''
 
-      minecart_damage:
+      island_chest:
         display-menu: true
         permission-enabled:
-          material: TNT_MINECART
-          name: '&6Minecart Damage'
+          material: ENDER_CHEST
+          name: '&6Community Chest'
           lore:
-            - '&7Access to damage minecarts inside the island.'
+            - '&7Access to the community chest of the island.'
             - '&7Currently &aENABLED&7.'
         permission-disabled:
-          material: TNT_MINECART
-          name: '&6Minecart Damage'
+          material: ENDER_CHEST
+          name: '&6Community Chest'
           lore:
-            - '&7Access to damage minecarts inside the island.'
+            - '&7Access to the community chest of the island.'
             - '&7Currently &cDISABLED&7.'
         role-permission:
-          material: TNT_MINECART
-          name: '&6Minecart Damage'
+          material: ENDER_CHEST
+          name: '&6Community Chest'
           lore:
-            - '&7Access to damage minecarts inside the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Access to the community chest of the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      item_frame:
+        display-menu: true
+        permission-enabled:
+          material: ITEM_FRAME
+          name: '&6Item Frame'
+          lore:
+            - '&7Access to interact with item frames inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: ITEM_FRAME
+          name: '&6Item Frame'
+          lore:
+            - '&7Access to interact with item frames inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: ITEM_FRAME
+          name: '&6Item Frame'
+          lore:
+            - '&7Access to interact with item frames inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      kick_member:
+        display-menu: true
+        permission-enabled:
+          material: SKELETON_SKULL
+          name: '&6Kick Member'
+          lore:
+            - '&7Access to kick members from the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: SKELETON_SKULL
+          name: '&6Kick Member'
+          lore:
+            - '&7Access to kick members from the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: SKELETON_SKULL
+          name: '&6Kick Member'
+          lore:
+            - '&7Access to kick members from the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      leash:
+        display-menu: true
+        permission-enabled:
+          material: LEAD
+          name: '&6Leash Mobs'
+          lore:
+            - '&7Access to leash mobs inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: LEAD
+          name: '&6Leash Mobs'
+          lore:
+            - '&7Access to leash mobs inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: LEAD
+          name: '&6Leash Mobs'
+          lore:
+            - '&7Access to leash mobs inside the island.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       monster_damage:
@@ -475,7 +826,95 @@ items:
           name: '&6Monster Damage'
           lore:
             - '&7Access to damage monsters inside the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      minecart_damage:
+        display-menu: true
+        permission-enabled:
+          material: TNT_MINECART
+          name: '&6Minecart Damage'
+          lore:
+            - '&7Access to damage minecarts inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: TNT_MINECART
+          name: '&6Minecart Damage'
+          lore:
+            - '&7Access to damage minecarts inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: TNT_MINECART
+          name: '&6Minecart Damage'
+          lore:
+            - '&7Access to damage minecarts inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      minecart_enter:
+        display-menu: true
+        permission-enabled:
+          material: HOPPER_MINECART
+          name: '&6Minecart Enter'
+          lore:
+            - '&7Access to enter minecarts inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: HOPPER_MINECART
+          name: '&6Minecart Enter'
+          lore:
+            - '&7Access to enter minecarts inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: HOPPER_MINECART
+          name: '&6Minecart Enter'
+          lore:
+            - '&7Access to enter minecarts inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      minecart_open:
+        display-menu: true
+        permission-enabled:
+          material: CHEST_MINECART
+          name: '&6Minecart Open'
+          lore:
+            - '&7Access to open minecarts inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: CHEST_MINECART
+          name: '&6Minecart Open'
+          lore:
+            - '&7Access to open minecarts inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: CHEST_MINECART
+          name: '&6Minecart Open'
+          lore:
+            - '&7Access to open minecarts inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      minecart_place:
+        display-menu: true
+        permission-enabled:
+          material: MINECART
+          name: '&6Minecart Place'
+          lore:
+            - '&7Access to place minecarts inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: MINECART
+          name: '&6Minecart Place'
+          lore:
+            - '&7Access to place minecarts inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: MINECART
+          name: '&6Minecart Place'
+          lore:
+            - '&7Access to place minecarts inside the island.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       monster_spawn:
@@ -497,7 +936,293 @@ items:
           name: '&6Monster Spawn'
           lore:
             - '&7Access to spawn monsters inside the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      name_entity:
+        display-menu: true
+        permission-enabled:
+          material: NAME_TAG
+          name: '&6Name Entity'
+          lore:
+            - '&7Access to name-tag entities inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: NAME_TAG
+          name: '&6Name Entity'
+          lore:
+            - '&7Access to name-tag entities inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: NAME_TAG
+          name: '&6Name Entity'
+          lore:
+            - '&7Access to name-tag entities inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      open_island:
+        display-menu: true
+        permission-enabled:
+          material: REDSTONE_TORCH
+          name: '&6Open Island'
+          lore:
+            - '&7Access to open the island to the public.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: REDSTONE_TORCH
+          name: '&6Open Island'
+          lore:
+            - '&7Access to open the island to the public.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: REDSTONE_TORCH
+          name: '&6Open Island'
+          lore:
+            - '&7Access to open the island to the public.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      painting:
+        display-menu: true
+        permission-enabled:
+          material: PAINTING
+          name: '&6Painting'
+          lore:
+            - '&7Access to interact with paintings inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: PAINTING
+          name: '&6Painting'
+          lore:
+            - '&7Access to interact with paintings inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: PAINTING
+          name: '&6Painting'
+          lore:
+            - '&7Access to interact with paintings inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      paypal_show:
+        display-menu: true
+        permission-enabled:
+          material: BLUE_WOOL
+          name: '&6Paypal Show'
+          lore:
+            - '&7Access to check the island''s linked paypal.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: BLUE_WOOL
+          name: '&6Paypal Show'
+          lore:
+            - '&7Access to check the island''s linked paypal.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: BLUE_WOOL
+          name: '&6Paypal Show'
+          lore:
+            - '&7Access to check the island''s linked paypal.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      pickup_axolotl:
+        display-menu: true
+        permission-enabled:
+          material: AXOLOTL_SPAWN_EGG
+          name: '&6Pickup Axolotls'
+          lore:
+            - '&7Access to pickup axolotls using a water bucket inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: AXOLOTL_SPAWN_EGG
+          name: '&6Pickup Axolotls'
+          lore:
+            - '&7Access to pickup axolotls using a water bucket inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: AXOLOTL_SPAWN_EGG
+          name: '&6Pickup Axolotls'
+          lore:
+            - '&7Access to pickup axolotls using a water bucket inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      pickup_drops:
+        display-menu: true
+        permission-enabled:
+          material: HOPPER
+          name: '&6Pickup Drops'
+          lore:
+            - '&7Access to pickup items inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: HOPPER
+          name: '&6Pickup Drops'
+          lore:
+            - '&7Access to pickup items inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: HOPPER
+          name: '&6Pickup Drops'
+          lore:
+            - '&7Access to pickup items inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      pickup_fish:
+        display-menu: true
+        permission-enabled:
+          material: COD
+          name: '&6Pickup Fish'
+          lore:
+            - '&7Access to pickup fish using buckets inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: COD
+          name: '&6Pickup Fish'
+          lore:
+            - '&7Access to pickup fish using buckets inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: COD
+          name: '&6Pickup Fish'
+          lore:
+            - '&7Access to pickup fish using buckets inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      pickup_lectern_book:
+        display-menu: true
+        permission-enabled:
+          material: LECTERN
+          name: '&6Pickup Lectern Book'
+          lore:
+            - '&7Access to pickup books out of lecterns inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: LECTERN
+          name: '&6Pickup Lectern Book'
+          lore:
+            - '&7Access to pickup books out of lecterns inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: LECTERN
+          name: '&6Pickup Lectern Book'
+          lore:
+            - '&7Access to pickup books out of lecterns inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      promote_members:
+        display-menu: true
+        permission-enabled:
+          material: DIAMOND
+          name: '&6Promote Members'
+          lore:
+            - '&7Access to promote members inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: DIAMOND
+          name: '&6Promote Members'
+          lore:
+            - '&7Access to promote members inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: DIAMOND
+          name: '&6Promote Members'
+          lore:
+            - '&7Access to promote members inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      rankup:
+        display-menu: true
+        permission-enabled:
+          material: GOLD_INGOT
+          name: '&6Upgrades Rankup'
+          lore:
+            - '&7Access to rankup island''s upgrades.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: GOLD_INGOT
+          name: '&6Upgrades Rankup'
+          lore:
+            - '&7Access to rankup island''s upgrades.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: GOLD_INGOT
+          name: '&6Upgrades Rankup'
+          lore:
+            - '&7Access to rankup island''s upgrades.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      ratings_show:
+        display-menu: true
+        permission-enabled:
+          material: NETHER_STAR
+          name: '&6Ratings Show'
+          lore:
+            - '&7Access to see all island''s ratings.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: NETHER_STAR
+          name: '&6Ratings Show'
+          lore:
+            - '&7Access to see all island''s ratings.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: NETHER_STAR
+          name: '&6Ratings Show'
+          lore:
+            - '&7Access to see all island''s ratings.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      set_biome:
+        display-menu: true
+        permission-enabled:
+          material: GRASS_BLOCK
+          name: '&6Set Biome'
+          lore:
+            - '&7Access to change the island''s biome.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: GRASS_BLOCK
+          name: '&6Set Biome'
+          lore:
+            - '&7Access to change the island''s biome.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: GRASS_BLOCK
+          name: '&6Set Biome'
+          lore:
+            - '&7Access to change the island''s biome.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      set_discord:
+        display-menu: true
+        permission-enabled:
+          material: LIGHT_BLUE_TERRACOTTA
+          name: '&6Set Discord'
+          lore:
+            - '&7Access to change the discord linked to the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: LIGHT_BLUE_TERRACOTTA
+          name: '&6Set Discord'
+          lore:
+            - '&7Access to change the discord linked to the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: LIGHT_BLUE_TERRACOTTA
+          name: '&6Set Discord'
+          lore:
+            - '&7Access to change the discord linked to the island.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       set_home:
@@ -519,29 +1244,95 @@ items:
           name: '&6Set Home'
           lore:
             - '&7Access to change the home location of the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
             - ''
 
-      withdraw_money:
+      set_paypal:
         display-menu: true
         permission-enabled:
-          material: EMERALD
-          name: '&6Withdraw Money'
+          material: BLUE_WOOL
+          name: '&6Set Paypal'
           lore:
-            - '&7Access to withdraw money from the island''s bank.'
+            - '&7Access to change the paypal linked to the island.'
             - '&7Currently &aENABLED&7.'
         permission-disabled:
-          material: EMERALD
-          name: '&6Withdraw Money'
+          material: BLUE_WOOL
+          name: '&6Set Paypal'
           lore:
-            - '&7Access to withdraw money from the island''s bank.'
+            - '&7Access to change the paypal linked to the island.'
             - '&7Currently &cDISABLED&7.'
         role-permission:
-          material: EMERALD
-          name: '&6Withdraw Money'
+          material: BLUE_WOOL
+          name: '&6Set Paypal'
           lore:
-            - '&7Access to withdraw money from the island''s bank.'
-            - '&7Role: &e{}&7.'
+            - '&7Access to change the paypal linked to the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      set_permission:
+        display-menu: true
+        permission-enabled:
+          material: REPEATER
+          name: '&6Set Permission'
+          lore:
+            - '&7Access to change permissions for island members.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: REPEATER
+          name: '&6Set Permission'
+          lore:
+            - '&7Access to change permissions for island members.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: REPEATER
+          name: '&6Set Permission'
+          lore:
+            - '&7Access to change permissions for island members.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      set_role:
+        display-menu: true
+        permission-enabled:
+          material: DIAMOND_CHESTPLATE
+          name: '&6Set Role'
+          lore:
+            - '&7Access to change roles for island members.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: DIAMOND_CHESTPLATE
+          name: '&6Set Role'
+          lore:
+            - '&7Access to change roles for island members.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: DIAMOND_CHESTPLATE
+          name: '&6Set Role'
+          lore:
+            - '&7Access to change roles for island members.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      set_settings:
+        display-menu: true
+        permission-enabled:
+          material: LEVER
+          name: '&6Set Settings'
+          lore:
+            - '&7Access to change settings for islands.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: LEVER
+          name: '&6Set Settings'
+          lore:
+            - '&7Access to change settings for islands.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: LEVER
+          name: '&6Set Settings'
+          lore:
+            - '&7Access to change settings for islands.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       set_warp:
@@ -563,7 +1354,95 @@ items:
           name: '&6Set Warp'
           lore:
             - '&7Access to set new warps for the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      uncoop_member:
+        display-menu: true
+        permission-enabled:
+          material: GOLDEN_APPLE
+          name: '&6Uncoop Member'
+          lore:
+            - '&7Access to remove co-op members from the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: GOLDEN_APPLE
+          name: '&6Uncoop Member'
+          lore:
+            - '&7Access to remove co-op members from the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: GOLDEN_APPLE
+          name: '&6Uncoop Member'
+          lore:
+            - '&7Access to remove co-op members from the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      sign_interact:
+        display-menu: true
+        permission-enabled:
+          material: OAK_SIGN
+          name: '&6Sign Interact'
+          lore:
+            - '&7Access to interact with signs inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: OAK_SIGN
+          name: '&6Sign Interact'
+          lore:
+            - '&7Access to interact with signs inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: OAK_SIGN
+          name: '&6Sign Interact'
+          lore:
+            - '&7Access to interact with signs inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      spawner_break:
+        display-menu: true
+        permission-enabled:
+          material: SPAWNER
+          name: '&6Spawner Break'
+          lore:
+            - '&7Access to break spawners inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: SPAWNER
+          name: '&6Spawner Break'
+          lore:
+            - '&7Access to break spawners inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: SPAWNER
+          name: '&6Spawner Break'
+          lore:
+            - '&7Access to break spawners inside the island.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      turtle_egg_tramping:
+        display-menu: true
+        permission-enabled:
+          material: TURTLE_EGG
+          name: '&6Turtle Eggs Tramping'
+          lore:
+            - '&7Access to tramp turtle eggs inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: TURTLE_EGG
+          name: '&6Turtle Eggs Tramping'
+          lore:
+            - '&7Access to tramp turtle eggs inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: TURTLE_EGG
+          name: '&6Turtle Eggs Tramping'
+          lore:
+            - '&7Access to tramp turtle eggs inside the island.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       use:
@@ -585,31 +1464,71 @@ items:
           name: '&6Use'
           lore:
             - '&7Access to use different blocks inside the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
+            - ''
+
+      valuable_break:
+        display-menu: true
+        permission-enabled:
+          material: GOLD_INGOT
+          name: '&6Valuable Blocks Break'
+          lore:
+            - '&7Access to break valuable blocks inside the island.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: GOLD_INGOT
+          name: '&6Valuable Blocks Break'
+          lore:
+            - '&7Access to break valuable blocks inside the island.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: GOLD_INGOT
+          name: '&6Valuable Blocks Break'
+          lore:
+            - '&7Access to break valuable blocks inside the island.'
+            - '&7Role: &e%role%&7.'
             - ''
 
       villager_trading:
         display-menu: true
         permission-enabled:
           material: PLAYER_HEAD
-          skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDFiODMwZWI0MDgyYWNlYzgzNmJjODM1ZTQwYTExMjgyYmI1MTE5MzMxNWY5MTE4NDMzN2U4ZDM1NTU1ODMifX19'
           name: '&6Villagers Trading'
           lore:
             - '&7Access to trade with villagers inside the island.'
             - '&7Currently &aENABLED&7.'
         permission-disabled:
           material: PLAYER_HEAD
-          skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDFiODMwZWI0MDgyYWNlYzgzNmJjODM1ZTQwYTExMjgyYmI1MTE5MzMxNWY5MTE4NDMzN2U4ZDM1NTU1ODMifX19'
           name: '&6Villagers Trading'
           lore:
             - '&7Access to trade with villagers inside the island.'
             - '&7Currently &cDISABLED&7.'
         role-permission:
           material: PLAYER_HEAD
-          skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDFiODMwZWI0MDgyYWNlYzgzNmJjODM1ZTQwYTExMjgyYmI1MTE5MzMxNWY5MTE4NDMzN2U4ZDM1NTU1ODMifX19'
           name: '&6Villagers Trading'
           lore:
             - '&7Access to trade with villagers inside the island.'
-            - '&7Role: &e{}&7.'
+            - '&7Role: &e%role%&7.'
             - ''
 
+      withdraw_money:
+        display-menu: true
+        permission-enabled:
+          material: EMERALD
+          name: '&6Withdraw Money'
+          lore:
+            - '&7Access to withdraw money from the island''s bank.'
+            - '&7Currently &aENABLED&7.'
+        permission-disabled:
+          material: EMERALD
+          name: '&6Withdraw Money'
+          lore:
+            - '&7Access to withdraw money from the island''s bank.'
+            - '&7Currently &cDISABLED&7.'
+        role-permission:
+          material: EMERALD
+          name: '&6Withdraw Money'
+          lore:
+            - '&7Access to withdraw money from the island''s bank.'
+            - '&7Role: &e%role%&7.'
+            - ''

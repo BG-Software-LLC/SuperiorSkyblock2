@@ -1,24 +1,25 @@
 package com.bgsoftware.superiorskyblock.core.zmenu.utils;
 
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import fr.maxlego08.menu.MenuItemStack;
 
 public class Permission {
 
-    private final String permission;
+    private final IslandPrivilege islandPrivilege;
 
     private final MenuItemStack itemStackEnabled;
     private final MenuItemStack itemStackDisabled;
     private final MenuItemStack itemStackPermission;
 
-    public Permission(String permission, MenuItemStack itemStackEnabled, MenuItemStack itemStackDisabled, MenuItemStack itemStackPermission) {
-        this.permission = permission;
+    public Permission(IslandPrivilege islandPrivilege, MenuItemStack itemStackEnabled, MenuItemStack itemStackDisabled, MenuItemStack itemStackPermission) {
+        this.islandPrivilege = islandPrivilege;
         this.itemStackEnabled = itemStackEnabled;
         this.itemStackDisabled = itemStackDisabled;
         this.itemStackPermission = itemStackPermission;
     }
 
-    public String getPermission() {
-        return permission;
+    public IslandPrivilege getIslandPrivilege() {
+        return islandPrivilege;
     }
 
     public MenuItemStack getItemStackEnabled() {
