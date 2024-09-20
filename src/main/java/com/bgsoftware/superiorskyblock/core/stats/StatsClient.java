@@ -99,8 +99,6 @@ public class StatsClient {
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setDoOutput(true);
 
-        Log.info("Submitting stats: " + GSON.toJson(statsObject));
-
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()))) {
             writer.write(GSON.toJson(statsObject));
         }
