@@ -9,13 +9,19 @@ public class StatsIslandsCounter implements IStatsCollector {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    private int lastIslandsCount = 0;
+
     private StatsIslandsCounter() {
 
     }
 
     @Override
     public void collect(JsonObject statsObject) {
-        statsObject.addProperty("islands_count", plugin.getGrid().getIslands().size());
+        int currentIslandsCount = plugin.getGrid().getIslands().size();
+        if (currentIslandsCount != this.lastIslandsCount) {
+            statsObject.addProperty("islands_count", currentIslandsCount);
+            this.lastIslandsCount = currentIslandsCount;
+        }
     }
 
 }

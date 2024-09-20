@@ -10,13 +10,26 @@ public class StatsPlayersCounter implements IStatsCollector {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    private int lastOnlinePlayers;
+    private int lastAllPlayers;
+
     private StatsPlayersCounter() {
 
     }
 
     @Override
     public void collect(JsonObject statsObject) {
-        statsObject.addProperty("online_players", Bukkit.getOnlinePlayers().size());
-        statsObject.addProperty("all_players", plugin.getPlayers().getAllPlayers().size());
+        int currentOnlinePlayers = Bukkit.getOnlinePlayers().size();
+        int currentAllPlayers = plugin.getPlayers().getAllPlayers().size();
+
+        if (currentOnlinePlayers != this.lastOnlinePlayers) {
+            statsObject.addProperty("online_players", currentOnlinePlayers);
+            this.lastOnlinePlayers = currentOnlinePlayers;
+        }
+
+        if (currentAllPlayers != this.lastAllPlayers) {
+            statsObject.addProperty("all_players", currentAllPlayers);
+            this.lastAllPlayers = currentAllPlayers;
+        }
     }
 }
