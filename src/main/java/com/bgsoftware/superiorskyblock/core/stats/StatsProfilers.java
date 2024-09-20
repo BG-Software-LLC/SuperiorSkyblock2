@@ -45,6 +45,9 @@ public class StatsProfilers implements IStatsCollector {
                     TimeUnit.NANOSECONDS.toMillis(session.getEndData().time - session.getStartData().time));
             profiler.addProperty("start_tps", session.getStartData().tps);
             profiler.addProperty("end_tps", session.getEndData().tps);
+            Object extra = session.getExtra();
+            if (extra != null)
+                profiler.addProperty("extra", String.valueOf(extra));
             profilers.add(profiler);
         });
 

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.profiler;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
 import java.util.ArrayList;
@@ -15,13 +16,16 @@ public class ProfilerSession {
     private final long id;
     private final AtomicInteger stopCount;
     private final ProfileType profileType;
+    @Nullable
+    private final Object extra;
     private final Data startData;
     private Data endData;
 
-    public ProfilerSession(long id, int stopCount, ProfileType profileType) {
+    public ProfilerSession(long id, int stopCount, ProfileType profileType, @Nullable Object extra) {
         this.id = id;
         this.stopCount = new AtomicInteger(stopCount);
         this.profileType = profileType;
+        this.extra = extra;
         this.startData = new Data();
     }
 
@@ -31,6 +35,11 @@ public class ProfilerSession {
 
     public ProfileType getProfileType() {
         return profileType;
+    }
+
+    @Nullable
+    public Object getExtra() {
+        return extra;
     }
 
     public Data getStartData() {
