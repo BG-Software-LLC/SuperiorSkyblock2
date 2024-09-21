@@ -1,0 +1,19 @@
+group 'AdvancedSlimePaper'
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+dependencies {
+    compileOnly 'com.infernalsuite:AdvancedSlimePaper:1.19.4-R0.1'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_slimeworldmanager') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_slimeworldmanager").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

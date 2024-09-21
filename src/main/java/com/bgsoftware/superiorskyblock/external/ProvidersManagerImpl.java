@@ -432,8 +432,13 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         if (canRegisterHook("CoreProtect"))
             registerHook("CoreProtectHook");
 
-        if (canRegisterHook("SlimeWorldManager"))
-            registerHook("SlimeWorldManagerHook");
+        if (isHookEnabled("SlimeWorldManager")) {
+            if (isOldSlimeWorldManager()) {
+                registerHook("SlimeWorldManagerHook");
+            } else {
+                registerHook("AdvancedSlimePaperHook");
+            }
+        }
 
         if (canRegisterHook("ProtocolLib"))
             registerHook("ProtocolLibHook");
@@ -645,6 +650,15 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
     private static boolean hasPaperAsyncSupport() {
         return new ReflectMethod<>(World.class, "getChunkAtAsync", int.class, int.class).isValid();
+    }
+
+    private static boolean isOldSlimeWorldManager() {
+        try {
+            Class.forName("com.grinderwolf.swm.api.SlimePlugin");
+            return true;
+        } catch (ClassNotFoundException error) {
+            return false;
+        }
     }
 
     private <T> Optional<T> createInstance(String className) {
