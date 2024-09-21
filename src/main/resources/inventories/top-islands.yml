@@ -37,43 +37,47 @@ items:
     no-island:
       material: BARRIER
       name: '&cInvalid Island'
-  '%':
+  worth:
+    type: SUPERIORSKYBLOCK_TOP_SORT
     slot: 10
+    sorting-type: 'WORTH'
     item:
       material: DIAMOND
-      sorting-type: 'WORTH'
       name: '&6Sort by Worth'
-  '*':
+  level:
+    type: SUPERIORSKYBLOCK_TOP_SORT
     slot: 19
+    sorting-type: 'LEVEL'
     item:
       material: GOLD_INGOT
-      sorting-type: 'LEVEL'
       name: '&6Sort by Level'
-  '^':
+  rating:
+    type: SUPERIORSKYBLOCK_TOP_SORT
     slot: 28
+    sorting-type: 'RATING'
     item:
       material: EMERALD
-      sorting-type: 'RATING'
       name: '&6Sort by Rating'
-  '&':
+  players:
+    type: SUPERIORSKYBLOCK_TOP_SORT
     slot: 37
+    sorting-type: 'PLAYERS'
     item:
       material: PLAYER_HEAD
-      sorting-type: 'PLAYERS'
       name: '&6Sort by Players'
-  '!':
+  previous:
     type: PREVIOUS
     slot: 48
     item:
       material: PAPER
       name: 'Previous Page'
-  '+':
+  next:
     type: NEXT
     slot: 50
     item:
       material: PAPER
       name: 'Next Page'
-  '~':
+  decoration:
     slots:
       - 0-8
       - 45-53

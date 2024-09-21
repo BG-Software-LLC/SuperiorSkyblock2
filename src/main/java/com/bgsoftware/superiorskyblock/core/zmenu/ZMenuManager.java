@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandMemberRoleLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandPermissionLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandSettingsLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandTopLoader;
+import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandTopSortLoader;
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.Inventory;
 import fr.maxlego08.menu.api.InventoryManager;
@@ -73,6 +74,7 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new IslandMemberRoleLoader(this.plugin));
         this.buttonManager.register(new IslandPermissionLoader(this.plugin));
         this.buttonManager.register(new IslandTopLoader(this.plugin));
+        this.buttonManager.register(new IslandTopSortLoader(this.plugin));
 
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMembersButton.class, "SUPERIORSKYBLOCK_MEMBERS"));
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMemberInfoButton.class, "SUPERIORSKYBLOCK_MEMBER_INFO"));
