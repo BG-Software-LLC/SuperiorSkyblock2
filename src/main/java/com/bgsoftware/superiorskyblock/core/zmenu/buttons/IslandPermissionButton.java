@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.zmenu.buttons;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.zmenu.utils.Permission;
@@ -13,6 +14,7 @@ import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.maxlego08.menu.zcore.utils.inventory.Pagination;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -70,8 +72,7 @@ public class IslandPermissionButton extends SuperiorButton implements PaginateBu
 
             PlayerRole currentRole;
             for (int j = -2; (currentRole = SPlayerRole.of(j)) != null; j++) {
-                if (!plugin.getSettings().isCoopMembers() && currentRole == SPlayerRole.coopRole())
-                    continue;
+                if (!plugin.getSettings().isCoopMembers() && currentRole == SPlayerRole.coopRole()) continue;
 
                 if (j < roleWeight) {
                     strings.add(this.noRolePermission.replace("%role%", String.valueOf(currentRole)));
@@ -87,7 +88,51 @@ public class IslandPermissionButton extends SuperiorButton implements PaginateBu
 
             inventory.addItem(slot, itemStack).setClick(event -> {
 
+                if (!(event.getWhoClicked() instanceof Player)) return;
+
+                SuperiorPlayer clickedPlayer = getSuperiorPlayer((Player) event.getWhoClicked());
+
+                onRoleButtonClick(island, clickedPlayer, event, permission, inventory);
             });
+        }
+    }
+
+    private void onRoleButtonClick(Island island, SuperiorPlayer clickedPlayer, InventoryClickEvent clickEvent, Permission permission, InventoryDefault inventoryDefault) {
+        IslandPrivilege islandPrivilege = permission.getIslandPrivilege();
+
+        if (islandPrivilege == null) return;
+
+        PlayerRole currentRole = island.getRequiredPlayerRole(islandPrivilege);
+
+        if (clickedPlayer.getPlayerRole().isLessThan(currentRole)) return;
+
+        PlayerRole newRole = null;
+
+        if (clickEvent.getClick().isLeftClick()) {
+            newRole = SPlayerRole.of(currentRole.getWeight() - 1);
+
+            if (!plugin.getSettings().isCoopMembers() && newRole == SPlayerRole.coopRole()) {
+                assert newRole != null;
+                newRole = SPlayerRole.of(newRole.getWeight() - 1);
+            }
+
+            if (newRole == null) newRole = clickedPlayer.getPlayerRole();
+        } else {
+            if (clickedPlayer.getPlayerRole().isHigherThan(currentRole)) {
+                newRole = SPlayerRole.of(currentRole.getWeight() + 1);
+            }
+
+            if (!plugin.getSettings().isCoopMembers() && newRole == SPlayerRole.coopRole()) {
+                assert newRole != null;
+                newRole = SPlayerRole.of(newRole.getWeight() + 1);
+            }
+
+            if (newRole == null) newRole = SPlayerRole.guestRole();
+        }
+
+        if (plugin.getEventsBus().callIslandChangeRolePrivilegeEvent(island, clickedPlayer, newRole)) {
+            island.setPermission(newRole, islandPrivilege);
+            onRender(clickedPlayer.asPlayer(), inventoryDefault);
         }
     }
 
@@ -98,6 +143,6 @@ public class IslandPermissionButton extends SuperiorButton implements PaginateBu
 
     @Override
     public boolean isPermanent() {
-        return super.isPermanent();
+        return true;
     }
 }
