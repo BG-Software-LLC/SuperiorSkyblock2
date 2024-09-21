@@ -79,6 +79,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public class NMSChunksImpl implements NMSChunks {
@@ -452,7 +453,7 @@ public class NMSChunksImpl implements NMSChunks {
     @Override
     public boolean isChunkEmpty(org.bukkit.Chunk bukkitChunk) {
         LevelChunk levelChunk = NMSUtils.getCraftChunkHandle((CraftChunk) bukkitChunk);
-        return Arrays.stream(levelChunk.getSections()).allMatch(chunkSection ->
+        return levelChunk != null && Arrays.stream(levelChunk.getSections()).allMatch(chunkSection ->
                 chunkSection == null || chunkSection.hasOnlyAir());
     }
 
@@ -474,7 +475,7 @@ public class NMSChunksImpl implements NMSChunks {
             if (cropsBlockEntity != null)
                 cropsBlockEntity.remove();
         } else {
-            LevelChunk levelChunk = NMSUtils.getCraftChunkHandle((CraftChunk) chunk);
+            LevelChunk levelChunk = Objects.requireNonNull(NMSUtils.getCraftChunkHandle((CraftChunk) chunk));
             CropsBlockEntity.create(island, levelChunk);
         }
     }
@@ -500,7 +501,7 @@ public class NMSChunksImpl implements NMSChunks {
 
     @Override
     public List<Location> getBlockEntities(Chunk chunk) {
-        LevelChunk levelChunk = NMSUtils.getCraftChunkHandle((CraftChunk) chunk);
+        LevelChunk levelChunk = Objects.requireNonNull(NMSUtils.getCraftChunkHandle((CraftChunk) chunk));
         List<Location> blockEntities = new LinkedList<>();
 
         World bukkitWorld = chunk.getWorld();
