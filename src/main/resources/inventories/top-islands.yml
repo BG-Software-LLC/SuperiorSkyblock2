@@ -1,0 +1,82 @@
+name: 'Top Islands'
+
+items:
+  rankings:
+    type: SUPERIORSKYBLOCK_TOP
+    slots:
+      - 14
+      - 22-24
+      - 30-34
+    positions:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+    island:
+      material: PLAYER_HEAD
+      name: '&e&l[!] &rIsland: &6&n%island-name%&r&7 (#%island-position%)'
+      lore:
+        - '&7'
+        - '&6* &eIsland Level &7%island-level%'
+        - '&7'
+        - '&6* &ePlace &7#%island-position%'
+        - '&6* &eWorth &7$%island-worth%'
+        - '&6* &eRating %island-total-rating% &7(%island-rating-amount%)'
+        - '&6* &ePlayers &7%island-players%'
+        - '&7'
+        - '&6* &eMembers:'
+        - '%members%&f - &a%role% &7%member-name% &7%online%'
+        - '&7'
+        - '&7&o(( &f&oLeft-Click &7&oto view their items. ))'
+        - '&7&o(( &f&oRight-Click &7&oto teleport to island warp. ))'
+    no-island:
+      material: BARRIER
+      name: '&cInvalid Island'
+  '%':
+    slot: 10
+    item:
+      material: DIAMOND
+      sorting-type: 'WORTH'
+      name: '&6Sort by Worth'
+  '*':
+    slot: 19
+    item:
+      material: GOLD_INGOT
+      sorting-type: 'LEVEL'
+      name: '&6Sort by Level'
+  '^':
+    slot: 28
+    item:
+      material: EMERALD
+      sorting-type: 'RATING'
+      name: '&6Sort by Rating'
+  '&':
+    slot: 37
+    item:
+      material: PLAYER_HEAD
+      sorting-type: 'PLAYERS'
+      name: '&6Sort by Players'
+  '!':
+    type: PREVIOUS
+    slot: 48
+    item:
+      material: PAPER
+      name: 'Previous Page'
+  '+':
+    type: NEXT
+    slot: 50
+    item:
+      material: PAPER
+      name: 'Next Page'
+  '~':
+    slots:
+      - 0-8
+      - 45-53
+    item:
+      material: BLACK_STAINED_GLASS_PANE
+      name: '&f'
