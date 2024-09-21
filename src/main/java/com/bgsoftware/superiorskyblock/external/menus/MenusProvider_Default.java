@@ -20,7 +20,6 @@ import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmBan;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmKick;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandCreation;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandPrivileges;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMissionsCategory;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategoryIconEdit;
@@ -142,7 +141,10 @@ public class MenusProvider_Default implements MenusProvider {
     public void openControlPanel(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        Menus.MENU_CONTROL_PANEL.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        // zMenu Start
+        // Menus.MENU_CONTROL_PANEL.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        this.plugin.getZMenumanager().openInventory(targetPlayer, "control-panel");
+        // zMenu End
     }
 
     @Override
@@ -322,7 +324,11 @@ public class MenusProvider_Default implements MenusProvider {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
         Preconditions.checkNotNull(permissibleRole, "permissibleRole parameter cannot be null.");
-        Menus.MENU_ISLAND_PRIVILEGES.createView(targetPlayer, new MenuIslandPrivileges.Args(targetIsland, permissibleRole), previousMenu);
+        // Menus.MENU_ISLAND_PRIVILEGES.createView(targetPlayer, new MenuIslandPrivileges.Args(targetIsland, permissibleRole), previousMenu);
+        // zMenu Start
+        // Menus.MENU_ISLAND_PRIVILEGES.createView(targetPlayer, new MenuIslandPrivileges.Args(targetIsland, permissiblePlayer), previousMenu);
+        plugin.getZMenumanager().openInventory(targetPlayer, "permissions");
+        // zMenu End
     }
 
     @Override

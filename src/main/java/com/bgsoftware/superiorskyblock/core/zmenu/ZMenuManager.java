@@ -86,7 +86,7 @@ public class ZMenuManager implements Listener {
 
         }
         // Save inventories files
-        List<String> strings = Arrays.asList("island-creation", "settings", "biomes", "members", "member-manage", "member-role", "permissions");
+        List<String> strings = Arrays.asList("island-creation", "settings", "biomes", "members", "member-manage", "member-role", "permissions", "control-panel");
         strings.forEach(inventoryName -> {
             if (!new File(plugin.getDataFolder(), "inventories/" + inventoryName + ".yml").exists()) {
                 this.plugin.saveResource("inventories/" + inventoryName + ".yml", false);
