@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberBa
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberInfoButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberKickButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMembersButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.loader.BlockValueLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.BorderColorLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.BorderToggleLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandBiomeLoader;
@@ -85,6 +86,7 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new BorderColorLoader(this.plugin));
         this.buttonManager.register(new BorderToggleLoader(this.plugin));
         this.buttonManager.register(new PlayerLanguageLoader(this.plugin));
+        this.buttonManager.register(new BlockValueLoader(this.plugin));
 
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMembersButton.class, "SUPERIORSKYBLOCK_MEMBERS"));
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMemberInfoButton.class, "SUPERIORSKYBLOCK_MEMBER_INFO"));
@@ -120,7 +122,8 @@ public class ZMenuManager implements Listener {
                 "confirm-disband",
                 "confirm-kick",
                 "confirm-leave",
-                "player-language"
+                "player-language",
+                "values"
         );
 
         strings.forEach(inventoryName -> {

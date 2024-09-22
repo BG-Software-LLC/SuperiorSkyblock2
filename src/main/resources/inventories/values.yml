@@ -1,0 +1,263 @@
+name: '%player-name% &n%worth%$'
+
+matrix:
+  - '&&&&&&&&&'
+  - ' $ABCDEF '
+  - '  GHIJKL '
+  - ' *MNOPQR '
+  - '  STUVWX '
+  - '&&&&&&&&&'
+
+items:
+  '&':
+    item:
+      material: BLACK_STAINED_GLASS_PANE
+      name: '&f'
+  '$':
+    item:
+      material: SPAWNER
+      name: '&eSPAWNERS ->'
+  '*':
+    item:
+      material: WRITABLE_BOOK
+      name: '&eITEMS ->'
+  'A':
+    block: SPAWNER:IRON_GOLEM
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODkwOTFkNzllYTBmNTllZjdlZjk0ZDdiYmE2ZTVmMTdmMmY3ZDQ1NzJjNDRmOTBmNzZjNDgxOWE3MTQifX19'
+      name: '&e[!] &7Iron Golem Spawner'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'B':
+    block: SPAWNER:BLAZE
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjc4ZWYyZTRjZjJjNDFhMmQxNGJmZGU5Y2FmZjEwMjE5ZjViMWJmNWIzNWE0OWViNTFjNjQ2Nzg4MmNiNWYwIn19fQ=='
+      name: '&e[!] &7Blaze Spawner'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'C':
+    block: SPAWNER:SPIDER
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDE2NDVkZmQ3N2QwOTkyMzEwN2IzNDk2ZTk0ZWViNWMzMDMyOWY5N2VmYzk2ZWQ3NmUyMjZlOTgyMjQifX19'
+      name: '&e[!] &7Spider Spawner'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'D':
+    block: SPAWNER:COW
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWQ2YzZlZGE5NDJmN2Y1ZjcxYzMxNjFjNzMwNmY0YWVkMzA3ZDgyODk1ZjlkMmIwN2FiNDUyNTcxOGVkYzUifX19'
+      name: '&e[!] &7Cow Spawner'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'E':
+    block: SPAWNER:ZOMBIE
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTZmYzg1NGJiODRjZjRiNzY5NzI5Nzk3M2UwMmI3OWJjMTA2OTg0NjBiNTFhNjM5YzYwZTVlNDE3NzM0ZTExIn19fQ=='
+      name: '&e[!] &7Zombie Spawner'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'F':
+    block: SPAWNER:SKELETON
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzAxMjY4ZTljNDkyZGExZjBkODgyNzFjYjQ5MmE0YjMwMjM5NWY1MTVhN2JiZjc3ZjRhMjBiOTVmYzAyZWIyIn19fQ=='
+      name: '&e[!] &7Skeleton Spawner'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'G':
+    block: SPAWNER:CREEPER
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjQyNTQ4MzhjMzNlYTIyN2ZmY2EyMjNkZGRhYWJmZTBiMDIxNWY3MGRhNjQ5ZTk0NDQ3N2Y0NDM3MGNhNjk1MiJ9fX0='
+      name: '&e[!] &7Creeper Spawner'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'H':
+    block: SPAWNER:ZOMBIFIED_PIGLIN
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2VhYmFlY2M1ZmFlNWE4YTQ5Yzg4NjNmZjQ4MzFhYWEyODQxOThmMWEyMzk4ODkwYzc2NWUwYThkZTE4ZGE4YyJ9fX0='
+      name: '&e[!] &7Zombified Piglin Spawner'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'I':
+    block: SPAWNER:GHAST
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGI2YTcyMTM4ZDY5ZmJiZDJmZWEzZmEyNTFjYWJkODcxNTJlNGYxYzk3ZTVmOTg2YmY2ODU1NzFkYjNjYzAifX19'
+      name: '&e[!] &7Ghast Spawner'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'J':
+    block: SPAWNER:SLIME
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTZhZDIwZmMyZDU3OWJlMjUwZDNkYjY1OWM4MzJkYTJiNDc4YTczYTY5OGI3ZWExMGQxOGM5MTYyZTRkOWI1In19fQ=='
+      name: '&e[!] &7Slime Spawner'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'K':
+    block: SPAWNER:GUARDIAN
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGZiNjc1Y2I1YTdlM2ZkMjVlMjlkYTgyNThmMjRmYzAyMGIzZmE5NTAzNjJiOGJjOGViMjUyZTU2ZTc0In19fQ=='
+      name: '&e[!] &7Guardian Spawner'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'L':
+    block: SPAWNER:SQUID
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMDE0MzNiZTI0MjM2NmFmMTI2ZGE0MzRiODczNWRmMWViNWIzY2IyY2VkZTM5MTQ1OTc0ZTljNDgzNjA3YmFjIn19fQ=='
+      name: '&e[!] &7Squid Spawner'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'M':
+    block: HOPPER
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      material: HOPPER
+      name: '&e[!] &7Hopper'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'N':
+    block: BEACON
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      material: BEACON
+      name: '&e[!] &7Beacon'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'O':
+    block: IRON_BLOCK
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      material: IRON_BLOCK
+      name: '&e[!] &7Iron Block'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'P':
+    block: GOLD_BLOCK
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      material: GOLD_BLOCK
+      name: '&e[!] &7Gold Block'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'Q':
+    block: DIAMOND_BLOCK
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      material: DIAMOND_BLOCK
+      name: '&e[!] &7Diamond Block'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'R':
+    block: EMERALD_BLOCK
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      material: EMERALD_BLOCK
+      name: '&e[!] &7Emerald Block'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'S':
+    block: BEDROCK
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      material: BEDROCK
+      name: '&e[!] &7Bedrock'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'T':
+    block: ENDER_CHEST
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      material: ENDER_CHEST
+      name: '&e[!] &7Ender Chest'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'U':
+    block: DRAGON_EGG
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      material: DRAGON_EGG
+      name: '&e[!] &7Dragon Egg'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'V':
+    block: CHEST
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      material: CHEST
+      name: '&e[!] &7Chest'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'W':
+    block: TRAPPED_CHEST
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      material: TRAPPED_CHEST
+      name: '&e[!] &7Trapped Chest'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
+  'X':
+    block: ENCHANTING_TABLE
+    type: SUPERIORSKYBLOCK_BLOCK_VALUE
+    item:
+      material: ENCHANTING_TABLE
+      name: '&e[!] &7Enchantment Table'
+      lore:
+        - '&6* &eQuantity &f%quantity%'
+        - '&6* &eWorth: &f%worth%$'
+        - '&6* &eLevel: &f%level%$'
