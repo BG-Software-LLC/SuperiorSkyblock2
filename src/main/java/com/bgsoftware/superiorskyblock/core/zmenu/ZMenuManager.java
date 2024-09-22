@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.zmenu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.TargetShowButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.confirm.ButtonConfirmBan;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.confirm.ButtonConfirmDisband;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.confirm.ButtonConfirmKick;
@@ -91,6 +92,7 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new NoneLoader(this.plugin, ButtonConfirmDisband.class, "SUPERIORSKYBLOCK_CONFIRM_DISBAND"));
         this.buttonManager.register(new NoneLoader(this.plugin, ButtonConfirmKick.class, "SUPERIORSKYBLOCK_CONFIRM_KICK"));
         this.buttonManager.register(new NoneLoader(this.plugin, ButtonConfirmLeave.class, "SUPERIORSKYBLOCK_CONFIRM_LEAVE"));
+        this.buttonManager.register(new NoneLoader(this.plugin, TargetShowButton.class, "SUPERIORSKYBLOCK_TARGET_SHOW"));
     }
 
     public void loadInventories() {
