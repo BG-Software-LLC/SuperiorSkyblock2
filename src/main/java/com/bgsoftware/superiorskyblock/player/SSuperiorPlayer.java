@@ -429,9 +429,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
             playerTeleportAlgorithm.teleport(player, island, dimension).whenComplete((result, error) -> {
                 boolean successful = error == null && result;
 
-                if(successful) {
-                    BukkitExecutor.sync(() -> removePlayerStatus(PlayerStatus.FALL_DAMAGE_IMMUNED), 40L);
-                }
+                BukkitExecutor.sync(() -> removePlayerStatus(PlayerStatus.FALL_DAMAGE_IMMUNED), 40L);
 
                 if (teleportResult != null)
                     teleportResult.accept(successful);
