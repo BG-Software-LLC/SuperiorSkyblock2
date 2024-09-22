@@ -374,7 +374,10 @@ public class MenusProvider_Default implements MenusProvider {
     @Override
     public void openPlayerLanguage(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
-        Menus.MENU_PLAYER_LANGUAGE.createView(targetPlayer, EmptyViewArgs.INSTANCE, previousMenu);
+        // zMenu Start
+        // Menus.MENU_PLAYER_LANGUAGE.createView(targetPlayer, EmptyViewArgs.INSTANCE, previousMenu);
+        this.plugin.getZMenumanager().openInventory(targetPlayer, "player-language");
+        // zMenu End
     }
 
     @Override

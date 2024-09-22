@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandPermissionLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandSettingsLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandTopLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandTopSortLoader;
+import com.bgsoftware.superiorskyblock.core.zmenu.loader.PlayerLanguageLoader;
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.Inventory;
 import fr.maxlego08.menu.api.InventoryManager;
@@ -83,6 +84,7 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new IslandTopSortLoader(this.plugin));
         this.buttonManager.register(new BorderColorLoader(this.plugin));
         this.buttonManager.register(new BorderToggleLoader(this.plugin));
+        this.buttonManager.register(new PlayerLanguageLoader(this.plugin));
 
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMembersButton.class, "SUPERIORSKYBLOCK_MEMBERS"));
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMemberInfoButton.class, "SUPERIORSKYBLOCK_MEMBER_INFO"));
@@ -117,7 +119,8 @@ public class ZMenuManager implements Listener {
                 "confirm-ban",
                 "confirm-disband",
                 "confirm-kick",
-                "confirm-leave"
+                "confirm-leave",
+                "player-language"
         );
 
         strings.forEach(inventoryName -> {
