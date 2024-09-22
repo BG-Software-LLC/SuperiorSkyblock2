@@ -1,0 +1,45 @@
+name: '&8Border Color'
+size: 45
+
+items:
+  toggle:
+    type: SUPERIORSKYBLOCK_BORDER_TOGGLE
+    slot: 20
+    closeInventory: true
+    enable-border:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2ZhZjRjMjlmMWU3NDA1ZjQ2ODBjNWMyYjAzZWY5Mzg0ZjFhZWNmZTI5ODZhZDUwMTM4YzYwNWZlZmZmMmYxNSJ9fX0='
+      name: '&aEnable Border'
+    disable-border:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2ZhZjRjMjlmMWU3NDA1ZjQ2ODBjNWMyYjAzZWY5Mzg0ZjFhZWNmZTI5ODZhZDUwMTM4YzYwNWZlZmZmMmYxNSJ9fX0='
+      name: '&cDisable Border'
+  decoration:
+    slots:
+      - 0-8
+      - 36-44
+    item:
+      material: BLACK_STAINED_GLASS_PANE
+      name: '&f '
+  green:
+    type: SUPERIORSKYBLOCK_BORDER_COLOR
+    slot: 22
+    border-color: GREEN
+    closeInventory: true
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzc0NzJkNjA4ODIxZjQ1YTg4MDUzNzZlYzBjNmZmY2I3ODExNzgyOWVhNWY5NjAwNDFjMmEwOWQxMGUwNGNiNCJ9fX0='
+      name: '&aGreen Color'
+  red:
+    type: SUPERIORSKYBLOCK_BORDER_COLOR
+    slot: 23
+    border-color: RED
+    closeInventory: true
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjk1M2IxMmEwOTQ2YjYyOWI0YzA4ODlkNDFmZDI2ZWQyNmZiNzI5ZDRkNTE0YjU5NzI3MTI0YzM3YmI3MGQ4ZCJ9fX0='
+      name: '&cRed Color'
+  blue:
+    type: SUPERIORSKYBLOCK_BORDER_COLOR
+    slot: 24
+    border-color: BLUE
+    closeInventory: true
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYzZTY2NDZmMWMwZDQxZmQzYmY1NTg0YTFjZTA0NGY1YzQ2ZDU5ODI1OGRiNDYyMTYxMTc4NTlmNTdhZjE5NyJ9fX0='
+      name: '&bBlue Color'

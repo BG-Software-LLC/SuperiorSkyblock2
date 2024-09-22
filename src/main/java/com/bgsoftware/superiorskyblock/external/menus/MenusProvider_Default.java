@@ -104,7 +104,10 @@ public class MenusProvider_Default implements MenusProvider {
     @Override
     public void openBorderColor(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
-        Menus.MENU_BORDER_COLOR.createView(targetPlayer, EmptyViewArgs.INSTANCE, previousMenu);
+        // zMenu Start
+        // Menus.MENU_BORDER_COLOR.createView(targetPlayer, EmptyViewArgs.INSTANCE, previousMenu);
+        plugin.getZMenumanager().openInventory(targetPlayer, "border-color");
+        // zMenu End
     }
 
     @Override

@@ -7,6 +7,8 @@ import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberIn
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberKickButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberRoleButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMembersButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.loader.BorderColorLoader;
+import com.bgsoftware.superiorskyblock.core.zmenu.loader.BorderToggleLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandBiomeLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandCreationLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandMemberRoleLoader;
@@ -75,6 +77,8 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new IslandPermissionLoader(this.plugin));
         this.buttonManager.register(new IslandTopLoader(this.plugin));
         this.buttonManager.register(new IslandTopSortLoader(this.plugin));
+        this.buttonManager.register(new BorderColorLoader(this.plugin));
+        this.buttonManager.register(new BorderToggleLoader(this.plugin));
 
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMembersButton.class, "SUPERIORSKYBLOCK_MEMBERS"));
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMemberInfoButton.class, "SUPERIORSKYBLOCK_MEMBER_INFO"));
@@ -87,10 +91,22 @@ public class ZMenuManager implements Listener {
         File folder = new File(plugin.getDataFolder(), "inventories");
         if (!folder.exists()) {
             folder.mkdirs();
-
         }
+
         // Save inventories files
-        List<String> strings = Arrays.asList("island-creation", "settings", "biomes", "members", "member-manage", "member-role", "permissions", "control-panel", "top-islands");
+        List<String> strings = Arrays.asList(
+                "island-creation",
+                "settings",
+                "biomes",
+                "members",
+                "member-manage",
+                "member-role",
+                "permissions",
+                "control-panel",
+                "top-islands",
+                "border-color"
+        );
+
         strings.forEach(inventoryName -> {
             if (!new File(plugin.getDataFolder(), "inventories/" + inventoryName + ".yml").exists()) {
                 this.plugin.saveResource("inventories/" + inventoryName + ".yml", false);
