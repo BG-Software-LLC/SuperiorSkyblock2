@@ -1,0 +1,26 @@
+name: '&8Confirm Kick'
+size: 45
+
+items:
+  decoration:
+    slots:
+      - 0-8
+      - 36-44
+    item:
+      material: BLACK_STAINED_GLASS_PANE
+      name: '&f '
+  confirm:
+    type: SUPERIORSKYBLOCK_CONFIRM_KICK
+    slot: 20
+    closeInventory: true
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzc0NzJkNjA4ODIxZjQ1YTg4MDUzNzZlYzBjNmZmY2I3ODExNzgyOWVhNWY5NjAwNDFjMmEwOWQxMGUwNGNiNCJ9fX0='
+      name: '&aConfirm'
+      lore:
+        - '&7Are you sure you want to kick that player?'
+  cancel:
+    closeInventory: true
+    slot: 24
+    item:
+      url: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjk1M2IxMmEwOTQ2YjYyOWI0YzA4ODlkNDFmZDI2ZWQyNmZiNzI5ZDRkNTE0YjU5NzI3MTI0YzM3YmI3MGQ4ZCJ9fX0='
+      name: '&4Cancel'

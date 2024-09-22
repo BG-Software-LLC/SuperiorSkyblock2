@@ -2,10 +2,13 @@ package com.bgsoftware.superiorskyblock.core.zmenu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.confirm.ButtonConfirmBan;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.confirm.ButtonConfirmDisband;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.confirm.ButtonConfirmKick;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.confirm.ButtonConfirmLeave;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberBanButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberInfoButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberKickButton;
-import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberRoleButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMembersButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.BorderColorLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.BorderToggleLoader;
@@ -84,6 +87,10 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMemberInfoButton.class, "SUPERIORSKYBLOCK_MEMBER_INFO"));
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMemberBanButton.class, "SUPERIORSKYBLOCK_MEMBER_BAN"));
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMemberKickButton.class, "SUPERIORSKYBLOCK_MEMBER_KICK"));
+        this.buttonManager.register(new NoneLoader(this.plugin, ButtonConfirmBan.class, "SUPERIORSKYBLOCK_CONFIRM_BAN"));
+        this.buttonManager.register(new NoneLoader(this.plugin, ButtonConfirmDisband.class, "SUPERIORSKYBLOCK_CONFIRM_DISBAND"));
+        this.buttonManager.register(new NoneLoader(this.plugin, ButtonConfirmKick.class, "SUPERIORSKYBLOCK_CONFIRM_KICK"));
+        this.buttonManager.register(new NoneLoader(this.plugin, ButtonConfirmLeave.class, "SUPERIORSKYBLOCK_CONFIRM_LEAVE"));
     }
 
     public void loadInventories() {
@@ -104,7 +111,11 @@ public class ZMenuManager implements Listener {
                 "permissions",
                 "control-panel",
                 "top-islands",
-                "border-color"
+                "border-color",
+                "confirm-ban",
+                "confirm-disband",
+                "confirm-kick",
+                "confirm-leave"
         );
 
         strings.forEach(inventoryName -> {
