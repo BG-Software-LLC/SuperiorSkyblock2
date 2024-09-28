@@ -27,6 +27,7 @@ import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.IInventory;
 import net.minecraft.server.v1_16_R3.IRegistry;
+import net.minecraft.server.v1_16_R3.MinecraftServer;
 import net.minecraft.server.v1_16_R3.World;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -169,7 +170,12 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public double getCurrentTps() {
-        return Bukkit.getTPS()[0];
+        try {
+            return MinecraftServer.getServer().tps1.getAverage();
+        } catch (Throwable error) {
+            //noinspection removal
+            return MinecraftServer.getServer().recentTps[0];
+        }
     }
 
     @Override
