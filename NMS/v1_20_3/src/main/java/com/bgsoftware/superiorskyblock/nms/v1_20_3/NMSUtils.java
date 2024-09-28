@@ -373,7 +373,7 @@ public class NMSUtils {
         if (loadedChunk != null)
             return loadedChunk;
 
-        return (LevelChunk) serverLevel.getChunk(craftChunk.getX(), craftChunk.getZ(), ChunkStatus.FULL, false);
+        return (LevelChunk) serverLevel.getChunk(craftChunk.getX(), craftChunk.getZ(), ChunkStatus.FULL, true);
     }
 
     public record UnloadedChunkCompound(ChunkPosition chunkPosition,
