@@ -102,9 +102,12 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
 
         this.modulesContainer.unregisterModule(pluginModule);
 
+        if (pluginModule instanceof BuiltinModule)
+            return;
+
         // We now want to unload the ClassLoader and free the held handles for the file.
         ClassLoader classLoader = pluginModule.getClassLoader();
-        if (classLoader instanceof URLClassLoader) {
+        if (classLoader != plugin.getPluginClassLoader() && classLoader instanceof URLClassLoader) {
             try {
                 ((URLClassLoader) classLoader).close();
                 // This is an attempt to force Windows to free the handles of the file.
