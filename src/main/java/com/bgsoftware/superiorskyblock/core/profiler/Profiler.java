@@ -32,9 +32,16 @@ public class Profiler {
     }
 
     public static long start(ProfileType profileType, int stopCount, @Nullable Object extra) {
-        ProfilerSession profilerSession = new ProfilerSession(lastProfilerId.incrementAndGet(), stopCount, profileType, extra);
-        profilerSessions.put(profilerSession.getId(), profilerSession);
-        return profilerSession.getId();
+        ProfilerSession profilerSession;
+
+        try {
+            profilerSession = new ProfilerSession(lastProfilerId.incrementAndGet(), stopCount, profileType, extra);
+            profilerSessions.put(profilerSession.getId(), profilerSession);
+            return profilerSession.getId();
+        } catch (Throwable error) {
+            error.printStackTrace();
+            return INVALID_PROFILE_ID;
+        }
     }
 
     public static void end(long id) {
