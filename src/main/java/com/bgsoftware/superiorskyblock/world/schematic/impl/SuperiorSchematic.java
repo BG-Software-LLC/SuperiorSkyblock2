@@ -124,7 +124,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
             return;
         }
 
-        long profiler = Profiler.start(ProfileType.SCHEMATIC_PLACE);
+        long profiler = Profiler.start(ProfileType.SCHEMATIC_PLACE, getName());
 
         Log.debug(Debug.PASTE_SCHEMATIC, this.name, island.getOwner().getName(), location);
 

@@ -164,7 +164,7 @@ public class Location2ObjectMap<V> extends AbstractMap<Location, V> {
     }
 
     public void removeAll(ChunkPosition chunkPosition, Consumer<V> predicate) {
-        ChunkMap<V> chunkMap = this.backendMap.get(chunkPosition.getWorldName(), chunkPosition.asPair());
+        ChunkMap<V> chunkMap = this.backendMap.remove(chunkPosition.getWorldName(), chunkPosition.asPair());
         if (chunkMap == null)
             return;
 

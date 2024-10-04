@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_20_3;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -32,6 +33,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.ProtoChunk;
@@ -364,12 +366,14 @@ public class NMSUtils {
                 blockState.getValue(SlabBlock.TYPE) == SlabType.DOUBLE;
     }
 
+    @Nullable
     public static LevelChunk getCraftChunkHandle(CraftChunk craftChunk) {
-        if (CRAFT_CHUNK_GET_HANDLE.isValid())
-            return CRAFT_CHUNK_GET_HANDLE.invoke(craftChunk);
-
         ServerLevel serverLevel = craftChunk.getCraftWorld().getHandle();
-        return serverLevel.getChunk(craftChunk.getX(), craftChunk.getZ());
+        LevelChunk loadedChunk = serverLevel.getChunkIfLoaded(craftChunk.getX(), craftChunk.getZ());
+        if (loadedChunk != null)
+            return loadedChunk;
+
+        return (LevelChunk) serverLevel.getChunk(craftChunk.getX(), craftChunk.getZ(), ChunkStatus.FULL, true);
     }
 
     public record UnloadedChunkCompound(ChunkPosition chunkPosition,
