@@ -15,20 +15,6 @@ items:
         - '&7Amount: $%amount%'
         - '&7 '
         - '&7&o(( &f&oRight-Click &7&oto filter transactions by this player. ))'
-  next:
-    type: NEXT
-    slot: 50
-    isPermanent: true
-    item:
-      material: PAPER
-      name: '&fNext Page'
-  previous:
-    type: PREVIOUS
-    slot: 58
-    isPermanent: true
-    item:
-      material: PAPER
-      name: '&fPrevious Page'
   decoration:
     isPermanent: true
     slots:
@@ -36,6 +22,27 @@ items:
     item:
       material: CYAN_STAINED_GLASS_PANE
       name: '&f'
+  next:
+    type: NEXT
+    slot: 42
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fNext Page'
+  previous:
+    type: PREVIOUS
+    slot: 38
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fPrevious Page'
+  back:
+    type: BACK
+    slot: 49
+    isPermanent: true
+    item:
+      material: BARRIER
+      name: '&fBack'
   sort-time:
     type: SUPERIORSKYBLOCK_BANK_LOGS_SORT
     slot: 39

@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberBa
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberInfoButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberKickButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMembersButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.loader.BankActionLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.BankLogsSortLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.BlockValueLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.BorderColorLoader;
@@ -97,6 +98,7 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new BlockValueLoader(this.plugin));
         this.buttonManager.register(new BankLogsSortLoader(this.plugin));
         this.buttonManager.register(new GlobalWarpsLoader(this.plugin));
+        this.buttonManager.register(new BankActionLoader(this.plugin));
 
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMembersButton.class, "SUPERIORSKYBLOCK_MEMBERS"));
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMemberInfoButton.class, "SUPERIORSKYBLOCK_MEMBER_INFO"));
@@ -121,7 +123,11 @@ public class ZMenuManager implements Listener {
         }
 
         // Save inventories files
-        List<String> strings = Arrays.asList("island-creation", "settings", "biomes", "members", "member-manage", "member-role", "permissions", "control-panel", "top-islands", "border-color", "confirm-ban", "confirm-disband", "confirm-kick", "confirm-leave", "player-language", "values", "bank-logs", "banned-players", "coops", "counts", "global-warps");
+        List<String> strings = Arrays.asList("island-creation", "settings", "biomes", "members",
+                "member-manage", "member-role", "permissions", "control-panel", "top-islands",
+                "border-color", "confirm-ban", "confirm-disband", "confirm-kick", "confirm-leave",
+                "player-language", "values", "bank-logs", "banned-players", "coops", "counts",
+                "global-warps", "island-bank");
 
         strings.forEach(inventoryName -> {
             if (!new File(plugin.getDataFolder(), "inventories/" + inventoryName + ".yml").exists()) {

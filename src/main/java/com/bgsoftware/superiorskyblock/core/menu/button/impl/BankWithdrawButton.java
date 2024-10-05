@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButt
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.IslandMenuView;
+import com.bgsoftware.superiorskyblock.island.bank.BankManager;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.math.BigDecimal;
@@ -38,7 +39,7 @@ public class BankWithdrawButton extends AbstractMenuViewButton<IslandMenuView> {
                 .multiply(getTemplate().withdrawValue);
 
         BankTransaction bankTransaction = island.getIslandBank().withdrawMoney(clickedPlayer, amount, getTemplate().withdrawCommands);
-        Menus.MENU_ISLAND_BANK.handleWithdraw(clickedPlayer, island, bankTransaction,
+        BankManager.handleWithdraw(clickedPlayer, island, bankTransaction,
                 getTemplate().successSound, getTemplate().failSound, amount);
     }
 

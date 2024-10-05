@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.bank.BankManager;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
@@ -73,7 +74,7 @@ public class CmdWithdraw implements ISuperiorCommand {
         }
 
         BankTransaction transaction = island.getIslandBank().withdrawMoney(superiorPlayer, amount, null);
-        Menus.MENU_ISLAND_BANK.handleWithdraw(superiorPlayer, island, transaction, null, null, amount);
+        BankManager.handleWithdraw(superiorPlayer, island, transaction, null, null, amount);
     }
 
     @Override

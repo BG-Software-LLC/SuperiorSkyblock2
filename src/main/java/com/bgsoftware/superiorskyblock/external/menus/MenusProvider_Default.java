@@ -218,7 +218,10 @@ public class MenusProvider_Default implements MenusProvider {
     public void openIslandBank(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        Menus.MENU_ISLAND_BANK.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        // zMenu Start
+        // Menus.MENU_ISLAND_BANK.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        plugin.getZMenumanager().openInventory(targetPlayer, "island-bank", cache -> cache.setIsland(targetIsland));
+        // zMenu End
     }
 
     @Override

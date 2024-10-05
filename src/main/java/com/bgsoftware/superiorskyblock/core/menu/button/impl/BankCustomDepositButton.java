@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.IslandMenuView;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.bank.BankManager;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -46,7 +47,7 @@ public class BankCustomDepositButton extends AbstractMenuViewButton<IslandMenuVi
             try {
                 BigDecimal newAmount = BigDecimal.valueOf(Double.parseDouble(message));
                 BankTransaction bankTransaction = island.getIslandBank().depositMoney(clickedPlayer, newAmount);
-                Menus.MENU_ISLAND_BANK.handleDeposit(clickedPlayer, island, bankTransaction,
+                BankManager.handleDeposit(clickedPlayer, island, bankTransaction,
                         getTemplate().successSound, getTemplate().failSound, newAmount);
             } catch (IllegalArgumentException ex) {
                 Message.INVALID_AMOUNT.send(clickedPlayer, message);

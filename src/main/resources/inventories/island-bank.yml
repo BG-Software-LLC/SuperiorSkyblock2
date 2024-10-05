@@ -1,0 +1,84 @@
+title: '&8Island Bank'
+
+matrix:
+  - '=-     -='
+  - '- !   % -'
+  - ' #  *  ^ '
+  - '- $   & -'
+  - '=-  ~  -='
+
+items:
+  '!':
+    type: SUPERIORSKYBLOCK_BANK_ACTION
+    item:
+      material: LIME_STAINED_GLASS_PANE
+      name: '&aDeposit Half Money'
+      lore:
+        - '&7Deposit half of your money into the bank.'
+    bank-action: DEPOSIT
+    percentage: 50.0
+  '#':
+    type: SUPERIORSKYBLOCK_BANK_ACTION
+    item:
+      material: LIME_STAINED_GLASS_PANE
+      name: '&aDeposit Money'
+      lore:
+        - '&7Deposit money into the bank.'
+    bank-action: DEPOSIT
+    percentage: 0.0
+  '$':
+    type: SUPERIORSKYBLOCK_BANK_ACTION
+    item:
+      material: LIME_STAINED_GLASS_PANE
+      name: '&aDeposit All Money'
+      lore:
+        - '&7Deposit all of your money into the bank.'
+    bank-action: DEPOSIT
+    percentage: 100.0
+  '%':
+    type: SUPERIORSKYBLOCK_BANK_ACTION
+    item:
+      material: RED_STAINED_GLASS_PANE
+      name: '&aWithdraw Half Money'
+      lore:
+        - '&7Withdraw half of the money from the bank.'
+    bank-action: WITHDRAW
+    percentage: 50.0
+  '^':
+    type: SUPERIORSKYBLOCK_BANK_ACTION
+    item:
+      material: RED_STAINED_GLASS_PANE
+      name: '&aWithdraw Money'
+      lore:
+        - '&7Withdraw money from the bank.'
+    bank-action: WITHDRAW
+    percentage: 0.0
+  '&':
+    type: SUPERIORSKYBLOCK_BANK_ACTION
+    item:
+      material: RED_STAINED_GLASS_PANE
+      name: '&aWithdraw All Money'
+      lore:
+        - '&7Withdraw all of the money from the bank.'
+    bank-action: WITHDRAW
+    percentage: 100.0
+  '*':
+    item:
+      material: PAPER
+      name: '&6Balance'
+      lore:
+        - '&7Your bank currently has $%superior_island_bank_format%'
+  '=':
+    item:
+      material: EMERALD_BLOCK
+      name: '&f '
+  '-':
+    item:
+      material: EMERALD
+      name: '&f '
+  '~':
+    type: INVENTORY
+    inventory: 'bank-logs'
+    item:
+      material: EXPERIENCE_BOTTLE
+      name: '&6Transaction Logs'

@@ -1,6 +1,13 @@
 name: '&8Island Coop Players (%coop%/%max-coop%)'
 
 items:
+  decoration:
+    isPermanent: true
+    slots:
+      - 36-53
+    item:
+      material: CYAN_STAINED_GLASS_PANE
+      name: '&f'
   players:
     type: SUPERIORSKYBLOCK_COOPS
     slots:
@@ -30,10 +37,3 @@ items:
     item:
       material: PAPER
       name: '&fPrevious Page'
-  decoration:
-    isPermanent: true
-    slots:
-      - 36-53
-    item:
-      material: CYAN_STAINED_GLASS_PANE
-      name: '&f'
