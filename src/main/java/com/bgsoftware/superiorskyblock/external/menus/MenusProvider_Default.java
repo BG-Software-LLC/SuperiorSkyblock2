@@ -453,7 +453,10 @@ public class MenusProvider_Default implements MenusProvider {
     public void openUniqueVisitors(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        Menus.MENU_ISLAND_UNIQUE_VISITORS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        // zMenu Start
+        // Menus.MENU_ISLAND_UNIQUE_VISITORS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        this.plugin.getZMenumanager().openInventory(targetPlayer, "unique-visitors", cache -> cache.setIsland(targetIsland));
+        // zMenu End
     }
 
     @Override

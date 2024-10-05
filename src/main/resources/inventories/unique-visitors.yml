@@ -1,0 +1,40 @@
+name: 'Island Visitors (%visitor%)'
+
+items:
+  decoration:
+    isPermanent: true
+    slots:
+      - 36-53
+    item:
+      material: CYAN_STAINED_GLASS_PANE
+      name: '&f'
+  visitors:
+    type: SUPERIORSKYBLOCK_UNIQUE_VISITORS
+    slots:
+      - 0-35
+    item:
+      material: PLAYER_HEAD
+      name: '&e%player%'
+      lore:
+        - '&7Island Owner: %island-owner%'
+        - '&7Last Time Joined: %time%'
+    else:
+      slots:
+        - 22
+      item:
+        material: BARRIER
+        name: "&cNo visitor"
+  next:
+    type: NEXT
+    slot: 42
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fNext Page'
+  previous:
+    type: PREVIOUS
+    slot: 38
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fPrevious Page'

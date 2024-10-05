@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.core.zmenu.buttons.CountsButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.IslandChestButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.RatingsButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.TargetShowButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.UniqueVisitorsButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.bank.BankLogsButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.confirm.ButtonConfirmBan;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.confirm.ButtonConfirmDisband;
@@ -119,6 +120,7 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new NoneLoader(this.plugin, CountsButton.class, "SUPERIORSKYBLOCK_COUNTS"));
         this.buttonManager.register(new NoneLoader(this.plugin, RatingsButton.class, "SUPERIORSKYBLOCK_RATINGS"));
         this.buttonManager.register(new NoneLoader(this.plugin, IslandChestButton.class, "SUPERIORSKYBLOCK_CHESTS"));
+        this.buttonManager.register(new NoneLoader(this.plugin, UniqueVisitorsButton.class, "SUPERIORSKYBLOCK_UNIQUE_VISITORS"));
     }
 
     public void loadInventories() {
@@ -133,7 +135,7 @@ public class ZMenuManager implements Listener {
                 "member-manage", "member-role", "permissions", "control-panel", "top-islands",
                 "border-color", "confirm-ban", "confirm-disband", "confirm-kick", "confirm-leave",
                 "player-language", "values", "bank-logs", "banned-players", "coops", "counts",
-                "global-warps", "island-bank", "island-ratings", "island-rate", "island-chests");
+                "global-warps", "island-bank", "island-ratings", "island-rate", "island-chests", "unique-visitors");
 
         inventories.forEach(inventoryName -> {
             if (!new File(plugin.getDataFolder(), "inventories/" + inventoryName + ".yml").exists()) {
