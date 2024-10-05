@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.zmenu.buttons;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
 import fr.maxlego08.menu.api.button.PaginateButton;
 import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
@@ -45,7 +46,7 @@ public class BannedPlayersButton extends SuperiorButton implements PaginateButto
             placeholders.register("player", bannedPlayer.getName());
             placeholders.register("role", bannedPlayer.getPlayerRole().toString());
 
-            inventory.addItem(slot, getItemStack().build(player, false, placeholders)).setClick(event -> {
+            inventory.addItem(slot, ItemSkulls.getPlayerHead(getItemStack().build(player, false, placeholders), bannedPlayer.getTextureValue())).setClick(event -> {
                 plugin.getCommands().dispatchSubCommand(player, "unban", bannedPlayer.getName());
                 menuManager.openInventory(player, "banned-players");
             });

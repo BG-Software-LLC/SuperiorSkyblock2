@@ -1,0 +1,43 @@
+name: '&8Island Block Counts'
+
+items:
+  blocks:
+    type: SUPERIORSKYBLOCK_COUNTS
+    slots:
+      - 0-35
+    item:
+      material: STONE
+      name: '&e%material-name%'
+      lore:
+        - '&6* &eQuantity &fx%quantity%'
+        - '&6* &eWorth: &f$%worth%'
+        - '&6* &eLevel: &f$%level%'
+    else:
+      slots:
+        - 22
+      item:
+        material: BARRIER
+        name: "&cNo blocks"
+        lore:
+          - "&8&oWtf ? your island doesn't have any blocks Oo"
+  next:
+    type: NEXT
+    slot: 50
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fNext Page'
+  previous:
+    type: PREVIOUS
+    slot: 48
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fPrevious Page'
+  decoration:
+    isPermanent: true
+    slots:
+      - 36-53
+    item:
+      material: CYAN_STAINED_GLASS_PANE
+      name: '&f'

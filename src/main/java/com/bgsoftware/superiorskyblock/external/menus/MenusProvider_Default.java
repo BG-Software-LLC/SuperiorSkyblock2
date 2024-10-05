@@ -188,7 +188,10 @@ public class MenusProvider_Default implements MenusProvider {
     public void openCounts(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        Menus.MENU_COUNTS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        // zMenu Start
+        // Menus.MENU_COUNTS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        this.plugin.getZMenumanager().openInventory(targetPlayer, "counts", cache -> cache.setIsland(targetIsland));
+        // zMenu End
     }
 
     @Override

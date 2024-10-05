@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.zmenu.buttons;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
 import fr.maxlego08.menu.api.button.PaginateButton;
 import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
@@ -54,7 +55,7 @@ public class CoopsButton extends SuperiorButton implements PaginateButton {
             placeholders.register("player", coopPlayer.getName());
             placeholders.register("role", coopPlayer.getPlayerRole().toString());
 
-            inventory.addItem(slot, getItemStack().build(player, false, placeholders)).setClick(event -> {
+            inventory.addItem(slot, ItemSkulls.getPlayerHead(getItemStack().build(player, false, placeholders), coopPlayer.getTextureValue())).setClick(event -> {
                 plugin.getCommands().dispatchSubCommand(player, "uncoop", coopPlayer.getName());
                 menuManager.openInventory(player, "coops");
             });

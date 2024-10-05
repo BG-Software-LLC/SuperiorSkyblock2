@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.BannedPlayersButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.CoopsButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.CountsButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.TargetShowButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.bank.BankLogsButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.confirm.ButtonConfirmBan;
@@ -105,6 +106,7 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new NoneLoader(this.plugin, BankLogsButton.class, "SUPERIORSKYBLOCK_BANK_LOGS"));
         this.buttonManager.register(new NoneLoader(this.plugin, BannedPlayersButton.class, "SUPERIORSKYBLOCK_BANNED_PLAYERS"));
         this.buttonManager.register(new NoneLoader(this.plugin, CoopsButton.class, "SUPERIORSKYBLOCK_COOPS"));
+        this.buttonManager.register(new NoneLoader(this.plugin, CountsButton.class, "SUPERIORSKYBLOCK_COUNTS"));
     }
 
     public void loadInventories() {
@@ -134,7 +136,8 @@ public class ZMenuManager implements Listener {
                 "values",
                 "bank-logs",
                 "banned-players",
-                "coops"
+                "coops",
+                "counts"
         );
 
         strings.forEach(inventoryName -> {
