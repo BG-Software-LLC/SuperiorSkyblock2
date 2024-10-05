@@ -891,4 +891,5 @@ public interface MenusManager {
     @Deprecated
     ISuperiorMenu getOldMenuFromView(MenuView<?, ?> menuView);
 
+    void openChests(SuperiorPlayer superiorPlayer, @Nullable ISuperiorMenu previousMenu, Island island);
 }

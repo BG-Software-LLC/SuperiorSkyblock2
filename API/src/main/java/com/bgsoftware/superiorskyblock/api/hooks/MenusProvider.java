@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
@@ -585,4 +586,5 @@ public interface MenusProvider {
      */
     void destroyWarps(WarpCategory warpCategory);
 
+    void openChests(SuperiorPlayer superiorPlayer, @Nullable ISuperiorMenu previousMenu, Island island);
 }

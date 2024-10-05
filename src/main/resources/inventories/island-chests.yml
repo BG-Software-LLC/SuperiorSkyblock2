@@ -1,0 +1,46 @@
+name: '&8Island Chest'
+
+items:
+  decoration:
+    isPermanent: true
+    slots:
+      - 0-9
+      - 17-18
+      - 26-27
+      - 35-36
+      - 44-53
+    item:
+      material: CYAN_STAINED_GLASS_PANE
+      name: '&f'
+  chests:
+    type: SUPERIORSKYBLOCK_CHESTS
+    slots:
+      - 11-15
+      - 20-24
+      - 29-33
+      - 38-42
+    item:
+      material: CHEST_MINECART
+      name: '&ePage #%index%'
+      lore:
+        - '&eSize: &7%size%'
+    else:
+      slots:
+        - 22
+      item:
+        material: BARRIER
+        name: "&cYou do not have a chest of island"
+  next:
+    type: NEXT
+    slot: 50
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fNext Page'
+  previous:
+    type: PREVIOUS
+    slot: 48
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fPrevious Page'

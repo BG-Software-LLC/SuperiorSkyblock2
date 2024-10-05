@@ -322,7 +322,10 @@ public class MenusProvider_Default implements MenusProvider {
     public void openMembers(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        Menus.MENU_ISLAND_MEMBERS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        // zMenu Start
+        // Menus.MENU_ISLAND_MEMBERS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        plugin.getZMenumanager().openInventory(targetPlayer, "members", cache -> cache.setIsland(targetIsland));
+        // zMenu End
     }
 
     @Override
@@ -577,6 +580,14 @@ public class MenusProvider_Default implements MenusProvider {
     public void destroyWarps(WarpCategory warpCategory) {
         Preconditions.checkNotNull(warpCategory, "warpCategory parameter cannot be null.");
         Menus.MENU_WARPS.closeViews(warpCategory);
+    }
+
+    @Override
+    public void openChests(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island) {
+        // zMenu Start
+        // Menus.MENU_ISLAND_CHEST.openMenu(superiorPlayer, previousMenu, island);
+        plugin.getZMenumanager().openInventory(superiorPlayer, "island-chests", cache -> cache.setIsland(island));
+        // zMenu End
     }
 
 }

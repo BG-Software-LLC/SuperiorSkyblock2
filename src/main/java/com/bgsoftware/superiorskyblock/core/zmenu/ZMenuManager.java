@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.BannedPlayersButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.CoopsButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.CountsButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.IslandChestButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.RatingsButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.TargetShowButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.bank.BankLogsButton;
@@ -117,6 +118,7 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new NoneLoader(this.plugin, CoopsButton.class, "SUPERIORSKYBLOCK_COOPS"));
         this.buttonManager.register(new NoneLoader(this.plugin, CountsButton.class, "SUPERIORSKYBLOCK_COUNTS"));
         this.buttonManager.register(new NoneLoader(this.plugin, RatingsButton.class, "SUPERIORSKYBLOCK_RATINGS"));
+        this.buttonManager.register(new NoneLoader(this.plugin, IslandChestButton.class, "SUPERIORSKYBLOCK_CHESTS"));
     }
 
     public void loadInventories() {
@@ -127,13 +129,13 @@ public class ZMenuManager implements Listener {
         }
 
         // Save inventories files
-        List<String> strings = Arrays.asList("island-creation", "settings", "biomes", "members",
+        List<String> inventories = Arrays.asList("island-creation", "settings", "biomes", "members",
                 "member-manage", "member-role", "permissions", "control-panel", "top-islands",
                 "border-color", "confirm-ban", "confirm-disband", "confirm-kick", "confirm-leave",
                 "player-language", "values", "bank-logs", "banned-players", "coops", "counts",
-                "global-warps", "island-bank", "island-ratings", "island-rate");
+                "global-warps", "island-bank", "island-ratings", "island-rate", "island-chests");
 
-        strings.forEach(inventoryName -> {
+        inventories.forEach(inventoryName -> {
             if (!new File(plugin.getDataFolder(), "inventories/" + inventoryName + ".yml").exists()) {
                 this.plugin.saveResource("inventories/" + inventoryName + ".yml", false);
             }
