@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.zmenu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.BannedPlayersButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.TargetShowButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.bank.BankLogsButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.confirm.ButtonConfirmBan;
@@ -101,6 +102,7 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new NoneLoader(this.plugin, ButtonConfirmLeave.class, "SUPERIORSKYBLOCK_CONFIRM_LEAVE"));
         this.buttonManager.register(new NoneLoader(this.plugin, TargetShowButton.class, "SUPERIORSKYBLOCK_TARGET_SHOW"));
         this.buttonManager.register(new NoneLoader(this.plugin, BankLogsButton.class, "SUPERIORSKYBLOCK_BANK_LOGS"));
+        this.buttonManager.register(new NoneLoader(this.plugin, BannedPlayersButton.class, "SUPERIORSKYBLOCK_BANNED_PLAYERS"));
     }
 
     public void loadInventories() {
@@ -128,7 +130,8 @@ public class ZMenuManager implements Listener {
                 "confirm-leave",
                 "player-language",
                 "values",
-                "bank-logs"
+                "bank-logs",
+                "banned-players"
         );
 
         strings.forEach(inventoryName -> {

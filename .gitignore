@@ -12,3 +12,4 @@ build
 # Ignore output generated files
 target
 out
+archive

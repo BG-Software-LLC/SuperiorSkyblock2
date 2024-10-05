@@ -17,14 +17,14 @@ items:
         - '&7&o(( &f&oRight-Click &7&oto filter transactions by this player. ))'
   next:
     type: NEXT
-    slot: 42
+    slot: 50
     isPermanent: true
     item:
       material: PAPER
       name: '&fNext Page'
   previous:
     type: PREVIOUS
-    slot: 38
+    slot: 58
     isPermanent: true
     item:
       material: PAPER
