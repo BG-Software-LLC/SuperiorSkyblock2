@@ -80,7 +80,10 @@ public class MenusProvider_Default implements MenusProvider {
     public void openBankLogs(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        Menus.MENU_BANK_LOGS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        // zMenu Start
+        // Menus.MENU_BANK_LOGS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        plugin.getZMenumanager().openInventory(targetPlayer, "bank-logs", cache -> cache.setIsland(targetIsland));
+        // zMenu End
     }
 
     @Override
@@ -95,7 +98,7 @@ public class MenusProvider_Default implements MenusProvider {
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
         // zMenu Start
         // Menus.MENU_BIOMES.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
-        plugin.getZMenumanager().openInventory(targetPlayer, "biomes");
+        plugin.getZMenumanager().openInventory(targetPlayer, "biomes", cache -> cache.setIsland(targetIsland));
         // zMenu End
     }
 
@@ -115,7 +118,10 @@ public class MenusProvider_Default implements MenusProvider {
         Preconditions.checkNotNull(bannedPlayer, "bannedPlayer parameter cannot be null.");
         // zMenu Start
         // Menus.MENU_CONFIRM_BAN.createView(targetPlayer, new MenuConfirmBan.Args(targetIsland, bannedPlayer), previousMenu);
-        plugin.getZMenumanager().openInventory(targetPlayer, "confirm-ban", cache -> cache.setTargetPlayer(bannedPlayer));
+        plugin.getZMenumanager().openInventory(targetPlayer, "confirm-ban", cache -> {
+            cache.setIsland(targetIsland);
+            cache.setTargetPlayer(bannedPlayer);
+        });
         // zMenu End
     }
 
@@ -125,7 +131,7 @@ public class MenusProvider_Default implements MenusProvider {
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
         // zMenu Start
         // Menus.MENU_CONFIRM_DISBAND.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
-        plugin.getZMenumanager().openInventory(targetPlayer, "confirm-disband");
+        plugin.getZMenumanager().openInventory(targetPlayer, "confirm-disband", cache -> cache.setIsland(targetIsland));
         // zMenu End
     }
 
@@ -136,7 +142,10 @@ public class MenusProvider_Default implements MenusProvider {
         Preconditions.checkNotNull(kickedPlayer, "kickedPlayer parameter cannot be null.");
         // zMenu Start
         // Menus.MENU_CONFIRM_KICK.createView(targetPlayer, new MenuConfirmKick.Args(targetIsland, kickedPlayer), previousMenu);
-        plugin.getZMenumanager().openInventory(targetPlayer, "confirm-kick", cache -> cache.setTargetPlayer(kickedPlayer));
+        plugin.getZMenumanager().openInventory(targetPlayer, "confirm-kick", cache -> {
+            cache.setIsland(targetIsland);
+            cache.setTargetPlayer(kickedPlayer);
+        });
         // zMenu End
     }
 
@@ -155,7 +164,7 @@ public class MenusProvider_Default implements MenusProvider {
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
         // zMenu Start
         // Menus.MENU_CONTROL_PANEL.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
-        this.plugin.getZMenumanager().openInventory(targetPlayer, "control-panel");
+        this.plugin.getZMenumanager().openInventory(targetPlayer, "control-panel", cache -> cache.setIsland(targetIsland));
         // zMenu End
     }
 

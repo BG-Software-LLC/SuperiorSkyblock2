@@ -1,9 +1,14 @@
 package com.bgsoftware.superiorskyblock.core.zmenu;
 
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import org.bukkit.entity.Player;
+
+import java.util.Comparator;
+import java.util.UUID;
 
 public class PlayerCache {
 
@@ -11,6 +16,9 @@ public class PlayerCache {
     private String islandName;
     private SuperiorPlayer targetPlayer;
     private SortingType sortingType;
+    private Comparator<BankTransaction> bankSorting;
+    private UUID filteredPlayer;
+    private Island island;
 
     public PlayerCache(Player player) {
         this.player = player;
@@ -42,5 +50,29 @@ public class PlayerCache {
 
     public void setSortingType(SortingType sortingType) {
         this.sortingType = sortingType;
+    }
+
+    public Comparator<BankTransaction> getBankSorting() {
+        return bankSorting;
+    }
+
+    public void setBankSorting(Comparator<BankTransaction> bankSorting) {
+        this.bankSorting = bankSorting;
+    }
+
+    public UUID getFilteredPlayer() {
+        return filteredPlayer;
+    }
+
+    public void setFilteredPlayer(UUID filteredPlayer) {
+        this.filteredPlayer = filteredPlayer;
+    }
+
+    public Island getIsland() {
+        return island;
+    }
+
+    public void setIsland(Island island) {
+        this.island = island;
     }
 }

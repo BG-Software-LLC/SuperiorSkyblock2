@@ -1,0 +1,52 @@
+name: '&8Transaction Logs &n%player%'
+
+items:
+  transactions:
+    type: SUPERIORSKYBLOCK_BANK_LOGS
+    slots:
+      - 0-35
+    item:
+      material: PAPER
+      name: '&eTransaction #%transaction%'
+      lore:
+        - '&7Player: %player%'
+        - '&7Status: %status%'
+        - '&7Time: %time%'
+        - '&7Amount: $%amount%'
+        - '&7 '
+        - '&7&o(( &f&oRight-Click &7&oto filter transactions by this player. ))'
+  next:
+    type: NEXT
+    slot: 42
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fNext Page'
+  previous:
+    type: PREVIOUS
+    slot: 38
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fPrevious Page'
+  decoration:
+    isPermanent: true
+    slots:
+      - 36-53
+    item:
+      material: CYAN_STAINED_GLASS_PANE
+      name: '&f'
+  sort-time:
+    type: SUPERIORSKYBLOCK_BANK_LOGS_SORT
+    slot: 39
+    sort: TIME
+    item:
+      material: CLOCK
+      name: '&6Sort by creation time'
+  sort-money:
+    type: SUPERIORSKYBLOCK_BANK_LOGS_SORT
+    slot: 41
+    sort: MONEY
+    item:
+      material: EMERALD
+      name: '&6Sort by money'
