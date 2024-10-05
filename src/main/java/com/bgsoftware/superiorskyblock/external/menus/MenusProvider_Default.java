@@ -203,7 +203,10 @@ public class MenusProvider_Default implements MenusProvider {
     @Override
     public void openGlobalWarps(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
-        Menus.MENU_GLOBAL_WARPS.createView(targetPlayer, EmptyViewArgs.INSTANCE, previousMenu);
+        // zMenu Start
+        // Menus.MENU_GLOBAL_WARPS.createView(targetPlayer, EmptyViewArgs.INSTANCE, previousMenu);
+        this.plugin.getZMenumanager().openInventory(targetPlayer, "global-warps");
+        // zMenu End
     }
 
     @Override

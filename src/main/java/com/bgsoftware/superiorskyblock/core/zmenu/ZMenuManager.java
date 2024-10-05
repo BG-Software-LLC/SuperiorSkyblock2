@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.core.zmenu.loader.BankLogsSortLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.BlockValueLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.BorderColorLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.BorderToggleLoader;
+import com.bgsoftware.superiorskyblock.core.zmenu.loader.GlobalWarpsLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandBiomeLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandCreationLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandMemberRoleLoader;
@@ -33,6 +34,7 @@ import fr.maxlego08.menu.api.InventoryManager;
 import fr.maxlego08.menu.button.loader.NoneLoader;
 import fr.maxlego08.menu.exceptions.InventoryException;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -49,6 +51,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -93,6 +96,7 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new PlayerLanguageLoader(this.plugin));
         this.buttonManager.register(new BlockValueLoader(this.plugin));
         this.buttonManager.register(new BankLogsSortLoader(this.plugin));
+        this.buttonManager.register(new GlobalWarpsLoader(this.plugin));
 
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMembersButton.class, "SUPERIORSKYBLOCK_MEMBERS"));
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMemberInfoButton.class, "SUPERIORSKYBLOCK_MEMBER_INFO"));
@@ -117,28 +121,7 @@ public class ZMenuManager implements Listener {
         }
 
         // Save inventories files
-        List<String> strings = Arrays.asList(
-                "island-creation",
-                "settings",
-                "biomes",
-                "members",
-                "member-manage",
-                "member-role",
-                "permissions",
-                "control-panel",
-                "top-islands",
-                "border-color",
-                "confirm-ban",
-                "confirm-disband",
-                "confirm-kick",
-                "confirm-leave",
-                "player-language",
-                "values",
-                "bank-logs",
-                "banned-players",
-                "coops",
-                "counts"
-        );
+        List<String> strings = Arrays.asList("island-creation", "settings", "biomes", "members", "member-manage", "member-role", "permissions", "control-panel", "top-islands", "border-color", "confirm-ban", "confirm-disband", "confirm-kick", "confirm-leave", "player-language", "values", "bank-logs", "banned-players", "coops", "counts", "global-warps");
 
         strings.forEach(inventoryName -> {
             if (!new File(plugin.getDataFolder(), "inventories/" + inventoryName + ".yml").exists()) {
@@ -189,7 +172,12 @@ public class ZMenuManager implements Listener {
     public void openInventory(Player player, String inventoryName) {
         List<Inventory> inventories = new ArrayList<>();
         this.inventoryManager.getCurrentPlayerInventory(player).ifPresent(inventories::add);
-        this.inventoryManager.getInventory(plugin, inventoryName).ifPresent(inventory -> this.inventoryManager.openInventory(player, inventory, 1, inventories));
+        Optional<Inventory> optional = this.inventoryManager.getInventory(plugin, inventoryName);
+        if (optional.isPresent()) {
+            this.inventoryManager.openInventory(player, optional.get(), 1, inventories);
+        } else {
+            player.sendMessage(ChatColor.RED + "Impossible to find the inventory " + inventoryName + " !");
+        }
     }
 
     public InventoryManager getInventoryManager() {

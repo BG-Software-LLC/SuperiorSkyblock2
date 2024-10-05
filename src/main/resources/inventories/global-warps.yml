@@ -1,0 +1,44 @@
+name: '&8Island Warps'
+
+# When enabled, instead of showing warps, the visitor warp locations will be shown.
+# To show the description, use the %description% placeholder.
+visitor-warps: false
+
+items:
+  '@':
+    type: SUPERIORSKYBLOCK_GLOBAL_WARPS
+    slots:
+      - 0-35
+    item:
+      material: PLAYER_HEAD
+      name: '&e%player%''s Island'
+      lore:
+        - '&7Click to see all warps of this island.'
+        - '&8>> &7This island has %warps% warps.'
+    else:
+      slots:
+        - 22
+      item:
+        material: BARRIER
+        name: "&cNo Warps"
+  next:
+    type: NEXT
+    slot: 50
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fNext Page'
+  previous:
+    type: PREVIOUS
+    slot: 48
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fPrevious Page'
+  decoration:
+    isPermanent: true
+    slots:
+      - 36-53
+    item:
+      material: CYAN_STAINED_GLASS_PANE
+      name: '&f'
