@@ -1,21 +1,21 @@
-name: '&8Island Banned Players'
+name: '&8Island Coop Players (%coop%/%max-coop%)'
 
 items:
   players:
-    type: SUPERIORSKYBLOCK_BANNED_PLAYERS
+    type: SUPERIORSKYBLOCK_COOPS
     slots:
       - 0-35
     item:
       material: PLAYER_HEAD
       name: '&e%player%'
       lore:
-        - '&7Click to unban the player.'
+        - '&7Click to uncoop the player.'
     else:
       slots:
         - 22
       item:
         material: BARRIER
-        name: "&cNo player banned"
+        name: "&cNo player coop"
   next:
     type: NEXT
     slot: 50

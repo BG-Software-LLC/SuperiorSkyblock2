@@ -172,7 +172,10 @@ public class MenusProvider_Default implements MenusProvider {
     public void openCoops(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        Menus.MENU_COOPS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        // zMenu Start
+        // Menus.MENU_COOPS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        this.plugin.getZMenumanager().openInventory(targetPlayer, "coops", cache -> cache.setIsland(targetIsland));
+        // zMenu End
     }
 
     @Override
