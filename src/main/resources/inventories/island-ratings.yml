@@ -1,0 +1,39 @@
+name: '&8Island Ratings (%superior_island_rating%/5)'
+
+items:
+  decoration:
+    isPermanent: true
+    slots:
+      - 36-53
+    item:
+      material: CYAN_STAINED_GLASS_PANE
+      name: '&f'
+  ratings:
+    type: SUPERIORSKYBLOCK_RATINGS
+    slots:
+      - 0-35
+    item:
+      material: PLAYER_HEAD
+      name: '&e%name%'
+      lore:
+        - '%rating%'
+    else:
+      slots:
+        - 22
+      item:
+        material: BARRIER
+        name: "&cNo rating"
+  next:
+    type: NEXT
+    slot: 50
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fNext Page'
+  previous:
+    type: PREVIOUS
+    slot: 48
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fPrevious Page'
