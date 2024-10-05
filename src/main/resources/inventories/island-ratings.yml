@@ -14,9 +14,9 @@ items:
       - 0-35
     item:
       material: PLAYER_HEAD
-      name: '&e%name%'
+      name: '&e%player%'
       lore:
-        - '%rating%'
+        - '&7Rate&8: %rating%'
     else:
       slots:
         - 22

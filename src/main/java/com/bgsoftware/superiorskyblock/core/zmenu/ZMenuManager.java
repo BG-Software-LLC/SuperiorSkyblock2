@@ -30,6 +30,7 @@ import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandSettingsLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandTopLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandTopSortLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.PlayerLanguageLoader;
+import com.bgsoftware.superiorskyblock.core.zmenu.loader.RateLoader;
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.Inventory;
 import fr.maxlego08.menu.api.InventoryManager;
@@ -100,6 +101,7 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new BankLogsSortLoader(this.plugin));
         this.buttonManager.register(new GlobalWarpsLoader(this.plugin));
         this.buttonManager.register(new BankActionLoader(this.plugin));
+        this.buttonManager.register(new RateLoader(this.plugin));
 
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMembersButton.class, "SUPERIORSKYBLOCK_MEMBERS"));
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMemberInfoButton.class, "SUPERIORSKYBLOCK_MEMBER_INFO"));
@@ -129,7 +131,7 @@ public class ZMenuManager implements Listener {
                 "member-manage", "member-role", "permissions", "control-panel", "top-islands",
                 "border-color", "confirm-ban", "confirm-disband", "confirm-kick", "confirm-leave",
                 "player-language", "values", "bank-logs", "banned-players", "coops", "counts",
-                "global-warps", "island-bank", "island-ratings");
+                "global-warps", "island-bank", "island-ratings", "island-rate");
 
         strings.forEach(inventoryName -> {
             if (!new File(plugin.getDataFolder(), "inventories/" + inventoryName + ".yml").exists()) {

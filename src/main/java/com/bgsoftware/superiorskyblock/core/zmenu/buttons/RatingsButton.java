@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
 import fr.maxlego08.menu.api.button.PaginateButton;
 import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
@@ -56,7 +57,7 @@ public class RatingsButton extends SuperiorButton implements PaginateButton {
             placeholders.register("player", ratingPlayer.getName());
             placeholders.register("rating", Formatters.RATING_FORMATTER.format(ratingInfo.getRating().getValue(), ratingPlayer.getUserLocale()));
 
-            inventory.addItem(slot, getItemStack().build(player, false, placeholders));
+            inventory.addItem(slot, ItemSkulls.getPlayerHead(getItemStack().build(player, false, placeholders), ratingPlayer.getTextureValue()));
         }
     }
 
