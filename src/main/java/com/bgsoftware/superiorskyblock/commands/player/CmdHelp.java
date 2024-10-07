@@ -8,9 +8,12 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 
 public class CmdHelp implements ISuperiorCommand {
 
@@ -70,6 +73,7 @@ public class CmdHelp implements ISuperiorCommand {
         List<SuperiorCommand> subCommands = new SequentialListBuilder<SuperiorCommand>()
                 .filter(subCommand -> subCommand.displayCommand() && (subCommand.getPermission().isEmpty() ||
                         sender.hasPermission(subCommand.getPermission())))
+                .sorted(Comparator.comparing(e -> e.getAliases().get(0)))
                 .build(plugin.getCommands().getSubCommands());
 
         if (subCommands.isEmpty()) {
@@ -84,7 +88,6 @@ public class CmdHelp implements ISuperiorCommand {
             Message.INVALID_AMOUNT.send(sender, page);
             return;
         }
-
         subCommands = subCommands.subList((page - 1) * 7, Math.min(subCommands.size(), page * 7));
 
         Message.ISLAND_HELP_HEADER.send(sender, page, lastPage);

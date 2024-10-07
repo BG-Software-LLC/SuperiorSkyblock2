@@ -5,6 +5,7 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
+import com.bgsoftware.superiorskyblock.api.service.message.MessageProvider;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
@@ -373,6 +374,15 @@ public enum Message {
     GOT_INVITE {
         @Override
         public void send(CommandSender sender, Locale locale, Object... args) {
+
+            // Always use minimessage format first!
+            try {
+                Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
+                super.send(sender, locale, args);
+                return;
+            } catch (Exception ignored) {
+            }
+
             if (!(sender instanceof Player)) {
                 super.send(sender, locale, args);
             } else {
@@ -817,8 +827,18 @@ public enum Message {
         public void send(CommandSender sender, Locale locale, Object... args) {
             String message = args.length == 0 ? null : args[0] == null ? null : args[0].toString();
             boolean translateColors = args.length >= 2 && args[1] instanceof Boolean && (boolean) args[1];
-            if (!Text.isBlank(message))
+            if (!Text.isBlank(message)) {
+                try {
+                    Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
+                    MessageProvider messageProvider = (MessageProvider) Class.forName("com.bgsoftware.superiorskyblock.external.minimessage.MiniMessageProvider").getConstructor().newInstance();
+                    if (sender instanceof Player) {
+                        messageProvider.sendMessage((Player) sender, message);
+                        return;
+                    }
+                } catch (Exception ignored) {
+                }
                 sender.sendMessage(translateColors ? Formatters.COLOR_FORMATTER.format(message) : message);
+            }
         }
 
     };
@@ -923,6 +943,29 @@ public enum Message {
         Log.info("Loading messages done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private static void convertOldFile() {
+        File file = new File(plugin.getDataFolder(), "lang.yml");
+        if (file.exists()) {
+            File dest = new File(plugin.getDataFolder(), "lang/en-US.yml");
+            dest.getParentFile().mkdirs();
+            file.renameTo(dest);
+        }
+    }
+
+    public static Optional<String> replaceArgs(String msg, Object... objects) {
+        if (Text.isBlank(msg))
+            return Optional.empty();
+
+        for (int i = 0; i < objects.length; i++) {
+            String objectString = objects[i] instanceof BigDecimal ?
+                    Formatters.NUMBER_FORMATTER.format((BigDecimal) objects[i]) : objects[i].toString();
+            msg = msg.replace("{" + i + "}", objectString);
+        }
+
+        return msg.isEmpty() ? Optional.empty() : Optional.of(msg);
+    }
+
     public boolean isCustom() {
         return isCustom;
     }
@@ -980,29 +1023,6 @@ public enum Message {
 
     private void setMessage(Locale locale, IMessageComponent messageComponent) {
         messages.put(locale, messageComponent);
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private static void convertOldFile() {
-        File file = new File(plugin.getDataFolder(), "lang.yml");
-        if (file.exists()) {
-            File dest = new File(plugin.getDataFolder(), "lang/en-US.yml");
-            dest.getParentFile().mkdirs();
-            file.renameTo(dest);
-        }
-    }
-
-    public static Optional<String> replaceArgs(String msg, Object... objects) {
-        if (Text.isBlank(msg))
-            return Optional.empty();
-
-        for (int i = 0; i < objects.length; i++) {
-            String objectString = objects[i] instanceof BigDecimal ?
-                    Formatters.NUMBER_FORMATTER.format((BigDecimal) objects[i]) : objects[i].toString();
-            msg = msg.replace("{" + i + "}", objectString);
-        }
-
-        return msg.isEmpty() ? Optional.empty() : Optional.of(msg);
     }
 
 }
