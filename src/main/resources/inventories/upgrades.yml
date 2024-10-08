@@ -1,0 +1,879 @@
+name: '&8Island Upgrades'
+size: 45
+
+items:
+  hopper-limit:
+    slot: 11
+    type: SUPERIORSKYBLOCK_UPGRADE
+    upgrade: 'hoppers-limit'
+    level: 1
+    item:
+      material: HOPPER
+      name: '&d&lHopper Increase &a(Available)'
+      lore:
+        - '&7'
+        - '&dNext Level: &e2'
+        - '&7'
+        - '&7Purchasing the hopper upgrade'
+        - '&7will increase your island''s'
+        - '&7max hoppers limit.'
+        - '&7'
+        - '&dAmount: &f16x Hoppers'
+        - '&dPrice: &f$1,000,000'
+        - '&7'
+        - '&aLeft-click to purchase upgrade.'
+    error-item:
+      material: HOPPER
+      name: '&d&lHopper Increase &c(Unavailable)'
+      lore:
+        - '&7'
+        - '&dNext Level: &e2'
+        - '&7'
+        - '&7Purchasing the hopper upgrade'
+        - '&7will increase your island''s'
+        - '&7max hoppers limit.'
+        - '&7'
+        - '&dAmount: &f16x Hoppers'
+        - '&dPrice: &f$1,000,000'
+        - '&7'
+        - '&aLeft-click to purchase upgrade.'
+    else:
+      type: SUPERIORSKYBLOCK_UPGRADE
+      upgrade: 'hoppers-limit'
+      level: 2
+      item:
+        material: HOPPER
+        name: '&d&lHopper Increase &a(Available)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e3'
+          - '&7'
+          - '&7Purchasing the hopper upgrade'
+          - '&7will increase your island''s'
+          - '&7max hoppers limit.'
+          - '&7'
+          - '&dAmount: &f32x Hoppers'
+          - '&dPrice: &f$3,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      error-item:
+        material: HOPPER
+        name: '&d&lHopper Increase &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e3'
+          - '&7'
+          - '&7Purchasing the hopper upgrade'
+          - '&7will increase your island''s'
+          - '&7max hoppers limit.'
+          - '&7'
+          - '&dAmount: &f32x Hoppers'
+          - '&dPrice: &f$3,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      else:
+        type: SUPERIORSKYBLOCK_UPGRADE
+        upgrade: 'hoppers-limit'
+        level: 3
+        item:
+          material: HOPPER
+          name: '&d&lHopper Increase &a(Available)'
+          lore:
+            - '&7'
+            - '&dNext Level: &e4'
+            - '&7'
+            - '&7Purchasing the hopper upgrade'
+            - '&7will increase your island''s'
+            - '&7max hoppers limit.'
+            - '&7'
+            - '&dAmount: &f64x Hoppers'
+            - '&dPrice: &f$9,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        error-item:
+          material: HOPPER
+          name: '&d&lHopper Increase &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&dNext Level: &e2'
+            - '&7'
+            - '&7Purchasing the hopper upgrade'
+            - '&7will increase your island''s'
+            - '&7max hoppers limit.'
+            - '&7'
+            - '&dAmount: &f64x Hoppers'
+            - '&dPrice: &f$9,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        else:
+          item:
+            material: HOPPER
+            name: "&cMAX LEVEL"
+            lore:
+              - '&7You have reached the maximum'
+              - '&7level of the hoppers limit!'
+
+  crop-growth:
+    slot: 13
+    type: SUPERIORSKYBLOCK_UPGRADE
+    upgrade: 'crop-growth'
+    level: 1
+    item:
+      material: WHEAT_SEEDS
+      name: '&aCrop Growth Speed &a(Available)'
+      lore:
+        - '&7'
+        - '&aNext Level: &e2'
+        - '&7'
+        - '&7Purchasing this upgrade'
+        - '&7will increase the growth speed of crops'
+        - '&7on your island.'
+        - '&7'
+        - '&aGrowth Speed: &f+10%'
+        - '&aPrice: &f$500,000'
+        - '&7'
+        - '&aLeft-click to purchase upgrade.'
+    error-item:
+      material: WHEAT_SEEDS
+      name: '&cCrop Growth Speed &c(Unavailable)'
+      lore:
+        - '&7'
+        - '&cNext Level: &e2'
+        - '&7'
+        - '&7Purchasing this upgrade'
+        - '&7will increase the growth speed of crops'
+        - '&7on your island.'
+        - '&7'
+        - '&cGrowth Speed: &f+10%'
+        - '&cPrice: &f$500,000'
+        - '&7'
+        - '&cLeft-click to purchase upgrade.'
+    else:
+      type: SUPERIORSKYBLOCK_UPGRADE
+      upgrade: 'crop-growth'
+      level: 2
+      item:
+        material: WHEAT_SEEDS
+        name: '&aCrop Growth Speed &a(Available)'
+        lore:
+          - '&7'
+          - '&aNext Level: &e3'
+          - '&7'
+          - '&7Purchasing this upgrade'
+          - '&7will increase the growth speed of crops'
+          - '&7on your island.'
+          - '&7'
+          - '&aGrowth Speed: &f+20%'
+          - '&aPrice: &f$1,500,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      error-item:
+        material: WHEAT_SEEDS
+        name: '&cCrop Growth Speed &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&cNext Level: &e3'
+          - '&7'
+          - '&7Purchasing this upgrade'
+          - '&7will increase the growth speed of crops'
+          - '&7on your island.'
+          - '&7'
+          - '&cGrowth Speed: &f+20%'
+          - '&cPrice: &f$1,500,000'
+          - '&7'
+          - '&cLeft-click to purchase upgrade.'
+      else:
+        type: SUPERIORSKYBLOCK_UPGRADE
+        upgrade: 'crop-growth'
+        level: 3
+        item:
+          material: WHEAT_SEEDS
+          name: '&aCrop Growth Speed &a(Available)'
+          lore:
+            - '&7'
+            - '&aNext Level: &e4'
+            - '&7'
+            - '&7Purchasing this upgrade'
+            - '&7will increase the growth speed of crops'
+            - '&7on your island.'
+            - '&7'
+            - '&aGrowth Speed: &f+30%'
+            - '&aPrice: &f$4,500,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        error-item:
+          material: WHEAT_SEEDS
+          name: '&cCrop Growth Speed &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&cNext Level: &e4'
+            - '&7'
+            - '&7Purchasing this upgrade'
+            - '&7will increase the growth speed of crops'
+            - '&7on your island.'
+            - '&7'
+            - '&cGrowth Speed: &f+30%'
+            - '&cPrice: &f$4,500,000'
+            - '&7'
+            - '&cLeft-click to purchase upgrade.'
+        else:
+          item:
+            material: WHEAT_SEEDS
+            name: "&cMAX LEVEL"
+            lore:
+              - '&7You have reached the maximum'
+              - '&7level of crop growth speed!'
+
+  members-limit:
+    slot: 15
+    type: SUPERIORSKYBLOCK_UPGRADE
+    upgrade: 'members-limit'
+    level: 1
+    item:
+      material: PLAYER_HEAD
+      name: '&aIsland Member Limit &a(Available)'
+      lore:
+        - '&7'
+        - '&aNext Level: &e2'
+        - '&7'
+        - '&7Purchasing this upgrade'
+        - '&7will increase the number of members'
+        - '&7you can add to your island.'
+        - '&7'
+        - '&aMember Limit: &f+1 Member'
+        - '&aPrice: &f$750,000'
+        - '&7'
+        - '&aLeft-click to purchase upgrade.'
+    error-item:
+      material: PLAYER_HEAD
+      name: '&cIsland Member Limit &c(Unavailable)'
+      lore:
+        - '&7'
+        - '&cNext Level: &e2'
+        - '&7'
+        - '&7Purchasing this upgrade'
+        - '&7will increase the number of members'
+        - '&7you can add to your island.'
+        - '&7'
+        - '&cMember Limit: &f+1 Member'
+        - '&cPrice: &f$750,000'
+        - '&7'
+        - '&cLeft-click to purchase upgrade.'
+    else:
+      type: SUPERIORSKYBLOCK_UPGRADE
+      upgrade: 'members-limit'
+      level: 2
+      item:
+        material: PLAYER_HEAD
+        name: '&aIsland Member Limit &a(Available)'
+        lore:
+          - '&7'
+          - '&aNext Level: &e3'
+          - '&7'
+          - '&7Purchasing this upgrade'
+          - '&7will increase the number of members'
+          - '&7you can add to your island.'
+          - '&7'
+          - '&aMember Limit: &f+2 Members'
+          - '&aPrice: &f$2,250,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      error-item:
+        material: PLAYER_HEAD
+        name: '&cIsland Member Limit &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&cNext Level: &e3'
+          - '&7'
+          - '&7Purchasing this upgrade'
+          - '&7will increase the number of members'
+          - '&7you can add to your island.'
+          - '&7'
+          - '&cMember Limit: &f+2 Members'
+          - '&cPrice: &f$2,250,000'
+          - '&7'
+          - '&cLeft-click to purchase upgrade.'
+      else:
+        type: SUPERIORSKYBLOCK_UPGRADE
+        upgrade: 'members-limit'
+        level: 3
+        item:
+          material: PLAYER_HEAD
+          name: '&aIsland Member Limit &a(Available)'
+          lore:
+            - '&7'
+            - '&aNext Level: &e4'
+            - '&7'
+            - '&7Purchasing this upgrade'
+            - '&7will increase the number of members'
+            - '&7you can add to your island.'
+            - '&7'
+            - '&aMember Limit: &f+3 Members'
+            - '&aPrice: &f$5,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        error-item:
+          material: PLAYER_HEAD
+          name: '&cIsland Member Limit &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&cNext Level: &e4'
+            - '&7'
+            - '&7Purchasing this upgrade'
+            - '&7will increase the number of members'
+            - '&7you can add to your island.'
+            - '&7'
+            - '&cMember Limit: &f+3 Members'
+            - '&cPrice: &f$5,000,000'
+            - '&7'
+            - '&cLeft-click to purchase upgrade.'
+        else:
+          item:
+            material: PLAYER_HEAD
+            name: "&cMAX LEVEL"
+            lore:
+              - '&7You have reached the maximum'
+              - '&7level of island members!'
+
+  spawner-rates:
+    slot: 21
+    type: SUPERIORSKYBLOCK_UPGRADE
+    upgrade: 'spawner-rates'
+    level: 1
+    item:
+      material: SPAWNER
+      name: '&aSpawner Rate Increase &a(Available)'
+      lore:
+        - '&7'
+        - '&aNext Level: &e2'
+        - '&7'
+        - '&7Purchasing this upgrade'
+        - '&7will increase the spawn rates of mobs'
+        - '&7on your island.'
+        - '&7'
+        - '&aSpawn Rate: &f+10%'
+        - '&aPrice: &f$1,000,000'
+        - '&7'
+        - '&aLeft-click to purchase upgrade.'
+    error-item:
+      material: SPAWNER
+      name: '&cSpawner Rate Increase &c(Unavailable)'
+      lore:
+        - '&7'
+        - '&cNext Level: &e2'
+        - '&7'
+        - '&7Purchasing this upgrade'
+        - '&7will increase the spawn rates of mobs'
+        - '&7on your island.'
+        - '&7'
+        - '&cSpawn Rate: &f+10%'
+        - '&cPrice: &f$1,000,000'
+        - '&7'
+        - '&cLeft-click to purchase upgrade.'
+    else:
+      type: SUPERIORSKYBLOCK_UPGRADE
+      upgrade: 'spawner-rates'
+      level: 2
+      item:
+        material: SPAWNER
+        name: '&aSpawner Rate Increase &a(Available)'
+        lore:
+          - '&7'
+          - '&aNext Level: &e3'
+          - '&7'
+          - '&7Purchasing this upgrade'
+          - '&7will increase the spawn rates of mobs'
+          - '&7on your island.'
+          - '&7'
+          - '&aSpawn Rate: &f+20%'
+          - '&aPrice: &f$3,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      error-item:
+        material: SPAWNER
+        name: '&cSpawner Rate Increase &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&cNext Level: &e3'
+          - '&7'
+          - '&7Purchasing this upgrade'
+          - '&7will increase the spawn rates of mobs'
+          - '&7on your island.'
+          - '&7'
+          - '&cSpawn Rate: &f+20%'
+          - '&cPrice: &f$3,000,000'
+          - '&7'
+          - '&cLeft-click to purchase upgrade.'
+      else:
+        type: SUPERIORSKYBLOCK_UPGRADE
+        upgrade: 'spawner-rates'
+        level: 3
+        item:
+          material: SPAWNER
+          name: '&aSpawner Rate Increase &a(Available)'
+          lore:
+            - '&7'
+            - '&aNext Level: &e4'
+            - '&7'
+            - '&7Purchasing this upgrade'
+            - '&7will increase the spawn rates of mobs'
+            - '&7on your island.'
+            - '&7'
+            - '&aSpawn Rate: &f+30%'
+            - '&aPrice: &f$6,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        error-item:
+          material: SPAWNER
+          name: '&cSpawner Rate Increase &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&cNext Level: &e4'
+            - '&7'
+            - '&7Purchasing this upgrade'
+            - '&7will increase the spawn rates of mobs'
+            - '&7on your island.'
+            - '&7'
+            - '&cSpawn Rate: &f+30%'
+            - '&cPrice: &f$6,000,000'
+            - '&7'
+            - '&cLeft-click to purchase upgrade.'
+        else:
+          item:
+            material: SPAWNER
+            name: "&cMAX LEVEL"
+            lore:
+              - '&7You have reached the maximum'
+              - '&7level of spawner rates!'
+
+  mob-drops:
+    slot: 23
+    type: SUPERIORSKYBLOCK_UPGRADE
+    upgrade: 'mob-drops'
+    level: 1
+    item:
+      material: BONE
+      name: '&aMob Drops Increase &a(Available)'
+      lore:
+        - '&7'
+        - '&aNext Level: &e2'
+        - '&7'
+        - '&7Purchasing this upgrade'
+        - '&7will increase the amount of drops'
+        - '&7from mobs killed on your island.'
+        - '&7'
+        - '&aDrop Rate: &f+10%'
+        - '&aPrice: &f$750,000'
+        - '&7'
+        - '&aLeft-click to purchase upgrade.'
+    error-item:
+      material: BONE
+      name: '&cMob Drops Increase &c(Unavailable)'
+      lore:
+        - '&7'
+        - '&cNext Level: &e2'
+        - '&7'
+        - '&7Purchasing this upgrade'
+        - '&7will increase the amount of drops'
+        - '&7from mobs killed on your island.'
+        - '&7'
+        - '&cDrop Rate: &f+10%'
+        - '&cPrice: &f$750,000'
+        - '&7'
+        - '&cLeft-click to purchase upgrade.'
+    else:
+      type: SUPERIORSKYBLOCK_UPGRADE
+      upgrade: 'mob-drops'
+      level: 2
+      item:
+        material: BONE
+        name: '&aMob Drops Increase &a(Available)'
+        lore:
+          - '&7'
+          - '&aNext Level: &e3'
+          - '&7'
+          - '&7Purchasing this upgrade'
+          - '&7will increase the amount of drops'
+          - '&7from mobs killed on your island.'
+          - '&7'
+          - '&aDrop Rate: &f+20%'
+          - '&aPrice: &f$2,250,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      error-item:
+        material: BONE
+        name: '&cMob Drops Increase &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&cNext Level: &e3'
+          - '&7'
+          - '&7Purchasing this upgrade'
+          - '&7will increase the amount of drops'
+          - '&7from mobs killed on your island.'
+          - '&7'
+          - '&cDrop Rate: &f+20%'
+          - '&cPrice: &f$2,250,000'
+          - '&7'
+          - '&cLeft-click to purchase upgrade.'
+      else:
+        type: SUPERIORSKYBLOCK_UPGRADE
+        upgrade: 'mob-drops'
+        level: 3
+        item:
+          material: BONE
+          name: '&aMob Drops Increase &a(Available)'
+          lore:
+            - '&7'
+            - '&aNext Level: &e4'
+            - '&7'
+            - '&7Purchasing this upgrade'
+            - '&7will increase the amount of drops'
+            - '&7from mobs killed on your island.'
+            - '&7'
+            - '&aDrop Rate: &f+30%'
+            - '&aPrice: &f$5,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        error-item:
+          material: BONE
+          name: '&cMob Drops Increase &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&cNext Level: &e4'
+            - '&7'
+            - '&7Purchasing this upgrade'
+            - '&7will increase the amount of drops'
+            - '&7from mobs killed on your island.'
+            - '&7'
+            - '&cDrop Rate: &f+30%'
+            - '&cPrice: &f$5,000,000'
+            - '&7'
+            - '&cLeft-click to purchase upgrade.'
+        else:
+          item:
+            material: BONE
+            name: "&cMAX LEVEL"
+            lore:
+              - '&7You have reached the maximum'
+              - '&7level of mob drops!'
+
+  border-size:
+    slot: 29
+    type: SUPERIORSKYBLOCK_UPGRADE
+    upgrade: 'border-size'
+    level: 1
+    item:
+      material: IRON_BARS
+      name: '&aIsland Border Size Increase &a(Available)'
+      lore:
+        - '&7'
+        - '&aNext Level: &e2'
+        - '&7'
+        - '&7Purchasing this upgrade'
+        - '&7will increase the size of your island''s border.'
+        - '&7'
+        - '&aBorder Size: &f+10 Blocks'
+        - '&aPrice: &f$2,000,000'
+        - '&7'
+        - '&aLeft-click to purchase upgrade.'
+    error-item:
+      material: IRON_BARS
+      name: '&cIsland Border Size Increase &c(Unavailable)'
+      lore:
+        - '&7'
+        - '&cNext Level: &e2'
+        - '&7'
+        - '&7Purchasing this upgrade'
+        - '&7will increase the size of your island''s border.'
+        - '&7'
+        - '&cBorder Size: &f+10 Blocks'
+        - '&cPrice: &f$2,000,000'
+        - '&7'
+        - '&cLeft-click to purchase upgrade.'
+    else:
+      type: SUPERIORSKYBLOCK_UPGRADE
+      upgrade: 'border-size'
+      level: 2
+      item:
+        material: IRON_BARS
+        name: '&aIsland Border Size Increase &a(Available)'
+        lore:
+          - '&7'
+          - '&aNext Level: &e3'
+          - '&7'
+          - '&7Purchasing this upgrade'
+          - '&7will increase the size of your island''s border.'
+          - '&7'
+          - '&aBorder Size: &f+20 Blocks'
+          - '&aPrice: &f$5,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      error-item:
+        material: IRON_BARS
+        name: '&cIsland Border Size Increase &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&cNext Level: &e3'
+          - '&7'
+          - '&7Purchasing this upgrade'
+          - '&7will increase the size of your island''s border.'
+          - '&7'
+          - '&cBorder Size: &f+20 Blocks'
+          - '&cPrice: &f$5,000,000'
+          - '&7'
+          - '&cLeft-click to purchase upgrade.'
+      else:
+        type: SUPERIORSKYBLOCK_UPGRADE
+        upgrade: 'border-size'
+        level: 3
+        item:
+          material: IRON_BARS
+          name: '&aIsland Border Size Increase &a(Available)'
+          lore:
+            - '&7'
+            - '&aNext Level: &e4'
+            - '&7'
+            - '&7Purchasing this upgrade'
+            - '&7will increase the size of your island''s border.'
+            - '&7'
+            - '&aBorder Size: &f+30 Blocks'
+            - '&aPrice: &f$10,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        error-item:
+          material: IRON_BARS
+          name: '&cIsland Border Size Increase &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&cNext Level: &e4'
+            - '&7'
+            - '&7Purchasing this upgrade'
+            - '&7will increase the size of your island''s border.'
+            - '&7'
+            - '&cBorder Size: &f+30 Blocks'
+            - '&cPrice: &f$10,000,000'
+            - '&7'
+            - '&cLeft-click to purchase upgrade.'
+        else:
+          item:
+            material: IRON_BARS
+            name: "&cMAX LEVEL"
+            lore:
+              - '&7You have reached the maximum'
+              - '&7level of island border size!'
+
+  generator-rates:
+    slot: 31
+    type: SUPERIORSKYBLOCK_UPGRADE
+    upgrade: 'generator-rates'
+    level: 1
+    item:
+      material: COBBLESTONE
+      name: '&aGenerator Rate Increase &a(Available)'
+      lore:
+        - '&7'
+        - '&aNext Level: &e2'
+        - '&7'
+        - '&7Purchasing this upgrade'
+        - '&7will increase the speed of your island''s generator.'
+        - '&7'
+        - '&aGeneration Speed: &f+10%'
+        - '&aPrice: &f$1,500,000'
+        - '&7'
+        - '&aLeft-click to purchase upgrade.'
+    error-item:
+      material: COBBLESTONE
+      name: '&cGenerator Rate Increase &c(Unavailable)'
+      lore:
+        - '&7'
+        - '&cNext Level: &e2'
+        - '&7'
+        - '&7Purchasing this upgrade'
+        - '&7will increase the speed of your island''s generator.'
+        - '&7'
+        - '&cGeneration Speed: &f+10%'
+        - '&cPrice: &f$1,500,000'
+        - '&7'
+        - '&cLeft-click to purchase upgrade.'
+    else:
+      type: SUPERIORSKYBLOCK_UPGRADE
+      upgrade: 'generator-rates'
+      level: 2
+      item:
+        material: COBBLESTONE
+        name: '&aGenerator Rate Increase &a(Available)'
+        lore:
+          - '&7'
+          - '&aNext Level: &e3'
+          - '&7'
+          - '&7Purchasing this upgrade'
+          - '&7will increase the speed of your island''s generator.'
+          - '&7'
+          - '&aGeneration Speed: &f+20%'
+          - '&aPrice: &f$4,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      error-item:
+        material: COBBLESTONE
+        name: '&cGenerator Rate Increase &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&cNext Level: &e3'
+          - '&7'
+          - '&7Purchasing this upgrade'
+          - '&7will increase the speed of your island''s generator.'
+          - '&7'
+          - '&cGeneration Speed: &f+20%'
+          - '&cPrice: &f$4,000,000'
+          - '&7'
+          - '&cLeft-click to purchase upgrade.'
+      else:
+        type: SUPERIORSKYBLOCK_UPGRADE
+        upgrade: 'generator-rates'
+        level: 3
+        item:
+          material: COBBLESTONE
+          name: '&aGenerator Rate Increase &a(Available)'
+          lore:
+            - '&7'
+            - '&aNext Level: &e4'
+            - '&7'
+            - '&7Purchasing this upgrade'
+            - '&7will increase the speed of your island''s generator.'
+            - '&7'
+            - '&aGeneration Speed: &f+30%'
+            - '&aPrice: &f$8,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        error-item:
+          material: COBBLESTONE
+          name: '&cGenerator Rate Increase &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&cNext Level: &e4'
+            - '&7'
+            - '&7Purchasing this upgrade'
+            - '&7will increase the speed of your island''s generator.'
+            - '&7'
+            - '&cGeneration Speed: &f+30%'
+            - '&cPrice: &f$8,000,000'
+            - '&7'
+            - '&cLeft-click to purchase upgrade.'
+        else:
+          item:
+            material: COBBLESTONE
+            name: "&cMAX LEVEL"
+            lore:
+              - '&7You have reached the maximum'
+              - '&7level of generator speed!'
+
+  minecarts-limit:
+    slot: 33
+    type: SUPERIORSKYBLOCK_UPGRADE
+    upgrade: 'minecarts-limit'
+    level: 1
+    item:
+      material: MINECART
+      name: '&aMinecart Limit Increase &a(Available)'
+      lore:
+        - '&7'
+        - '&aNext Level: &e2'
+        - '&7'
+        - '&7Purchasing this upgrade'
+        - '&7will increase the number of minecarts'
+        - '&7you can have on your island.'
+        - '&7'
+        - '&aMinecart Limit: &f+5 Minecarts'
+        - '&aPrice: &f$2,000,000'
+        - '&7'
+        - '&aLeft-click to purchase upgrade.'
+    error-item:
+      material: MINECART
+      name: '&cMinecart Limit Increase &c(Unavailable)'
+      lore:
+        - '&7'
+        - '&cNext Level: &e2'
+        - '&7'
+        - '&7Purchasing this upgrade'
+        - '&7will increase the number of minecarts'
+        - '&7you can have on your island.'
+        - '&7'
+        - '&cMinecart Limit: &f+5 Minecarts'
+        - '&cPrice: &f$2,000,000'
+        - '&7'
+        - '&cLeft-click to purchase upgrade.'
+    else:
+      type: SUPERIORSKYBLOCK_UPGRADE
+      upgrade: 'minecarts-limit'
+      level: 2
+      item:
+        material: MINECART
+        name: '&aMinecart Limit Increase &a(Available)'
+        lore:
+          - '&7'
+          - '&aNext Level: &e3'
+          - '&7'
+          - '&7Purchasing this upgrade'
+          - '&7will increase the number of minecarts'
+          - '&7you can have on your island.'
+          - '&7'
+          - '&aMinecart Limit: &f+10 Minecarts'
+          - '&aPrice: &f$5,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      error-item:
+        material: MINECART
+        name: '&cMinecart Limit Increase &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&cNext Level: &e3'
+          - '&7'
+          - '&7Purchasing this upgrade'
+          - '&7will increase the number of minecarts'
+          - '&7you can have on your island.'
+          - '&7'
+          - '&cMinecart Limit: &f+10 Minecarts'
+          - '&cPrice: &f$5,000,000'
+          - '&7'
+          - '&cLeft-click to purchase upgrade.'
+      else:
+        type: SUPERIORSKYBLOCK_UPGRADE
+        upgrade: 'minecarts-limit'
+        level: 3
+        item:
+          material: MINECART
+          name: '&aMinecart Limit Increase &a(Available)'
+          lore:
+            - '&7'
+            - '&aNext Level: &e4'
+            - '&7'
+            - '&7Purchasing this upgrade'
+            - '&7will increase the number of minecarts'
+            - '&7you can have on your island.'
+            - '&7'
+            - '&aMinecart Limit: &f+15 Minecarts'
+            - '&aPrice: &f$10,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        error-item:
+          material: MINECART
+          name: '&cMinecart Limit Increase &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&cNext Level: &e4'
+            - '&7'
+            - '&7Purchasing this upgrade'
+            - '&7will increase the number of minecarts'
+            - '&7you can have on your island.'
+            - '&7'
+            - '&cMinecart Limit: &f+15 Minecarts'
+            - '&cPrice: &f$10,000,000'
+            - '&7'
+            - '&cLeft-click to purchase upgrade.'
+        else:
+          item:
+            material: MINECART
+            name: "&cMAX LEVEL"
+            lore:
+              - '&7You have reached the maximum'
+              - '&7level of minecart limit!'

@@ -469,7 +469,10 @@ public class MenusProvider_Default implements MenusProvider {
     public void openUpgrades(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        Menus.MENU_ISLAND_UPGRADES.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        // zMenu Start
+        // Menus.MENU_ISLAND_UPGRADES.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        plugin.getZMenumanager().openInventory(targetPlayer, "upgrades", cache -> cache.setIsland(targetIsland));
+        // zMenu End
     }
 
     @Override
@@ -498,7 +501,10 @@ public class MenusProvider_Default implements MenusProvider {
     public void openVisitors(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        Menus.MENU_ISLAND_VISITORS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        // zMenu Start
+        // Menus.MENU_ISLAND_VISITORS.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        plugin.getZMenumanager().openInventory(targetPlayer, "visitors", cache -> cache.setIsland(targetIsland));
+        // zMenu End
     }
 
     @Override

@@ -1,0 +1,48 @@
+name: '&8Island Visitors'
+
+items:
+  decoration:
+    isPermanent: true
+    slots:
+      - 36-53
+    item:
+      material: CYAN_STAINED_GLASS_PANE
+      name: '&f'
+    else:
+      slots:
+        - 21
+      item:
+        material: BARRIER
+        name: "&cNo Visitor"
+  next:
+    type: NEXT
+    slot: 50
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fNext Page'
+  previous:
+    type: PREVIOUS
+    slot: 48
+    isPermanent: true
+    item:
+      material: PAPER
+      name: '&fPrevious Page'
+  unique-visitors:
+    type: INVENTORY
+    inventory: 'unique-visitors'
+    plugin: 'SuperiorSkyBlock2'
+    slot: 49
+    isPermanent: true
+    item:
+      material: BOOK
+      name: "&fUnique Visitors"
+  players:
+    type: SUPERIORSKYBLOCK_VISITORS
+    slots:
+      - 0-35
+    item:
+      material: PLAYER_HEAD
+      name: '&e%player%'
+      lore:
+        - '&7Island Owner: %island-owner%'

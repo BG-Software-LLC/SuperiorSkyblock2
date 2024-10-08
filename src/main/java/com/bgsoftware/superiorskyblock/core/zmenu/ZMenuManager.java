@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.core.zmenu.buttons.IslandChestButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.RatingsButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.TargetShowButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.UniqueVisitorsButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.VisitorsButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.bank.BankLogsButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.confirm.ButtonConfirmBan;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.confirm.ButtonConfirmDisband;
@@ -33,6 +34,7 @@ import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandTopLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandTopSortLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.PlayerLanguageLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.RateLoader;
+import com.bgsoftware.superiorskyblock.core.zmenu.loader.UpgradeLoader;
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.Inventory;
 import fr.maxlego08.menu.api.InventoryManager;
@@ -104,6 +106,7 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new GlobalWarpsLoader(this.plugin));
         this.buttonManager.register(new BankActionLoader(this.plugin));
         this.buttonManager.register(new RateLoader(this.plugin));
+        this.buttonManager.register(new UpgradeLoader(this.plugin));
 
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMembersButton.class, "SUPERIORSKYBLOCK_MEMBERS"));
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMemberInfoButton.class, "SUPERIORSKYBLOCK_MEMBER_INFO"));
@@ -121,6 +124,7 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new NoneLoader(this.plugin, RatingsButton.class, "SUPERIORSKYBLOCK_RATINGS"));
         this.buttonManager.register(new NoneLoader(this.plugin, IslandChestButton.class, "SUPERIORSKYBLOCK_CHESTS"));
         this.buttonManager.register(new NoneLoader(this.plugin, UniqueVisitorsButton.class, "SUPERIORSKYBLOCK_UNIQUE_VISITORS"));
+        this.buttonManager.register(new NoneLoader(this.plugin, VisitorsButton.class, "SUPERIORSKYBLOCK_VISITORS"));
     }
 
     public void loadInventories() {
@@ -134,7 +138,7 @@ public class ZMenuManager implements Listener {
         List<String> inventories = Arrays.asList("island-creation", "settings", "biomes", "members",
                 "member-manage", "member-role", "permissions", "control-panel", "top-islands",
                 "border-color", "confirm-ban", "confirm-disband", "confirm-kick", "confirm-leave",
-                "player-language", "values", "bank-logs", "banned-players", "coops", "counts",
+                "player-language", "values", "bank-logs", "banned-players", "coops", "counts", "visitors", "upgrades",
                 "global-warps", "island-bank", "island-ratings", "island-rate", "island-chests", "unique-visitors");
 
         inventories.forEach(inventoryName -> {
