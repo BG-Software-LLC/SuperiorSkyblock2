@@ -1,7 +1,12 @@
 package com.bgsoftware.superiorskyblock.core.zmenu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.BannedPlayersButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.CoopsButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.CountsButton;
@@ -35,6 +40,7 @@ import com.bgsoftware.superiorskyblock.core.zmenu.loader.IslandTopSortLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.PlayerLanguageLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.RateLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.UpgradeLoader;
+import com.bgsoftware.superiorskyblock.core.zmenu.loader.WarpsLoader;
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.Inventory;
 import fr.maxlego08.menu.api.InventoryManager;
@@ -50,6 +56,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -107,6 +114,7 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new BankActionLoader(this.plugin));
         this.buttonManager.register(new RateLoader(this.plugin));
         this.buttonManager.register(new UpgradeLoader(this.plugin));
+        this.buttonManager.register(new WarpsLoader(this.plugin));
 
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMembersButton.class, "SUPERIORSKYBLOCK_MEMBERS"));
         this.buttonManager.register(new NoneLoader(this.plugin, IslandMemberInfoButton.class, "SUPERIORSKYBLOCK_MEMBER_INFO"));
@@ -137,7 +145,7 @@ public class ZMenuManager implements Listener {
         // Save inventories files
         List<String> inventories = Arrays.asList("island-creation", "settings", "biomes", "members",
                 "member-manage", "member-role", "permissions", "control-panel", "top-islands",
-                "border-color", "confirm-ban", "confirm-disband", "confirm-kick", "confirm-leave",
+                "border-color", "confirm-ban", "confirm-disband", "confirm-kick", "confirm-leave", "warps",
                 "player-language", "values", "bank-logs", "banned-players", "coops", "counts", "visitors", "upgrades",
                 "global-warps", "island-bank", "island-ratings", "island-rate", "island-chests", "unique-visitors");
 

@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
+import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -62,7 +63,8 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
         } else {
             WarpCategory warpCategory = island.getWarpCategories().values().stream().findFirst()
                     .orElseGet(() -> island.createWarpCategory("Default Category"));
-            Menus.MENU_WARPS.openMenu(superiorPlayer, previousMenu, warpCategory);
+
+            plugin.getMenus().openWarps(superiorPlayer, (ISuperiorMenu) previousMenu, warpCategory);
         }
     }
 

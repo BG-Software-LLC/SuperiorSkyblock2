@@ -23,7 +23,6 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategoryIconEdit;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategoryManage;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpIconEdit;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpManage;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarps;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuCustom;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
@@ -576,7 +575,10 @@ public class MenusProvider_Default implements MenusProvider {
     public void openWarps(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, WarpCategory targetCategory) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetCategory, "targetCategory parameter cannot be null.");
-        Menus.MENU_WARPS.createView(targetPlayer, new MenuWarps.Args(targetCategory), previousMenu);
+        // zMenu Start
+        // Menus.MENU_WARPS.createView(targetPlayer, new MenuWarps.Args(targetCategory), previousMenu);
+        plugin.getZMenumanager().openInventory(targetPlayer, "warps", cache -> cache.setWarpCategory(targetCategory));
+        // zMenu End
     }
 
     @Override

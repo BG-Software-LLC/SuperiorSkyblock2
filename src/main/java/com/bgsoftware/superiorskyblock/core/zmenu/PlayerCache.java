@@ -3,6 +3,8 @@ package com.bgsoftware.superiorskyblock.core.zmenu;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import org.bukkit.entity.Player;
@@ -19,6 +21,8 @@ public class PlayerCache {
     private Comparator<BankTransaction> bankSorting;
     private UUID filteredPlayer;
     private Island island;
+    private WarpCategory warpCategory;
+    private IslandWarp islandWarp;
 
     public PlayerCache(Player player) {
         this.player = player;
@@ -74,5 +78,21 @@ public class PlayerCache {
 
     public void setIsland(Island island) {
         this.island = island;
+    }
+
+    public WarpCategory getWarpCategory() {
+        return warpCategory;
+    }
+
+    public void setWarpCategory(WarpCategory warpCategory) {
+        this.warpCategory = warpCategory;
+    }
+
+    public IslandWarp getIslandWarp() {
+        return islandWarp;
+    }
+
+    public void setIslandWarp(IslandWarp islandWarp) {
+        this.islandWarp = islandWarp;
     }
 }

@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarps;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.warp.SIslandWarp;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -30,7 +31,7 @@ public class WarpPagedObjectButton extends AbstractPagedMenuButton<MenuWarps.Vie
             menuView.setPreviousMove(false);
             plugin.getMenus().openWarpManage(clickedPlayer, MenuViewWrapper.fromView(menuView), pagedObject);
         } else {
-            Menus.MENU_WARPS.simulateClick(clickedPlayer, menuView.getWarpCategory().getIsland(), pagedObject);
+            SIslandWarp.teleportWarp(plugin, clickedPlayer, menuView.getWarpCategory().getIsland(), pagedObject);
             BukkitExecutor.sync(() -> menuView.setPreviousMove(false), 1L);
         }
     }

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
+import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -54,7 +55,7 @@ public class WarpCategoryPagedObjectButton extends AbstractPagedMenuButton<MenuW
         if (menuView.hasManagePerms() && clickEvent.getClick().isRightClick()) {
             plugin.getMenus().openWarpCategoryManage(menuView.getInventoryViewer(), MenuViewWrapper.fromView(menuView), pagedObject);
         } else {
-            Menus.MENU_WARPS.openMenu(menuView.getInventoryViewer(), menuView, pagedObject);
+            plugin.getMenus().openWarps(menuView.getInventoryViewer(), (ISuperiorMenu) menuView, pagedObject);
         }
     }
 
