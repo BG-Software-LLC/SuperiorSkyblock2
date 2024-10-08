@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.IslandPlaceholderParser;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlayerPlaceholderParser;
+import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
@@ -338,8 +339,10 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     return handlePermissionsPlaceholder(island, superiorPlayer, matcher.group(1));
                 } else if ((matcher = UPGRADE_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String upgradeName = matcher.group(1);
-                    return Optional.of(island.getUpgradeLevel(plugin.getUpgrades()
-                            .getUpgrade(upgradeName)).getLevel() + "");
+                    if (upgradeName.isEmpty()) return Optional.empty();
+                    Upgrade upgrade = plugin.getUpgrades().getUpgrade(upgradeName);
+                    if (upgrade == null) return Optional.empty();
+                    return Optional.of(String.valueOf(island.getUpgradeLevel(upgrade).getLevel()));
                 } else if ((matcher = COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
                     return Optional.of(Formatters.NUMBER_FORMATTER.format(island
