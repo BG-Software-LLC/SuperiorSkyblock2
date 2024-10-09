@@ -6,7 +6,9 @@ import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.util.Comparator;
@@ -23,6 +25,7 @@ public class PlayerCache {
     private Island island;
     private WarpCategory warpCategory;
     private IslandWarp islandWarp;
+    private ItemBuilder editableBuilder = new ItemBuilder(Material.STONE);
 
     public PlayerCache(Player player) {
         this.player = player;
@@ -94,5 +97,13 @@ public class PlayerCache {
 
     public void setIslandWarp(IslandWarp islandWarp) {
         this.islandWarp = islandWarp;
+    }
+
+    public ItemBuilder getEditableBuilder() {
+        return editableBuilder;
+    }
+
+    public void setEditableBuilder(ItemBuilder editableBuilder) {
+        this.editableBuilder = editableBuilder;
     }
 }

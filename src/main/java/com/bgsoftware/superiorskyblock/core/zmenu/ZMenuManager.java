@@ -24,6 +24,15 @@ import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberBa
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberInfoButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMemberKickButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.members.IslandMembersButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.warps.WarpIconConfirmButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.warps.WarpIconDisplayButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.warps.WarpIconLoreButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.warps.WarpIconNameButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.warps.WarpIconTypeButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.warps.WarpManageIconButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.warps.WarpManageLocationButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.warps.WarpManagePrivacyButton;
+import com.bgsoftware.superiorskyblock.core.zmenu.buttons.warps.WarpManageRenameButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.BankActionLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.BankLogsSortLoader;
 import com.bgsoftware.superiorskyblock.core.zmenu.loader.BlockValueLoader;
@@ -133,6 +142,15 @@ public class ZMenuManager implements Listener {
         this.buttonManager.register(new NoneLoader(this.plugin, IslandChestButton.class, "SUPERIORSKYBLOCK_CHESTS"));
         this.buttonManager.register(new NoneLoader(this.plugin, UniqueVisitorsButton.class, "SUPERIORSKYBLOCK_UNIQUE_VISITORS"));
         this.buttonManager.register(new NoneLoader(this.plugin, VisitorsButton.class, "SUPERIORSKYBLOCK_VISITORS"));
+        this.buttonManager.register(new NoneLoader(this.plugin, WarpManagePrivacyButton.class, "SUPERIORSKYBLOCK_WARP_MANAGE_PRIVACY"));
+        this.buttonManager.register(new NoneLoader(this.plugin, WarpManageLocationButton.class, "SUPERIORSKYBLOCK_WARP_MANAGE_LOCATION"));
+        this.buttonManager.register(new NoneLoader(this.plugin, WarpManageRenameButton.class, "SUPERIORSKYBLOCK_WARP_MANAGE_RENAME"));
+        this.buttonManager.register(new NoneLoader(this.plugin, WarpManageIconButton.class, "SUPERIORSKYBLOCK_WARP_MANAGE_ICON"));
+        this.buttonManager.register(new NoneLoader(this.plugin, WarpIconConfirmButton.class, "SUPERIORSKYBLOCK_WARP_ICON_CONFIRM"));
+        this.buttonManager.register(new NoneLoader(this.plugin, WarpIconNameButton.class, "SUPERIORSKYBLOCK_WARP_ICON_NAME"));
+        this.buttonManager.register(new NoneLoader(this.plugin, WarpIconLoreButton.class, "SUPERIORSKYBLOCK_WARP_ICON_LORE"));
+        this.buttonManager.register(new NoneLoader(this.plugin, WarpIconTypeButton.class, "SUPERIORSKYBLOCK_WARP_ICON_TYPE"));
+        this.buttonManager.register(new NoneLoader(this.plugin, WarpIconDisplayButton.class, "SUPERIORSKYBLOCK_WARP_ICON_DISPLAY"));
     }
 
     public void loadInventories() {
@@ -147,6 +165,7 @@ public class ZMenuManager implements Listener {
                 "member-manage", "member-role", "permissions", "control-panel", "top-islands",
                 "border-color", "confirm-ban", "confirm-disband", "confirm-kick", "confirm-leave", "warps",
                 "player-language", "values", "bank-logs", "banned-players", "coops", "counts", "visitors", "upgrades",
+                "warp-manage", "warp-icon-edit",
                 "global-warps", "island-bank", "island-ratings", "island-rate", "island-chests", "unique-visitors");
 
         inventories.forEach(inventoryName -> {

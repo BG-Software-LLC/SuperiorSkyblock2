@@ -1,0 +1,46 @@
+name: '&8Warp: %name%'
+size: 36
+
+items:
+  rename:
+    slot: 11
+    type: SUPERIORSKYBLOCK_WARP_MANAGE_RENAME
+    item:
+      material: BOOK
+      name: '&6Rename Warp'
+      lore:
+        - '&f '
+        - '&f '
+        - '&7&o(( &f&oClick &7&oto rename the warp. ))'
+  update:
+    type: SUPERIORSKYBLOCK_WARP_MANAGE_ICON
+    slot: 22
+    item:
+      material: '%material%'
+      lore:
+        - '&f '
+        - '&7&oYou can use the following placeholders:'
+        - '&7&o{0} is used for the warp''s name.'
+        - '&7&o{1} is used for the warp''s location.'
+        - '&7&o{2} is used for the warp''s public status.'
+        - '&7&o(( &f&oClick &7&oto edit the icon. ))'
+  location:
+    type: SUPERIORSKYBLOCK_WARP_MANAGE_LOCATION
+    slot: 16
+    item:
+      material: ENDER_PEARL
+      name: '&6Warp Location'
+      lore:
+        - '&f '
+        - '&f '
+        - '&7&o(( &f&oClick &7&oto update the warp location. ))'
+  privacy:
+    type: SUPERIORSKYBLOCK_WARP_MANAGE_PRIVACY
+    slot: 13
+    item:
+      material: FEATHER
+      name: '&6Private Warp'
+      lore:
+        - '&f '
+        - '&f '
+        - '&7&o(( &f&oClick &7&oto toggle warp to the public. ))'

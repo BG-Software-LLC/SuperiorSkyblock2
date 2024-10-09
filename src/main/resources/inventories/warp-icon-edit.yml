@@ -1,0 +1,45 @@
+name: '&8Warp: %name%'
+size: 36
+
+items:
+  '!':
+    type: SUPERIORSKYBLOCK_WARP_ICON_TYPE
+    slot: 11
+    item:
+      material: DIAMOND
+      name: '&6Set Type'
+      lore:
+        - '&f '
+        - '&7&o(( &f&oClick &7&oto edit the item type. ))'
+  '~':
+    type: SUPERIORSKYBLOCK_WARP_ICON_NAME
+    slot: 13
+    item:
+      material: ANVIL
+      name: '&6Set Name'
+      lore:
+        - '&f '
+        - '&7&o(( &f&oClick &7&oto edit the item name. ))'
+  '$':
+    type: SUPERIORSKYBLOCK_WARP_ICON_LORE
+    slot: 15
+    item:
+      material: PAPER
+      name: '&6Set Lore'
+      lore:
+        - '&f '
+        - '&7&o(( &f&oClick &7&oto edit the item lore. ))'
+  '%':
+    type: SUPERIORSKYBLOCK_WARP_ICON_CONFIRM
+    slot: 35
+    item:
+      material: EMERALD
+      name: '&6Confirm Changes'
+      lore:
+        - '&f '
+        - '&7&o(( &f&oClick &7&oto confirm all changes. ))'
+  '^':
+    type: SUPERIORSKYBLOCK_WARP_ICON_DISPLAY
+    slot: 22
+    item:
+      material: STONE

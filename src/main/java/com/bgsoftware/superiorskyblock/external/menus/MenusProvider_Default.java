@@ -555,7 +555,10 @@ public class MenusProvider_Default implements MenusProvider {
     public void openWarpIconEdit(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, IslandWarp targetWarp) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetWarp, "targetWarp parameter cannot be null.");
-        Menus.MENU_WARP_ICON_EDIT.createView(targetPlayer, new MenuWarpIconEdit.Args(targetWarp), previousMenu);
+        // zMenu Start
+        // Menus.MENU_WARP_ICON_EDIT.createView(targetPlayer, new MenuWarpIconEdit.Args(targetWarp), previousMenu);
+        plugin.getZMenumanager().openInventory(targetPlayer, "warp-icon-edit", cache -> cache.setIslandWarp(targetWarp));
+        // zMenu End
     }
 
     @Override
@@ -563,6 +566,10 @@ public class MenusProvider_Default implements MenusProvider {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetWarp, "targetWarp parameter cannot be null.");
         Menus.MENU_WARP_MANAGE.createView(targetPlayer, new MenuWarpManage.Args(targetWarp), previousMenu);
+        // zMenu Start
+        // Menus.MENU_WARP_MANAGE.createView(targetPlayer, new MenuWarpManage.Args(targetWarp), previousMenu);
+        plugin.getZMenumanager().openInventory(targetPlayer, "warp-manage", cache -> cache.setIslandWarp(targetWarp));
+        // zMenu End
     }
 
     @Override
