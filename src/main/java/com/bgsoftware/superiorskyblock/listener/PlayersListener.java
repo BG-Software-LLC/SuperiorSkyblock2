@@ -465,12 +465,16 @@ public class PlayersListener implements Listener {
     }
 
     private void registerChatListener() {
-        try {
-            Class.forName("io.papermc.paper.event.player.AsyncChatEvent");
-            Bukkit.getPluginManager().registerEvents(new PaperChatListener(), plugin);
-        } catch (Exception ignored) {
-            Bukkit.getPluginManager().registerEvents(new SpigotChatListener(), plugin);
+        if (plugin.getSettings().getChatSigningSupport()) {
+            try {
+                Class.forName("io.papermc.paper.event.player.AsyncChatEvent");
+                Bukkit.getPluginManager().registerEvents(new PaperChatListener(), plugin);
+                return;
+            } catch (Exception ignored) {
+            }
         }
+
+        Bukkit.getPluginManager().registerEvents(new SpigotChatListener(), plugin);
     }
 
     private class PaperChatListener implements Listener {
