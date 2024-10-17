@@ -31,7 +31,6 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -72,7 +71,7 @@ public enum Message {
     BORDER_PLAYER_COLOR_NAME_GREEN,
     BORDER_PLAYER_COLOR_NAME_RED,
     BORDER_PLAYER_COLOR_UPDATED,
-    BUILD_OUTSIDE_ISLAND,
+    BUILD_OUTSIDE_ISLAND(3, TimeUnit.SECONDS),
     CANNOT_SET_ROLE,
     CHANGED_BANK_LIMIT,
     CHANGED_BANK_LIMIT_ALL,
@@ -878,6 +877,7 @@ public enum Message {
             plugin.saveResource("lang/it-IT.yml", false);
             plugin.saveResource("lang/iw-IL.yml", false);
             plugin.saveResource("lang/pl-PL.yml", false);
+            plugin.saveResource("lang/ru-RU.yml", false);
             plugin.saveResource("lang/vi-VN.yml", false);
             plugin.saveResource("lang/zh-CN.yml", false);
         }
@@ -902,10 +902,9 @@ public enum Message {
                 PlayerLocales.setDefaultLocale(fileLocale);
 
             CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(langFile);
-            InputStream inputStream = plugin.getResource("lang/" + langFile.getName());
 
-            try {
-                cfg.syncWithConfig(langFile, inputStream == null ? plugin.getResource("lang/en-US.yml") : inputStream, "lang/en-US.yml");
+            try (InputStream langResourceStream = plugin.getResource("lang/" + langFile.getName())) {
+                cfg.syncWithConfig(langFile, langResourceStream == null ? plugin.getResource("lang/en-US.yml") : langResourceStream, "lang/en-US.yml");
             } catch (Exception error) {
                 Log.error(error, "An unexpected error occurred while saving lang file ", langFile.getName(), ":");
             }
