@@ -81,6 +81,7 @@ public class IslandPrivileges {
     public static final IslandPrivilege USE = register("USE");
     public static final IslandPrivilege VALUABLE_BREAK = register("VALUABLE_BREAK");
     public static final IslandPrivilege VILLAGER_TRADING = register("VILLAGER_TRADING");
+    public static final IslandPrivilege WIND_CHARGE = register("WIND_CHARGE", ServerVersion.isAtLeast(ServerVersion.v1_21));
     public static final IslandPrivilege WITHDRAW_MONEY = register("WITHDRAW_MONEY");
 
     private IslandPrivileges() {

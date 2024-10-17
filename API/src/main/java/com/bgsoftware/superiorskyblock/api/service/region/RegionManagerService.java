@@ -116,6 +116,15 @@ public interface RegionManagerService {
     InteractionResult handlePlayerConsumeChorusFruit(SuperiorPlayer superiorPlayer, Location location);
 
     /**
+     * Handle a player using a wind charge.
+     *
+     * @param superiorPlayer The player that used the wind charge.
+     * @param location       The location of the player.
+     * @return The result of the interaction.
+     */
+    InteractionResult handlePlayerUseWindCharge(SuperiorPlayer superiorPlayer, Location location);
+
+    /**
      * Handle an entity damaging another entity.
      *
      * @param damager The entity that dealt the damage.
