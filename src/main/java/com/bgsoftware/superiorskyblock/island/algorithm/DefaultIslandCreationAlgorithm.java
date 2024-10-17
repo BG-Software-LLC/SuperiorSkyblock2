@@ -75,7 +75,6 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
 
         long profiler = Profiler.start(ProfileType.CREATE_ISLAND, schematic.getName());
 
-        CompletableFuture<IslandCreationResult> completableFuture = new CompletableFuture<>();
 
         Location islandLocation = plugin.getProviders().getWorldsProvider().getNextLocation(
                 lastIsland.parse().clone(),
@@ -93,21 +92,26 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
 
         EventResult<Boolean> event = plugin.getEventsBus().callIslandCreateEvent(builder.owner, island, builder.islandType);
 
-        if (!event.isCancelled()) {
-            schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
-                plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
-                        builder.owner.getUniqueId(), builder.uuid);
-                completableFuture.complete(new IslandCreationResult(IslandCreationResult.Status.SUCCESS, island, islandLocation, event.getResult()));
-                island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
-                Profiler.end(profiler);
-            }, error -> {
-                island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
-                plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
-                        builder.owner.getUniqueId(), builder.uuid);
-                completableFuture.completeExceptionally(error);
-                Profiler.end(profiler);
-            });
+        if (event.isCancelled()) {
+            Log.debugResult(Debug.CREATE_ISLAND, "Creation Failed", "Event was cancelled for creating the island '" + builder.islandName + "'.");
+            return CompletableFuture.completedFuture(new IslandCreationResult(IslandCreationResult.Status.EVENT_CANCELLED, null, null, false));
         }
+
+        CompletableFuture<IslandCreationResult> completableFuture = new CompletableFuture<>();
+
+        schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
+            plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
+                    builder.owner.getUniqueId(), builder.uuid);
+            completableFuture.complete(new IslandCreationResult(IslandCreationResult.Status.SUCCESS, island, islandLocation, event.getResult()));
+            island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
+            Profiler.end(profiler);
+        }, error -> {
+            island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
+            plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
+                    builder.owner.getUniqueId(), builder.uuid);
+            completableFuture.completeExceptionally(error);
+            Profiler.end(profiler);
+        });
 
         return completableFuture;
     }
