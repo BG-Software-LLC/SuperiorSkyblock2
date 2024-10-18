@@ -4,6 +4,7 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.io.Resources;
 import com.bgsoftware.superiorskyblock.core.itemstack.heads.MinecraftHeadsClient;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
@@ -42,12 +43,12 @@ public class ItemSkulls {
         File file = new File(plugin.getDataFolder(), "heads.yml");
 
         if (!file.exists())
-            plugin.saveResource("heads.yml", false);
+            Resources.saveResource("heads.yml");
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
         try {
-            cfg.syncWithConfig(file, plugin.getResource("heads.yml"));
+            cfg.syncWithConfig(file, Resources.getResource("heads.yml"));
         } catch (Exception error) {
             Log.entering("ENTER");
             Log.error(error, "An unexpected error occurred while syncing heads file:");
