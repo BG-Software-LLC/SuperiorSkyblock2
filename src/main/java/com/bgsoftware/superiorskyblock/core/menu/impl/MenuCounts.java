@@ -77,8 +77,10 @@ public class MenuCounts extends AbstractPagedMenu<MenuCounts.View, IslandViewArg
             for (Material material : Material.values()) {
                 blockCounts.add(new BlockCount(Keys.of(material), BigInteger.ONE));
             }
-            for (EntityType entityType : EntityType.values())
-                blockCounts.add(new BlockCount(Keys.ofSpawner(entityType), BigInteger.ONE));
+            for (EntityType entityType : EntityType.values()) {
+                if (entityType.isAlive())
+                    blockCounts.add(new BlockCount(Keys.ofSpawner(entityType), BigInteger.ONE));
+            }
             return blockCounts;
         }
 
