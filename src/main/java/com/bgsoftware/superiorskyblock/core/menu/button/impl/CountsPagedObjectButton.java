@@ -246,30 +246,6 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
             Material blockMaterial = BLOCKS_TO_ITEMS.getOrDefault(blockTypeAndData.getKey(), blockTypeAndData.getKey());
             short damage = blockTypeAndData.getValue();
 
-//            String convertedItem = BLOCKS_TO_ITEMS.get(blockKey.getGlobalKey());
-//
-//            if (convertedItem != null) {
-//                Key tempBlockType = Keys.ofMaterialAndData(convertedItem);
-//                if (tempBlockType instanceof MaterialKey)
-//                    blockKey = tempBlockType;
-//            }
-
-//            Material blockMaterial;
-//            byte damage = 0;
-//
-//            try {
-//                blockMaterial = Material.valueOf(blockKey.getGlobalKey());
-//                if (!blockKey.getSubKey().isEmpty()) {
-//                    try {
-//                        damage = Byte.parseByte(blockKey.getSubKey());
-//                    } catch (Throwable ignored) {
-//                    }
-//                }
-//            } catch (Exception ex) {
-//                blockMaterial = Material.BEDROCK;
-//                materialName = blockKey.getGlobalKey();
-//            }
-
             String texture;
 
             if (blockMaterial == Materials.SPAWNER.toBukkitType() && !blockKey.getSubKey().isEmpty() &&
