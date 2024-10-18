@@ -7,8 +7,8 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
@@ -17,9 +17,11 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.CountsPagedObjectBu
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 
 import java.math.BigInteger;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -68,9 +70,16 @@ public class MenuCounts extends AbstractPagedMenu<MenuCounts.View, IslandViewArg
 
         @Override
         protected List<MenuCounts.BlockCount> requestObjects() {
-            return new SequentialListBuilder<MenuCounts.BlockCount>()
-                    .sorted(BLOCK_COUNT_COMPARATOR)
-                    .build(island.getBlockCountsAsBigInteger().entrySet(), BLOCK_COUNT_MAPPER);
+//            return new SequentialListBuilder<MenuCounts.BlockCount>()
+//                    .sorted(BLOCK_COUNT_COMPARATOR)
+//                    .build(island.getBlockCountsAsBigInteger().entrySet(), BLOCK_COUNT_MAPPER);
+            List<MenuCounts.BlockCount> blockCounts = new LinkedList<>();
+            for (Material material : Material.values()) {
+                blockCounts.add(new BlockCount(Keys.of(material), BigInteger.ONE));
+            }
+            for (EntityType entityType : EntityType.values())
+                blockCounts.add(new BlockCount(Keys.ofSpawner(entityType), BigInteger.ONE));
+            return blockCounts;
         }
 
     }

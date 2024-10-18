@@ -5,18 +5,17 @@ import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCounts;
 import com.bgsoftware.superiorskyblock.core.values.BlockValue;
-import com.google.common.collect.ImmutableMap;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -25,13 +24,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.View, MenuCounts.BlockCount> {
 
     private static final BigInteger MAX_STACK = BigInteger.valueOf(64);
 
-    private static final ImmutableMap<String, String> BLOCKS_TO_ITEMS = new ImmutableMap.Builder<String, String>()
+    private static final Map<Material, Material> BLOCKS_TO_ITEMS = new MapBuilder()
             .put("ACACIA_DOOR", "ACACIA_DOOR_ITEM")
             .put("ACACIA_WALL_SIGN", "ACACIA_SIGN")
             .put("BAMBOO_SAPLING", "BAMBOO")
@@ -67,6 +68,7 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
             .put("DIODE_BLOCK_ON", "DIODE")
             .put("DRAGON_WALL_HEAD", "DRAGON_HEAD")
             .put("END_PORTAL", "END_PORTAL_FRAME")
+            .put("FIRE", "FIRE_CHARGE")
             .put("FIRE_CORAL_WALL_FAN", "FIRE_CORAL")
             .put("FLOWER_POT", "FLOWER_POT_ITEM")
             .put("GLOWING_REDSTONE_ORE", "REDSTONE_ORE")
@@ -150,7 +152,9 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
             .put("WOODEN_DOOR", "WOOD_DOOR")
             .put("YELLOW_WALL_BANNER", "YELLOW_BANNER")
             .put("ZOMBIE_WALL_HEAD", "ZOMBIE_HEAD")
+            .put("ZOMBIE_WALL_HEAD", "ZOMBIE_HEAD")
             .build();
+
 
     private CountsPagedObjectButton(MenuTemplateButton<MenuCounts.View> templateButton, MenuCounts.View menuView) {
         super(templateButton, menuView);
@@ -179,29 +183,33 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
         } else {
             Key blockKey = customKeyItem.getKey();
 
-            String convertedItem = BLOCKS_TO_ITEMS.get(blockKey.getGlobalKey());
+            Pair<Material, Short> blockTypeAndData = getMaterialAndData(blockKey);
+            Material blockMaterial = BLOCKS_TO_ITEMS.getOrDefault(blockTypeAndData.getKey(), blockTypeAndData.getKey());
+            short damage = blockTypeAndData.getValue();
 
-            if (convertedItem != null) {
-                Key tempBlockType = Keys.ofMaterialAndData(convertedItem);
-                if (tempBlockType instanceof MaterialKey)
-                    blockKey = tempBlockType;
-            }
+//            String convertedItem = BLOCKS_TO_ITEMS.get(blockKey.getGlobalKey());
+//
+//            if (convertedItem != null) {
+//                Key tempBlockType = Keys.ofMaterialAndData(convertedItem);
+//                if (tempBlockType instanceof MaterialKey)
+//                    blockKey = tempBlockType;
+//            }
 
-            Material blockMaterial;
-            byte damage = 0;
-
-            try {
-                blockMaterial = Material.valueOf(blockKey.getGlobalKey());
-                if (!blockKey.getSubKey().isEmpty()) {
-                    try {
-                        damage = Byte.parseByte(blockKey.getSubKey());
-                    } catch (Throwable ignored) {
-                    }
-                }
-            } catch (Exception ex) {
-                blockMaterial = Material.BEDROCK;
-                materialName = blockKey.getGlobalKey();
-            }
+//            Material blockMaterial;
+//            byte damage = 0;
+//
+//            try {
+//                blockMaterial = Material.valueOf(blockKey.getGlobalKey());
+//                if (!blockKey.getSubKey().isEmpty()) {
+//                    try {
+//                        damage = Byte.parseByte(blockKey.getSubKey());
+//                    } catch (Throwable ignored) {
+//                    }
+//                }
+//            } catch (Exception ex) {
+//                blockMaterial = Material.BEDROCK;
+//                materialName = blockKey.getGlobalKey();
+//            }
 
             String texture;
 
@@ -211,8 +219,7 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
                 materialName = blockKey.getSubKey() + "_SPAWNER";
             } else {
                 itemBuilder = new ItemBuilder(blockMaterial, damage);
-                if (materialName == null)
-                    materialName = rawKey.getGlobalKey();
+                materialName = rawKey.getGlobalKey();
             }
         }
 
@@ -244,6 +251,46 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
                     CountsPagedObjectButton::new);
         }
 
+    }
+
+    private static class MapBuilder {
+
+        private final EnumMap<Material, Material> mapper = new EnumMap<>(Material.class);
+
+        public MapBuilder put(String block, String item) {
+            Material blockMaterial = EnumHelper.getEnum(Material.class, block);
+            Material itemMaterial = EnumHelper.getEnum(Material.class, item);
+            if (blockMaterial != null && itemMaterial != null)
+                mapper.put(blockMaterial, itemMaterial);
+            return this;
+        }
+
+        public Map<Material, Material> build() {
+            return mapper;
+        }
+
+    }
+
+    private static Pair<Material, Short> getMaterialAndData(Key key) {
+        if (key instanceof MaterialKey)
+            return new Pair<>(((MaterialKey) key).getMaterial(), ((MaterialKey) key).getDurability());
+
+        try {
+            Material blockMaterial = Material.valueOf(key.getGlobalKey());
+            short damage = 0;
+
+            if (!key.getSubKey().isEmpty()) {
+                try {
+                    damage = Short.parseShort(key.getSubKey());
+                } catch (Throwable ignored) {
+                }
+            }
+
+            return new Pair<>(blockMaterial, damage);
+        } catch (Exception ignored) {
+        }
+
+        return new Pair<>(Material.BEDROCK, (short) 0);
     }
 
 }

@@ -99,4 +99,8 @@ public class MaterialKey extends BaseKey<MaterialKey> {
         return this.type;
     }
 
+    public short getDurability() {
+        return this.durability;
+    }
+
 }
