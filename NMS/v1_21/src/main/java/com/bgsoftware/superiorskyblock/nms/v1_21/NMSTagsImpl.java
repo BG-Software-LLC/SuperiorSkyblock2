@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.serialization.Dynamic;
+import net.minecraft.SharedConstants;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.IntArrayTag;
@@ -28,11 +29,9 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 
 @SuppressWarnings({"unused"})
 public class NMSTagsImpl implements NMSTags {
@@ -43,7 +42,7 @@ public class NMSTagsImpl implements NMSTags {
 
         net.minecraft.nbt.CompoundTag tagCompound = (net.minecraft.nbt.CompoundTag)
                 itemStack.save(MinecraftServer.getServer().registryAccess());
-        tagCompound.putInt("DataVersion", CraftMagicNumbers.INSTANCE.getDataVersion());
+        tagCompound.putInt("DataVersion", SharedConstants.getCurrentVersion().getDataVersion().getVersion());
 
         return CompoundTag.fromNBT(tagCompound);
     }
@@ -57,7 +56,7 @@ public class NMSTagsImpl implements NMSTags {
 
         net.minecraft.nbt.CompoundTag tagCompound = (net.minecraft.nbt.CompoundTag) compoundTag.toNBT();
 
-        int currentVersion = CraftMagicNumbers.INSTANCE.getDataVersion();
+        int currentVersion = SharedConstants.getCurrentVersion().getDataVersion().getVersion();
         int itemVersion = tagCompound.getInt("DataVersion");
         if (itemVersion < currentVersion) {
             tagCompound = (net.minecraft.nbt.CompoundTag) DataFixers.getDataFixer().update(References.ITEM_STACK,

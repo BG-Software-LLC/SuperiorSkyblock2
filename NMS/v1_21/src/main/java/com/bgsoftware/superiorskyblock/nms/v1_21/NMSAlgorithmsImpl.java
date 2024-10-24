@@ -20,6 +20,7 @@ import io.papermc.paper.chat.ChatRenderer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TextReplacementConfig;
+import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -208,7 +209,7 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public int getDataVersion() {
-        return CraftMagicNumbers.INSTANCE.getDataVersion();
+        return SharedConstants.getCurrentVersion().getDataVersion().getVersion();
     }
 
     @Override
