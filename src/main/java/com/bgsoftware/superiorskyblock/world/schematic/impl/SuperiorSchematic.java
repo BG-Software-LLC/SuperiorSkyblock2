@@ -144,6 +144,8 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
         List<Runnable> finishTasks = new LinkedList<>();
 
+        long placeProfiler = Profiler.start(ProfileType.SCHEMATIC_BLOCKS_PLACE, getName());
+
         this.data.blocks.forEach(schematicBlockData -> {
             Location blockLocation = schematicBlockData.getBlockOffset().applyToLocation(min.clone());
             SchematicBlock schematicBlock = new SchematicBlock(blockLocation, schematicBlockData);
@@ -156,6 +158,8 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
             if (schematicBlock.shouldPostPlace())
                 finishTasks.add(() -> schematicBlock.doPostPlace(island));
         });
+
+        Profiler.end(placeProfiler);
 
         List<ChunkPosition> affectedChunks = worldEditSession.getAffectedChunks();
         List<CompletableFuture<Chunk>> chunkFutures = new ArrayList<>(affectedChunks.size());
