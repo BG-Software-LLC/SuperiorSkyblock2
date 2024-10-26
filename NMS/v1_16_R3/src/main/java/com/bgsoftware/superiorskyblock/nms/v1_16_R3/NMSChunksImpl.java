@@ -151,11 +151,9 @@ public class NMSChunksImpl implements NMSChunks {
             @Override
             public void onLoadedChunk(Chunk chunk) {
                 Arrays.fill(chunk.getSections(), Chunk.a);
+
                 removeEntities(chunk);
-
-                new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::removeTileEntity);
-                chunk.tileEntities.clear();
-
+                removeTileEntities(chunk);
                 removeBlocks(chunk);
             }
 
@@ -453,6 +451,11 @@ public class NMSChunksImpl implements NMSChunks {
                 entitySlices[i] = entitySliceCreationFunction.apply(null);
             }
         }
+    }
+
+    private static void removeTileEntities(Chunk chunk) {
+        new LinkedList<>(chunk.tileEntities.keySet()).forEach(chunk.world::removeTileEntity);
+        chunk.tileEntities.clear();
     }
 
     private static void removeBlocks(Chunk chunk) {

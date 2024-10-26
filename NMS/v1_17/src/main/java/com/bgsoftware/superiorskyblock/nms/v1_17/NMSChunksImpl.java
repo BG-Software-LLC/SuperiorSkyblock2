@@ -41,6 +41,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -157,10 +158,7 @@ public class NMSChunksImpl implements NMSChunks {
                 Arrays.fill(levelChunk.getSections(), LevelChunk.EMPTY_SECTION);
 
                 removeEntities(levelChunk);
-
-                new HashSet<>(levelChunk.getBlockEntities().keySet()).forEach(levelChunk.getLevel()::removeBlockEntity);
-                levelChunk.getBlockEntities().clear();
-
+                removeBlockEntities(levelChunk);
                 removeBlocks(levelChunk);
             }
 
@@ -479,6 +477,11 @@ public class NMSChunksImpl implements NMSChunks {
             if (!(entity instanceof net.minecraft.world.entity.player.Player))
                 entity.setRemoved(Entity.RemovalReason.DISCARDED);
         }
+    }
+
+    private static void removeBlockEntities(LevelChunk levelChunk) {
+        new LinkedList<>(levelChunk.getBlockEntities().keySet()).forEach(levelChunk.getLevel()::removeBlockEntity);
+        levelChunk.getBlockEntities().clear();
     }
 
     private static void removeBlocks(LevelChunk levelChunk) {
