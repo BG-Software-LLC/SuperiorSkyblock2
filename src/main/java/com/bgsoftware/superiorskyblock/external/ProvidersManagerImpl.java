@@ -475,7 +475,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         } else if (canRegisterHook("SilkSpawners") &&
                 Bukkit.getPluginManager().getPlugin("SilkSpawners").getDescription().getAuthors().contains("CandC_9_12") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("SilkSpawners"))) {
-            spawnersProvider = createInstance("spawners.SpawnersProvider_SilkSpawners");
+            spawnersProvider = createInstance("spawners.SpawnersProvider_CandcSilkSpawners");
         } else if (canRegisterHook("PvpingSpawners") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("PvpingSpawners"))) {
             spawnersProvider = createInstance("spawners.SpawnersProvider_PvpingSpawners");
