@@ -28,6 +28,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.TNTPrimed;
@@ -68,6 +69,10 @@ public class BlockChangesListener implements Listener {
             ProjectileHitEvent.class, "getHitBlock");
     @Nullable
     private static final Material CHORUS_FLOWER = EnumHelper.getEnum(Material.class, "CHORUS_FLOWER");
+    @Nullable
+    private static final EntityType WIND_CHARGE = EnumHelper.getEnum(EntityType.class, "WIND_CHARGE");
+    @Nullable
+    private static final Material POINTED_DRIPSTONE = EnumHelper.getEnum(Material.class, "POINTED_DRIPSTONE");
 
     @WorldRecordFlags
     private static final int REGULAR_RECORD_FLAGS = WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS;
@@ -321,8 +326,15 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onEntityExplode(EntityExplodeEvent e) {
+        boolean isWindCharge = e.getEntityType() == WIND_CHARGE;
+
         KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         e.blockList().forEach(block -> {
+            Material blockType = block.getType();
+            // Wind charges only break chorus flowers and pointed drip-stones
+            if (isWindCharge && blockType != CHORUS_FLOWER && blockType != POINTED_DRIPSTONE)
+                return;
+
             Key blockKey = Keys.of(block);
             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
         });
