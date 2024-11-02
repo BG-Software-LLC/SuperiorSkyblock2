@@ -1328,14 +1328,27 @@ public class SIsland implements Island {
 
     @Override
     public boolean isInside(Location location) {
+        return isInside(location, 0);
+    }
+
+    @Override
+    public boolean isInside(Location location, int extraRadius) {
+        return isInside(location, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInside(Location location, double extraRadius) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
+        Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
 
         if (!isIslandWorld(location.getWorld()))
             return false;
 
         int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
                 (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
+
         IslandArea islandArea = new IslandArea(this.center, islandDistance);
+        islandArea.expand(extraRadius);
 
         return islandArea.intercepts(location.getBlockX(), location.getBlockZ());
     }
@@ -1366,16 +1379,24 @@ public class SIsland implements Island {
 
     @Override
     public boolean isInsideRange(Location location) {
-        Preconditions.checkNotNull(location, "location parameter cannot be null.");
         return isInsideRange(location, 0);
     }
 
-    public boolean isInsideRange(Location location, int extra) {
+    @Override
+    public boolean isInsideRange(Location location, int extraRadius) {
+        return isInsideRange(location, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(Location location, double extraRadius) {
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
+        Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
+
         if (!isIslandWorld(location.getWorld()))
             return false;
 
         IslandArea islandArea = new IslandArea(center, getIslandSize());
-        islandArea.expand(extra);
+        islandArea.expand(extraRadius);
 
         return islandArea.intercepts(location.getBlockX(), location.getBlockZ());
     }

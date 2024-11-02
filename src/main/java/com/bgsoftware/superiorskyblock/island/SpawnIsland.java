@@ -729,8 +729,26 @@ public class SpawnIsland implements Island {
 
     @Override
     public boolean isInside(Location location) {
-        return location.getWorld().equals(this.spawnWorld) &&
-                this.islandArea.intercepts(location.getBlockX(), location.getBlockZ());
+        return isInside(location, 0);
+    }
+
+    @Override
+    public boolean isInside(Location location, int extraRadius) {
+        return isInside(location, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInside(Location location, double extraRadius) {
+        if(!location.getWorld().equals(this.spawnWorld))
+            return false;
+
+        IslandArea islandArea = this.islandArea;
+        if(extraRadius != 0) {
+            islandArea = islandArea.copy();
+            islandArea.expand(extraRadius);
+        }
+
+        return islandArea.intercepts(location.getBlockX(), location.getBlockZ());
     }
 
     @Override
@@ -751,7 +769,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public boolean isInsideRange(Location location, int extraRadius) {
-        return isInside(location);
+        return isInside(location, extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(Location location, double extraRadius) {
+        return isInside(location, extraRadius);
     }
 
     @Override

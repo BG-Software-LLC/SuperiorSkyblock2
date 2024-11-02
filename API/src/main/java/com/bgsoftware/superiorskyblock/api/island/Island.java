@@ -855,6 +855,20 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     boolean isInside(Location location);
 
     /**
+     * Check if the location is inside the island's area.
+     *
+     * @param location The location to check.
+     */
+    boolean isInside(Location location, int extraRadius);
+
+    /**
+     * Check if the location is inside the island's area.
+     *
+     * @param location The location to check.
+     */
+    boolean isInside(Location location, double extraRadius);
+
+    /**
      * Check if a chunk location is inside the island's area.
      *
      * @param world  The world of the chunk.
@@ -877,6 +891,14 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param extraRadius Add extra radius to the protected range.
      */
     boolean isInsideRange(Location location, int extraRadius);
+
+    /**
+     * Check if the location is inside the island's protected area.
+     *
+     * @param location    The location to check.
+     * @param extraRadius Add extra radius to the protected range.
+     */
+    boolean isInsideRange(Location location, double extraRadius);
 
     /**
      * Check if the chunk is inside the island's protected area.

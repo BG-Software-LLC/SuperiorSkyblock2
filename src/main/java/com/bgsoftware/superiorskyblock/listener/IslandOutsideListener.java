@@ -39,7 +39,7 @@ public class IslandOutsideListener implements Listener {
         Location entityLocation = e.getRightClicked().getLocation();
         Island entityIsland = plugin.getGrid().getIslandAt(entityLocation);
 
-        if (entityIsland != null && entityIsland.isInsideRange(entityLocation))
+        if (entityIsland != null && entityIsland.isInsideRange(entityLocation, 1D))
             return;
 
         e.setCancelled(true);
@@ -59,7 +59,7 @@ public class IslandOutsideListener implements Listener {
         Location vehicleLocation = e.getVehicle().getLocation();
         Island entityIsland = plugin.getGrid().getIslandAt(vehicleLocation);
 
-        if (entityIsland != null && entityIsland.isInsideRange(vehicleLocation))
+        if (entityIsland != null && entityIsland.isInsideRange(vehicleLocation, 1D))
             return;
 
         e.setCancelled(true);
@@ -123,7 +123,7 @@ public class IslandOutsideListener implements Listener {
             return false;
 
         Island toIsland = plugin.getGrid().getIslandAt(to);
-        if (toIsland != null && toIsland.isInsideRange(to))
+        if (toIsland != null && toIsland.isInsideRange(to, 1D))
             return false;
 
         if (delayTeleport) {

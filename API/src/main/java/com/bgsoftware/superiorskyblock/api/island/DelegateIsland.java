@@ -606,6 +606,16 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public boolean isInside(Location location, int extraRadius) {
+        return this.handle.isInside(location, extraRadius);
+    }
+
+    @Override
+    public boolean isInside(Location location, double extraRadius) {
+        return this.handle.isInside(location, extraRadius);
+    }
+
+    @Override
     public boolean isInside(World world, int chunkX, int chunkZ) {
         return this.handle.isInside(world, chunkX, chunkZ);
     }
@@ -617,6 +627,11 @@ public class DelegateIsland implements Island {
 
     @Override
     public boolean isInsideRange(Location location, int extraRadius) {
+        return this.handle.isInsideRange(location, extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(Location location, double extraRadius) {
         return this.handle.isInsideRange(location, extraRadius);
     }
 

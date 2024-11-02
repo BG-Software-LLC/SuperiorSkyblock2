@@ -4,23 +4,23 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 
 public class IslandArea {
 
-    private int minX;
-    private int minZ;
-    private int maxX;
-    private int maxZ;
+    private double minX;
+    private double minZ;
+    private double maxX;
+    private double maxZ;
 
-    public IslandArea(BlockPosition center, int size) {
+    public IslandArea(BlockPosition center, double size) {
         this(center.getX() - size, center.getZ() - size, center.getX() + size, center.getZ() + size);
     }
 
-    public IslandArea(int minX, int minZ, int maxX, int maxZ) {
+    public IslandArea(double minX, double minZ, double maxX, double maxZ) {
         this.minX = minX;
         this.minZ = minZ;
         this.maxX = maxX;
         this.maxZ = maxZ;
     }
 
-    public void expand(int size) {
+    public void expand(double size) {
         if (size != 0) {
             this.minX -= size;
             this.minZ -= size;
@@ -31,14 +31,14 @@ public class IslandArea {
 
     public void rshift(int shift) {
         if (shift != 0) {
-            this.minX = this.minX >> shift;
-            this.minZ = this.minZ >> shift;
-            this.maxX = this.maxX >> shift;
-            this.maxZ = this.maxZ >> shift;
+            this.minX = (int)this.minX >> shift;
+            this.minZ = (int)this.minZ >> shift;
+            this.maxX = (int)this.maxX >> shift;
+            this.maxZ = (int)this.maxZ >> shift;
         }
     }
 
-    public boolean intercepts(int x, int z) {
+    public boolean intercepts(double x, double z) {
         return x >= this.minX && x <= this.maxX && z >= this.minZ && z <= this.maxZ;
     }
 

@@ -153,23 +153,29 @@ public class NMSWorldImpl implements NMSWorld {
         if (disabled || island == null || (!plugin.getSettings().getSpawn().isWorldBorder() && island.isSpawn())) {
             worldBorder = serverLevel.getWorldBorder();
         } else {
-            worldBorder = new WorldBorder();
-            worldBorder.world = serverLevel;
-
             Dimension dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(world);
             if (dimension == null)
                 return;
 
             Location center = island.getCenter(dimension);
 
+            worldBorder = new WorldBorder();
+            worldBorder.world = serverLevel;
             worldBorder.setWarningBlocks(0);
-            worldBorder.setSize((islandSize * 2) + 1);
             worldBorder.setCenter(center.getX(), center.getZ());
 
-            double worldBorderSize = worldBorder.getSize();
             switch (superiorPlayer.getBorderColor()) {
-                case GREEN -> worldBorder.lerpSizeBetween(worldBorderSize - 0.1D, worldBorderSize, Long.MAX_VALUE);
-                case RED -> worldBorder.lerpSizeBetween(worldBorderSize, worldBorderSize - 1.0D, Long.MAX_VALUE);
+                case BLUE -> {
+                    worldBorder.setSize((islandSize * 2) + 1D);
+                }
+                case GREEN -> {
+                    worldBorder.setSize((islandSize * 2) + 1.001D);
+                    worldBorder.lerpSizeBetween(worldBorder.getSize() - 0.001D, worldBorder.getSize(), Long.MAX_VALUE);
+                }
+                case RED -> {
+                    worldBorder.setSize((islandSize * 2) + 1D);
+                    worldBorder.lerpSizeBetween(worldBorder.getSize(), worldBorder.getSize() - 0.001D, Long.MAX_VALUE);
+                }
             }
         }
 

@@ -126,27 +126,32 @@ public class NMSWorldImpl implements NMSWorld {
         if (disabled || island == null || (!plugin.getSettings().getSpawn().isWorldBorder() && island.isSpawn())) {
             worldBorder = worldServer.getWorldBorder();
         } else {
-            worldBorder = new WorldBorder();
-
-            worldBorder.setWarningDistance(0);
-
-            worldBorder.world = worldServer;
-            worldBorder.setSize((islandSize * 2) + 1);
-
             Dimension dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(world);
             if (dimension == null)
                 return;
 
             Location center = island.getCenter(dimension);
+
+            worldBorder = new WorldBorder();
+            worldBorder.world = worldServer;
+            worldBorder.setWarningDistance(0);
             worldBorder.setCenter(center.getX(), center.getZ());
 
             switch (superiorPlayer.getBorderColor()) {
-                case GREEN:
-                    worldBorder.transitionSizeBetween(worldBorder.getSize() - 0.1D, worldBorder.getSize(), Long.MAX_VALUE);
+                case BLUE: {
+                    worldBorder.setSize((islandSize * 2) + 1D);
                     break;
-                case RED:
-                    worldBorder.transitionSizeBetween(worldBorder.getSize(), worldBorder.getSize() - 1.0D, Long.MAX_VALUE);
+                }
+                case GREEN: {
+                    worldBorder.setSize((islandSize * 2) + 1.001D);
+                    worldBorder.transitionSizeBetween(worldBorder.getSize() - 0.001D, worldBorder.getSize(), Long.MAX_VALUE);
                     break;
+                }
+                case RED: {
+                    worldBorder.setSize((islandSize * 2) + 1D);
+                    worldBorder.transitionSizeBetween(worldBorder.getSize(), worldBorder.getSize() - 0.001D, Long.MAX_VALUE);
+                    break;
+                }
             }
         }
 
