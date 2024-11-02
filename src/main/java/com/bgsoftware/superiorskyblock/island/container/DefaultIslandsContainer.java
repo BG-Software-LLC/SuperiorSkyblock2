@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.IslandPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.google.common.base.Preconditions;
@@ -184,7 +185,12 @@ public class DefaultIslandsContainer implements IslandsContainer {
         List<Island> newIslandsList = new ArrayList<>(islandsByUUID.values());
         newIslandsList.removeIf(Island::isIgnored);
 
-        newIslandsList.sort(sortingType);
+        try {
+            newIslandsList.sort(sortingType);
+        } catch (Throwable error) {
+            Log.warn("An error occurred while sorting islands for sorting-type ", sortingType.getName(), ":");
+            throw error;
+        }
 
         this.sortedIslands.put(sortingType, Synchronized.of(newIslandsList));
 
