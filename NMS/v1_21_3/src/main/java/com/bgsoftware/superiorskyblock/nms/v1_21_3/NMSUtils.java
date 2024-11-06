@@ -252,9 +252,8 @@ public class NMSUtils {
                         int chunkZ = chunkPosition.getZ();
                         MoonriseRegionFileIO.RegionDataController.ReadData readData =
                                 regionDataController.readData(chunkX, chunkZ);
-                        if (readData != null) {
-                            net.minecraft.nbt.CompoundTag entityData = regionDataController.finishRead(
-                                    chunkX, chunkZ, readData);
+                        if (readData != null && readData.result() == MoonriseRegionFileIO.RegionDataController.ReadData.ReadResult.SYNC_READ) {
+                            net.minecraft.nbt.CompoundTag entityData = readData.syncRead();
                             if (entityData != null) {
                                 UnloadedChunkCompound unloadedChunkCompound = new UnloadedChunkCompound(chunkPosition, entityData);
                                 chunkCallback.onUnloadedChunk(unloadedChunkCompound);
