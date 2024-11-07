@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.JavaVersion;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -432,7 +433,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         if (canRegisterHook("CoreProtect"))
             registerHook("CoreProtectHook");
 
-        if (isHookEnabled("SlimeWorldManager")) {
+        if (isHookEnabled("SlimeWorldManager") && JavaVersion.isAtLeast(17)) {
             if (isOldSlimeWorldManager()) {
                 registerHook("SlimeWorldManagerHook");
             } else {
@@ -644,7 +645,8 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             Method registerMethod = clazz.getMethod("register", SuperiorSkyblockPlugin.class);
             registerMethod.invoke(null, plugin);
         } catch (Throwable error) {
-            Log.error(error, "An unexpected error occurred while registering hook ", className, ":");
+            if (error.getClass() != UnsupportedClassVersionError.class)
+                Log.error(error, "An unexpected error occurred while registering hook ", className, ":");
         }
     }
 
