@@ -55,6 +55,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -474,9 +475,13 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
                 (auto || configSpawnersProvider.equalsIgnoreCase("WildStacker"))) {
             spawnersProvider = createInstance("spawners.SpawnersProvider_WildStacker");
         } else if (canRegisterHook("SilkSpawners") &&
-                Bukkit.getPluginManager().getPlugin("SilkSpawners").getDescription().getAuthors().contains("CandC_9_12") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("SilkSpawners"))) {
-            spawnersProvider = createInstance("spawners.SpawnersProvider_CandcSilkSpawners");
+            Plugin silkSpawnersPlugin = Bukkit.getPluginManager().getPlugin("SilkSpawners");
+            if(silkSpawnersPlugin.getDescription().getAuthors().contains("CandC_9_12")) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_CandcSilkSpawners");
+            } else if(silkSpawnersPlugin.getDescription().getAuthors().contains("mushroomhostage")) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_TimbruSilkSpawners");
+            }
         } else if (canRegisterHook("PvpingSpawners") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("PvpingSpawners"))) {
             spawnersProvider = createInstance("spawners.SpawnersProvider_PvpingSpawners");

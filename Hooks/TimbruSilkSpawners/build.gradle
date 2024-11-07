@@ -1,0 +1,13 @@
+group 'Hooks:TimbruSilkSpawners'
+
+dependencies {
+    compileOnly 'de.dustplanet:SilkSpawners:6.0.0'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_timbrusilkspawners') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_timbrusilkspawners").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}
