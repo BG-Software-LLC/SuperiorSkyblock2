@@ -15,13 +15,16 @@ public class SchematicBlock {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Location location;
-    private final SchematicBlockData schematicBlockData;
+    private final int blockId;
+    @Nullable
+    private final Extra extra;
     @Nullable
     private CompoundTag tileEntityData = null;
 
-    public SchematicBlock(Location location, SchematicBlockData schematicBlockData) {
+    public SchematicBlock(Location location, int blockId, @Nullable Extra extra) {
         this.location = location;
-        this.schematicBlockData = schematicBlockData;
+        this.blockId = blockId;
+        this.extra = extra;
     }
 
     public int getX() {
@@ -41,25 +44,17 @@ public class SchematicBlock {
     }
 
     public int getCombinedId() {
-        return schematicBlockData.getCombinedId();
-    }
-
-    public byte getSkyLightLevel() {
-        return schematicBlockData.getSkyLightLevel();
-    }
-
-    public byte getBlockLightLevel() {
-        return schematicBlockData.getBlockLightLevel();
+        return this.blockId;
     }
 
     @Nullable
     public CompoundTag getStatesTag() {
-        return schematicBlockData.getStatesTag();
+        return this.extra == null ? null : this.extra.statesTag;
     }
 
     @Nullable
     public CompoundTag getOriginalTileEntity() {
-        CompoundTag tileEntity = schematicBlockData.getTileEntity();
+        CompoundTag tileEntity = this.extra == null ? null : this.extra.tileEntity;
         return tileEntity == null ? null : new CompoundTag(tileEntity);
     }
 
@@ -132,6 +127,20 @@ public class SchematicBlock {
         } finally {
             this.tileEntityData = null;
         }
+    }
+
+    public static class Extra {
+
+        @Nullable
+        private final CompoundTag statesTag;
+        @Nullable
+        private final CompoundTag tileEntity;
+
+        public Extra(@Nullable CompoundTag statesTag, @Nullable CompoundTag tileEntity) {
+            this.statesTag = statesTag;
+            this.tileEntity = tileEntity;
+        }
+
     }
 
 }

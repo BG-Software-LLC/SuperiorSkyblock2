@@ -3,27 +3,18 @@ package com.bgsoftware.superiorskyblock.core.schematic;
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
-import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 
 public class SchematicBlockData implements Comparable<SchematicBlockData> {
 
     private final int combinedId;
     private final BlockOffset blockOffset;
-    private final byte skyLightLevel;
-    private final byte blockLightLevel;
     @Nullable
-    private final CompoundTag statesTag;
-    @Nullable
-    private final CompoundTag tileEntity;
+    private final SchematicBlock.Extra extra;
 
-    public SchematicBlockData(int combinedId, BlockOffset blockOffset, byte skyLightLevel, byte blockLightLevel,
-                              @Nullable CompoundTag statesTag, @Nullable CompoundTag tileEntity) {
+    public SchematicBlockData(int combinedId, BlockOffset blockOffset, @Nullable SchematicBlock.Extra extra) {
         this.combinedId = combinedId;
         this.blockOffset = blockOffset;
-        this.skyLightLevel = skyLightLevel;
-        this.blockLightLevel = blockLightLevel;
-        this.statesTag = statesTag;
-        this.tileEntity = tileEntity;
+        this.extra = extra;
     }
 
     public BlockOffset getBlockOffset() {
@@ -34,22 +25,9 @@ public class SchematicBlockData implements Comparable<SchematicBlockData> {
         return combinedId;
     }
 
-    public byte getSkyLightLevel() {
-        return skyLightLevel;
-    }
-
-    public byte getBlockLightLevel() {
-        return blockLightLevel;
-    }
-
     @Nullable
-    public CompoundTag getStatesTag() {
-        return statesTag;
-    }
-
-    @Nullable
-    public CompoundTag getTileEntity() {
-        return tileEntity;
+    public SchematicBlock.Extra getExtra() {
+        return extra;
     }
 
     @Override
