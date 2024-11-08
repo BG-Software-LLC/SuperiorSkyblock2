@@ -185,6 +185,7 @@ public class NMSUtils {
     private static void runActionOnUnloadedEntityChunks(Collection<ChunkPosition> chunks,
                                                         ChunkCallback chunkCallback) {
         CompletableFutureList<Void> workerChunks = new CompletableFutureList<>(-1);
+
         chunks.forEach(chunkPosition -> {
             ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
             IOWorker worker = ENTITY_STORAGE_WORKER.get(serverLevel.entityManager.permanentStorage);
@@ -204,12 +205,16 @@ public class NMSUtils {
                 }
             });
         });
-        workerChunks.forEachCompleted(pair -> {
-            // Wait for all chunks to load.
-        }, error -> {
-            Log.error(error, "An unexpected error occurred while interacting with an unloaded chunk:");
+
+        BukkitExecutor.createTask().runAsync(v -> {
+            workerChunks.forEachCompleted(pair -> {
+                // Wait for all chunks to load.
+            }, error -> {
+                Log.error(error, "An unexpected error occurred while interacting with an unloaded chunk:");
+            });
+        }).runSync(v -> {
+            chunkCallback.onFinish();
         });
-        chunkCallback.onFinish();
     }
 
     public static List<CompletableFuture<Void>> getPendingChunkActions() {

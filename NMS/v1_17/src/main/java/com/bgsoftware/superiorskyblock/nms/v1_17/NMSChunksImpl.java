@@ -41,7 +41,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -69,7 +68,6 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -304,7 +302,7 @@ public class NMSChunksImpl implements NMSChunks {
 
             @Override
             public void onFinish() {
-                BukkitExecutor.sync(() -> {
+                BukkitExecutor.ensureMain(() -> {
                     for (Pair<ServerLevel, ListTag> worldUnloadedEntityTagsPair : unloadedEntityTags) {
                         for (Tag entityTag : worldUnloadedEntityTagsPair.getValue()) {
                             EntityType<?> entityType = EntityType.by((CompoundTag) entityTag).orElse(null);

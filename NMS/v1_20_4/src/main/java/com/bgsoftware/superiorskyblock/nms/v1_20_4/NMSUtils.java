@@ -5,6 +5,7 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.v1_20_4.world.PropertiesMapper;
@@ -209,28 +210,44 @@ public class NMSUtils {
     private static void runActionOnUnloadedEntityChunks(Collection<ChunkPosition> chunks,
                                                         ChunkCallback chunkCallback) {
         if (SERVER_LEVEL_ENTITY_MANAGER.isValid()) {
+            CompletableFutureList<Void> readChunksTasksList = new CompletableFutureList<>(-1);
+
             chunks.forEach(chunkPosition -> {
                 ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+
                 PersistentEntitySectionManager<Entity> entityManager = SERVER_LEVEL_ENTITY_MANAGER.get(serverLevel);
                 SimpleRegionStorage regionStorage = ENTITY_STORAGE_REGION_STORAGE.get(entityManager.permanentStorage);
 
                 ChunkPos chunkPos = new ChunkPos(chunkPosition.getX(), chunkPosition.getZ());
 
+                CompletableFuture<Void> readTask = new CompletableFuture<>();
+                readChunksTasksList.add(readTask);
+
                 regionStorage.read(chunkPos).whenComplete((entityDataOptional, error) -> {
                     if (error != null) {
-                        Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkPos, ":");
+                        readTask.completeExceptionally(error);
                     } else {
                         entityDataOptional.ifPresent(entityData -> {
                             UnloadedChunkCompound unloadedChunkCompound = new UnloadedChunkCompound(chunkPosition, entityData);
                             chunkCallback.onUnloadedChunk(unloadedChunkCompound);
                         });
+
+                        readTask.complete(null);
                     }
                 });
             });
 
-            chunkCallback.onFinish();
+            BukkitExecutor.createTask().runAsync(v -> {
+                readChunksTasksList.forEachCompleted(p -> {
+                    // Wait for all chunks to load.
+                }, error -> {
+                    Log.error(error, "An unexpected error occurred while interacting with unloaded chunk:");
+                });
+            }).runSync(v -> {
+                chunkCallback.onFinish();
+            });
         } else {
-            BukkitExecutor.async(() -> {
+            BukkitExecutor.createTask().runAsync(v -> {
                 chunks.forEach(chunkPosition -> {
                     ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
 
@@ -245,7 +262,7 @@ public class NMSUtils {
                         Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkPosition, ":");
                     }
                 });
-
+            }).runSync(v -> {
                 chunkCallback.onFinish();
             });
         }

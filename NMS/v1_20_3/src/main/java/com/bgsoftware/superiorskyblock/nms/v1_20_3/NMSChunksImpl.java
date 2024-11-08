@@ -415,7 +415,7 @@ public class NMSChunksImpl implements NMSChunks {
 
             @Override
             public void onFinish() {
-                BukkitExecutor.sync(() -> {
+                BukkitExecutor.ensureMain(() -> {
                     for (NMSUtils.UnloadedChunkCompound unloadedChunkCompound : unloadedChunkCompounds) {
                         ServerLevel serverLevel = unloadedChunkCompound.serverLevel();
 

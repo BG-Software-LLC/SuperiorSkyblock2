@@ -74,7 +74,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -408,7 +407,7 @@ public class NMSChunksImpl implements NMSChunks {
 
             @Override
             public void onFinish() {
-                BukkitExecutor.sync(() -> {
+                BukkitExecutor.ensureMain(() -> {
                     for (NMSUtils.UnloadedChunkCompound unloadedChunkCompound : unloadedChunkCompounds) {
                         ServerLevel serverLevel = unloadedChunkCompound.serverLevel();
 
