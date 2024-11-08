@@ -453,6 +453,13 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
         if (canRegisterHook("SmoothTimber"))
             registerHook("SmoothTimberHook");
+
+        if (canRegisterHook("SilkSpawners")) {
+            List<String> pluginAuthors = Bukkit.getPluginManager().getPlugin("SilkSpawners").getDescription().getAuthors();
+            if (pluginAuthors.contains("mushroomhostage")) {
+                registerHook("TimbruSilkSpawnersHook");
+            }
+        }
     }
 
     private void registerSpawnersProvider() {
@@ -477,9 +484,9 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         } else if (canRegisterHook("SilkSpawners") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("SilkSpawners"))) {
             Plugin silkSpawnersPlugin = Bukkit.getPluginManager().getPlugin("SilkSpawners");
-            if(silkSpawnersPlugin.getDescription().getAuthors().contains("CandC_9_12")) {
+            if (silkSpawnersPlugin.getDescription().getAuthors().contains("CandC_9_12")) {
                 spawnersProvider = createInstance("spawners.SpawnersProvider_CandcSilkSpawners");
-            } else if(silkSpawnersPlugin.getDescription().getAuthors().contains("mushroomhostage")) {
+            } else if (silkSpawnersPlugin.getDescription().getAuthors().contains("mushroomhostage")) {
                 spawnersProvider = createInstance("spawners.SpawnersProvider_TimbruSilkSpawners");
             }
         } else if (canRegisterHook("PvpingSpawners") &&
