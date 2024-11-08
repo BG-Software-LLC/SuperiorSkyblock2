@@ -739,11 +739,11 @@ public class SpawnIsland implements Island {
 
     @Override
     public boolean isInside(Location location, double extraRadius) {
-        if(!location.getWorld().equals(this.spawnWorld))
+        if (!location.getWorld().equals(this.spawnWorld))
             return false;
 
         IslandArea islandArea = this.islandArea;
-        if(extraRadius != 0) {
+        if (extraRadius != 0) {
             islandArea = islandArea.copy();
             islandArea.expand(extraRadius);
         }
@@ -1985,19 +1985,19 @@ public class SpawnIsland implements Island {
 
     @Nullable
     @Override
-    public Key generateBlock(Location location, boolean optimizeCobblestone) {
+    public Key generateBlock(Location location, boolean optimizeDefaultBlock) {
         return null;
     }
 
     @Override
-    public Key generateBlock(Location location, Dimension dimension, boolean optimizeCobblestone) {
+    public Key generateBlock(Location location, Dimension dimension, boolean optimizeDefaultBlock) {
         return null;
     }
 
     @Nullable
     @Override
     @Deprecated
-    public Key generateBlock(Location location, World.Environment environment, boolean optimizeCobblestone) {
+    public Key generateBlock(Location location, World.Environment environment, boolean optimizeDefaultBlock) {
         return null;
     }
 

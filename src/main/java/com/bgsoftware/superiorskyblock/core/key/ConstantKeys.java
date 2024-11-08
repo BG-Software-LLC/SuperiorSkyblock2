@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.core.Materials;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class ConstantKeys {
@@ -27,6 +28,9 @@ public class ConstantKeys {
     public static final Key END_PORTAL_FRAME = Keys.of(Materials.END_PORTAL_FRAME.toBukkitType());
     public static final Key WET_SPONGE = Keys.of(EnumHelper.getEnum(Material.class, "WET_SPONGE", "SPONGE"));
     public static final Key COBBLESTONE = Keys.of(Material.COBBLESTONE);
+    @Nullable
+    public static final Key BASALT = Optional.ofNullable(EnumHelper.getEnum(Material.class, "BASALT"))
+            .map(Keys::of).orElse(null);
     public static final Key CHORUS_FLOWER = Optional.ofNullable(EnumHelper.getEnum(Material.class, "CHORUS_FLOWER"))
             .map(Keys::of).orElse(Keys.EMPTY);
 
