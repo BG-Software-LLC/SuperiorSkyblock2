@@ -20,6 +20,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 
+import java.util.Optional;
+
 @SuppressWarnings("unused")
 public class GeneratorsListener implements Listener {
 
@@ -51,15 +53,27 @@ public class GeneratorsListener implements Listener {
         if (island == null)
             return;
 
-        if (e.getBlock().getType() != LAVA_MATERIAL || e.getNewState().getType() != BASALT_MATERIAL)
+        GeneratorType generatorType = e.getNewState().getType() == BASALT_MATERIAL ?
+                GeneratorType.BASALT : GeneratorType.NORMAL;
+
+        if (e.getBlock().getType() != LAVA_MATERIAL || generatorType != GeneratorType.BASALT)
             return;
 
-        Dimension dimension = Dimensions.NORMAL;
+        Dimension dimension;
         if (module.isMatchGeneratorWorld()) {
-            Dimension blockDimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(blockLocation.getWorld());
-            if (blockDimension.getEnvironment() != World.Environment.NETHER || e.getNewState().getType() == BASALT_MATERIAL)
-                dimension = blockDimension;
+            dimension = Dimensions.NETHER;
+        } else {
+            World blockWorld = blockLocation.getWorld();
+            dimension = Optional.ofNullable(plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(blockWorld))
+                    .orElseGet(() -> Dimensions.fromEnvironment(blockWorld.getEnvironment()));
         }
+//
+//        Dimension dimension;
+//        if (module.isMatchGeneratorWorld()) {
+//            dimension = e.getNewState().getType() == BASALT_MATERIAL ? Dimensions.NETHER : Dimensions.NORMAL;
+//        } else {
+//            dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(blockLocation.getWorld());
+//        }
 
         Key generatedBlock = island.generateBlock(blockLocation, dimension, true);
 
@@ -95,14 +109,12 @@ public class GeneratorsListener implements Listener {
         if (generatorType == GeneratorType.NONE)
             return;
 
-        Dimension dimension = Dimensions.NORMAL;
+        Dimension dimension;
         if (module.isMatchGeneratorWorld()) {
-            Dimension blockDimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(blockWorld);
-            if (blockDimension == null)
-                blockDimension = Dimensions.fromEnvironment(blockWorld.getEnvironment());
-
-            if (blockDimension.getEnvironment() != World.Environment.NETHER || generatorType == GeneratorType.BASALT)
-                dimension = blockDimension;
+            dimension = generatorType == GeneratorType.BASALT ? Dimensions.NETHER : Dimensions.NORMAL;
+        } else {
+            dimension = Optional.ofNullable(plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(blockWorld))
+                    .orElseGet(() -> Dimensions.fromEnvironment(blockWorld.getEnvironment()));
         }
 
         Key generatedBlock = island.generateBlock(blockLocation, dimension, true);
