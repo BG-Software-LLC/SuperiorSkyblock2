@@ -175,33 +175,9 @@ public class PlayersListener implements Listener {
         if (superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
-        // Removing coop status from other islands.
-        for (Island _island : plugin.getGrid().getIslands()) {
-            if (_island.isCoop(superiorPlayer)) {
-                if (plugin.getEventsBus().callIslandUncoopPlayerEvent(_island, null, superiorPlayer, IslandUncoopPlayerEvent.UncoopReason.SERVER_LEAVE)) {
-                    _island.removeCoop(superiorPlayer);
-                    IslandUtils.sendMessage(_island, Message.UNCOOP_LEFT_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
-                }
-            }
-        }
-
         // Handling player quit
         if (superiorPlayer.isShownAsOnline())
             IslandNotifications.notifyPlayerQuit(superiorPlayer);
-
-        // Remove coop players
-        Island island = superiorPlayer.getIsland();
-        if (island != null && plugin.getSettings().isAutoUncoopWhenAlone() && !island.getCoopPlayers().isEmpty()) {
-            boolean shouldRemoveCoops = island.getIslandMembers(true).stream().noneMatch(islandMember ->
-                    islandMember != superiorPlayer && island.hasPermission(islandMember, IslandPrivileges.UNCOOP_MEMBER) && islandMember.isOnline());
-
-            if (shouldRemoveCoops) {
-                for (SuperiorPlayer coopPlayer : island.getCoopPlayers()) {
-                    island.removeCoop(coopPlayer);
-                    Message.UNCOOP_AUTO_ANNOUNCEMENT.send(coopPlayer);
-                }
-            }
-        }
 
         this.regionManagerService.get().handlePlayerQuit(superiorPlayer, e.getPlayer().getLocation());
 
