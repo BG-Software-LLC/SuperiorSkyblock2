@@ -186,20 +186,6 @@ public class PlayersListener implements Listener {
         if (superiorPlayer.isShownAsOnline())
             IslandNotifications.notifyPlayerQuit(superiorPlayer);
 
-        // Remove coop players
-        Island island = superiorPlayer.getIsland();
-        if (island != null && plugin.getSettings().isAutoUncoopWhenAlone() && !island.getCoopPlayers().isEmpty()) {
-            boolean shouldRemoveCoops = island.getIslandMembers(true).stream().noneMatch(islandMember ->
-                    islandMember != superiorPlayer && island.hasPermission(islandMember, IslandPrivileges.UNCOOP_MEMBER) && islandMember.isOnline());
-
-            if (shouldRemoveCoops) {
-                for (SuperiorPlayer coopPlayer : island.getCoopPlayers()) {
-                    island.removeCoop(coopPlayer);
-                    Message.UNCOOP_AUTO_ANNOUNCEMENT.send(coopPlayer);
-                }
-            }
-        }
-
         this.regionManagerService.get().handlePlayerQuit(superiorPlayer, e.getPlayer().getLocation());
 
         // Remove all player chat-listeners
