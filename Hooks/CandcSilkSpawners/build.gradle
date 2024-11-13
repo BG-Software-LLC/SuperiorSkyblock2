@@ -1,4 +1,4 @@
-group 'Hooks:SilkSpawners'
+group 'Hooks:CandcSilkSpawners'
 
 dependencies {
     compileOnly 'de.candc:SilkSpawners:1.6'
@@ -7,7 +7,7 @@ dependencies {
     compileOnly rootProject
 }
 
-if (project.hasProperty('hook.compile_silkspawners') &&
-        !Boolean.valueOf(project.findProperty("hook.compile_silkspawners").toString())) {
+if (project.hasProperty('hook.compile_candcsilkspawners') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_candcsilkspawners").toString())) {
     project.tasks.all { task -> task.enabled = false }
 }

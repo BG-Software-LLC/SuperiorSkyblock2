@@ -227,12 +227,16 @@ public class NMSUtils {
                 }
             });
         });
-        workerChunks.forEachCompleted(pair -> {
-            // Wait for chunks to load.
-        }, error -> {
-            Log.error(error, "An unexpected error occurred while interacting with an unloaded chunk:");
+
+        BukkitExecutor.createTask().runAsync(v -> {
+            workerChunks.forEachCompleted(pair -> {
+                // Wait for chunks to load.
+            }, error -> {
+                Log.error(error, "An unexpected error occurred while interacting with an unloaded chunk:");
+            });
+        }).runSync(v -> {
+            chunkCallback.onFinish();
         });
-        chunkCallback.onFinish();
     }
 
     public static List<CompletableFuture<Void>> getPendingChunkActions() {

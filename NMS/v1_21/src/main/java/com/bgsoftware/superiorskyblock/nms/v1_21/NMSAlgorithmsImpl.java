@@ -18,6 +18,9 @@ import com.bgsoftware.superiorskyblock.nms.v1_21.menu.MenuHopperBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_21.world.KeyBlocksCache;
 import io.papermc.paper.chat.ChatRenderer;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TextReplacementConfig;
+import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -206,7 +209,7 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public int getDataVersion() {
-        return CraftMagicNumbers.INSTANCE.getDataVersion();
+        return SharedConstants.getCurrentVersion().getDataVersion().getVersion();
     }
 
     @Override
@@ -228,6 +231,10 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     private static class ChatRendererWrapper {
 
+        private static final String MESSAGE_PLACEHOLDER = "{message}";
+        private static final net.kyori.adventure.text.Component MESSAGE_PLACEHOLDER_COMPONENT =
+                net.kyori.adventure.text.Component.text(MESSAGE_PLACEHOLDER);
+
         private final ChatRenderer renderer = new ChatRenderer() {
             @Override
             public net.kyori.adventure.text.@NotNull Component render(@NotNull Player source,
@@ -235,13 +242,17 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
                                                                       net.kyori.adventure.text.@NotNull Component message,
                                                                       @NotNull Audience viewer) {
                 String originalFormat = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-                        .legacyAmpersand().serialize(originalRenderer.render(source, sourceDisplayName, message, viewer));
+                        .legacyAmpersand().serialize(originalRenderer.render(source, sourceDisplayName, MESSAGE_PLACEHOLDER_COMPONENT, viewer));
 
                 SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(source);
                 Island island = superiorPlayer.getIsland();
 
                 return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand().deserialize(
-                        Formatters.CHAT_FORMATTER.format(new ChatFormatter.ChatFormatArgs(originalFormat, superiorPlayer, island)));
+                                Formatters.CHAT_FORMATTER.format(new ChatFormatter.ChatFormatArgs(originalFormat, superiorPlayer, island)))
+                        .replaceText(TextReplacementConfig.builder()
+                                .matchLiteral(MESSAGE_PLACEHOLDER)
+                                .replacement(message)
+                                .build());
             }
         };
 

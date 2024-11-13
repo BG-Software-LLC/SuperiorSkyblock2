@@ -56,6 +56,7 @@ import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -86,6 +87,7 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
+import com.bgsoftware.superiorskyblock.world.GeneratorType;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
@@ -1328,14 +1330,27 @@ public class SIsland implements Island {
 
     @Override
     public boolean isInside(Location location) {
+        return isInside(location, 0);
+    }
+
+    @Override
+    public boolean isInside(Location location, int extraRadius) {
+        return isInside(location, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInside(Location location, double extraRadius) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
+        Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
 
         if (!isIslandWorld(location.getWorld()))
             return false;
 
         int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
                 (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
+
         IslandArea islandArea = new IslandArea(this.center, islandDistance);
+        islandArea.expand(extraRadius);
 
         return islandArea.intercepts(location.getBlockX(), location.getBlockZ());
     }
@@ -1366,16 +1381,24 @@ public class SIsland implements Island {
 
     @Override
     public boolean isInsideRange(Location location) {
-        Preconditions.checkNotNull(location, "location parameter cannot be null.");
         return isInsideRange(location, 0);
     }
 
-    public boolean isInsideRange(Location location, int extra) {
+    @Override
+    public boolean isInsideRange(Location location, int extraRadius) {
+        return isInsideRange(location, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(Location location, double extraRadius) {
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
+        Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
+
         if (!isIslandWorld(location.getWorld()))
             return false;
 
         IslandArea islandArea = new IslandArea(center, getIslandSize());
-        islandArea.expand(extra);
+        islandArea.expand(extraRadius);
 
         return islandArea.intercepts(location.getBlockX(), location.getBlockZ());
     }
@@ -4060,21 +4083,21 @@ public class SIsland implements Island {
 
     @Nullable
     @Override
-    public Key generateBlock(Location location, boolean optimizeCobblestone) {
+    public Key generateBlock(Location location, boolean optimizeDefaultBlock) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
         Preconditions.checkArgument(isInside(location), "location must be inside island");
         Dimension dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(location.getWorld());
-        return generateBlock(location, dimension, optimizeCobblestone);
+        return generateBlock(location, dimension, optimizeDefaultBlock);
     }
 
     @Override
-    public Key generateBlock(Location location, Dimension dimension, boolean optimizeCobblestone) {
+    public Key generateBlock(Location location, Dimension dimension, boolean optimizeDefaultBlock) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
         Preconditions.checkNotNull(dimension, "environment parameter cannot be null.");
 
-        Log.debug(Debug.GENERATE_BLOCK, owner.getName(), location, dimension.getName(), optimizeCobblestone);
+        Log.debug(Debug.GENERATE_BLOCK, owner.getName(), location, dimension.getName(), optimizeDefaultBlock);
 
         int totalGeneratorAmounts = getGeneratorTotalAmount(dimension);
 
@@ -4085,7 +4108,9 @@ public class SIsland implements Island {
 
         Map<String, Integer> generatorAmounts = getGeneratorAmounts(dimension);
 
-        Key newStateKey = ConstantKeys.COBBLESTONE;
+        GeneratorType generatorType = GeneratorType.fromDimension(dimension);
+        Key defaultBlockKey = generatorType.getDefaultBlock();
+        Key newStateKey = defaultBlockKey;
 
         if (totalGeneratorAmounts == 1) {
             newStateKey = Keys.ofMaterialAndData(generatorAmounts.keySet().iterator().next());
@@ -4111,8 +4136,8 @@ public class SIsland implements Island {
 
         Key generatedBlock = eventResult.getResult().getBlock();
 
-        if (optimizeCobblestone && generatedBlock.getGlobalKey().equals("COBBLESTONE")) {
-            Log.debugResult(Debug.GENERATE_BLOCK, "Return Cobblestone", generatedBlock);
+        if (optimizeDefaultBlock && generatedBlock.equals(defaultBlockKey)) {
+            Log.debugResult(Debug.GENERATE_BLOCK, "Return Default Block", generatedBlock);
             return generatedBlock;
         }
 
@@ -4129,7 +4154,8 @@ public class SIsland implements Island {
                 combinedId = plugin.getNMSAlgorithms().getCombinedId(generateBlockType, blockData);
             } catch (IllegalArgumentException error) {
                 Log.error("Invalid block for generating block: ", generatedBlock);
-                combinedId = plugin.getNMSAlgorithms().getCombinedId(Material.COBBLESTONE, (byte) 0);
+                combinedId = plugin.getNMSAlgorithms().getCombinedId(
+                        ((MaterialKey) defaultBlockKey).getMaterial(), (byte) 0);
             }
 
             plugin.getNMSWorld().setBlock(location, combinedId);
@@ -4144,8 +4170,8 @@ public class SIsland implements Island {
 
     @Override
     @Deprecated
-    public Key generateBlock(Location location, World.Environment environment, boolean optimizeCobblestone) {
-        return generateBlock(location, Dimensions.fromEnvironment(environment), optimizeCobblestone);
+    public Key generateBlock(Location location, World.Environment environment, boolean optimizeDefaultBlock) {
+        return generateBlock(location, Dimensions.fromEnvironment(environment), optimizeDefaultBlock);
     }
 
     @Override

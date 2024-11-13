@@ -193,10 +193,6 @@ public abstract class AbstractMenuLayout<V extends MenuView<V, ?>> implements Me
                     rowsSize = Math.max(Math.min(rowsSize, 6), 1);
                     this.buttons = new MenuTemplateButton[rowsSize * 9];
                     break;
-                case DROPPER:
-                case DISPENSER:
-                    this.buttons = new MenuTemplateButton[inventoryType.getDefaultSize() - 1];
-                    break;
                 default:
                     this.buttons = new MenuTemplateButton[inventoryType.getDefaultSize()];
                     break;

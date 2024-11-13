@@ -855,6 +855,20 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     boolean isInside(Location location);
 
     /**
+     * Check if the location is inside the island's area.
+     *
+     * @param location The location to check.
+     */
+    boolean isInside(Location location, int extraRadius);
+
+    /**
+     * Check if the location is inside the island's area.
+     *
+     * @param location The location to check.
+     */
+    boolean isInside(Location location, double extraRadius);
+
+    /**
      * Check if a chunk location is inside the island's area.
      *
      * @param world  The world of the chunk.
@@ -877,6 +891,14 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param extraRadius Add extra radius to the protected range.
      */
     boolean isInsideRange(Location location, int extraRadius);
+
+    /**
+     * Check if the location is inside the island's protected area.
+     *
+     * @param location    The location to check.
+     * @param extraRadius Add extra radius to the protected range.
+     */
+    boolean isInsideRange(Location location, double extraRadius);
 
     /**
      * Check if the chunk is inside the island's protected area.
@@ -2601,15 +2623,15 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * It doesn't look for any conditions for generating it - lava, water, etc are not required.
      * The method will fail if there are no valid generator rates for the environment.
      *
-     * @param location            The location to generate block at.
-     * @param optimizeCobblestone When set to true and cobblestone needs to be generated, the plugin will
-     *                            not play effects, count the block towards the block counts or set the block.
-     *                            This is useful when calling the method from BlockFromToEvent, and instead of letting
-     *                            the player do the logic of vanilla, the plugin lets the game do it.
+     * @param location             The location to generate block at.
+     * @param optimizeDefaultBlock When set to true and the default block needs to be generated, the plugin will
+     *                             not play any effect, count the block towards the block counts or set the block.
+     *                             This is useful when calling the method from BlockFromToEvent, and instead of letting
+     *                             the plugin do the logic of vanilla, the plugin lets the game do it.
      * @return The block type that was generated, null if failed.
      */
     @Nullable
-    Key generateBlock(Location location, boolean optimizeCobblestone);
+    Key generateBlock(Location location, boolean optimizeDefaultBlock);
 
     /**
      * Generate a block at a specified location.
@@ -2617,32 +2639,32 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * It doesn't look for any conditions for generating it - lava, water, etc are not required.
      * The method will fail if there are no valid generator rates for the environment.
      *
-     * @param location            The location to generate block at.
-     * @param dimension           The world to get generator rates from.
-     * @param optimizeCobblestone When set to true and cobblestone needs to be generated, the plugin will
-     *                            not play effects, count the block towards the block counts or set the block.
-     *                            This is useful when calling the method from BlockFromToEvent, and instead of letting
-     *                            the player do the logic of vanilla, the plugin lets the game do it.
+     * @param location             The location to generate block at.
+     * @param dimension            The world to get generator rates from.
+     * @param optimizeDefaultBlock When set to true and the default block needs to be generated, the plugin will
+     *                             not play any effect, count the block towards the block counts or set the block.
+     *                             This is useful when calling the method from BlockFromToEvent, and instead of letting
+     *                             the plugin do the logic of vanilla, the plugin lets the game do it.
      * @return The block type that was generated, null if failed.
      */
     @Nullable
-    Key generateBlock(Location location, Dimension dimension, boolean optimizeCobblestone);
+    Key generateBlock(Location location, Dimension dimension, boolean optimizeDefaultBlock);
 
     /**
      * Generate a block at a specified location.
      *
-     * @param location            The location to generate block at.
-     * @param environment         The world to get generator rates from.
-     * @param optimizeCobblestone When set to true and cobblestone needs to be generated, the plugin will
-     *                            not play effects, count the block towards the block counts or set the block.
-     *                            This is useful when calling the method from BlockFromToEvent, and instead of letting
-     *                            the player do the logic of vanilla, the plugin lets the game do it.
+     * @param location             The location to generate block at.
+     * @param environment          The world to get generator rates from.
+     * @param optimizeDefaultBlock When set to true and the default block needs to be generated, the plugin will
+     *                             not play any effect, count the block towards the block counts or set the block.
+     *                             This is useful when calling the method from BlockFromToEvent, and instead of letting
+     *                             the plugin do the logic of vanilla, the plugin lets the game do it.
      * @return The block type that was generated, null if failed.
      * @deprecated See {@link #generateBlock(Location, Dimension, boolean)}
      */
     @Deprecated
     @Nullable
-    Key generateBlock(Location location, World.Environment environment, boolean optimizeCobblestone);
+    Key generateBlock(Location location, World.Environment environment, boolean optimizeDefaultBlock);
 
     /*
      *  Schematic methods

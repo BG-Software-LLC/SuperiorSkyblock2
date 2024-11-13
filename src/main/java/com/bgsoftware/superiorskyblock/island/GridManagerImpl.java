@@ -293,6 +293,10 @@ public class GridManagerImpl extends Manager implements GridManager {
                 Message.ISLAND_ALREADY_EXIST.send(builder.owner);
                 Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Island already exists");
                 return;
+            case EVENT_CANCELLED:
+                builder.owner.setIsland(null);
+                Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Island creation event was cancelled");
+                return;
             case SUCCESS:
                 break;
             default:

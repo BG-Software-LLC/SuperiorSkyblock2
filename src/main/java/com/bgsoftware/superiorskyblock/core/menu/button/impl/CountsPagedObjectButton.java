@@ -5,18 +5,17 @@ import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCounts;
 import com.bgsoftware.superiorskyblock.core.values.BlockValue;
-import com.google.common.collect.ImmutableMap;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -25,13 +24,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.View, MenuCounts.BlockCount> {
 
     private static final BigInteger MAX_STACK = BigInteger.valueOf(64);
 
-    private static final ImmutableMap<String, String> BLOCKS_TO_ITEMS = new ImmutableMap.Builder<String, String>()
+    private static final Map<Material, Material> BLOCKS_TO_ITEMS = new MapBuilder()
             .put("ACACIA_DOOR", "ACACIA_DOOR_ITEM")
             .put("ACACIA_WALL_SIGN", "ACACIA_SIGN")
             .put("BAMBOO_SAPLING", "BAMBOO")
@@ -137,7 +138,7 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
             .put("SPRUCE_DOOR", "SPRUCE_DOOR_ITEM")
             .put("SPRUCE_WALL_SIGN", "SPRUCE_SIGN")
             .put("SUGAR_CANE_BLOCK", "SUGAR_CANE")
-            .put("SWEET_BERRY_BUSH", "SWEET_BERRY")
+            .put("SWEET_BERRY_BUSH", "SWEET_BERRIES")
             .put("TALL_SEAGRASS", "SEAGRASS")
             .put("TRIPWIRE", "TRIPWIRE_HOOK")
             .put("TUBE_CORAL_WALL_FAN", "TUBE_CORAL")
@@ -150,7 +151,69 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
             .put("WOODEN_DOOR", "WOOD_DOOR")
             .put("YELLOW_WALL_BANNER", "YELLOW_BANNER")
             .put("ZOMBIE_WALL_HEAD", "ZOMBIE_HEAD")
+            .put("ZOMBIE_WALL_HEAD", "ZOMBIE_HEAD")
+            .put("FIRE", "FIRE_CHARGE")
+            .put("SOUL_FIRE", "FIRE_CHARGE")
+            .put("CHERRY_WALL_SIGN", "CHERRY_SIGN")
+            .put("MANGROVE_WALL_SIGN", "MANGROVE_SIGN")
+            .put("BAMBOO_WALL_SIGN", "BAMBOO_SIGN")
+            .put("OAK_WALL_HANGING_SIGN", "OAK_HANGING_SIGN")
+            .put("SPRUCE_WALL_HANGING_SIGN", "SPRUCE_HANGING_SIGN")
+            .put("BIRCH_WALL_HANGING_SIGN", "BIRCH_HANGING_SIGN")
+            .put("ACACIA_WALL_HANGING_SIGN", "ACACIA_HANGING_SIGN")
+            .put("CHERRY_WALL_HANGING_SIGN", "CHERRY_HANGING_SIGN")
+            .put("JUNGLE_WALL_HANGING_SIGN", "JUNGLE_HANGING_SIGN")
+            .put("DARK_OAK_WALL_HANGING_SIGN", "DARK_OAK_HANGING_SIGN")
+            .put("MANGROVE_WALL_HANGING_SIGN", "MANGROVE_HANGING_SIGN")
+            .put("CRIMSON_WALL_HANGING_SIGN", "CRIMSON_HANGING_SIGN")
+            .put("WARPED_WALL_HANGING_SIGN", "WARPED_HANGING_SIGN")
+            .put("BAMBOO_WALL_HANGING_SIGN", "BAMBOO_HANGING_SIGN")
+            .put("SOUL_WALL_TORCH", "SOUL_TORCH")
+            .put("NETHER_PORTAL", "OBSIDIAN")
+            .put("ATTACHED_PUMPKIN_STEM", "PUMPKIN_SEEDS")
+            .put("ATTACHED_MELON_STEM", "MELON_SEEDS")
+            .put("WATER_CAULDRON", "CAULDRON")
+            .put("LAVA_CAULDRON", "CAULDRON")
+            .put("POWDER_SNOW_CAULDRON", "CAULDRON")
+            .put("POTTED_TORCHFLOWER", "FLOWER_POT")
+            .put("POTTED_CHERRY_SAPLING", "FLOWER_POT")
+            .put("POTTED_MANGROVE_PROPAGULE", "FLOWER_POT")
+            .put("PIGLIN_WALL_HEAD", "PIGLIN_HEAD")
+            .put("TORCHFLOWER_CROP", "TORCHFLOWER_SEEDS")
+            .put("PITCHER_CROP", "PITCHER_PLANT")
+            .put("END_GATEWAY", "END_PORTAL_FRAME")
+            .put("FROSTED_ICE", "ICE")
+            .put("WEEPING_VINES_PLANT", "WEEPING_VINES")
+            .put("TWISTING_VINES_PLANT", "TWISTING_VINES")
+            .put("CRIMSON_WALL_SIGN", "CRIMSON_SIGN")
+            .put("WARPED_WALL_SIGN", "WARPED_SIGN")
+            .put("POTTED_CRIMSON_FUNGUS", "FLOWER_POT")
+            .put("POTTED_WARPED_FUNGUS", "FLOWER_POT")
+            .put("POTTED_CRIMSON_ROOTS", "FLOWER_POT")
+            .put("POTTED_WARPED_ROOTS", "FLOWER_POT")
+            .put("CANDLE_CAKE", "CANDLE")
+            .put("WHITE_CANDLE_CAKE", "WHITE_CANDLE")
+            .put("ORANGE_CANDLE_CAKE", "ORANGE_CANDLE")
+            .put("MAGENTA_CANDLE_CAKE", "MAGENTA_CANDLE")
+            .put("LIGHT_BLUE_CANDLE_CAKE", "LIGHT_BLUE_CANDLE")
+            .put("YELLOW_CANDLE_CAKE", "YELLOW_CANDLE")
+            .put("LIME_CANDLE_CAKE", "LIME_CANDLE")
+            .put("PINK_CANDLE_CAKE", "PINK_CANDLE")
+            .put("GRAY_CANDLE_CAKE", "GRAY_CANDLE")
+            .put("LIGHT_GRAY_CANDLE_CAKE", "LIGHT_GRAY_CANDLE")
+            .put("CYAN_CANDLE_CAKE", "CYAN_CANDLE")
+            .put("PURPLE_CANDLE_CAKE", "PURPLE_CANDLE")
+            .put("BLUE_CANDLE_CAKE", "BLUE_CANDLE")
+            .put("BROWN_CANDLE_CAKE", "BROWN_CANDLE")
+            .put("GREEN_CANDLE_CAKE", "GREEN_CANDLE")
+            .put("RED_CANDLE_CAKE", "RED_CANDLE")
+            .put("BLACK_CANDLE_CAKE", "BLACK_CANDLE")
+            .put("POWDER_SNOW", "POWDER_SNOW_BUCKET")
+            .put("BIG_DRIPLEAF_STEM", "BIG_DRIPLEAF")
+            .put("POTTED_AZALEA_BUSH", "FLOWER_POT")
+            .put("POTTED_FLOWERING_AZALEA_BUSH", "FLOWER_POT")
             .build();
+
 
     private CountsPagedObjectButton(MenuTemplateButton<MenuCounts.View> templateButton, MenuCounts.View menuView) {
         super(templateButton, menuView);
@@ -179,29 +242,9 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
         } else {
             Key blockKey = customKeyItem.getKey();
 
-            String convertedItem = BLOCKS_TO_ITEMS.get(blockKey.getGlobalKey());
-
-            if (convertedItem != null) {
-                Key tempBlockType = Keys.ofMaterialAndData(convertedItem);
-                if (tempBlockType instanceof MaterialKey)
-                    blockKey = tempBlockType;
-            }
-
-            Material blockMaterial;
-            byte damage = 0;
-
-            try {
-                blockMaterial = Material.valueOf(blockKey.getGlobalKey());
-                if (!blockKey.getSubKey().isEmpty()) {
-                    try {
-                        damage = Byte.parseByte(blockKey.getSubKey());
-                    } catch (Throwable ignored) {
-                    }
-                }
-            } catch (Exception ex) {
-                blockMaterial = Material.BEDROCK;
-                materialName = blockKey.getGlobalKey();
-            }
+            Pair<Material, Short> blockTypeAndData = getMaterialAndData(blockKey);
+            Material blockMaterial = BLOCKS_TO_ITEMS.getOrDefault(blockTypeAndData.getKey(), blockTypeAndData.getKey());
+            short damage = blockTypeAndData.getValue();
 
             String texture;
 
@@ -211,7 +254,9 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
                 materialName = blockKey.getSubKey() + "_SPAWNER";
             } else {
                 itemBuilder = new ItemBuilder(blockMaterial, damage);
-                if (materialName == null)
+                if (blockMaterial == Materials.SPAWNER.toBukkitType())
+                    materialName = blockKey.getSubKey() + "_SPAWNER";
+                else
                     materialName = rawKey.getGlobalKey();
             }
         }
@@ -244,6 +289,46 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
                     CountsPagedObjectButton::new);
         }
 
+    }
+
+    private static class MapBuilder {
+
+        private final EnumMap<Material, Material> mapper = new EnumMap<>(Material.class);
+
+        public MapBuilder put(String block, String item) {
+            Material blockMaterial = EnumHelper.getEnum(Material.class, block);
+            Material itemMaterial = EnumHelper.getEnum(Material.class, item);
+            if (blockMaterial != null && itemMaterial != null)
+                mapper.put(blockMaterial, itemMaterial);
+            return this;
+        }
+
+        public Map<Material, Material> build() {
+            return mapper;
+        }
+
+    }
+
+    private static Pair<Material, Short> getMaterialAndData(Key key) {
+        if (key instanceof MaterialKey)
+            return new Pair<>(((MaterialKey) key).getMaterial(), ((MaterialKey) key).getDurability());
+
+        try {
+            Material blockMaterial = Material.valueOf(key.getGlobalKey());
+            short damage = 0;
+
+            if (!key.getSubKey().isEmpty()) {
+                try {
+                    damage = Short.parseShort(key.getSubKey());
+                } catch (Throwable ignored) {
+                }
+            }
+
+            return new Pair<>(blockMaterial, damage);
+        } catch (Exception ignored) {
+        }
+
+        return new Pair<>(Material.BEDROCK, (short) 0);
     }
 
 }

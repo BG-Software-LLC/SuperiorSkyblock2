@@ -273,6 +273,19 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onWindChargeUse(ProjectileLaunchEvent e) {
+        if (e.getEntityType() != WIND_CHARGE)
+            return;
+
+        BukkitEntities.getPlayerSource(e.getEntity()).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(shooerPlayer -> {
+            InteractionResult interactionResult = this.protectionManager.get().handlePlayerUseWindCharge(
+                    shooerPlayer, shooerPlayer.getLocation());
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, shooerPlayer, true))
+                e.setCancelled(true);
+        });
+    }
+
     /* ENTITY INTERACTS */
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)

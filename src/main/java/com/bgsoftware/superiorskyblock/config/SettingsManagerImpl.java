@@ -573,6 +573,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         return this.global.getBlockCountsSaveThreshold();
     }
 
+    @Override
+    public boolean getChatSigningSupport() {
+        return this.global.getChatSigningSupport();
+    }
+
     public void updateValue(String path, Object value) throws IOException {
         File file = new File(plugin.getDataFolder(), "config.yml");
 

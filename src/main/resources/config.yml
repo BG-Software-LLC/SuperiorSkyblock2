@@ -202,6 +202,7 @@ island-roles:
       - TURTLE_EGG_TRAMPING
       - USE
       - VILLAGER_TRADING
+      - WIND_CHARGE
 
   # The roles ladder for island members.
   # All the island member roles go here.
@@ -814,3 +815,10 @@ player-respawn:
 # database with the new block counts. If the server stops and there was a change to the block counts, the block counts
 # will be saved to the database despite the threshold.
 block-counts-save-threshold: 100
+
+# Support for chat-signing in 1.19 or above.
+# When set to true, the plugin will properly handle messages to not interface
+# with the signing of chat messages. However, this may cause issues with other
+# plugins that do not properly handle signed messages, and in this case it
+# might be better to disable it.
+chat-signing-support: true

@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.JavaVersion;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -54,6 +55,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -432,7 +434,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         if (canRegisterHook("CoreProtect"))
             registerHook("CoreProtectHook");
 
-        if (isHookEnabled("SlimeWorldManager")) {
+        if (isHookEnabled("SlimeWorldManager") && JavaVersion.isAtLeast(17)) {
             if (isOldSlimeWorldManager()) {
                 registerHook("SlimeWorldManagerHook");
             } else {
@@ -451,6 +453,13 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
         if (canRegisterHook("SmoothTimber"))
             registerHook("SmoothTimberHook");
+
+        if (canRegisterHook("SilkSpawners")) {
+            List<String> pluginAuthors = Bukkit.getPluginManager().getPlugin("SilkSpawners").getDescription().getAuthors();
+            if (pluginAuthors.contains("mushroomhostage")) {
+                registerHook("TimbruSilkSpawnersHook");
+            }
+        }
     }
 
     private void registerSpawnersProvider() {
@@ -473,9 +482,13 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
                 (auto || configSpawnersProvider.equalsIgnoreCase("WildStacker"))) {
             spawnersProvider = createInstance("spawners.SpawnersProvider_WildStacker");
         } else if (canRegisterHook("SilkSpawners") &&
-                Bukkit.getPluginManager().getPlugin("SilkSpawners").getDescription().getAuthors().contains("CandC_9_12") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("SilkSpawners"))) {
-            spawnersProvider = createInstance("spawners.SpawnersProvider_SilkSpawners");
+            Plugin silkSpawnersPlugin = Bukkit.getPluginManager().getPlugin("SilkSpawners");
+            if (silkSpawnersPlugin.getDescription().getAuthors().contains("CandC_9_12")) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_CandcSilkSpawners");
+            } else if (silkSpawnersPlugin.getDescription().getAuthors().contains("mushroomhostage")) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_TimbruSilkSpawners");
+            }
         } else if (canRegisterHook("PvpingSpawners") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("PvpingSpawners"))) {
             spawnersProvider = createInstance("spawners.SpawnersProvider_PvpingSpawners");
@@ -644,7 +657,8 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             Method registerMethod = clazz.getMethod("register", SuperiorSkyblockPlugin.class);
             registerMethod.invoke(null, plugin);
         } catch (Throwable error) {
-            Log.error(error, "An unexpected error occurred while registering hook ", className, ":");
+            if (error.getClass() != UnsupportedClassVersionError.class)
+                Log.error(error, "An unexpected error occurred while registering hook ", className, ":");
         }
     }
 

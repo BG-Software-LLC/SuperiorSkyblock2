@@ -320,7 +320,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     public InteractionResult handlePlayerConsumeChorusFruit(SuperiorPlayer superiorPlayer, Location location) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(location, "location cannot be null");
-        Preconditions.checkArgument(location.getWorld() != null, "destination's world cannot be null");
+        Preconditions.checkArgument(location.getWorld() != null, "location's world cannot be null");
 
         if (IslandPrivileges.CHORUS_FRUIT == null) {
             // Chorus Fruit privilege does not exist, we will just return SUCCESS in this case.
@@ -328,7 +328,24 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         }
 
         Island island = plugin.getGrid().getIslandAt(location);
-        return handleInteractionInternal(superiorPlayer, location, island, IslandPrivileges.CHORUS_FRUIT, 0, true, true);
+        return handleInteractionInternal(superiorPlayer, location, island, IslandPrivileges.CHORUS_FRUIT,
+                0, true, true);
+    }
+
+    @Override
+    public InteractionResult handlePlayerUseWindCharge(SuperiorPlayer superiorPlayer, Location location) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
+        Preconditions.checkNotNull(location, "location cannot be null");
+        Preconditions.checkArgument(location.getWorld() != null, "location's world cannot be null");
+
+        if (IslandPrivileges.WIND_CHARGE == null) {
+            // Wind Charge privilege does not exist, we will just return SUCCESS in this case.
+            return InteractionResult.SUCCESS;
+        }
+
+        Island island = plugin.getGrid().getIslandAt(location);
+        return handleInteractionInternal(superiorPlayer, location, island, IslandPrivileges.WIND_CHARGE,
+                0, true, true);
     }
 
     @Override

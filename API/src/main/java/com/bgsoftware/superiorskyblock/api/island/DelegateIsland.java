@@ -606,6 +606,16 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public boolean isInside(Location location, int extraRadius) {
+        return this.handle.isInside(location, extraRadius);
+    }
+
+    @Override
+    public boolean isInside(Location location, double extraRadius) {
+        return this.handle.isInside(location, extraRadius);
+    }
+
+    @Override
     public boolean isInside(World world, int chunkX, int chunkZ) {
         return this.handle.isInside(world, chunkX, chunkZ);
     }
@@ -617,6 +627,11 @@ public class DelegateIsland implements Island {
 
     @Override
     public boolean isInsideRange(Location location, int extraRadius) {
+        return this.handle.isInsideRange(location, extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(Location location, double extraRadius) {
         return this.handle.isInsideRange(location, extraRadius);
     }
 
@@ -1873,20 +1888,20 @@ public class DelegateIsland implements Island {
 
     @Nullable
     @Override
-    public Key generateBlock(Location location, boolean optimizeCobblestone) {
-        return this.handle.generateBlock(location, optimizeCobblestone);
+    public Key generateBlock(Location location, boolean optimizeDefaultBlock) {
+        return this.handle.generateBlock(location, optimizeDefaultBlock);
     }
 
     @Nullable
     @Override
     @Deprecated
-    public Key generateBlock(Location location, World.Environment environment, boolean optimizeCobblestone) {
-        return this.handle.generateBlock(location, environment, optimizeCobblestone);
+    public Key generateBlock(Location location, World.Environment environment, boolean optimizeDefaultBlock) {
+        return this.handle.generateBlock(location, environment, optimizeDefaultBlock);
     }
 
     @Override
-    public Key generateBlock(Location location, Dimension dimension, boolean optimizeCobblestone) {
-        return this.handle.generateBlock(location, dimension, optimizeCobblestone);
+    public Key generateBlock(Location location, Dimension dimension, boolean optimizeDefaultBlock) {
+        return this.handle.generateBlock(location, dimension, optimizeDefaultBlock);
     }
 
     @Override

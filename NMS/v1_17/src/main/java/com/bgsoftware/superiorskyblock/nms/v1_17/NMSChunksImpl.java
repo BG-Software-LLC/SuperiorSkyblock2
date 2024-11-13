@@ -68,7 +68,6 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -157,10 +156,7 @@ public class NMSChunksImpl implements NMSChunks {
                 Arrays.fill(levelChunk.getSections(), LevelChunk.EMPTY_SECTION);
 
                 removeEntities(levelChunk);
-
-                new HashSet<>(levelChunk.getBlockEntities().keySet()).forEach(levelChunk.getLevel()::removeBlockEntity);
-                levelChunk.getBlockEntities().clear();
-
+                removeBlockEntities(levelChunk);
                 removeBlocks(levelChunk);
             }
 
@@ -306,7 +302,7 @@ public class NMSChunksImpl implements NMSChunks {
 
             @Override
             public void onFinish() {
-                BukkitExecutor.sync(() -> {
+                BukkitExecutor.ensureMain(() -> {
                     for (Pair<ServerLevel, ListTag> worldUnloadedEntityTagsPair : unloadedEntityTags) {
                         for (Tag entityTag : worldUnloadedEntityTagsPair.getValue()) {
                             EntityType<?> entityType = EntityType.by((CompoundTag) entityTag).orElse(null);
@@ -479,6 +475,11 @@ public class NMSChunksImpl implements NMSChunks {
             if (!(entity instanceof net.minecraft.world.entity.player.Player))
                 entity.setRemoved(Entity.RemovalReason.DISCARDED);
         }
+    }
+
+    private static void removeBlockEntities(LevelChunk levelChunk) {
+        new LinkedList<>(levelChunk.getBlockEntities().keySet()).forEach(levelChunk.getLevel()::removeBlockEntity);
+        levelChunk.getBlockEntities().clear();
     }
 
     private static void removeBlocks(LevelChunk levelChunk) {

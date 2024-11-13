@@ -68,7 +68,7 @@ public class MenuCounts extends AbstractPagedMenu<MenuCounts.View, IslandViewArg
 
         @Override
         protected List<MenuCounts.BlockCount> requestObjects() {
-            return new SequentialListBuilder<MenuCounts.BlockCount>()
+            return new SequentialListBuilder<BlockCount>()
                     .sorted(BLOCK_COUNT_COMPARATOR)
                     .build(island.getBlockCountsAsBigInteger().entrySet(), BLOCK_COUNT_MAPPER);
         }

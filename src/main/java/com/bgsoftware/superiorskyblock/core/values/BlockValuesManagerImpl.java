@@ -155,10 +155,6 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
             return getValuesKey(key);
         }
 
-        if (customBlockKeys.contains(key)) {
-            return customBlockKeys.getKey(key);
-        }
-
         if (blockValuesContainer.containsKeyRaw(key)) {
             return key;
         }
@@ -170,7 +166,11 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
             }
         }
 
-        return blockValuesContainer.getBlockValueKey(key);
+        Key blockValuesKey = blockValuesContainer.getBlockValueKey(key);
+        if (blockValuesKey != key)
+            return blockValuesKey;
+
+        return customBlockKeys.getKey(key, key);
     }
 
     @Override

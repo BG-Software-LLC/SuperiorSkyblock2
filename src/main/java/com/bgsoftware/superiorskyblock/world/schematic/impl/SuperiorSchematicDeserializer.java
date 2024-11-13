@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.schematic.SchematicBlock;
 import com.bgsoftware.superiorskyblock.core.schematic.SchematicBlockData;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -200,16 +201,23 @@ public class SuperiorSchematicDeserializer {
             return null;
         }
 
-        byte skyLightLevel = compoundTag.getByte("skyLightLevel");
-        byte blockLightLevel = compoundTag.getByte("blockLightLevel");
-
         SuperiorSchematicDeserializer.convertOldTileEntity(compoundTag);
+
+        SchematicBlock.Extra extra = deserializeSchematicBlockExtra(compoundTag, dataVersion);
+
+        return new SchematicBlockData(combinedId, blockOffset, extra);
+    }
+
+    private static SchematicBlock.Extra deserializeSchematicBlockExtra(CompoundTag compoundTag, int dataVersion) {
+        // Ignore light levels
+        // byte skyLightLevel = compoundTag.getByte("skyLightLevel");
+        // byte blockLightLevel = compoundTag.getByte("blockLightLevel");
 
         CompoundTag statesTag = compoundTag.getCompound("states");
         CompoundTag tileEntity = compoundTag.getCompound("tileEntity");
         tileEntity = SuperiorSchematicDeserializer.upgradeTileEntity(tileEntity, dataVersion);
 
-        return new SchematicBlockData(combinedId, blockOffset, skyLightLevel, blockLightLevel, statesTag, tileEntity);
+        return statesTag == null && tileEntity == null ? null : new SchematicBlock.Extra(statesTag, tileEntity);
     }
 
     @Nullable

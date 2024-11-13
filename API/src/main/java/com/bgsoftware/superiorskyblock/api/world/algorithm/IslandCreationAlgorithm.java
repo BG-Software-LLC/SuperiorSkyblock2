@@ -109,6 +109,7 @@ public interface IslandCreationAlgorithm {
         public enum Status {
 
             NAME_OCCUPIED,
+            EVENT_CANCELLED,
             SUCCESS
 
         }
