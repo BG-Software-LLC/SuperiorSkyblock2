@@ -72,6 +72,8 @@ public class BlockChangesListener implements Listener {
     @Nullable
     private static final EntityType WIND_CHARGE = EnumHelper.getEnum(EntityType.class, "WIND_CHARGE");
     @Nullable
+    private static final EntityType BREEZE_WIND_CHARGE = EnumHelper.getEnum(EntityType.class, "BREEZE_WIND_CHARGE");
+    @Nullable
     private static final Material POINTED_DRIPSTONE = EnumHelper.getEnum(Material.class, "POINTED_DRIPSTONE");
 
     @WorldRecordFlags
@@ -326,7 +328,7 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onEntityExplode(EntityExplodeEvent e) {
-        boolean isWindCharge = e.getEntityType() == WIND_CHARGE;
+        boolean isWindCharge = e.getEntityType() == WIND_CHARGE || e.getEntityType() == BREEZE_WIND_CHARGE;
 
         KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         e.blockList().forEach(block -> {
