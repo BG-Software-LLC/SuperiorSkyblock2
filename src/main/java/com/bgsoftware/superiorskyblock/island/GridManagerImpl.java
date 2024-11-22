@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
@@ -35,6 +36,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.island.preview.IslandPreviews;
@@ -68,6 +70,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 public class GridManagerImpl extends Manager implements GridManager {
@@ -105,6 +108,13 @@ public class GridManagerImpl extends Manager implements GridManager {
     private boolean forceSort = false;
 
     private final List<SortingType> pendingSortingTypes = new LinkedList<>();
+    private final AtomicInteger activeCalcTasks = new AtomicInteger(0);
+    private final LazyReference<Synchronized<EnumerateSet<SortingType>>> activeSortingTasks = new LazyReference<Synchronized<EnumerateSet<SortingType>>>() {
+        @Override
+        protected Synchronized<EnumerateSet<SortingType>> create() {
+            return Synchronized.of(new EnumerateSet<>(SortingType.values()));
+        }
+    };
 
     public GridManagerImpl(SuperiorSkyblockPlugin plugin, IslandsPurger islandsPurger, IslandPreviews islandPreviews) {
         super(plugin);
@@ -640,8 +650,16 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         Log.debug(Debug.SORT_ISLANDS, sortingType.getName());
 
+        boolean isSortedAlready = activeSortingTasks.get().readAndGet(
+                activeSortingTasks -> activeSortingTasks.contains(sortingType));
+        if (isSortedAlready)
+            return;
+
+        activeSortingTasks.get().write(activeSortingTasks -> activeSortingTasks.add(sortingType));
+
         this.islandsContainer.sortIslands(sortingType, forceSort, () -> {
             plugin.getMenus().refreshTopIslands(sortingType);
+            activeSortingTasks.get().write(activeSortingTasks -> activeSortingTasks.remove(sortingType));
             if (onFinish != null)
                 onFinish.run();
         });
@@ -823,6 +841,17 @@ public class GridManagerImpl extends Manager implements GridManager {
         for (int i = 0; i < islands.size(); i++) {
             islands.get(i).calcIslandWorth(null, i + 1 < islands.size() ? null : callback);
         }
+    }
+
+    public void startCalcTask() {
+        this.activeCalcTasks.incrementAndGet();
+    }
+
+    public boolean stopCalcTask() {
+        int activeCalcTasks = this.activeCalcTasks.decrementAndGet();
+        if (activeCalcTasks < 0)
+            throw new IllegalStateException();
+        return activeCalcTasks == 0;
     }
 
     @Override
