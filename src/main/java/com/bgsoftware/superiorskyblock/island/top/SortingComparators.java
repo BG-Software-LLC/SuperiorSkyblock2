@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.island.top.metadata.IslandSortMetadata;
 
 import java.util.Comparator;
 
@@ -47,6 +48,8 @@ public class SortingComparators {
         int compare = Integer.compare(o2.getPlayerRole().getWeight(), o1.getPlayerRole().getWeight());
         return compare == 0 ? PLAYER_NAMES_COMPARATOR.compare(o1, o2) : compare;
     };
+    public static final Comparator<IslandSortMetadata> ISLAND_METADATA_COMPARATOR =
+            (Comparator<IslandSortMetadata>) (o1, o2) -> o1.compareTo(o2);
 
     private SortingComparators() {
 

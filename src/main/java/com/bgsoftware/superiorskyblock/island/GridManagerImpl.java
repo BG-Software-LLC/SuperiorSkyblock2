@@ -652,8 +652,12 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         boolean isSortedAlready = activeSortingTasks.get().readAndGet(
                 activeSortingTasks -> activeSortingTasks.contains(sortingType));
-        if (isSortedAlready)
+        if (isSortedAlready) {
+            if (onFinish != null)
+                onFinish.run();
+            forceSort = false;
             return;
+        }
 
         activeSortingTasks.get().write(activeSortingTasks -> activeSortingTasks.add(sortingType));
 
