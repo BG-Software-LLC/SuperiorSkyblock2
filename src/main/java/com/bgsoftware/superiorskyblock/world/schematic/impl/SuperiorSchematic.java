@@ -286,11 +286,12 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                     if (island.getOwner().isOnline())
                         finishTasks.forEach(Runnable::run);
 
-                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Spawning Entities", "");
-
-                    for (SchematicEntity entity : this.data.entities) {
-                        entity.spawnEntity(min);
-                    }
+                    // We spawn the entities with a delay, waiting for players to teleport to the island first.
+                    BukkitExecutor.sync(() -> {
+                        for (SchematicEntity entity : this.data.entities) {
+                            entity.spawnEntity(min);
+                        }
+                    }, 20L);
 
                     Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Schematic Placement", "");
 
