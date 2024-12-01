@@ -2067,7 +2067,7 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(messageComponent, "messageComponent parameter cannot be null.");
         Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
 
-        Log.debug(Debug.SEND_MESSAGE, owner.getName(), messageComponent.getMessage(), ignoredMembers, Arrays.asList(args));
+        Log.debug(Debug.SEND_MESSAGE, owner.getName(), messageComponent.getMessage(args), ignoredMembers, Arrays.asList(args));
 
         forEachIslandMember(ignoredMembers, false, islandMember -> messageComponent.sendMessage(islandMember.asPlayer(), args));
     }

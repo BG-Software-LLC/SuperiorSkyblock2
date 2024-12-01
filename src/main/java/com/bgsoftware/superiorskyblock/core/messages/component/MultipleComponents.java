@@ -91,8 +91,14 @@ public class MultipleComponents implements IMessageComponent {
     }
 
     @Override
+    @Deprecated
     public String getMessage() {
         return messageComponents.isEmpty() ? "" : messageComponents.get(0).getMessage();
+    }
+
+    @Override
+    public String getMessage(Object... args) {
+        return messageComponents.isEmpty() ? "" : messageComponents.get(0).getMessage(args);
     }
 
     @Override

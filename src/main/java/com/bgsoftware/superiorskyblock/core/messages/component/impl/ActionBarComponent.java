@@ -4,7 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -13,14 +13,14 @@ public class ActionBarComponent implements IMessageComponent {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final String message;
+    private final MessageContent content;
 
     public static IMessageComponent of(@Nullable String message) {
         return Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new ActionBarComponent(message);
     }
 
-    private ActionBarComponent(String message) {
-        this.message = message;
+    private ActionBarComponent(String content) {
+        this.content = MessageContent.parse(content);
     }
 
     @Override
@@ -30,12 +30,17 @@ public class ActionBarComponent implements IMessageComponent {
 
     @Override
     public String getMessage() {
-        return this.message;
+        return this.content.getContent().orElse("");
+    }
+
+    @Override
+    public String getMessage(Object... args) {
+        return this.content.getContent(args).orElse("");
     }
 
     @Override
     public void sendMessage(CommandSender sender, Object... args) {
-        Message.replaceArgs(this.message, args).ifPresent(message ->
+        this.content.getContent(args).ifPresent(message ->
                 plugin.getNMSPlayers().sendActionBar((Player) sender, message));
     }
 
