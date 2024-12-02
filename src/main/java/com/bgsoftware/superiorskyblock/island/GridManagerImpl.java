@@ -319,6 +319,8 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         List<ChunkPosition> affectedChunks = schematic instanceof BaseSchematic ?
                 ((BaseSchematic) schematic).getAffectedChunks() : null;
+        Runnable onTeleportCallback = schematic instanceof BaseSchematic ?
+                ((BaseSchematic) schematic).onTeleportCallback() : null;
 
         Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Registering new island");
 
@@ -383,6 +385,9 @@ public class GridManagerImpl extends Manager implements GridManager {
                         }
 
                         plugin.getEventsBus().callPostIslandCreateEvent(builder.owner, island);
+
+                        if (onTeleportCallback != null)
+                            onTeleportCallback.run();
                     }
                 });
             }

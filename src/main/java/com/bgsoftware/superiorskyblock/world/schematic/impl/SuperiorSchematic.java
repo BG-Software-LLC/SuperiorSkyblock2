@@ -53,6 +53,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
     private final Data data;
 
     private List<ChunkPosition> affectedChunks = null;
+    private Runnable onTeleportCallback = null;
 
     public SuperiorSchematic(String name, CompoundTag compoundTag) {
         super(name);
@@ -286,13 +287,6 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                     if (island.getOwner().isOnline())
                         finishTasks.forEach(Runnable::run);
 
-                    // We spawn the entities with a delay, waiting for players to teleport to the island first.
-                    BukkitExecutor.sync(() -> {
-                        for (SchematicEntity entity : this.data.entities) {
-                            entity.spawnEntity(min);
-                        }
-                    }, 20L);
-
                     Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Schematic Placement", "");
 
                     island.handleBlocksPlace(cachedCounts);
@@ -300,10 +294,15 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                     plugin.getEventsBus().callIslandSchematicPasteEvent(island, name, location);
 
                     Profiler.end(profiler);
-
-                    this.affectedChunks = new LinkedList<>(affectedChunks);
-                    callback.run();
-                    this.affectedChunks = null;
+                    
+                    synchronized (this) {
+                        try {
+                            prepareCallback(affectedChunks, min);
+                            callback.run();
+                        } finally {
+                            finishCallback();
+                        }
+                    }
                 } catch (Throwable error2) {
                     Log.debugResult(Debug.PASTE_SCHEMATIC, "Failed Finishing Placement", error2);
                     Profiler.end(profiler);
@@ -326,6 +325,11 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         return affectedChunks == null ? Collections.emptyList() : Collections.unmodifiableList(affectedChunks);
     }
 
+    @Override
+    public Runnable onTeleportCallback() {
+        return this.onTeleportCallback;
+    }
+
     public SuperiorSchematic copy(String newName) {
         return new SuperiorSchematic(newName, this.data, this.cachedCounts);
     }
@@ -333,6 +337,23 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
     private void readBlock(SchematicBlockData block) {
         Key key = plugin.getNMSAlgorithms().getBlockKey(block.getCombinedId());
         cachedCounts.put(key, cachedCounts.getRaw(key, 0) + 1);
+    }
+
+    private void prepareCallback(List<ChunkPosition> affectedChunks, Location min) {
+        this.affectedChunks = new LinkedList<>(affectedChunks);
+        // We spawn the entities with a delay, waiting for players to teleport to the island first.
+        this.onTeleportCallback = () -> {
+            BukkitExecutor.sync(() -> {
+                for (SchematicEntity entity : data.entities) {
+                    entity.spawnEntity(min);
+                }
+            }, 20L);
+        };
+    }
+
+    private void finishCallback() {
+        this.affectedChunks = null;
+        this.onTeleportCallback = null;
     }
 
     private static class Data {

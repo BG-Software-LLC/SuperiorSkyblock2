@@ -107,6 +107,11 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
         return Collections.emptyList();
     }
 
+    @Override
+    public Runnable onTeleportCallback() {
+        return null;
+    }
+
     private void readBlocks() {
         BlockArrayClipboard clipboard = (BlockArrayClipboard) schematic.getClipboard();
 
