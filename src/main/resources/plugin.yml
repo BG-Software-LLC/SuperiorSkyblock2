@@ -36,6 +36,7 @@ class-depends:
   - Vault
   - WildStacker
   - WorldEdit
+  - zMenu
 
 loadbefore:
   - Multiverse-Core
