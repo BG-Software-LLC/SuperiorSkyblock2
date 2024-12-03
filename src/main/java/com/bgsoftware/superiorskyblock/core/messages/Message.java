@@ -983,8 +983,8 @@ public enum Message {
     }
 
     @Nullable
-    public String getMessage(Locale locale, Object... objects) {
-        return isEmpty(locale) ? defaultMessage : replaceArgs(messages.get(locale).getMessage(), objects).orElse(null);
+    public String getMessage(Locale locale, Object... args) {
+        return isEmpty(locale) ? defaultMessage : messages.get(locale).getMessage(args);
     }
 
     public final void send(SuperiorPlayer superiorPlayer, Object... args) {

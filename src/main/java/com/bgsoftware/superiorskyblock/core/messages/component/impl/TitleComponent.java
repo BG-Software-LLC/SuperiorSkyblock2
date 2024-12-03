@@ -5,7 +5,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -14,8 +14,8 @@ public class TitleComponent implements IMessageComponent {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final String titleMessage;
-    private final String subtitleMessage;
+    private final MessageContent titleMessage;
+    private final MessageContent subtitleMessage;
     private final int fadeIn;
     private final int duration;
     private final int fadeOut;
@@ -27,8 +27,8 @@ public class TitleComponent implements IMessageComponent {
     }
 
     private TitleComponent(String titleMessage, String subtitleMessage, int fadeIn, int duration, int fadeOut) {
-        this.titleMessage = titleMessage;
-        this.subtitleMessage = subtitleMessage;
+        this.titleMessage = MessageContent.parse(titleMessage);
+        this.subtitleMessage = MessageContent.parse(subtitleMessage);
         this.fadeIn = fadeIn;
         this.duration = duration;
         this.fadeOut = fadeOut;
@@ -41,18 +41,21 @@ public class TitleComponent implements IMessageComponent {
 
     @Override
     public String getMessage() {
-        return this.titleMessage;
+        return this.titleMessage.getContent().orElse("");
+    }
+
+    @Override
+    public String getMessage(Object... args) {
+        return this.titleMessage.getContent(args).orElse("");
     }
 
     @Override
     public void sendMessage(CommandSender sender, Object... args) {
-        String titleMessage = Message.replaceArgs(this.titleMessage, args).orElse(null);
-        String subtitleMessage = Message.replaceArgs(this.subtitleMessage, args).orElse(null);
-
-        if (titleMessage != null || subtitleMessage != null) {
+        String titleMessage = this.titleMessage.getContent(args).orElse(null);
+        String subtitleMessage = this.subtitleMessage.getContent(args).orElse(null);
+        if (titleMessage != null && subtitleMessage != null)
             plugin.getNMSPlayers().sendTitle((Player) sender, titleMessage, subtitleMessage,
                     this.fadeIn, this.duration, this.fadeOut);
-        }
     }
 
 }

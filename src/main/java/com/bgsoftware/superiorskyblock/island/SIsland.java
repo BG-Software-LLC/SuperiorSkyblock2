@@ -2067,7 +2067,7 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(messageComponent, "messageComponent parameter cannot be null.");
         Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
 
-        Log.debug(Debug.SEND_MESSAGE, owner.getName(), messageComponent.getMessage(), ignoredMembers, Arrays.asList(args));
+        Log.debug(Debug.SEND_MESSAGE, owner.getName(), messageComponent.getMessage(args), ignoredMembers, Arrays.asList(args));
 
         forEachIslandMember(ignoredMembers, false, islandMember -> messageComponent.sendMessage(islandMember.asPlayer(), args));
     }
@@ -4284,10 +4284,12 @@ public class SIsland implements Island {
     private void calcIslandWorthInternal(@Nullable SuperiorPlayer asker, @Nullable Runnable callback) {
         try {
             this.beingRecalculated = true;
+            plugin.getGrid().startCalcTask();
             runCalcIslandWorthInternal(asker, callback);
         } catch (Throwable error) {
             // In case of an error, we get out of the recalculate state.
             this.beingRecalculated = false;
+            plugin.getGrid().stopCalcTask();
             throw error;
         }
     }
@@ -4310,6 +4312,7 @@ public class SIsland implements Island {
 
         calculationResult.whenComplete((result, error) -> {
             beingRecalculated = false;
+            boolean isLastActiveTask = plugin.getGrid().stopCalcTask();
 
             if (error != null) {
                 if (error instanceof TimeoutException) {
@@ -4337,7 +4340,7 @@ public class SIsland implements Island {
             plugin.getMenus().refreshValues(this);
             plugin.getMenus().refreshCounts(this);
 
-            saveBlockCounts(this.currentTotalBlockCounts.get(), oldWorth, oldLevel, true);
+            saveBlockCounts(this.currentTotalBlockCounts.get(), oldWorth, oldLevel, true, isLastActiveTask);
             updateLastTime();
         });
     }
@@ -4448,11 +4451,11 @@ public class SIsland implements Island {
     }
 
     private void saveBlockCounts(BigInteger currentTotalBlocksCount, BigDecimal oldWorth, BigDecimal oldLevel) {
-        saveBlockCounts(currentTotalBlocksCount, oldWorth, oldLevel, false);
+        saveBlockCounts(currentTotalBlocksCount, oldWorth, oldLevel, false, true);
     }
 
     private void saveBlockCounts(BigInteger currentTotalBlocksCount, BigDecimal oldWorth, BigDecimal oldLevel,
-                                 boolean forceBlocksCountSave) {
+                                 boolean forceBlocksCountSave, boolean sortIslands) {
         BigDecimal newWorth = getWorth();
         BigDecimal newLevel = getIslandLevel();
 
@@ -4467,10 +4470,12 @@ public class SIsland implements Island {
         if (forceBlocksCountSave || deltaBlockCounts.compareTo(plugin.getSettings().getBlockCountsSaveThreshold()) >= 0) {
             this.lastSavedBlockCounts = currentTotalBlocksCount;
             IslandsDatabaseBridge.saveBlockCounts(this);
-            plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
-            plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
             plugin.getMenus().refreshValues(this);
             plugin.getMenus().refreshCounts(this);
+            if (sortIslands) {
+                plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
+                plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
+            }
         } else {
             IslandsDatabaseBridge.markBlockCountsToBeSaved(this);
         }

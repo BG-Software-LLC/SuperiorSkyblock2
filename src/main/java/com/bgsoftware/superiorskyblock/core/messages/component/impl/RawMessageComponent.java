@@ -4,7 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessageProvider;
 import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
 import com.bgsoftware.superiorskyblock.service.message.SpigotMessageProvider;
 import org.bukkit.command.CommandSender;
@@ -27,6 +27,14 @@ public class RawMessageComponent implements IMessageComponent {
 
     public static IMessageComponent of(@Nullable String message) {
         return Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new RawMessageComponent(message);
+    private final MessageContent content;
+
+    public static IMessageComponent of(@Nullable String message) {
+        return Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new RawMessageComponent(message);
+    }
+
+    private RawMessageComponent(String message) {
+        this.content = MessageContent.parse(message);
     }
 
     @Override
@@ -36,7 +44,12 @@ public class RawMessageComponent implements IMessageComponent {
 
     @Override
     public String getMessage() {
-        return this.message;
+        return this.content.getContent().orElse("");
+    }
+
+    @Override
+    public String getMessage(Object... args) {
+        return this.content.getContent(args).orElse("");
     }
 
     @Override
@@ -46,6 +59,7 @@ public class RawMessageComponent implements IMessageComponent {
                 this.messageProvider.sendMessage((Player) sender, message);
             } else sender.sendMessage(message);
         });
+        this.content.getContent(args).ifPresent(sender::sendMessage);
     }
 
 }

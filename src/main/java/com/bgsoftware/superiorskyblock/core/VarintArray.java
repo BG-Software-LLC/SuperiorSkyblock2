@@ -9,33 +9,30 @@ public class VarintArray {
 
     private static final byte[] VARINT_BUF = new byte[10];
 
-    private byte[] backend;
+    private final ByteBigArray backend;
     private int size;
 
     public VarintArray() {
-        this.backend = new byte[32];
+        this.backend = new ByteBigArray();
         this.size = 0;
     }
 
-    public VarintArray(byte[] data) {
-        Preconditions.checkState(data.length == 0 || (data[data.length - 1] & 0x80) == 0,
+    public VarintArray(ByteBigArray data) {
+        Preconditions.checkState(data.size() == 0 || (data.get(data.size() - 1) & 0x80) == 0,
                 "Last byte in data-stream cannot have its MSB on");
         this.backend = data;
-        this.size = data.length;
+        this.size = data.size();
     }
 
     public void add(long value) {
         byte[] varint = serializeVarint(value);
-        if (this.size + varint.length >= this.backend.length) {
-            this.backend = Arrays.copyOf(this.backend, this.backend.length * 2);
-        }
-        int oldSize = this.size;
-        System.arraycopy(varint, 0, this.backend, oldSize, varint.length);
+        for (byte b : varint)
+            this.backend.add(b);
         this.size += varint.length;
     }
 
-    public byte[] toByteArray() {
-        return Arrays.copyOf(this.backend, this.size);
+    public ByteBigArray toArray() {
+        return this.backend.readOnly();
     }
 
     public Itr iterator() {
@@ -67,7 +64,7 @@ public class VarintArray {
             int i = 0;
             long value = 0;
             while (index < size) {
-                byte b = backend[index++];
+                byte b = backend.get(index++);
                 value |= (long) (b & 0x7f) << i;
                 i += 7;
                 if ((b & 0x80) == 0)

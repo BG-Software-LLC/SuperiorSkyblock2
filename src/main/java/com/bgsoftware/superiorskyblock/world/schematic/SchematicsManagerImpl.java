@@ -90,6 +90,8 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             throw new ManagerLoadException("&cThere were no valid schematics.",
                     ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
+
+        System.gc();
     }
 
     private void loadDefaultSchematicParsers() {

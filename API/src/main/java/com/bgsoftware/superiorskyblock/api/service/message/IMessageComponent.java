@@ -11,8 +11,18 @@ public interface IMessageComponent {
 
     /**
      * Get the raw message of this component.
+     *
+     * @deprecated See {@link #getMessage(Object...)}
      */
+    @Deprecated
     String getMessage();
+
+    /**
+     * Get the raw message of this component.
+     */
+    default String getMessage(Object... args) {
+        return getMessage();
+    }
 
     /**
      * Send this message to a {@link CommandSender}.
@@ -21,7 +31,7 @@ public interface IMessageComponent {
      * @param args   The arguments of the message.
      */
     void sendMessage(CommandSender sender, Object... args);
-    
+
     enum Type {
 
         /**

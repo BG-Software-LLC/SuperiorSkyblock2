@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.world.schematic;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
@@ -12,7 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("WeakerAccess")
 public abstract class BaseSchematic implements Schematic {
 
     protected static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -41,5 +41,8 @@ public abstract class BaseSchematic implements Schematic {
     }
 
     public abstract List<ChunkPosition> getAffectedChunks();
+
+    @Nullable
+    public abstract Runnable onTeleportCallback();
 
 }
