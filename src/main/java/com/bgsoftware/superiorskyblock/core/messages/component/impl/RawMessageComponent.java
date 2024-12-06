@@ -12,29 +12,23 @@ import org.bukkit.entity.Player;
 
 public class RawMessageComponent implements IMessageComponent {
 
-    private final String message;
-    private MessageProvider messageProvider;
-
-    private RawMessageComponent(String message) {
-        this.message = message;
-        try {
-            Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
-            this.messageProvider = (MessageProvider) Class.forName("com.bgsoftware.superiorskyblock.external.minimessage.MiniMessageProvider").getConstructor().newInstance();
-        } catch (Exception ignored) {
-            this.messageProvider = new SpigotMessageProvider();
-        }
-    }
-
-    public static IMessageComponent of(@Nullable String message) {
-        return Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new RawMessageComponent(message);
     private final MessageContent content;
-
-    public static IMessageComponent of(@Nullable String message) {
-        return Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new RawMessageComponent(message);
-    }
+    private final MessageProvider messageProvider;
 
     private RawMessageComponent(String message) {
         this.content = MessageContent.parse(message);
+        MessageProvider messageProviderLocal;
+        try {
+            Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
+            messageProviderLocal = (MessageProvider) Class.forName("com.bgsoftware.superiorskyblock.external.minimessage.MiniMessageProvider").getConstructor().newInstance();
+        } catch (Exception ignored) {
+            messageProviderLocal = new SpigotMessageProvider();
+        }
+        this.messageProvider = messageProviderLocal;
+    }
+
+    public static IMessageComponent of(@Nullable String message) {
+        return Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new RawMessageComponent(message);
     }
 
     @Override
@@ -54,12 +48,11 @@ public class RawMessageComponent implements IMessageComponent {
 
     @Override
     public void sendMessage(CommandSender sender, Object... args) {
-        Message.replaceArgs(this.message, args).ifPresent(message -> {
-            if (sender instanceof Player && this.messageProvider != null) {
-                this.messageProvider.sendMessage((Player) sender, message);
-            } else sender.sendMessage(message);
-        });
-        this.content.getContent(args).ifPresent(sender::sendMessage);
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            this.content.getContent(args).ifPresent(string -> messageProvider.sendMessage(player, string));
+        } else {
+            this.content.getContent(args).ifPresent(sender::sendMessage);
+        }
     }
-
 }
