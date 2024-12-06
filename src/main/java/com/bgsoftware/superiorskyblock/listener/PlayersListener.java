@@ -453,7 +453,7 @@ public class PlayersListener implements Listener {
 
     /* PLAYER DEATH */
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void onPlayerRespawn(PlayerRespawnEvent event) {
         for (RespawnAction respawnAction : plugin.getSettings().getPlayerRespawn()) {
             if (respawnAction == RespawnActions.VANILLA || respawnAction.canPerform(event)) {
