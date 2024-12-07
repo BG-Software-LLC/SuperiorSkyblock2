@@ -160,6 +160,11 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public Location getLocation(Location location) {
+        return this.handle.getLocation(location);
+    }
+
+    @Override
     public void teleport(Location location) {
         this.handle.teleport(location);
     }

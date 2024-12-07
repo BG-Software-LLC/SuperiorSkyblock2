@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.external.entities;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
@@ -48,9 +49,10 @@ public class EntitiesProvider_RoseStacker implements EntitiesProvider {
             if (stackedEntity == null || stackedEntity.getStackSize() <= 1)
                 return;
 
-            Location location = e.getEntity().getLocation();
-
-            Island island = plugin.getGrid().getIslandAt(location);
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getEntity().getLocation(wrapper.getHandle()));
+            }
 
             if (island == null)
                 return;

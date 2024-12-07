@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.external.spawners;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
@@ -47,14 +48,22 @@ public class SpawnersProvider_CandcSilkSpawners implements SpawnersProvider_Auto
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerPlace(SpawnerPlaceEvent e) {
-            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation(wrapper.getHandle()));
+            }
+
             if (island != null)
                 island.handleBlockPlace(Keys.ofSpawner(e.getSpawnedEntity()), 1);
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerUnstack(SpawnerBreakEvent e) {
-            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation(wrapper.getHandle()));
+            }
+
             if (island != null)
                 island.handleBlockBreak(Keys.ofSpawner(e.getSpawnedEntity()), 1);
         }

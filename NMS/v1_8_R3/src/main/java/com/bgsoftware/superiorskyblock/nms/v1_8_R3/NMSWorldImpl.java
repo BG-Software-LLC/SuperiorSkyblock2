@@ -182,7 +182,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public ICachedBlock cacheBlock(org.bukkit.block.Block block) {
-        return new NMSCachedBlock(block);
+        return NMSCachedBlock.obtain(block);
     }
 
     @Override
@@ -234,9 +234,8 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public int getDefaultAmount(org.bukkit.block.Block block) {
-        Location blockLocation = block.getLocation();
-        IBlockData blockData = ((CraftWorld) block.getWorld()).getHandle().getType(new BlockPosition(
-                blockLocation.getBlockX(), blockLocation.getBlockY(), blockLocation.getBlockZ()));
+        WorldServer worldServer = ((CraftWorld) block.getWorld()).getHandle();
+        IBlockData blockData = worldServer.getType(new BlockPosition(block.getX(), block.getY(), block.getZ()));
         return getDefaultAmount(blockData);
     }
 
@@ -338,7 +337,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public WorldEditSession createEditSession(World world) {
-        return new WorldEditSessionImpl(((CraftWorld) world).getHandle());
+        return WorldEditSessionImpl.obtain(((CraftWorld) world).getHandle());
     }
 
 }

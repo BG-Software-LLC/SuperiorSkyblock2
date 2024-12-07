@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -40,8 +41,12 @@ public class GameSoundImpl implements GameSound {
     }
 
     public static void playSound(Player player, @Nullable GameSound gameSound) {
-        if (!isEmpty(gameSound))
-            player.playSound(player.getLocation(), gameSound.getSound(), gameSound.getVolume(), gameSound.getPitch());
+        if (!isEmpty(gameSound)) {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                player.playSound(player.getLocation(wrapper.getHandle()), gameSound.getSound(),
+                        gameSound.getVolume(), gameSound.getPitch());
+            }
+        }
     }
 
 }

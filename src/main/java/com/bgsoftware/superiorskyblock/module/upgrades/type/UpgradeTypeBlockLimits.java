@@ -6,13 +6,14 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.Materials;
-import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -56,8 +57,10 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
         @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
         public void onBlockPlace(BlockPlaceEvent e) {
-            Island island = plugin.getGrid().getIslandAt(e.getBlockPlaced().getLocation());
-
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getBlockPlaced().getLocation(wrapper.getHandle()));
+            }
             if (island == null)
                 return;
 
@@ -89,10 +92,12 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
             MutableObject<Key> minecraftKey = new MutableObject<>(null);
 
-            if (preventMinecartPlace(handItemType, e.getClickedBlock().getLocation(), minecraftKey)) {
-                e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(
-                        minecraftKey.getValue().getGlobalKey()));
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                if (preventMinecartPlace(handItemType, e.getClickedBlock().getLocation(wrapper.getHandle()), minecraftKey)) {
+                    e.setCancelled(true);
+                    Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(
+                            minecraftKey.getValue().getGlobalKey()));
+                }
             }
         }
 
@@ -123,8 +128,10 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
             if (!Materials.isRail(targetBlock.getType()))
                 return;
 
-            if (preventMinecartPlace(dispenseItemType, targetBlock.getLocation(), null))
-                e.setCancelled(true);
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                if (preventMinecartPlace(dispenseItemType, targetBlock.getLocation(wrapper.getHandle()), null))
+                    e.setCancelled(true);
+            }
 
         }
 
@@ -169,8 +176,10 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
         @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
         public void onBucketEmpty(PlayerBucketEmptyEvent e) {
-            Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
-
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation(wrapper.getHandle()));
+            }
             if (island == null)
                 return;
 
@@ -184,7 +193,10 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
         @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
         public void onBlockGrow(BlockGrowEvent e) {
-            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getBlock().getLocation(wrapper.getHandle()));
+            }
 
             if (island == null)
                 return;

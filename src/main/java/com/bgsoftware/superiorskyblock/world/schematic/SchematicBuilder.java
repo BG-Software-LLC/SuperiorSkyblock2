@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.world.schematic;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.schematic.SchematicEntityFilter;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
@@ -63,9 +64,12 @@ public class SchematicBuilder {
 
     public SchematicBuilder applyEntity(Entity entity, Location min) {
         if (!(entity instanceof Player)) {
-            Location offset = entity.getLocation().subtract(min);
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location offset = entity.getLocation(wrapper.getHandle()).subtract(min);
+                compoundValue.put("offset", new StringTag(Serializers.LOCATION_SERIALIZER.serialize(offset)));
+            }
+
             compoundValue.put("entityType", new StringTag(entity.getType().name()));
-            compoundValue.put("offset", new StringTag(Serializers.LOCATION_SERIALIZER.serialize(offset)));
             compoundValue.put("NBT", SchematicEntityFilter.filterNBTTag(plugin.getNMSTags().getNBTTag(entity)));
         }
         return this;

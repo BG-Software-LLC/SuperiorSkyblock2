@@ -471,7 +471,7 @@ public class IslandsDatabaseBridge {
     public static void saveDirtyChunks(DirtyChunksContainer dirtyChunksContainer) {
         runOperationIfRunning(dirtyChunksContainer.getIsland().getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands",
                 createFilter("uuid", dirtyChunksContainer.getIsland()),
-                new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunkPositions(dirtyChunksContainer.getDirtyChunks()))
+                new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunkPositions(dirtyChunksContainer))
         ));
     }
 

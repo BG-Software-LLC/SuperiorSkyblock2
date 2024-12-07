@@ -7,8 +7,10 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParseException;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
@@ -130,22 +132,26 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
     @Override
     public void saveSchematic(SuperiorPlayer superiorPlayer, String schematicName) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        Preconditions.checkNotNull(superiorPlayer.getLocation(), "superiorPlayer must be online.");
+        Preconditions.checkArgument(superiorPlayer.isOnline(), "superiorPlayer must be online.");
         Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
         Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
 
-        Location pos1 = superiorPlayer.getSchematicPos1().parse();
-        Location pos2 = superiorPlayer.getSchematicPos2().parse();
-        Location min = new Location(pos1.getWorld(),
-                Math.min(pos1.getX(), pos2.getX()),
-                Math.min(pos1.getY(), pos2.getY()),
-                Math.min(pos1.getZ(), pos2.getZ())
-        );
-        Location offset = superiorPlayer.getLocation().clone().subtract(min.clone().add(0, 1, 0));
+        BlockPosition pos1 = superiorPlayer.getSchematicPos1();
+        BlockPosition pos2 = superiorPlayer.getSchematicPos2();
 
-        saveSchematic(superiorPlayer.getSchematicPos1().parse(), superiorPlayer.getSchematicPos2().parse(),
-                offset.getBlockX(), offset.getBlockY(), offset.getBlockZ(), offset.getYaw(), offset.getPitch(), schematicName, () ->
-                        Message.SCHEMATIC_SAVED.send(superiorPlayer));
+        Location offset;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location min = new Location(pos1.getWorld(),
+                    Math.min(pos1.getX(), pos2.getX()),
+                    Math.min(pos1.getY(), pos2.getY()),
+                    Math.min(pos1.getZ(), pos2.getZ())
+            );
+
+            offset = superiorPlayer.getLocation(wrapper.getHandle()).subtract(min.add(0, 1, 0));
+        }
+
+        saveSchematic(pos1.parse(), pos2.parse(), offset.getBlockX(), offset.getBlockY(), offset.getBlockZ(),
+                offset.getYaw(), offset.getPitch(), schematicName, () -> Message.SCHEMATIC_SAVED.send(superiorPlayer));
 
         superiorPlayer.setSchematicPos1(null);
         superiorPlayer.setSchematicPos2(null);
@@ -208,9 +214,12 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
                 for (int y = 0; y <= ySize; y++) {
                     Block block = world.getBlockAt(x + min.getBlockX(), y + min.getBlockY(), z + min.getBlockZ());
                     Material blockType = block.getType();
-                    Location blockLocation = block.getLocation();
+                    if (blockType == Material.AIR)
+                        continue;
 
-                    if (blockType != Material.AIR) {
+                    try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                        Location blockLocation = block.getLocation(wrapper.getHandle());
+
                         CompoundTag tileEntity = plugin.getNMSWorld().readTileEntity(blockLocation);
                         if (tileEntity != null && block.getState() instanceof InventoryHolder)
                             tileEntity.setString("inventoryType", ((InventoryHolder) block.getState()).getInventory().getType().name());
@@ -337,8 +346,10 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             for (int z = minChunk.getZ(); z <= maxChunk.getZ(); z++) {
                 Chunk currentChunk = min.getWorld().getChunkAt(x, z);
                 for (Entity entity : currentChunk.getEntities()) {
-                    if (!(entity instanceof Player) && betweenLocations(entity.getLocation(), min, max))
-                        livingEntities.add(entity);
+                    try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                        if (!(entity instanceof Player) && betweenLocations(entity.getLocation(wrapper.getHandle()), min, max))
+                            livingEntities.add(entity);
+                    }
                 }
             }
         }

@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.ChatFormatter;
@@ -130,11 +131,15 @@ public class PlayersListener implements Listener {
         if (superiorPlayer.isShownAsOnline())
             IslandNotifications.notifyPlayerJoin(superiorPlayer);
 
-        Location playerLocation = e.getPlayer().getLocation();
-        Island island = plugin.getGrid().getIslandAt(playerLocation);
+        MoveResult moveResult;
+        Island island;
 
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location playerLocation = e.getPlayer().getLocation(wrapper.getHandle());
+            island = plugin.getGrid().getIslandAt(playerLocation);
+            moveResult = this.regionManagerService.get().handlePlayerJoin(superiorPlayer, playerLocation);
+        }
 
-        MoveResult moveResult = this.regionManagerService.get().handlePlayerJoin(superiorPlayer, playerLocation);
         boolean teleportToSpawn = moveResult != MoveResult.SUCCESS;
 
         BukkitExecutor.sync(() -> {
@@ -146,7 +151,10 @@ public class PlayersListener implements Listener {
                 plugin.getNMSPlayers().setSkinTexture(superiorPlayer);
 
             if (!superiorPlayer.hasBypassModeEnabled()) {
-                Island delayedIsland = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
+                Island delayedIsland;
+                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                    delayedIsland = plugin.getGrid().getIslandAt(e.getPlayer().getLocation(wrapper.getHandle()));
+                }
                 // Checking if the player is in the islands world, not inside an island.
                 if ((delayedIsland == island && teleportToSpawn) ||
                         (plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld()) && delayedIsland == null)) {
@@ -203,7 +211,9 @@ public class PlayersListener implements Listener {
             }
         }
 
-        this.regionManagerService.get().handlePlayerQuit(superiorPlayer, e.getPlayer().getLocation());
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            this.regionManagerService.get().handlePlayerQuit(superiorPlayer, e.getPlayer().getLocation(wrapper.getHandle()));
+        }
 
         // Remove all player chat-listeners
         PlayerChat.remove(e.getPlayer());
@@ -264,7 +274,10 @@ public class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onPlayerChangeWorld(PlayerChangedWorldEvent e) {
-        Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
+        Island island;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation(wrapper.getHandle()));
+        }
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if (island != null && superiorPlayer.hasIslandFlyEnabled() && !e.getPlayer().getAllowFlight() &&
@@ -287,7 +300,10 @@ public class PlayersListener implements Listener {
         if (targetPlayer instanceof SuperiorNPCPlayer)
             return;
 
-        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+        Island island;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            island = plugin.getGrid().getIslandAt(e.getEntity().getLocation(wrapper.getHandle()));
+        }
 
         SuperiorPlayer damagerPlayer = !(e instanceof EntityDamageByEntityEvent) ? null :
                 BukkitEntities.getPlayerSource(((EntityDamageByEntityEvent) e).getDamager())
@@ -407,12 +423,15 @@ public class PlayersListener implements Listener {
 
         e.setCancelled(true);
 
-        if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
-            Message.SCHEMATIC_RIGHT_SELECT.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(e.getClickedBlock().getLocation()));
-            superiorPlayer.setSchematicPos1(e.getClickedBlock());
-        } else {
-            Message.SCHEMATIC_LEFT_SELECT.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(e.getClickedBlock().getLocation()));
-            superiorPlayer.setSchematicPos2(e.getClickedBlock());
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location location = e.getClickedBlock().getLocation(wrapper.getHandle());
+            if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
+                Message.SCHEMATIC_RIGHT_SELECT.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(location));
+                superiorPlayer.setSchematicPos1(e.getClickedBlock());
+            } else {
+                Message.SCHEMATIC_LEFT_SELECT.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(location));
+                superiorPlayer.setSchematicPos2(e.getClickedBlock());
+            }
         }
 
         if (superiorPlayer.getSchematicPos1() != null && superiorPlayer.getSchematicPos2() != null)

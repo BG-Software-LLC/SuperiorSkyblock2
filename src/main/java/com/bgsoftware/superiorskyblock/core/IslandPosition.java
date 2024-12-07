@@ -6,19 +6,25 @@ import org.bukkit.Location;
 
 import java.util.Objects;
 
-public class IslandPosition {
+public class IslandPosition implements ObjectsPool.Releasable, AutoCloseable {
+
+    private static final ObjectsPool<IslandPosition> POOL = new ObjectsPool<>(IslandPosition::new);
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Nullable
-    private final String worldName;
-    private final int x;
-    private final int z;
+    private String worldName;
+    private int x;
+    private int z;
 
-    private IslandPosition(@Nullable String worldName, int x, int z) {
+    private IslandPosition() {
+    }
+
+    private IslandPosition initialize(@Nullable String worldName, int x, int z) {
         this.worldName = worldName;
         this.x = x;
         this.z = z;
+        return this;
     }
 
     public static IslandPosition of(Location location) {
@@ -26,10 +32,29 @@ public class IslandPosition {
     }
 
     public static IslandPosition of(String worldName, int locX, int locZ) {
+        return of(worldName, locX, locZ, true);
+    }
+
+    public static IslandPosition of(String worldName, int locX, int locZ, boolean fromPool) {
         int radius = plugin.getSettings().getMaxIslandSize() * 3;
         int x = (Math.abs(locX) + (radius / 2)) / radius;
         int z = (Math.abs(locZ) + (radius / 2)) / radius;
-        return new IslandPosition(plugin.getProviders().hasCustomWorldsSupport() ? worldName : null, locX < 0 ? -x : x, locZ < 0 ? -z : z);
+
+        IslandPosition islandPosition = fromPool ? POOL.obtain() : new IslandPosition();
+
+        return islandPosition.initialize(plugin.getProviders().hasCustomWorldsSupport() ? worldName : null,
+                locX < 0 ? -x : x, locZ < 0 ? -z : z);
+    }
+
+    @Override
+    public void release() {
+        this.worldName = null;
+        POOL.release(this);
+    }
+
+    @Override
+    public void close() {
+        this.release();
     }
 
     @Override

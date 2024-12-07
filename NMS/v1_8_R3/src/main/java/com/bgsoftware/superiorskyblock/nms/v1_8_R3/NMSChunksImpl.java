@@ -132,7 +132,7 @@ public class NMSChunksImpl implements NMSChunks {
             @Override
             public void onChunk(Chunk chunk, boolean isLoaded) {
                 World bukkitWorld = chunk.world.getWorld();
-                ChunkPosition chunkPosition = ChunkPosition.of(bukkitWorld, chunk.locX, chunk.locZ);
+                ChunkPosition chunkPosition = ChunkPosition.of(bukkitWorld, chunk.locX, chunk.locZ, false);
 
                 KeyMap<Counter> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
                 List<Location> spawnersLocations = new LinkedList<>();
@@ -295,7 +295,7 @@ public class NMSChunksImpl implements NMSChunks {
         } catch (Throwable ignored) {
         }
 
-        if(hasWorldHField) {
+        if (hasWorldHField) {
             chunk.tileEntities.forEach(((blockPosition, tileEntity) -> {
                 chunk.world.tileEntityList.remove(tileEntity);
                 chunk.world.h.remove(tileEntity);

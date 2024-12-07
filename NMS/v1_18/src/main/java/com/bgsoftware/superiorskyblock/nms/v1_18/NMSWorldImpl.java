@@ -199,7 +199,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public ICachedBlock cacheBlock(org.bukkit.block.Block block) {
-        return new NMSCachedBlock(block);
+        return NMSCachedBlock.obtain(block);
     }
 
     @Override
@@ -400,7 +400,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public WorldEditSession createEditSession(World world) {
-        return new WorldEditSessionImpl(((CraftWorld) world).getHandle());
+        return WorldEditSessionImpl.obtain(((CraftWorld) world).getHandle());
     }
 
 }

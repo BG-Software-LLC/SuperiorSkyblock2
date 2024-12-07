@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -179,17 +180,19 @@ public class StackedBlocksListener implements Listener {
 
             blockItem = block.getState().getData().toItemStack(amount);
 
-            Location location = block.getLocation();
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location location = block.getLocation(wrapper.getHandle());
 
-            Island island = plugin.getGrid().getIslandAt(location);
-            if (island != null)
-                island.handleBlockBreak(block, amount);
+                Island island = plugin.getGrid().getIslandAt(location);
+                if (island != null)
+                    island.handleBlockBreak(block, amount);
 
-            plugin.getStackedBlocks().removeStackedBlock(location);
-            block.setType(Material.AIR);
+                plugin.getStackedBlocks().removeStackedBlock(location);
+                block.setType(Material.AIR);
 
-            // Dropping the item
-            block.getWorld().dropItemNaturally(location, blockItem);
+                // Dropping the item
+                block.getWorld().dropItemNaturally(location, blockItem);
+            }
         }
     }
 
@@ -226,17 +229,19 @@ public class StackedBlocksListener implements Listener {
         if (entityTemplateOffsets == null)
             return;
 
-        Location entityLocation = e.getEntity().getLocation();
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location entityLocation = e.getEntity().getLocation(wrapper.getHandle());
 
-        if (plugin.getStackedBlocks().getStackedBlockAmount(entityLocation) > 1) {
-            e.setCancelled(true);
-            return;
-        }
-
-        for (BlockOffset blockOffset : entityTemplateOffsets) {
-            if (plugin.getStackedBlocks().getStackedBlockAmount(blockOffset.applyToLocation(entityLocation)) > 1) {
+            if (plugin.getStackedBlocks().getStackedBlockAmount(entityLocation) > 1) {
                 e.setCancelled(true);
                 return;
+            }
+
+            for (BlockOffset blockOffset : entityTemplateOffsets) {
+                if (plugin.getStackedBlocks().getStackedBlockAmount(blockOffset.applyToLocation(entityLocation)) > 1) {
+                    e.setCancelled(true);
+                    return;
+                }
             }
         }
     }

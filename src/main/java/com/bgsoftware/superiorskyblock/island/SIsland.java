@@ -42,6 +42,7 @@ import com.bgsoftware.superiorskyblock.core.IslandArea;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LegacyMasks;
 import com.bgsoftware.superiorskyblock.core.LocationKey;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
@@ -52,7 +53,6 @@ import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
-import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -315,8 +315,11 @@ public class SIsland implements Island {
         builder.dirtyChunks.forEach(dirtyChunk -> {
             try {
                 WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dirtyChunk.getWorldName());
-                if (worldInfo != null)
-                    this.dirtyChunksContainer.markDirty(ChunkPosition.of(worldInfo, dirtyChunk.getX(), dirtyChunk.getZ()), false);
+                if (worldInfo != null) {
+                    try (ChunkPosition chunkPosition = ChunkPosition.of(worldInfo, dirtyChunk.getX(), dirtyChunk.getZ())) {
+                        this.dirtyChunksContainer.markDirty(chunkPosition, false);
+                    }
+                }
             } catch (IllegalStateException ignored) {
             }
         });
@@ -624,10 +627,12 @@ public class SIsland implements Island {
 
         plugin.getMenus().refreshIslandBannedPlayers(this);
 
-        Location location = superiorPlayer.getLocation();
-
-        if (location != null && isInside(location))
-            superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+        superiorPlayer.runIfOnline(player -> {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                if (isInside(player.getLocation(wrapper.getHandle())))
+                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+            }
+        });
 
         IslandsDatabaseBridge.addBannedPlayer(this,
                 superiorPlayer, whom == null ? CONSOLE_UUID : whom.getUniqueId(),
@@ -679,15 +684,17 @@ public class SIsland implements Island {
         if (!uncoopPlayer)
             return;
 
-        Location location = superiorPlayer.getLocation();
+        superiorPlayer.runIfOnline(player -> {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                if (isLocked() && isInside(player.getLocation(wrapper.getHandle()))) {
+                    MenuView<?, ?> openedView = superiorPlayer.getOpenedView();
+                    if (openedView != null)
+                        openedView.closeView();
 
-        if (isLocked() && location != null && isInside(location)) {
-            MenuView<?, ?> openedView = superiorPlayer.getOpenedView();
-            if (openedView != null)
-                openedView.closeView();
-
-            superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-        }
+                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                }
+            }
+        });
 
         plugin.getMenus().refreshCoops(this);
     }
@@ -1581,13 +1588,17 @@ public class SIsland implements Island {
 
         privilegeNode.setPermission(islandPrivilege, value);
 
-        if (superiorPlayer.isOnline() && isInside(superiorPlayer.getLocation())) {
-            if (islandPrivilege == IslandPrivileges.FLY) {
-                updateIslandFly(superiorPlayer);
-            } else if (islandPrivilege == IslandPrivileges.VILLAGER_TRADING) {
-                IslandUtils.updateTradingMenus(this, superiorPlayer);
+        superiorPlayer.runIfOnline(player -> {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                if (isInside(player.getLocation(wrapper.getHandle()))) {
+                    if (islandPrivilege == IslandPrivileges.FLY) {
+                        updateIslandFly(superiorPlayer);
+                    } else if (islandPrivilege == IslandPrivileges.VILLAGER_TRADING) {
+                        IslandUtils.updateTradingMenus(this, superiorPlayer);
+                    }
+                }
             }
-        }
+        });
 
         IslandsDatabaseBridge.savePlayerPermission(this, superiorPlayer, islandPrivilege, value);
 
@@ -1943,19 +1954,19 @@ public class SIsland implements Island {
                 WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, defaultWorldDimension);
                 Location centerBlock = getCenter(defaultWorldDimension);
 
-                ChunkPosition centerChunkPosition = ChunkPosition.of(worldInfo,
-                        centerBlock.getBlockX() >> 4, centerBlock.getBlockZ() >> 4);
-
-                return ChunksProvider.loadChunk(centerChunkPosition, ChunkLoadReason.BIOME_REQUEST, null)
-                        .thenApply(chunk -> centerBlock.getBlock().getBiome())
-                        .whenComplete((biome, error) -> {
-                            if (error != null)
-                                error.printStackTrace();
-                            else {
-                                this.biome = biome;
-                                biomeGetterTask.set((CompletableFuture<Biome>) null);
-                            }
-                        });
+                try (ChunkPosition centerChunkPosition = ChunkPosition.of(worldInfo,
+                        centerBlock.getBlockX() >> 4, centerBlock.getBlockZ() >> 4)) {
+                    return ChunksProvider.loadChunk(centerChunkPosition, ChunkLoadReason.BIOME_REQUEST, null)
+                            .thenApply(chunk -> centerBlock.getBlock().getBiome())
+                            .whenComplete((biome, error) -> {
+                                if (error != null)
+                                    error.printStackTrace();
+                                else {
+                                    this.biome = biome;
+                                    biomeGetterTask.set((CompletableFuture<Biome>) null);
+                                }
+                            });
+                }
             });
 
             return IslandUtils.getDefaultWorldBiome(plugin.getSettings().getWorlds().getDefaultWorldDimension());
@@ -2668,21 +2679,27 @@ public class SIsland implements Island {
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, worldName);
         Preconditions.checkArgument(worldInfo != null && isChunkInside(chunkX, chunkZ),
                 "Chunk must be within the island boundaries.");
-        return this.dirtyChunksContainer.isMarkedDirty(ChunkPosition.of(worldInfo, chunkX, chunkZ));
+        try (ChunkPosition chunkPosition = ChunkPosition.of(worldInfo, chunkX, chunkZ)) {
+            return this.dirtyChunksContainer.isMarkedDirty(chunkPosition);
+        }
     }
 
     @Override
     public void markChunkDirty(World world, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
-        this.dirtyChunksContainer.markDirty(ChunkPosition.of(WorldInfo.of(world), chunkX, chunkZ), save);
+        try (ChunkPosition chunkPosition = ChunkPosition.of(WorldInfo.of(world), chunkX, chunkZ)) {
+            this.dirtyChunksContainer.markDirty(chunkPosition, save);
+        }
     }
 
     @Override
     public void markChunkEmpty(World world, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
-        this.dirtyChunksContainer.markEmpty(ChunkPosition.of(WorldInfo.of(world), chunkX, chunkZ), save);
+        try (ChunkPosition chunkPosition = ChunkPosition.of(WorldInfo.of(world), chunkX, chunkZ)) {
+            this.dirtyChunksContainer.markEmpty(chunkPosition, save);
+        }
     }
 
     @Override

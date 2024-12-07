@@ -55,7 +55,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
 
         Preconditions.checkNotNull(defaultWorld, "Default world information cannot be null!");
 
-        this.islandsByPositions.put(IslandPosition.of(defaultWorld.getName(), center.getX(), center.getZ()), island);
+        this.islandsByPositions.put(IslandPosition.of(defaultWorld.getName(), center.getX(), center.getZ(), false), island);
 
         if (plugin.getProviders().hasCustomWorldsSupport()) {
             // We don't know the logic of the custom worlds support, therefore we add a position
@@ -83,7 +83,9 @@ public class DefaultIslandsContainer implements IslandsContainer {
 
         Preconditions.checkNotNull(defaultWorld, "Default world information cannot be null!");
 
-        this.islandsByPositions.remove(IslandPosition.of(defaultWorld.getName(), center.getX(), center.getZ()), island);
+        try (IslandPosition islandPosition = IslandPosition.of(defaultWorld.getName(), center.getX(), center.getZ())) {
+            this.islandsByPositions.remove(islandPosition, island);
+        }
 
         if (plugin.getProviders().hasCustomWorldsSupport()) {
             for (Dimension dimension : Dimension.values()) {
@@ -132,7 +134,10 @@ public class DefaultIslandsContainer implements IslandsContainer {
     @Nullable
     @Override
     public Island getIslandAt(Location location) {
-        Island island = this.islandsByPositions.get(IslandPosition.of(location));
+        Island island;
+        try (IslandPosition islandPosition = IslandPosition.of(location)) {
+            island = this.islandsByPositions.get(islandPosition);
+        }
         return island == null || !island.isInside(location) ? null : island;
     }
 
@@ -240,7 +245,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
                                     Dimension dimension, Consumer<IslandPosition> consumer) {
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
         if (worldInfo != null && !worldInfo.equals(defaultWorld))
-            consumer.accept(IslandPosition.of(worldInfo.getName(), center.getX(), center.getZ()));
+            consumer.accept(IslandPosition.of(worldInfo.getName(), center.getX(), center.getZ(), false));
     }
 
 }

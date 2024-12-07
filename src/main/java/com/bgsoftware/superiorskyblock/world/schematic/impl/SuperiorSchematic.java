@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -215,6 +216,11 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
         long placeProfiler = Profiler.start(ProfileType.SCHEMATIC_BLOCKS_PLACE, getName());
 
+        try {
+            Thread.sleep(TimeUnit.SECONDS.toMillis(10));
+        } catch (Throwable ignored) {
+        }
+
         VarintArray.Itr blockIdsIterator = new VarintArray(this.data.blockIds).iterator();
 
         for (int i = this.data.bitSet.nextSetBit(0); i >= 0; i = this.data.bitSet.nextSetBit(i + 1)) {
@@ -294,7 +300,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                     plugin.getEventsBus().callIslandSchematicPasteEvent(island, name, location);
 
                     Profiler.end(profiler);
-                    
+
                     synchronized (this) {
                         try {
                             prepareCallback(affectedChunks, min);

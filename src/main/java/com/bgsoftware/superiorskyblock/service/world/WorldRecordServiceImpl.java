@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.service.world.RecordResult;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -54,7 +55,9 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
     public RecordResult recordBlockPlace(Block block, int blockCount, @Nullable BlockState oldBlockState,
                                          @WorldRecordFlags int flags) {
         Preconditions.checkNotNull(block, "block cannot be null");
-        return recordBlockPlace(Keys.of(block), block.getLocation(), blockCount, oldBlockState, flags);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return recordBlockPlace(Keys.of(block), block.getLocation(wrapper.getHandle()), blockCount, oldBlockState, flags);
+        }
     }
 
     @Override
@@ -148,7 +151,9 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
     @Override
     public RecordResult recordBlockBreak(Block block, int blockCount, @WorldRecordFlags int flags) {
         Preconditions.checkNotNull(block, "block cannot be null");
-        return recordBlockBreak(Keys.of(block), block.getLocation(), blockCount, flags);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return recordBlockBreak(Keys.of(block), block.getLocation(wrapper.getHandle()), blockCount, flags);
+        }
     }
 
     @Override
@@ -250,7 +255,9 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
         if (BukkitEntities.canBypassEntityLimit(entity))
             return RecordResult.ENTITY_CANNOT_BE_TRACKED;
 
-        return recordEntitySpawnInternal(entity.getType(), entity.getLocation());
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return recordEntitySpawnInternal(entity.getType(), entity.getLocation(wrapper.getHandle()));
+        }
     }
 
     @Override
@@ -287,7 +294,10 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
         if (BukkitEntities.canBypassEntityLimit(entity))
             return RecordResult.ENTITY_CANNOT_BE_TRACKED;
 
-        RecordResult recordResult = recordEntityDespawnInternal(entity.getType(), entity.getLocation());
+        RecordResult recordResult;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            recordResult = recordEntityDespawnInternal(entity.getType(), entity.getLocation(wrapper.getHandle()));
+        }
         if (recordResult != RecordResult.SUCCESS)
             return recordResult;
 
@@ -297,7 +307,9 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
             } else {
                 // Vehicle was not registered by VehicleDestroyEvent; We want to register its block break
                 Key blockKey = plugin.getNMSAlgorithms().getMinecartBlock((Minecart) entity);
-                recordBlockBreak(blockKey, entity.getLocation(), 1, REGULAR_RECORD_FLAGS);
+                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                    recordBlockBreak(blockKey, entity.getLocation(wrapper.getHandle()), 1, REGULAR_RECORD_FLAGS);
+                }
             }
         }
 

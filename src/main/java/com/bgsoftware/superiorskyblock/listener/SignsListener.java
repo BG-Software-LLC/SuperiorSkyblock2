@@ -2,9 +2,11 @@ package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.signs.IslandSigns;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -32,7 +34,11 @@ public class SignsListener implements Listener {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         String[] signLines = e.getLines().clone();
 
-        IslandSigns.Result result = IslandSigns.handleSignPlace(superiorPlayer, e.getBlock().getLocation(), signLines, true);
+        IslandSigns.Result result;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            result = IslandSigns.handleSignPlace(superiorPlayer,
+                    e.getBlock().getLocation(wrapper.getHandle()), signLines, true);
+        }
         switch (result.getReason()) {
             case NOT_IN_ISLAND:
                 return;

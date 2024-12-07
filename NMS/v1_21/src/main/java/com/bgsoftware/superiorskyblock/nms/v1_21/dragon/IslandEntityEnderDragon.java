@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -48,8 +49,10 @@ public class IslandEntityEnderDragon extends EnderDragon {
         if (!(this.serverLevel.getDragonFight() instanceof EndWorldEndDragonFightHandler dragonBattleHandler))
             return;
 
-        Location entityLocation = getBukkitEntity().getLocation();
-        Island island = plugin.getGrid().getIslandAt(entityLocation);
+        Island island;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            island = plugin.getGrid().getIslandAt(getBukkitEntity().getLocation(wrapper.getHandle()));
+        }
 
         if (island == null)
             return;

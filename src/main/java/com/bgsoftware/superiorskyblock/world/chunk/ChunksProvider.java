@@ -40,10 +40,12 @@ public class ChunksProvider {
         Log.debug(Debug.LOAD_CHUNK, chunkPosition, chunkLoadReason);
 
         Chunk loadedChunk = ChunkPosition.getLoadedChunk(chunkPosition).orElse(null);
+
         if (loadedChunk != null) {
             processPendingChunkLoadRequest(loadedChunk, chunkPosition);
             if (onLoadConsumer != null)
                 onLoadConsumer.accept(loadedChunk);
+            chunkPosition.release();
             return CompletableFuture.completedFuture(loadedChunk);
         }
 
@@ -52,6 +54,7 @@ public class ChunksProvider {
         if (pendingRequest != null) {
             if (onLoadConsumer != null)
                 pendingRequest.callbacks.add(onLoadConsumer);
+            chunkPosition.release();
             return pendingRequest.completableFuture;
         } else {
             CompletableFuture<Chunk> completableFuture = new CompletableFuture<>();
@@ -60,8 +63,12 @@ public class ChunksProvider {
             if (onLoadConsumer != null)
                 chunkConsumers.add(onLoadConsumer);
 
-            pendingRequests.put(chunkPosition, new PendingChunkLoadRequest(completableFuture, chunkConsumers));
-            chunksExecutor.addWorker(new ChunkLoadWorker(chunkPosition, chunkLoadReason));
+            // Copy pool resource
+            ChunkPosition clonedChunkPos = chunkPosition.copy();
+            chunkPosition.release();
+
+            pendingRequests.put(clonedChunkPos, new PendingChunkLoadRequest(completableFuture, chunkConsumers));
+            chunksExecutor.addWorker(new ChunkLoadWorker(clonedChunkPos, chunkLoadReason));
 
             if (!chunksExecutor.isRunning())
                 start();

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -87,17 +88,25 @@ public class CmdAdminSetBlockAmount implements ISuperiorCommand {
         if (args.length == 3) {
             list = CommandTabCompletes.getWorlds(args[2]);
         } else if (sender instanceof Player) {
-            Location location = ((Player) sender).getLocation();
+            String blockX;
+            String blockY;
+            String blockZ;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location location = ((Player) sender).getLocation(wrapper.getHandle());
+                blockX = String.valueOf(location.getBlockX());
+                blockY = String.valueOf(location.getBlockY());
+                blockZ = String.valueOf(location.getBlockZ());
+            }
             if (args.length == 4) {
-                if ((location.getBlockX() + "").contains(args[3]))
-                    list.add(location.getBlockX() + "");
+                if (blockX.contains(args[3]))
+                    list.add(blockX);
             } else if (args.length == 5) {
-                if ((location.getBlockY() + "").contains(args[4]))
-                    list.add(location.getBlockY() + "");
+                if (blockY.contains(args[4]))
+                    list.add(blockY);
 
             } else if (args.length == 6) {
-                if ((location.getBlockZ() + "").contains(args[5]))
-                    list.add(location.getBlockZ() + "");
+                if (blockZ.contains(args[5]))
+                    list.add(blockZ);
             }
         }
 

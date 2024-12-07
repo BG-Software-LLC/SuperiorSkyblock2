@@ -153,12 +153,17 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public World getWorld() {
-        return npc.getLocation().getWorld();
+        return npc.getWorld();
     }
 
     @Override
     public Location getLocation() {
         return npc.getLocation();
+    }
+
+    @Override
+    public Location getLocation(Location location) {
+        return this.npc.getLocation(location);
     }
 
     @Override

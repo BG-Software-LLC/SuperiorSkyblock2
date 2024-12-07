@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Counter;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
@@ -129,7 +130,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         if (player.hasPlayerStatus(PlayerStatus.PVP_IMMUNED))
             return target ? HitActionResult.TARGET_PVP_WARMUP : HitActionResult.PVP_WARMUP;
 
-        Island standingIsland = plugin.getGrid().getIslandAt(player.getLocation());
+        Island standingIsland;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            standingIsland = plugin.getGrid().getIslandAt(player.getLocation(wrapper.getHandle()));
+        }
 
         if (standingIsland != null && (plugin.getSettings().getSpawn().isProtected() || !standingIsland.isSpawn())) {
             // Checks for pvp status
@@ -378,14 +382,25 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public World getWorld() {
-        Location location = getLocation();
-        return location == null ? null : location.getWorld();
+        Player player = asPlayer();
+        return player == null ? null : player.getWorld();
     }
 
     @Override
     public Location getLocation() {
         Player player = asPlayer();
         return player == null ? null : player.getLocation();
+    }
+
+    @Override
+    public Location getLocation(@Nullable Location location) {
+        if (location != null) {
+            Player player = asPlayer();
+            if (player != null)
+                player.getLocation(location);
+        }
+
+        return location;
     }
 
     @Override
@@ -455,7 +470,9 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public boolean isInsideIsland() {
         Player player = asPlayer();
         Island island = getIsland();
-        return player != null && island != null && island.isInside(player.getLocation());
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return player != null && island != null && island.isInside(player.getLocation(wrapper.getHandle()));
+        }
     }
 
     /*
@@ -769,8 +786,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setSchematicPos1(@Nullable Block block) {
-        Log.debug(Debug.SET_SCHEMATIC_POSITION, getName(), block == null ? "null" : block.getLocation());
-        this.schematicPos1 = block == null ? null : new SBlockPosition(block.getLocation());
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Log.debug(Debug.SET_SCHEMATIC_POSITION, getName(), block == null ? "null" : block.getLocation(wrapper.getHandle()));
+        }
+        this.schematicPos1 = block == null ? null : new SBlockPosition(block);
     }
 
     @Override
@@ -780,8 +799,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setSchematicPos2(@Nullable Block block) {
-        Log.debug(Debug.SET_SCHEMATIC_POSITION, getName(), block == null ? "null" : block.getLocation());
-        this.schematicPos2 = block == null ? null : new SBlockPosition(block.getLocation());
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Log.debug(Debug.SET_SCHEMATIC_POSITION, getName(), block == null ? "null" : block.getLocation(wrapper.getHandle()));
+        }
+        this.schematicPos2 = block == null ? null : new SBlockPosition(block);
     }
 
     /*

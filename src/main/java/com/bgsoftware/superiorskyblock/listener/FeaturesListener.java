@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
@@ -22,6 +23,7 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -125,7 +127,10 @@ public class FeaturesListener implements Listener {
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             return;
 
-        Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
+        Island island;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation(wrapper.getHandle()));
+        }
         if (island == null)
             return;
 
@@ -138,8 +143,10 @@ public class FeaturesListener implements Listener {
         PlayerHand usedItem = BukkitItems.getHand(e);
         BukkitItems.setHandItem(e.getPlayer(), usedItem, inHandItem.getAmount() == 0 ? null : inHandItem);
 
-        BukkitItems.addItem(new ItemStack(Material.LAVA_BUCKET), e.getPlayer().getInventory(),
-                e.getPlayer().getLocation());
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            BukkitItems.addItem(new ItemStack(Material.LAVA_BUCKET), e.getPlayer().getInventory(),
+                    e.getPlayer().getLocation(wrapper.getHandle()));
+        }
 
         island.handleBlockBreak(ConstantKeys.OBSIDIAN, 1);
 
@@ -158,7 +165,10 @@ public class FeaturesListener implements Listener {
         if (superiorPlayer.hasBypassModeEnabled())
             return;
 
-        Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
+        Island island;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation(wrapper.getHandle()));
+        }
 
         if (island == null || island.isSpawn() || !island.isVisitor(superiorPlayer, true))
             return;

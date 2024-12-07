@@ -2,7 +2,9 @@ package com.bgsoftware.superiorskyblock.island.warp;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -37,7 +39,9 @@ public class SignWarp {
 
             // Detected warp sign
             signBlock.setType(Material.AIR);
-            signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(Material.SIGN));
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                signBlock.getWorld().dropItemNaturally(signBlock.getLocation(wrapper.getHandle()), new ItemStack(Material.SIGN));
+            }
 
             Message.DELETE_WARP_SIGN_BROKE.send(commandSender);
         }

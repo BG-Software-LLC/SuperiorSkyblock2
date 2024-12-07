@@ -3,9 +3,11 @@ package com.bgsoftware.superiorskyblock.module.upgrades.type;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddEffect;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetEffect;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -46,7 +48,10 @@ public class UpgradeTypeIslandEffects implements IUpgradeType {
                     e.getCause() == EntityPotionEffectEvent.Cause.PLUGIN || e.getCause() == EntityPotionEffectEvent.Cause.BEACON)
                 return;
 
-            Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getEntity().getLocation(wrapper.getHandle()));
+            }
 
             if (island == null)
                 return;

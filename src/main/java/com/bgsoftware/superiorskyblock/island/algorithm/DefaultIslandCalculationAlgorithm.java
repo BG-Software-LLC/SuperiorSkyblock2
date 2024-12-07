@@ -76,8 +76,10 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
                     ChunkLoadReason.BLOCKS_RECALCULATE, plugin.getProviders()::takeSnapshots).forEach(completableFuture -> {
                 CompletableFuture<List<CalculatedChunk>> calculateCompletable = new CompletableFuture<>();
                 completableFuture.whenComplete((chunk, ex) -> {
-                    plugin.getNMSChunks().calculateChunks(Collections.singletonList(ChunkPosition.of(chunk)), CACHED_CALCULATED_CHUNKS)
-                            .whenComplete((pair, ex2) -> calculateCompletable.complete(pair));
+                    try (ChunkPosition chunkPosition = ChunkPosition.of(chunk)) {
+                        plugin.getNMSChunks().calculateChunks(Collections.singletonList(chunkPosition), CACHED_CALCULATED_CHUNKS)
+                                .whenComplete((pair, ex2) -> calculateCompletable.complete(pair));
+                    }
                 });
                 chunksToLoad.add(calculateCompletable);
             });

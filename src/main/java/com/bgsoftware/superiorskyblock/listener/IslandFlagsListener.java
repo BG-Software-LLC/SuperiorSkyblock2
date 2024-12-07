@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.listener;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
@@ -116,24 +117,28 @@ public class IslandFlagsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     private void onHangingBreakByEntity(HangingBreakByEntityEvent e) {
-        if (e.getCause() == HangingBreakEvent.RemoveCause.EXPLOSION) {
-            if (e.getRemover() instanceof Player) {
-                // Explosion was set by TNT.
-                if (preventAction(e.getEntity().getLocation(), IslandFlags.TNT_EXPLOSION)) {
-                    e.setCancelled(true);
-                    return;
-                }
-            } else if (e.getRemover() instanceof Ghast) {
-                // Explosion was set by TNT.
-                if (preventAction(e.getEntity().getLocation(), IslandFlags.GHAST_FIREBALL)) {
-                    e.setCancelled(true);
-                    return;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location entityLocation = e.getEntity().getLocation(wrapper.getHandle());
+
+            if (e.getCause() != HangingBreakEvent.RemoveCause.EXPLOSION) {
+                if (e.getRemover() instanceof Player) {
+                    // Explosion was set by TNT.
+                    if (preventAction(entityLocation, IslandFlags.TNT_EXPLOSION)) {
+                        e.setCancelled(true);
+                        return;
+                    }
+                } else if (e.getRemover() instanceof Ghast) {
+                    // Explosion was set by TNT.
+                    if (preventAction(entityLocation, IslandFlags.GHAST_FIREBALL)) {
+                        e.setCancelled(true);
+                        return;
+                    }
                 }
             }
-        }
 
-        if (preventEntityExplosion(e.getRemover(), e.getEntity().getLocation())) {
-            e.setCancelled(true);
+            if (preventEntityExplosion(e.getRemover(), entityLocation)) {
+                e.setCancelled(true);
+            }
         }
     }
 
@@ -145,8 +150,10 @@ public class IslandFlagsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     private void onEntityChangeBlock(EntityChangeBlockEvent e) {
-        if (preventEntityExplosion(e.getEntity(), e.getBlock().getLocation()))
-            e.setCancelled(true);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            if (preventEntityExplosion(e.getEntity(), e.getBlock().getLocation(wrapper.getHandle())))
+                e.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -193,14 +200,18 @@ public class IslandFlagsListener implements Listener {
     private void onBlockFlow(BlockFromToEvent e) {
         IslandFlag islandFlag = plugin.getNMSWorld().isWaterLogged(e.getBlock()) ?
                 IslandFlags.WATER_FLOW : IslandFlags.LAVA_FLOW;
-        if (preventAction(e.getToBlock().getLocation(), islandFlag))
-            e.setCancelled(true);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            if (preventAction(e.getToBlock().getLocation(wrapper.getHandle()), islandFlag))
+                e.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     private void onCropsGrowth(BlockGrowEvent e) {
-        if (preventAction(e.getBlock().getLocation(), IslandFlags.CROPS_GROWTH))
-            e.setCancelled(true);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            if (preventAction(e.getBlock().getLocation(wrapper.getHandle()), IslandFlags.CROPS_GROWTH))
+                e.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -211,29 +222,46 @@ public class IslandFlagsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     private void onFireSpread(BlockBurnEvent e) {
-        if (preventAction(e.getBlock().getLocation(), IslandFlags.FIRE_SPREAD))
-            e.setCancelled(true);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            if (preventAction(e.getBlock().getLocation(wrapper.getHandle()), IslandFlags.FIRE_SPREAD))
+                e.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     private void onBlockIgnite(BlockIgniteEvent e) {
-        if (e.getCause() == BlockIgniteEvent.IgniteCause.SPREAD && preventAction(e.getBlock().getLocation(), IslandFlags.FIRE_SPREAD))
-            e.setCancelled(true);
+        if (e.getCause() != BlockIgniteEvent.IgniteCause.SPREAD)
+            return;
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            if (preventAction(e.getBlock().getLocation(wrapper.getHandle()), IslandFlags.FIRE_SPREAD))
+                e.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     private void onEndermanGrief(EntityChangeBlockEvent e) {
-        if (e.getEntity() instanceof Enderman && preventAction(e.getBlock().getLocation(), IslandFlags.ENDERMAN_GRIEF))
-            e.setCancelled(true);
+        if (!(e.getEntity() instanceof Enderman))
+            return;
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            if (preventAction(e.getBlock().getLocation(wrapper.getHandle()), IslandFlags.ENDERMAN_GRIEF))
+                e.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     private void onEggLay(ItemSpawnEvent e) {
-        if (e.getEntity().getItemStack().getType() == Material.EGG && preventAction(e.getEntity().getLocation(), IslandFlags.EGG_LAY)) {
-            for (Entity entity : e.getEntity().getNearbyEntities(1, 1, 1)) {
-                if (entity instanceof Chicken) {
-                    e.setCancelled(true);
-                    return;
+        if (e.getEntity().getItemStack().getType() != Material.EGG)
+            return;
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            if (preventAction(e.getEntity().getLocation(wrapper.getHandle()), IslandFlags.EGG_LAY)) {
+                for (Entity entity : e.getEntity().getNearbyEntities(1, 1, 1)) {
+                    if (entity instanceof Chicken) {
+                        e.setCancelled(true);
+                        return;
+                    }
                 }
             }
         }
@@ -245,8 +273,10 @@ public class IslandFlagsListener implements Listener {
             return;
 
         BukkitEntities.getPlayerSource(e.getEntity()).ifPresent(shooterPlayer -> {
-            if (!preventAction(e.getEntity().getLocation(), IslandFlags.PVP))
-                return;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                if (!preventAction(e.getEntity().getLocation(wrapper.getHandle()), IslandFlags.PVP))
+                    return;
+            }
 
             List<Entity> nearbyEntities = e.getEntity().getNearbyEntities(2, 2, 2);
 

@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.service.portals.PortalsManagerService
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
@@ -77,7 +78,10 @@ public class PortalsListener implements Listener {
         //  - Using an end portal in the end
         //  - The target world is disabled
 
-        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+        Island island;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            island = plugin.getGrid().getIslandAt(e.getEntity().getLocation(wrapper.getHandle()));
+        }
 
         if (island == null)
             return;

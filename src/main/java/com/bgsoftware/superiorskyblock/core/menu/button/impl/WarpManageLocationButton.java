@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
@@ -29,15 +30,18 @@ public class WarpManageLocationButton extends AbstractMenuViewButton<MenuWarpMan
         Player player = (Player) clickEvent.getWhoClicked();
         IslandWarp islandWarp = menuView.getIslandWarp();
 
-        Location playerLocation = player.getLocation();
+        EventResult<Location> eventResult;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location playerLocation = player.getLocation(wrapper.getHandle());
 
-        if (!islandWarp.getIsland().isInsideRange(playerLocation)) {
-            Message.SET_WARP_OUTSIDE.send(player);
-            return;
+            if (!islandWarp.getIsland().isInsideRange(playerLocation)) {
+                Message.SET_WARP_OUTSIDE.send(player);
+                return;
+            }
+
+            eventResult = plugin.getEventsBus().callIslandChangeWarpLocationEvent(
+                    plugin.getPlayers().getSuperiorPlayer(player), islandWarp.getIsland(), islandWarp, playerLocation);
         }
-
-        EventResult<Location> eventResult = plugin.getEventsBus().callIslandChangeWarpLocationEvent(
-                plugin.getPlayers().getSuperiorPlayer(player), islandWarp.getIsland(), islandWarp, playerLocation);
 
         if (eventResult.isCancelled())
             return;

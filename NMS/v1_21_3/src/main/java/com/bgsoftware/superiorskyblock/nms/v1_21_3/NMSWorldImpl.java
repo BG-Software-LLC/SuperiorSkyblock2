@@ -405,7 +405,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public WorldEditSession createEditSession(World world) {
-        return new WorldEditSessionImpl(((CraftWorld) world).getHandle());
+        return WorldEditSessionImpl.obtain(((CraftWorld) world).getHandle());
     }
 
 }

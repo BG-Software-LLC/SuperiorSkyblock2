@@ -473,7 +473,11 @@ public class SpawnIsland implements Island {
 
         for (int x = minChunk.getX(); x <= maxChunk.getX(); x++) {
             for (int z = minChunk.getZ(); z <= maxChunk.getZ(); z++) {
-                if (!noEmptyChunks || this.dirtyChunksContainer.isMarkedDirty(ChunkPosition.of(this.spawnWorldInfo, x, z)))
+                boolean addChunk;
+                try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, x, z)) {
+                    addChunk = !noEmptyChunks || this.dirtyChunksContainer.isMarkedDirty(chunkPosition);
+                }
+                if (addChunk)
                     chunks.add(minChunk.getWorld().getChunkAt(x, z));
             }
         }
@@ -542,10 +546,13 @@ public class SpawnIsland implements Island {
 
         for (int chunkX = min.getBlockX() >> 4; chunkX <= max.getBlockX() >> 4; chunkX++) {
             for (int chunkZ = min.getBlockZ() >> 4; chunkZ <= max.getBlockZ() >> 4; chunkZ++) {
-                if (this.spawnWorld.isChunkLoaded(chunkX, chunkZ) && (!noEmptyChunks || this.dirtyChunksContainer.isMarkedDirty(
-                        ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)))) {
-                    chunks.add(this.spawnWorld.getChunkAt(chunkX, chunkZ));
+                boolean addChunk;
+                try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)) {
+                    addChunk = this.spawnWorld.isChunkLoaded(chunkX, chunkZ) &&
+                            (!noEmptyChunks || this.dirtyChunksContainer.isMarkedDirty(chunkPosition));
                 }
+                if (addChunk)
+                    chunks.add(this.spawnWorld.getChunkAt(chunkX, chunkZ));
             }
         }
 
@@ -1350,7 +1357,9 @@ public class SpawnIsland implements Island {
     public boolean isChunkDirty(World world, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
-        return this.dirtyChunksContainer.isMarkedDirty(ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ));
+        try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)) {
+            return this.dirtyChunksContainer.isMarkedDirty(chunkPosition);
+        }
     }
 
     @Override
@@ -1358,21 +1367,27 @@ public class SpawnIsland implements Island {
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null.");
         Preconditions.checkArgument(this.spawnWorldInfo.getName().equals(worldName) && isChunkInside(chunkX, chunkZ),
                 "Chunk must be within the island boundaries.");
-        return this.dirtyChunksContainer.isMarkedDirty(ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ));
+        try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)) {
+            return this.dirtyChunksContainer.isMarkedDirty(chunkPosition);
+        }
     }
 
     @Override
     public void markChunkDirty(World world, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
-        this.dirtyChunksContainer.markDirty(ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ), save);
+        try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)) {
+            this.dirtyChunksContainer.markDirty(chunkPosition, save);
+        }
     }
 
     @Override
     public void markChunkEmpty(World world, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
-        this.dirtyChunksContainer.markEmpty(ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ), save);
+        try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)) {
+            this.dirtyChunksContainer.markEmpty(chunkPosition, save);
+        }
     }
 
     @Override

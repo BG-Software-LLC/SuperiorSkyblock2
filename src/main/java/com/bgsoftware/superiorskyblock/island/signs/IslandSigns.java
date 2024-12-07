@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -31,9 +32,11 @@ public class IslandSigns {
         if (island == null)
             return new Result(Reason.NOT_IN_ISLAND, false);
 
-        Location playerLocation = superiorPlayer.getLocation();
-        if (playerLocation != null)
-            warpLocation.setYaw(playerLocation.getYaw());
+        superiorPlayer.runIfOnline(player -> {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                warpLocation.setYaw(player.getLocation(wrapper.getHandle()).getYaw());
+            }
+        });
 
         if (isWarpSign(warpLines[0])) {
             Reason reason = handleWarpSignPlace(superiorPlayer, island, warpLocation, warpLines, sendMessage);

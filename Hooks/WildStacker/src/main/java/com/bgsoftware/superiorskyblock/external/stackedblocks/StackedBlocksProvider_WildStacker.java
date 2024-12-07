@@ -73,7 +73,11 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
     @Override
     public Collection<Pair<Key, Integer>> getBlocks(World world, int chunkX, int chunkZ) {
-        StackedSnapshot stackedSnapshot = WildStackerSnapshotsContainer.getSnapshot(ChunkPosition.of(world, chunkX, chunkZ));
+        StackedSnapshot stackedSnapshot;
+
+        try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ)) {
+            stackedSnapshot = WildStackerSnapshotsContainer.getSnapshot(chunkPosition);
+        }
 
         try {
             return stackedSnapshot.getAllBarrelsItems().values().stream()
@@ -94,7 +98,9 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
     @Override
     public void releaseSnapshot(World world, int chunkX, int chunkZ) {
-        WildStackerSnapshotsContainer.releaseSnapshot(ChunkPosition.of(world, chunkX, chunkZ));
+        try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ)) {
+            WildStackerSnapshotsContainer.releaseSnapshot(chunkPosition);
+        }
     }
 
     @SuppressWarnings("unused")
