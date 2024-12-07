@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.collections;
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.MutableChunkPosition;
 import com.bgsoftware.superiorskyblock.core.WorldInfoImpl;
 import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 
@@ -190,12 +191,19 @@ public class Chunk2ObjectMap<V> extends AbstractMap<ChunkPosition, V> {
 
         private class KeySetItr extends Itr<ChunkPosition> {
 
+            private final MutableChunkPosition mutableChunkPosition = new MutableChunkPosition();
+            private WorldInfoImpl cachedWorldInfo = null;
+
             @Override
             protected ChunkPosition getNext() {
-                return ChunkPosition.of(new WorldInfoImpl(this.currWorld, null),
-                        getChunkXFromPair(this.currChunk), getChunkZFromPair(this.currChunk));
+                return this.mutableChunkPosition.reset(this.cachedWorldInfo, getChunkXFromPair(this.currChunk),
+                        getChunkZFromPair(this.currChunk));
             }
 
+            @Override
+            protected void onWorldChange() {
+                this.cachedWorldInfo = new WorldInfoImpl(this.currWorld, null);
+            }
         }
 
     }
@@ -278,22 +286,36 @@ public class Chunk2ObjectMap<V> extends AbstractMap<ChunkPosition, V> {
 
         private class EntrySetItr extends Itr<Entry<ChunkPosition, V>> {
 
+            private final MutableChunkPosition mutableChunkPosition = new MutableChunkPosition();
+            private final EntryImpl mutableEntry = new EntryImpl();
+            private WorldInfoImpl cachedWorldInfo = null;
+
             @Override
             protected Entry<ChunkPosition, V> getNext() {
-                return new EntryImpl(ChunkPosition.of(
-                        new WorldInfoImpl(this.currWorld, null),
-                        getChunkXFromPair(this.currChunk), getChunkZFromPair(this.currChunk)), this.currValue);
+                return mutableEntry.reset(
+                        this.mutableChunkPosition.reset(this.cachedWorldInfo,
+                                getChunkXFromPair(this.currChunk), getChunkZFromPair(this.currChunk)),
+                        this.currValue);
+            }
+
+            @Override
+            protected void onWorldChange() {
+                this.cachedWorldInfo = new WorldInfoImpl(this.currWorld, null);
             }
 
             private class EntryImpl implements Entry<ChunkPosition, V> {
 
-                private final ChunkPosition chunkPosition;
+                private ChunkPosition chunkPosition;
                 private V cachedValue;
 
+                EntryImpl() {
 
-                EntryImpl(ChunkPosition chunkPosition, V value) {
+                }
+
+                EntryImpl reset(ChunkPosition chunkPosition, V value) {
                     this.chunkPosition = chunkPosition;
                     this.cachedValue = value;
+                    return this;
                 }
 
                 @Override
@@ -351,6 +373,7 @@ public class Chunk2ObjectMap<V> extends AbstractMap<ChunkPosition, V> {
                 Entry<String, Long2ObjectMapView<V>> nextWorld = this.worldsIterator.next();
                 this.currWorldIterator = nextWorld.getValue().entryIterator();
                 this.currWorld = nextWorld.getKey();
+                onWorldChange();
             }
 
             Long2ObjectMapView.Entry<V> nextChunk = this.currWorldIterator.next();
@@ -358,6 +381,10 @@ public class Chunk2ObjectMap<V> extends AbstractMap<ChunkPosition, V> {
             this.currValue = nextChunk.getValue();
 
             return getNext();
+        }
+
+        protected void onWorldChange() {
+
         }
 
         protected abstract T getNext();

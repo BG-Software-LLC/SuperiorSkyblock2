@@ -25,6 +25,10 @@ public class SBlockPosition implements BlockPosition {
         this(LazyWorldLocation.getWorldName(location), location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
+    public SBlockPosition(Block block) {
+        this(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
+    }
+
     public SBlockPosition(String worldName, int x, int y, int z) {
         this.worldName = worldName;
         this.x = x;

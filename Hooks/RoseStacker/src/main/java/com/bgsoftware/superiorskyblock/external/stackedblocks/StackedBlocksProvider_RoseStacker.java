@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.google.common.base.Preconditions;
@@ -58,16 +59,22 @@ public class StackedBlocksProvider_RoseStacker implements StackedBlocksProvider_
         if (!Bukkit.isPrimaryThread())
             return null;
 
-        ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ);
-
         Map<Key, Integer> blockKeys = new HashMap<>();
-        RoseStackerAPI.getInstance().getStackedBlocks().entrySet().stream()
-                .filter(entry -> chunkPosition.isInsideChunk(entry.getKey().getLocation()))
-                .forEach(entry -> {
-                    Key blockKey = Key.of(entry.getKey());
-                    blockKeys.put(blockKey, blockKeys.getOrDefault(blockKey, 0) + entry.getValue().getStackSize());
-                });
-        return blockKeys.entrySet().stream().map(entry -> new Pair<>(entry.getKey(), entry.getValue())).collect(Collectors.toSet());
+
+        try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ);
+             ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            RoseStackerAPI.getInstance().getStackedBlocks().entrySet().stream()
+                    .filter(entry ->
+                            chunkPosition.isInsideChunk(entry.getKey().getLocation(wrapper.getHandle())))
+                    .forEach(entry -> {
+                        Key blockKey = Key.of(entry.getKey());
+                        blockKeys.put(blockKey, blockKeys.getOrDefault(blockKey, 0) + entry.getValue().getStackSize());
+                    });
+        }
+
+        return blockKeys.entrySet().stream()
+                .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toSet());
     }
 
     private class StackerListener implements Listener {

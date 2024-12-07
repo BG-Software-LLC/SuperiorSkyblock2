@@ -3,10 +3,12 @@ package com.bgsoftware.superiorskyblock.module.upgrades.type;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddMobDrops;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetMobDrops;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -65,7 +67,10 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
             if (livingEntity.getHealth() - e.getFinalDamage() > 0)
                 return;
 
-            Island island = plugin.getGrid().getIslandAt(livingEntity.getLocation());
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(livingEntity.getLocation(wrapper.getHandle()));
+            }
             if (island == null)
                 return;
 
@@ -77,7 +82,10 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
             if (!canDupeDropsForEntity(e.getEntity()))
                 return;
 
-            Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getEntity().getLocation(wrapper.getHandle()));
+            }
             if (island == null)
                 return;
 

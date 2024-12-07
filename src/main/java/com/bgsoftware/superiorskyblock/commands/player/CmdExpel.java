@@ -7,9 +7,11 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -78,7 +80,10 @@ public class CmdExpel implements IPermissibleCommand {
             return;
         }
 
-        Island targetIsland = plugin.getGrid().getIslandAt(target.getLocation());
+        Island targetIsland;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            targetIsland = plugin.getGrid().getIslandAt(target.getLocation(wrapper.getHandle()));
+        }
 
         if (targetIsland == null) {
             Message.PLAYER_NOT_INSIDE_ISLAND.send(sender);
@@ -99,18 +104,26 @@ public class CmdExpel implements IPermissibleCommand {
         }
 
         targetPlayer.teleport(plugin.getGrid().getSpawnIsland());
-        target.getLocation().setDirection(plugin.getGrid().getSpawnIsland()
-                .getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension()).getDirection());
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            target.getLocation(wrapper.getHandle()).setDirection(plugin.getGrid().getSpawnIsland()
+                    .getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension()).getDirection());
+        }
         Message.EXPELLED_PLAYER.send(sender, targetPlayer.getName());
         Message.GOT_EXPELLED.send(targetPlayer, sender.getName());
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        return args.length != 2 ? Collections.emptyList() : island != null ?
-                CommandTabCompletes.getIslandVisitors(island, args[1], plugin.getSettings().isTabCompleteHideVanished()) :
-                CommandTabCompletes.getOnlinePlayers(plugin, args[1], plugin.getSettings().isTabCompleteHideVanished(),
-                        onlinePlayer -> plugin.getGrid().getIslandAt(onlinePlayer.getLocation()) != null);
+        if (args.length != 2)
+            return Collections.emptyList();
+
+        if (island != null)
+            return CommandTabCompletes.getIslandVisitors(island, args[1], plugin.getSettings().isTabCompleteHideVanished());
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return CommandTabCompletes.getOnlinePlayers(plugin, args[1], plugin.getSettings().isTabCompleteHideVanished(),
+                    onlinePlayer -> plugin.getGrid().getIslandAt(onlinePlayer.getLocation(wrapper.getHandle())) != null);
+        }
     }
 
 }

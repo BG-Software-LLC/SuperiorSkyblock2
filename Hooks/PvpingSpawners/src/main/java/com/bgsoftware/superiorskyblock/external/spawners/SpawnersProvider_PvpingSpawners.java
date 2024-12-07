@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.external.spawners;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -51,16 +52,23 @@ public class SpawnersProvider_PvpingSpawners implements SpawnersProviderItemMeta
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerStack(SpawnerStackEvent e) {
-            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
-            if (island != null)
-                island.handleBlockPlace(e.getSpawner().getLocation().getBlock(), e.getSpawnerAmount());
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location spawnerLocation = e.getSpawner().getLocation(wrapper.getHandle());
+                island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation(spawnerLocation));
+                if (island != null)
+                    island.handleBlockPlace(spawnerLocation.getBlock(), e.getSpawnerAmount());
+            }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerUnstack(SpawnerUnstackEvent e) {
-            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
-            if (island != null)
-                island.handleBlockBreak(e.getSpawner().getLocation().getBlock(), e.getSpawnerAmount());
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location spawnerLocation = e.getSpawner().getLocation(wrapper.getHandle());
+                Island island = plugin.getGrid().getIslandAt(spawnerLocation);
+                if (island != null)
+                    island.handleBlockBreak(spawnerLocation.getBlock(), e.getSpawnerAmount());
+            }
         }
 
     }

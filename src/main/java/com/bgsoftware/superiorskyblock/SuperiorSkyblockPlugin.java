@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.config.SettingsManagerImpl;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PluginLoadingStage;
 import com.bgsoftware.superiorskyblock.core.PluginReloadReason;
 import com.bgsoftware.superiorskyblock.core.database.DataManager;
@@ -81,6 +82,7 @@ import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -289,26 +291,29 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             }
 
             BukkitExecutor.sync(() -> {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
-                    superiorPlayer.updateLastTimeStatus();
-                    Island island = gridHandler.getIslandAt(superiorPlayer.getLocation());
-                    Island playerIsland = superiorPlayer.getIsland();
+                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
+                        superiorPlayer.updateLastTimeStatus();
 
-                    if (superiorPlayer.hasIslandFlyEnabled()) {
-                        if (island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
-                            player.setAllowFlight(true);
-                            player.setFlying(true);
-                        } else {
-                            superiorPlayer.toggleIslandFly();
+                        Island island = gridHandler.getIslandAt(player.getLocation(wrapper.getHandle()));
+                        Island playerIsland = superiorPlayer.getIsland();
+
+                        if (superiorPlayer.hasIslandFlyEnabled()) {
+                            if (island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
+                                player.setAllowFlight(true);
+                                player.setFlying(true);
+                            } else {
+                                superiorPlayer.toggleIslandFly();
+                            }
                         }
+
+                        if (playerIsland != null)
+                            playerIsland.setCurrentlyActive(true);
+
+                        if (island != null)
+                            island.setPlayerInside(superiorPlayer, true);
                     }
-
-                    if (playerIsland != null)
-                        playerIsland.setCurrentlyActive(true);
-
-                    if (island != null)
-                        island.setPlayerInside(superiorPlayer, true);
                 }
             }, 1L);
 
@@ -484,11 +489,13 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_MODULE_DATA_LOAD, reloadReason == PluginReloadReason.COMMAND);
 
         BukkitExecutor.sync(() -> {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
-                Island island = gridHandler.getIslandAt(player.getLocation());
-                superiorPlayer.updateWorldBorder(island);
-                if (island != null) island.applyEffects(superiorPlayer);
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
+                    Island island = gridHandler.getIslandAt(player.getLocation(wrapper.getHandle()));
+                    superiorPlayer.updateWorldBorder(island);
+                    if (island != null) island.applyEffects(superiorPlayer);
+                }
             }
         });
 

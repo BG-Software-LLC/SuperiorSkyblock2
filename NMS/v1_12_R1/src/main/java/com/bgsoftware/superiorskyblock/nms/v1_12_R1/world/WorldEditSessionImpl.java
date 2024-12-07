@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.ObjectsPool;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.collections.view.LongIterator;
@@ -38,10 +39,13 @@ import org.bukkit.craftbukkit.v1_12_R1.generator.CustomChunkGenerator;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 public class WorldEditSessionImpl implements WorldEditSession {
+
+    private static final ObjectsPool<WorldEditSessionImpl> POOL = new ObjectsPool<>(WorldEditSessionImpl::new);
 
     private static final ReflectMethod<Void> TILE_ENTITY_LOAD = new ReflectMethod<>(TileEntity.class, "a", NBTTagCompound.class);
 
@@ -51,12 +55,20 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private final List<Pair<BlockPosition, IBlockData>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPosition, CompoundTag>> blockEntities = new LinkedList<>();
     private final List<BlockPosition> lights = new LinkedList<>();
-    private final WorldServer worldServer;
-    private final Dimension dimension;
+    private WorldServer worldServer;
+    private Dimension dimension;
 
-    public WorldEditSessionImpl(WorldServer worldServer) {
+    public static WorldEditSessionImpl obtain(WorldServer worldServer) {
+        return POOL.obtain().initialize(worldServer);
+    }
+
+    private WorldEditSessionImpl() {
+    }
+
+    public WorldEditSessionImpl initialize(WorldServer worldServer) {
         this.worldServer = worldServer;
         this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(worldServer.getWorld());
+        return this;
     }
 
     @Override
@@ -96,13 +108,17 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     @Override
     public List<ChunkPosition> getAffectedChunks() {
+        if (chunks.isEmpty())
+            return Collections.emptyList();
+
         List<ChunkPosition> chunkPositions = new LinkedList<>();
         World bukkitWorld = worldServer.getWorld();
         LongIterator iterator = chunks.keyIterator();
         while (iterator.hasNext()) {
             long chunkKey = iterator.next();
-            ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair((int) chunkKey, (int) (chunkKey >> 32));
-            chunkPositions.add(ChunkPosition.of(bukkitWorld, chunkCoord.x, chunkCoord.z));
+            int chunkX = (int) chunkKey;
+            int chunkZ = (int) (chunkKey >> 32);
+            chunkPositions.add(ChunkPosition.of(bukkitWorld, chunkX, chunkZ, false));
         }
         return chunkPositions;
     }
@@ -172,6 +188,19 @@ public class WorldEditSessionImpl implements WorldEditSession {
                 }
             }, 5L);
         }
+
+        release();
+    }
+
+    @Override
+    public void release() {
+        this.chunks.clear();
+        this.blocksToUpdate.clear();
+        this.blockEntities.clear();
+        this.lights.clear();
+        this.worldServer = null;
+        this.dimension = null;
+        POOL.release(this);
     }
 
     private boolean isValidPosition(BlockPosition blockPosition) {

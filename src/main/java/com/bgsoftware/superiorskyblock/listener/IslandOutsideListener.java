@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.listener;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -36,11 +37,13 @@ public class IslandOutsideListener implements Listener {
         if (superiorPlayer.hasBypassModeEnabled())
             return;
 
-        Location entityLocation = e.getRightClicked().getLocation();
-        Island entityIsland = plugin.getGrid().getIslandAt(entityLocation);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location entityLocation = e.getRightClicked().getLocation(wrapper.getHandle());
+            Island entityIsland = plugin.getGrid().getIslandAt(entityLocation);
 
-        if (entityIsland != null && entityIsland.isInsideRange(entityLocation, 1D))
-            return;
+            if (entityIsland != null && entityIsland.isInsideRange(entityLocation, 1D))
+                return;
+        }
 
         e.setCancelled(true);
     }
@@ -56,11 +59,13 @@ public class IslandOutsideListener implements Listener {
         if (e.getEntered() instanceof Player && plugin.getPlayers().getSuperiorPlayer(e.getEntered()).hasBypassModeEnabled())
             return;
 
-        Location vehicleLocation = e.getVehicle().getLocation();
-        Island entityIsland = plugin.getGrid().getIslandAt(vehicleLocation);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location vehicleLocation = e.getVehicle().getLocation(wrapper.getHandle());
+            Island entityIsland = plugin.getGrid().getIslandAt(vehicleLocation);
 
-        if (entityIsland != null && entityIsland.isInsideRange(vehicleLocation, 1D))
-            return;
+            if (entityIsland != null && entityIsland.isInsideRange(vehicleLocation, 1D))
+                return;
+        }
 
         e.setCancelled(true);
     }

@@ -84,7 +84,7 @@ public class StackedBlock {
         }
 
         if (hologram == null)
-            hologram = hologramsService.get().createHologram(getLocation().add(0.5, 1, 0.5));
+            hologram = hologramsService.get().createHologram(location.add(0.5, 1, 0.5));
 
         hologram.setHologramName(plugin.getSettings().getStackedBlocks().getCustomName()
                 .replace("{0}", String.valueOf(amount))

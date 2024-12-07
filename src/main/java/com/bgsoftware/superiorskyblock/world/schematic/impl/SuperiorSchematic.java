@@ -294,7 +294,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                     plugin.getEventsBus().callIslandSchematicPasteEvent(island, name, location);
 
                     Profiler.end(profiler);
-                    
+
                     synchronized (this) {
                         try {
                             prepareCallback(affectedChunks, min);

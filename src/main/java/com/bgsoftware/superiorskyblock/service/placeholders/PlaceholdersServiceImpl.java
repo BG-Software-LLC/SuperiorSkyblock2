@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.service.placeholders.IslandPlaceholde
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlayerPlaceholderParser;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -21,6 +22,7 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.google.common.collect.ImmutableMap;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 
 import java.time.Duration;
@@ -256,8 +258,14 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 IslandPlaceholderParser customIslandParser = CUSTOM_ISLAND_PARSERS.get(
                         isLocationPlaceholder ? placeholder.substring(9) : placeholder);
                 if (customIslandParser != null) {
-                    Island island = isLocationPlaceholder ? plugin.getGrid().getIslandAt(superiorPlayer.getLocation()) :
-                            superiorPlayer.getIsland();
+                    Island island;
+                    if (isLocationPlaceholder) {
+                        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                            island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation(wrapper.getHandle()));
+                        }
+                    } else {
+                        island = superiorPlayer.getIsland();
+                    }
                     placeholderResult = Optional.ofNullable(customIslandParser.apply(island, superiorPlayer));
                 }
             }
@@ -269,8 +277,16 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 placeholderResult = parsePlaceholdersForPlayer(superiorPlayer, subPlaceholder);
             } else if ((matcher = ISLAND_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                 String subPlaceholder = matcher.group(1).toLowerCase(Locale.ENGLISH);
-                Island island = superiorPlayer == null ? null : subPlaceholder.startsWith("location_") ?
-                        plugin.getGrid().getIslandAt(superiorPlayer.getLocation()) : superiorPlayer.getIsland();
+                Island island;
+                if (superiorPlayer == null) {
+                    island = null;
+                } else if (subPlaceholder.startsWith("location_")) {
+                    try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                        island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation(wrapper.getHandle()));
+                    }
+                } else {
+                    island = superiorPlayer.getIsland();
+                }
                 placeholderResult = parsePlaceholdersForIsland(island, superiorPlayer,
                         placeholder.replace("location_", ""),
                         subPlaceholder.replace("location_", ""));

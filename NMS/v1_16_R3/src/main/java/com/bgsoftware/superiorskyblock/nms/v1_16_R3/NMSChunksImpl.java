@@ -239,7 +239,8 @@ public class NMSChunksImpl implements NMSChunks {
         NMSUtils.runActionOnChunks(chunkPositionsToCalculate, false, new NMSUtils.ChunkCallback() {
             @Override
             public void onLoadedChunk(Chunk chunk) {
-                ChunkPosition chunkPosition = ChunkPosition.of(chunk.getWorld().getWorld(), chunk.getPos().x, chunk.getPos().z);
+                ChunkPosition chunkPosition = ChunkPosition.of(chunk.getWorld().getWorld(),
+                        chunk.getPos().x, chunk.getPos().z, false);
                 allCalculatedChunks.add(calculateChunk(chunkPosition, chunk.getSections()));
             }
 

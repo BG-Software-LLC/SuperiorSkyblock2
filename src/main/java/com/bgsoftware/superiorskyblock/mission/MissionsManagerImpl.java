@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Either;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
@@ -28,6 +29,7 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -328,8 +330,11 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                         .replaceAll("{2}", getIslandPlaceholder(missionsHolder))
                         .build();
                 toGive.setAmount(itemStack.getAmount());
-                BukkitExecutor.ensureMain(() -> superiorPlayer.runIfOnline(player ->
-                        BukkitItems.addItem(toGive, player.getInventory(), player.getLocation())));
+                BukkitExecutor.ensureMain(() -> superiorPlayer.runIfOnline(player -> {
+                    try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                        BukkitItems.addItem(toGive, player.getInventory(), player.getLocation(wrapper.getHandle()));
+                    }
+                }));
             }
 
             BukkitExecutor.ensureMain(() -> {

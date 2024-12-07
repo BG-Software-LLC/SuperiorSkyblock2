@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
@@ -22,6 +23,7 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.event.inventory.InventoryType;
@@ -85,7 +87,7 @@ public class IslandUtils {
         for (int x = min.getX() >> 4; x <= max.getX() >> 4; x++) {
             for (int z = min.getZ() >> 4; z <= max.getZ() >> 4; z++) {
                 if (!noEmptyChunks || island.isChunkDirty(worldInfo.getName(), x, z)) {
-                    chunkCoords.add(ChunkPosition.of(worldInfo, x, z));
+                    chunkCoords.add(ChunkPosition.of(worldInfo, x, z, false));
                 }
             }
         }
@@ -274,8 +276,10 @@ public class IslandUtils {
             return false;
 
         superiorPlayer.setBorderColor(borderColor);
-        plugin.getNMSWorld().setWorldBorder(superiorPlayer,
-                plugin.getGrid().getIslandAt(superiorPlayer.getLocation()));
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            plugin.getNMSWorld().setWorldBorder(superiorPlayer,
+                    plugin.getGrid().getIslandAt(superiorPlayer.getLocation(wrapper.getHandle())));
+        }
 
         Message.BORDER_PLAYER_COLOR_UPDATED.send(superiorPlayer,
                 Formatters.BORDER_COLOR_FORMATTER.format(borderColor, superiorPlayer.getUserLocale()));

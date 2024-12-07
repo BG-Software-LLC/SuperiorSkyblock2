@@ -57,7 +57,10 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
 
     @Override
     public Pair<Integer, String> getSpawner(Location location) {
-        StackedSnapshot cachedSnapshot = WildStackerSnapshotsContainer.getSnapshot(ChunkPosition.of(location));
+        StackedSnapshot cachedSnapshot;
+        try (ChunkPosition chunkPosition = ChunkPosition.of(location)) {
+            cachedSnapshot = WildStackerSnapshotsContainer.getSnapshot(chunkPosition);
+        }
         Map.Entry<Integer, EntityType> entry = cachedSnapshot.getStackedSpawner(location);
         return new Pair<>(entry.getKey(), entry.getValue() + "");
     }
@@ -69,7 +72,9 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
 
     @Override
     public void releaseSnapshot(World world, int chunkX, int chunkZ) {
-        WildStackerSnapshotsContainer.releaseSnapshot(ChunkPosition.of(world, chunkX, chunkZ));
+        try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ)) {
+            WildStackerSnapshotsContainer.releaseSnapshot(chunkPosition);
+        }
     }
 
     @SuppressWarnings("unused")

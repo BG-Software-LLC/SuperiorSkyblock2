@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Either;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
@@ -107,54 +108,56 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
     public InteractionResult handleStackedBlockBreak(Block block, @Nullable SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(block, "block cannot be null");
 
-        Location blockLocation = block.getLocation();
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location blockLocation = block.getLocation(wrapper.getHandle());
 
-        int blockAmount = plugin.getStackedBlocks().getStackedBlockAmount(blockLocation);
-        if (blockAmount <= 1)
-            return InteractionResult.NOT_STACKED_BLOCK;
+            int blockAmount = plugin.getStackedBlocks().getStackedBlockAmount(blockLocation);
+            if (blockAmount <= 1)
+                return InteractionResult.NOT_STACKED_BLOCK;
 
-        Island island = plugin.getGrid().getIslandAt(blockLocation);
-        if (superiorPlayer != null && island != null) {
-            com.bgsoftware.superiorskyblock.api.service.region.InteractionResult interactionResult =
-                    this.regionManagerService.get().handleBlockBreak(superiorPlayer, block);
-            if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
-                return InteractionResult.STACKED_BLOCK_PROTECTED;
-        }
+            Island island = plugin.getGrid().getIslandAt(blockLocation);
+            if (superiorPlayer != null && island != null) {
+                com.bgsoftware.superiorskyblock.api.service.region.InteractionResult interactionResult =
+                        this.regionManagerService.get().handleBlockBreak(superiorPlayer, block);
+                if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
+                    return InteractionResult.STACKED_BLOCK_PROTECTED;
+            }
 
-        Player onlinePlayer = superiorPlayer == null ? null : superiorPlayer.asPlayer();
+            Player onlinePlayer = superiorPlayer == null ? null : superiorPlayer.asPlayer();
 
-        int amountToBreak = Math.min(blockAmount, onlinePlayer != null && onlinePlayer.isSneaking() ? 64 : 1);
+            int amountToBreak = Math.min(blockAmount, onlinePlayer != null && onlinePlayer.isSneaking() ? 64 : 1);
 
-        int leftAmount = blockAmount - amountToBreak;
+            int leftAmount = blockAmount - amountToBreak;
 
-        if (!plugin.getEventsBus().callBlockUnstackEvent(block, onlinePlayer, blockAmount, leftAmount))
-            return InteractionResult.EVENT_CANCELLED;
+            if (!plugin.getEventsBus().callBlockUnstackEvent(block, onlinePlayer, blockAmount, leftAmount))
+                return InteractionResult.EVENT_CANCELLED;
 
-        if (!plugin.getStackedBlocks().setStackedBlock(block, leftAmount))
-            return InteractionResult.GLITCHED_STACKED_BLOCK;
+            if (!plugin.getStackedBlocks().setStackedBlock(block, leftAmount))
+                return InteractionResult.GLITCHED_STACKED_BLOCK;
 
-        plugin.getNMSWorld().playBreakAnimation(block);
+            plugin.getNMSWorld().playBreakAnimation(block);
 
-        if (superiorPlayer != null) {
-            OfflinePlayer offlinePlayer = onlinePlayer == null ? superiorPlayer.asOfflinePlayer() : onlinePlayer;
-            plugin.getProviders().notifyStackedBlocksListeners(offlinePlayer, block, IStackedBlocksListener.Action.BLOCK_BREAK);
-        }
+            if (superiorPlayer != null) {
+                OfflinePlayer offlinePlayer = onlinePlayer == null ? superiorPlayer.asOfflinePlayer() : onlinePlayer;
+                plugin.getProviders().notifyStackedBlocksListeners(offlinePlayer, block, IStackedBlocksListener.Action.BLOCK_BREAK);
+            }
 
-        if (island != null)
-            island.handleBlockBreak(block, amountToBreak);
+            if (island != null)
+                island.handleBlockBreak(block, amountToBreak);
 
-        ItemStack blockItem = ServerVersion.isLegacy() ?
-                block.getState().getData().toItemStack(amountToBreak) :
-                new ItemStack(block.getType(), amountToBreak);
+            ItemStack blockItem = ServerVersion.isLegacy() ?
+                    block.getState().getData().toItemStack(amountToBreak) :
+                    new ItemStack(block.getType(), amountToBreak);
 
-        if (leftAmount <= 0)
-            block.setType(Material.AIR);
+            if (leftAmount <= 0)
+                block.setType(Material.AIR);
 
-        // Dropping the item
-        if (onlinePlayer != null && plugin.getSettings().getStackedBlocks().isAutoCollect()) {
-            BukkitItems.addItem(blockItem, onlinePlayer.getInventory(), blockLocation);
-        } else {
-            block.getWorld().dropItemNaturally(blockLocation.add(0, 0.5, 0), blockItem);
+            // Dropping the item
+            if (onlinePlayer != null && plugin.getSettings().getStackedBlocks().isAutoCollect()) {
+                BukkitItems.addItem(blockItem, onlinePlayer.getInventory(), blockLocation);
+            } else {
+                block.getWorld().dropItemNaturally(blockLocation.add(0, 0.5, 0), blockItem);
+            }
         }
 
         return InteractionResult.SUCCESS;
@@ -197,9 +200,16 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
     private InteractionResult handleBlockStackInternal(SuperiorPlayer superiorPlayer, Block stackedBlock,
                                                        int amountToDeposit,
                                                        Either<EquipmentSlot, OnItemRemovalCallback> removalData) {
-        Player onlinePlayer = superiorPlayer.asPlayer();
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return handleBlockStackInternal(superiorPlayer, stackedBlock, stackedBlock.getLocation(wrapper.getHandle()),
+                    amountToDeposit, removalData);
+        }
+    }
 
-        Location stackedBlockLocation = stackedBlock.getLocation();
+    private InteractionResult handleBlockStackInternal(SuperiorPlayer superiorPlayer, Block stackedBlock,
+                                                       Location stackedBlockLocation, int amountToDeposit,
+                                                       Either<EquipmentSlot, OnItemRemovalCallback> removalData) {
+        Player onlinePlayer = superiorPlayer.asPlayer();
 
         int blockAmount = plugin.getStackedBlocks().getStackedBlockAmount(stackedBlockLocation);
         Key blockKey = plugin.getStackedBlocks().getStackedBlockKey(stackedBlockLocation);

@@ -191,6 +191,15 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     Location getLocation();
 
     /**
+     * Get the location of the player.
+     * When the player is offline, {@param location} will be returned.
+     *
+     * @param location Location object to re-use.
+     */
+    @Nullable
+    Location getLocation(@Nullable Location location);
+
+    /**
      * Teleport the player to a location.
      *
      * @param location The location to teleport the player to.

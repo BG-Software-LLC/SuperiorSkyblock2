@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
@@ -100,17 +101,23 @@ public class BlockChangesListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onBlockPlace(BlockPlaceEvent e) {
         boolean shouldAvoidReplacedState = e.getBlockReplacedState().equals(e.getBlock().getState());
-        this.worldRecordService.get().recordBlockPlace(Keys.of(e.getBlock()),
-                e.getBlock().getLocation(), plugin.getNMSWorld().getDefaultAmount(e.getBlock()),
-                shouldAvoidReplacedState ? null : e.getBlockReplacedState(),
-                REGULAR_RECORD_FLAGS);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            this.worldRecordService.get().recordBlockPlace(Keys.of(e.getBlock()),
+                    e.getBlock().getLocation(wrapper.getHandle()),
+                    plugin.getNMSWorld().getDefaultAmount(e.getBlock()),
+                    shouldAvoidReplacedState ? null : e.getBlockReplacedState(),
+                    REGULAR_RECORD_FLAGS);
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onBucketEmpty(PlayerBucketEmptyEvent e) {
         Key blockKey = Keys.ofMaterialAndData(e.getBucket().name().replace("_BUCKET", ""));
-        this.worldRecordService.get().recordBlockPlace(blockKey, e.getBlockClicked().getLocation(), 1,
-                null, REGULAR_RECORD_FLAGS);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            this.worldRecordService.get().recordBlockPlace(blockKey,
+                    e.getBlockClicked().getLocation(wrapper.getHandle()), 1,
+                    null, REGULAR_RECORD_FLAGS);
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -133,15 +140,20 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onBlockGrow(BlockGrowEvent e) {
-        this.worldRecordService.get().recordBlockPlace(Keys.of(e.getNewState()), e.getBlock().getLocation(),
-                1, null, REGULAR_RECORD_FLAGS);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            this.worldRecordService.get().recordBlockPlace(Keys.of(e.getNewState()),
+                    e.getBlock().getLocation(wrapper.getHandle()),
+                    1, null, REGULAR_RECORD_FLAGS);
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onBlockFrom(BlockFormEvent e) {
-        Location location = e.getNewState().getLocation();
-        // Do not save block counts
-        this.worldRecordService.get().recordBlockBreak(Keys.of(e.getBlock()), location, 1, WorldRecordFlags.DIRTY_CHUNKS);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location location = e.getNewState().getLocation(wrapper.getHandle());
+            // Do not save block counts
+            this.worldRecordService.get().recordBlockBreak(Keys.of(e.getBlock()), location, 1, WorldRecordFlags.DIRTY_CHUNKS);
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -152,8 +164,11 @@ public class BlockChangesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockSpread(BlockSpreadEvent e) {
-        this.worldRecordService.get().recordBlockPlace(Keys.of(e.getNewState()), e.getBlock().getLocation(),
-                1, e.getBlock().getState(), REGULAR_RECORD_FLAGS);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            this.worldRecordService.get().recordBlockPlace(Keys.of(e.getNewState()),
+                    e.getBlock().getLocation(wrapper.getHandle()),
+                    1, e.getBlock().getState(), REGULAR_RECORD_FLAGS);
+        }
     }
 
     private void onMinecartPlace(PlayerInteractEvent e) {
@@ -174,9 +189,13 @@ public class BlockChangesListener implements Listener {
             return;
 
         Key minecartBlockKey = getMinecartBlockKey(handItemType);
-        if (minecartBlockKey != null)
-            this.worldRecordService.get().recordBlockPlace(minecartBlockKey, e.getClickedBlock().getLocation(),
-                    1, null, REGULAR_RECORD_FLAGS);
+        if (minecartBlockKey != null) {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                this.worldRecordService.get().recordBlockPlace(minecartBlockKey,
+                        e.getClickedBlock().getLocation(wrapper.getHandle()),
+                        1, null, REGULAR_RECORD_FLAGS);
+            }
+        }
     }
 
     private void onSpawnerChange(PlayerInteractEvent e) {
@@ -205,8 +224,10 @@ public class BlockChangesListener implements Listener {
 
             Key newSpawnerKey = Keys.of(block);
             if (!oldSpawnerKey.equals(newSpawnerKey)) {
-                this.worldRecordService.get().recordBlockPlace(newSpawnerKey, block.getLocation(),
-                        1, oldBlockState, REGULAR_RECORD_FLAGS);
+                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                    this.worldRecordService.get().recordBlockPlace(newSpawnerKey, block.getLocation(wrapper.getHandle()),
+                            1, oldBlockState, REGULAR_RECORD_FLAGS);
+                }
             }
         }, 1L);
     }
@@ -239,9 +260,12 @@ public class BlockChangesListener implements Listener {
             return;
 
         Key minecartBlockKey = getMinecartBlockKey(dispenseItemType);
-        if (minecartBlockKey != null)
-            this.worldRecordService.get().recordBlockPlace(minecartBlockKey, targetBlock.getLocation(),
-                    1, null, REGULAR_RECORD_FLAGS);
+        if (minecartBlockKey != null) {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                this.worldRecordService.get().recordBlockPlace(minecartBlockKey, targetBlock.getLocation(wrapper.getHandle()),
+                        1, null, REGULAR_RECORD_FLAGS);
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -255,8 +279,10 @@ public class BlockChangesListener implements Listener {
             blockKey = Keys.of(e.getTo(), (byte) 0);
         }
 
-        this.worldRecordService.get().recordBlockPlace(blockKey, e.getBlock().getLocation(), 1,
-                e.getBlock().getState(), WorldRecordFlags.SAVE_BLOCK_COUNT);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            this.worldRecordService.get().recordBlockPlace(blockKey, e.getBlock().getLocation(wrapper.getHandle()), 1,
+                    e.getBlock().getState(), WorldRecordFlags.SAVE_BLOCK_COUNT);
+        }
     }
 
     /* BLOCK BREAKS */
@@ -270,8 +296,10 @@ public class BlockChangesListener implements Listener {
     private void onEntityBlockDeath(EntityDeathEvent e) {
         if (e.getEntity() instanceof FallingBlock) {
             Key blockKey = plugin.getNMSAlgorithms().getFallingBlockType((FallingBlock) e.getEntity());
-            this.worldRecordService.get().recordBlockBreak(blockKey, e.getEntity().getLocation(),
-                    1, REGULAR_RECORD_FLAGS);
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                this.worldRecordService.get().recordBlockBreak(blockKey, e.getEntity().getLocation(wrapper.getHandle()),
+                        1, REGULAR_RECORD_FLAGS);
+            }
         }
     }
 
@@ -280,20 +308,25 @@ public class BlockChangesListener implements Listener {
         boolean isWaterLogged = plugin.getNMSWorld().isWaterLogged(e.getBlockClicked());
         if (isWaterLogged || e.getBlockClicked().isLiquid()) {
             Key blockKey = isWaterLogged ? ConstantKeys.WATER : Keys.of(e.getBlockClicked());
-            this.worldRecordService.get().recordBlockBreak(blockKey, e.getBlockClicked().getLocation(),
-                    1, REGULAR_RECORD_FLAGS);
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                this.worldRecordService.get().recordBlockBreak(blockKey,
+                        e.getBlockClicked().getLocation(wrapper.getHandle()),
+                        1, REGULAR_RECORD_FLAGS);
+            }
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onDragonEggDrop(ItemSpawnEvent e) {
         if (e.getEntity().getItemStack().getType() == Material.DRAGON_EGG) {
-            for (Entity nearby : e.getEntity().getNearbyEntities(2, 2, 2)) {
-                if (nearby instanceof FallingBlock) {
-                    Key blockKey = plugin.getNMSAlgorithms().getFallingBlockType((FallingBlock) nearby);
-                    this.worldRecordService.get().recordBlockBreak(blockKey, nearby.getLocation(),
-                            1, WorldRecordFlags.SAVE_BLOCK_COUNT);
-                    return;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                for (Entity nearby : e.getEntity().getNearbyEntities(2, 2, 2)) {
+                    if (nearby instanceof FallingBlock) {
+                        Key blockKey = plugin.getNMSAlgorithms().getFallingBlockType((FallingBlock) nearby);
+                        this.worldRecordService.get().recordBlockBreak(blockKey, nearby.getLocation(wrapper.getHandle()),
+                                1, WorldRecordFlags.SAVE_BLOCK_COUNT);
+                        return;
+                    }
                 }
             }
         }
@@ -351,8 +384,10 @@ public class BlockChangesListener implements Listener {
     private void onMinecartBreak(VehicleDestroyEvent e) {
         if (e.getVehicle() instanceof Minecart) {
             Key blockKey = plugin.getNMSAlgorithms().getMinecartBlock((Minecart) e.getVehicle());
-            this.worldRecordService.get().recordBlockBreak(blockKey, e.getVehicle().getLocation(),
-                    1, REGULAR_RECORD_FLAGS);
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                this.worldRecordService.get().recordBlockBreak(blockKey, e.getVehicle().getLocation(wrapper.getHandle()),
+                        1, REGULAR_RECORD_FLAGS);
+            }
             e.getVehicle().setMetadata("SSB-VehicleDestory", new FixedMetadataValue(plugin, true));
         }
     }
@@ -415,14 +450,17 @@ public class BlockChangesListener implements Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpongeAbsorb(org.bukkit.event.block.SpongeAbsorbEvent e) {
-            Location location = e.getBlock().getLocation();
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location location = e.getBlock().getLocation(wrapper.getHandle());
 
-            if (alreadySpongeAbosrbCalled.contains(location))
-                return;
+                if (alreadySpongeAbosrbCalled.contains(location))
+                    return;
 
-            worldRecordService.get().recordBlockPlace(ConstantKeys.WET_SPONGE, location, 1,
-                    e.getBlock().getState(), WorldRecordFlags.SAVE_BLOCK_COUNT);
-            alreadySpongeAbosrbCalled.add(location);
+                worldRecordService.get().recordBlockPlace(ConstantKeys.WET_SPONGE, location, 1,
+                        e.getBlock().getState(), WorldRecordFlags.SAVE_BLOCK_COUNT);
+
+                alreadySpongeAbosrbCalled.add(location.clone());
+            }
         }
 
     }
