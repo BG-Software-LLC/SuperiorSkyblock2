@@ -621,6 +621,9 @@ public class ProtectionListener implements Listener {
 
         @EventHandler
         public void onRaidTrigger(RaidTriggerEvent e) {
+            if (!plugin.getGrid().isIslandsWorld(e.getWorld()))
+                return;
+
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
             Location location = e.getRaid().getLocation();
 
