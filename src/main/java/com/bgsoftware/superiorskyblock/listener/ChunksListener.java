@@ -151,7 +151,11 @@ public class ChunksListener implements Listener {
                 recalculateEntities.set(true);
         }
 
-        plugin.getStackedBlocks().updateStackedBlockHolograms(chunk);
+        BukkitExecutor.sync(() -> {
+            if (chunk.isLoaded())
+                // Update holograms of stacked blocks in delay so the chunk is entirely loaded.
+                plugin.getStackedBlocks().updateStackedBlockHolograms(chunk);
+        }, 10L);
 
         BukkitExecutor.sync(() -> {
             if (!pendingLoadedChunksForIsland.remove(chunk) || !chunk.isLoaded())
