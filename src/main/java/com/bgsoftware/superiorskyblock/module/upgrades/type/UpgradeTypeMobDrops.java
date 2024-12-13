@@ -29,9 +29,11 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
             new CmdAdminSetMobDrops());
 
     private final SuperiorSkyblockPlugin plugin;
+    private final boolean isWildStackerInstalled;
 
     public UpgradeTypeMobDrops(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+        isWildStackerInstalled = Bukkit.getPluginManager().isPluginEnabled("WildStacker");
     }
 
     @Override
@@ -83,47 +85,51 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
                     return;
             }
 
+            BukkitEntities.clearEntityEquipment(e.getEntity());
+
             double mobDropsMultiplier = island.getMobDropsMultiplier();
+            if (mobDropsMultiplier <= 1)
+                return;
 
-            if (mobDropsMultiplier != 1 && mobDropsMultiplier > 0) {
-                for (ItemStack itemStack : new LinkedList<>(e.getDrops())) {
-                    if (itemStack != null && !BukkitEntities.isEquipment(e.getEntity(), itemStack) &&
-                            !plugin.getNMSTags().serializeItem(itemStack).containsKey("WildChests")) {
-                        int newAmount = (int) Math.floor(itemStack.getAmount() * mobDropsMultiplier);
+            List<ItemStack> dropsToAdd = isWildStackerInstalled ? null : new LinkedList<>();
 
-                        if (Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {
-                            itemStack.setAmount(newAmount);
-                        } else {
-                            int stackAmounts = newAmount / itemStack.getMaxStackSize();
-                            int leftOvers = newAmount % itemStack.getMaxStackSize();
-                            boolean usedOriginal = false;
+            for (ItemStack itemStack : e.getDrops()) {
+                if (itemStack != null && !BukkitEntities.isEquipment(e.getEntity(), itemStack)) {
+                    int newAmount = (int) Math.floor(itemStack.getAmount() * mobDropsMultiplier);
 
-                            if (stackAmounts > 0) {
-                                itemStack.setAmount(itemStack.getMaxStackSize());
-                                usedOriginal = true;
+                    if (isWildStackerInstalled) {
+                        itemStack.setAmount(newAmount);
+                    } else {
+                        int stackAmounts = newAmount / itemStack.getMaxStackSize();
+                        int leftOvers = newAmount % itemStack.getMaxStackSize();
+                        boolean usedOriginal = false;
 
-                                ItemStack stackItem = itemStack.clone();
-                                stackItem.setAmount(itemStack.getMaxStackSize());
+                        if (stackAmounts > 0) {
+                            itemStack.setAmount(itemStack.getMaxStackSize());
+                            usedOriginal = true;
 
-                                for (int i = 0; i < stackAmounts - 1; i++)
-                                    e.getDrops().add(itemStack.clone());
-                            }
+                            ItemStack stackItem = itemStack.clone();
+                            stackItem.setAmount(itemStack.getMaxStackSize());
 
-                            if (leftOvers > 0) {
-                                if (usedOriginal) {
-                                    ItemStack leftOversItem = itemStack.clone();
-                                    leftOversItem.setAmount(leftOvers);
-                                    e.getDrops().add(leftOversItem);
-                                } else {
-                                    itemStack.setAmount(leftOvers);
-                                }
+                            for (int i = 0; i < stackAmounts - 1; i++)
+                                dropsToAdd.add(itemStack.clone());
+                        }
+
+                        if (leftOvers > 0) {
+                            if (usedOriginal) {
+                                ItemStack leftOversItem = itemStack.clone();
+                                leftOversItem.setAmount(leftOvers);
+                                dropsToAdd.add(leftOversItem);
+                            } else {
+                                itemStack.setAmount(leftOvers);
                             }
                         }
                     }
                 }
             }
 
-            BukkitEntities.clearEntityEquipment(e.getEntity());
+            if (dropsToAdd != null)
+                e.getDrops().addAll(dropsToAdd);
         }
 
     }
