@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.nms.v1_20_4.chunks;
+package com.bgsoftware.superiorskyblock.nms.v1_20_4.crops;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;

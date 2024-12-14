@@ -1,10 +1,11 @@
-package com.bgsoftware.superiorskyblock.nms.v1_20_3.chunks;
+package com.bgsoftware.superiorskyblock.nms.v1_18.crops;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.TickingBlockEntity;
 
-public record CropsTickingBlockEntity(CropsBlockEntity cropsBlockEntity) implements TickingBlockEntity {
+public record CropsTickingBlockEntity(
+        CropsBlockEntity cropsBlockEntity) implements TickingBlockEntity {
 
 
     @Override
