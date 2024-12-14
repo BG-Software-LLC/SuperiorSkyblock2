@@ -92,13 +92,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
     private static SuperiorSkyblockPlugin plugin;
 
-    /* Global handlers */
-    private final Updater updater = new Updater(this, "superiorskyblock2");
-    private final EventsBus eventsBus = new EventsBus(this);
-    private final CallbacksBus callbacksBus = new CallbacksBus();
-    private final BukkitListeners bukkitListeners = new BukkitListeners(this);
-    private IScriptEngine scriptEngine = EnginesFactory.createDefaultEngine();
-
     /* Managers */
     private final DataManager dataHandler = new DataManager(this);
     private final FactoriesManagerImpl factoriesHandler = new FactoriesManagerImpl();
@@ -117,6 +110,13 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     private final ModulesManagerImpl modulesHandler = new ModulesManagerImpl(this, new DefaultModulesContainer(this));
     private final ServicesHandler servicesHandler = new ServicesHandler(this);
     private final SettingsManagerImpl settingsHandler = new SettingsManagerImpl(this);
+
+    /* Global handlers */
+    private final Updater updater = new Updater(this, "superiorskyblock2");
+    private final EventsBus eventsBus = new EventsBus(this);
+    private final CallbacksBus callbacksBus = new CallbacksBus();
+    private final BukkitListeners bukkitListeners = new BukkitListeners(this);
+    private IScriptEngine scriptEngine = EnginesFactory.createDefaultEngine();
 
     /* NMS */
     @Nullable
@@ -138,6 +138,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     @Override
     public void onLoad() {
         plugin = this;
+        callbacksBus.registerDefaultCallbacks();
 
         DependenciesManager.inject(this);
 

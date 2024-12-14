@@ -15,6 +15,9 @@ public class CallbacksBus {
     private final EnumMap<CallbackType, List<Runnable>> CALLBACKS = new EnumMap<>(CallbackType.class);
 
     public CallbacksBus() {
+    }
+
+    public void registerDefaultCallbacks() {
         SIsland.registerCallbacks(this);
         CommandsMap.registerCallbacks(this);
         SpawnIsland.registerCallbacks(this);

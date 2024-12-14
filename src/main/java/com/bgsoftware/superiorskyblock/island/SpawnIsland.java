@@ -34,6 +34,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.WorldInfoImpl;
@@ -84,8 +85,12 @@ import java.util.function.Consumer;
 public class SpawnIsland implements Island {
 
     private static final UUID spawnUUID = new UUID(0, 0);
-    private static final SSuperiorPlayer ownerPlayer = new SSuperiorPlayer((SuperiorPlayerBuilderImpl)
-            SuperiorPlayer.newBuilder().setUniqueId(spawnUUID));
+    private static final LazyReference<SSuperiorPlayer> ownerPlayer = new LazyReference<SSuperiorPlayer>() {
+        @Override
+        protected SSuperiorPlayer create() {
+            return new SSuperiorPlayer((SuperiorPlayerBuilderImpl) SuperiorPlayer.newBuilder().setUniqueId(spawnUUID));
+        }
+    };
     private static final IslandChest[] EMPTY_ISLAND_CHESTS = new IslandChest[0];
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -162,7 +167,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public SuperiorPlayer getOwner() {
-        return ownerPlayer;
+        return ownerPlayer.get();
     }
 
     @Override
