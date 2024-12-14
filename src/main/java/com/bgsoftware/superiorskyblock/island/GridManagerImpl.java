@@ -349,7 +349,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         if (spawnOffset != null)
             homeLocation = spawnOffset.applyToLocation(homeLocation);
 
-        island.setIslandHome(homeLocation);
+        island.setIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension(), homeLocation);
 
         BukkitExecutor.sync(() -> builder.owner.runIfOnline(player -> {
             if (updateGamemode)

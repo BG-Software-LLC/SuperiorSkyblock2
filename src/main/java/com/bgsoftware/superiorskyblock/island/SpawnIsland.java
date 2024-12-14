@@ -778,7 +778,8 @@ public class SpawnIsland implements Island {
 
     @Override
     public boolean isInside(Location location, double extraRadius) {
-        if (!location.getWorld().equals(this.spawnWorld))
+        World bukkitWorld = location.getWorld();
+        if (bukkitWorld == null || !bukkitWorld.equals(this.spawnWorld))
             return false;
 
         try (IslandArea islandArea = this.islandArea.copy()) {

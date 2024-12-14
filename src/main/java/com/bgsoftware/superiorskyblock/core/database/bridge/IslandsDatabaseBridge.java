@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.database.bridge;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
@@ -17,8 +18,11 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LegacyMasks;
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
@@ -42,6 +46,8 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("unchecked")
 public class IslandsDatabaseBridge {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final Location LOCATION = new Location(null, 0, 100, 0);
 
@@ -612,10 +618,12 @@ public class IslandsDatabaseBridge {
 
     public static void insertIsland(Island island, List<ChunkPosition> dirtyChunks) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
+            BlockPosition centerPosition = island.getCenterPosition();
+            WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, Dimensions.NORMAL);
             databaseBridge.insertObject("islands",
                     new Pair<>("uuid", island.getUniqueId().toString()),
                     new Pair<>("owner", island.getOwner().getUniqueId().toString()),
-                    new Pair<>("center", Serializers.LOCATION_SERIALIZER.serialize(island.getCenter(Dimensions.NORMAL))),
+                    new Pair<>("center", Serializers.LOCATION_SERIALIZER.serialize(LazyWorldLocation.of(worldInfo, centerPosition))),
                     new Pair<>("creation_time", island.getCreationTime()),
                     new Pair<>("island_type", island.getSchematicName()),
                     new Pair<>("discord", island.getDiscord()),
