@@ -2,6 +2,10 @@ package com.bgsoftware.superiorskyblock.nms.v1_16_R3.crops;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.Chunk;
@@ -11,7 +15,9 @@ import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.WorldServer;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class CropsTickingMethod {
@@ -21,14 +27,23 @@ public abstract class CropsTickingMethod {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    private static Set<Block> CROPS_TO_GROW_CACHE;
+
+    static {
+        plugin.getCallbacksBus().registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, CropsTickingMethod::onSettingsUpdate);
+    }
+
     private static final BlockPosition.MutableBlockPosition chunkTickMutablePosition = new BlockPosition.MutableBlockPosition();
 
     private static final CropsTickingMethod INSTANCE = WORLD_SERVER_RANDOM_TICK_RANDOM.isValid() ?
             new PaperCropsTickingMethod() : new SpigotCropsTickingMethod();
 
-
     protected CropsTickingMethod() {
 
+    }
+
+    public static void register() {
+        // Calls the static initializer which registers the callback.
     }
 
     public static void tick(Chunk chunk, int tickSpeed) {
@@ -36,6 +51,18 @@ public abstract class CropsTickingMethod {
     }
 
     protected abstract void doTick(Chunk chunk, int tickSpeed);
+
+    private static void onSettingsUpdate() {
+        CROPS_TO_GROW_CACHE = new HashSet<>();
+        plugin.getSettings().getCropsToGrow().forEach(cropName -> {
+            Key key = Keys.ofMaterialAndData(cropName);
+            if (key instanceof MaterialKey) {
+                Block block = CraftMagicNumbers.getBlock(((MaterialKey) key).getMaterial());
+                if (block != null && block.getBlockData().isTicking())
+                    CROPS_TO_GROW_CACHE.add(block);
+            }
+        });
+    }
 
     private static class PaperCropsTickingMethod extends CropsTickingMethod {
 
@@ -69,8 +96,7 @@ public abstract class CropsTickingMethod {
                     long raw = chunkSection.tickingList.getRaw(index);
                     int location = com.destroystokyo.paper.util.maplist.IBlockDataList.getLocationFromRaw(raw);
                     IBlockData blockData = com.destroystokyo.paper.util.maplist.IBlockDataList.getBlockDataFromRaw(raw);
-                    Block block = blockData.getBlock();
-                    if (!plugin.getSettings().getCropsToGrow().contains(CraftMagicNumbers.getMaterial(block).name()))
+                    if (!CROPS_TO_GROW_CACHE.contains(blockData.getBlock()))
                         continue;
 
                     chunkTickMutablePosition.setValues((location & 15) | chunkOffsetX,
@@ -107,9 +133,7 @@ public abstract class CropsTickingMethod {
                         int z = factor >> 8 & 15;
                         int y = factor >> 16 & 15;
                         IBlockData blockData = chunkSection.getType(x, y, z);
-                        Block block = blockData.getBlock();
-                        if (blockData.isTicking() &&
-                                plugin.getSettings().getCropsToGrow().contains(CraftMagicNumbers.getMaterial(block).name())) {
+                        if (blockData.isTicking() && CROPS_TO_GROW_CACHE.contains(blockData.getBlock())) {
                             chunkTickMutablePosition.setValues(x + chunkOffsetX, y + chunkSection.getYPosition(), z + chunkOffsetZ);
                             blockData.b(worldServer, chunkTickMutablePosition, worldServer.random);
                         }

@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Map;
 
 public class DefaultValuesSection extends SettingsContainerHolder implements SettingsManager.DefaultValues {
@@ -62,12 +63,16 @@ public class DefaultValuesSection extends SettingsContainerHolder implements Set
 
     @Override
     public Map<Key, Integer>[] getGenerators() {
+        return getGeneratorsUnsafe().clone();
+    }
+
+    public Map<Key, Integer>[] getGeneratorsUnsafe() {
         return getContainer().defaultGenerator;
     }
 
     @Override
     public Map<Integer, Integer> getRoleLimits() {
-        return getContainer().defaultRoleLimits.asMap();
+        return Collections.unmodifiableMap(getContainer().defaultRoleLimits.asMap());
     }
 
     public Int2IntMapView getRoleLimitsAsView() {

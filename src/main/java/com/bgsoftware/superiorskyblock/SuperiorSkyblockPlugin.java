@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.core.database.transaction.DatabaseTransac
 import com.bgsoftware.superiorskyblock.core.engine.EnginesFactory;
 import com.bgsoftware.superiorskyblock.core.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.factory.FactoriesManagerImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.GlowEnchantment;
@@ -84,14 +85,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.lang.reflect.Constructor;
 import java.util.Locale;
 import java.util.Optional;
 
 public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
 
     private static SuperiorSkyblockPlugin plugin;
+
+    /* Global handlers */
+    private final Updater updater = new Updater(this, "superiorskyblock2");
+    private final EventsBus eventsBus = new EventsBus(this);
+    private final CallbacksBus callbacksBus = new CallbacksBus();
+    private final BukkitListeners bukkitListeners = new BukkitListeners(this);
+    private IScriptEngine scriptEngine = EnginesFactory.createDefaultEngine();
 
     /* Managers */
     private final DataManager dataHandler = new DataManager(this);
@@ -111,14 +117,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     private final ModulesManagerImpl modulesHandler = new ModulesManagerImpl(this, new DefaultModulesContainer(this));
     private final ServicesHandler servicesHandler = new ServicesHandler(this);
     private final SettingsManagerImpl settingsHandler = new SettingsManagerImpl(this);
-
-    /* Global handlers */
-    private final Updater updater = new Updater(this, "superiorskyblock2");
-    private final EventsBus eventsBus = new EventsBus(this);
-    private final BukkitListeners bukkitListeners = new BukkitListeners(this);
-    private IScriptEngine scriptEngine = EnginesFactory.createDefaultEngine();
-    @Nullable
-    private ChunkGenerator worldGenerator = null;
 
     /* NMS */
     @Nullable
@@ -316,6 +314,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             eventsBus.callPluginInitializedEvent(this);
 
             loadingStage = PluginLoadingStage.ENABLED;
+
+            plugin.getCallbacksBus().notifyCallbacks(CallbacksBus.CallbackType.SETTINGS_UPDATE);
         } catch (Throwable error) {
             Log.error(error, "An unexpected error occurred while enabling the plugin:");
             Bukkit.shutdown();
@@ -587,6 +587,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
     public EventsBus getEventsBus() {
         return eventsBus;
+    }
+
+    public CallbacksBus getCallbacksBus() {
+        return callbacksBus;
     }
 
     public ServicesHandler getServices() {

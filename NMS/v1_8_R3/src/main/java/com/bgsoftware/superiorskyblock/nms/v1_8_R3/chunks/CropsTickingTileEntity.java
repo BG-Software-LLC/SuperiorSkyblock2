@@ -2,9 +2,13 @@ package com.bgsoftware.superiorskyblock.nms.v1_8_R3.chunks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Chunk;
@@ -16,13 +20,21 @@ import net.minecraft.server.v1_8_R3.TileEntity;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 
 import java.lang.ref.WeakReference;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 public class CropsTickingTileEntity extends TileEntity implements IUpdatePlayerListBox {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static Set<Block> CROPS_TO_GROW_CACHE;
+
+    static {
+        plugin.getCallbacksBus().registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, CropsTickingTileEntity::onSettingsUpdate);
+    }
 
     private static final Long2ObjectMapView<CropsTickingTileEntity> tickingChunks = CollectionsFactory.createLong2ObjectHashMap();
     private static int random = ThreadLocalRandom.current().nextInt();
@@ -36,19 +48,8 @@ public class CropsTickingTileEntity extends TileEntity implements IUpdatePlayerL
 
     private double cachedCropGrowthMultiplier;
 
-    private CropsTickingTileEntity(Island island, Chunk chunk) {
-        this.island = new WeakReference<>(island);
-        this.chunk = new WeakReference<>(chunk);
-        this.chunkX = chunk.locX;
-        this.chunkZ = chunk.locZ;
-        a(chunk.getWorld());
-        a(new BlockPosition(chunkX << 4, 1, chunkZ << 4));
-        try {
-            world.tileEntityList.add(this);
-        } catch (Throwable error) {
-            world.a(this);
-        }
-        this.cachedCropGrowthMultiplier = island.getCropGrowthMultiplier() - 1;
+    public static void register() {
+        // Calls the static initializer which registers the callback.
     }
 
     public static CropsTickingTileEntity remove(long chunkCoords) {
@@ -70,6 +71,21 @@ public class CropsTickingTileEntity extends TileEntity implements IUpdatePlayerL
             if (cropsTickingTileEntity != null)
                 cropsTickingTileEntityConsumer.accept(cropsTickingTileEntity);
         });
+    }
+
+    private CropsTickingTileEntity(Island island, Chunk chunk) {
+        this.island = new WeakReference<>(island);
+        this.chunk = new WeakReference<>(chunk);
+        this.chunkX = chunk.locX;
+        this.chunkZ = chunk.locZ;
+        a(chunk.getWorld());
+        a(new BlockPosition(chunkX << 4, 1, chunkZ << 4));
+        try {
+            world.tileEntityList.add(this);
+        } catch (Throwable error) {
+            world.a(this);
+        }
+        this.cachedCropGrowthMultiplier = island.getCropGrowthMultiplier() - 1;
     }
 
     @Override
@@ -102,7 +118,7 @@ public class CropsTickingTileEntity extends TileEntity implements IUpdatePlayerL
                         int y = factor >> 16 & 15;
                         IBlockData blockData = chunkSection.getType(x, y, z);
                         Block block = blockData.getBlock();
-                        if (block.isTicking() && plugin.getSettings().getCropsToGrow().contains(CraftMagicNumbers.getMaterial(block).name())) {
+                        if (block.isTicking() && CROPS_TO_GROW_CACHE.contains(block)) {
                             block.a(world, new BlockPosition(x + (chunkX << 4), y + chunkSection.getYPosition(), z + (chunkZ << 4)),
                                     blockData, ThreadLocalRandom.current());
                         }
@@ -115,6 +131,18 @@ public class CropsTickingTileEntity extends TileEntity implements IUpdatePlayerL
 
     public void setCropGrowthMultiplier(double cropGrowthMultiplier) {
         this.cachedCropGrowthMultiplier = cropGrowthMultiplier;
+    }
+
+    private static void onSettingsUpdate() {
+        CROPS_TO_GROW_CACHE = new HashSet<>();
+        plugin.getSettings().getCropsToGrow().forEach(cropName -> {
+            Key key = Keys.ofMaterialAndData(cropName);
+            if (key instanceof MaterialKey) {
+                Block block = CraftMagicNumbers.getBlock(((MaterialKey) key).getMaterial());
+                if (block != null && block.isTicking())
+                    CROPS_TO_GROW_CACHE.add(block);
+            }
+        });
     }
 
 }

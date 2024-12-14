@@ -48,11 +48,11 @@ import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
-import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -147,6 +147,12 @@ public class SIsland implements Island {
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
     private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static EnumerateSet<IslandFlag> DEFAULT_FLAGS_CACHE;
+
+    static {
+        plugin.getCallbacksBus().registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, SIsland::onSettingsUpdate);
+    }
 
     private final DatabaseBridge databaseBridge;
     private final IslandBank islandBank;
@@ -3662,7 +3668,7 @@ public class SIsland implements Island {
     @Override
     public boolean hasSettingsEnabled(IslandFlag settings) {
         Preconditions.checkNotNull(settings, "settings parameter cannot be null.");
-        return islandFlags.getOrDefault(settings, (byte) (plugin.getSettings().getDefaultSettings().contains(settings.getName()) ? 1 : 0)) == 1;
+        return islandFlags.getOrDefault(settings, (byte) (DEFAULT_FLAGS_CACHE.contains(settings) ? 1 : 0)) == 1;
     }
 
     @Override
@@ -4728,7 +4734,7 @@ public class SIsland implements Island {
 
         this.cobbleGeneratorValues.write(cobbleGeneratorValues -> {
             for (Dimension dimension : Dimension.values()) {
-                Map<Key, Integer> defaultGenerator = plugin.getSettings().getDefaultValues().getGenerators()[dimension.ordinal()];
+                Map<Key, Integer> defaultGenerator = plugin.getSettings().getDefaultValues().getGeneratorsUnsafe()[dimension.ordinal()];
                 if (defaultGenerator != null) {
                     KeyMap<IntValue> worldGeneratorRates = cobbleGeneratorValues.get(dimension);
 
@@ -5010,6 +5016,16 @@ public class SIsland implements Island {
         double newCropGrowthMultiplier = newCropGrowth - 1;
         IslandUtils.getChunkCoords(this, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS)
                 .values().forEach(chunkPositions -> plugin.getNMSChunks().updateCropsTicker(chunkPositions, newCropGrowthMultiplier));
+    }
+
+    private static void onSettingsUpdate() {
+        DEFAULT_FLAGS_CACHE = new EnumerateSet<>(IslandFlag.values());
+        plugin.getSettings().getDefaultSettings().forEach(islandFlagName -> {
+            try {
+                DEFAULT_FLAGS_CACHE.add(IslandFlag.getByName(islandFlagName));
+            } catch (Throwable ignored) {
+            }
+        });
     }
 
     public static class UniqueVisitor {

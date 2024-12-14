@@ -2,6 +2,10 @@ package com.bgsoftware.superiorskyblock.nms.v1_17.crops;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -11,7 +15,9 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class CropsTickingMethod {
@@ -20,6 +26,12 @@ public abstract class CropsTickingMethod {
             ServerLevel.class, Random.class, "randomTickRandom");
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static Set<Block> CROPS_TO_GROW_CACHE;
+
+    static {
+        plugin.getCallbacksBus().registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, CropsTickingMethod::onSettingsUpdate);
+    }
 
     private static final BlockPos.MutableBlockPos chunkTickMutablePosition = new BlockPos.MutableBlockPos();
 
@@ -31,11 +43,27 @@ public abstract class CropsTickingMethod {
 
     }
 
+    public static void register() {
+        // Calls the static initializer which registers the callback.
+    }
+
     public static void tick(LevelChunk levelChunk, int tickSpeed) {
         INSTANCE.doTick(levelChunk, tickSpeed);
     }
 
     protected abstract void doTick(LevelChunk levelChunk, int tickSpeed);
+
+    private static void onSettingsUpdate() {
+        CROPS_TO_GROW_CACHE = new HashSet<>();
+        plugin.getSettings().getCropsToGrow().forEach(cropName -> {
+            Key key = Keys.ofMaterialAndData(cropName);
+            if (key instanceof MaterialKey materialKey) {
+                Block block = CraftMagicNumbers.getBlock(materialKey.getMaterial());
+                if (block != null && block.defaultBlockState().isRandomlyTicking())
+                    CROPS_TO_GROW_CACHE.add(block);
+            }
+        });
+    }
 
     private static class PaperCropsTickingMethod extends CropsTickingMethod {
 
@@ -74,8 +102,7 @@ public abstract class CropsTickingMethod {
                     long raw = levelChunkSection.tickingList.getRaw(index);
                     int location = com.destroystokyo.paper.util.maplist.IBlockDataList.getLocationFromRaw(raw);
                     BlockState blockState = com.destroystokyo.paper.util.maplist.IBlockDataList.getBlockDataFromRaw(raw);
-                    Block block = blockState.getBlock();
-                    if (!plugin.getSettings().getCropsToGrow().contains(CraftMagicNumbers.getMaterial(block).name()))
+                    if (!CROPS_TO_GROW_CACHE.contains(blockState.getBlock()))
                         continue;
 
                     chunkTickMutablePosition.set((location & 15) | chunkOffsetX,
@@ -118,9 +145,7 @@ public abstract class CropsTickingMethod {
                     int z = factor >> 8 & 15;
                     int y = factor >> 16 & 15;
                     BlockState blockState = levelChunkSection.getBlockState(x, y, z);
-                    Block block = blockState.getBlock();
-                    if (blockState.isRandomlyTicking() &&
-                            plugin.getSettings().getCropsToGrow().contains(CraftMagicNumbers.getMaterial(block).name())) {
+                    if (blockState.isRandomlyTicking() && CROPS_TO_GROW_CACHE.contains(blockState.getBlock())) {
                         chunkTickMutablePosition.set(x + chunkOffsetX, y + sectionBottomY, z + chunkOffsetZ);
                         blockState.randomTick(serverLevel, chunkTickMutablePosition, serverLevel.getRandom());
                     }

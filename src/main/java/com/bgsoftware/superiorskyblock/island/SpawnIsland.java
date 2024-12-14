@@ -37,8 +37,10 @@ import com.bgsoftware.superiorskyblock.core.IslandArea;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.WorldInfoImpl;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.persistence.EmptyPersistentDataContainer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
@@ -86,6 +88,31 @@ public class SpawnIsland implements Island {
             SuperiorPlayer.newBuilder().setUniqueId(spawnUUID));
     private static final IslandChest[] EMPTY_ISLAND_CHESTS = new IslandChest[0];
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static EnumerateSet<IslandFlag> DEFAULT_SPAWN_FLAGS_CACHE;
+    private static EnumerateSet<IslandPrivilege> DEFAULT_SPAWN_PRIVILEGES_CACHE;
+
+    static {
+        plugin.getCallbacksBus().registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, SpawnIsland::onSettingsUpdate);
+    }
+
+    private static void onSettingsUpdate() {
+        DEFAULT_SPAWN_FLAGS_CACHE = new EnumerateSet<>(IslandFlag.values());
+        plugin.getSettings().getSpawn().getSettings().forEach(flagName -> {
+            try {
+                DEFAULT_SPAWN_FLAGS_CACHE.add(IslandFlag.getByName(flagName));
+            } catch (Throwable ignored) {
+            }
+        });
+
+        DEFAULT_SPAWN_PRIVILEGES_CACHE = new EnumerateSet<>(IslandPrivilege.values());
+        plugin.getSettings().getSpawn().getPermissions().forEach(privilegeName -> {
+            try {
+                DEFAULT_SPAWN_PRIVILEGES_CACHE.add(IslandPrivilege.getByName(privilegeName));
+            } catch (Throwable ignored) {
+            }
+        });
+    }
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
     private final DirtyChunksContainer dirtyChunksContainer;
@@ -890,7 +917,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public PlayerRole getRequiredPlayerRole(IslandPrivilege islandPrivilege) {
-        return plugin.getSettings().getSpawn().getPermissions().contains(islandPrivilege.getName()) ?
+        return DEFAULT_SPAWN_PRIVILEGES_CACHE.contains(islandPrivilege) ?
                 SPlayerRole.guestRole() : SPlayerRole.lastRole();
     }
 
@@ -1842,7 +1869,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public boolean hasSettingsEnabled(IslandFlag islandFlag) {
-        return plugin.getSettings().getSpawn().getSettings().contains(islandFlag.getName());
+        return DEFAULT_SPAWN_FLAGS_CACHE.contains(islandFlag);
     }
 
     @Override

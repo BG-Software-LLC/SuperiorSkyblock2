@@ -4,18 +4,34 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
 import com.google.common.base.Preconditions;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class CommandsMap {
+
+    private static Set<SuperiorCommand> DISABLED_COMMANDS_CACHE;
+    private static boolean registeredCallback = false;
+
+    private static void onSettingsUpdate() {
+        DISABLED_COMMANDS_CACHE = new HashSet<>();
+        SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+        plugin.getSettings().getDisabledCommands().forEach(commandLabel -> {
+            SuperiorCommand superiorCommand = plugin.getCommands().getCommand(commandLabel);
+            if (superiorCommand != null && !(superiorCommand instanceof IAdminIslandCommand))
+                DISABLED_COMMANDS_CACHE.add(superiorCommand);
+        });
+    }
 
     private final Map<String, SuperiorCommand> subCommands = new LinkedHashMap<>();
     private final Map<String, SuperiorCommand> aliasesToCommand = new HashMap<>();
@@ -24,6 +40,10 @@ public abstract class CommandsMap {
 
     protected CommandsMap(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+        if (!registeredCallback) {
+            registeredCallback = true;
+            plugin.getCallbacksBus().registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, CommandsMap::onSettingsUpdate);
+        }
     }
 
     public abstract void loadDefaultCommands();
@@ -79,8 +99,7 @@ public abstract class CommandsMap {
     }
 
     private boolean isCommandEnabled(SuperiorCommand superiorCommand) {
-        return superiorCommand instanceof IAdminIslandCommand || superiorCommand.getAliases().stream()
-                .noneMatch(plugin.getSettings().getDisabledCommands()::contains);
+        return superiorCommand instanceof IAdminIslandCommand || !DISABLED_COMMANDS_CACHE.contains(superiorCommand);
     }
 
 }

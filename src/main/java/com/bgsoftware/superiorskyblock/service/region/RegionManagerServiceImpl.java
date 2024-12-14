@@ -8,6 +8,8 @@ import com.bgsoftware.superiorskyblock.api.events.IslandRestrictMoveEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.MoveResult;
@@ -16,6 +18,10 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
+import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.KeySets;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -69,11 +75,30 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     @Nullable
     private static final EntityType AXOLOTL_TYPE = getSafeEntityType("AXOLOTL");
     private static final int MAX_PICKUP_DISTANCE = 1;
+    private static EnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
+    private static KeySet INTERACTABLES_CACHE;
 
     private final SuperiorSkyblockPlugin plugin;
 
     public RegionManagerServiceImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+        plugin.getCallbacksBus().registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, this::onSettingsUpdate);
+    }
+
+    private void onSettingsUpdate() {
+        WORLD_PERMISSIONS_CACHE = new EnumerateSet<>(IslandPrivilege.values());
+        plugin.getSettings().getWorldPermissions().forEach(islandPrivilageName -> {
+            try {
+                WORLD_PERMISSIONS_CACHE.add(IslandPrivilege.getByName(islandPrivilageName));
+            } catch (Throwable ignored) {
+            }
+        });
+
+        INTERACTABLES_CACHE = KeySets.createHashSet(KeyIndicator.MATERIAL);
+        plugin.getSettings().getInteractables().forEach(interactableName -> {
+            INTERACTABLES_CACHE.add(Keys.ofMaterialAndData(interactableName));
+        });
+
     }
 
     @Override
@@ -123,20 +148,20 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(block, "block cannot be null");
 
         Location blockLocation = block.getLocation();
-        Material blockType = block.getType();
+        Key blockKey = Keys.of(block);
 
         boolean isInteractableItem = BukkitItems.isInteractableItem(usedItem);
 
         int stackedBlockAmount = plugin.getStackedBlocks().getStackedBlockAmount(blockLocation);
 
-        if (!isInteractableItem && stackedBlockAmount <= 1 &&
-                !plugin.getSettings().getInteractables().contains(blockType.name()))
+        if (!isInteractableItem && stackedBlockAmount <= 1 && !INTERACTABLES_CACHE.contains(blockKey))
             return InteractionResult.SUCCESS;
 
         Island island = plugin.getGrid().getIslandAt(blockLocation);
 
         BlockState blockState = block.getState();
         EntityType spawnType = usedItem == null ? EntityType.UNKNOWN : BukkitItems.getEntityType(usedItem);
+        Material blockType = block.getType();
 
         IslandPrivilege islandPrivilege;
 
@@ -364,7 +389,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         if (superiorPlayer.hasBypassModeEnabled())
             return InteractionResult.SUCCESS;
 
-        if (checkIslandBoundaries && !plugin.getSettings().getWorldPermissions().contains(islandPrivilege.getName())) {
+        if (checkIslandBoundaries && !WORLD_PERMISSIONS_CACHE.contains(islandPrivilege)) {
             if (island == null && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld()))
                 return InteractionResult.OUTSIDE_ISLAND;
 

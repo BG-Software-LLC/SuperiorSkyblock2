@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_19.crops.CropsBlockEntity;
+import com.bgsoftware.superiorskyblock.nms.v1_19.crops.CropsTickingMethod;
 import com.bgsoftware.superiorskyblock.nms.v1_19.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
@@ -87,6 +88,7 @@ public class NMSChunksImpl implements NMSChunks {
     public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         KeyBlocksCache.cacheAllBlocks();
+        CropsTickingMethod.register();
     }
 
     @Override
