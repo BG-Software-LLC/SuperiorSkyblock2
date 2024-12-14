@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -31,9 +32,11 @@ public class IslandSigns {
         if (island == null)
             return new Result(Reason.NOT_IN_ISLAND, false);
 
-        Location playerLocation = superiorPlayer.getLocation();
-        if (playerLocation != null)
-            warpLocation.setYaw(playerLocation.getYaw());
+        superiorPlayer.runIfOnline(player -> {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                warpLocation.setYaw(player.getLocation(wrapper.getHandle()).getYaw());
+            }
+        });
 
         if (isWarpSign(warpLines[0])) {
             Reason reason = handleWarpSignPlace(superiorPlayer, island, warpLocation, warpLines, sendMessage);
@@ -46,24 +49,27 @@ public class IslandSigns {
     }
 
     public static Result handleSignBreak(SuperiorPlayer superiorPlayer, Sign sign) {
-        Island island = plugin.getGrid().getIslandAt(sign.getLocation());
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location signLocation = sign.getLocation(wrapper.getHandle());
+            Island island = plugin.getGrid().getIslandAt(signLocation);
 
-        if (island == null)
-            return new Result(Reason.NOT_IN_ISLAND, false);
+            if (island == null)
+                return new Result(Reason.NOT_IN_ISLAND, false);
 
-        IslandWarp islandWarp = island.getWarp(sign.getLocation());
+            IslandWarp islandWarp = island.getWarp(signLocation);
 
-        if (islandWarp != null) {
-            if (!plugin.getEventsBus().callIslandDeleteWarpEvent(superiorPlayer, island, islandWarp))
-                return new Result(Reason.EVENT_CANCELLED, true);
-
-            island.deleteWarp(superiorPlayer, sign.getLocation());
-        } else {
-            if (sign.getLine(0).equalsIgnoreCase(plugin.getSettings().getVisitorsSign().getActive())) {
-                if (!plugin.getEventsBus().callIslandRemoveVisitorHomeEvent(superiorPlayer, island))
+            if (islandWarp != null) {
+                if (!plugin.getEventsBus().callIslandDeleteWarpEvent(superiorPlayer, island, islandWarp))
                     return new Result(Reason.EVENT_CANCELLED, true);
 
-                island.setVisitorsLocation(null);
+                island.deleteWarp(superiorPlayer, signLocation);
+            } else {
+                if (sign.getLine(0).equalsIgnoreCase(plugin.getSettings().getVisitorsSign().getActive())) {
+                    if (!plugin.getEventsBus().callIslandRemoveVisitorHomeEvent(superiorPlayer, island))
+                        return new Result(Reason.EVENT_CANCELLED, true);
+
+                    island.setVisitorsLocation(null);
+                }
             }
         }
 

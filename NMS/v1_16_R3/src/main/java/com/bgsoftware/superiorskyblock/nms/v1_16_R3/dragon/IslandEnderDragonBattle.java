@@ -4,6 +4,8 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.nms.v1_16_R3.NMSUtils;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.BlockPredicate;
 import net.minecraft.server.v1_16_R3.Blocks;
@@ -127,16 +129,20 @@ public class IslandEnderDragonBattle extends EnderDragonBattle {
 
         int highestBlock = this.world.getHighestBlockYAt(HeightMap.Type.MOTION_BLOCKING, this.islandBlockPosition).getY();
 
-        for (int y = highestBlock; y >= 0; --y) {
-            BlockPosition currentPosition = new BlockPosition(this.islandBlockPosition.getX(), y, this.islandBlockPosition.getZ());
+        try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPosition.MutableBlockPosition currentPosition = wrapper.getHandle();
+            currentPosition.setValues(this.islandBlockPosition.getX(), 0, this.islandBlockPosition.getZ());
+            for (int y = highestBlock; y >= 0; --y) {
+                currentPosition.setY(y);
 
-            ShapeDetector.ShapeDetectorCollection shapeDetectorCollection = EXIT_PORTAL_PATTERN.a(this.world, currentPosition);
+                ShapeDetector.ShapeDetectorCollection shapeDetectorCollection = EXIT_PORTAL_PATTERN.a(this.world, currentPosition);
 
-            if (shapeDetectorCollection != null) {
-                if (this.exitPortalLocation == null)
-                    this.exitPortalLocation = shapeDetectorCollection.a(3, 3, 3).getPosition();
+                if (shapeDetectorCollection != null) {
+                    if (this.exitPortalLocation == null)
+                        this.exitPortalLocation = shapeDetectorCollection.a(3, 3, 3).getPosition();
 
-                return shapeDetectorCollection;
+                    return shapeDetectorCollection;
+                }
             }
         }
 

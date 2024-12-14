@@ -3,9 +3,11 @@ package com.bgsoftware.superiorskyblock.external;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import de.dustplanet.silkspawners.events.SilkSpawnersSpawnerChangeEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -39,7 +41,10 @@ public class TimbruSilkSpawnersHook {
             if (oldEntity == null || newEntity == null || oldEntity == newEntity)
                 return;
 
-            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation(wrapper.getHandle()));
+            }
             if (island == null)
                 return;
 

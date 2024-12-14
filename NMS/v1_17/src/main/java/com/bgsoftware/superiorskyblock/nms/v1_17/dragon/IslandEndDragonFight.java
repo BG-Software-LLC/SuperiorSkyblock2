@@ -4,7 +4,9 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.nms.v1_17.NMSUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -131,16 +133,20 @@ public class IslandEndDragonFight extends EndDragonFight {
 
         int highestBlock = this.serverLevel.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, this.islandBlockPos).getY();
 
-        for (int y = highestBlock; y >= this.serverLevel.getMinBuildHeight(); --y) {
-            BlockPos currentPosition = new BlockPos(this.islandBlockPos.getX(), y, this.islandBlockPos.getZ());
+        try (ObjectsPools.Wrapper<BlockPos.MutableBlockPos> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPos.MutableBlockPos currentPosition = wrapper.getHandle();
+            currentPosition.set(this.islandBlockPos.getX(), 0, this.islandBlockPos.getZ());
+            for (int y = highestBlock; y >= this.serverLevel.getMinBuildHeight(); --y) {
+                currentPosition.setY(y);
 
-            BlockPattern.BlockPatternMatch blockPatternMatch = EXIT_PORTAL_PATTERN.find(this.serverLevel, currentPosition);
+                BlockPattern.BlockPatternMatch blockPatternMatch = EXIT_PORTAL_PATTERN.find(this.serverLevel, currentPosition);
 
-            if (blockPatternMatch != null) {
-                if (this.portalLocation == null)
-                    this.portalLocation = blockPatternMatch.getBlock(3, 3, 3).getPos();
+                if (blockPatternMatch != null) {
+                    if (this.portalLocation == null)
+                        this.portalLocation = blockPatternMatch.getBlock(3, 3, 3).getPos();
 
-                return blockPatternMatch;
+                    return blockPatternMatch;
+                }
             }
         }
 

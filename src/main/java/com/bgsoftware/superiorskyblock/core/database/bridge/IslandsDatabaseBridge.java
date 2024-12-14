@@ -43,6 +43,8 @@ import java.util.function.Consumer;
 @SuppressWarnings("unchecked")
 public class IslandsDatabaseBridge {
 
+    private static final Location LOCATION = new Location(null, 0, 100, 0);
+
     private static final Map<UUID, Map<FutureSave, Set<Object>>> SAVE_METHODS_TO_BE_EXECUTED = new ConcurrentHashMap<>();
 
     private IslandsDatabaseBridge() {
@@ -348,7 +350,7 @@ public class IslandsDatabaseBridge {
                 new Pair<>("island", island.getUniqueId().toString()),
                 new Pair<>("name", islandWarp.getName()),
                 new Pair<>("category", category == null ? "" : category.getName()),
-                new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(islandWarp.getLocation())),
+                new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(islandWarp.getLocation(LOCATION))),
                 new Pair<>("private", islandWarp.hasPrivateFlag()),
                 new Pair<>("icon", Serializers.ITEM_STACK_SERIALIZER.serialize(icon))
         ));
@@ -364,7 +366,7 @@ public class IslandsDatabaseBridge {
     public static void updateWarpLocation(Island island, IslandWarp islandWarp) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands_warps",
                 createFilter("island", island, new Pair<>("name", islandWarp.getName())),
-                new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(islandWarp.getLocation()))
+                new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(islandWarp.getLocation(LOCATION)))
         ));
     }
 
@@ -471,7 +473,7 @@ public class IslandsDatabaseBridge {
     public static void saveDirtyChunks(DirtyChunksContainer dirtyChunksContainer) {
         runOperationIfRunning(dirtyChunksContainer.getIsland().getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands",
                 createFilter("uuid", dirtyChunksContainer.getIsland()),
-                new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunkPositions(dirtyChunksContainer.getDirtyChunks()))
+                new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunkPositions(dirtyChunksContainer))
         ));
     }
 

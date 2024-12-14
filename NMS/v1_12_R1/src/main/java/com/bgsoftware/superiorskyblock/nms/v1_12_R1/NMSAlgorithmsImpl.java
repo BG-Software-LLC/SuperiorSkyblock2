@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.algorithms.GlowEnchantment;
@@ -57,7 +58,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public int getCombinedId(Location location) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
-        IBlockData blockData = world.getType(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+        IBlockData blockData;
+        try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            wrapper.getHandle().setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            blockData = world.getType(wrapper.getHandle());
+        }
         return Block.getCombinedId(blockData);
     }
 

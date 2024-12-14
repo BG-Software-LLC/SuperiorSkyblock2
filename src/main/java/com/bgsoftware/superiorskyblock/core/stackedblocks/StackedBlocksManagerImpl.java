@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.StackedBlocksDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -69,7 +70,9 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     @Override
     public int getStackedBlockAmount(Block block) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        return getStackedBlockAmount(block.getLocation());
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return getStackedBlockAmount(block.getLocation(wrapper.getHandle()));
+        }
     }
 
     @Override
@@ -93,7 +96,9 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     @Override
     public boolean setStackedBlock(Block block, int amount) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        return setStackedBlock(block.getLocation(), Keys.of(block), amount);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return setStackedBlock(block.getLocation(wrapper.getHandle()), Keys.of(block), amount);
+        }
     }
 
     @Override
@@ -153,7 +158,9 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     @Override
     public Map<Location, Integer> removeStackedBlocks(World world, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
-        return removeStackedBlocks(ChunkPosition.of(WorldInfo.of(world), chunkX, chunkZ));
+        try (ChunkPosition chunkPosition = ChunkPosition.of(WorldInfo.of(world), chunkX, chunkZ)) {
+            return removeStackedBlocks(chunkPosition);
+        }
     }
 
     public Map<Location, Integer> removeStackedBlocks(ChunkPosition chunkPosition) {
@@ -184,12 +191,12 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     @Override
     public Map<Location, Integer> getStackedBlocks(World world, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
-        ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ);
-
         Map<Location, Integer> chunkStackedBlocks = new LinkedHashMap<>();
 
-        this.stackedBlocksContainer.forEach(chunkPosition, stackedBlock ->
-                chunkStackedBlocks.put(stackedBlock.getLocation(), stackedBlock.getAmount()));
+        try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ)) {
+            this.stackedBlocksContainer.forEach(chunkPosition, stackedBlock ->
+                    chunkStackedBlocks.put(stackedBlock.getLocation(), stackedBlock.getAmount()));
+        }
 
         return Collections.unmodifiableMap(chunkStackedBlocks);
     }
@@ -219,11 +226,13 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     @Override
     public void updateStackedBlockHolograms(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "chunk parameter cannot be null.");
-        this.stackedBlocksContainer.forEach(ChunkPosition.of(chunk), stackedBlock -> {
-            stackedBlock.updateName();
-            if (stackedBlock.getAmount() <= 1)
-                removeStackedBlock(stackedBlock.getLocation());
-        });
+        try (ChunkPosition chunkPosition = ChunkPosition.of(chunk)) {
+            this.stackedBlocksContainer.forEach(chunkPosition, stackedBlock -> {
+                stackedBlock.updateName();
+                if (stackedBlock.getAmount() <= 1)
+                    removeStackedBlock(stackedBlock.getLocation());
+            });
+        }
     }
 
     @Override
@@ -241,7 +250,9 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     @Override
     public void removeStackedBlockHolograms(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "chunk parameter cannot be null.");
-        this.stackedBlocksContainer.forEach(ChunkPosition.of(chunk), StackedBlock::removeHologram);
+        try (ChunkPosition chunkPosition = ChunkPosition.of(chunk)) {
+            this.stackedBlocksContainer.forEach(chunkPosition, StackedBlock::removeHologram);
+        }
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import io.th0rgal.oraxen.api.OraxenBlocks;
@@ -93,8 +94,13 @@ public class OraxenHook {
         public void onOraxenBlockBreak(BlockBreakEvent e) {
             Key blockKey = Keys.of(e.getBlock());
             if (blockKey.getGlobalKey().equals(ORAXEN_PREFIX)) {
-                worldRecordService.get().recordBlockBreak(blockKey, e.getBlock().getLocation(), 1,
-                        WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS | WorldRecordFlags.HANDLE_NEARBY_BLOCKS);
+                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                    worldRecordService.get().recordBlockBreak(blockKey,
+                            e.getBlock().getLocation(wrapper.getHandle()), 1,
+                            WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS | WorldRecordFlags.HANDLE_NEARBY_BLOCKS);
+                }
+
+
             }
         }
 

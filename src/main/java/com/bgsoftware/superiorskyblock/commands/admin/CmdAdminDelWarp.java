@@ -76,7 +76,7 @@ public class CmdAdminDelWarp implements IAdminIslandCommand {
         island.deleteWarp(islandWarp.getName());
         Message.DELETE_WARP.send(sender, islandWarp.getName());
 
-        ChunksProvider.loadChunk(ChunkPosition.of(islandWarp.getLocation()), ChunkLoadReason.WARP_SIGN_BREAK, chunk -> {
+        ChunksProvider.loadChunk(ChunkPosition.of(islandWarp), ChunkLoadReason.WARP_SIGN_BREAK, chunk -> {
             SignWarp.trySignWarpBreak(islandWarp, sender);
         });
     }

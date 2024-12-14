@@ -1,37 +1,29 @@
 package com.bgsoftware.superiorskyblock.core;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 
 import java.lang.ref.WeakReference;
 import java.util.Objects;
 import java.util.Optional;
 
-public class ChunkPosition {
+public class ChunkPosition implements ObjectsPool.Releasable, AutoCloseable {
 
-    private final WorldInfo worldInfo;
-    private final int x;
-    private final int z;
+    private static final ObjectsPool<ChunkPosition> POOL = new ObjectsPool<>(ChunkPosition::new);
 
-    private long pairedXZ = -1;
+    protected WorldInfo worldInfo;
+    protected int x;
+    protected int z;
+
+    protected long pairedXZ = -1;
     @Nullable
-    private WeakReference<World> cachedBukkitWorld = new WeakReference<>(null);
-
-    private ChunkPosition(WorldInfo worldInfo, int x, int z) {
-        this.worldInfo = worldInfo;
-        this.x = x;
-        this.z = z;
-    }
-
-    public static ChunkPosition of(Block block) {
-        World world = block.getWorld();
-        return of(WorldInfo.of(world), block.getX() >> 4, block.getZ() >> 4).withBukkitWorld(world);
-    }
+    protected WeakReference<World> cachedBukkitWorld = new WeakReference<>(null);
+    private final boolean isPool;
 
     public static ChunkPosition of(Location location) {
         World world = location.getWorld();
@@ -39,16 +31,50 @@ public class ChunkPosition {
     }
 
     public static ChunkPosition of(Chunk chunk) {
+        return of(chunk, true);
+    }
+
+    public static ChunkPosition of(Chunk chunk, boolean fromPool) {
         World world = chunk.getWorld();
-        return of(WorldInfo.of(world), chunk.getX(), chunk.getZ()).withBukkitWorld(world);
+        return of(WorldInfo.of(world), chunk.getX(), chunk.getZ(), fromPool).withBukkitWorld(world);
     }
 
     public static ChunkPosition of(World world, int x, int z) {
-        return of(WorldInfo.of(world), x, z).withBukkitWorld(world);
+        return of(world, x, z, true);
+    }
+
+    public static ChunkPosition of(World world, int x, int z, boolean fromPool) {
+        return of(WorldInfo.of(world), x, z, fromPool).withBukkitWorld(world);
     }
 
     public static ChunkPosition of(WorldInfo worldInfo, int x, int z) {
-        return new ChunkPosition(worldInfo, x, z);
+        return of(worldInfo, x, z, true);
+    }
+
+    public static ChunkPosition of(WorldInfo worldInfo, int x, int z, boolean fromPool) {
+        ChunkPosition chunkPosition = fromPool ? POOL.obtain() : new ChunkPosition(false);
+        return chunkPosition.initialize(worldInfo, x, z);
+    }
+
+    public static ChunkPosition of(IslandWarp islandWarp) {
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return of(islandWarp.getLocation(wrapper.getHandle()));
+        }
+    }
+
+    protected ChunkPosition() {
+        this(true);
+    }
+
+    protected ChunkPosition(boolean isPool) {
+        this.isPool = isPool;
+    }
+
+    private ChunkPosition initialize(WorldInfo worldInfo, int x, int z) {
+        this.worldInfo = worldInfo;
+        this.x = x;
+        this.z = z;
+        return this;
     }
 
     public World getWorld() {
@@ -93,6 +119,26 @@ public class ChunkPosition {
         int deltaX = this.x - other.x;
         int deltaZ = this.z - other.z;
         return (deltaX * deltaX) + (deltaZ * deltaZ);
+    }
+
+    @Override
+    public void release() {
+        if (!isPool)
+            return;
+
+        this.worldInfo = null;
+        this.pairedXZ = -1;
+        this.cachedBukkitWorld.clear();
+        POOL.release(this);
+    }
+
+    public ChunkPosition copy() {
+        return new ChunkPosition().initialize(this.worldInfo, this.x, this.z);
+    }
+
+    @Override
+    public void close() {
+        release();
     }
 
     @Override

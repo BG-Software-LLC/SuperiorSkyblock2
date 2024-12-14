@@ -18,7 +18,7 @@ public class WildStackerSnapshotsContainer {
     }
 
     public static void takeSnapshot(Chunk chunk) {
-        ChunkPosition chunkPosition = ChunkPosition.of(chunk);
+        ChunkPosition chunkPosition = ChunkPosition.of(chunk, false);
 
         if (cachedSnapshots.containsKey(chunkPosition))
             return;

@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.ObjectsPool;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
@@ -46,6 +47,7 @@ import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.ticks.ProtoChunkTicks;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -67,6 +69,8 @@ import java.util.function.Supplier;
 
 public class WorldEditSessionImpl implements WorldEditSession {
 
+    private static final ObjectsPool<WorldEditSessionImpl> POOL = new ObjectsPool<>(WorldEditSessionImpl::new);
+
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final boolean isStarLightInterface = ((Supplier<Boolean>) () -> {
         try {
@@ -81,12 +85,20 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private final List<Pair<BlockPos, BlockState>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPos, CompoundTag>> blockEntities = new LinkedList<>();
     private final Set<ChunkPos> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
-    private final ServerLevel serverLevel;
-    private final Dimension dimension;
+    private ServerLevel serverLevel;
+    private Dimension dimension;
 
-    public WorldEditSessionImpl(ServerLevel serverLevel) {
+    public static WorldEditSessionImpl obtain(ServerLevel serverLevel) {
+        return POOL.obtain().initialize(serverLevel);
+    }
+
+    private WorldEditSessionImpl() {
+    }
+
+    public WorldEditSessionImpl initialize(ServerLevel serverLevel) {
         this.serverLevel = serverLevel;
         this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(serverLevel.getWorld());
+        return this;
     }
 
     @Override
@@ -155,13 +167,17 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     @Override
     public List<ChunkPosition> getAffectedChunks() {
+        if (chunks.isEmpty())
+            return Collections.emptyList();
+
         List<ChunkPosition> chunkPositions = new LinkedList<>();
         World bukkitWorld = serverLevel.getWorld();
         LongIterator iterator = chunks.keyIterator();
         while (iterator.hasNext()) {
             long chunkKey = iterator.next();
-            ChunkPos chunkPos = new ChunkPos(chunkKey);
-            chunkPositions.add(ChunkPosition.of(bukkitWorld, chunkPos.x, chunkPos.z));
+            int chunkX = (int) chunkKey;
+            int chunkZ = (int) (chunkKey >> 32);
+            chunkPositions.add(ChunkPosition.of(bukkitWorld, chunkX, chunkZ, false));
         }
         return chunkPositions;
     }
@@ -255,6 +271,18 @@ public class WorldEditSessionImpl implements WorldEditSession {
             this.lightenChunks.clear();
         }
 
+        release();
+    }
+
+    @Override
+    public void release() {
+        this.chunks.clear();
+        this.blocksToUpdate.clear();
+        this.blockEntities.clear();
+        this.lightenChunks.clear();
+        this.serverLevel = null;
+        this.dimension = null;
+        POOL.release(this);
     }
 
     private boolean isValidPosition(BlockPos blockPos) {

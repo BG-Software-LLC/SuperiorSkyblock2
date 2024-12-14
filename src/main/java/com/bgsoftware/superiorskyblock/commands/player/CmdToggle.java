@@ -4,8 +4,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
@@ -67,7 +70,9 @@ public class CmdToggle implements ISuperiorCommand {
             }
 
             superiorPlayer.toggleWorldBorder();
-            superiorPlayer.updateWorldBorder(plugin.getGrid().getIslandAt(superiorPlayer.getLocation()));
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                superiorPlayer.updateWorldBorder(plugin.getGrid().getIslandAt(((Player) sender).getLocation(wrapper.getHandle())));
+            }
         } else if (args[1].equalsIgnoreCase("blocks")) {
             if (!superiorPlayer.hasPermission("superior.island.toggle.blocks")) {
                 Message.NO_COMMAND_PERMISSION.send(sender);

@@ -1,9 +1,12 @@
 package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.ObjectsPool;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -11,7 +14,6 @@ import com.google.common.collect.Maps;
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Chunk;
-import net.minecraft.server.v1_12_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_12_R1.ChunkProviderServer;
 import net.minecraft.server.v1_12_R1.ChunkSection;
 import net.minecraft.server.v1_12_R1.EntityHuman;
@@ -24,6 +26,7 @@ import net.minecraft.server.v1_12_R1.PlayerChunkMap;
 import net.minecraft.server.v1_12_R1.TileEntity;
 import net.minecraft.server.v1_12_R1.World;
 import net.minecraft.server.v1_12_R1.WorldServer;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 
 import java.util.Collection;
@@ -50,8 +53,28 @@ public class NMSUtils {
 
     private static final List<CompletableFuture<Void>> PENDING_CHUNK_ACTIONS = new LinkedList<>();
 
+    public static final ObjectsPool<ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition>> BLOCK_POS_POOL =
+            ObjectsPools.createNewPool(() -> new BlockPosition.MutableBlockPosition(0, 0, 0));
+
     private NMSUtils() {
 
+    }
+
+    @Nullable
+    public static <T extends TileEntity> T getTileEntityAt(Location location, Class<T> type) {
+        org.bukkit.World bukkitWorld = location.getWorld();
+
+        if (bukkitWorld == null)
+            return null;
+
+        WorldServer worldServer = ((CraftWorld) bukkitWorld).getHandle();
+
+        try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
+            blockPosition.setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            TileEntity tileEntity = worldServer.getTileEntity(blockPosition);
+            return !type.isInstance(tileEntity) ? null : type.cast(tileEntity);
+        }
     }
 
     public static void runActionOnEntityChunks(Collection<ChunkPosition> chunksCoords,

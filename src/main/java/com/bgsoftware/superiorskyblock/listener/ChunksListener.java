@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
@@ -101,15 +102,15 @@ public class ChunksListener implements Listener {
 
         List<Island> chunkIslands = plugin.getGrid().getIslandsAt(chunk);
         chunkIslands.forEach(island -> {
-            if (!island.isSpawn())
-                handleIslandChunkLoad(island, chunk, isNewChunk);
+            if (!island.isSpawn()) {
+                try (ChunkPosition chunkPosition = ChunkPosition.of(chunk)) {
+                    handleIslandChunkLoad(island, chunk, chunkPosition, isNewChunk);
+                }
+            }
         });
     }
 
-    private void handleIslandChunkLoad(Island island, Chunk chunk, boolean isNewChunk) {
-        ChunkPosition chunkPosition = ChunkPosition.of(chunk);
-
-
+    private void handleIslandChunkLoad(Island island, Chunk chunk, ChunkPosition chunkPosition, boolean isNewChunk) {
         World world = chunk.getWorld();
         Dimension dimension = plugin.getGrid().getIslandsWorldDimension(world);
 
@@ -120,7 +121,7 @@ public class ChunksListener implements Listener {
                 List<Player> playersToUpdate = new SequentialListBuilder<Player>()
                         .filter(player -> player.getWorld().equals(world))
                         .build(island.getAllPlayersInside(), SuperiorPlayer::asPlayer);
-                plugin.getNMSChunks().setBiome(Collections.singletonList(ChunkPosition.of(chunk)), island.getBiome(), playersToUpdate);
+                plugin.getNMSChunks().setBiome(Collections.singletonList(chunkPosition), island.getBiome(), playersToUpdate);
             }
         }
 
@@ -165,11 +166,13 @@ public class ChunksListener implements Listener {
             if (!island.getEntitiesTracker().canRecalculateEntityCounts())
                 recalculateEntities.set(false);
 
-            for (Entity entity : chunk.getEntities()) {
-                // We want to delete old holograms of stacked blocks + count entities for the chunk
-                if (entity instanceof ArmorStand && isOldHologram((ArmorStand) entity) &&
-                        plugin.getStackedBlocks().getStackedBlockAmount(entity.getLocation().subtract(0, 1, 0)) > 1) {
-                    entity.remove();
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                for (Entity entity : chunk.getEntities()) {
+                    // We want to delete old holograms of stacked blocks + count entities for the chunk
+                    if (entity instanceof ArmorStand && isOldHologram((ArmorStand) entity) &&
+                            plugin.getStackedBlocks().getStackedBlockAmount(entity.getLocation(wrapper.getHandle()).subtract(0, 1, 0)) > 1) {
+                        entity.remove();
+                    }
                 }
             }
 

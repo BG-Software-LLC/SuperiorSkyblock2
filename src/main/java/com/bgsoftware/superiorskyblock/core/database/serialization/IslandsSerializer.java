@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.database.serialization;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.DirtyChunk;
+import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -62,19 +63,29 @@ public class IslandsSerializer {
 
     public static String serializeDirtyChunkPositions(List<ChunkPosition> dirtyChunks) {
         JsonObject dirtyChunksObject = new JsonObject();
-        dirtyChunks.forEach(dirtyChunk -> {
-            JsonArray dirtyChunksArray;
-
-            if (dirtyChunksObject.has(dirtyChunk.getWorldName())) {
-                dirtyChunksArray = dirtyChunksObject.getAsJsonArray(dirtyChunk.getWorldName());
-            } else {
-                dirtyChunksArray = new JsonArray();
-                dirtyChunksObject.add(dirtyChunk.getWorldName(), dirtyChunksArray);
-            }
-
-            dirtyChunksArray.add(new JsonPrimitive(dirtyChunk.getX() + "," + dirtyChunk.getZ()));
-        });
+        dirtyChunks.forEach(dirtyChunk ->
+                serializeDirtyChunkPosition(dirtyChunksObject, dirtyChunk));
         return gson.toJson(dirtyChunksObject);
+    }
+
+    public static String serializeDirtyChunkPositions(DirtyChunksContainer container) {
+        JsonObject dirtyChunksObject = new JsonObject();
+        container.getDirtyChunks(dirtyChunk ->
+                serializeDirtyChunkPosition(dirtyChunksObject, dirtyChunk));
+        return gson.toJson(dirtyChunksObject);
+    }
+
+    private static void serializeDirtyChunkPosition(JsonObject dirtyChunksObject, ChunkPosition dirtyChunk) {
+        JsonArray dirtyChunksArray;
+
+        if (dirtyChunksObject.has(dirtyChunk.getWorldName())) {
+            dirtyChunksArray = dirtyChunksObject.getAsJsonArray(dirtyChunk.getWorldName());
+        } else {
+            dirtyChunksArray = new JsonArray();
+            dirtyChunksObject.add(dirtyChunk.getWorldName(), dirtyChunksArray);
+        }
+
+        dirtyChunksArray.add(new JsonPrimitive(dirtyChunk.getX() + "," + dirtyChunk.getZ()));
     }
 
 }

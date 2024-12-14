@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
 
@@ -17,6 +18,14 @@ public interface IslandPreview {
      * Get the location of the island preview.
      */
     Location getLocation();
+
+    /**
+     * Get the location of the island preview.
+     *
+     * @param location Location object to re-use.
+     */
+    @Nullable
+    Location getLocation(@Nullable Location location);
 
     /**
      * Get the requested schematic.

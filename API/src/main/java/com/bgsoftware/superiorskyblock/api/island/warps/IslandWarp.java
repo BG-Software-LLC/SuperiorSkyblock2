@@ -32,6 +32,14 @@ public interface IslandWarp {
     Location getLocation();
 
     /**
+     * Get the location of the warp.
+     *
+     * @param location Location object to re-use.
+     */
+    @Nullable
+    Location getLocation(@Nullable Location location);
+
+    /**
      * Set the location of the warp.
      *
      * @param location The new location to set.
