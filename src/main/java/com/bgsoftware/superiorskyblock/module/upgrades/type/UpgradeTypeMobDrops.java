@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetMobDr
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -46,22 +47,25 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
         return commands;
     }
 
+    private static boolean canDupeDropsForEntity(Entity entity) {
+        return entity instanceof LivingEntity && !(entity instanceof Player) && !(entity instanceof ArmorStand);
+    }
+
     private class MobDropsListener implements Listener {
 
         // Priority is set to HIGH for fixing detection with WildStacker
         // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/540
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onLastDamageEntity(EntityDamageEvent e) {
-            if (!(e.getEntity() instanceof LivingEntity))
+            if (!canDupeDropsForEntity(e.getEntity()))
                 return;
 
             LivingEntity livingEntity = (LivingEntity) e.getEntity();
 
-            if (!(livingEntity instanceof ArmorStand) && livingEntity.getHealth() - e.getFinalDamage() > 0)
+            if (livingEntity.getHealth() - e.getFinalDamage() > 0)
                 return;
 
             Island island = plugin.getGrid().getIslandAt(livingEntity.getLocation());
-
             if (island == null)
                 return;
 
@@ -70,12 +74,11 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
 
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onEntityDeath(EntityDeathEvent e) {
-            Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-
-            if (island == null)
+            if (!canDupeDropsForEntity(e.getEntity()))
                 return;
 
-            if (e.getEntity() instanceof Player)
+            Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+            if (island == null)
                 return;
 
             if (plugin.getSettings().isDropsUpgradePlayersMultiply()) {
@@ -85,16 +88,18 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
                     return;
             }
 
-            BukkitEntities.clearEntityEquipment(e.getEntity());
-
             double mobDropsMultiplier = island.getMobDropsMultiplier();
-            if (mobDropsMultiplier <= 1)
-                return;
+            if (mobDropsMultiplier > 1)
+                modifyEventDrops(e.getDrops(), e.getEntity(), mobDropsMultiplier);
 
+            BukkitEntities.clearEntityEquipment(e.getEntity());
+        }
+
+        private void modifyEventDrops(List<ItemStack> drops, LivingEntity livingEntity, double mobDropsMultiplier) {
             List<ItemStack> dropsToAdd = isWildStackerInstalled ? null : new LinkedList<>();
 
-            for (ItemStack itemStack : e.getDrops()) {
-                if (itemStack != null && !BukkitEntities.isEquipment(e.getEntity(), itemStack)) {
+            for (ItemStack itemStack : drops) {
+                if (itemStack != null && !BukkitEntities.isEquipment(livingEntity, itemStack)) {
                     int newAmount = (int) Math.floor(itemStack.getAmount() * mobDropsMultiplier);
 
                     if (isWildStackerInstalled) {
@@ -129,7 +134,7 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
             }
 
             if (dropsToAdd != null)
-                e.getDrops().addAll(dropsToAdd);
+                drops.addAll(dropsToAdd);
         }
 
     }
