@@ -92,8 +92,8 @@ public class SpawnIsland implements Island {
     private static EnumerateSet<IslandFlag> DEFAULT_SPAWN_FLAGS_CACHE;
     private static EnumerateSet<IslandPrivilege> DEFAULT_SPAWN_PRIVILEGES_CACHE;
 
-    static {
-        plugin.getCallbacksBus().registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, SpawnIsland::onSettingsUpdate);
+    public static void registerCallbacks(CallbacksBus bus) {
+        bus.registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, SpawnIsland::onSettingsUpdate);
     }
 
     private static void onSettingsUpdate() {

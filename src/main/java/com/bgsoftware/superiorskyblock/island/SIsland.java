@@ -150,10 +150,6 @@ public class SIsland implements Island {
 
     private static EnumerateSet<IslandFlag> DEFAULT_FLAGS_CACHE;
 
-    static {
-        plugin.getCallbacksBus().registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, SIsland::onSettingsUpdate);
-    }
-
     private final DatabaseBridge databaseBridge;
     private final IslandBank islandBank;
     private final IslandCalculationAlgorithm calculationAlgorithm;
@@ -5016,6 +5012,10 @@ public class SIsland implements Island {
         double newCropGrowthMultiplier = newCropGrowth - 1;
         IslandUtils.getChunkCoords(this, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS)
                 .values().forEach(chunkPositions -> plugin.getNMSChunks().updateCropsTicker(chunkPositions, newCropGrowthMultiplier));
+    }
+
+    public static void registerCallbacks(CallbacksBus bus) {
+        bus.registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, SIsland::onSettingsUpdate);
     }
 
     private static void onSettingsUpdate() {

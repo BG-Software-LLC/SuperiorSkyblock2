@@ -1,6 +1,10 @@
 package com.bgsoftware.superiorskyblock.core.events;
 
+import com.bgsoftware.superiorskyblock.commands.CommandsMap;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.island.SpawnIsland;
+import com.bgsoftware.superiorskyblock.service.region.RegionManagerServiceImpl;
 
 import java.util.EnumMap;
 import java.util.LinkedList;
@@ -11,6 +15,10 @@ public class CallbacksBus {
     private final EnumMap<CallbackType, List<Runnable>> CALLBACKS = new EnumMap<>(CallbackType.class);
 
     public CallbacksBus() {
+        SIsland.registerCallbacks(this);
+        CommandsMap.registerCallbacks(this);
+        SpawnIsland.registerCallbacks(this);
+        RegionManagerServiceImpl.registerCallbacks(this);
     }
 
     public void registerCallback(CallbackType callbackType, Runnable callback) {

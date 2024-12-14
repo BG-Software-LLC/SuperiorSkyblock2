@@ -21,7 +21,6 @@ import java.util.Set;
 public abstract class CommandsMap {
 
     private static Set<SuperiorCommand> DISABLED_COMMANDS_CACHE;
-    private static boolean registeredCallback = false;
 
     private static void onSettingsUpdate() {
         DISABLED_COMMANDS_CACHE = new HashSet<>();
@@ -33,6 +32,10 @@ public abstract class CommandsMap {
         });
     }
 
+    public static void registerCallbacks(CallbacksBus bus) {
+        bus.registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, CommandsMap::onSettingsUpdate);
+    }
+
     private final Map<String, SuperiorCommand> subCommands = new LinkedHashMap<>();
     private final Map<String, SuperiorCommand> aliasesToCommand = new HashMap<>();
 
@@ -40,10 +43,6 @@ public abstract class CommandsMap {
 
     protected CommandsMap(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        if (!registeredCallback) {
-            registeredCallback = true;
-            plugin.getCallbacksBus().registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, CommandsMap::onSettingsUpdate);
-        }
     }
 
     public abstract void loadDefaultCommands();

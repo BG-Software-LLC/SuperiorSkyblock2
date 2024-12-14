@@ -82,10 +82,14 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
     public RegionManagerServiceImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        plugin.getCallbacksBus().registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, this::onSettingsUpdate);
     }
 
-    private void onSettingsUpdate() {
+    public static void registerCallbacks(CallbacksBus bus) {
+        bus.registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, RegionManagerServiceImpl::onSettingsUpdate);
+    }
+
+    private static void onSettingsUpdate() {
+        SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
         WORLD_PERMISSIONS_CACHE = new EnumerateSet<>(IslandPrivilege.values());
         plugin.getSettings().getWorldPermissions().forEach(islandPrivilageName -> {
             try {
