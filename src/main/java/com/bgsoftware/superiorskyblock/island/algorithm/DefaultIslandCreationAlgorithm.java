@@ -100,22 +100,22 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
 
         CompletableFuture<IslandCreationResult> completableFuture = new CompletableFuture<>();
 
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location location = islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(wrapper.getHandle());
-            schematic.pasteSchematic(island, location, () -> {
-                plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
-                        builder.owner.getUniqueId(), builder.uuid);
-                completableFuture.complete(new IslandCreationResult(IslandCreationResult.Status.SUCCESS, island, islandLocation, event.getResult()));
-                island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
-                Profiler.end(profiler);
-            }, error -> {
-                island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
-                plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
-                        builder.owner.getUniqueId(), builder.uuid);
-                completableFuture.completeExceptionally(error);
-                Profiler.end(profiler);
-            });
-        }
+        // Clone location as pasteSchematic uses the same location in later scheduled tasks
+        Location location = islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation();
+
+        schematic.pasteSchematic(island, location, () -> {
+            plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
+                    builder.owner.getUniqueId(), builder.uuid);
+            completableFuture.complete(new IslandCreationResult(IslandCreationResult.Status.SUCCESS, island, islandLocation, event.getResult()));
+            island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
+            Profiler.end(profiler);
+        }, error -> {
+            island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
+            plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
+                    builder.owner.getUniqueId(), builder.uuid);
+            completableFuture.completeExceptionally(error);
+            Profiler.end(profiler);
+        });
 
         return completableFuture;
     }
