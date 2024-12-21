@@ -1,0 +1,25 @@
+group 'Hooks:Nexo'
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+    repositories {
+        maven { url 'https://repo.bg-software.com/repository/nms/' }
+        maven { url 'https://repo.bg-software.com/repository/api/' }
+        maven { url 'https://repo.bg-software.com/repository/common/' }
+        maven { url 'https://repo.bg-software.com/repository/dependencies/' }
+        maven { url 'https://repo.nexomc.com/releases/' }
+    }        
+dependencies {
+    compileOnly 'com.nexomc:nexo:0.5.0'
+    compileOnly "org.spigotmc:v1_20_R3:b3973-2"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_nexo') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_nexo").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}
