@@ -107,7 +107,6 @@ interactables:
   - 'ENCHANTING_TABLE'
   - 'ENCHANTMENT_TABLE'
   - 'ENDER_CHEST'
-  - 'ENDER_PEARL'
   - 'ENDER_PORTAL_FRAME'
   - 'FARMLAND'
   - 'FENCE'
