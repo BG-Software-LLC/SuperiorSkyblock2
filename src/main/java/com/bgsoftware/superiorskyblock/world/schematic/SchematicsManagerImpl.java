@@ -202,17 +202,33 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
                 Math.max(pos1.getZ(), pos2.getZ())
         );
 
-        int xSize = max.getBlockX() - min.getBlockX();
-        int ySize = max.getBlockY() - min.getBlockY();
-        int zSize = max.getBlockZ() - min.getBlockZ();
+        int minBlockX = min.getBlockX();
+        int minBlockY = min.getBlockY();
+        int minBlockZ = min.getBlockZ();
+
+        int xSize = max.getBlockX() - minBlockX;
+        int ySize = max.getBlockY() - minBlockY;
+        int zSize = max.getBlockZ() - minBlockZ;
 
         List<Tag<?>> blocks = new ArrayList<>();
         List<Tag<?>> entities = new ArrayList<>();
 
         for (int x = 0; x <= xSize; x++) {
-            for (int z = 0; z <= zSize; z++) {
+            int blockX = minBlockX + x;
+            for (int z = 0; z <= zSize; /* z increments inside loop */) {
+                int blockZ = minBlockZ + z;
+                // Check if we at start of new chunk
+                if ((blockX & 0xF) == 0 && (blockZ & 0xF) == 0) {
+                    Chunk chunk = world.getChunkAt(blockX >> 4, blockZ >> 4);
+                    if (plugin.getNMSChunks().isChunkEmpty(chunk)) {
+                        // Skip empty chunk
+                        z += 16;
+                        continue;
+                    }
+                }
+
                 for (int y = 0; y <= ySize; y++) {
-                    Block block = world.getBlockAt(x + min.getBlockX(), y + min.getBlockY(), z + min.getBlockZ());
+                    Block block = world.getBlockAt(blockX, minBlockY + y, blockZ);
                     Material blockType = block.getType();
                     if (blockType == Material.AIR)
                         continue;
@@ -235,6 +251,8 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
                         );
                     }
                 }
+
+                ++z;
             }
         }
 
