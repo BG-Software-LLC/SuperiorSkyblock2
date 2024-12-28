@@ -526,14 +526,14 @@ public class SIsland implements Island {
 
         boolean addedNewMember = members.writeAndGet(members -> members.add(superiorPlayer));
 
-        // This player is already an member of the island
+        // This player is already a member of the island
         if (!addedNewMember)
             return;
 
-        // Removing player from being a coop.
-        if (isCoop(superiorPlayer)) {
-            removeCoop(superiorPlayer);
-        }
+        // Remove player from being coop, invited and its ratings
+        removeCoop(superiorPlayer);
+        revokeInvite(superiorPlayer);
+        removeRating(superiorPlayer);
 
         superiorPlayer.setIsland(this);
 
