@@ -81,16 +81,17 @@ public abstract class CommandsMap {
     public SuperiorCommand getCommand(String label) {
         label = label.toLowerCase(Locale.ENGLISH);
         SuperiorCommand superiorCommand = subCommands.get(label);
-        if (superiorCommand == null || !isCommandEnabled(superiorCommand)) {
-            List<SuperiorCommand> commandAliases = aliasesToCommand.getOrDefault(label, Collections.emptyList());
-            for (SuperiorCommand commandAlias : commandAliases) {
-                if (isCommandEnabled(commandAlias)) {
-                    superiorCommand = commandAlias;
-                    break;
-                }
+        if (superiorCommand != null && isCommandEnabled(superiorCommand))
+            return superiorCommand;
+
+        List<SuperiorCommand> commandAliases = aliasesToCommand.getOrDefault(label, Collections.emptyList());
+        for (SuperiorCommand commandAlias : commandAliases) {
+            if (isCommandEnabled(commandAlias)) {
+                return commandAlias;
             }
         }
-        return superiorCommand;
+
+        return null;
     }
 
     public List<SuperiorCommand> getSubCommands(boolean includeDisabled) {
