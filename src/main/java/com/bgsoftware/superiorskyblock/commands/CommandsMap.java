@@ -37,7 +37,7 @@ public abstract class CommandsMap {
     }
 
     private final Map<String, SuperiorCommand> subCommands = new LinkedHashMap<>();
-    private final Map<String, SuperiorCommand> aliasesToCommand = new HashMap<>();
+    private final Map<String, List<SuperiorCommand>> aliasesToCommand = new HashMap<>();
 
     protected final SuperiorSkyblockPlugin plugin;
 
@@ -49,17 +49,17 @@ public abstract class CommandsMap {
 
     public void registerCommand(SuperiorCommand superiorCommand, boolean sort) {
         List<String> aliases = new LinkedList<>(superiorCommand.getAliases());
-        String label = aliases.get(0).toLowerCase(Locale.ENGLISH);
+        String label = aliases.remove(0).toLowerCase(Locale.ENGLISH);
         aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, Collections.emptyList()));
 
-        if (subCommands.containsKey(label)) {
-            subCommands.remove(label);
-            aliasesToCommand.values().removeIf(sC -> sC.getAliases().get(0).equals(aliases.get(0)));
+        if (subCommands.remove(label) != null) {
+            aliasesToCommand.values().forEach(commandsList ->
+                    commandsList.removeIf(sC -> sC.getAliases().get(0).equalsIgnoreCase(label)));
         }
         subCommands.put(label, superiorCommand);
 
         for (String alias : aliases) {
-            aliasesToCommand.put(alias.toLowerCase(Locale.ENGLISH), superiorCommand);
+            aliasesToCommand.computeIfAbsent(alias.toLowerCase(Locale.ENGLISH), a -> new LinkedList<>()).add(superiorCommand);
         }
 
         if (sort) {
@@ -74,18 +74,28 @@ public abstract class CommandsMap {
         Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
 
         List<String> aliases = new LinkedList<>(superiorCommand.getAliases());
-        String label = aliases.get(0).toLowerCase(Locale.ENGLISH);
+        String label = aliases.remove(0).toLowerCase(Locale.ENGLISH);
         aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, Collections.emptyList()));
 
         subCommands.remove(label);
-        aliasesToCommand.values().removeIf(sC -> sC.getAliases().get(0).equals(aliases.get(0)));
+        aliasesToCommand.values().forEach(commandsList ->
+                commandsList.removeIf(sC -> sC.getAliases().get(0).equals(aliases.get(0))));
     }
 
     @Nullable
     public SuperiorCommand getCommand(String label) {
         label = label.toLowerCase(Locale.ENGLISH);
-        SuperiorCommand superiorCommand = subCommands.getOrDefault(label, aliasesToCommand.get(label));
-        return superiorCommand != null && !isCommandEnabled(superiorCommand) ? null : superiorCommand;
+        SuperiorCommand superiorCommand = subCommands.get(label);
+        if (superiorCommand == null || !isCommandEnabled(superiorCommand)) {
+            List<SuperiorCommand> commandAliases = aliasesToCommand.getOrDefault(label, Collections.emptyList());
+            for (SuperiorCommand commandAlias : commandAliases) {
+                if (isCommandEnabled(commandAlias)) {
+                    superiorCommand = commandAlias;
+                    break;
+                }
+            }
+        }
+        return superiorCommand;
     }
 
     public List<SuperiorCommand> getSubCommands(boolean includeDisabled) {
