@@ -37,19 +37,31 @@ public class BigBitSet {
         int backendIdx = fromIndex / DEFAULT_CAPACITY;
         int bitSetIdx = fromIndex % DEFAULT_CAPACITY;
 
-        int next = -1;
+        return nextSetBitInternal(backendIdx, bitSetIdx);
+    }
+
+    private int nextSetBitInternal(int backendIdx, int bitSetIdx) {
+        if (backendIdx < 0 || backendIdx >= this.backend.length)
+            return -1;
 
         BitSet bitSet = this.backend[backendIdx];
         if (bitSet != null) {
-            next = bitSet.nextSetBit(bitSetIdx);
-            if (next == -1 && ++backendIdx < this.backend.length) {
-                bitSet = this.backend[backendIdx];
-                if (bitSet != null)
-                    next = bitSet.nextSetBit(0);
+            int next = bitSet.nextSetBit(bitSetIdx);
+            if (next != -1) {
+                return backendIdx * DEFAULT_CAPACITY + next;
             }
         }
 
-        return next == -1 ? -1 : backendIdx * DEFAULT_CAPACITY + next;
+        return nextSetBitInternal(backendIdx + 1, 0);
+    }
+
+    public int cardinality() {
+        int cardinality = 0;
+        for (BitSet bitSet : backend) {
+            if (bitSet != null)
+                cardinality += bitSet.cardinality();
+        }
+        return cardinality;
     }
 
 }
