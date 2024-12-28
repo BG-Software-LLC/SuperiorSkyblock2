@@ -3562,7 +3562,7 @@ public class SIsland implements Island {
 
         IslandWarp islandWarp;
         try (LocationKey locationKey = LocationKey.of(location)) {
-            islandWarp = warpsByLocation.remove(location);
+            islandWarp = warpsByLocation.remove(locationKey);
         }
 
         if (islandWarp != null) {
