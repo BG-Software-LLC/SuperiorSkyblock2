@@ -52,10 +52,7 @@ public abstract class CommandsMap {
         String label = aliases.remove(0).toLowerCase(Locale.ENGLISH);
         aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, Collections.emptyList()));
 
-        if (subCommands.remove(label) != null) {
-            aliasesToCommand.values().forEach(commandsList ->
-                    commandsList.removeIf(sC -> sC.getAliases().get(0).equalsIgnoreCase(label)));
-        }
+        removeCommand(label);
         subCommands.put(label, superiorCommand);
 
         for (String alias : aliases) {
@@ -77,9 +74,7 @@ public abstract class CommandsMap {
         String label = aliases.remove(0).toLowerCase(Locale.ENGLISH);
         aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, Collections.emptyList()));
 
-        subCommands.remove(label);
-        aliasesToCommand.values().forEach(commandsList ->
-                commandsList.removeIf(sC -> sC.getAliases().get(0).equals(aliases.get(0))));
+        removeCommand(label);
     }
 
     @Nullable
@@ -109,6 +104,13 @@ public abstract class CommandsMap {
 
     private boolean isCommandEnabled(SuperiorCommand superiorCommand) {
         return superiorCommand instanceof IAdminIslandCommand || !DISABLED_COMMANDS_CACHE.contains(superiorCommand);
+    }
+
+    private void removeCommand(String label) {
+        if (subCommands.remove(label) != null) {
+            aliasesToCommand.values().forEach(commandsList ->
+                    commandsList.removeIf(sC -> sC.getAliases().get(0).equalsIgnoreCase(label)));
+        }
     }
 
 }
