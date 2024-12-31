@@ -100,6 +100,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension()).getBlockZ() + "")
                     .put("world", (island, superiorPlayer) ->
                             island.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension()).getWorld().getName())
+                    .put("schematic", (island, superiorPlayer) -> island.getSchematicName())
                     .put("team_size", (island, superiorPlayer) -> island.getIslandMembers(true).size() + "")
                     .put("team_size_online", (island, superiorPlayer) ->
                             island.getIslandMembers(true).stream().filter(SuperiorPlayer::isShownAsOnline).count() + "")
