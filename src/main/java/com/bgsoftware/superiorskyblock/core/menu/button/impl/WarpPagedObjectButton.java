@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
@@ -13,7 +14,7 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarps;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.island.warp.SIslandWarp;
+import org.bukkit.Location;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -46,12 +47,14 @@ public class WarpPagedObjectButton extends AbstractPagedMenuButton<MenuWarps.Vie
         if (menuView.hasManagePerms() && !Menus.MENU_WARPS.getEditLore().isEmpty())
             itemBuilder.appendLore(Menus.MENU_WARPS.getEditLore());
 
-        return itemBuilder.replaceAll("{0}", pagedObject.getName())
-                .replaceAll("{1}", Formatters.LOCATION_FORMATTER.format(pagedObject.getLocation()))
-                .replaceAll("{2}", pagedObject.hasPrivateFlag() ?
-                        ensureNotNull(Message.ISLAND_WARP_PRIVATE.getMessage(superiorPlayer.getUserLocale())) :
-                        ensureNotNull(Message.ISLAND_WARP_PUBLIC.getMessage(superiorPlayer.getUserLocale())))
-                .build(superiorPlayer);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return itemBuilder.replaceAll("{0}", pagedObject.getName())
+                    .replaceAll("{1}", Formatters.LOCATION_FORMATTER.format(pagedObject.getLocation(wrapper.getHandle())))
+                    .replaceAll("{2}", pagedObject.hasPrivateFlag() ?
+                            ensureNotNull(Message.ISLAND_WARP_PRIVATE.getMessage(superiorPlayer.getUserLocale())) :
+                            ensureNotNull(Message.ISLAND_WARP_PUBLIC.getMessage(superiorPlayer.getUserLocale())))
+                    .build(superiorPlayer);
+        }
     }
 
     public static class Builder extends PagedMenuTemplateButtonImpl.AbstractBuilder<MenuWarps.View, IslandWarp> {

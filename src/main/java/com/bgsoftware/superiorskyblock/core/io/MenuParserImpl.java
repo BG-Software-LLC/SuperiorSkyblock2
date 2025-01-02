@@ -321,6 +321,9 @@ public class MenuParserImpl implements MenuParser {
         if (section.contains("lore"))
             itemBuilder.withLore(section.getStringList("lore"));
 
+        if (section.isInt("amount"))
+            itemBuilder.withAmount(section.getInt("amount"));
+
         if (section.contains("enchants")) {
             for (String _enchantment : section.getConfigurationSection("enchants").getKeys(false)) {
                 Enchantment enchantment;

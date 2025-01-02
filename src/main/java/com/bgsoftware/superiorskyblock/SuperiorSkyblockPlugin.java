@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.config.SettingsManagerImpl;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PluginLoadingStage;
 import com.bgsoftware.superiorskyblock.core.PluginReloadReason;
 import com.bgsoftware.superiorskyblock.core.database.DataManager;
@@ -24,6 +25,7 @@ import com.bgsoftware.superiorskyblock.core.database.transaction.DatabaseTransac
 import com.bgsoftware.superiorskyblock.core.engine.EnginesFactory;
 import com.bgsoftware.superiorskyblock.core.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.factory.FactoriesManagerImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.GlowEnchantment;
@@ -81,6 +83,7 @@ import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -114,10 +117,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     /* Global handlers */
     private final Updater updater = new Updater(this, "superiorskyblock2");
     private final EventsBus eventsBus = new EventsBus(this);
+    private final CallbacksBus callbacksBus = new CallbacksBus();
     private final BukkitListeners bukkitListeners = new BukkitListeners(this);
     private IScriptEngine scriptEngine = EnginesFactory.createDefaultEngine();
-    @Nullable
-    private ChunkGenerator worldGenerator = null;
 
     /* NMS */
     @Nullable
@@ -140,6 +142,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     @Override
     public void onLoad() {
         plugin = this;
+        callbacksBus.registerDefaultCallbacks();
 
         DependenciesManager.inject(this);
 
@@ -293,32 +296,37 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             }
 
             BukkitExecutor.sync(() -> {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
-                    superiorPlayer.updateLastTimeStatus();
-                    Island island = gridHandler.getIslandAt(superiorPlayer.getLocation());
-                    Island playerIsland = superiorPlayer.getIsland();
+                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
+                        superiorPlayer.updateLastTimeStatus();
 
-                    if (superiorPlayer.hasIslandFlyEnabled()) {
-                        if (island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
-                            player.setAllowFlight(true);
-                            player.setFlying(true);
-                        } else {
-                            superiorPlayer.toggleIslandFly();
+                        Island island = gridHandler.getIslandAt(player.getLocation(wrapper.getHandle()));
+                        Island playerIsland = superiorPlayer.getIsland();
+
+                        if (superiorPlayer.hasIslandFlyEnabled()) {
+                            if (island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
+                                player.setAllowFlight(true);
+                                player.setFlying(true);
+                            } else {
+                                superiorPlayer.toggleIslandFly();
+                            }
                         }
+
+                        if (playerIsland != null)
+                            playerIsland.setCurrentlyActive(true);
+
+                        if (island != null)
+                            island.setPlayerInside(superiorPlayer, true);
                     }
-
-                    if (playerIsland != null)
-                        playerIsland.setCurrentlyActive(true);
-
-                    if (island != null)
-                        island.setPlayerInside(superiorPlayer, true);
                 }
             }, 1L);
 
             eventsBus.callPluginInitializedEvent(this);
 
             loadingStage = PluginLoadingStage.ENABLED;
+
+            plugin.getCallbacksBus().notifyCallbacks(CallbacksBus.CallbackType.SETTINGS_UPDATE);
         } catch (Throwable error) {
             Log.error(error, "An unexpected error occurred while enabling the plugin:");
             Bukkit.shutdown();
@@ -486,11 +494,13 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_MODULE_DATA_LOAD, reloadReason == PluginReloadReason.COMMAND);
 
         BukkitExecutor.sync(() -> {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
-                Island island = gridHandler.getIslandAt(player.getLocation());
-                superiorPlayer.updateWorldBorder(island);
-                if (island != null) island.applyEffects(superiorPlayer);
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
+                    Island island = gridHandler.getIslandAt(player.getLocation(wrapper.getHandle()));
+                    superiorPlayer.updateWorldBorder(island);
+                    if (island != null) island.applyEffects(superiorPlayer);
+                }
             }
         });
 
@@ -594,6 +604,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
     public EventsBus getEventsBus() {
         return eventsBus;
+    }
+
+    public CallbacksBus getCallbacksBus() {
+        return callbacksBus;
     }
 
     public ServicesHandler getServices() {

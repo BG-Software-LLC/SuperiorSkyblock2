@@ -5,6 +5,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.hologram.HologramsService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -30,7 +32,10 @@ public class IslandWorldEventsListener implements Listener {
         if (!plugin.getSettings().isDisableRedstoneOffline() && !plugin.getSettings().getAFKIntegrations().isDisableRedstone())
             return;
 
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+        Island island;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            island = plugin.getGrid().getIslandAt(e.getBlock().getLocation(wrapper.getHandle()));
+        }
 
         if (island == null || island.isSpawn())
             return;
@@ -48,7 +53,10 @@ public class IslandWorldEventsListener implements Listener {
                 hologramsService.get().isHologram(e.getEntity()))
             return;
 
-        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+        Island island;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            island = plugin.getGrid().getIslandAt(e.getEntity().getLocation(wrapper.getHandle()));
+        }
 
         if (island == null || island.isSpawn() || !island.getAllPlayersInside().stream().allMatch(SuperiorPlayer::isAFK))
             return;

@@ -35,6 +35,11 @@ public class DelegateIslandWarp implements IslandWarp {
     }
 
     @Override
+    public Location getLocation(Location location) {
+        return this.handle.getLocation(location);
+    }
+
+    @Override
     public void setLocation(Location location) {
         this.handle.setLocation(location);
     }

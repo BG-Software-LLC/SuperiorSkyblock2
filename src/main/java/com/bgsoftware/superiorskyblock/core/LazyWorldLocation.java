@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.core;
 
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -17,6 +19,11 @@ public class LazyWorldLocation extends Location {
 
         return new LazyWorldLocation(location.getWorld().getName(), location.getX(), location.getY(), location.getZ(),
                 location.getYaw(), location.getPitch());
+    }
+
+    public static LazyWorldLocation of(WorldInfo worldInfo, BlockPosition blockPosition) {
+        return new LazyWorldLocation(worldInfo.getName(), blockPosition.getX(), blockPosition.getY(), blockPosition.getZ(),
+                0f, 0f);
     }
 
     public LazyWorldLocation(String worldName, double x, double y, double z, float yaw, float pitch) {

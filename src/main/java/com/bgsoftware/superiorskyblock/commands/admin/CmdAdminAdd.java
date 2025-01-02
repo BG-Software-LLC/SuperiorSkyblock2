@@ -78,7 +78,6 @@ public class CmdAdminAdd implements IAdminIslandCommand {
 
         IslandUtils.sendMessage(island, Message.JOIN_ANNOUNCEMENT, Collections.emptyList(), targetPlayer.getName());
 
-        island.revokeInvite(targetPlayer);
         island.addMember(targetPlayer, SPlayerRole.defaultRole());
 
         if (superiorPlayer == null) {

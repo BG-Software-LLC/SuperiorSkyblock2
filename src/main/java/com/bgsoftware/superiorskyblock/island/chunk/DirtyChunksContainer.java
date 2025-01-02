@@ -6,15 +6,15 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.MutableChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
-import org.bukkit.World;
 
 import java.util.BitSet;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class DirtyChunksContainer {
 
@@ -97,11 +97,11 @@ public class DirtyChunksContainer {
         }
     }
 
-    public List<ChunkPosition> getDirtyChunks() {
+    public void getDirtyChunks(Consumer<ChunkPosition> consumer) {
         if (this.dirtyChunks.isEmpty())
-            return Collections.emptyList();
+            return;
 
-        List<ChunkPosition> dirtyChunkPositions = new LinkedList<>();
+        MutableChunkPosition mutableChunkPosition = new MutableChunkPosition();
 
         for (Dimension dimension : Dimension.values()) {
             BitSet dirtyChunks = this.dirtyChunks.get(dimension);
@@ -111,13 +111,12 @@ public class DirtyChunksContainer {
                     for (int j = dirtyChunks.nextSetBit(0); j >= 0; j = dirtyChunks.nextSetBit(j + 1)) {
                         int deltaX = j / this.chunksInXAxis;
                         int deltaZ = j % this.chunksInXAxis;
-                        dirtyChunkPositions.add(ChunkPosition.of(worldInfo, deltaX + this.minChunkX, deltaZ + this.minChunkZ));
+                        consumer.accept(mutableChunkPosition.reset(worldInfo, deltaX + this.minChunkX, deltaZ + this.minChunkZ));
                     }
                 }
             }
         }
 
-        return dirtyChunkPositions;
     }
 
     private int getChunkIndex(ChunkPosition chunkPosition) {

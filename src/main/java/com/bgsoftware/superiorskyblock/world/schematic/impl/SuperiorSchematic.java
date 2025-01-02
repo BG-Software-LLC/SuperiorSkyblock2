@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.VarintArray;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
 import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
 import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import com.bgsoftware.superiorskyblock.core.schematic.SchematicBlock;
@@ -246,8 +247,17 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         List<CompletableFuture<Chunk>> chunkFutures = new ArrayList<>(affectedChunks.size());
 
         AtomicBoolean failed = new AtomicBoolean(false);
+        MutableBoolean printedWarning = new MutableBoolean(false);
 
         affectedChunks.forEach(chunkPosition -> {
+            if (!island.isInside(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ())) {
+                if (!printedWarning.get()) {
+                    Log.warn("Part of the schematic ", name, " is placed outside of the island, skipping this part...");
+                    printedWarning.set(true);
+                }
+                return;
+            }
+
             chunkFutures.add(ChunksProvider.loadChunk(chunkPosition, ChunkLoadReason.SCHEMATIC_PLACE, chunk -> {
                 if (failed.get())
                     return;
@@ -294,7 +304,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                     plugin.getEventsBus().callIslandSchematicPasteEvent(island, name, location);
 
                     Profiler.end(profiler);
-                    
+
                     synchronized (this) {
                         try {
                             prepareCallback(affectedChunks, min);

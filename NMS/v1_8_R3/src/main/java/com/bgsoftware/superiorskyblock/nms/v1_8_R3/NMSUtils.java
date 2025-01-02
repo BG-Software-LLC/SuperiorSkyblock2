@@ -1,8 +1,11 @@
 package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.ObjectsPool;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.google.common.collect.Maps;
@@ -22,6 +25,7 @@ import net.minecraft.server.v1_8_R3.PlayerChunkMap;
 import net.minecraft.server.v1_8_R3.TileEntity;
 import net.minecraft.server.v1_8_R3.World;
 import net.minecraft.server.v1_8_R3.WorldServer;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 
 import java.util.Collection;
@@ -39,8 +43,28 @@ public class NMSUtils {
 
     private static final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
 
+    public static final ObjectsPool<ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition>> BLOCK_POS_POOL =
+            ObjectsPools.createNewPool(() -> new BlockPosition.MutableBlockPosition(0, 0, 0));
+
     private NMSUtils() {
 
+    }
+
+    @Nullable
+    public static <T extends TileEntity> T getTileEntityAt(Location location, Class<T> type) {
+        org.bukkit.World bukkitWorld = location.getWorld();
+
+        if (bukkitWorld == null)
+            return null;
+
+        WorldServer worldServer = ((CraftWorld) bukkitWorld).getHandle();
+
+        try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
+            blockPosition.c(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            TileEntity tileEntity = worldServer.getTileEntity(blockPosition);
+            return !type.isInstance(tileEntity) ? null : type.cast(tileEntity);
+        }
     }
 
     public static void runActionOnChunks(Collection<ChunkPosition> chunksCoords,

@@ -3,11 +3,14 @@ package com.bgsoftware.superiorskyblock.module.upgrades.type;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddMobDrops;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetMobDrops;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,9 +32,11 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
             new CmdAdminSetMobDrops());
 
     private final SuperiorSkyblockPlugin plugin;
+    private final boolean isWildStackerInstalled;
 
     public UpgradeTypeMobDrops(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+        isWildStackerInstalled = Bukkit.getPluginManager().isPluginEnabled("WildStacker");
     }
 
     @Override
@@ -44,22 +49,28 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
         return commands;
     }
 
+    private static boolean canDupeDropsForEntity(Entity entity) {
+        return entity instanceof LivingEntity && !(entity instanceof Player) && !(entity instanceof ArmorStand);
+    }
+
     private class MobDropsListener implements Listener {
 
         // Priority is set to HIGH for fixing detection with WildStacker
         // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/540
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onLastDamageEntity(EntityDamageEvent e) {
-            if (!(e.getEntity() instanceof LivingEntity))
+            if (!canDupeDropsForEntity(e.getEntity()))
                 return;
 
             LivingEntity livingEntity = (LivingEntity) e.getEntity();
 
-            if (!(livingEntity instanceof ArmorStand) && livingEntity.getHealth() - e.getFinalDamage() > 0)
+            if (livingEntity.getHealth() - e.getFinalDamage() > 0)
                 return;
 
-            Island island = plugin.getGrid().getIslandAt(livingEntity.getLocation());
-
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(livingEntity.getLocation(wrapper.getHandle()));
+            }
             if (island == null)
                 return;
 
@@ -68,12 +79,14 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
 
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onEntityDeath(EntityDeathEvent e) {
-            Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-
-            if (island == null)
+            if (!canDupeDropsForEntity(e.getEntity()))
                 return;
 
-            if (e.getEntity() instanceof Player)
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getEntity().getLocation(wrapper.getHandle()));
+            }
+            if (island == null)
                 return;
 
             if (plugin.getSettings().isDropsUpgradePlayersMultiply()) {
@@ -84,46 +97,52 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
             }
 
             double mobDropsMultiplier = island.getMobDropsMultiplier();
+            if (mobDropsMultiplier > 1)
+                modifyEventDrops(e.getDrops(), e.getEntity(), mobDropsMultiplier);
 
-            if (mobDropsMultiplier != 1 && mobDropsMultiplier > 0) {
-                for (ItemStack itemStack : new LinkedList<>(e.getDrops())) {
-                    if (itemStack != null && !BukkitEntities.isEquipment(e.getEntity(), itemStack) &&
-                            !plugin.getNMSTags().serializeItem(itemStack).containsKey("WildChests")) {
-                        int newAmount = (int) Math.floor(itemStack.getAmount() * mobDropsMultiplier);
+            BukkitEntities.clearEntityEquipment(e.getEntity());
+        }
 
-                        if (Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {
-                            itemStack.setAmount(newAmount);
-                        } else {
-                            int stackAmounts = newAmount / itemStack.getMaxStackSize();
-                            int leftOvers = newAmount % itemStack.getMaxStackSize();
-                            boolean usedOriginal = false;
+        private void modifyEventDrops(List<ItemStack> drops, LivingEntity livingEntity, double mobDropsMultiplier) {
+            List<ItemStack> dropsToAdd = isWildStackerInstalled ? null : new LinkedList<>();
 
-                            if (stackAmounts > 0) {
-                                itemStack.setAmount(itemStack.getMaxStackSize());
-                                usedOriginal = true;
+            for (ItemStack itemStack : drops) {
+                if (itemStack != null && !BukkitEntities.isEquipment(livingEntity, itemStack)) {
+                    int newAmount = (int) Math.floor(itemStack.getAmount() * mobDropsMultiplier);
 
-                                ItemStack stackItem = itemStack.clone();
-                                stackItem.setAmount(itemStack.getMaxStackSize());
+                    if (isWildStackerInstalled) {
+                        itemStack.setAmount(newAmount);
+                    } else {
+                        int stackAmounts = newAmount / itemStack.getMaxStackSize();
+                        int leftOvers = newAmount % itemStack.getMaxStackSize();
+                        boolean usedOriginal = false;
 
-                                for (int i = 0; i < stackAmounts - 1; i++)
-                                    e.getDrops().add(itemStack.clone());
-                            }
+                        if (stackAmounts > 0) {
+                            itemStack.setAmount(itemStack.getMaxStackSize());
+                            usedOriginal = true;
 
-                            if (leftOvers > 0) {
-                                if (usedOriginal) {
-                                    ItemStack leftOversItem = itemStack.clone();
-                                    leftOversItem.setAmount(leftOvers);
-                                    e.getDrops().add(leftOversItem);
-                                } else {
-                                    itemStack.setAmount(leftOvers);
-                                }
+                            ItemStack stackItem = itemStack.clone();
+                            stackItem.setAmount(itemStack.getMaxStackSize());
+
+                            for (int i = 0; i < stackAmounts - 1; i++)
+                                dropsToAdd.add(itemStack.clone());
+                        }
+
+                        if (leftOvers > 0) {
+                            if (usedOriginal) {
+                                ItemStack leftOversItem = itemStack.clone();
+                                leftOversItem.setAmount(leftOvers);
+                                dropsToAdd.add(leftOversItem);
+                            } else {
+                                itemStack.setAmount(leftOvers);
                             }
                         }
                     }
                 }
             }
 
-            BukkitEntities.clearEntityEquipment(e.getEntity());
+            if (dropsToAdd != null)
+                drops.addAll(dropsToAdd);
         }
 
     }

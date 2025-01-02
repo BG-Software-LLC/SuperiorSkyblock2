@@ -80,7 +80,7 @@ public class CmdDelWarp implements IPermissibleCommand {
         island.deleteWarp(islandWarp.getName());
         Message.DELETE_WARP.send(superiorPlayer, islandWarp.getName());
 
-        ChunksProvider.loadChunk(ChunkPosition.of(islandWarp.getLocation()), ChunkLoadReason.WARP_SIGN_BREAK, chunk -> {
+        ChunksProvider.loadChunk(ChunkPosition.of(islandWarp), ChunkLoadReason.WARP_SIGN_BREAK, chunk -> {
             SignWarp.trySignWarpBreak(islandWarp, player);
         });
     }

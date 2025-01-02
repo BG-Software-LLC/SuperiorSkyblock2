@@ -65,6 +65,20 @@ public class SIslandWarp implements IslandWarp {
     }
 
     @Override
+    public Location getLocation(Location location) {
+        if (location != null) {
+            location.setWorld(this.location.getWorld());
+            location.setX(this.location.getX());
+            location.setY(this.location.getY());
+            location.setZ(this.location.getZ());
+            location.setYaw(this.location.getYaw());
+            location.setPitch(this.location.getPitch());
+        }
+
+        return location;
+    }
+
+    @Override
     public void setLocation(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
 

@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.island.signs.IslandSigns;
@@ -97,23 +98,17 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void listenSpawner(Location location, IntFunction<Integer> delayChangeCallback) {
-        org.bukkit.World world = location.getWorld();
-
-        if (world == null)
+        TileEntityMobSpawner mobSpawner = NMSUtils.getTileEntityAt(location, TileEntityMobSpawner.class);
+        if (mobSpawner == null || mobSpawner instanceof TileEntityMobSpawnerNotifier)
             return;
 
-        WorldServer worldServer = ((CraftWorld) world).getHandle();
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        TileEntity mobSpawner = worldServer.getTileEntity(blockPosition);
+        World world = mobSpawner.getWorld();
 
-        if (!(mobSpawner instanceof TileEntityMobSpawner) || mobSpawner instanceof TileEntityMobSpawnerNotifier)
-            return;
+        TileEntityMobSpawnerNotifier tileEntityMobSpawnerNotifier =
+                new TileEntityMobSpawnerNotifier(mobSpawner, delayChangeCallback);
 
-        TileEntityMobSpawnerNotifier tileEntityMobSpawnerNotifier = new TileEntityMobSpawnerNotifier(
-                (TileEntityMobSpawner) mobSpawner, delayChangeCallback);
-
-        worldServer.removeTileEntity(blockPosition);
-        worldServer.setTileEntity(blockPosition, tileEntityMobSpawnerNotifier);
+        world.removeTileEntity(mobSpawner.getPosition());
+        world.setTileEntity(mobSpawner.getPosition(), tileEntityMobSpawnerNotifier);
     }
 
     @Override
@@ -180,22 +175,32 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public void setBlock(Location location, int combinedId) {
         WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        NMSUtils.setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, combinedId, null, null);
-        NMSUtils.sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
-                new PacketPlayOutBlockChange(world, blockPosition));
+        try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
+            blockPosition.setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+
+            NMSUtils.setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, combinedId, null, null);
+            NMSUtils.sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
+                    new PacketPlayOutBlockChange(world, blockPosition));
+        }
     }
 
     @Override
     public ICachedBlock cacheBlock(org.bukkit.block.Block block) {
-        return new NMSCachedBlock(block);
+        return NMSCachedBlock.obtain(block);
     }
 
     @Override
     public CompoundTag readBlockStates(Location location) {
-        net.minecraft.server.v1_16_R3.World world = ((CraftWorld) location.getWorld()).getHandle();
-        BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
-        IBlockData blockData = world.getType(blockPosition);
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+
+        IBlockData blockData;
+        try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
+            blockPosition.setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            blockData = world.getType(blockPosition);
+        }
+
         CompoundTag compoundTag = null;
 
         for (Map.Entry<IBlockState<?>, Comparable<?>> entry : blockData.getStateMap().entrySet()) {
@@ -223,20 +228,21 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public byte[] getLightLevels(Location location) {
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         LightEngine lightEngine = ((CraftWorld) location.getWorld()).getHandle().e();
-        return new byte[]{
-                location.getWorld().getEnvironment() != org.bukkit.World.Environment.NORMAL ? 0 : (byte) lightEngine.a(EnumSkyBlock.SKY).b(blockPosition),
-                (byte) lightEngine.a(EnumSkyBlock.BLOCK).b(blockPosition)
-        };
+        try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
+            blockPosition.setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            return new byte[]{
+                    location.getWorld().getEnvironment() != org.bukkit.World.Environment.NORMAL ? 0 :
+                            (byte) lightEngine.a(EnumSkyBlock.SKY).b(blockPosition),
+                    (byte) lightEngine.a(EnumSkyBlock.BLOCK).b(blockPosition)
+            };
+        }
     }
 
     @Override
     public CompoundTag readTileEntity(Location location) {
-        net.minecraft.server.v1_16_R3.World world = ((CraftWorld) location.getWorld()).getHandle();
-        BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
-        TileEntity tileEntity = world.getTileEntity(blockPosition);
-
+        TileEntity tileEntity = NMSUtils.getTileEntityAt(location, TileEntity.class);
         if (tileEntity == null)
             return null;
 
@@ -290,28 +296,26 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void placeSign(Island island, Location location) {
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        WorldServer worldServer = ((CraftWorld) location.getWorld()).getHandle();
-        TileEntity tileEntity = worldServer.getTileEntity(blockPosition);
-        if (tileEntity instanceof TileEntitySign) {
-            TileEntitySign tileEntitySign = (TileEntitySign) tileEntity;
-            String[] lines = new String[4];
-            System.arraycopy(CraftSign.revertComponents(tileEntitySign.lines), 0, lines, 0, lines.length);
-            String[] strippedLines = new String[4];
-            for (int i = 0; i < 4; i++)
-                strippedLines[i] = Formatters.STRIP_COLOR_FORMATTER.format(lines[i]);
+        TileEntitySign tileEntitySign = NMSUtils.getTileEntityAt(location, TileEntitySign.class);
+        if (tileEntitySign == null)
+            return;
 
-            IChatBaseComponent[] newLines;
+        String[] lines = new String[4];
+        System.arraycopy(CraftSign.revertComponents(tileEntitySign.lines), 0, lines, 0, lines.length);
+        String[] strippedLines = new String[4];
+        for (int i = 0; i < 4; i++)
+            strippedLines[i] = Formatters.STRIP_COLOR_FORMATTER.format(lines[i]);
 
-            IslandSigns.Result result = IslandSigns.handleSignPlace(island.getOwner(), location, strippedLines, false);
-            if (result.isCancelEvent()) {
-                newLines = CraftSign.sanitizeLines(strippedLines);
-            } else {
-                newLines = CraftSign.sanitizeLines(lines);
-            }
+        IChatBaseComponent[] newLines;
 
-            System.arraycopy(newLines, 0, tileEntitySign.lines, 0, 4);
+        IslandSigns.Result result = IslandSigns.handleSignPlace(island.getOwner(), location, strippedLines, false);
+        if (result.isCancelEvent()) {
+            newLines = CraftSign.sanitizeLines(strippedLines);
+        } else {
+            newLines = CraftSign.sanitizeLines(lines);
         }
+
+        System.arraycopy(newLines, 0, tileEntitySign.lines, 0, 4);
     }
 
     @Override
@@ -325,29 +329,40 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void playGeneratorSound(Location location) {
-        net.minecraft.server.v1_16_R3.World world = ((CraftWorld) location.getWorld()).getHandle();
-        BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
-        world.triggerEffect(1501, blockPosition, 0);
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
+            blockPosition.setValues(location.getX(), location.getY(), location.getZ());
+            world.triggerEffect(1501, blockPosition, 0);
+        }
     }
 
     @Override
     public void playBreakAnimation(org.bukkit.block.Block block) {
-        net.minecraft.server.v1_16_R3.World world = ((CraftWorld) block.getWorld()).getHandle();
-        BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
-        world.a(null, 2001, blockPosition, Block.getCombinedId(world.getType(blockPosition)));
+        World world = ((CraftWorld) block.getWorld()).getHandle();
+        try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
+            blockPosition.setValues(block.getX(), block.getY(), block.getZ());
+            world.a(null, 2001, blockPosition, Block.getCombinedId(world.getType(blockPosition)));
+        }
     }
 
     @Override
     public void playPlaceSound(Location location) {
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        net.minecraft.server.v1_16_R3.World world = ((CraftWorld) location.getWorld()).getHandle();
-        SoundEffectType soundEffectType = world.getType(blockPosition).getStepSound();
+        World world = ((CraftWorld) location.getWorld()).getHandle();
 
-        float volume = SOUND_VOLUME.isValid() ? SOUND_VOLUME.invoke(soundEffectType) : soundEffectType.getVolume();
-        float pitch = SOUND_PITCH.isValid() ? SOUND_PITCH.invoke(soundEffectType) : soundEffectType.getPitch();
+        try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
+            blockPosition.setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            SoundEffectType soundEffectType = world.getType(blockPosition).getStepSound();
 
-        world.playSound(null, blockPosition, soundEffectType.getPlaceSound(),
-                SoundCategory.BLOCKS, (volume + 1.0F) / 2.0F, pitch * 0.8F);
+            float volume = SOUND_VOLUME.isValid() ? SOUND_VOLUME.invoke(soundEffectType) : soundEffectType.getVolume();
+            float pitch = SOUND_PITCH.isValid() ? SOUND_PITCH.invoke(soundEffectType) : soundEffectType.getPitch();
+
+            world.playSound(null, blockPosition, soundEffectType.getPlaceSound(),
+                    SoundCategory.BLOCKS, (volume + 1.0F) / 2.0F, pitch * 0.8F);
+
+        }
     }
 
     @Override
@@ -373,7 +388,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public WorldEditSession createEditSession(org.bukkit.World world) {
-        return new WorldEditSessionImpl(((CraftWorld) world).getHandle());
+        return WorldEditSessionImpl.obtain(((CraftWorld) world).getHandle());
     }
 
 }

@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.island.signs.IslandSigns;
@@ -61,12 +62,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.IntFunction;
 
 public class NMSWorldImpl implements NMSWorld {
+
+    private static final byte[] EMPTY_LIGHTS = new byte[0];
 
     private static final ReflectMethod<Object> LINES_SIGN_CHANGE_EVENT = new ReflectMethod<>(SignChangeEvent.class, "lines");
     private static final ReflectField<Object> CHUNK_PACKET_BLOCK_CONTROLLER = new ReflectField<>(Level.class,
@@ -96,25 +99,19 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void listenSpawner(Location location, IntFunction<Integer> delayChangeCallback) {
-        org.bukkit.World world = location.getWorld();
-
-        if (world == null)
+        SpawnerBlockEntity spawnerBlockEntity = NMSUtils.getBlockEntityAt(location, SpawnerBlockEntity.class);
+        if (spawnerBlockEntity == null)
             return;
 
-        ServerLevel serverLevel = ((CraftWorld) world).getHandle();
-        BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        BlockEntity blockEntity = serverLevel.getBlockEntity(blockPos);
-
-        if (!(blockEntity instanceof SpawnerBlockEntity spawnerBlockEntity))
-            return;
+        ServerLevel serverLevel = (ServerLevel) spawnerBlockEntity.getLevel();
 
         List<TickingBlockEntity> blockEntityTickers = LEVEL_BLOCK_ENTITY_TICKERS.get(serverLevel);
         Iterator<TickingBlockEntity> blockEntityTickersIterator = blockEntityTickers.iterator();
-        List<TickingBlockEntity> tickersToAdd = new ArrayList<>();
+        List<TickingBlockEntity> tickersToAdd = new LinkedList<>();
 
         while (blockEntityTickersIterator.hasNext()) {
             TickingBlockEntity tickingBlockEntity = blockEntityTickersIterator.next();
-            if (tickingBlockEntity.getPos().equals(blockPos) &&
+            if (tickingBlockEntity.getPos().equals(spawnerBlockEntity.getBlockPos()) &&
                     !(tickingBlockEntity instanceof TickingSpawnerBlockEntityNotifier)) {
                 blockEntityTickersIterator.remove();
                 tickersToAdd.add(new TickingSpawnerBlockEntityNotifier(spawnerBlockEntity, tickingBlockEntity, delayChangeCallback));
@@ -190,16 +187,20 @@ public class NMSWorldImpl implements NMSWorld {
             return;
 
         ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
-        BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        NMSUtils.setBlock(serverLevel.getChunkAt(blockPos), blockPos, combinedId, null, null);
+        try (ObjectsPools.Wrapper<BlockPos.MutableBlockPos> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPos.MutableBlockPos blockPos = wrapper.getHandle();
 
-        ClientboundBlockUpdatePacket blockUpdatePacket = new ClientboundBlockUpdatePacket(serverLevel, blockPos);
-        NMSUtils.sendPacketToRelevantPlayers(serverLevel, blockPos.getX() >> 4, blockPos.getZ() >> 4, blockUpdatePacket);
+            blockPos.set(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            NMSUtils.setBlock(serverLevel.getChunkAt(blockPos), blockPos, combinedId, null, null);
+
+            ClientboundBlockUpdatePacket blockUpdatePacket = new ClientboundBlockUpdatePacket(serverLevel, blockPos);
+            NMSUtils.sendPacketToRelevantPlayers(serverLevel, blockPos.getX() >> 4, blockPos.getZ() >> 4, blockUpdatePacket);
+        }
     }
 
     @Override
     public ICachedBlock cacheBlock(org.bukkit.block.Block block) {
-        return new NMSCachedBlock(block);
+        return NMSCachedBlock.obtain(block);
     }
 
     @Override
@@ -210,11 +211,13 @@ public class NMSWorldImpl implements NMSWorld {
             return null;
 
         ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
-        BlockPos blockPos = new BlockPos(location.getX(), location.getY(), location.getZ());
-        BlockState blockState = serverLevel.getBlockState(blockPos);
 
-        if (blockState.getValues().isEmpty())
-            return null;
+        BlockState blockState;
+        try (ObjectsPools.Wrapper<BlockPos.MutableBlockPos> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPos.MutableBlockPos blockPos = wrapper.getHandle();
+            blockPos.set(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            blockState = serverLevel.getBlockState(blockPos);
+        }
 
         CompoundTag compoundTag = new CompoundTag();
 
@@ -238,30 +241,25 @@ public class NMSWorldImpl implements NMSWorld {
         org.bukkit.World bukkitWorld = location.getWorld();
 
         if (bukkitWorld == null)
-            return new byte[0];
+            return EMPTY_LIGHTS;
 
         ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
-        BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-
         LevelLightEngine lightEngine = serverLevel.getLightEngine();
-        return new byte[]{
-                location.getWorld().getEnvironment() != org.bukkit.World.Environment.NORMAL ? 0 :
-                        (byte) lightEngine.getLayerListener(LightLayer.SKY).getLightValue(blockPos),
-                (byte) lightEngine.getLayerListener(LightLayer.BLOCK).getLightValue(blockPos)
-        };
+
+        try (ObjectsPools.Wrapper<BlockPos.MutableBlockPos> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPos.MutableBlockPos blockPos = wrapper.getHandle();
+            blockPos.set(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            return new byte[]{
+                    location.getWorld().getEnvironment() != World.Environment.NORMAL ? 0 :
+                            (byte) lightEngine.getLayerListener(LightLayer.SKY).getLightValue(blockPos),
+                    (byte) lightEngine.getLayerListener(LightLayer.BLOCK).getLightValue(blockPos)
+            };
+        }
     }
 
     @Override
     public CompoundTag readTileEntity(Location location) {
-        org.bukkit.World bukkitWorld = location.getWorld();
-
-        if (bukkitWorld == null)
-            return null;
-
-        ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
-        BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        BlockEntity blockEntity = serverLevel.getBlockEntity(blockPos);
-
+        BlockEntity blockEntity = NMSUtils.getBlockEntityAt(location, BlockEntity.class);
         if (blockEntity == null)
             return null;
 
@@ -308,16 +306,8 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void placeSign(Island island, Location location) {
-        org.bukkit.World bukkitWorld = location.getWorld();
-
-        if (bukkitWorld == null)
-            return;
-
-        ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
-        BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        BlockEntity blockEntity = serverLevel.getBlockEntity(blockPos);
-
-        if (!(blockEntity instanceof SignBlockEntity signBlockEntity))
+        SignBlockEntity signBlockEntity = NMSUtils.getBlockEntityAt(location, SignBlockEntity.class);
+        if (signBlockEntity == null)
             return;
 
         String[] lines = new String[4];
@@ -355,15 +345,22 @@ public class NMSWorldImpl implements NMSWorld {
             return;
 
         ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
-        BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        serverLevel.levelEvent(1501, blockPos, 0);
+
+        try (ObjectsPools.Wrapper<BlockPos.MutableBlockPos> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPos.MutableBlockPos blockPos = wrapper.getHandle();
+            blockPos.set(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            serverLevel.levelEvent(1501, blockPos, 0);
+        }
     }
 
     @Override
     public void playBreakAnimation(org.bukkit.block.Block block) {
         ServerLevel serverLevel = ((CraftWorld) block.getWorld()).getHandle();
-        BlockPos blockPos = new BlockPos(block.getX(), block.getY(), block.getZ());
-        serverLevel.levelEvent(null, 2001, blockPos, Block.getId(serverLevel.getBlockState(blockPos)));
+        try (ObjectsPools.Wrapper<BlockPos.MutableBlockPos> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPos.MutableBlockPos blockPos = wrapper.getHandle();
+            blockPos.set(block.getX(), block.getY(), block.getZ());
+            serverLevel.levelEvent(null, 2001, blockPos, Block.getId(serverLevel.getBlockState(blockPos)));
+        }
     }
 
     @Override
@@ -374,11 +371,14 @@ public class NMSWorldImpl implements NMSWorld {
             return;
 
         ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
-        BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        SoundType soundType = serverLevel.getBlockState(blockPos).getSoundType();
+        try (ObjectsPools.Wrapper<BlockPos.MutableBlockPos> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPos.MutableBlockPos blockPos = wrapper.getHandle();
+            blockPos.set(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            SoundType soundType = serverLevel.getBlockState(blockPos).getSoundType();
 
-        serverLevel.playSound(null, blockPos, soundType.getPlaceSound(), SoundSource.BLOCKS,
-                (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
+            serverLevel.playSound(null, blockPos, soundType.getPlaceSound(), SoundSource.BLOCKS,
+                    (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
+        }
     }
 
     @Override
@@ -400,7 +400,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public WorldEditSession createEditSession(World world) {
-        return new WorldEditSessionImpl(((CraftWorld) world).getHandle());
+        return WorldEditSessionImpl.obtain(((CraftWorld) world).getHandle());
     }
 
 }

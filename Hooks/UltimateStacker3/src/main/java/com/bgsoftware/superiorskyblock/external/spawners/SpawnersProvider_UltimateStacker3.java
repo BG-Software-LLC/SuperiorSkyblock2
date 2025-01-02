@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -49,7 +50,10 @@ public class SpawnersProvider_UltimateStacker3 implements SpawnersProviderItemMe
 
         @EventHandler(priority = EventPriority.HIGHEST)
         public void onSpawnerStack(SpawnerPlaceEvent e) {
-            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getBlock().getLocation(wrapper.getHandle()));
+            }
 
             if (island == null)
                 return;
@@ -67,7 +71,10 @@ public class SpawnersProvider_UltimateStacker3 implements SpawnersProviderItemMe
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerUnstack(SpawnerBreakEvent e) {
-            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getBlock().getLocation(wrapper.getHandle()));
+            }
             if (island != null)
                 island.handleBlockBreak(e.getBlock(), e.getAmount());
         }

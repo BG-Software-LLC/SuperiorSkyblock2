@@ -1,9 +1,10 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -52,18 +53,21 @@ public class CmdAdminSetSpawn implements ISuperiorCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         Player player = (Player) sender;
-        Location playerLocation = player.getLocation();
 
-        Location spawnLocation = new Location(player.getWorld(), playerLocation.getBlockX(), playerLocation.getBlockY(),
-                playerLocation.getBlockZ(), playerLocation.getYaw(), playerLocation.getPitch());
-
-        String newSpawnLocation = Serializers.LOCATION_SPACED_SERIALIZER.serialize(spawnLocation);
+        String newSpawnLocation;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location location = player.getLocation(wrapper.getHandle());
+            location.setX(location.getBlockX());
+            location.setY(location.getBlockY());
+            location.setZ(location.getBlockZ());
+            newSpawnLocation = Serializers.LOCATION_SPACED_SERIALIZER.serialize(location);
+        }
 
         try {
             plugin.getSettings().updateValue("spawn.location", newSpawnLocation);
             plugin.getGrid().updateSpawn();
         } catch (Exception error) {
-            Log.entering("ENTER", spawnLocation);
+            Log.entering("ENTER", newSpawnLocation);
             Log.error(error, "An unexpected error occurred while setting spawn:");
         }
 

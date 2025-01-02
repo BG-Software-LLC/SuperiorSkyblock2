@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.LocationKey;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
@@ -33,6 +34,7 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
@@ -105,8 +107,12 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
                 if (spawningPlayer != null && spawningPlayer.isOnline()) {
                     Message.REACHED_ENTITY_LIMIT.send(spawningPlayer, Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
                     List<ItemStack> itemsToGiveBack = spawningPlayerData.itemStacks;
-                    for (ItemStack itemStack : itemsToGiveBack) {
-                        BukkitItems.addItem(itemStack, spawningPlayer.getInventory(), spawningPlayer.getLocation());
+                    try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                        Location location = spawningPlayer.getLocation(wrapper.getHandle());
+                        PlayerInventory inventory = spawningPlayer.getInventory();
+                        for (ItemStack itemStack : itemsToGiveBack) {
+                            BukkitItems.addItem(itemStack, inventory, location);
+                        }
                     }
                 }
             }
@@ -120,7 +126,10 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (BukkitEntities.canBypassEntityLimit(entity) || !BukkitEntities.canHaveLimit(entityType))
                 return;
 
-            Island island = plugin.getGrid().getIslandAt(entity.getLocation());
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()));
+            }
 
             if (island == null)
                 return;
@@ -154,18 +163,18 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (!isMinecart && !isBoat)
                 return;
 
-            Location blockLocation = e.getClickedBlock().getLocation();
-            Island island = plugin.getGrid().getIslandAt(blockLocation);
+            LocationKey futureEntitySpawnLocation;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location blockLocation = e.getClickedBlock().getLocation(wrapper.getHandle());
+                Island island = plugin.getGrid().getIslandAt(blockLocation);
 
-            if (island == null)
-                return;
+                if (island == null)
+                    return;
 
-            LocationKey futureEntitySpawnLocation = isMinecart ? new LocationKey(blockLocation) : new LocationKey(
-                    blockLocation.getWorld().getName(),
-                    blockLocation.getX(),
-                    blockLocation.getY() + 1,
-                    blockLocation.getZ()
-            );
+                futureEntitySpawnLocation = isMinecart ? LocationKey.of(blockLocation, false) :
+                        LocationKey.of(blockLocation.getWorld().getName(), blockLocation.getX(),
+                                blockLocation.getY() + 1, blockLocation.getZ(), false);
+            }
 
             vehiclesOwners.put(futureEntitySpawnLocation, new SpawningPlayerData(e.getPlayer()));
         }
@@ -178,19 +187,23 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (BukkitEntities.canBypassEntityLimit(entity) || !BukkitEntities.canHaveLimit(entityType))
                 return;
 
-            Location entityLocation = entity.getLocation();
+            Island island;
+            LocationKey entityBlockLocation;
 
-            Island island = plugin.getGrid().getIslandAt(entityLocation);
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location entityLocation = entity.getLocation(wrapper.getHandle());
+                island = plugin.getGrid().getIslandAt(entityLocation);
 
-            if (island == null)
-                return;
+                if (island == null)
+                    return;
 
-            LocationKey entityBlockLocation = new LocationKey(
-                    entityLocation.getWorld().getName(),
-                    entityLocation.getBlockX(),
-                    entityLocation.getBlockY(),
-                    entityLocation.getBlockZ()
-            );
+                entityBlockLocation = LocationKey.of(
+                        entityLocation.getWorld().getName(),
+                        entityLocation.getBlockX(),
+                        entityLocation.getBlockY(),
+                        entityLocation.getBlockZ()
+                );
+            }
 
             SpawningPlayerData vehicleOwnerData = vehiclesOwners.remove(entityBlockLocation);
             Player vehicleOwner = vehicleOwnerData == null ? null : vehicleOwnerData.player.get();
@@ -219,8 +232,10 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (spawnEggEntityType == EntityType.UNKNOWN || !BukkitEntities.canHaveLimit(spawnEggEntityType))
                 return;
 
-            Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
-
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation(wrapper.getHandle()));
+            }
             if (island == null)
                 return;
 
@@ -259,7 +274,10 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (!(e.getBreeder() instanceof Player) || !BukkitEntities.canHaveLimit(childEntityType))
                 return;
 
-            Island island = plugin.getGrid().getIslandAt(child.getLocation());
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(child.getLocation(wrapper.getHandle()));
+            }
 
             if (island == null)
                 return;

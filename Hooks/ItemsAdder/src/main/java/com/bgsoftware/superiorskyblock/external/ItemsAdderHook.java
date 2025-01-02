@@ -3,11 +3,13 @@ package com.bgsoftware.superiorskyblock.external;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandGenerateBlockEvent;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -58,8 +60,12 @@ public class ItemsAdderHook {
             BlockState oldState = e.getBlockReplacedState();
 
             BukkitExecutor.sync(() -> {
-                worldRecordService.get().recordBlockPlace(Keys.of(e.getBlock()), e.getBlock().getLocation(), 1,
-                        oldState, WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS);
+                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                    worldRecordService.get().recordBlockPlace(Keys.of(e.getBlock()),
+                            e.getBlock().getLocation(wrapper.getHandle()), 1,
+                            oldState, WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS);
+                }
+
             }, 1L);
 
         }

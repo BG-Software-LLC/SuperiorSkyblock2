@@ -2,9 +2,12 @@ package com.bgsoftware.superiorskyblock.island.warp;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
@@ -21,10 +24,16 @@ public class SignWarp {
     }
 
     public static void trySignWarpBreak(IslandWarp islandWarp, CommandSender commandSender) {
-        Block signBlock = islandWarp.getLocation().getBlock();
-        // We check for a sign block at the warp's location.
-        if (signBlock.getState() instanceof Sign) {
-            Sign sign = (Sign) signBlock.getState();
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location warpLocation = islandWarp.getLocation(wrapper.getHandle());
+            Block signBlock = warpLocation.getBlock();
+            BlockState blockState = signBlock.getState();
+
+            // We check for a sign block at the warp's location.
+            if (!(blockState instanceof Sign))
+                return;
+
+            Sign sign = (Sign) blockState;
 
             List<String> configSignWarp = new ArrayList<>(plugin.getSettings().getSignWarp());
             configSignWarp.replaceAll(line -> line.replace("{0}", islandWarp.getName()));
@@ -37,7 +46,7 @@ public class SignWarp {
 
             // Detected warp sign
             signBlock.setType(Material.AIR);
-            signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(Material.SIGN));
+            signBlock.getWorld().dropItemNaturally(warpLocation, new ItemStack(Material.SIGN));
 
             Message.DELETE_WARP_SIGN_BROKE.send(commandSender);
         }

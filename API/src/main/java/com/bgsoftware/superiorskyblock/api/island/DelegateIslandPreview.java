@@ -22,6 +22,11 @@ public class DelegateIslandPreview implements IslandPreview {
     }
 
     @Override
+    public Location getLocation(Location location) {
+        return this.handle.getLocation(location);
+    }
+
+    @Override
     public String getSchematic() {
         return this.handle.getSchematic();
     }

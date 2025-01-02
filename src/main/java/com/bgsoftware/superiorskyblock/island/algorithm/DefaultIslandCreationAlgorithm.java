@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
@@ -99,7 +100,10 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
 
         CompletableFuture<IslandCreationResult> completableFuture = new CompletableFuture<>();
 
-        schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
+        // Clone location as pasteSchematic uses the same location in later scheduled tasks
+        Location location = islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation();
+
+        schematic.pasteSchematic(island, location, () -> {
             plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
                     builder.owner.getUniqueId(), builder.uuid);
             completableFuture.complete(new IslandCreationResult(IslandCreationResult.Status.SUCCESS, island, islandLocation, event.getResult()));

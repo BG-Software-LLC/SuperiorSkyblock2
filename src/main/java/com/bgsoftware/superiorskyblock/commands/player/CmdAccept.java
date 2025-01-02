@@ -91,7 +91,6 @@ public class CmdAccept implements ISuperiorCommand {
 
         IslandUtils.sendMessage(island, Message.JOIN_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
 
-        island.revokeInvite(superiorPlayer);
         island.addMember(superiorPlayer, SPlayerRole.defaultRole());
 
         if (targetPlayer == null)

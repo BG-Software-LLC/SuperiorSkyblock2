@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.external.slimefun.ProtectionModule_Dev999;
@@ -120,7 +121,9 @@ public class SlimefunHook {
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onAndroidMiner(AndroidMineEvent e) {
-            Log.debug(Debug.BLOCK_BREAK, e.getBlock().getLocation(), e.getBlock().getType());
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Log.debug(Debug.BLOCK_BREAK, e.getBlock().getLocation(wrapper.getHandle()), e.getBlock().getType());
+            }
 
             InteractionResult interactionResult = stackedBlocksInteractionService.get()
                     .handleStackedBlockBreak(e.getBlock(), null);

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.external.spawners;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
@@ -51,23 +52,25 @@ public class SpawnersProvider_AdvancedSpawners implements SpawnersProvider_AutoD
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerStack(AdvancedSpawnerPlaceEvent e) {
-            Location location = e.getSpawner().getLocation();
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation(wrapper.getHandle()));
+            }
 
-            Island island = plugin.getGrid().getIslandAt(location);
-
-            if (island != null)
-                island.handleBlockPlace(
-                        Keys.ofSpawner(e.getEntityType()),
-                        e.getCountPlaced());
+            if (island != null) {
+                island.handleBlockPlace(Keys.ofSpawner(e.getEntityType()), e.getCountPlaced());
+            }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerUnstack(AdvancedSpawnersBreakEvent e) {
-            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation(wrapper.getHandle()));
+            }
+
             if (island != null)
-                island.handleBlockBreak(
-                        Keys.ofSpawner(e.getEntityType()),
-                        e.getCountBroken());
+                island.handleBlockBreak(Keys.ofSpawner(e.getEntityType()), e.getCountBroken());
         }
 
     }

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.key.types.CustomKey;
@@ -72,7 +73,9 @@ public class Keys {
             baseKey = MaterialKey.of(blockType, data, MaterialKeySource.BLOCK);
         }
 
-        return plugin.getBlockValues().convertKey(baseKey, block.getLocation());
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return plugin.getBlockValues().convertKey(baseKey, block.getLocation(wrapper.getHandle()));
+        }
     }
 
     public static Key of(BlockState blockState) {
@@ -84,7 +87,9 @@ public class Keys {
             baseKey = MaterialKey.of(blockState.getType(), data, MaterialKeySource.BLOCK);
         }
 
-        return plugin.getBlockValues().convertKey(baseKey, blockState.getLocation());
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return plugin.getBlockValues().convertKey(baseKey, blockState.getLocation(wrapper.getHandle()));
+        }
     }
 
     public static Key of(Key baseKey, Location location) {
@@ -103,7 +108,7 @@ public class Keys {
     }
 
     public static Key of(Material type, short data) {
-        if(ServerVersion.isLessThan(ServerVersion.v1_21) || type == Materials.SPAWNER.toBukkitType()) {
+        if (ServerVersion.isLessThan(ServerVersion.v1_21) || type == Materials.SPAWNER.toBukkitType()) {
             return of(new ItemStack(type, 1, data));
         }
 

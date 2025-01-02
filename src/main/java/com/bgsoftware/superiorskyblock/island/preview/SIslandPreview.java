@@ -48,7 +48,21 @@ public class SIslandPreview implements IslandPreview {
 
     @Override
     public Location getLocation() {
-        return previewLocation;
+        return previewLocation.clone();
+    }
+
+    @Override
+    public Location getLocation(Location location) {
+        if (location != null) {
+            location.setWorld(this.previewLocation.getWorld());
+            location.setX(this.previewLocation.getX());
+            location.setY(this.previewLocation.getY());
+            location.setZ(this.previewLocation.getZ());
+            location.setYaw(this.previewLocation.getYaw());
+            location.setPitch(this.previewLocation.getPitch());
+        }
+
+        return location;
     }
 
     @Override

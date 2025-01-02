@@ -23,6 +23,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
@@ -348,7 +349,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         if (spawnOffset != null)
             homeLocation = spawnOffset.applyToLocation(homeLocation);
 
-        island.setIslandHome(homeLocation);
+        island.setIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension(), homeLocation);
 
         BukkitExecutor.sync(() -> builder.owner.runIfOnline(player -> {
             if (updateGamemode)
@@ -564,8 +565,10 @@ public class GridManagerImpl extends Manager implements GridManager {
         if (!plugin.getGrid().isIslandsWorld(chunk.getWorld()))
             return null;
 
-        ChunkPosition chunkPosition = ChunkPosition.of(chunk);
-        Location cornerLocation = WorldBlocks.getChunkBlock(chunkPosition, 0, 100, 0);
+        Location cornerLocation;
+        try (ChunkPosition chunkPosition = ChunkPosition.of(chunk)) {
+            cornerLocation = WorldBlocks.getChunkBlock(chunkPosition, 0, 100, 0);
+        }
 
         Island island;
 
@@ -600,8 +603,10 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         Set<Island> islands = new LinkedHashSet<>();
 
-        ChunkPosition chunkPosition = ChunkPosition.of(chunk);
-        Location cornerLocation = WorldBlocks.getChunkBlock(chunkPosition, 0, 100, 0);
+        Location cornerLocation;
+        try (ChunkPosition chunkPosition = ChunkPosition.of(chunk)) {
+            cornerLocation = WorldBlocks.getChunkBlock(chunkPosition, 0, 100, 0);
+        }
 
         Island island;
 
@@ -809,7 +814,9 @@ public class GridManagerImpl extends Manager implements GridManager {
     @Deprecated
     public int getBlockAmount(Block block) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        return getBlockAmount(block.getLocation());
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return getBlockAmount(block.getLocation(wrapper.getHandle()));
+        }
     }
 
     @Override

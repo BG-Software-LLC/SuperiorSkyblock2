@@ -34,11 +34,14 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.WorldInfoImpl;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
 import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.persistence.EmptyPersistentDataContainer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
@@ -82,10 +85,39 @@ import java.util.function.Consumer;
 public class SpawnIsland implements Island {
 
     private static final UUID spawnUUID = new UUID(0, 0);
-    private static final SSuperiorPlayer ownerPlayer = new SSuperiorPlayer((SuperiorPlayerBuilderImpl)
-            SuperiorPlayer.newBuilder().setUniqueId(spawnUUID));
+    private static final LazyReference<SSuperiorPlayer> ownerPlayer = new LazyReference<SSuperiorPlayer>() {
+        @Override
+        protected SSuperiorPlayer create() {
+            return new SSuperiorPlayer((SuperiorPlayerBuilderImpl) SuperiorPlayer.newBuilder().setUniqueId(spawnUUID));
+        }
+    };
     private static final IslandChest[] EMPTY_ISLAND_CHESTS = new IslandChest[0];
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static EnumerateSet<IslandFlag> DEFAULT_SPAWN_FLAGS_CACHE;
+    private static EnumerateSet<IslandPrivilege> DEFAULT_SPAWN_PRIVILEGES_CACHE;
+
+    public static void registerCallbacks(CallbacksBus bus) {
+        bus.registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, SpawnIsland::onSettingsUpdate);
+    }
+
+    private static void onSettingsUpdate() {
+        DEFAULT_SPAWN_FLAGS_CACHE = new EnumerateSet<>(IslandFlag.values());
+        plugin.getSettings().getSpawn().getSettings().forEach(flagName -> {
+            try {
+                DEFAULT_SPAWN_FLAGS_CACHE.add(IslandFlag.getByName(flagName));
+            } catch (Throwable ignored) {
+            }
+        });
+
+        DEFAULT_SPAWN_PRIVILEGES_CACHE = new EnumerateSet<>(IslandPrivilege.values());
+        plugin.getSettings().getSpawn().getPermissions().forEach(privilegeName -> {
+            try {
+                DEFAULT_SPAWN_PRIVILEGES_CACHE.add(IslandPrivilege.getByName(privilegeName));
+            } catch (Throwable ignored) {
+            }
+        });
+    }
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
     private final DirtyChunksContainer dirtyChunksContainer;
@@ -122,7 +154,7 @@ public class SpawnIsland implements Island {
         this.islandSize = plugin.getSettings().getSpawn().getSize();
 
         this.center = new SBlockPosition(worldName, smartCenter.getBlockX(), smartCenter.getBlockY(), smartCenter.getBlockZ());
-        this.islandArea = new IslandArea(this.center, this.islandSize);
+        this.islandArea = IslandArea.of(this.center, this.islandSize, false);
         this.spawnWorldInfo = new WorldInfoImpl(this.spawnWorld.getName(), Dimensions.fromEnvironment(this.spawnWorld.getEnvironment()));
 
         this.homeYaw = smartCenter.getYaw();
@@ -135,7 +167,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public SuperiorPlayer getOwner() {
-        return ownerPlayer;
+        return ownerPlayer.get();
     }
 
     @Override
@@ -473,7 +505,11 @@ public class SpawnIsland implements Island {
 
         for (int x = minChunk.getX(); x <= maxChunk.getX(); x++) {
             for (int z = minChunk.getZ(); z <= maxChunk.getZ(); z++) {
-                if (!noEmptyChunks || this.dirtyChunksContainer.isMarkedDirty(ChunkPosition.of(this.spawnWorldInfo, x, z)))
+                boolean addChunk;
+                try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, x, z)) {
+                    addChunk = !noEmptyChunks || this.dirtyChunksContainer.isMarkedDirty(chunkPosition);
+                }
+                if (addChunk)
                     chunks.add(minChunk.getWorld().getChunkAt(x, z));
             }
         }
@@ -542,10 +578,13 @@ public class SpawnIsland implements Island {
 
         for (int chunkX = min.getBlockX() >> 4; chunkX <= max.getBlockX() >> 4; chunkX++) {
             for (int chunkZ = min.getBlockZ() >> 4; chunkZ <= max.getBlockZ() >> 4; chunkZ++) {
-                if (this.spawnWorld.isChunkLoaded(chunkX, chunkZ) && (!noEmptyChunks || this.dirtyChunksContainer.isMarkedDirty(
-                        ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)))) {
-                    chunks.add(this.spawnWorld.getChunkAt(chunkX, chunkZ));
+                boolean addChunk;
+                try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)) {
+                    addChunk = this.spawnWorld.isChunkLoaded(chunkX, chunkZ) &&
+                            (!noEmptyChunks || this.dirtyChunksContainer.isMarkedDirty(chunkPosition));
                 }
+                if (addChunk)
+                    chunks.add(this.spawnWorld.getChunkAt(chunkX, chunkZ));
             }
         }
 
@@ -739,16 +778,17 @@ public class SpawnIsland implements Island {
 
     @Override
     public boolean isInside(Location location, double extraRadius) {
-        if (!location.getWorld().equals(this.spawnWorld))
+        World bukkitWorld = location.getWorld();
+        if (bukkitWorld == null || !bukkitWorld.equals(this.spawnWorld))
             return false;
 
-        IslandArea islandArea = this.islandArea;
-        if (extraRadius != 0) {
-            islandArea = islandArea.copy();
-            islandArea.expand(extraRadius);
-        }
+        try (IslandArea islandArea = this.islandArea.copy()) {
+            if (extraRadius != 0) {
+                islandArea.expand(extraRadius);
+            }
 
-        return islandArea.intercepts(location.getBlockX(), location.getBlockZ());
+            return islandArea.intercepts(location.getBlockX(), location.getBlockZ());
+        }
     }
 
     @Override
@@ -757,9 +797,10 @@ public class SpawnIsland implements Island {
     }
 
     public boolean isChunkInside(int chunkX, int chunkZ) {
-        IslandArea islandArea = this.islandArea.copy();
-        islandArea.rshift(4);
-        return islandArea.intercepts(chunkX, chunkZ);
+        try (IslandArea islandArea = this.islandArea.copy()) {
+            islandArea.rshift(4);
+            return islandArea.intercepts(chunkX, chunkZ);
+        }
     }
 
     @Override
@@ -890,7 +931,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public PlayerRole getRequiredPlayerRole(IslandPrivilege islandPrivilege) {
-        return plugin.getSettings().getSpawn().getPermissions().contains(islandPrivilege.getName()) ?
+        return DEFAULT_SPAWN_PRIVILEGES_CACHE.contains(islandPrivilege) ?
                 SPlayerRole.guestRole() : SPlayerRole.lastRole();
     }
 
@@ -1350,7 +1391,9 @@ public class SpawnIsland implements Island {
     public boolean isChunkDirty(World world, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
-        return this.dirtyChunksContainer.isMarkedDirty(ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ));
+        try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)) {
+            return this.dirtyChunksContainer.isMarkedDirty(chunkPosition);
+        }
     }
 
     @Override
@@ -1358,21 +1401,27 @@ public class SpawnIsland implements Island {
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null.");
         Preconditions.checkArgument(this.spawnWorldInfo.getName().equals(worldName) && isChunkInside(chunkX, chunkZ),
                 "Chunk must be within the island boundaries.");
-        return this.dirtyChunksContainer.isMarkedDirty(ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ));
+        try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)) {
+            return this.dirtyChunksContainer.isMarkedDirty(chunkPosition);
+        }
     }
 
     @Override
     public void markChunkDirty(World world, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
-        this.dirtyChunksContainer.markDirty(ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ), save);
+        try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)) {
+            this.dirtyChunksContainer.markDirty(chunkPosition, save);
+        }
     }
 
     @Override
     public void markChunkEmpty(World world, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
-        this.dirtyChunksContainer.markEmpty(ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ), save);
+        try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)) {
+            this.dirtyChunksContainer.markEmpty(chunkPosition, save);
+        }
     }
 
     @Override
@@ -1842,7 +1891,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public boolean hasSettingsEnabled(IslandFlag islandFlag) {
-        return plugin.getSettings().getSpawn().getSettings().contains(islandFlag.getName());
+        return DEFAULT_SPAWN_FLAGS_CACHE.contains(islandFlag);
     }
 
     @Override
