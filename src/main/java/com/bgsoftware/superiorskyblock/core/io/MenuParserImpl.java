@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.menu.parser.MenuParser;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -424,12 +425,8 @@ public class MenuParserImpl implements MenuParser {
         return !section.contains(key) ? Collections.emptyList() : menuPatternSlots.getSlots(section.getString(key));
     }
 
-    private static <E extends Enum<E>> E getMinecraftEnum(Class<E> type, String name) throws IllegalArgumentException {
-        String mappedName = MinecraftNamesMapper.getMinecraftName(name)
-                .map(minecraftKey -> NAMES_MAPPER.get().getMappedName(type, minecraftKey).orElse(minecraftKey))
-                .orElse(name);
-
-        return Enum.valueOf(type, mappedName.toUpperCase(Locale.ENGLISH));
+    private static <T> T getMinecraftEnum(Class<T> type, String name) throws IllegalArgumentException {
+        return getMinecraftEnum(type, name, mappedName -> EnumHelper.getEnum(type, mappedName));
     }
 
     private static <T> T getMinecraftEnum(Class<T> type, String name, Function<String, T> enumCreator) throws IllegalArgumentException {
