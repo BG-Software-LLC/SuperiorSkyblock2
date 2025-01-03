@@ -84,4 +84,7 @@ public interface NMSAlgorithms {
         throw new UnsupportedOperationException();
     }
 
+    default void hideAttributes(ItemMeta itemMeta) {
+
+    }
 }

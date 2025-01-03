@@ -17,6 +17,8 @@ import com.bgsoftware.superiorskyblock.nms.v1_21.menu.MenuDispenserBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_21.menu.MenuFurnaceBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_21.menu.MenuHopperBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_21.world.KeyBlocksCache;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import io.papermc.paper.chat.ChatRenderer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.TextReplacementConfig;
@@ -36,6 +38,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.CraftRegistry;
 import org.bukkit.craftbukkit.CraftServer;
@@ -66,6 +70,9 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     private static final ReflectField<Map<NamespacedKey, Enchantment>> REGISTRY_CACHE =
             new ReflectField<>(CraftRegistry.class, Map.class, "cache");
+
+    private static final Multimap<Attribute, AttributeModifier> EMPTY_ATTRIBUTES_MAP =
+            MultimapBuilder.hashKeys().hashSetValues().build();
 
     private static final EnumMap<InventoryType, MenuCreator> MENUS_HOLDER_CREATORS = new EnumMap<>(InventoryType.class);
 
@@ -227,6 +234,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
         io.papermc.paper.chat.ChatRenderer originalRenderer = asyncChatEvent.renderer();
         asyncChatEvent.renderer(new ChatRendererWrapper(originalRenderer).renderer);
+    }
+
+    @Override
+    public void hideAttributes(ItemMeta itemMeta) {
+        itemMeta.setAttributeModifiers(EMPTY_ATTRIBUTES_MAP);
     }
 
     private interface MenuCreator extends BiFunction<InventoryHolder, String, Container> {

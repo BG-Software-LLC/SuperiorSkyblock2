@@ -193,8 +193,15 @@ public class ItemBuilder {
     }
 
     public ItemBuilder withFlags(ItemFlag... itemFlags) {
-        if (itemMeta != null)
+        if (itemMeta != null) {
             itemMeta.addItemFlags(itemFlags);
+            for (ItemFlag itemFlag : itemFlags) {
+                if (itemFlag == ItemFlag.HIDE_ATTRIBUTES) {
+                    plugin.getNMSAlgorithms().hideAttributes(itemMeta);
+                    break;
+                }
+            }
+        }
         return this;
     }
 
