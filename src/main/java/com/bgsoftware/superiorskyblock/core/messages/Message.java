@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessageProvider;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
@@ -816,8 +817,7 @@ public enum Message {
             Message.ISLAND_PROTECTED.send(sender, locale, args);
 
             SuperiorCommand bypassCommand = plugin.getCommands().getAdminCommand("bypass");
-
-            if (bypassCommand != null && sender.hasPermission(bypassCommand.getPermission()))
+            if (CommandsHelper.hasCommandAccess(bypassCommand, sender))
                 Message.ISLAND_PROTECTED_OPPED.send(sender, locale, args);
         }
     },

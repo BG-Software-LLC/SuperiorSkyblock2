@@ -634,6 +634,12 @@ public interface SettingsManager {
      */
     boolean getChatSigningSupport();
 
+    /**
+     * Amount of commands to be listed in the `/is help` and `/is admin` commands.
+     * Config-path: commands-per-page
+     */
+    int getCommandsPerPage();
+
     interface Database {
 
         /**

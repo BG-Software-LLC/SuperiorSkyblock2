@@ -2,8 +2,12 @@ package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
@@ -16,6 +20,17 @@ import java.util.List;
 import java.util.function.Function;
 
 public class CmdHelp implements ISuperiorCommand {
+
+    private static final Int2ObjectMapView<List<SuperiorCommand>> commandsPerPageCache = CollectionsFactory.createInt2ObjectArrayMap();
+
+    public static void registerCallbacks(CallbacksBus bus) {
+        bus.registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, CmdHelp::onCommandsRefresh);
+        bus.registerCallback(CallbacksBus.CallbackType.COMMANDS_UPDATE, CmdHelp::onCommandsRefresh);
+    }
+
+    private static void onCommandsRefresh() {
+        commandsPerPageCache.clear();
+    }
 
     @Override
     public List<String> getAliases() {
@@ -71,9 +86,7 @@ public class CmdHelp implements ISuperiorCommand {
         }
 
         List<SuperiorCommand> subCommands = new SequentialListBuilder<SuperiorCommand>()
-                .filter(subCommand -> subCommand.displayCommand() && (subCommand.getPermission().isEmpty() ||
-                        sender.hasPermission(subCommand.getPermission())))
-                .sorted(Comparator.comparing(e -> e.getAliases().get(0)))
+                .filter(subCommand -> CommandsHelper.shouldDisplayCommandForPlayer(subCommand, sender))
                 .build(plugin.getCommands().getSubCommands());
 
         if (subCommands.isEmpty()) {
@@ -81,24 +94,41 @@ public class CmdHelp implements ISuperiorCommand {
             return;
         }
 
-        int lastPage = subCommands.size() / 7;
-        if (subCommands.size() % 7 != 0) lastPage++;
+        int commandsPerPageCount = plugin.getSettings().getCommandsPerPage();
+
+        int lastPage;
+        if (commandsPerPageCount > 0) {
+            lastPage = subCommands.size() / commandsPerPageCount;
+            if (subCommands.size() % commandsPerPageCount != 0) lastPage++;
+        } else {
+            lastPage = 1;
+        }
 
         if (page > lastPage) {
             Message.INVALID_AMOUNT.send(sender, page);
             return;
         }
-        subCommands = subCommands.subList((page - 1) * 7, Math.min(subCommands.size(), page * 7));
 
         Message.ISLAND_HELP_HEADER.send(sender, page, lastPage);
 
         java.util.Locale locale = PlayerLocales.getLocale(sender);
 
-        for (SuperiorCommand _subCommand : subCommands) {
-            String description = _subCommand.getDescription(locale);
+        List<SuperiorCommand> commandsOfPage;
+        if (commandsPerPageCount > 0) {
+            commandsOfPage = commandsPerPageCache.get(page);
+            if (commandsOfPage == null) {
+                commandsOfPage = subCommands.subList((page - 1) * commandsPerPageCount, Math.min(subCommands.size(), page * commandsPerPageCount));
+                commandsPerPageCache.put(page, commandsOfPage);
+            }
+        } else {
+            commandsOfPage = subCommands;
+        }
+
+        for (SuperiorCommand subCommand : commandsOfPage) {
+            String description = subCommand.getDescription(locale);
             if (description == null)
-                new NullPointerException("The description of the command " + _subCommand.getAliases().get(0) + " is null.").printStackTrace();
-            Message.ISLAND_HELP_LINE.send(sender, plugin.getCommands().getLabel() + " " + _subCommand.getUsage(locale), description == null ? "" : description);
+                new NullPointerException("The description of the command " + subCommand.getAliases().get(0) + " is null.").printStackTrace();
+            Message.ISLAND_HELP_LINE.send(sender, plugin.getCommands().getLabel() + " " + subCommand.getUsage(locale), description == null ? "" : description);
         }
 
         if (page != lastPage)
@@ -109,20 +139,27 @@ public class CmdHelp implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        if (args.length != 2)
+            return Collections.emptyList();
+
         List<String> list = new LinkedList<>();
 
-        if (args.length == 2) {
-            List<SuperiorCommand> subCommands = new SequentialListBuilder<SuperiorCommand>()
-                    .filter(subCommand -> subCommand.displayCommand() && (subCommand.getPermission().isEmpty() ||
-                            sender.hasPermission(subCommand.getPermission())))
-                    .build(plugin.getCommands().getSubCommands());
+        List<SuperiorCommand> subCommands = new SequentialListBuilder<SuperiorCommand>()
+                .filter(subCommand -> CommandsHelper.shouldDisplayCommandForPlayer(subCommand, sender))
+                .build(plugin.getCommands().getSubCommands());
 
-            int lastPage = subCommands.size() / 7;
-            if (subCommands.size() % 7 != 0) lastPage++;
+        int commandsPerPageCount = plugin.getSettings().getCommandsPerPage();
 
-            for (int i = 1; i <= lastPage; i++)
-                list.add(i + "");
+        int lastPage;
+        if (commandsPerPageCount > 0) {
+            lastPage = subCommands.size() / commandsPerPageCount;
+            if (subCommands.size() % commandsPerPageCount != 0) lastPage++;
+        } else {
+            lastPage = 1;
         }
+
+        for (int i = 1; i <= lastPage; i++)
+            list.add(i + "");
 
         return Collections.unmodifiableList(list);
     }

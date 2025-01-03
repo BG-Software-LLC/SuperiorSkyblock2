@@ -2,8 +2,12 @@ package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -17,6 +21,17 @@ import java.util.List;
 import java.util.Locale;
 
 public class CmdAdmin implements ISuperiorCommand {
+
+    private static final Int2ObjectMapView<List<SuperiorCommand>> commandsPerPageCache = CollectionsFactory.createInt2ObjectArrayMap();
+
+    public static void registerCallbacks(CallbacksBus bus) {
+        bus.registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, CmdAdmin::onCommandsRefresh);
+        bus.registerCallback(CallbacksBus.CallbackType.COMMANDS_UPDATE, CmdAdmin::onCommandsRefresh);
+    }
+
+    private static void onCommandsRefresh() {
+        commandsPerPageCache.clear();
+    }
 
     @Override
     public List<String> getAliases() {
@@ -67,7 +82,7 @@ public class CmdAdmin implements ISuperiorCommand {
                     return;
                 }
 
-                if (!command.getPermission().isEmpty() && !sender.hasPermission(command.getPermission())) {
+                if (!CommandsHelper.hasCommandAccess(command, sender)) {
                     Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", command.getPermission());
                     Message.NO_COMMAND_PERMISSION.send(sender, locale);
                     return;
@@ -89,17 +104,19 @@ public class CmdAdmin implements ISuperiorCommand {
         if (args.length == 2) {
             try {
                 page = Integer.parseInt(args[1]);
-            } catch (Throwable ignored) {
+            } catch (IllegalArgumentException ex) {
+                Message.INVALID_AMOUNT.send(sender, args[1]);
+                return;
             }
         }
 
         if (page <= 0) {
-            Message.INVALID_AMOUNT.send(sender, locale, page);
+            Message.INVALID_AMOUNT.send(sender, page);
             return;
         }
 
         List<SuperiorCommand> subCommands = new SequentialListBuilder<SuperiorCommand>()
-                .filter(subCommand -> subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission()))
+                .filter(subCommand -> CommandsHelper.shouldDisplayCommandForPlayer(subCommand, sender))
                 .build(plugin.getCommands().getAdminSubCommands());
 
         if (subCommands.isEmpty()) {
@@ -107,25 +124,39 @@ public class CmdAdmin implements ISuperiorCommand {
             return;
         }
 
-        int lastPage = subCommands.size() / 7;
-        if (subCommands.size() % 7 != 0) lastPage++;
+        int commandsPerPageCount = plugin.getSettings().getCommandsPerPage();
+
+        int lastPage;
+        if (commandsPerPageCount > 0) {
+            lastPage = subCommands.size() / commandsPerPageCount;
+            if (subCommands.size() % commandsPerPageCount != 0) lastPage++;
+        } else {
+            lastPage = 1;
+        }
 
         if (page > lastPage) {
-            Message.INVALID_AMOUNT.send(sender, locale, page);
+            Message.INVALID_AMOUNT.send(sender, page);
             return;
         }
 
-        subCommands = subCommands.subList((page - 1) * 7, Math.min(subCommands.size(), page * 7));
-
         Message.ADMIN_HELP_HEADER.send(sender, locale, page, lastPage);
 
-        for (SuperiorCommand _subCommand : subCommands) {
-            if (_subCommand.displayCommand() && (_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission()))) {
-                String description = _subCommand.getDescription(locale);
-                if (description == null)
-                    new NullPointerException("The description of the command " + _subCommand.getAliases().get(0) + " is null.").printStackTrace();
-                Message.ADMIN_HELP_LINE.send(sender, locale, plugin.getCommands().getLabel() + " " + _subCommand.getUsage(locale), description);
+        List<SuperiorCommand> commandsOfPage;
+        if (commandsPerPageCount > 0) {
+            commandsOfPage = commandsPerPageCache.get(page);
+            if (commandsOfPage == null) {
+                commandsOfPage = subCommands.subList((page - 1) * commandsPerPageCount, Math.min(subCommands.size(), page * commandsPerPageCount));
+                commandsPerPageCache.put(page, commandsOfPage);
             }
+        } else {
+            commandsOfPage = subCommands;
+        }
+
+        for (SuperiorCommand subCommand : commandsOfPage) {
+            String description = subCommand.getDescription(locale);
+            if (description == null)
+                new NullPointerException("The description of the command " + subCommand.getAliases().get(0) + " is null.").printStackTrace();
+            Message.ADMIN_HELP_LINE.send(sender, locale, plugin.getCommands().getLabel() + " " + subCommand.getUsage(locale), description);
         }
 
         if (page != lastPage)
@@ -139,28 +170,28 @@ public class CmdAdmin implements ISuperiorCommand {
         if (args.length > 1) {
             SuperiorCommand command = plugin.getCommands().getAdminCommand(args[1]);
             if (command != null) {
-                return command.getPermission() != null && !sender.hasPermission(command.getPermission()) ?
-                        Collections.emptyList() : command.tabComplete(plugin, sender, args);
+                return CommandsHelper.hasCommandAccess(command, sender) ?
+                        command.tabComplete(plugin, sender, args) : Collections.emptyList();
             }
+        } else if (args.length == 1) {
+            return Collections.emptyList();
         }
 
         List<String> list = new LinkedList<>();
 
-        if (args.length != 1) {
-            for (SuperiorCommand subCommand : plugin.getCommands().getAdminSubCommands()) {
-                if (subCommand.displayCommand() && (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission()))) {
-                    List<String> aliases = new LinkedList<>(subCommand.getAliases());
-                    aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), Collections.emptyList()));
-                    for (String _aliases : aliases) {
-                        if (_aliases.contains(args[1].toLowerCase(Locale.ENGLISH))) {
-                            list.add(_aliases);
-                        }
+        for (SuperiorCommand subCommand : plugin.getCommands().getAdminSubCommands()) {
+            if (CommandsHelper.shouldDisplayCommandForPlayer(subCommand, sender)) {
+                List<String> aliases = new LinkedList<>(subCommand.getAliases());
+                aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), Collections.emptyList()));
+                for (String alias : aliases) {
+                    if (alias.contains(args[1].toLowerCase(Locale.ENGLISH))) {
+                        list.add(alias);
                     }
                 }
             }
         }
 
-        return Collections.unmodifiableList(list);
+        return list.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(list);
     }
 
     private boolean isNumber(String str) {

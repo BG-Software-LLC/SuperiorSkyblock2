@@ -264,7 +264,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                         return false;
                     }
 
-                    if (!command.getPermission().isEmpty() && !sender.hasPermission(command.getPermission())) {
+                    if (!CommandsHelper.hasCommandAccess(command, sender)) {
                         Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", command.getPermission());
                         Message.NO_COMMAND_PERMISSION.send(sender, locale);
                         return false;
@@ -346,20 +346,20 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
             if (args.length > 0) {
                 SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
                 if (command != null) {
-                    return command.getPermission() != null && !sender.hasPermission(command.getPermission()) ?
-                            Collections.emptyList() : command.tabComplete(plugin, sender, args);
+                    return CommandsHelper.shouldDisplayCommandForPlayer(command, sender) ?
+                            command.tabComplete(plugin, sender, args) : Collections.emptyList();
                 }
             }
 
             List<String> list = new LinkedList<>();
 
             for (SuperiorCommand subCommand : getSubCommands()) {
-                if (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission())) {
+                if (CommandsHelper.shouldDisplayCommandForPlayer(subCommand, sender)) {
                     List<String> aliases = new LinkedList<>(subCommand.getAliases());
                     aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), Collections.emptyList()));
-                    for (String _aliases : aliases) {
-                        if (_aliases.contains(args[0].toLowerCase(Locale.ENGLISH))) {
-                            list.add(_aliases);
+                    for (String alias : aliases) {
+                        if (alias.contains(args[0].toLowerCase(Locale.ENGLISH))) {
+                            list.add(alias);
                         }
                     }
                 }

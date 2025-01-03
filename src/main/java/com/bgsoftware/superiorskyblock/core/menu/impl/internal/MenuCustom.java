@@ -3,8 +3,11 @@ package com.bgsoftware.superiorskyblock.core.menu.impl.internal;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
+import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -13,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
+import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -26,6 +30,14 @@ import java.util.Locale;
 import java.util.Map;
 
 public class MenuCustom extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final LazyReference<MessagesService> messagesService = new LazyReference<MessagesService>() {
+        @Override
+        protected MessagesService create() {
+            return plugin.getServices().getService(MessagesService.class);
+        }
+    };
 
     private MenuCustom(MenuParseResult<BaseMenuView> parseResult, String fileName, @Nullable CommandArgs commandArgs) {
         super(MenuIdentifiers.MENU_CUSTOM_PREFIX + fileName, parseResult);
@@ -58,12 +70,17 @@ public class MenuCustom extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
                 return null;
             }
 
-            List<String> aliases = Arrays.asList(commandsSection.getString("aliases", "").split(", "));
+            List<String> aliases = commandsSection.isList("aliases") ?
+                    commandsSection.getStringList("aliases") :
+                    Arrays.asList(commandsSection.getString("aliases", "").split(", "));
             String permission = commandsSection.getString("permission", "");
-            Map<Locale, String> descriptions = new ArrayMap<>();
-            if (commandsSection.contains("description")) {
-                for (String locale : commandsSection.getConfigurationSection("description").getKeys(false))
-                    descriptions.put(PlayerLocales.getLocale(locale), commandsSection.getString("description." + locale));
+            Map<Locale, IMessageComponent> descriptions = new ArrayMap<>();
+            if (commandsSection.isConfigurationSection("description")) {
+                ConfigurationSection description = commandsSection.getConfigurationSection("description");
+                for (String locale : description.getKeys(false)) {
+                    descriptions.put(PlayerLocales.getLocale(locale),
+                            messagesService.get().parseComponent(cfg, description.getCurrentPath() + "." + locale));
+                }
             }
             boolean displayCommand = commandsSection.getBoolean("display-command", false);
 
@@ -77,10 +94,10 @@ public class MenuCustom extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
 
         private final List<String> aliases;
         private final String permission;
-        private final Map<Locale, String> descriptions;
+        private final Map<Locale, IMessageComponent> descriptions;
         private final boolean displayCommand;
 
-        CommandArgs(List<String> aliases, String permission, Map<Locale, String> descriptions, boolean displayCommand) {
+        CommandArgs(List<String> aliases, String permission, Map<Locale, IMessageComponent> descriptions, boolean displayCommand) {
             this.aliases = aliases;
             this.permission = permission;
             this.descriptions = descriptions;
@@ -114,7 +131,7 @@ public class MenuCustom extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
 
         @Override
         public String getDescription(Locale locale) {
-            return this.args.descriptions.getOrDefault(locale, "");
+            return this.args.descriptions.getOrDefault(locale, EmptyMessageComponent.getInstance()).getMessage();
         }
 
         @Override

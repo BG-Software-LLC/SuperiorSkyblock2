@@ -581,6 +581,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         return this.global.getChatSigningSupport();
     }
 
+    @Override
+    public int getCommandsPerPage() {
+        return this.global.getCommandsPerPage();
+    }
+
     public void updateValue(String path, Object value) throws IOException {
         File file = new File(plugin.getDataFolder(), "config.yml");
 

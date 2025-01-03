@@ -214,6 +214,7 @@ public class SettingsContainer {
     public final List<RespawnAction> playerRespawnActions;
     public final BigInteger blockCountsSaveThreshold;
     public final boolean chatSigningSupport;
+    public final int commandsPerPage;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws ManagerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
@@ -534,6 +535,7 @@ public class SettingsContainer {
         this.playerRespawnActions = Collections.unmodifiableList(playerRespawnActions);
         blockCountsSaveThreshold = BigInteger.valueOf(config.getInt("block-counts-save-threshold", 100));
         chatSigningSupport = config.getBoolean("chat-signing-support", true);
+        commandsPerPage = config.getInt("commands-per-page", 7);
     }
 
     private List<String> loadInteractables(SuperiorSkyblockPlugin plugin) {

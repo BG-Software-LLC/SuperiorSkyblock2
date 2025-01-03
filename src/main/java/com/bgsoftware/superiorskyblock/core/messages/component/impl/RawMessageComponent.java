@@ -28,6 +28,10 @@ public class RawMessageComponent implements IMessageComponent {
     public static IMessageComponent of(@Nullable String message) {
         return Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new RawMessageComponent(message);
     private final MessageContent content;
+
+    public static IMessageComponent of(@Nullable String message) {
+        return Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new RawMessageComponent(message);
+    private final MessageContent content;
     private final MessageProvider messageProvider;
 
     private RawMessageComponent(String message) {
