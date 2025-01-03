@@ -1,12 +1,11 @@
 package com.bgsoftware.superiorskyblock.core.zmenu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
-import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
+import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandKickEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandQuitEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.BannedPlayersButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.CoopsButton;
 import com.bgsoftware.superiorskyblock.core.zmenu.buttons.CountsButton;
@@ -65,7 +64,6 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -99,6 +97,36 @@ public class ZMenuManager implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         this.caches.remove(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerKick(IslandKickEvent event) {
+        clearCache(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerKick(IslandUncoopPlayerEvent event) {
+        clearCache(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerKick(IslandQuitEvent event) {
+        clearCache(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onIslandDelete(IslandDisbandEvent event) {
+        for (SuperiorPlayer islandMember : event.getIsland().getIslandMembers(true)) {
+            clearCache(islandMember);
+        }
+    }
+
+    private void clearCache(SuperiorPlayer superiorPlayer) {
+        if (superiorPlayer.isOnline()) {
+            Player player = superiorPlayer.asPlayer();
+            this.inventoryManager.getCurrentPlayerInventory(player).ifPresent(i -> player.closeInventory());
+            this.caches.remove(player);
+        }
     }
 
     public PlayerCache getCache(Player player) {
@@ -161,12 +189,7 @@ public class ZMenuManager implements Listener {
         }
 
         // Save inventories files
-        List<String> inventories = Arrays.asList("island-creation", "settings", "biomes", "members",
-                "member-manage", "member-role", "permissions", "control-panel", "top-islands",
-                "border-color", "confirm-ban", "confirm-disband", "confirm-kick", "confirm-leave", "warps",
-                "player-language", "values", "bank-logs", "banned-players", "coops", "counts", "visitors", "upgrades",
-                "warp-manage", "warp-icon-edit",
-                "global-warps", "island-bank", "island-ratings", "island-rate", "island-chests", "unique-visitors");
+        List<String> inventories = Arrays.asList("island-creation", "settings", "biomes", "members", "member-manage", "member-role", "permissions", "control-panel", "top-islands", "border-color", "confirm-ban", "confirm-disband", "confirm-kick", "confirm-leave", "warps", "player-language", "values", "bank-logs", "banned-players", "coops", "counts", "visitors", "upgrades", "warp-manage", "warp-icon-edit", "global-warps", "island-bank", "island-ratings", "island-rate", "island-chests", "unique-visitors");
 
         inventories.forEach(inventoryName -> {
             if (!new File(plugin.getDataFolder(), "inventories/" + inventoryName + ".yml").exists()) {
