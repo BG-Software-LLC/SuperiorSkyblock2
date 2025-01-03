@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.core.events;
 
 import com.bgsoftware.superiorskyblock.commands.CommandsMap;
+import com.bgsoftware.superiorskyblock.commands.player.CmdAdmin;
+import com.bgsoftware.superiorskyblock.commands.player.CmdHelp;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
@@ -22,6 +24,8 @@ public class CallbacksBus {
         CommandsMap.registerCallbacks(this);
         SpawnIsland.registerCallbacks(this);
         RegionManagerServiceImpl.registerCallbacks(this);
+        CmdHelp.registerCallbacks(this);
+        CmdAdmin.registerCallbacks(this);
     }
 
     public void registerCallback(CallbackType callbackType, Runnable callback) {
@@ -42,7 +46,8 @@ public class CallbacksBus {
 
     public enum CallbackType {
 
-        SETTINGS_UPDATE
+        SETTINGS_UPDATE,
+        COMMANDS_UPDATE
 
     }
 

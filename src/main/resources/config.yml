@@ -822,3 +822,7 @@ block-counts-save-threshold: 100
 # plugins that do not properly handle signed messages, and in this case it
 # might be better to disable it.
 chat-signing-support: true
+
+# Amount of commands to be listed in the `/is help` and `/is admin` commands.
+# Setting this to 0 or below will result all commands to be shown in a single page.
+commands-per-page: 7

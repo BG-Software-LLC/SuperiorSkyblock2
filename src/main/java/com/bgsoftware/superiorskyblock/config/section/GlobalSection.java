@@ -364,4 +364,8 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().chatSigningSupport;
     }
 
+    public int getCommandsPerPage() {
+        return getContainer().commandsPerPage;
+    }
+
 }

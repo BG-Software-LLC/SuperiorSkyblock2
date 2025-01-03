@@ -65,6 +65,8 @@ public abstract class CommandsMap {
             subCommands.clear();
             superiorCommands.forEach(s -> subCommands.put(s.getAliases().get(0), s));
         }
+
+        plugin.getCallbacksBus().notifyCallbacks(CallbacksBus.CallbackType.COMMANDS_UPDATE);
     }
 
     public void unregisterCommand(SuperiorCommand superiorCommand) {
@@ -75,6 +77,8 @@ public abstract class CommandsMap {
         aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, Collections.emptyList()));
 
         removeCommand(label);
+
+        plugin.getCallbacksBus().notifyCallbacks(CallbacksBus.CallbackType.COMMANDS_UPDATE);
     }
 
     @Nullable
