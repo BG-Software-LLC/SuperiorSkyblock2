@@ -85,7 +85,7 @@ dependencies {
     // Spigot jars
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
-    compileOnly 'com.github.Maxlego08:zMenu-API:303d4e9178'
+    compileOnly 'com.github.Maxlego08:zMenu-API:1.0.3.7'
 }
 
 jar {
