@@ -12,6 +12,8 @@ import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class LazyLoadedKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V> {
@@ -19,6 +21,8 @@ public class LazyLoadedKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V
     private final KeyMapStrategy strategy;
     @Nullable
     private KeyMap<V> delegate;
+    @Nullable
+    private KeyMap<V> pendingCustomKeys;
 
     public LazyLoadedKeyMap(KeyMapStrategy strategy) {
         this.strategy = strategy;
@@ -26,17 +30,17 @@ public class LazyLoadedKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V
 
     @Override
     public int size() {
-        return this.delegate == null ? 0 : this.delegate.size();
+        return runOnMap(KeyMap::size, 0);
     }
 
     @Override
     public boolean containsKey(Object o) {
-        return this.delegate != null && this.delegate.containsKey(o);
+        return runOnMap(m -> m.containsKey(o), false);
     }
 
     @Override
     public V get(Object obj) {
-        return this.delegate == null ? null : this.delegate.get(obj);
+        return runOnMap(m -> m.get(obj), null);
     }
 
     @Override
@@ -54,10 +58,15 @@ public class LazyLoadedKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V
 
         if (key instanceof EntityTypeKey) {
             this.delegate = new EntityTypeKeyMap<>(this.strategy);
+            addPendingCustomKeys();
         } else if (key instanceof MaterialKey) {
             this.delegate = new MaterialKeyMap<>(this.strategy);
+            addPendingCustomKeys();
         } else {
-            throw new IllegalArgumentException("Cannot insert key of type " + key.getClass());
+            if (this.pendingCustomKeys == null)
+                this.pendingCustomKeys = new CustomKeyMap<>(this.strategy);
+
+            return this.pendingCustomKeys.put(key, value);
         }
 
         return this.delegate.put(key, value);
@@ -65,56 +74,82 @@ public class LazyLoadedKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V
 
     @Override
     public V remove(Object key) {
-        return this.delegate == null ? null : this.delegate.remove(key);
+        return runOnMap(m -> m.remove(key), null);
     }
 
     @Override
     public void clear() {
-        if (this.delegate != null)
-            this.delegate.clear();
+        runOnMap(KeyMap::clear);
     }
 
     @NotNull
     @Override
     public Set<Entry<Key, V>> entrySet() {
-        return this.delegate == null ? Collections.emptySet() : this.delegate.entrySet();
+        return runOnMap(KeyMap::entrySet, Collections.emptySet());
     }
 
     @Override
     public String toString() {
-        return this.delegate == null ? "LazyLoadedKeyMap{}" : this.delegate.toString();
+        return runOnMap(KeyMap::toString, "LazyLoadedKeyMap{}");
     }
 
     @Nullable
     @Override
     public Key getKey(Key original) {
-        return this.delegate == null ? null : this.delegate.getKey(original);
+        return runOnMap(m -> m.getKey(original), null);
     }
 
     @Override
     public Key getKey(Key original, @Nullable Key def) {
-        return this.delegate == null ? def : this.delegate.getKey(original, def);
+        return runOnMap(m -> m.getKey(original, def), def);
     }
 
 
     @Override
     public boolean removeIf(Predicate<Key> predicate) {
-        return this.delegate != null && this.delegate.removeIf(predicate);
+        return runOnMap(m -> m.removeIf(predicate), false);
     }
 
     @Override
     public V getRaw(Key key, V def) {
-        return this.delegate == null ? def : this.delegate.getRaw(key, def);
+        return runOnMap(m -> m.getRaw(key, def), def);
     }
 
     @Override
     public V getOrDefault(Object key, V defaultValue) {
-        return this.delegate == null ? defaultValue : this.delegate.getOrDefault(key, defaultValue);
+        return runOnMap(m -> m.getOrDefault(key, defaultValue), defaultValue);
     }
 
     @Override
     public Map<Key, V> asMap() {
-        return this.delegate == null ? this : this.delegate.asMap();
+        return runOnMap(KeyMap::asMap, this);
+    }
+
+    private <T> T runOnMap(Function<KeyMap<V>, T> function, T def) {
+        if (this.delegate != null)
+            return function.apply(this.delegate);
+
+        else if (this.pendingCustomKeys != null)
+            return function.apply(this.pendingCustomKeys);
+
+        else
+            return def;
+    }
+
+    private void runOnMap(Consumer<KeyMap<V>> consumer) {
+        if (this.delegate != null)
+            consumer.accept(this.delegate);
+
+        else if (this.pendingCustomKeys != null)
+            consumer.accept(this.pendingCustomKeys);
+    }
+
+    private void addPendingCustomKeys() {
+        if (this.pendingCustomKeys == null)
+            return;
+
+        this.delegate.putAll(this.pendingCustomKeys);
+        this.pendingCustomKeys = null;
     }
 
 }

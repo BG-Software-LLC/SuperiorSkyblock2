@@ -11,30 +11,29 @@ import com.google.common.collect.Iterators;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class LazyLoadedKeySet extends AbstractSet<Key> implements KeySet {
 
     private final KeySetStrategy strategy;
     @Nullable
     private KeySet delegate;
+    @Nullable
+    private KeySet pendingCustomKeys;
 
     public LazyLoadedKeySet(KeySetStrategy strategy) {
         this.strategy = strategy;
     }
 
     @Override
-    public Iterator<Key> iterator() {
-        return this.delegate == null ? Iterators.emptyIterator() : this.delegate.iterator();
-    }
-
-    @Override
     public int size() {
-        return this.delegate == null ? 0 : this.delegate.size();
+        return runOnSet(KeySet::size, 0);
     }
 
     @Override
     public boolean contains(Object o) {
-        return this.delegate != null && this.delegate.contains(o);
+        return runOnSet(s -> s.contains(o), false);
     }
 
     @Override
@@ -52,10 +51,15 @@ public class LazyLoadedKeySet extends AbstractSet<Key> implements KeySet {
 
         if (key instanceof EntityTypeKey) {
             this.delegate = new EntityTypeKeySet(this.strategy);
+            addPendingCustomKeys();
         } else if (key instanceof MaterialKey) {
             this.delegate = new MaterialKeySet(this.strategy);
+            addPendingCustomKeys();
         } else {
-            throw new IllegalArgumentException("Cannot insert key of type " + key.getClass());
+            if (this.pendingCustomKeys == null)
+                this.pendingCustomKeys = new CustomKeySet(this.strategy);
+
+            return this.pendingCustomKeys.add(key);
         }
 
         return this.delegate.add(key);
@@ -63,34 +67,65 @@ public class LazyLoadedKeySet extends AbstractSet<Key> implements KeySet {
 
     @Override
     public boolean remove(Object key) {
-        return this.delegate != null && this.delegate.remove(key);
+        return runOnSet(s -> s.remove(key), false);
     }
 
     @Override
     public void clear() {
-        if (this.delegate != null)
-            this.delegate.clear();
+        runOnSet(Set::clear);
+    }
+
+    @Override
+    public Iterator<Key> iterator() {
+        return runOnSet(Set::iterator, Iterators.emptyIterator());
     }
 
     @Nullable
     @Override
     public Key getKey(Key original) {
-        return this.delegate == null ? null : this.delegate.getKey(original);
+        return runOnSet(s -> s.getKey(original), null);
     }
 
     @Override
     public Key getKey(Key original, Key def) {
-        return this.delegate == null ? def : this.delegate.getKey(original, def);
+        return runOnSet(s -> s.getKey(original, def), def);
     }
 
     @Override
     public String toString() {
-        return this.delegate == null ? "LazyLoadedKeySet[]" : this.delegate.toString();
+        return runOnSet(Object::toString, "LazyLoadedKeySet[]");
     }
 
     @Override
     public Set<Key> asSet() {
-        return this.delegate == null ? this : this.delegate.asSet();
+        return runOnSet(KeySet::asSet, this);
+    }
+
+    private <T> T runOnSet(Function<KeySet, T> function, T def) {
+        if (this.delegate != null)
+            return function.apply(this.delegate);
+
+        else if (this.pendingCustomKeys != null)
+            return function.apply(this.pendingCustomKeys);
+
+        else
+            return def;
+    }
+
+    private void runOnSet(Consumer<KeySet> consumer) {
+        if (this.delegate != null)
+            consumer.accept(this.delegate);
+
+        else if (this.pendingCustomKeys != null)
+            consumer.accept(this.pendingCustomKeys);
+    }
+
+    private void addPendingCustomKeys() {
+        if (this.pendingCustomKeys == null)
+            return;
+
+        this.delegate.addAll(this.pendingCustomKeys);
+        this.pendingCustomKeys = null;
     }
 
 }
