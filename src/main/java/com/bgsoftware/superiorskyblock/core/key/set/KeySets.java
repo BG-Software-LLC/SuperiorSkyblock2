@@ -1,13 +1,11 @@
-package com.bgsoftware.superiorskyblock.core.key;
+package com.bgsoftware.superiorskyblock.core.key.set;
 
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
-import com.bgsoftware.superiorskyblock.core.key.collections.EntityTypeKeySet;
-import com.bgsoftware.superiorskyblock.core.key.collections.KeySetStrategy;
-import com.bgsoftware.superiorskyblock.core.key.collections.LazyLoadedKeySet;
-import com.bgsoftware.superiorskyblock.core.key.collections.MaterialKeySet;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.google.common.collect.Iterators;
 
 import java.util.Collection;

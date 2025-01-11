@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.core.key.collections;
+package com.bgsoftware.superiorskyblock.core.key.set;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;

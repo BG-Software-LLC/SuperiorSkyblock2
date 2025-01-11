@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.core.key.collections;
+package com.bgsoftware.superiorskyblock.core.key.set;
 
 import java.util.HashSet;
 import java.util.Map;

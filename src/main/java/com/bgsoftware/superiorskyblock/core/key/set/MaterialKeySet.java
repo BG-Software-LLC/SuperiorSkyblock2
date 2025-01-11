@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.core.key.collections;
+package com.bgsoftware.superiorskyblock.core.key.set;
 
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 

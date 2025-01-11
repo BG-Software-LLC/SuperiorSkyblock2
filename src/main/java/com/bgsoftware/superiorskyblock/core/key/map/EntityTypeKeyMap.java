@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.core.key.collections;
+package com.bgsoftware.superiorskyblock.core.key.map;
 
 import com.bgsoftware.superiorskyblock.core.key.types.EntityTypeKey;
 
