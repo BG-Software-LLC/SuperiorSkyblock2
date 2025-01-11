@@ -5,14 +5,19 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandGenerateBlockEvent;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.external.blocks.ICustomBlocksProvider;
 import com.nexomc.nexo.api.NexoBlocks;
+import com.nexomc.nexo.api.NexoFurniture;
 import com.nexomc.nexo.api.NexoItems;
 import com.nexomc.nexo.api.events.furniture.NexoFurnitureBreakEvent;
 import com.nexomc.nexo.api.events.furniture.NexoFurniturePlaceEvent;
@@ -22,9 +27,14 @@ import com.nexomc.nexo.mechanics.MechanicFactory;
 import com.nexomc.nexo.mechanics.MechanicsManager;
 import com.nexomc.nexo.mechanics.custom_block.noteblock.NoteBlockMechanicFactory;
 import com.nexomc.nexo.mechanics.custom_block.stringblock.StringBlockMechanicFactory;
+import com.nexomc.nexo.mechanics.furniture.FurnitureMechanic;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -55,6 +65,7 @@ public class NexoHook {
     public static void register(SuperiorSkyblockPlugin plugin) {
         NexoHook.plugin = plugin;
         plugin.getBlockValues().registerKeyParser(new NexoKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
+        plugin.getProviders().registerCustomBlocksProvider(new NexuCustomBlocksProvider());
         plugin.getServer().getPluginManager().registerEvents(new NexoListener(), plugin);
         BukkitExecutor.sync(NexoHook::initializeMechanics, 1L);
     }
@@ -63,6 +74,34 @@ public class NexoHook {
         MechanicsManager mechanicsManager = MechanicsManager.INSTANCE;
         AVAILABLE_MECHANICS.add(new MechanicData(mechanicsManager.getMechanicFactory("noteblock"), NoteBlockMechanicFactory.Companion::setBlockModel));
         AVAILABLE_MECHANICS.add(new MechanicData(mechanicsManager.getMechanicFactory("stringblock"), StringBlockMechanicFactory.Companion::setBlockModel));
+    }
+
+    private static class NexuCustomBlocksProvider implements ICustomBlocksProvider {
+
+        @Nullable
+        @Override
+        public KeyMap<Integer> getBlockCountsForChunk(ChunkPosition chunkPosition) {
+            if (!Bukkit.isPrimaryThread())
+                return null;
+
+            World world = chunkPosition.getWorld();
+            if (!world.isChunkLoaded(chunkPosition.getX(), chunkPosition.getZ()))
+                return KeyMaps.createEmptyMap();
+
+            KeyMap<Integer> blockCounts = KeyMaps.createHashMap(KeyIndicator.CUSTOM);
+
+            Chunk chunk = world.getChunkAt(chunkPosition.getX(), chunkPosition.getZ());
+
+            for (Entity entity : chunk.getEntities()) {
+                FurnitureMechanic mechanic = NexoFurniture.furnitureMechanic(entity);
+                if (mechanic != null) {
+                    Key blockKey = Keys.of(NEXO_PREFIX, mechanic.getItemID().toUpperCase(Locale.ENGLISH), KeyIndicator.CUSTOM);
+                    blockCounts.put(blockKey, blockCounts.getRaw(blockKey, 0) + 1);
+                }
+            }
+
+            return blockCounts;
+        }
     }
 
     private static class NexoListener implements Listener {

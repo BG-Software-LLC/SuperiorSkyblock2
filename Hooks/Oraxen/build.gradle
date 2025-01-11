@@ -2,12 +2,12 @@ group 'Hooks:Oraxen'
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
 dependencies {
-    compileOnly 'io.th0rgal:Oraxen:1.155.1'
+    compileOnly 'io.th0rgal:Oraxen:1.187.0'
     compileOnly "org.spigotmc:v1_16_R3-Tuinity:latest"
     compileOnly project(":API")
     compileOnly rootProject
