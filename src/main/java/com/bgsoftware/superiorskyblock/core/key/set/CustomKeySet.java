@@ -7,9 +7,9 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.types.LazyKey;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterators;
 
 import java.util.AbstractSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -85,7 +85,7 @@ public class CustomKeySet extends AbstractSet<Key> implements KeySet {
 
     @Override
     public Iterator<Key> iterator() {
-        return this.innerSet.getIfPresent().map(Set::iterator).orElse(Iterators.emptyIterator());
+        return this.innerSet.getIfPresent().map(Set::iterator).orElse(Collections.emptyIterator());
     }
 
     @Nullable

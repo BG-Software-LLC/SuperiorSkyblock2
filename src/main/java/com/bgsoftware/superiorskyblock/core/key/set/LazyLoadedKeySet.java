@@ -6,9 +6,9 @@ import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.key.types.EntityTypeKey;
 import com.bgsoftware.superiorskyblock.core.key.types.LazyKey;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
-import com.google.common.collect.Iterators;
 
 import java.util.AbstractSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -77,7 +77,7 @@ public class LazyLoadedKeySet extends AbstractSet<Key> implements KeySet {
 
     @Override
     public Iterator<Key> iterator() {
-        return runOnSet(Set::iterator, Iterators.emptyIterator());
+        return runOnSet(Set::iterator, Collections.emptyIterator());
     }
 
     @Nullable

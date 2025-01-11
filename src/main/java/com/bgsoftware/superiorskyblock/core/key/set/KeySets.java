@@ -6,9 +6,9 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
-import com.google.common.collect.Iterators;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Spliterator;
@@ -110,7 +110,7 @@ public class KeySets {
         @NotNull
         @Override
         public Iterator<Key> iterator() {
-            return Iterators.emptyIterator();
+            return Collections.emptyIterator();
         }
 
         @NotNull
