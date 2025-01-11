@@ -20,8 +20,6 @@ public interface NMSTags {
         return ItemSkulls.getPlayerHeadNoNMS(itemStack, texture);
     }
 
-    CompoundTag getNBTTag(Entity entity);
-
     void spawnEntity(EntityType entityType, Location location, CompoundTag compoundTag);
 
     byte[] getNBTByteArrayValue(Object object);

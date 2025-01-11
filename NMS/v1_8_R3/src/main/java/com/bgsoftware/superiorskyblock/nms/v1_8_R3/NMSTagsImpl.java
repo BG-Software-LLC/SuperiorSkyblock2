@@ -24,7 +24,6 @@ import net.minecraft.server.v1_8_R3.NBTTagString;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 
@@ -67,16 +66,6 @@ public class NMSTagsImpl implements NMSTags {
         itemStack.setTag((NBTTagCompound) nbtData.toNBT());
 
         return CraftItemStack.asCraftMirror(itemStack);
-    }
-
-    @Override
-    public CompoundTag getNBTTag(org.bukkit.entity.Entity bukkitEntity) {
-        Entity entity = ((CraftEntity) bukkitEntity).getHandle();
-        NBTTagCompound nbtTagCompound = new NBTTagCompound();
-        entity.c(nbtTagCompound);
-        nbtTagCompound.set("Yaw", new NBTTagFloat(entity.yaw));
-        nbtTagCompound.set("Pitch", new NBTTagFloat(entity.pitch));
-        return CompoundTag.fromNBT(nbtTagCompound);
     }
 
     @Override

@@ -5,9 +5,10 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
+import com.bgsoftware.superiorskyblock.nms.world.ChunkReader;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
-import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
+import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -30,12 +31,6 @@ public interface NMSWorld {
     void setBlock(Location location, int combinedId);
 
     ICachedBlock cacheBlock(Block block);
-
-    CompoundTag readBlockStates(Location location);
-
-    byte[] getLightLevels(Location location);
-
-    CompoundTag readTileEntity(Location location);
 
     boolean isWaterLogged(Block block);
 
@@ -62,5 +57,7 @@ public interface NMSWorld {
     IslandsGenerator createGenerator(Dimension dimension);
 
     WorldEditSession createEditSession(World world);
+
+    ChunkReader createChunkReader(Chunk chunk);
 
 }

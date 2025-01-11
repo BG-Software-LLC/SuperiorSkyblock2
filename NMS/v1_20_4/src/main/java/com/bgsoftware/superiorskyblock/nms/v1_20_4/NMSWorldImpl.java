@@ -18,34 +18,28 @@ import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.nms.v1_20_3.algorithms.NMSCachedBlock;
 import com.bgsoftware.superiorskyblock.nms.v1_20_4.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_20_4.spawners.TickingSpawnerBlockEntityNotifier;
+import com.bgsoftware.superiorskyblock.nms.v1_20_4.world.ChunkReaderImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_20_4.world.KeyBlocksCache;
-import com.bgsoftware.superiorskyblock.nms.v1_20_4.world.PropertiesMapper;
 import com.bgsoftware.superiorskyblock.nms.v1_20_4.world.WorldEditSessionImpl;
+import com.bgsoftware.superiorskyblock.nms.world.ChunkReader;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
-import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.border.WorldBorder;
-import net.minecraft.world.level.lighting.LevelLightEngine;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -210,78 +204,6 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public CompoundTag readBlockStates(Location location) {
-        World bukkitWorld = location.getWorld();
-
-        if (bukkitWorld == null)
-            return null;
-
-        ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
-
-        BlockState blockState;
-        try (ObjectsPools.Wrapper<BlockPos.MutableBlockPos> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
-            BlockPos.MutableBlockPos blockPos = wrapper.getHandle();
-            blockPos.set(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-            blockState = serverLevel.getBlockState(blockPos);
-        }
-
-        if (blockState.getValues().isEmpty())
-            return null;
-
-        CompoundTag compoundTag = new CompoundTag();
-
-        blockState.getValues().forEach((property, value) -> {
-            String name = PropertiesMapper.getPropertyName(property);
-
-            if (property instanceof BooleanProperty) {
-                compoundTag.setByte(name, (Boolean) value ? (byte) 1 : 0);
-            } else if (property instanceof IntegerProperty integerProperty) {
-                compoundTag.setIntArray(name, new int[]{(Integer) value, integerProperty.min, integerProperty.max});
-            } else if (property instanceof EnumProperty<?>) {
-                compoundTag.setString(name, ((Enum<?>) value).name());
-            }
-        });
-
-        return compoundTag;
-    }
-
-    @Override
-    public byte[] getLightLevels(Location location) {
-        World bukkitWorld = location.getWorld();
-
-        if (bukkitWorld == null)
-            return EMPTY_LIGHTS;
-
-        ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
-        LevelLightEngine lightEngine = serverLevel.getLightEngine();
-
-        try (ObjectsPools.Wrapper<BlockPos.MutableBlockPos> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
-            BlockPos.MutableBlockPos blockPos = wrapper.getHandle();
-            blockPos.set(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-            return new byte[]{
-                    location.getWorld().getEnvironment() != World.Environment.NORMAL ? 0 :
-                            (byte) lightEngine.getLayerListener(LightLayer.SKY).getLightValue(blockPos),
-                    (byte) lightEngine.getLayerListener(LightLayer.BLOCK).getLightValue(blockPos)
-            };
-        }
-    }
-
-    @Override
-    public CompoundTag readTileEntity(Location location) {
-        BlockEntity blockEntity = NMSUtils.getBlockEntityAt(location, BlockEntity.class);
-        if (blockEntity == null)
-            return null;
-
-        net.minecraft.nbt.CompoundTag compoundTag = blockEntity.saveWithFullMetadata(MinecraftServer.getServer().registryAccess());
-
-        compoundTag.remove("x");
-        compoundTag.remove("y");
-        compoundTag.remove("z");
-
-        return CompoundTag.fromNBT(compoundTag);
-    }
-
-    @Override
     public boolean isWaterLogged(org.bukkit.block.Block block) {
         if (Materials.isWater(block.getType()))
             return true;
@@ -409,6 +331,11 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public WorldEditSession createEditSession(World world) {
         return WorldEditSessionImpl.obtain(((CraftWorld) world).getHandle());
+    }
+
+    @Override
+    public ChunkReader createChunkReader(Chunk chunk) {
+        return new ChunkReaderImpl(chunk);
     }
 
 }

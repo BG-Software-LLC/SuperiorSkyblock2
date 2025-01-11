@@ -18,7 +18,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.References;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
@@ -26,7 +25,6 @@ import net.minecraft.world.item.component.ResolvableProfile;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 
@@ -94,16 +92,6 @@ public class NMSTagsImpl implements NMSTags {
         itemStack.set(DataComponents.PROFILE, resolvableProfile);
 
         return CraftItemStack.asBukkitCopy(itemStack);
-    }
-
-    @Override
-    public CompoundTag getNBTTag(org.bukkit.entity.Entity bukkitEntity) {
-        Entity entity = ((CraftEntity) bukkitEntity).getHandle();
-        net.minecraft.nbt.CompoundTag compoundTag = new net.minecraft.nbt.CompoundTag();
-        entity.save(compoundTag);
-        compoundTag.putFloat("Yaw", entity.getYRot());
-        compoundTag.putFloat("Pitch", entity.getXRot());
-        return CompoundTag.fromNBT(compoundTag);
     }
 
     @Override

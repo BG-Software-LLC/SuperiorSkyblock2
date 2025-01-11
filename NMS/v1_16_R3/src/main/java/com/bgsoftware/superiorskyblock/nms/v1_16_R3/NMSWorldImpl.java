@@ -18,41 +18,31 @@ import com.bgsoftware.superiorskyblock.nms.algorithms.NMSCachedBlock;
 import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.spawners.TileEntityMobSpawnerNotifier;
-import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.BlockStatesMapper;
+import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.ChunkReaderImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.WorldEditSessionImpl;
+import com.bgsoftware.superiorskyblock.nms.world.ChunkReader;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
-import com.bgsoftware.superiorskyblock.tag.ByteTag;
-import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
-import com.bgsoftware.superiorskyblock.tag.StringTag;
-import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.destroystokyo.paper.antixray.ChunkPacketBlockController;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.BlockPropertySlabType;
-import net.minecraft.server.v1_16_R3.BlockStateBoolean;
-import net.minecraft.server.v1_16_R3.BlockStateInteger;
 import net.minecraft.server.v1_16_R3.BlockStepAbstract;
-import net.minecraft.server.v1_16_R3.EnumSkyBlock;
 import net.minecraft.server.v1_16_R3.IBlockData;
-import net.minecraft.server.v1_16_R3.IBlockState;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
-import net.minecraft.server.v1_16_R3.LightEngine;
-import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_16_R3.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_16_R3.SoundCategory;
 import net.minecraft.server.v1_16_R3.SoundEffectType;
 import net.minecraft.server.v1_16_R3.TagsBlock;
-import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.TileEntityMobSpawner;
 import net.minecraft.server.v1_16_R3.TileEntitySign;
 import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldBorder;
 import net.minecraft.server.v1_16_R3.WorldServer;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.block.data.Waterlogged;
@@ -66,7 +56,6 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
 
-import java.util.Map;
 import java.util.function.IntFunction;
 
 public class NMSWorldImpl implements NMSWorld {
@@ -188,71 +177,6 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public ICachedBlock cacheBlock(org.bukkit.block.Block block) {
         return NMSCachedBlock.obtain(block);
-    }
-
-    @Override
-    public CompoundTag readBlockStates(Location location) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-
-        IBlockData blockData;
-        try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
-            BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
-            blockPosition.setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-            blockData = world.getType(blockPosition);
-        }
-
-        CompoundTag compoundTag = null;
-
-        for (Map.Entry<IBlockState<?>, Comparable<?>> entry : blockData.getStateMap().entrySet()) {
-            if (compoundTag == null)
-                compoundTag = new CompoundTag();
-
-            Tag<?> value;
-            Class<?> keyClass = entry.getKey().getClass();
-            String name = BlockStatesMapper.getBlockStateName(entry.getKey());
-
-            if (keyClass.equals(BlockStateBoolean.class)) {
-                value = new ByteTag((Boolean) entry.getValue() ? (byte) 1 : 0);
-            } else if (keyClass.equals(BlockStateInteger.class)) {
-                BlockStateInteger key = (BlockStateInteger) entry.getKey();
-                value = new IntArrayTag(new int[]{(Integer) entry.getValue(), key.min, key.max});
-            } else {
-                value = new StringTag(((Enum<?>) entry.getValue()).name());
-            }
-
-            compoundTag.setTag(name, value);
-        }
-
-        return compoundTag;
-    }
-
-    @Override
-    public byte[] getLightLevels(Location location) {
-        LightEngine lightEngine = ((CraftWorld) location.getWorld()).getHandle().e();
-        try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
-            BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
-            blockPosition.setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-            return new byte[]{
-                    location.getWorld().getEnvironment() != org.bukkit.World.Environment.NORMAL ? 0 :
-                            (byte) lightEngine.a(EnumSkyBlock.SKY).b(blockPosition),
-                    (byte) lightEngine.a(EnumSkyBlock.BLOCK).b(blockPosition)
-            };
-        }
-    }
-
-    @Override
-    public CompoundTag readTileEntity(Location location) {
-        TileEntity tileEntity = NMSUtils.getTileEntityAt(location, TileEntity.class);
-        if (tileEntity == null)
-            return null;
-
-        NBTTagCompound tileEntityCompound = tileEntity.save(new NBTTagCompound());
-
-        tileEntityCompound.remove("x");
-        tileEntityCompound.remove("y");
-        tileEntityCompound.remove("z");
-
-        return CompoundTag.fromNBT(tileEntityCompound);
     }
 
     @Override
@@ -389,6 +313,11 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public WorldEditSession createEditSession(org.bukkit.World world) {
         return WorldEditSessionImpl.obtain(((CraftWorld) world).getHandle());
+    }
+
+    @Override
+    public ChunkReader createChunkReader(Chunk chunk) {
+        return new ChunkReaderImpl(chunk);
     }
 
 }

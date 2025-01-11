@@ -15,31 +15,30 @@ import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.spawners.MobSpawnerAbstractNotifier;
+import com.bgsoftware.superiorskyblock.nms.v1_12_R1.world.ChunkReaderImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.world.WorldEditSessionImpl;
+import com.bgsoftware.superiorskyblock.nms.world.ChunkReader;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
-import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockDoubleStep;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.EnumParticle;
-import net.minecraft.server.v1_12_R1.EnumSkyBlock;
 import net.minecraft.server.v1_12_R1.IBlockData;
 import net.minecraft.server.v1_12_R1.IChatBaseComponent;
 import net.minecraft.server.v1_12_R1.MobSpawnerAbstract;
-import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_12_R1.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_12_R1.SoundCategory;
 import net.minecraft.server.v1_12_R1.SoundEffectType;
 import net.minecraft.server.v1_12_R1.SoundEffects;
-import net.minecraft.server.v1_12_R1.TileEntity;
 import net.minecraft.server.v1_12_R1.TileEntityMobSpawner;
 import net.minecraft.server.v1_12_R1.TileEntitySign;
 import net.minecraft.server.v1_12_R1.WorldBorder;
 import net.minecraft.server.v1_12_R1.WorldServer;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -178,40 +177,6 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public CompoundTag readBlockStates(Location location) {
-        // Doesn't exist
-        return null;
-    }
-
-    @Override
-    public byte[] getLightLevels(Location location) {
-        WorldServer worldServer = ((CraftWorld) location.getWorld()).getHandle();
-        try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
-            BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
-            blockPosition.setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-            return new byte[]{
-                    (byte) worldServer.getBrightness(EnumSkyBlock.SKY, blockPosition),
-                    (byte) worldServer.getBrightness(EnumSkyBlock.BLOCK, blockPosition)
-            };
-        }
-    }
-
-    @Override
-    public CompoundTag readTileEntity(Location location) {
-        TileEntity tileEntity = NMSUtils.getTileEntityAt(location, TileEntity.class);
-        if (tileEntity == null)
-            return null;
-
-        NBTTagCompound tileEntityCompound = tileEntity.save(new NBTTagCompound());
-
-        tileEntityCompound.remove("x");
-        tileEntityCompound.remove("y");
-        tileEntityCompound.remove("z");
-
-        return CompoundTag.fromNBT(tileEntityCompound);
-    }
-
-    @Override
     public boolean isWaterLogged(org.bukkit.block.Block block) {
         Material blockType = block.getType();
         return blockType == Material.WATER || blockType == Material.STATIONARY_WATER;
@@ -346,4 +311,10 @@ public class NMSWorldImpl implements NMSWorld {
     public WorldEditSession createEditSession(World world) {
         return WorldEditSessionImpl.obtain(((CraftWorld) world).getHandle());
     }
+
+    @Override
+    public ChunkReader createChunkReader(Chunk chunk) {
+        return new ChunkReaderImpl(chunk);
+    }
+
 }

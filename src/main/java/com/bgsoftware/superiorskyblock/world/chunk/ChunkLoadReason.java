@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.world.chunk;
 public enum ChunkLoadReason {
 
     SCHEMATIC_PLACE,
+    SCHEMATIC_SAVE,
     ENTITY_TELEPORT,
     BLOCKS_RECALCULATE,
     ENTITIES_RECALCULATE,
