@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
@@ -58,7 +59,7 @@ public class ComplexMessageComponent implements IMessageComponent {
     private static MessageContent findTextComponentContent(BaseComponent[] baseComponents) {
         for (BaseComponent baseComponent : baseComponents) {
             if (baseComponent instanceof TextComponent)
-                return MessageContent.parse(((TextComponent) baseComponent).getText());
+                return MessageContent.parse(baseComponent.toLegacyText());
         }
 
         return MessageContent.EMPTY;
@@ -117,18 +118,23 @@ public class ComplexMessageComponent implements IMessageComponent {
         private final MessageContent content;
         @Nullable
         private final HoverEventContents hoverEventContents;
+        @Nullable
+        private final ClickEvent clickEvent;
 
         ContentComponent(TextComponent textComponent) {
-            this.content = MessageContent.parse(textComponent.getText());
+            this.content = MessageContent.parse(textComponent.toLegacyText());
             this.hoverEventContents = textComponent.getHoverEvent() == null ? null :
                     new HoverEventContents(textComponent.getHoverEvent());
+            this.clickEvent = textComponent.getClickEvent();
         }
 
         @Override
         public BaseComponent parse(Object... args) {
-            TextComponent textComponent = new TextComponent(this.content.getContent(args).orElse(""));
+            TextComponent textComponent = (TextComponent) TextComponent.fromLegacyText(this.content.getContent(args).orElse(""))[0];
             if (this.hoverEventContents != null)
                 textComponent.setHoverEvent(this.hoverEventContents.parse(args));
+            if (this.clickEvent != null)
+                textComponent.setClickEvent(this.clickEvent);
 
             return textComponent;
         }
