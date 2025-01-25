@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.listener;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -43,10 +44,13 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class IslandFlagsListener implements Listener {
+
+    private static final EnumSet<CreatureSpawnEvent.SpawnReason> NATURAL_SPAWN_REASONS = initializeNaturalSpawnReasons();
 
     private final Map<UUID, ProjectileSource> originalFireballsDamager = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
 
@@ -68,46 +72,31 @@ public class IslandFlagsListener implements Listener {
     public boolean preventEntitySpawn(Location location, CreatureSpawnEvent.SpawnReason spawnReason, EntityType entityType) {
         IslandFlag actionFlag;
 
-        switch (spawnReason.name()) {
-            case "JOCKEY":
-            case "CHUNK_GEN":
-            case "NATURAL":
-            case "TRAP":
-            case "MOUNT":
-            case "VILLAGE_INVASION":
-            case "VILLAGE_DEFENSE":
-            case "PATROL":
-            case "BEEHIVE":
-            case "LIGHTNING":
-            case "DEFAULT": {
-                switch (BukkitEntities.getCategory(entityType)) {
-                    case ANIMAL:
-                        actionFlag = IslandFlags.NATURAL_ANIMALS_SPAWN;
-                        break;
-                    case MONSTER:
-                        actionFlag = IslandFlags.NATURAL_MONSTER_SPAWN;
-                        break;
-                    default:
-                        return false;
-                }
-                break;
+        if (spawnReason == CreatureSpawnEvent.SpawnReason.SPAWNER ||
+                spawnReason == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG) {
+            switch (BukkitEntities.getCategory(entityType)) {
+                case ANIMAL:
+                    actionFlag = IslandFlags.SPAWNER_ANIMALS_SPAWN;
+                    break;
+                case MONSTER:
+                    actionFlag = IslandFlags.SPAWNER_MONSTER_SPAWN;
+                    break;
+                default:
+                    return false;
             }
-            case "SPAWNER":
-            case "SPAWNER_EGG": {
-                switch (BukkitEntities.getCategory(entityType)) {
-                    case ANIMAL:
-                        actionFlag = IslandFlags.SPAWNER_ANIMALS_SPAWN;
-                        break;
-                    case MONSTER:
-                        actionFlag = IslandFlags.SPAWNER_MONSTER_SPAWN;
-                        break;
-                    default:
-                        return false;
-                }
-                break;
+        } else if (NATURAL_SPAWN_REASONS.contains(spawnReason)) {
+            switch (BukkitEntities.getCategory(entityType)) {
+                case ANIMAL:
+                    actionFlag = IslandFlags.NATURAL_ANIMALS_SPAWN;
+                    break;
+                case MONSTER:
+                    actionFlag = IslandFlags.NATURAL_MONSTER_SPAWN;
+                    break;
+                default:
+                    return false;
             }
-            default:
-                return false;
+        } else {
+            return false;
         }
 
         return preventAction(location, actionFlag);
@@ -309,6 +298,27 @@ public class IslandFlagsListener implements Listener {
             Bukkit.getPluginManager().registerEvents(new PaperListener(), plugin);
         } catch (Throwable ignored) {
         }
+    }
+
+    private static EnumSet<CreatureSpawnEvent.SpawnReason> initializeNaturalSpawnReasons() {
+        EnumSet<CreatureSpawnEvent.SpawnReason> naturalSpawnReasons = EnumSet.noneOf(CreatureSpawnEvent.SpawnReason.class);
+
+        Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "JOCKEY")).ifPresent(naturalSpawnReasons::add);
+        Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "CHUNK_GEN")).ifPresent(naturalSpawnReasons::add);
+        Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "NATURAL")).ifPresent(naturalSpawnReasons::add);
+        Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "TRAP")).ifPresent(naturalSpawnReasons::add);
+        Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "MOUNT")).ifPresent(naturalSpawnReasons::add);
+        Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "VILLAGE_INVASION")).ifPresent(naturalSpawnReasons::add);
+        Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "VILLAGE_DEFENSE")).ifPresent(naturalSpawnReasons::add);
+        Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "PATROL")).ifPresent(naturalSpawnReasons::add);
+        Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "BEEHIVE")).ifPresent(naturalSpawnReasons::add);
+        Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "LIGHTNING")).ifPresent(naturalSpawnReasons::add);
+        Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "DEFAULT")).ifPresent(naturalSpawnReasons::add);
+        Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "JOCKEY")).ifPresent(naturalSpawnReasons::add);
+        Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "JOCKEY")).ifPresent(naturalSpawnReasons::add);
+        Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "JOCKEY")).ifPresent(naturalSpawnReasons::add);
+
+        return naturalSpawnReasons;
     }
 
     private class PaperListener implements Listener {
