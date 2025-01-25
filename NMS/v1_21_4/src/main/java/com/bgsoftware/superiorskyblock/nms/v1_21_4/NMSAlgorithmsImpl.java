@@ -186,7 +186,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public Enchantment createGlowEnchantment() {
-        Enchantment enchantment = getGlowEnchant();
+        Enchantment enchantment = Registry.ENCHANTMENT.get(GlowEnchantment.GLOW_ENCHANTMENT_KEY);
+        if (enchantment != null)
+            return enchantment;
+
+        enchantment = getGlowEnchant();
 
         Registry<Enchantment> registry = Registry.ENCHANTMENT;
         try {

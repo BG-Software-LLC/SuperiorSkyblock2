@@ -44,6 +44,7 @@ public class GlowEnchantment {
     }
 
     private static final String GLOW_ENCHANTMENT_NAME = "superiorskyblock_glowing_enchant";
+    public static final NamespacedKey GLOW_ENCHANTMENT_KEY = NamespacedKey.minecraft(GLOW_ENCHANTMENT_NAME);
 
     private static final HandleType HANDLE_TYPE = findHandleType();
 
