@@ -17,6 +17,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -34,6 +35,8 @@ import java.util.Optional;
 public class NMSPlayersImpl implements NMSPlayers {
 
     private static final ReflectMethod<Locale> PLAYER_LOCALE = new ReflectMethod<>(ServerPlayer.class, "locale");
+    private static final ReflectMethod<Void> ENTITY_SET_LEVEL = new ReflectMethod<>(
+            Entity.class, 1, Level.class);
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -70,7 +73,7 @@ public class NMSPlayersImpl implements NMSPlayers {
         Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter(Dimensions.NORMAL);
 
         if (spawnLocation != null) {
-            serverPlayer.setLevel(serverLevel);
+            ENTITY_SET_LEVEL.invoke(serverPlayer, serverLevel);
             serverPlayer.absMoveTo(spawnLocation.getX(), spawnLocation.getY(), spawnLocation.getZ(),
                     spawnLocation.getYaw(), spawnLocation.getPitch());
         }
