@@ -181,7 +181,7 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public Enchantment getGlowEnchant() {
-        return new GlowEnchantment();
+        return GlowEnchantment.createEnchantment();
     }
 
     @Override
