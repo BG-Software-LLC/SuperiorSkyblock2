@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_8_R3.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.world.WorldEditSessionImpl;
 import com.bgsoftware.superiorskyblock.nms.world.ChunkReader;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
+import com.bgsoftware.superiorskyblock.world.SignType;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockDoubleStep;
@@ -184,6 +185,11 @@ public class NMSWorldImpl implements NMSWorld {
     public boolean isWaterLogged(org.bukkit.block.Block block) {
         Material blockType = block.getType();
         return blockType == Material.WATER || blockType == Material.STATIONARY_WATER;
+    }
+
+    @Override
+    public SignType getSignType(Object sign) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override

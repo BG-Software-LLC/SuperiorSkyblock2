@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.nms.world.ChunkReader;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
+import com.bgsoftware.superiorskyblock.world.SignType;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
@@ -33,6 +34,12 @@ public interface NMSWorld {
     ICachedBlock cacheBlock(Block block);
 
     boolean isWaterLogged(Block block);
+
+    default SignType getSignType(Block block) {
+        return getSignType(getBlockData(block));
+    }
+
+    SignType getSignType(Object sign);
 
     PistonPushReaction getPistonReaction(Block block);
 

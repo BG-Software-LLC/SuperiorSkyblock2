@@ -23,6 +23,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.WorldEditSessionImpl;
 import com.bgsoftware.superiorskyblock.nms.world.ChunkReader;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
+import com.bgsoftware.superiorskyblock.world.SignType;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.destroystokyo.paper.antixray.ChunkPacketBlockController;
 import net.minecraft.server.v1_16_R3.Block;
@@ -47,6 +48,8 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.BubbleColumn;
+import org.bukkit.block.data.type.Sign;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlockState;
@@ -188,6 +191,16 @@ public class NMSWorldImpl implements NMSWorld {
 
         return blockData instanceof BubbleColumn ||
                 (blockData instanceof Waterlogged && ((Waterlogged) blockData).isWaterlogged());
+    }
+
+    @Override
+    public SignType getSignType(Object sign) {
+        if (sign instanceof WallSign)
+            return SignType.WALL_SIGN;
+        else if (sign instanceof Sign)
+            return SignType.STANDING_SIGN;
+        else
+            return SignType.UNKNOWN;
     }
 
     @Override
