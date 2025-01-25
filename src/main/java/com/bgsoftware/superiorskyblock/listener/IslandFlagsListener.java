@@ -109,7 +109,7 @@ public class IslandFlagsListener implements Listener {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location entityLocation = e.getEntity().getLocation(wrapper.getHandle());
 
-            if (e.getCause() != HangingBreakEvent.RemoveCause.EXPLOSION) {
+            if (e.getCause() == HangingBreakEvent.RemoveCause.EXPLOSION) {
                 if (e.getRemover() instanceof Player) {
                     // Explosion was set by TNT.
                     if (preventAction(entityLocation, IslandFlags.TNT_EXPLOSION)) {
