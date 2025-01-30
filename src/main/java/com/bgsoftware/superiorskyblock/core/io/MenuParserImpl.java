@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.itemstack.GlowEnchantment;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.itemstack.MinecraftNamesMapper;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -342,9 +341,7 @@ public class MenuParserImpl implements MenuParser {
         }
 
         if (section.getBoolean("glow", false)) {
-            Enchantment glowEnchant = GlowEnchantment.getGlowEnchant();
-            if (glowEnchant != null)
-                itemBuilder.withEnchant(glowEnchant, 1);
+            itemBuilder.makeItemGlow();
         }
 
         if (section.contains("flags")) {

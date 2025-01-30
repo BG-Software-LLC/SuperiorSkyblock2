@@ -4,7 +4,6 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
-import com.bgsoftware.superiorskyblock.core.itemstack.GlowEnchantment;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
@@ -12,7 +11,6 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButt
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuTopIslands;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -38,13 +36,9 @@ public class ChangeSortingTypeButton extends AbstractMenuViewButton<MenuTopIslan
                 menuView.getSortingType() != getTemplate().sortingType)
             return buttonItem;
 
-        ItemBuilder itemBuilder = new ItemBuilder(buttonItem);
-
-        Enchantment glowEnchant = GlowEnchantment.getGlowEnchant();
-        if (glowEnchant != null)
-            itemBuilder.withEnchant(glowEnchant, 1);
-
-        return itemBuilder.build();
+        return new ItemBuilder(buttonItem)
+                .makeItemGlow()
+                .build();
     }
 
     @Override

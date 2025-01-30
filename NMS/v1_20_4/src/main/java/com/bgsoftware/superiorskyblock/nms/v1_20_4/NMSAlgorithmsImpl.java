@@ -43,7 +43,6 @@ import org.bukkit.craftbukkit.entity.CraftMinecart;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -170,15 +169,8 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
-    public Enchantment getGlowEnchant() {
-        // Not supported anymore
-        return null;
-    }
-
-    @Override
-    public Enchantment createGlowEnchantment() {
-        // Not supported anymore
-        return null;
+    public void makeItemGlow(ItemMeta itemMeta) {
+        itemMeta.setEnchantmentGlintOverride(true);
     }
 
     @Nullable

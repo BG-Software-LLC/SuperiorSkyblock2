@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_21_4;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -11,7 +10,6 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.ChatFormatter;
 import com.bgsoftware.superiorskyblock.core.io.ClassProcessor;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
-import com.bgsoftware.superiorskyblock.nms.v1_21_4.enchantment.GlowEnchantment;
 import com.bgsoftware.superiorskyblock.nms.v1_21_4.menu.MenuBrewingStandBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_21_4.menu.MenuDispenserBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_21_4.menu.MenuFurnaceBlockEntity;
@@ -36,12 +34,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.command.defaults.BukkitCommand;
-import org.bukkit.craftbukkit.CraftRegistry;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftFallingBlock;
@@ -49,7 +44,6 @@ import org.bukkit.craftbukkit.entity.CraftMinecart;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -61,15 +55,11 @@ import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumMap;
-import java.util.Map;
 import java.util.function.BiFunction;
 
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
-    private static final ReflectField<Map<NamespacedKey, Enchantment>> REGISTRY_CACHE =
-            new ReflectField<>(CraftRegistry.class, Map.class, "cache");
 
     private static final Multimap<Attribute, AttributeModifier> EMPTY_ATTRIBUTES_MAP =
             MultimapBuilder.hashKeys().hashSetValues().build();
@@ -180,31 +170,8 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
-    public Enchantment getGlowEnchant() {
-        return GlowEnchantment.createEnchantment();
-    }
-
-    @Override
-    public Enchantment createGlowEnchantment() {
-        Enchantment enchantment = Registry.ENCHANTMENT.get(GlowEnchantment.GLOW_ENCHANTMENT_KEY);
-        if (enchantment != null)
-            return enchantment;
-
-        enchantment = getGlowEnchant();
-
-        Registry<Enchantment> registry = Registry.ENCHANTMENT;
-        try {
-            if (registry instanceof io.papermc.paper.registry.legacy.DelayedRegistry) {
-                registry = ((io.papermc.paper.registry.legacy.DelayedRegistry) registry).delegate();
-            }
-        } catch (Throwable ignored) {
-        }
-
-        Map<NamespacedKey, Enchantment> registryCache = REGISTRY_CACHE.get(registry);
-
-        registryCache.put(enchantment.getKey(), enchantment);
-
-        return enchantment;
+    public void makeItemGlow(ItemMeta itemMeta) {
+        itemMeta.setEnchantmentGlintOverride(true);
     }
 
     @Nullable

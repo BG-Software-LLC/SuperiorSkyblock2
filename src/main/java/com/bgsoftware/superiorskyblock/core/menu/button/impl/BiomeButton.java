@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
-import com.bgsoftware.superiorskyblock.core.itemstack.GlowEnchantment;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
@@ -19,7 +18,6 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -63,13 +61,9 @@ public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
         if (island == null || island.getBiome() != getTemplate().biome)
             return buttonItem;
 
-        ItemBuilder itemBuilder = new ItemBuilder(buttonItem);
-
-        Enchantment glowEnchant = GlowEnchantment.getGlowEnchant();
-        if (glowEnchant != null)
-            itemBuilder.withEnchant(glowEnchant, 1);
-
-        return itemBuilder.build();
+        return new ItemBuilder(buttonItem)
+                .makeItemGlow()
+                .build();
     }
 
     @Override

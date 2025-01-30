@@ -192,6 +192,11 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder makeItemGlow() {
+        plugin.getNMSAlgorithms().makeItemGlow(itemMeta);
+        return this;
+    }
+
     public ItemBuilder withFlags(ItemFlag... itemFlags) {
         if (itemMeta != null) {
             itemMeta.addItemFlags(itemFlags);
