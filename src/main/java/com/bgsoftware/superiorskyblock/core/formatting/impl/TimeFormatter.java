@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.core.formatting.impl;
 
+import com.bgsoftware.superiorskyblock.core.formatting.IBiFormatter;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
-import com.bgsoftware.superiorskyblock.core.formatting.ILocaleFormatter;
 
 import java.time.Duration;
 import java.util.Locale;
 
-public class TimeFormatter implements ILocaleFormatter<Duration> {
+public class TimeFormatter implements IBiFormatter<Duration, Locale> {
 
     private static final TimeFormatter INSTANCE = new TimeFormatter();
 

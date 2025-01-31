@@ -88,7 +88,7 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
                 return;
         }
 
-        if (plugin.getGrid().getIslandsWorld(island, dimension) == null) {
+        if (plugin.getGrid().getIslandsWorldInfo(island, dimension) == null) {
             Message.WORLD_NOT_ENABLED.send(sender);
             return;
         }

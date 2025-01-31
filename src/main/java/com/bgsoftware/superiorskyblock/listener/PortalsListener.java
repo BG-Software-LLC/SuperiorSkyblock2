@@ -5,7 +5,9 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.service.portals.EntityPortalResult;
 import com.bgsoftware.superiorskyblock.api.service.portals.PortalsManagerService;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
@@ -100,11 +102,20 @@ public class PortalsListener implements Listener {
                 teleportedPlayer.setPlayerStatus(PlayerStatus.LEAVING_ISLAND);
 
             BukkitExecutor.sync(() -> {
-                EntityTeleports.teleportUntilSuccess(e.getEntity(),
-                        island.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension()), 5, () -> {
-                            if (teleportedPlayer != null)
-                                teleportedPlayer.removePlayerStatus(PlayerStatus.LEAVING_ISLAND);
-                        });
+                Dimension dimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
+                IslandWorlds.accessIslandWorldAsync(island, dimension, islandWorldResult -> {
+                    islandWorldResult.ifRight(error -> {
+                        if (teleportedPlayer != null)
+                            teleportedPlayer.removePlayerStatus(PlayerStatus.LEAVING_ISLAND);
+                    }).ifLeft(unused -> {
+                        EntityTeleports.teleportUntilSuccess(e.getEntity(),
+                                island.getIslandHome(dimension), 5, () -> {
+                                    if (teleportedPlayer != null)
+                                        teleportedPlayer.removePlayerStatus(PlayerStatus.LEAVING_ISLAND);
+                                });
+                    });
+                });
+
             }, 5L);
         }
 

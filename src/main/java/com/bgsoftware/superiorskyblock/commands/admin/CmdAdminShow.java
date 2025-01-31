@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -95,9 +96,11 @@ public class CmdAdminShow implements IAdminIslandCommand {
             infoMessage.append(Message.ISLAND_INFO_NAME.getMessage(locale, island.getName())).append("\n");
 
         // Island location
-        if (!Message.ISLAND_INFO_LOCATION.isEmpty(locale))
-            infoMessage.append(Message.ISLAND_INFO_LOCATION.getMessage(locale, Formatters.LOCATION_FORMATTER.format(
-                    island.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension())))).append("\n");
+        if (!Message.ISLAND_INFO_LOCATION.isEmpty(locale)) {
+            WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, plugin.getSettings().getWorlds().getDefaultWorldDimension());
+            infoMessage.append(Message.ISLAND_INFO_LOCATION.getMessage(locale,
+                    Formatters.BLOCK_POSITION_FORMATTER.format(island.getCenterPosition(), worldInfo))).append("\n");
+        }
 
         // Island last time updated
         if (lastTime != -1) {

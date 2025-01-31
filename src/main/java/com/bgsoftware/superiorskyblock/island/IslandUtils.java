@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
@@ -15,8 +14,8 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -31,8 +30,6 @@ import org.bukkit.inventory.Inventory;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -117,12 +114,12 @@ public class IslandUtils {
         return chunkCoords;
     }
 
-    public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island, World world, @IslandChunkFlags int flags,
+    public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island, WorldInfo worldInfo, @IslandChunkFlags int flags,
                                                                    ChunkLoadReason chunkLoadReason,
                                                                    Consumer<Chunk> onChunkLoad) {
         return new SequentialListBuilder<CompletableFuture<Chunk>>()
                 .mutable()
-                .build(IslandUtils.getChunkCoords(island, WorldInfo.of(world), flags), chunkPosition ->
+                .build(IslandUtils.getChunkCoords(island, worldInfo, flags), chunkPosition ->
                         ChunksProvider.loadChunk(chunkPosition, chunkLoadReason, onChunkLoad));
     }
 
@@ -133,13 +130,13 @@ public class IslandUtils {
 
         for (Dimension dimension : Dimension.values()) {
             if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension) && island.wasSchematicGenerated(dimension)) {
-                World world = island.getCenter(dimension).getWorld();
-                chunkCoords.addAll(getAllChunksAsync(island, world, flags, chunkLoadReason, onChunkLoad));
+                WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
+                chunkCoords.addAll(getAllChunksAsync(island, worldInfo, flags, chunkLoadReason, onChunkLoad));
             }
         }
 
         for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
-            chunkCoords.addAll(getAllChunksAsync(island, registeredWorld, flags, chunkLoadReason, onChunkLoad));
+            chunkCoords.addAll(getAllChunksAsync(island, WorldInfo.of(registeredWorld), flags, chunkLoadReason, onChunkLoad));
         }
 
         return chunkCoords;

@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.core.formatting.impl;
 
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.formatting.ILocaleFormatter;
+import com.bgsoftware.superiorskyblock.core.formatting.IBiFormatter;
 
 import java.util.Locale;
 
-public class RatingFormatter implements ILocaleFormatter<Number> {
+public class RatingFormatter implements IBiFormatter<Number, Locale> {
 
     private static final RatingFormatter INSTANCE = new RatingFormatter();
 

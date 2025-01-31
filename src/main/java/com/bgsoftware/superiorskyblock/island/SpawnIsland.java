@@ -344,6 +344,14 @@ public class SpawnIsland implements Island {
         return this.center;
     }
 
+    public World getSpawnWorld() {
+        return spawnWorld;
+    }
+
+    public WorldInfo getSpawnWorldInfo() {
+        return spawnWorldInfo;
+    }
+
     @Override
     @Deprecated
     public Location getTeleportLocation(World.Environment unused) {
@@ -639,7 +647,7 @@ public class SpawnIsland implements Island {
     public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension unused,
                                                             @IslandChunkFlags int flags,
                                                             @Nullable Consumer<Chunk> onChunkLoad) {
-        return IslandUtils.getAllChunksAsync(this, center.getWorld(), flags, ChunkLoadReason.API_REQUEST, onChunkLoad);
+        return IslandUtils.getAllChunksAsync(this, spawnWorldInfo, flags, ChunkLoadReason.API_REQUEST, onChunkLoad);
     }
 
     @Override

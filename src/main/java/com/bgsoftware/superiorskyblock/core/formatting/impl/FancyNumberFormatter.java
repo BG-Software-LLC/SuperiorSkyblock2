@@ -2,11 +2,11 @@ package com.bgsoftware.superiorskyblock.core.formatting.impl;
 
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.formatting.ILocaleFormatter;
+import com.bgsoftware.superiorskyblock.core.formatting.IBiFormatter;
 
 import java.util.Locale;
 
-public class FancyNumberFormatter implements ILocaleFormatter<Number> {
+public class FancyNumberFormatter implements IBiFormatter<Number, Locale> {
 
     private static final FancyNumberFormatter INSTANCE = new FancyNumberFormatter();
 

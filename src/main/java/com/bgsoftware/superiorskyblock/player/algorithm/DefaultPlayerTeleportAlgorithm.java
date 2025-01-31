@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
@@ -43,6 +44,21 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
 
     @Override
     public CompletableFuture<Boolean> teleport(Player player, Island island, Dimension dimension) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        IslandWorlds.accessIslandWorldAsync(island, dimension, islandWorldResult -> {
+            islandWorldResult.ifRight(result::completeExceptionally).ifLeft(world ->
+                    teleportInternal(player, island, dimension, result));
+        });
+        return result;
+    }
+
+    @Override
+    @Deprecated
+    public CompletableFuture<Boolean> teleport(Player player, Island island, World.Environment environment) {
+        return teleport(player, island, Dimensions.fromEnvironment(environment));
+    }
+
+    public void teleportInternal(Player player, Island island, Dimension dimension, CompletableFuture<Boolean> result) {
         Location homeLocation = island.getIslandHome(dimension);
 
         Preconditions.checkNotNull(homeLocation, "Cannot find a suitable home location for island " +
@@ -50,36 +66,26 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
 
         Log.debug(Debug.TELEPORT_PLAYER, player.getName(), island.getOwner().getName(), dimension);
 
-        CompletableFuture<Boolean> teleportResult = new CompletableFuture<>();
-
         EntityTeleports.findIslandSafeLocation(island, dimension).whenComplete((safeSpot, error) -> {
             if (error != null) {
                 Log.debugResult(Debug.TELEPORT_PLAYER, "Teleport Location", null);
-                teleportResult.completeExceptionally(error);
+                result.completeExceptionally(error);
             } else if (safeSpot == null) {
                 Log.debugResult(Debug.TELEPORT_PLAYER, "Teleport Location", null);
-                teleportResult.complete(false);
+                result.complete(false);
             } else {
                 Log.debugResult(Debug.TELEPORT_PLAYER, "Teleport Location", safeSpot);
                 teleport(player, safeSpot).whenComplete((teleport, teleportError) -> {
                     if (teleportError != null) {
                         Log.debugResult(Debug.TELEPORT_PLAYER, "Teleport Result", false);
-                        teleportResult.completeExceptionally(teleportError);
+                        result.completeExceptionally(teleportError);
                     } else {
                         Log.debugResult(Debug.TELEPORT_PLAYER, "Teleport Result", true);
-                        teleportResult.complete(teleport);
+                        result.complete(teleport);
                     }
                 });
             }
         });
-
-        return teleportResult;
-    }
-
-    @Override
-    @Deprecated
-    public CompletableFuture<Boolean> teleport(Player player, Island island, World.Environment environment) {
-        return teleport(player, island, Dimensions.fromEnvironment(environment));
     }
 
 }

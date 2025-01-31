@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
@@ -68,6 +69,15 @@ public class EntityTeleports {
     }
 
     public static CompletableFuture<Location> findIslandSafeLocation(Island island, Dimension dimension) {
+        CompletableFuture<Location> result = new CompletableFuture<>();
+        IslandWorlds.accessIslandWorldAsync(island, dimension, islandWorldResult -> {
+            islandWorldResult.ifRight(result::completeExceptionally).ifLeft(world ->
+                    findIslandSafeLocation(island, dimension, result));
+        });
+        return result;
+    }
+
+    public static void findIslandSafeLocation(Island island, Dimension dimension, CompletableFuture<Location> result) {
         Location homeLocation = island.getIslandHome(dimension);
 
         Preconditions.checkNotNull(homeLocation, "Cannot find a suitable home location for island " +
@@ -84,7 +94,8 @@ public class EntityTeleports {
             Block homeLocationBlock = homeLocation.getBlock();
             if (island.isSpawn() || WorldBlocks.isSafeBlock(homeLocationBlock)) {
                 Log.debugResult(Debug.FIND_SAFE_TELEPORT, "Result Location", homeLocation);
-                return CompletableFuture.completedFuture(homeLocation);
+                result.complete(homeLocation);
+                return;
             }
         }
 
@@ -92,12 +103,10 @@ public class EntityTeleports {
         {
             Block teleportLocationHighestBlock = islandsWorld.getHighestBlockAt(homeLocation).getRelative(BlockFace.UP);
             if (WorldBlocks.isSafeBlock(teleportLocationHighestBlock)) {
-                return CompletableFuture.completedFuture(adjustLocationToHome(island,
-                        teleportLocationHighestBlock, rotationYaw, rotationPitch));
+                result.complete(adjustLocationToHome(island, teleportLocationHighestBlock, rotationYaw, rotationPitch));
+                return;
             }
         }
-
-        CompletableFuture<Location> result = new CompletableFuture<>();
 
         // The teleport location is not safe. We check for a safe spot in the center of the island.
 
@@ -128,8 +137,6 @@ public class EntityTeleports {
         } else {
             findNewSafeSpotOnIsland(island, islandsWorld, homeLocation, rotationYaw, rotationPitch, result);
         }
-
-        return result;
     }
 
     private static void findNewSafeSpotOnIsland(Island island, World islandsWorld, Location homeLocation,

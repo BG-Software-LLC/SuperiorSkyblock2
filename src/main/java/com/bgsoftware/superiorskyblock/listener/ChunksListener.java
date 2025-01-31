@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
@@ -137,12 +138,12 @@ public class ChunksListener implements Listener {
         if (!plugin.getNMSChunks().isChunkEmpty(chunk))
             island.markChunkDirty(world, chunk.getX(), chunk.getZ(), true);
 
-        Location islandCenter = island.getCenter(dimension);
+        BlockPosition islandCenter = island.getCenterPosition();
 
         boolean entityLimitsEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class);
         MutableBoolean recalculateEntities = new MutableBoolean(false);
 
-        if (chunk.getX() == (islandCenter.getBlockX() >> 4) && chunk.getZ() == (islandCenter.getBlockZ() >> 4)) {
+        if (chunk.getX() == (islandCenter.getX() >> 4) && chunk.getZ() == (islandCenter.getZ() >> 4)) {
             if (dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
                 Block chunkBlock = chunk.getBlock(0, 100, 0);
                 island.setBiome(world.getBiome(chunkBlock.getX(), chunkBlock.getZ()), false);

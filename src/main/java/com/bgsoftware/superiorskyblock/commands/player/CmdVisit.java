@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -19,6 +20,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class CmdVisit implements ISuperiorCommand {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Override
     public List<String> getAliases() {
@@ -65,19 +68,38 @@ public class CmdVisit implements ISuperiorCommand {
             return;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+        Dimension dimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
 
+        IslandWorlds.accessIslandWorldAsync(targetIsland, dimension, islandWorldResult -> {
+            islandWorldResult.ifLeft(world -> teleportPlayerInternal(targetIsland, superiorPlayer));
+        });
+    }
+
+    @Override
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
+                plugin.getSettings().isTabCompleteHideVanished(),
+                (onlinePlayer, onlineIsland) -> onlineIsland != null && (
+                        (!plugin.getSettings().getVisitorsSign().isRequiredForVisit() ||
+                                onlineIsland.getVisitorsLocation((Dimension) null /* unused */) != null) ||
+                                superiorPlayer.hasBypassModeEnabled()) && (!onlineIsland.isLocked() ||
+                        onlineIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS))) : Collections.emptyList();
+    }
+
+    private static void teleportPlayerInternal(Island targetIsland, SuperiorPlayer superiorPlayer) {
         Location visitLocation = plugin.getSettings().getVisitorsSign().isRequiredForVisit() ?
                 targetIsland.getVisitorsLocation((Dimension) null /* unused */) :
                 targetIsland.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension());
 
         if (visitLocation == null) {
-            Message.INVALID_VISIT_LOCATION.send(sender);
+            Message.INVALID_VISIT_LOCATION.send(superiorPlayer);
 
             if (!superiorPlayer.hasBypassModeEnabled())
                 return;
 
             visitLocation = targetIsland.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension());
-            Message.INVALID_VISIT_LOCATION_BYPASS.send(sender);
+            Message.INVALID_VISIT_LOCATION_BYPASS.send(superiorPlayer);
         }
 
         if (targetIsland.isLocked() && !targetIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)) {
@@ -99,19 +121,8 @@ public class CmdVisit implements ISuperiorCommand {
         }
     }
 
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
-                plugin.getSettings().isTabCompleteHideVanished(),
-                (onlinePlayer, onlineIsland) -> onlineIsland != null && (
-                        (!plugin.getSettings().getVisitorsSign().isRequiredForVisit() ||
-                                onlineIsland.getVisitorsLocation((Dimension) null /* unused */) != null) ||
-                                superiorPlayer.hasBypassModeEnabled()) && (!onlineIsland.isLocked() ||
-                        onlineIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS))) : Collections.emptyList();
-    }
-
-    private void teleportPlayerNoWarmup(SuperiorPlayer superiorPlayer, Island island, Location visitLocation, boolean checkIslandLock) {
+    private static void teleportPlayerNoWarmup(SuperiorPlayer superiorPlayer, Island island,
+                                               Location visitLocation, boolean checkIslandLock) {
         superiorPlayer.setTeleportTask(null);
 
         if (checkIslandLock && island.isLocked() && !island.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)) {

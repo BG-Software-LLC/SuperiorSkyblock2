@@ -2,12 +2,12 @@ package com.bgsoftware.superiorskyblock.core.formatting.impl;
 
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.formatting.ILocaleFormatter;
+import com.bgsoftware.superiorskyblock.core.formatting.IBiFormatter;
 
 import java.util.EnumMap;
 import java.util.Locale;
 
-public class BorderColorFormatter implements ILocaleFormatter<BorderColor> {
+public class BorderColorFormatter implements IBiFormatter<BorderColor, Locale> {
 
     private static final BorderColorFormatter INSTANCE = new BorderColorFormatter();
 
