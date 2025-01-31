@@ -55,8 +55,8 @@ import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -1436,11 +1436,8 @@ public class SIsland implements Island {
         if (dimension == null)
             return false;
 
-        World islandWorld = plugin.getGrid().getIslandsWorld(this, dimension);
-        if (!Objects.equals(world, islandWorld))
-            return false;
-
-        return true;
+        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
+        return worldInfo.getName().equals(world.getName());
     }
 
     @Override
