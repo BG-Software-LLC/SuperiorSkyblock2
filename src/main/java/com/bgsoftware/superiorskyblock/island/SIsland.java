@@ -39,6 +39,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
+import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LegacyMasks;
 import com.bgsoftware.superiorskyblock.core.LocationKey;
@@ -55,8 +56,8 @@ import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -1180,8 +1181,8 @@ public class SIsland implements Island {
                                                             @Nullable Consumer<Chunk> onChunkLoad) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null");
 
-        World world = getCenter(dimension).getWorld();
-        return IslandUtils.getAllChunksAsync(this, world, flags, ChunkLoadReason.API_REQUEST, onChunkLoad);
+        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
+        return IslandUtils.getAllChunksAsync(this, worldInfo, flags, ChunkLoadReason.API_REQUEST, onChunkLoad);
     }
 
     @Override
@@ -1436,11 +1437,8 @@ public class SIsland implements Island {
         if (dimension == null)
             return false;
 
-        World islandWorld = plugin.getGrid().getIslandsWorld(this, dimension);
-        if (!Objects.equals(world, islandWorld))
-            return false;
-
-        return true;
+        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
+        return worldInfo.getName().equals(world.getName());
     }
 
     @Override
@@ -1951,34 +1949,49 @@ public class SIsland implements Island {
     @Override
     public Biome getBiome() {
         if (biome == null) {
-            biomeGetterTask.set(task -> {
-                if (task != null)
-                    return task;
-
-                Dimension defaultWorldDimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
-                WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, defaultWorldDimension);
-                Location centerBlock = getCenter(defaultWorldDimension);
-
-                try (ChunkPosition centerChunkPosition = ChunkPosition.of(worldInfo,
-                        centerBlock.getBlockX() >> 4, centerBlock.getBlockZ() >> 4)) {
-                    return ChunksProvider.loadChunk(centerChunkPosition, ChunkLoadReason.BIOME_REQUEST, null)
-                            .thenApply(chunk -> centerBlock.getBlock().getBiome())
-                            .whenComplete((biome, error) -> {
-                                if (error != null)
-                                    error.printStackTrace();
-                                else {
-                                    this.biome = biome;
-                                    biomeGetterTask.set((CompletableFuture<Biome>) null);
-                                }
-                            });
-                }
-            });
-
+            biomeGetterTask.set(this::getBiomeAsyncTask);
             return IslandUtils.getDefaultWorldBiome(plugin.getSettings().getWorlds().getDefaultWorldDimension());
         }
 
         return biome;
     }
+
+    private CompletableFuture<Biome> getBiomeAsyncTask(CompletableFuture<Biome> currentTask) {
+        if (currentTask != null)
+            return currentTask;
+
+        Dimension defaultWorldDimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
+        BlockPosition centerBlockPosition = getCenterPosition();
+
+        CompletableFuture<Biome> newTask = new CompletableFuture<>();
+
+        IslandWorlds.accessIslandWorldAsync(this, defaultWorldDimension, islandWorldResult -> {
+            if (islandWorldResult.getRight() != null) {
+                newTask.completeExceptionally(islandWorldResult.getRight());
+                return;
+            }
+
+            World world = islandWorldResult.getLeft();
+
+            try (ChunkPosition centerChunkPosition = ChunkPosition.of(world,
+                    centerBlockPosition.getX() >> 4, centerBlockPosition.getZ() >> 4)) {
+                ChunksProvider.loadChunk(centerChunkPosition, ChunkLoadReason.BIOME_REQUEST, null)
+                        .thenApply(chunk -> centerBlockPosition.parse(world).getBlock().getBiome())
+                        .whenComplete((biome, error) -> {
+                            if (error != null)
+                                newTask.completeExceptionally(error);
+                            else {
+                                this.biome = biome;
+                                biomeGetterTask.set((CompletableFuture<Biome>) null);
+                                newTask.complete(biome);
+                            }
+                        });
+            }
+        });
+
+        return newTask;
+    }
+
 
     @Override
     public void setBiome(Biome biome) {

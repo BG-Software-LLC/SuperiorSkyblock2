@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.MaterialKeySource;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;

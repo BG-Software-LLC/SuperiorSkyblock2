@@ -12,7 +12,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.IslandPlaceholderParser;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlayerPlaceholderParser;
-import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -92,15 +92,15 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Map<String, IslandPlaceholderParser> ISLAND_PARSES =
             new ImmutableMap.Builder<String, IslandPlaceholderParser>()
                     .put("center", (island, superiorPlayer) ->
-                            Formatters.LOCATION_FORMATTER.format(island.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension())))
+                            Formatters.BLOCK_POSITION_FORMATTER.format(island.getCenterPosition(), getDefaultWorldInfo(island)))
                     .put("x", (island, superiorPlayer) ->
-                            island.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension()).getBlockX() + "")
+                            island.getCenterPosition().getX() + "")
                     .put("y", (island, superiorPlayer) ->
-                            island.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension()).getBlockY() + "")
+                            island.getCenterPosition().getY() + "")
                     .put("z", (island, superiorPlayer) ->
-                            island.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension()).getBlockZ() + "")
-                    .put("world", (island, superiorPlayer) ->
-                            island.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension()).getWorld().getName())
+                            island.getCenterPosition().getZ() + "")
+                    .put("world", (island, superiorPlayer) -> getDefaultWorldInfo(island).getName())
+                    .put("schematic", (island, superiorPlayer) -> island.getSchematicName())
                     .put("team_size", (island, superiorPlayer) -> island.getIslandMembers(true).size() + "")
                     .put("team_size_online", (island, superiorPlayer) ->
                             island.getIslandMembers(true).stream().filter(SuperiorPlayer::isShownAsOnline).count() + "")
@@ -509,6 +509,10 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             return Optional.empty();
 
         return Optional.of(members.get(targetMemberIndex).getName());
+    }
+
+    private static WorldInfo getDefaultWorldInfo(Island island) {
+        return plugin.getGrid().getIslandsWorldInfo(island, plugin.getSettings().getWorlds().getDefaultWorldDimension());
     }
 
 }

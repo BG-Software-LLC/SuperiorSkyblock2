@@ -34,6 +34,7 @@ required-missions:
 required-blocks:
   '1':
     types:
+      - 'STONE'
       - 'COBBLESTONE'
     amount: 96
   '2':

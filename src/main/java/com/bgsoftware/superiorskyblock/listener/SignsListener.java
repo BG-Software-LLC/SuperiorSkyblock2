@@ -6,11 +6,13 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.signs.IslandSigns;
+import com.bgsoftware.superiorskyblock.world.SignType;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.Directional;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -35,13 +37,21 @@ public class SignsListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     private void onSignPlace(SignChangeEvent e) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-        String[] signLines = e.getLines().clone();
+        String[] signLines;
 
         IslandSigns.Result result;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            result = IslandSigns.handleSignPlace(superiorPlayer,
-                    e.getBlock().getLocation(wrapper.getHandle()), signLines, true);
+            Location warpLocation = e.getBlock().getLocation(wrapper.getHandle());
+            SignType signType = plugin.getNMSWorld().getSignType(e.getBlock());
+
+            // Hanging signs are not allowed
+            if (signType == SignType.HANGING_SIGN || signType == SignType.HANGING_WALL_SIGN)
+                return;
+
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+            signLines = e.getLines().clone();
+
+            result = IslandSigns.handleSignPlace(superiorPlayer, warpLocation, signLines, true);
         }
         switch (result.getReason()) {
             case NOT_IN_ISLAND:
@@ -92,14 +102,22 @@ public class SignsListener implements Listener {
                         isSignGonnaBreak = sign.getAttachedFace().getOppositeFace() == blockFace;
                     } else {
                         Object blockData = plugin.getNMSWorld().getBlockData(faceBlock);
-                        if (blockData instanceof org.bukkit.block.data.type.WallSign) {
-                            // Wall signs will only be broken if they are attached to the block
-                            isSignGonnaBreak = ((org.bukkit.block.data.type.WallSign) blockData).getFacing() == blockFace;
-                        } else if (blockData instanceof org.bukkit.block.data.type.Sign) {
-                            // Standing signs will only be broken if they are placed on top of the block
-                            isSignGonnaBreak = blockFace == BlockFace.UP;
-                        } else {
-                            throw new RuntimeException("Found sign that cannot be handled: " + blockData);
+                        switch (plugin.getNMSWorld().getSignType(blockData)) {
+                            case WALL_SIGN:
+                                // Wall signs will only be broken if they are attached to the block
+                                isSignGonnaBreak = ((Directional) blockData).getFacing() == blockFace;
+                                break;
+                            case STANDING_SIGN:
+                                // Standing signs will only be broken if they are placed on top of the block
+                                isSignGonnaBreak = blockFace == BlockFace.UP;
+                                break;
+                            case HANGING_WALL_SIGN:
+                            case HANGING_SIGN:
+                                // Hanging signs are not allowed as warp signs
+                                isSignGonnaBreak = false;
+                                break;
+                            default:
+                                throw new RuntimeException("Found sign that cannot be handled: " + blockData);
                         }
                     }
 

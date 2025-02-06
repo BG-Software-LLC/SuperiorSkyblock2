@@ -1,13 +1,16 @@
 package com.bgsoftware.superiorskyblock.nms.v1_12_R1.dragon;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import net.minecraft.server.v1_12_R1.BlockPosition;
+import net.minecraft.server.v1_12_R1.DifficultyDamageScaler;
 import net.minecraft.server.v1_12_R1.EnderDragonBattle;
 import net.minecraft.server.v1_12_R1.EntityEnderDragon;
+import net.minecraft.server.v1_12_R1.GroupDataEntity;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.World;
 import net.minecraft.server.v1_12_R1.WorldProviderTheEnd;
@@ -26,20 +29,41 @@ public class IslandEntityEnderDragon extends EntityEnderDragon {
     public IslandEntityEnderDragon(World world) {
         // Used when loading entities to the world.
         super(world);
-        this.islandBlockPosition = BlockPosition.ZERO;
         this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(world.getWorld());
     }
 
     public IslandEntityEnderDragon(WorldServer worldServer, BlockPosition islandBlockPosition) {
-        super(worldServer);
+        this(worldServer);
         this.islandBlockPosition = islandBlockPosition;
-        this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(worldServer.getWorld());
+    }
+
+    @Nullable
+    @Override
+    public GroupDataEntity prepare(DifficultyDamageScaler difficultydamagescaler,
+                                   @Nullable GroupDataEntity groupdataentity) {
+        if (this.islandBlockPosition == null)
+            finalizeIslandEnderDragon();
+
+        return super.prepare(difficultydamagescaler, groupdataentity);
     }
 
     @Override
     public void a(NBTTagCompound nbtTagCompound) {
         super.a(nbtTagCompound);
+        finalizeIslandEnderDragon();
+    }
 
+    @Override
+    public void n() {
+        DragonUtils.runWithPodiumPosition(this.islandBlockPosition, super::n);
+    }
+
+    @Override
+    public CraftEnderDragon getBukkitEntity() {
+        return (CraftEnderDragon) super.getBukkitEntity();
+    }
+
+    private void finalizeIslandEnderDragon() {
         if (!(world.worldProvider instanceof WorldProviderTheEnd) || !plugin.getGrid().isIslandsWorld(world.getWorld()))
             return;
 
@@ -67,18 +91,8 @@ public class IslandEntityEnderDragon extends EntityEnderDragon {
 
         this.islandBlockPosition = new BlockPosition(middleBlock.getX(), middleBlock.getY(), middleBlock.getZ());
 
-        dragonBattleHandler.addDragonBattle(island.getUniqueId(), new IslandEnderDragonBattle(island,
-                (WorldServer) world, this.islandBlockPosition, this));
-    }
-
-    @Override
-    public void n() {
-        DragonUtils.runWithPodiumPosition(this.islandBlockPosition, super::n);
-    }
-
-    @Override
-    public CraftEnderDragon getBukkitEntity() {
-        return (CraftEnderDragon) super.getBukkitEntity();
+        IslandEnderDragonBattle dragonBattle = new IslandEnderDragonBattle(island, (WorldServer) world, this.islandBlockPosition, this);
+        dragonBattleHandler.addDragonBattle(island.getUniqueId(), dragonBattle);
     }
 
 }

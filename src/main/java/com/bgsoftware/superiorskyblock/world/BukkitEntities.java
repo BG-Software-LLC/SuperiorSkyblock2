@@ -37,19 +37,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 public class BukkitEntities {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final Map<UUID, List<ItemStack>> entityContent = new HashMap<>();
-    private static final Class<?> HOGLIN_CLASS = ((Supplier<Class<?>>) () -> {
-        try {
-            return Class.forName("org.bukkit.entity.Hoglin");
-        } catch (ClassNotFoundException error) {
-            return null;
-        }
-    }).get();
+    private static final Class<?> HOGLIN_CLASS = getEntityTypeClass("org.bukkit.entity.Hoglin");
+    private static final Class<?> SKELETON_HORSE_CLASS = getEntityTypeClass("org.bukkit.entity.SkeletonHorse");
+    private static final Class<?> ZOMBIE_HORSE_CLASS = getEntityTypeClass("org.bukkit.entity.ZombieHorse");
 
     private BukkitEntities() {
 
@@ -185,7 +180,11 @@ public class BukkitEntities {
                         Flying.class.isAssignableFrom(entityClass) ||
                         // In Bukkit, Hoglins are considered as Animals for no reason.
                         // We want to explicitly tell the plugin its monster type.
-                        entityClass == HOGLIN_CLASS
+                        entityClass == HOGLIN_CLASS ||
+                        // In Bukkit, Skeleton and Zombie horses are considered Horses,
+                        // and therefore they are animals. We want to explicit tell the plugin
+                        // they are monsters.
+                        entityClass == SKELETON_HORSE_CLASS || entityClass == ZOMBIE_HORSE_CLASS
                 );
             });
 
@@ -205,7 +204,9 @@ public class BukkitEntities {
                         // We check that the entity type is whether a Creature or an Ambient
                         (Creature.class.isAssignableFrom(entityClass) || Ambient.class.isAssignableFrom(entityClass)) &&
                         // We make sure this is not Hoglin; In Bukkit, they are considered Animals.
-                        entityClass != HOGLIN_CLASS;
+                        entityClass != HOGLIN_CLASS &&
+                        // We make sure this is not Skeleton/Zombie horses; In Bukkit, they are considered Animals.
+                        entityClass != SKELETON_HORSE_CLASS && entityClass != ZOMBIE_HORSE_CLASS;
             });
 
             @Override
@@ -262,6 +263,14 @@ public class BukkitEntities {
 
         abstract boolean isFromCategory(EntityType entityType);
 
+    }
+
+    private static Class<?> getEntityTypeClass(String clazz) {
+        try {
+            return Class.forName(clazz);
+        } catch (ClassNotFoundException error) {
+            return null;
+        }
     }
 
 }

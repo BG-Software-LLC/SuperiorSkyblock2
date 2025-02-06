@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.core.io.ClassProcessor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.defaults.BukkitCommand;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Minecart;
 import org.bukkit.event.inventory.InventoryType;
@@ -15,8 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
-
-import java.lang.reflect.Field;
 
 public interface NMSAlgorithms {
 
@@ -42,30 +39,7 @@ public interface NMSAlgorithms {
 
     String getMinecraftKey(ItemStack itemStack);
 
-    @Nullable
-    Enchantment getGlowEnchant();
-
-    @Nullable
-    default Enchantment createGlowEnchantment() {
-        Enchantment glowEnchant = getGlowEnchant();
-
-        if (glowEnchant != null) {
-            try {
-                Field field = Enchantment.class.getDeclaredField("acceptingNew");
-                field.setAccessible(true);
-                field.set(null, true);
-                field.setAccessible(false);
-            } catch (Exception ignored) {
-            }
-
-            try {
-                Enchantment.registerEnchantment(glowEnchant);
-            } catch (Exception ignored) {
-            }
-        }
-
-        return glowEnchant;
-    }
+    void makeItemGlow(ItemMeta itemMeta);
 
     @Nullable
     Object createMenuInventoryHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title);
@@ -84,4 +58,7 @@ public interface NMSAlgorithms {
         throw new UnsupportedOperationException();
     }
 
+    default void hideAttributes(ItemMeta itemMeta) {
+
+    }
 }

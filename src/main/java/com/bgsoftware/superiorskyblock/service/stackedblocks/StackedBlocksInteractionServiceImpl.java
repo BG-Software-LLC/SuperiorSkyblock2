@@ -19,7 +19,7 @@ import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;

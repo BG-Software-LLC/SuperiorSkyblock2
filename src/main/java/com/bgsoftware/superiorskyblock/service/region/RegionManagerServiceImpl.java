@@ -22,7 +22,7 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.KeySets;
+import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;

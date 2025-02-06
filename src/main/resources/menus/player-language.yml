@@ -10,9 +10,8 @@ previous-menu: true
 
 pattern:
   - '@ @ @ @ @ @ @ @ @'
-  - '@ @ # @ % @ * @ @'
-  - '@ + @ ^ @ ~ @ 1 @'
-  - '@ @ - @ = @ ! @ @'
+  - '@ # % * + ^ ~ 1 @'
+  - '@ @ - = @ ! 2 @ @'
   - '@ @ @ @ @ @ @ @ @'
 
 items:
@@ -48,6 +47,14 @@ items:
     name: '&ePolish'
     lore:
       - '&7Change language to Polish.'
+  '2':
+    language: 'pt-BR'
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWE0NjQ3NWQ1ZGNjODE1ZjZjNWYyODU5ZWRiYjEwNjExZjNlODYxYzBlYjE0ZjA4ODE2MWIzYzBjY2IyYjBkOSJ9fX0='
+    name: '&eBrazilian Portuguese'
+    lore:
+      - '&7Change language to Brazilian Portuguese.'
   '^':
     language: 'it-IT'
     type: SKULL_ITEM

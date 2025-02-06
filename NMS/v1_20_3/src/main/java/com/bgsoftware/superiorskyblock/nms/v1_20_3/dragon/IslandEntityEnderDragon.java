@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_20_3.dragon;
 
 import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -9,9 +10,13 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEnderDragon;
 
@@ -40,12 +45,38 @@ public class IslandEntityEnderDragon extends EnderDragon {
         this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(level.getWorld());
     }
 
+    @Nullable
+    @Override
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor world,
+                                        DifficultyInstance difficulty,
+                                        MobSpawnType spawnReason,
+                                        @Nullable SpawnGroupData entityData,
+                                        @Nullable CompoundTag entityNbt) {
+        if (this.islandBlockPos == null)
+            finalizeIslandEnderDragon();
+
+        return super.finalizeSpawn(world, difficulty, spawnReason, entityData, entityNbt);
+    }
+
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         // loadData
-
         super.readAdditionalSaveData(compoundTag);
+        finalizeIslandEnderDragon();
+    }
 
+    @Override
+    public void aiStep() {
+        DragonUtils.runWithPodiumPosition(this.islandBlockPos, super::aiStep);
+    }
+
+    @Override
+    @NotNull
+    public CraftEnderDragon getBukkitEntity() {
+        return (CraftEnderDragon) super.getBukkitEntity();
+    }
+
+    private void finalizeIslandEnderDragon() {
         if (!(this.serverLevel.getDragonFight() instanceof EndWorldEndDragonFightHandler dragonBattleHandler))
             return;
 
@@ -68,17 +99,6 @@ public class IslandEntityEnderDragon extends EnderDragon {
 
         IslandEndDragonFight dragonBattle = new IslandEndDragonFight(island, this.serverLevel, this.islandBlockPos, this);
         dragonBattleHandler.addDragonFight(island.getUniqueId(), dragonBattle);
-    }
-
-    @Override
-    public void aiStep() {
-        DragonUtils.runWithPodiumPosition(this.islandBlockPos, super::aiStep);
-    }
-
-    @Override
-    @NotNull
-    public CraftEnderDragon getBukkitEntity() {
-        return (CraftEnderDragon) super.getBukkitEntity();
     }
 
 }

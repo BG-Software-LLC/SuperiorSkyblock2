@@ -699,6 +699,9 @@ public class GridManagerImpl extends Manager implements GridManager {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
         if (island.isSpawn()) {
+            if (island instanceof SpawnIsland)
+                return ((SpawnIsland) island).getSpawnWorld();
+
             return island.getIslandHome(dimension).getWorld();
         }
 
@@ -730,6 +733,9 @@ public class GridManagerImpl extends Manager implements GridManager {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
         if (island.isSpawn()) {
+            if (island instanceof SpawnIsland)
+                return ((SpawnIsland) island).getSpawnWorldInfo();
+
             return WorldInfo.of(island.getIslandHome(dimension).getWorld());
         }
 
@@ -755,6 +761,9 @@ public class GridManagerImpl extends Manager implements GridManager {
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null.");
 
         if (island.isSpawn()) {
+            if (island instanceof SpawnIsland)
+                return ((SpawnIsland) island).getSpawnWorldInfo();
+
             return WorldInfo.of(island.getIslandHome(Dimensions.NORMAL).getWorld());
         }
 

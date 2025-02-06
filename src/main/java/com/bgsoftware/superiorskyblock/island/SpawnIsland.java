@@ -42,7 +42,7 @@ import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
-import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.persistence.EmptyPersistentDataContainer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -344,6 +344,14 @@ public class SpawnIsland implements Island {
         return this.center;
     }
 
+    public World getSpawnWorld() {
+        return spawnWorld;
+    }
+
+    public WorldInfo getSpawnWorldInfo() {
+        return spawnWorldInfo;
+    }
+
     @Override
     @Deprecated
     public Location getTeleportLocation(World.Environment unused) {
@@ -639,7 +647,7 @@ public class SpawnIsland implements Island {
     public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension unused,
                                                             @IslandChunkFlags int flags,
                                                             @Nullable Consumer<Chunk> onChunkLoad) {
-        return IslandUtils.getAllChunksAsync(this, center.getWorld(), flags, ChunkLoadReason.API_REQUEST, onChunkLoad);
+        return IslandUtils.getAllChunksAsync(this, spawnWorldInfo, flags, ChunkLoadReason.API_REQUEST, onChunkLoad);
     }
 
     @Override

@@ -11,7 +11,7 @@ import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attri
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.IslandWarpAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.PlayerAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.WarpCategoryAttributes;
-import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;

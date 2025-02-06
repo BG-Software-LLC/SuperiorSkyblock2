@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleResetResult;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
@@ -84,10 +85,13 @@ public class DragonBattleServiceImpl implements DragonBattleService, IService {
 
         stopEnderDragonBattle(island, dimension);
 
-        Location islandCenter = island.getCenter(dimension);
-
-        plugin.getNMSDragonFight().startDragonBattle(island,
-                dimensionConfig.getPortalOffset().applyToLocation(islandCenter));
+        IslandWorlds.accessIslandWorldAsync(island, dimension, islandWorldResult -> {
+            islandWorldResult.ifRight(Throwable::printStackTrace).ifLeft(world -> {
+                Location islandCenter = island.getCenter(dimension);
+                plugin.getNMSDragonFight().startDragonBattle(island,
+                        dimensionConfig.getPortalOffset().applyToLocation(islandCenter));
+            });
+        });
 
         return DragonBattleResetResult.SUCCESS;
     }

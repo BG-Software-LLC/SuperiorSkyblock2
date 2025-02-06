@@ -18,7 +18,7 @@ import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attri
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;

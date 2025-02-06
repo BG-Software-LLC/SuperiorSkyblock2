@@ -31,6 +31,7 @@ required-blocks:
   '1':
     types:
       - 'STONE'
+      - 'COBBLESTONE'
     amount: 48
   '2':
     types:

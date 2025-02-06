@@ -52,12 +52,15 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Field;
 import java.util.EnumMap;
 import java.util.function.BiFunction;
 
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
 
     private static final EnumMap<InventoryType, MenuCreator> MENUS_HOLDER_CREATORS = new EnumMap<>(InventoryType.class);
 
@@ -165,12 +168,8 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
-    public Enchantment getGlowEnchant() {
-        try {
-            return new PaperGlowEnchantment("superior_glowing_enchant");
-        } catch (Throwable error) {
-            return new SpigotGlowEnchantment("superior_glowing_enchant");
-        }
+    public void makeItemGlow(ItemMeta itemMeta) {
+        itemMeta.addEnchant(GLOW_ENCHANT, 1, true);
     }
 
     @Nullable
@@ -212,6 +211,31 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
         io.papermc.paper.chat.ChatRenderer originalRenderer = asyncChatEvent.renderer();
         asyncChatEvent.renderer(new ChatRendererWrapper(originalRenderer).renderer);
+    }
+
+    private static Enchantment initializeGlowEnchantment() {
+        Enchantment glowEnchant;
+
+        try {
+            glowEnchant = new PaperGlowEnchantment("superiorskyblock_glowing_enchant");
+        } catch (Throwable error) {
+            glowEnchant = new SpigotGlowEnchantment("superiorskyblock_glowing_enchant");
+        }
+
+        try {
+            Field field = Enchantment.class.getDeclaredField("acceptingNew");
+            field.setAccessible(true);
+            field.set(null, true);
+            field.setAccessible(false);
+        } catch (Exception ignored) {
+        }
+
+        try {
+            Enchantment.registerEnchantment(glowEnchant);
+        } catch (Exception ignored) {
+        }
+
+        return glowEnchant;
     }
 
     private interface MenuCreator extends BiFunction<InventoryHolder, String, Container> {

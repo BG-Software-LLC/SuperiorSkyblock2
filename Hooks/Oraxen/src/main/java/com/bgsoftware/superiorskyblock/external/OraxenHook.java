@@ -7,25 +7,36 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandGenerateBlockEvent;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
+import com.bgsoftware.superiorskyblock.external.blocks.ICustomBlocksProvider;
 import io.th0rgal.oraxen.api.OraxenBlocks;
+import io.th0rgal.oraxen.api.OraxenFurniture;
 import io.th0rgal.oraxen.api.OraxenItems;
+import io.th0rgal.oraxen.api.events.furniture.OraxenFurnitureBreakEvent;
+import io.th0rgal.oraxen.api.events.furniture.OraxenFurniturePlaceEvent;
 import io.th0rgal.oraxen.items.ItemBuilder;
 import io.th0rgal.oraxen.mechanics.Mechanic;
 import io.th0rgal.oraxen.mechanics.MechanicFactory;
 import io.th0rgal.oraxen.mechanics.MechanicsManager;
 import io.th0rgal.oraxen.mechanics.provided.gameplay.block.BlockMechanicFactory;
+import io.th0rgal.oraxen.mechanics.provided.gameplay.furniture.FurnitureMechanic;
 import io.th0rgal.oraxen.mechanics.provided.gameplay.noteblock.NoteBlockMechanicFactory;
 import io.th0rgal.oraxen.mechanics.provided.gameplay.stringblock.StringBlockMechanicFactory;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -43,34 +54,41 @@ public class OraxenHook {
     private static final Key BLOCK_ITEM_KEY = Keys.of(Material.PAPER);
     private static final Key BLOCK_KEY = Keys.of(Material.NOTE_BLOCK);
 
-    private static final List<Pair<MechanicFactory, SetBlockModelFunction>> AVAILABLE_MECHANICS;
+    private static final List<MechanicData> AVAILABLE_MECHANICS = initializeMechanics();
 
-    static {
-        List<Pair<MechanicFactory, SetBlockModelFunction>> availableMechanics = new LinkedList<>();
+    private static List<MechanicData> initializeMechanics() {
+        List<MechanicData> mechanics = new LinkedList<>();
 
         try {
             Class.forName("io.th0rgal.oraxen.mechanics.provided.gameplay.block.BlockMechanicFactory");
-            availableMechanics.add(new Pair<>(MechanicsManager.getMechanicFactory("block"), BlockMechanicFactory::setBlockModel));
-            availableMechanics.add(new Pair<>(MechanicsManager.getMechanicFactory("noteblock"), NoteBlockMechanicFactory::setBlockModel));
-            availableMechanics.add(new Pair<>(MechanicsManager.getMechanicFactory("stringblock"), StringBlockMechanicFactory::setBlockModel));
+            mechanics.add(new MechanicData(MechanicsManager.getMechanicFactory("block"), BlockMechanicFactory::setBlockModel));
+            mechanics.add(new MechanicData(MechanicsManager.getMechanicFactory("noteblock"), NoteBlockMechanicFactory::setBlockModel));
+            mechanics.add(new MechanicData(MechanicsManager.getMechanicFactory("stringblock"), StringBlockMechanicFactory::setBlockModel));
         } catch (Throwable error) {
-            availableMechanics.add(new Pair<>(MechanicsManager.getMechanicFactory("block"), (block, itemId) -> {
+            {
                 ReflectMethod<Void> setBlockModel = new ReflectMethod<>(
                         new ClassInfo("io.th0rgal.oraxen.mechanics.provided.block.BlockMechanicFactory", ClassInfo.PackageType.UNKNOWN),
                         "setBlockModel", Block.class, String.class);
-                if (setBlockModel.isValid())
-                    setBlockModel.invoke(null, block, itemId);
-            }));
-            availableMechanics.add(new Pair<>(MechanicsManager.getMechanicFactory("noteblock"), (block, itemId) -> {
+
+                mechanics.add(new MechanicData(MechanicsManager.getMechanicFactory("block"), (block, itemId) -> {
+                    if (setBlockModel.isValid())
+                        setBlockModel.invoke(null, block, itemId);
+                }));
+            }
+
+            {
                 ReflectMethod<Void> setBlockModel = new ReflectMethod<>(
                         new ClassInfo("io.th0rgal.oraxen.mechanics.provided.noteblock.NoteBlockMechanicFactory", ClassInfo.PackageType.UNKNOWN),
                         "setBlockModel", Block.class, String.class);
-                if (setBlockModel.isValid())
-                    setBlockModel.invoke(null, block, itemId);
-            }));
+
+                mechanics.add(new MechanicData(MechanicsManager.getMechanicFactory("noteblock"), (block, itemId) -> {
+                    if (setBlockModel.isValid())
+                        setBlockModel.invoke(null, block, itemId);
+                }));
+            }
         }
 
-        AVAILABLE_MECHANICS = Collections.unmodifiableList(availableMechanics);
+        return Collections.unmodifiableList(mechanics);
     }
 
     private static final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {
@@ -85,10 +103,44 @@ public class OraxenHook {
     public static void register(SuperiorSkyblockPlugin plugin) {
         OraxenHook.plugin = plugin;
         plugin.getBlockValues().registerKeyParser(new OraxenKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
-        plugin.getServer().getPluginManager().registerEvents(new GeneratorListener(), plugin);
+        plugin.getProviders().registerCustomBlocksProvider(new OraxenCustomBlocksProvider());
+        plugin.getServer().getPluginManager().registerEvents(new OraxenListener(), plugin);
     }
 
-    private static class GeneratorListener implements Listener {
+    private static class OraxenCustomBlocksProvider implements ICustomBlocksProvider {
+
+        @Nullable
+        @Override
+        public KeyMap<Integer> getBlockCountsForChunk(ChunkPosition chunkPosition) {
+            if (!Bukkit.isPrimaryThread())
+                return null;
+
+            World world = chunkPosition.getWorld();
+            if (!world.isChunkLoaded(chunkPosition.getX(), chunkPosition.getZ()))
+                return KeyMaps.createEmptyMap();
+
+            KeyMap<Integer> blockCounts = KeyMaps.createHashMap(KeyIndicator.CUSTOM);
+
+            Chunk chunk = world.getChunkAt(chunkPosition.getX(), chunkPosition.getZ());
+
+            for (Entity entity : chunk.getEntities()) {
+                FurnitureMechanic mechanic = OraxenFurniture.getFurnitureMechanic(entity);
+                if (mechanic != null) {
+                    Key blockKey = Keys.of(ORAXEN_PREFIX, mechanic.getItemID().toUpperCase(Locale.ENGLISH), KeyIndicator.CUSTOM);
+                    blockCounts.put(blockKey, blockCounts.getRaw(blockKey, 0) + 1);
+                }
+            }
+
+            return blockCounts;
+        }
+    }
+
+    private static class OraxenListener implements Listener {
+
+        @WorldRecordFlags
+        private static final int REGULAR_RECORD_FLAGS = WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS;
+        @WorldRecordFlags
+        private static final int ALL_RECORD_FLAGS = REGULAR_RECORD_FLAGS | WorldRecordFlags.HANDLE_NEARBY_BLOCKS;
 
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onOraxenBlockBreak(BlockBreakEvent e) {
@@ -96,11 +148,28 @@ public class OraxenHook {
             if (blockKey.getGlobalKey().equals(ORAXEN_PREFIX)) {
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                     worldRecordService.get().recordBlockBreak(blockKey,
-                            e.getBlock().getLocation(wrapper.getHandle()), 1,
-                            WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS | WorldRecordFlags.HANDLE_NEARBY_BLOCKS);
+                            e.getBlock().getLocation(wrapper.getHandle()), 1, ALL_RECORD_FLAGS);
                 }
 
 
+            }
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onFurniturePlace(OraxenFurniturePlaceEvent e) {
+            Key blockKey = Keys.of(ORAXEN_PREFIX, e.getMechanic().getItemID().toUpperCase(Locale.ENGLISH), KeyIndicator.CUSTOM);
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                worldRecordService.get().recordBlockPlace(blockKey, e.getBlock().getLocation(wrapper.getHandle()),
+                        1, null, REGULAR_RECORD_FLAGS);
+            }
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onFurnitureBreak(OraxenFurnitureBreakEvent e) {
+            Key blockKey = Keys.of(ORAXEN_PREFIX, e.getMechanic().getItemID().toUpperCase(Locale.ENGLISH), KeyIndicator.CUSTOM);
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                worldRecordService.get().recordBlockBreak(blockKey,
+                        e.getBaseEntity().getLocation(wrapper.getHandle()), 1, ALL_RECORD_FLAGS);
             }
         }
 
@@ -116,17 +185,16 @@ public class OraxenHook {
                 return;
             }
 
-            Pair<MechanicFactory, SetBlockModelFunction> mechanic = AVAILABLE_MECHANICS.stream()
-                    .filter(pair -> pair.getKey() != null && !pair.getKey().isNotImplementedIn(itemId))
-                    .findFirst().orElse(null);
-
-            if (mechanic == null) {
-                event.setCancelled(true);
-                return;
+            for (MechanicData mechanic : AVAILABLE_MECHANICS) {
+                if (mechanic.mechanicFactory != null && !mechanic.mechanicFactory.isNotImplementedIn(itemId)) {
+                    event.setPlaceBlock(false);
+                    mechanic.setBlockModelFunction.setBlockModel(event.getLocation().getBlock(), itemId);
+                    return;
+                }
             }
 
-            event.setPlaceBlock(false);
-            mechanic.getValue().setBlockModel(event.getLocation().getBlock(), itemId);
+            // No mechanic was found
+            event.setCancelled(true);
         }
 
     }
@@ -162,6 +230,10 @@ public class OraxenHook {
                 return null;
             return itemBuilder.build();
         }
+
+    }
+
+    private record MechanicData(MechanicFactory mechanicFactory, SetBlockModelFunction setBlockModelFunction) {
 
     }
 

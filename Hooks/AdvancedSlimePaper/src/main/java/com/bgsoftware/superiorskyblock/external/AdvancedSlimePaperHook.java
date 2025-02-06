@@ -31,7 +31,6 @@ public class AdvancedSlimePaperHook {
     }
 
     public static void register(SuperiorSkyblockPlugin plugin) {
-        Bukkit.getLogger().info("AdvancedSlimePaperHook::register");
         slimeWorldPlugin = Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
         plugin.getProviders().registerWorldsListener(AdvancedSlimePaperHook::loadWorld);
     }

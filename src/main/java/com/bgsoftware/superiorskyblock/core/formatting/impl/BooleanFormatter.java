@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.core.formatting.impl;
 
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.formatting.ILocaleFormatter;
+import com.bgsoftware.superiorskyblock.core.formatting.IBiFormatter;
 
 import java.util.Locale;
 
-public class BooleanFormatter implements ILocaleFormatter<Boolean> {
+public class BooleanFormatter implements IBiFormatter<Boolean, Locale> {
 
     private static final BooleanFormatter INSTANCE = new BooleanFormatter();
 

@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import org.bukkit.Location;
@@ -71,6 +72,11 @@ public class SchematicBlock {
 
         this.tileEntityData = new CompoundTag(originalTileEntity);
         String id = this.tileEntityData.getString("id");
+
+        if (id == null) {
+            Log.warn("Weird tile-entity data detected: " + this.tileEntityData.getValue());
+            throw new RuntimeException("Detected tile-entity data with no 'id' key.");
+        }
 
         if (id.equalsIgnoreCase(ServerVersion.isLegacy() ? "Sign" : "minecraft:sign")) {
             boolean needSignFormat = false;

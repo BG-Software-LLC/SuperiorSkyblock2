@@ -28,7 +28,6 @@ import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.factory.FactoriesManagerImpl;
-import com.bgsoftware.superiorskyblock.core.itemstack.GlowEnchantment;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
 import com.bgsoftware.superiorskyblock.core.key.KeysManagerImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -212,8 +211,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             BukkitExecutor.init(this);
 
             loadUpgradeCostLoaders();
-
-            GlowEnchantment.registerGlowEnchantment(this);
 
             try {
                 settingsHandler.loadData();

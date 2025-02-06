@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.player;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
@@ -79,9 +80,11 @@ public class CmdShow implements ISuperiorCommand {
             infoMessage.append(Message.ISLAND_INFO_OWNER.getMessage(locale, island.getOwner().getName())).append("\n");
         if (!Message.ISLAND_INFO_NAME.isEmpty(locale) && !island.getName().isEmpty())
             infoMessage.append(Message.ISLAND_INFO_NAME.getMessage(locale, island.getName())).append("\n");
-        if (!Message.ISLAND_INFO_LOCATION.isEmpty(locale))
-            infoMessage.append(Message.ISLAND_INFO_LOCATION.getMessage(locale, Formatters.LOCATION_FORMATTER.format(
-                    island.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension())))).append("\n");
+        if (!Message.ISLAND_INFO_LOCATION.isEmpty(locale)) {
+            WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, plugin.getSettings().getWorlds().getDefaultWorldDimension());
+            infoMessage.append(Message.ISLAND_INFO_LOCATION.getMessage(locale,
+                    Formatters.BLOCK_POSITION_FORMATTER.format(island.getCenterPosition(), worldInfo))).append("\n");
+        }
         if (!Message.ISLAND_INFO_CREATION_TIME.isEmpty(locale))
             infoMessage.append(Message.ISLAND_INFO_CREATION_TIME.getMessage(locale, island.getCreationTimeDate())).append("\n");
         if (!Message.ISLAND_INFO_RATE.isEmpty(locale)) {

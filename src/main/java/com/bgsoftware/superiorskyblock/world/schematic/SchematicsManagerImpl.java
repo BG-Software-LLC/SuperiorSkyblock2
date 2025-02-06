@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
@@ -19,12 +20,16 @@ import com.bgsoftware.superiorskyblock.core.io.Resources;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.nms.world.ChunkReader;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.FloatTag;
 import com.bgsoftware.superiorskyblock.tag.IntTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
+import com.bgsoftware.superiorskyblock.world.WorldReader;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.schematic.container.SchematicsContainer;
 import com.bgsoftware.superiorskyblock.world.schematic.impl.SuperiorSchematic;
 import com.bgsoftware.superiorskyblock.world.schematic.parser.DefaultSchematicParser;
@@ -34,10 +39,9 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryHolder;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -191,97 +195,112 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
         Log.debug(Debug.SAVE_SCHEMATIC, pos1, pos2, offsetX, offsetY, offsetZ, yaw, pitch, schematicName);
 
         World world = pos1.getWorld();
-        Location min = new Location(world,
-                Math.min(pos1.getX(), pos2.getX()),
-                Math.min(pos1.getY(), pos2.getY()),
-                Math.min(pos1.getZ(), pos2.getZ())
-        );
-        Location max = new Location(world,
-                Math.max(pos1.getX(), pos2.getX()),
-                Math.max(pos1.getY(), pos2.getY()),
-                Math.max(pos1.getZ(), pos2.getZ())
-        );
 
-        int minBlockX = min.getBlockX();
-        int minBlockY = min.getBlockY();
-        int minBlockZ = min.getBlockZ();
+        int minBlockX = Math.min(pos1.getBlockX(), pos2.getBlockX());
+        int minBlockY = Math.min(pos1.getBlockY(), pos2.getBlockY());
+        int minBlockZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
 
-        int xSize = max.getBlockX() - minBlockX;
-        int ySize = max.getBlockY() - minBlockY;
-        int zSize = max.getBlockZ() - minBlockZ;
+        int maxBlockX = Math.max(pos1.getBlockX(), pos2.getBlockX());
+        int maxBlockY = Math.max(pos1.getBlockY(), pos2.getBlockY());
+        int maxBlockZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
 
-        List<Tag<?>> blocks = new ArrayList<>();
-        List<Tag<?>> entities = new ArrayList<>();
+        int xSize = maxBlockX - minBlockX;
+        int ySize = maxBlockY - minBlockY;
+        int zSize = maxBlockZ - minBlockZ;
 
-        for (int x = 0; x <= xSize; x++) {
-            int blockX = minBlockX + x;
-            for (int z = 0; z <= zSize; /* z increments inside loop */) {
-                int blockZ = minBlockZ + z;
-                // Check if we at start of new chunk
-                if ((blockX & 0xF) == 0 && (blockZ & 0xF) == 0) {
-                    Chunk chunk = world.getChunkAt(blockX >> 4, blockZ >> 4);
-                    if (plugin.getNMSChunks().isChunkEmpty(chunk)) {
-                        // Skip empty chunk
-                        z += 16;
-                        continue;
-                    }
+        WorldReader worldReader = new WorldReader(world, ChunkLoadReason.SCHEMATIC_SAVE);
+
+        int minChunkX = minBlockX >> 4;
+        int minChunkZ = minBlockZ >> 4;
+        int maxChunkX = maxBlockX >> 4;
+        int maxChunkZ = maxBlockZ >> 4;
+        for (int chunkX = minChunkX; chunkX <= maxChunkX; ++chunkX) {
+            for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; ++chunkZ) {
+                try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ)) {
+                    worldReader.prepareChunk(chunkPosition);
                 }
+            }
+        }
 
-                for (int y = 0; y <= ySize; y++) {
-                    Block block = world.getBlockAt(blockX, minBlockY + y, blockZ);
-                    Material blockType = block.getType();
-                    if (blockType == Material.AIR)
-                        continue;
+        worldReader.finish(() -> {
+            List<Tag<?>> entities = new ArrayList<>();
+            List<Tag<?>> blocks = new ArrayList<>();
 
-                    try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                        Location blockLocation = block.getLocation(wrapper.getHandle());
+            for (int x = minBlockX; x <= maxBlockX; ++x) {
+                for (int z = minBlockZ; z <= maxBlockZ; ++z) {
+                    ChunkReader chunkReader = worldReader.getChunkReader(x, z);
 
-                        CompoundTag tileEntity = plugin.getNMSWorld().readTileEntity(blockLocation);
-                        if (tileEntity != null && block.getState() instanceof InventoryHolder)
-                            tileEntity.setString("inventoryType", ((InventoryHolder) block.getState()).getInventory().getType().name());
+                    int offsetBlockX = x - minBlockX;
+                    int offsetBlockZ = z - minBlockZ;
 
-                        //noinspection deprecation
+                    int chunkBlockX = x & 0xF;
+                    int chunkBlockZ = z & 0xF;
+
+                    for (int chunkBlockY = minBlockY; chunkBlockY <= maxBlockY; ++chunkBlockY) {
+                        Material blockType = chunkReader.getType(chunkBlockX, chunkBlockY, chunkBlockZ);
+                        if (blockType == Material.AIR)
+                            continue;
+
+                        short blockData = chunkReader.getData(chunkBlockX, chunkBlockY, chunkBlockZ);
+                        CompoundTag blockStates = chunkReader.readBlockStates(chunkBlockX, chunkBlockY, chunkBlockZ);
+                        byte[] lightLevels = chunkReader.getLightLevels(chunkBlockX, chunkBlockY, chunkBlockZ);
+                        CompoundTag tileEntity = chunkReader.getTileEntity(chunkBlockX, chunkBlockY, chunkBlockZ);
+
+                        int offsetBlockY = chunkBlockY - minBlockY;
+
                         blocks.add(new SchematicBuilder()
-                                .withBlockOffset(SBlockOffset.fromOffsets(x, y, z))
-                                .withBlockType(blockLocation, blockType, block.getData())
-                                .withStates(plugin.getNMSWorld().readBlockStates(blockLocation))
-                                .withLightLevels(plugin.getNMSWorld().getLightLevels(blockLocation))
+                                .withBlockOffset(SBlockOffset.fromOffsets(offsetBlockX, offsetBlockY, offsetBlockZ))
+                                .withBlockType(blockType, blockData)
+                                .withStates(blockStates)
+                                .withLightLevels(lightLevels)
                                 .withTileEntity(tileEntity)
                                 .build()
                         );
                     }
                 }
-
-                ++z;
             }
-        }
 
-        for (Entity livingEntity : getEntities(min, max)) {
-            entities.add(new SchematicBuilder().applyEntity(livingEntity, min).build());
-        }
+            for (int x = minChunkX; x <= maxChunkX; ++x) {
+                for (int z = minChunkZ; z <= maxChunkZ; ++z) {
+                    ChunkReader chunkReader = worldReader.getChunkReader(x << 4, z << 4);
+                    if (chunkReader != null) {
+                        chunkReader.forEachEntity((entityType, entityTag, location) -> {
+                            if (entityType != EntityType.PLAYER &&
+                                    location.getBlockX() >= minBlockX && location.getBlockX() <= maxBlockX &&
+                                    location.getBlockY() >= minBlockY && location.getBlockY() <= maxBlockY &&
+                                    location.getBlockZ() >= minBlockZ && location.getBlockZ() <= maxBlockZ) {
+                                location.subtract(minBlockX, minBlockY, minBlockZ);
+                                entities.add(new SchematicBuilder().applyEntity(entityType, entityTag, location).build());
+                            }
+                        });
+                    }
+                }
+            }
 
-        Map<String, Tag<?>> compoundValue = new HashMap<>();
-        compoundValue.put("xSize", new IntTag(xSize));
-        compoundValue.put("ySize", new IntTag(ySize));
-        compoundValue.put("zSize", new IntTag(zSize));
-        compoundValue.put("blocks", new ListTag(CompoundTag.class, blocks));
-        compoundValue.put("entities", new ListTag(CompoundTag.class, entities));
-        compoundValue.put("offsetX", new IntTag(offsetX));
-        compoundValue.put("offsetY", new IntTag(offsetY));
-        compoundValue.put("offsetZ", new IntTag(offsetZ));
-        compoundValue.put("yaw", new FloatTag(yaw));
-        compoundValue.put("pitch", new FloatTag(pitch));
-        compoundValue.put("version", new StringTag(ServerVersion.getBukkitVersion()));
-        if (!ServerVersion.isLegacy())
-            compoundValue.put("minecraftDataVersion", new IntTag(plugin.getNMSAlgorithms().getDataVersion()));
+            Map<String, Tag<?>> compoundValue = new HashMap<>();
+            compoundValue.put("xSize", new IntTag(xSize));
+            compoundValue.put("ySize", new IntTag(ySize));
+            compoundValue.put("zSize", new IntTag(zSize));
+            compoundValue.put("blocks", new ListTag(CompoundTag.class, blocks));
+            compoundValue.put("entities", new ListTag(CompoundTag.class, entities));
+            compoundValue.put("offsetX", new IntTag(offsetX));
+            compoundValue.put("offsetY", new IntTag(offsetY));
+            compoundValue.put("offsetZ", new IntTag(offsetZ));
+            compoundValue.put("yaw", new FloatTag(yaw));
+            compoundValue.put("pitch", new FloatTag(pitch));
+            compoundValue.put("version", new StringTag(ServerVersion.getBukkitVersion()));
+            if (!ServerVersion.isLegacy())
+                compoundValue.put("minecraftDataVersion", new IntTag(plugin.getNMSAlgorithms().getDataVersion()));
 
-        CompoundTag schematicTag = new CompoundTag(compoundValue);
-        SuperiorSchematic schematic = new SuperiorSchematic(schematicName, schematicTag);
-        this.schematicsContainer.addSchematic(schematic);
-        saveIntoFile(schematicName, schematicTag);
+            CompoundTag schematicTag = new CompoundTag(compoundValue);
+            SuperiorSchematic schematic = new SuperiorSchematic(schematicName, schematicTag);
+            this.schematicsContainer.addSchematic(schematic);
+            saveIntoFile(schematicName, schematicTag);
 
-        if (runnable != null)
-            runnable.run();
+            if (runnable != null)
+                BukkitExecutor.sync(runnable);
+        });
+
     }
 
     public String getDefaultSchematic(Dimension dimension) {

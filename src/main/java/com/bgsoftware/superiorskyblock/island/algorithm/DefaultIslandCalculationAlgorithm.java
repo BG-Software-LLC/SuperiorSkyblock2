@@ -14,8 +14,8 @@ import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -23,6 +23,7 @@ import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
 import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
+import com.bgsoftware.superiorskyblock.external.blocks.ICustomBlocksProvider;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import org.bukkit.Location;
@@ -113,16 +114,8 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
                 }
 
                 ChunkPosition chunkPosition = calculatedChunk.getPosition();
-
-                // Load stacked blocks
-                Collection<Pair<Key, Integer>> stackedBlocks = plugin.getProviders().getStackedBlocksProvider()
-                        .getBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
-
-                if (stackedBlocks == null) {
-                    chunksToCheck.add(calculatedChunk.getPosition());
-                } else for (Pair<Key, Integer> pair : stackedBlocks) {
-                    blockCounts.addCounts(pair.getKey(), pair.getValue() - 1);
-                }
+                if (!loadExternalBlocksForChunk(chunkPosition, blockCounts))
+                    chunksToCheck.add(chunkPosition);
 
                 // Load built-in stacked blocks
                 plugin.getStackedBlocks().forEach(calculatedChunk.getPosition(), stackedBlock ->
@@ -160,10 +153,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
 
             // Calculate stacked block counts
             for (ChunkPosition chunkPosition : chunksToCheck) {
-                for (Pair<Key, Integer> pair : plugin.getProviders().getStackedBlocksProvider()
-                        .getBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ())) {
-                    blockCounts.addCounts(pair.getKey(), pair.getValue() - 1);
-                }
+                loadExternalBlocksForChunk(chunkPosition, blockCounts);
             }
 
             // Calculate minecart block counts
@@ -196,6 +186,34 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
         return Collections.unmodifiableList(minecartBlockTypes);
     }
 
+    private boolean loadExternalBlocksForChunk(ChunkPosition chunkPosition, BlockCountsTracker blockCounts) {
+        // Load stacked blocks
+        Collection<Pair<Key, Integer>> stackedBlocks = plugin.getProviders().getStackedBlocksProvider()
+                .getBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
+
+        if (stackedBlocks == null)
+            return false;
+
+        BlockCountsTracker chunkBlockCounts = new BlockCountsTracker();
+
+        for (ICustomBlocksProvider customBlocksProvider : plugin.getProviders().getCustomBlocksProviders()) {
+            KeyMap<Integer> customBlocksCounts = customBlocksProvider.getBlockCountsForChunk(chunkPosition);
+            if (customBlocksCounts == null)
+                return false;
+
+            customBlocksCounts.forEach(chunkBlockCounts::addCounts);
+        }
+
+        chunkBlockCounts.blockCounts.forEach((block, count) ->
+                blockCounts.addCounts(block, count.intValue()));
+
+        for (Pair<Key, Integer> pair : stackedBlocks) {
+            blockCounts.addCounts(pair.getKey(), pair.getValue() - 1);
+        }
+
+        return true;
+    }
+
     private static class BlockCountsTracker implements IslandCalculationResult {
 
         private final KeyMap<BigInteger> blockCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
@@ -212,6 +230,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
         public void addCounts(KeyMap<Counter> other) {
             other.forEach((key, counter) -> addCounts(key, counter.get()));
         }
+
     }
 
     private static class SpawnerInfo {

@@ -15,29 +15,28 @@ import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.spawners.MobSpawnerAbstractNotifier;
+import com.bgsoftware.superiorskyblock.nms.v1_8_R3.world.ChunkReaderImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.world.WorldEditSessionImpl;
+import com.bgsoftware.superiorskyblock.nms.world.ChunkReader;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
-import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.world.SignType;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockDoubleStep;
 import net.minecraft.server.v1_8_R3.BlockPosition;
-import net.minecraft.server.v1_8_R3.Chunk;
 import net.minecraft.server.v1_8_R3.EnumParticle;
-import net.minecraft.server.v1_8_R3.EnumSkyBlock;
 import net.minecraft.server.v1_8_R3.IBlockData;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.MobSpawnerAbstract;
-import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_8_R3.PacketPlayOutWorldBorder;
-import net.minecraft.server.v1_8_R3.TileEntity;
 import net.minecraft.server.v1_8_R3.TileEntityMobSpawner;
 import net.minecraft.server.v1_8_R3.TileEntitySign;
 import net.minecraft.server.v1_8_R3.WorldBorder;
 import net.minecraft.server.v1_8_R3.WorldServer;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -183,47 +182,14 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public CompoundTag readBlockStates(Location location) {
-        // Doesn't exist
-        return null;
-    }
-
-    @Override
-    public byte[] getLightLevels(Location location) {
-        WorldServer worldServer = ((CraftWorld) location.getWorld()).getHandle();
-        try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
-            BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
-            blockPosition.c(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-
-            Chunk chunk = worldServer.getChunkAtWorldCoords(blockPosition);
-
-            return new byte[]{
-                    (byte) chunk.getBrightness(EnumSkyBlock.SKY, blockPosition),
-                    (byte) chunk.getBrightness(EnumSkyBlock.BLOCK, blockPosition)
-            };
-        }
-    }
-
-    @Override
-    public CompoundTag readTileEntity(Location location) {
-        TileEntity tileEntity = NMSUtils.getTileEntityAt(location, TileEntity.class);
-        if (tileEntity == null)
-            return null;
-
-        NBTTagCompound tileEntityCompound = new NBTTagCompound();
-        tileEntity.b(tileEntityCompound);
-
-        tileEntityCompound.remove("x");
-        tileEntityCompound.remove("y");
-        tileEntityCompound.remove("z");
-
-        return CompoundTag.fromNBT(tileEntityCompound);
-    }
-
-    @Override
     public boolean isWaterLogged(org.bukkit.block.Block block) {
         Material blockType = block.getType();
         return blockType == Material.WATER || blockType == Material.STATIONARY_WATER;
+    }
+
+    @Override
+    public SignType getSignType(Object sign) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
@@ -352,6 +318,11 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public WorldEditSession createEditSession(World world) {
         return WorldEditSessionImpl.obtain(((CraftWorld) world).getHandle());
+    }
+
+    @Override
+    public ChunkReader createChunkReader(Chunk chunk) {
+        return new ChunkReaderImpl(chunk);
     }
 
 }
