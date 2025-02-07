@@ -252,6 +252,9 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
     public RecordResult recordEntitySpawn(Entity entity) {
         Preconditions.checkNotNull(entity, "entity parameter cannot be null");
 
+        if (entity.isDead())
+            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+
         if (BukkitEntities.canBypassEntityLimit(entity))
             return RecordResult.ENTITY_CANNOT_BE_TRACKED;
 
