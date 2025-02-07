@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
@@ -74,17 +75,17 @@ public class CmdAdminMission implements IAdminPlayerCommand {
         } else if (args[3].equalsIgnoreCase("reset")) {
             Island island = targetPlayer.getIsland();
 
-            boolean anyIslandChanged = false;
+            int islandsChangedCount = 0;
 
             for (Mission<?> mission : missions) {
                 IMissionsHolder missionsHolder = mission.getIslandMission() ? island : targetPlayer;
-                if (missionsHolder != null && plugin.getEventsBus().callMissionResetEvent(sender, missionsHolder, mission)) {
-                    anyIslandChanged = true;
+                if (missionsHolder != null && PluginEventsFactory.callMissionResetEvent(sender, missionsHolder, mission)) {
+                    ++islandsChangedCount;
                     missionsHolder.resetMission(mission);
                 }
             }
 
-            if (!anyIslandChanged)
+            if (islandsChangedCount <= 0)
                 return;
 
             if (missions.size() == 1)

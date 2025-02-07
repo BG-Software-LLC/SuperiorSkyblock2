@@ -7,7 +7,9 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -69,20 +71,21 @@ public class CmdAdminAddCoopLimit implements IAdminIslandCommand {
 
         int limit = arguments.getNumber();
 
-        boolean anyIslandChanged = false;
+        int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeCoopLimitEvent(sender,
-                    island, island.getCoopLimit() + limit);
-            anyIslandChanged |= !eventResult.isCancelled();
-            if (!eventResult.isCancelled())
-                island.setCoopLimit(eventResult.getResult());
+            PluginEvent<PluginEventArgs.IslandChangeCoopLimit> event = PluginEventsFactory.callIslandChangeCoopLimitEvent(
+                    island, sender, island.getCoopLimit() + limit);
+            if (!event.isCancelled()) {
+                island.setCoopLimit(event.getArgs().coopLimit);
+                ++islandsChangedCount;
+            }
         }
 
-        if (!anyIslandChanged)
+        if (islandsChangedCount <= 0)
             return;
 
-        if (islands.size() > 1)
+        if (islandsChangedCount > 1)
             Message.CHANGED_COOP_LIMIT_ALL.send(sender);
         else if (targetPlayer == null)
             Message.CHANGED_COOP_LIMIT_NAME.send(sender, islands.get(0).getName());

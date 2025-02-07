@@ -3,14 +3,15 @@ package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractIconProviderMenu;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class WarpIconEditConfirmButton extends AbstractMenuViewButton<AbstractIconProviderMenu.View<IslandWarp>> {
 
@@ -25,17 +26,17 @@ public class WarpIconEditConfirmButton extends AbstractMenuViewButton<AbstractIc
 
         IslandWarp islandWarp = menuView.getIconProvider();
 
-        EventResult<ItemStack> eventResult = plugin.getEventsBus().callIslandChangeWarpIconEvent(inventoryViewer,
-                islandWarp.getIsland(), islandWarp, menuView.getIconTemplate().build());
+        PluginEvent<PluginEventArgs.IslandChangeWarpIcon> event = PluginEventsFactory.callIslandChangeWarpIconEvent(
+                islandWarp.getIsland(), inventoryViewer, islandWarp, menuView.getIconTemplate().build());
 
-        if (eventResult.isCancelled())
+        if (event.isCancelled())
             return;
 
         clickEvent.getWhoClicked().closeInventory();
 
         Message.WARP_ICON_UPDATED.send(inventoryViewer);
 
-        islandWarp.setIcon(eventResult.getResult());
+        islandWarp.setIcon(event.getArgs().icon);
     }
 
     public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<AbstractIconProviderMenu.View<IslandWarp>> {

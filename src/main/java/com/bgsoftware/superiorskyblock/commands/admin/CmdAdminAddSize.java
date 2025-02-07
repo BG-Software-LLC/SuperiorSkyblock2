@@ -7,7 +7,9 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -73,20 +75,21 @@ public class CmdAdminAddSize implements IAdminIslandCommand {
             return;
         }
 
-        boolean anyIslandChanged = false;
+        int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeBorderSizeEvent(sender,
-                    island, island.getIslandSize() + size);
-            anyIslandChanged |= !eventResult.isCancelled();
-            if (!eventResult.isCancelled())
-                island.setIslandSize(eventResult.getResult());
+            PluginEvent<PluginEventArgs.IslandChangeBorderSize> event = PluginEventsFactory.callIslandChangeBorderSizeEvent(
+                    island, sender, island.getIslandSize() + size);
+            if (!event.isCancelled()) {
+                island.setIslandSize(event.getArgs().borderSize);
+                ++islandsChangedCount;
+            }
         }
 
-        if (!anyIslandChanged)
+        if (islandsChangedCount <= 0)
             return;
 
-        if (islands.size() > 1)
+        if (islandsChangedCount > 1)
             Message.CHANGED_ISLAND_SIZE_ALL.send(sender);
         else if (targetPlayer == null)
             Message.CHANGED_ISLAND_SIZE_NAME.send(sender, islands.get(0).getName());

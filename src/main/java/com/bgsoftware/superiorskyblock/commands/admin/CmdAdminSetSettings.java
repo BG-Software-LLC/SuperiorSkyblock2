@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -71,26 +72,26 @@ public class CmdAdminSetSettings implements IAdminIslandCommand {
 
         boolean value = args[4].equalsIgnoreCase("true");
 
-        boolean anyIslandChanged = false;
+        int islandsChangedCount = 0;
 
         for (Island island : islands) {
             if (island.hasSettingsEnabled(islandFlag) == value) {
-                anyIslandChanged = true;
+                ++islandsChangedCount;
                 continue;
             }
 
             if (value) {
-                if (plugin.getEventsBus().callIslandEnableFlagEvent(sender, island, islandFlag)) {
-                    anyIslandChanged = true;
+                if (PluginEventsFactory.callIslandEnableFlagEvent(island, sender, islandFlag)) {
+                    ++islandsChangedCount;
                     island.enableSettings(islandFlag);
                 }
-            } else if (plugin.getEventsBus().callIslandDisableFlagEvent(sender, island, islandFlag)) {
-                anyIslandChanged = true;
+            } else if (PluginEventsFactory.callIslandDisableFlagEvent(island, sender, islandFlag)) {
+                ++islandsChangedCount;
                 island.disableSettings(islandFlag);
             }
         }
 
-        if (!anyIslandChanged)
+        if (islandsChangedCount <= 0)
             return;
 
         if (islands.size() != 1)

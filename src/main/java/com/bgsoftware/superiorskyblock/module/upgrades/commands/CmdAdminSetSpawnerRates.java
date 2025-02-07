@@ -7,7 +7,9 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -69,19 +71,21 @@ public class CmdAdminSetSpawnerRates implements IAdminIslandCommand {
 
         double multiplier = arguments.getNumber();
 
-        boolean anyIslandChanged = false;
+        int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            EventResult<Double> eventResult = plugin.getEventsBus().callIslandChangeSpawnerRatesEvent(sender, island, multiplier);
-            anyIslandChanged |= !eventResult.isCancelled();
-            if (!eventResult.isCancelled())
-                island.setSpawnerRatesMultiplier(eventResult.getResult());
+            PluginEvent<PluginEventArgs.IslandChangeSpawnerRates> event = PluginEventsFactory.callIslandChangeSpawnerRatesEvent(
+                    island, sender, multiplier);
+            if (!event.isCancelled()) {
+                island.setSpawnerRatesMultiplier(event.getArgs().spawnerRates);
+                ++islandsChangedCount;
+            }
         }
 
-        if (!anyIslandChanged)
+        if (islandsChangedCount <= 0)
             return;
 
-        if (islands.size() > 1)
+        if (islandsChangedCount > 1)
             Message.CHANGED_SPAWNER_RATES_ALL.send(sender);
         else if (targetPlayer == null)
             Message.CHANGED_SPAWNER_RATES_NAME.send(sender, islands.get(0).getName());

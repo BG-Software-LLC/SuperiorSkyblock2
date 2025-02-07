@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
@@ -24,8 +25,8 @@ public class WarpManagePrivateButton extends AbstractMenuViewButton<MenuWarpMana
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
 
-        if (openToPublic ? !plugin.getEventsBus().callIslandOpenWarpEvent(islandWarp.getIsland(), superiorPlayer, islandWarp) :
-                !plugin.getEventsBus().callIslandCloseWarpEvent(islandWarp.getIsland(), superiorPlayer, islandWarp))
+        if (openToPublic ? !PluginEventsFactory.callIslandOpenWarpEvent(islandWarp.getIsland(), superiorPlayer, islandWarp) :
+                !PluginEventsFactory.callIslandCloseWarpEvent(islandWarp.getIsland(), superiorPlayer, islandWarp))
             return;
 
         islandWarp.setPrivateFlag(!openToPublic);

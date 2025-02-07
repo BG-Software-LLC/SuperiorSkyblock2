@@ -31,6 +31,7 @@ import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -255,7 +256,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         // Removing any active previews for the player.
         boolean updateGamemode = this.islandPreviews.endIslandPreview(builder.owner) != null;
 
-        if (!plugin.getEventsBus().callPreIslandCreateEvent(builder.owner, builder.islandName))
+        if (!PluginEventsFactory.callPreIslandCreateEvent(builder.owner, builder.islandName))
             return;
 
         builder.setUniqueId(generateIslandUUID());
@@ -385,7 +386,7 @@ public class GridManagerImpl extends Manager implements GridManager {
                             this.dragonBattleService.get().resetEnderDragonBattle(island, defaultDimension);
                         }
 
-                        plugin.getEventsBus().callPostIslandCreateEvent(builder.owner, island);
+                        PluginEventsFactory.callPostIslandCreateEvent(island, builder.owner);
 
                         if (onTeleportCallback != null)
                             onTeleportCallback.run();

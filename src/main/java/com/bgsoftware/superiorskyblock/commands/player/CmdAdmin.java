@@ -7,7 +7,8 @@ import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
-import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -24,9 +25,9 @@ public class CmdAdmin implements ISuperiorCommand {
 
     private static final Int2ObjectMapView<List<SuperiorCommand>> commandsPerPageCache = CollectionsFactory.createInt2ObjectArrayMap();
 
-    public static void registerCallbacks(CallbacksBus bus) {
-        bus.registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, CmdAdmin::onCommandsRefresh);
-        bus.registerCallback(CallbacksBus.CallbackType.COMMANDS_UPDATE, CmdAdmin::onCommandsRefresh);
+    public static void registerCallbacks(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, CmdAdmin::onCommandsRefresh);
+        dispatcher.registerCallback(PluginEventType.COMMANDS_UPDATE_EVENT, CmdAdmin::onCommandsRefresh);
     }
 
     private static void onCommandsRefresh() {

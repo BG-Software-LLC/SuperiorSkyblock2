@@ -14,26 +14,18 @@ import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.StackedBlocksDepositMenu;
+import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
+import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.service.stackedblocks.StackedBlocksServiceHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockFormEvent;
-import org.bukkit.event.block.BlockPhysicsEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -43,14 +35,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class StackedBlocksListener implements Listener {
+public class StackedBlocksListener extends AbstractGameEventListener {
 
     @Nullable
     private static final Material COPPER_BLOCK = EnumHelper.getEnum(Material.class, "COPPER_BLOCK");
     private static final Material HONEYCOMB = EnumHelper.getEnum(Material.class, "HONEYCOMB");
     private final Map<CreatureSpawnEvent.SpawnReason, List<BlockOffset>> ENTITY_TEMPLATE_OFFSETS = buildEntityTemplateOffsetsMap();
 
-    private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<StackedBlocksInteractionService> stackedBlocksInteractionService = new LazyReference<StackedBlocksInteractionService>() {
         @Override
         protected StackedBlocksInteractionService create() {
@@ -59,110 +50,134 @@ public class StackedBlocksListener implements Listener {
     };
 
     public StackedBlocksListener(SuperiorSkyblockPlugin plugin) {
-        this.plugin = plugin;
-        this.registerPhysicsListener();
-        this.registerSpongeListener();
+        super(plugin);
+        this.registerListeners();
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockStack(BlockPlaceEvent e) {
-        if (e.getBlockAgainst().equals(e.getBlock()))
+    private void onStackedBlockInteract(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
+        if (e.getArgs().action != Action.RIGHT_CLICK_BLOCK)
             return;
 
-        if (plugin.getStackedBlocks().getStackedBlockAmount(e.getBlock()) > 1)
-            plugin.getStackedBlocks().setStackedBlock(e.getBlock(), 1);
+        if (handleStackedBlockPlace(e)) return;
+        if (handleStackedBlockUnstack(e)) return;
+    }
+
+    /* STACK LISTENERS */
+
+    private void onStackedBlockPlace(GameEvent<GameEventArgs.BlockPlaceEvent> e) {
+        Block block = e.getArgs().block;
+        Block againstBlock = e.getArgs().againstBlock;
+
+        if (againstBlock.equals(block))
+            return;
+
+        if (plugin.getStackedBlocks().getStackedBlockAmount(block) > 1)
+            plugin.getStackedBlocks().setStackedBlock(block, 1);
+
+        Player player = e.getArgs().player;
+        PlayerHand usedHand = e.getArgs().usedHand;
+        ItemStack inHand = e.getArgs().usedItem;
 
         // We do not stack blocks when the hand items has a name or a lore.
-        ItemStack inHand = e.getItemInHand();
         if (inHand.hasItemMeta() && (inHand.getItemMeta().hasDisplayName() || inHand.getItemMeta().hasLore()))
             return;
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-        PlayerHand usedHand = BukkitItems.getHand(e);
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
         InteractionResult interactionResult = this.stackedBlocksInteractionService.get().handleStackedBlockPlace(
-                superiorPlayer, e.getBlockAgainst(), usedHand.getEquipmentSlot());
+                superiorPlayer, againstBlock, usedHand.getEquipmentSlot());
         if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult))
-            e.setCancelled(true);
+            e.setCancelled();
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockStack(PlayerInteractEvent e) {
-        if (e.getAction() != Action.RIGHT_CLICK_BLOCK)
-            return;
+    private boolean handleStackedBlockPlace(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
+        boolean cancelled = false;
 
-        Block clickedBlock = e.getClickedBlock();
+        Player player = e.getArgs().player;
+        Block clickedBlock = e.getArgs().clickedBlock;
+        PlayerHand usedHand = e.getArgs().usedHand;
+        ItemStack usedItem = e.getArgs().usedItem;
+
         Material clickedBlockType = clickedBlock.getType();
 
-        ItemStack inHand = e.getItem();
-
         if (clickedBlockType == Material.DRAGON_EGG) {
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
             if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) > 1) {
-                e.setCancelled(true);
-                if (inHand == null)
+                e.setCancelled();
+                if (usedItem == null)
                     this.stackedBlocksInteractionService.get().handleStackedBlockBreak(clickedBlock, superiorPlayer);
+                cancelled = true;
             }
 
-            if (inHand != null) {
-                PlayerHand usedHand = BukkitItems.getHand(e);
+            if (usedItem != null) {
                 InteractionResult interactionResult = this.stackedBlocksInteractionService.get()
                         .handleStackedBlockPlace(superiorPlayer, clickedBlock, usedHand.getEquipmentSlot());
-                if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult))
-                    e.setCancelled(true);
+                if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult)) {
+                    e.setCancelled();
+                    cancelled = true;
+                }
             }
-        } else if (clickedBlockType == COPPER_BLOCK && inHand != null && inHand.getType() == HONEYCOMB &&
+        } else if (clickedBlockType == COPPER_BLOCK && usedItem != null && usedItem.getType() == HONEYCOMB &&
                 plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) > 1) {
-            e.setCancelled(true);
+            e.setCancelled();
+            cancelled = true;
         }
+
+        return cancelled;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockUnstack(BlockBreakEvent e) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+    /* UNSTACK LISTENERS */
+
+    private void onStackedBlockBreak(GameEvent<GameEventArgs.BlockBreakEvent> e) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
         InteractionResult interactionResult = this.stackedBlocksInteractionService.get()
-                .handleStackedBlockBreak(e.getBlock(), superiorPlayer);
+                .handleStackedBlockBreak(e.getArgs().block, superiorPlayer);
         if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult))
-            e.setCancelled(true);
+            e.setCancelled();
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockUnstack(PlayerInteractEvent e) {
-        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() != null ||
-                BukkitItems.getHand(e) != PlayerHand.MAIN_HAND)
-            return;
+    private boolean handleStackedBlockUnstack(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
+        if (e.getArgs().usedItem != null || e.getArgs().usedHand != PlayerHand.MAIN_HAND)
+            return false;
 
-        if (plugin.getStackedBlocks().getStackedBlockAmount(e.getClickedBlock()) <= 1)
-            return;
+        Block clickedBlock = e.getArgs().clickedBlock;
 
-        if (plugin.getSettings().getStackedBlocks().getDepositMenu().isEnabled() && e.getPlayer().isSneaking()) {
-            StackedBlocksDepositMenu depositMenu = new StackedBlocksDepositMenu(e.getClickedBlock().getLocation());
-            e.getPlayer().openInventory(depositMenu.getInventory());
+        if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) <= 1)
+            return false;
+
+        Player player = e.getArgs().player;
+
+        if (plugin.getSettings().getStackedBlocks().getDepositMenu().isEnabled() && player.isSneaking()) {
+            StackedBlocksDepositMenu depositMenu = new StackedBlocksDepositMenu(clickedBlock.getLocation());
+            player.openInventory(depositMenu.getInventory());
         } else {
-            ItemStack offHandItem = BukkitItems.getHandItem(e.getPlayer(), PlayerHand.OFF_HAND);
-            if (offHandItem != null && offHandItem.getType() == e.getClickedBlock().getType())
-                return;
+            ItemStack offHandItem = BukkitItems.getHandItem(player, PlayerHand.OFF_HAND);
+            if (offHandItem != null && offHandItem.getType() == clickedBlock.getType())
+                return false;
 
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
             InteractionResult interactionResult = this.stackedBlocksInteractionService.get()
-                    .handleStackedBlockBreak(e.getClickedBlock(), superiorPlayer);
-            if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult))
-                e.setCancelled(true);
+                    .handleStackedBlockBreak(clickedBlock, superiorPlayer);
+            if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult)) {
+                e.setCancelled();
+                return true;
+            }
         }
+
+        return false;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockUnstack(EntityChangeBlockEvent e) {
+    private void onStackedBlockBreakByEntity(GameEvent<GameEventArgs.EntityChangeBlockEvent> e) {
         InteractionResult interactionResult = this.stackedBlocksInteractionService.get()
-                .handleStackedBlockBreak(e.getBlock(), null);
+                .handleStackedBlockBreak(e.getArgs().block, null);
         if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult))
-            e.setCancelled(true);
+            e.setCancelled();
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onExplode(EntityExplodeEvent e) {
-        List<Block> blockList = new LinkedList<>(e.blockList());
+    private void onStackedBlockExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
+        List<Block> blockList = new LinkedList<>(e.getArgs().blocks);
         ItemStack blockItem;
 
         for (Block block : blockList) {
@@ -176,7 +191,7 @@ public class StackedBlocksListener implements Listener {
                 continue;
 
             // All checks are done. We can remove the block from the list.
-            e.blockList().remove(block);
+            e.getArgs().blocks.remove(block);
 
             blockItem = block.getState().getData().toItemStack(amount);
 
@@ -196,67 +211,78 @@ public class StackedBlocksListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onPistonExtend(BlockPistonExtendEvent e) {
-        for (Block block : e.getBlocks()) {
+    /* STACKED-BLOCKS PROTECTION */
+
+    private void onPistonExtend(GameEvent<GameEventArgs.PistonExtendEvent> e) {
+        for (Block block : e.getArgs().blocks) {
             if (plugin.getStackedBlocks().getStackedBlockAmount(block) > 1) {
-                e.setCancelled(true);
+                e.setCancelled();
                 break;
             }
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onPistonRetract(BlockPistonRetractEvent e) {
-        for (Block block : e.getBlocks()) {
+    public void onPistonRetract(GameEvent<GameEventArgs.PistonRetractEvent> e) {
+        for (Block block : e.getArgs().blocks) {
             if (plugin.getStackedBlocks().getStackedBlockAmount(block) > 1) {
-                e.setCancelled(true);
+                e.setCancelled();
                 break;
             }
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onBlockChangeState(BlockFormEvent e) {
-        if (plugin.getStackedBlocks().getStackedBlockAmount(e.getBlock()) > 1)
-            e.setCancelled(true);
+    private void onBlockChangeState(GameEvent<GameEventArgs.BlockFormEvent> e) {
+        if (plugin.getStackedBlocks().getStackedBlockAmount(e.getArgs().block) > 1)
+            e.setCancelled();
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onGolemCreate(CreatureSpawnEvent e) {
-        List<BlockOffset> entityTemplateOffsets = ENTITY_TEMPLATE_OFFSETS.get(e.getSpawnReason());
+    private void onGolemCreate(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
+        List<BlockOffset> entityTemplateOffsets = ENTITY_TEMPLATE_OFFSETS.get(e.getArgs().spawnReason);
 
         if (entityTemplateOffsets == null)
             return;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location entityLocation = e.getEntity().getLocation(wrapper.getHandle());
+            Location entityLocation = e.getArgs().entity.getLocation(wrapper.getHandle());
 
             if (plugin.getStackedBlocks().getStackedBlockAmount(entityLocation) > 1) {
-                e.setCancelled(true);
+                e.setCancelled();
                 return;
             }
 
             for (BlockOffset blockOffset : entityTemplateOffsets) {
                 if (plugin.getStackedBlocks().getStackedBlockAmount(blockOffset.applyToLocation(entityLocation)) > 1) {
-                    e.setCancelled(true);
+                    e.setCancelled();
                     return;
                 }
             }
         }
     }
 
-    private void registerPhysicsListener() {
-        if (plugin.getSettings().isPhysicsListener())
-            Bukkit.getPluginManager().registerEvents(new PhysicsListener(), plugin);
+    private void onSpongeAbsorb(GameEvent<GameEventArgs.SpongeAbsorbEvent> e) {
+        if (plugin.getStackedBlocks().getStackedBlockAmount(e.getArgs().block) > 1)
+            e.setCancelled();
     }
 
-    private void registerSpongeListener() {
-        try {
-            Class.forName("org.bukkit.event.block.SpongeAbsorbEvent");
-            Bukkit.getPluginManager().registerEvents(new SpongeAbsorbListener(), plugin);
-        } catch (Throwable ignored) {
-        }
+    private void onStackedBlockPhysics(GameEvent<GameEventArgs.BlockPhysicsEvent> e) {
+        if (plugin.getStackedBlocks().getStackedBlockAmount(e.getArgs().block) > 1)
+            e.setCancelled();
+    }
+
+    /* INTERNAL */
+
+    private void registerListeners() {
+        registerCallback(GameEventType.BLOCK_PLACE_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockPlace);
+        registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockBreak);
+        registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockInteract);
+        registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockBreakByEntity);
+        registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockExplode);
+        registerCallback(GameEventType.PISTON_EXTEND_EVENT, GameEventPriority.LOWEST, this::onPistonExtend);
+        registerCallback(GameEventType.PISTON_RETRACT_EVENT, GameEventPriority.LOWEST, this::onPistonRetract);
+        registerCallback(GameEventType.BLOCK_FORM_EVENT, GameEventPriority.LOWEST, this::onBlockChangeState);
+        registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.LOWEST, this::onGolemCreate);
+        registerCallback(GameEventType.BLOCK_PHYSICS_EVENT, GameEventPriority.LOWEST, this::onStackedBlockPhysics);
+        registerCallback(GameEventType.SPONGE_ABSORB_EVENT, GameEventPriority.LOWEST, this::onSpongeAbsorb);
     }
 
     private static Map<CreatureSpawnEvent.SpawnReason, List<BlockOffset>> buildEntityTemplateOffsetsMap() {
@@ -290,26 +316,6 @@ public class StackedBlocksListener implements Listener {
         ));
 
         return Collections.unmodifiableMap(offsetsMap);
-    }
-
-    private class PhysicsListener implements Listener {
-
-        @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-        public void onStackedBlockPhysics(BlockPhysicsEvent e) {
-            if (plugin.getStackedBlocks().getStackedBlockAmount(e.getBlock()) > 1)
-                e.setCancelled(true);
-        }
-
-    }
-
-    private class SpongeAbsorbListener implements Listener {
-
-        @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-        public void onSpongeAbsorb(org.bukkit.event.block.SpongeAbsorbEvent e) {
-            if (plugin.getStackedBlocks().getStackedBlockAmount(e.getBlock()) > 1)
-                e.setCancelled(true);
-        }
-
     }
 
 }

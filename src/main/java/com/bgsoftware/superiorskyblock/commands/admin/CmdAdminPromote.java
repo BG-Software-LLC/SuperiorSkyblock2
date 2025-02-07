@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -89,7 +90,7 @@ public class CmdAdminPromote implements IAdminPlayerCommand {
             return;
         }
 
-        if (!plugin.getEventsBus().callPlayerChangeRoleEvent(targetPlayer, nextRole))
+        if (!PluginEventsFactory.callPlayerChangeRoleEvent(targetPlayer, nextRole))
             return;
 
         targetPlayer.setPlayerRole(nextRole);

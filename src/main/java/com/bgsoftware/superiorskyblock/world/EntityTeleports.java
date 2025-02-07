@@ -7,10 +7,13 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -234,13 +237,14 @@ public class EntityTeleports {
             Location location = block.getLocation(wrapper.getHandle()).add(0.5, 0, 0.5);
             location.setYaw(yaw);
             location.setPitch(pitch);
-            EventResult<Location> eventResult = plugin.getEventsBus().callIslandSetHomeEvent(island, location,
-                    IslandSetHomeEvent.Reason.SAFE_HOME, null);
 
-            if (eventResult.isCancelled()) {
+            PluginEvent<PluginEventArgs.IslandSetHome> event = PluginEventsFactory.callIslandSetHomeEvent(
+                    island, (SuperiorPlayer) null, location, IslandSetHomeEvent.Reason.SAFE_HOME);
+
+            if (event.isCancelled()) {
                 newHomeLocation = location;
             } else {
-                newHomeLocation = eventResult.getResult();
+                newHomeLocation = event.getArgs().islandHome;
                 island.setIslandHome(newHomeLocation);
             }
         }

@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
@@ -32,12 +33,12 @@ public class IslandFlagPagedObjectButton extends AbstractPagedMenuButton<MenuIsl
             return;
 
         if (island.hasSettingsEnabled(islandFlag)) {
-            if (!plugin.getEventsBus().callIslandDisableFlagEvent(inventoryViewer, island, islandFlag))
+            if (!PluginEventsFactory.callIslandDisableFlagEvent(island, inventoryViewer, islandFlag))
                 return;
 
             island.disableSettings(islandFlag);
         } else {
-            if (!plugin.getEventsBus().callIslandEnableFlagEvent(inventoryViewer, island, islandFlag))
+            if (!PluginEventsFactory.callIslandEnableFlagEvent(island, inventoryViewer, islandFlag))
                 return;
 
             island.enableSettings(islandFlag);

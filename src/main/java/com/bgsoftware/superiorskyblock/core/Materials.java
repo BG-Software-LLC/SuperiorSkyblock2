@@ -25,7 +25,7 @@ public enum Materials {
     END_PORTAL_FRAME("ENDER_PORTAL_FRAME");
 
 
-    private static final EnumMap<Material, MaterialTag> MATERIAL_TAGS = setupMaterialTags();
+    private static final EnumMap<Material, EnumSet<Tag>> MATERIAL_TAGS = setupMaterialTags();
     private static final EnumSet<Material> BLOCK_NON_LEGACY_MATERIALS = allOf(material -> material.isBlock() && !isLegacy(material));
     private static final EnumSet<Material> SOLID_MATERIALS = allOf(Material::isSolid);
     private static final Map<String, String> PATCHED_MATERIAL_NAMES = setupPatchedMaterialNames();
@@ -58,52 +58,61 @@ public enum Materials {
         return ServerVersion.isLegacy() ? new ItemStack(toBukkitType(), amount, bukkitData) : new ItemStack(toBukkitType(), amount);
     }
 
+    public static boolean hasTag(Material material, Tag tag) {
+        EnumSet<Tag> materialsTag = MATERIAL_TAGS.get(material);
+        return materialsTag != null && materialsTag.contains(tag);
+    }
+
     public static boolean isSlab(Material material) {
-        return MATERIAL_TAGS.get(material) instanceof SlabMaterialTag;
+        return hasTag(material, Tag.SLAB);
     }
 
     public static boolean isWater(Material material) {
-        return MATERIAL_TAGS.get(material) instanceof WaterMaterialTag;
+        return hasTag(material, Tag.WATER);
     }
 
     public static boolean isLegacy(Material material) {
-        return MATERIAL_TAGS.get(material) instanceof LegacyMaterialTag;
+        return hasTag(material, Tag.LEGACY);
     }
 
     public static boolean isRail(Material material) {
-        return MATERIAL_TAGS.get(material) instanceof RailMaterialTag;
+        return hasTag(material, Tag.RAIL);
     }
 
     public static boolean isMinecart(Material material) {
-        return MATERIAL_TAGS.get(material) instanceof MinecartMaterialTag;
+        return hasTag(material, Tag.MINECART);
     }
 
     public static boolean isChest(Material material) {
-        return MATERIAL_TAGS.get(material) instanceof ChestMaterialTag;
+        return hasTag(material, Tag.CHEST);
     }
 
     public static boolean isBoat(Material material) {
-        return MATERIAL_TAGS.get(material) instanceof BoatMaterialTag;
+        return hasTag(material, Tag.BOAT);
     }
 
     public static boolean isLava(Material material) {
-        return MATERIAL_TAGS.get(material) instanceof LavaMaterialTag;
+        return hasTag(material, Tag.LAVA);
     }
 
     public static boolean isSign(Material material) {
-        return MATERIAL_TAGS.get(material) instanceof SignMaterialTag;
+        return hasTag(material, Tag.SIGN);
     }
 
     public static boolean isDye(Material material) {
-        return MATERIAL_TAGS.get(material) instanceof DyeMaterialTag;
+        return hasTag(material, Tag.DYE);
     }
 
     public static boolean isSpawnEgg(Material material) {
-        return MATERIAL_TAGS.get(material) instanceof SpawnEggMaterialTag;
+        return hasTag(material, Tag.SPAWN_EGG);
     }
 
     public static boolean isCarpet(Material material) {
-        return MATERIAL_TAGS.get(material) instanceof CarpetMaterialTag;
+        return hasTag(material, Tag.CARPET);
+    }
+
+    public static boolean isBed(Material material) {
+        return hasTag(material, Tag.BED);
     }
 
     public static Set<Material> getBlocksNonLegacy() {
@@ -128,36 +137,48 @@ public enum Materials {
         return enumSet;
     }
 
-    private static EnumMap<Material, MaterialTag> setupMaterialTags() {
-        EnumMap<Material, MaterialTag> enumMap = new EnumMap<>(Material.class);
-        Arrays.stream(Material.values()).forEach(material -> {
+    private static EnumMap<Material, EnumSet<Tag>> setupMaterialTags() {
+        EnumMap<Material, EnumSet<Tag>> enumMap = new EnumMap<>(Material.class);
+
+        for (Material material : Material.values()) {
+            EnumSet<Tag> materialTags = EnumSet.noneOf(Tag.class);
+
             String materialName = material.name();
             if (materialName.startsWith("LEGACY_"))
-                enumMap.put(material, LegacyMaterialTag.INSTANCE);
-            else if (materialName.contains("SLAB"))
-                enumMap.put(material, SlabMaterialTag.INSTANCE);
-            else if (materialName.contains("WATER"))
-                enumMap.put(material, WaterMaterialTag.INSTANCE);
-            else if (materialName.contains("RAIL"))
-                enumMap.put(material, RailMaterialTag.INSTANCE);
-            else if (materialName.contains("MINECART"))
-                enumMap.put(material, MinecartMaterialTag.INSTANCE);
-            else if (material == Material.CHEST || material == Material.ENDER_CHEST ||
+                materialTags.add(Tag.LEGACY);
+            if (materialName.contains("SLAB"))
+                materialTags.add(Tag.SLAB);
+            if (materialName.contains("WATER"))
+                materialTags.add(Tag.WATER);
+            if (materialName.contains("RAIL"))
+                materialTags.add(Tag.RAIL);
+            if (materialName.contains("MINECART"))
+                materialTags.add(Tag.MINECART);
+            if (material == Material.CHEST || material == Material.ENDER_CHEST ||
                     material == Material.TRAPPED_CHEST || materialName.contains("SHULKER_BOX") ||
                     materialName.equals("BARREL"))
-                enumMap.put(material, ChestMaterialTag.INSTANCE);
-            else if (materialName.contains("BOAT"))
-                enumMap.put(material, BoatMaterialTag.INSTANCE);
-            else if (materialName.contains("LAVA"))
-                enumMap.put(material, LavaMaterialTag.INSTANCE);
-            else if (materialName.contains("SIGN"))
-                enumMap.put(material, SignMaterialTag.INSTANCE);
-            else if (ServerVersion.isLegacy() ? material == Material.INK_SACK : materialName.contains("_DYE"))
-                enumMap.put(material, DyeMaterialTag.INSTANCE);
-            else if (ServerVersion.isLegacy() ? material == Material.MONSTER_EGG : materialName.contains("_SPAWN_EGG"))
-                enumMap.put(material, SpawnEggMaterialTag.INSTANCE);
-            else if (materialName.contains("CARPET"))
-                enumMap.put(material, CarpetMaterialTag.INSTANCE);
+                materialTags.add(Tag.CHEST);
+            if (materialName.contains("BOAT"))
+                materialTags.add(Tag.BOAT);
+            if (materialName.contains("LAVA"))
+                materialTags.add(Tag.LAVA);
+            if (materialName.contains("SIGN"))
+                materialTags.add(Tag.SIGN);
+            if (ServerVersion.isLegacy() ? material == Material.INK_SACK : materialName.contains("_DYE"))
+                materialTags.add(Tag.DYE);
+            if (ServerVersion.isLegacy() ? material == Material.MONSTER_EGG : materialName.contains("_SPAWN_EGG"))
+                materialTags.add(Tag.SPAWN_EGG);
+            if (materialName.contains("CARPET"))
+                materialTags.add(Tag.CARPET);
+            if (materialName.contains("BED"))
+                materialTags.add(Tag.BED);
+
+            if (!materialTags.isEmpty())
+                enumMap.put(material, materialTags);
+        }
+
+        Arrays.stream(Material.values()).forEach(material -> {
+
         });
         return enumMap;
     }
@@ -172,79 +193,21 @@ public enum Materials {
         return map.isEmpty() ? Collections.emptyMap() : map;
     }
 
-    private interface MaterialTag {
+    public enum Tag {
 
-    }
-
-    private static class SlabMaterialTag implements MaterialTag {
-
-        private static final SlabMaterialTag INSTANCE = new SlabMaterialTag();
-
-    }
-
-    private static class WaterMaterialTag implements MaterialTag {
-
-        private static final WaterMaterialTag INSTANCE = new WaterMaterialTag();
-
-    }
-
-    private static class LegacyMaterialTag implements MaterialTag {
-
-        private static final LegacyMaterialTag INSTANCE = new LegacyMaterialTag();
-
-    }
-
-    private static class RailMaterialTag implements MaterialTag {
-
-        private static final RailMaterialTag INSTANCE = new RailMaterialTag();
-
-    }
-
-    private static class MinecartMaterialTag implements MaterialTag {
-
-        private static final MinecartMaterialTag INSTANCE = new MinecartMaterialTag();
-
-    }
-
-    private static class ChestMaterialTag implements MaterialTag {
-
-        private static final ChestMaterialTag INSTANCE = new ChestMaterialTag();
-
-    }
-
-    private static class BoatMaterialTag implements MaterialTag {
-
-        private static final BoatMaterialTag INSTANCE = new BoatMaterialTag();
-
-    }
-
-    private static class LavaMaterialTag implements MaterialTag {
-
-        private static final LavaMaterialTag INSTANCE = new LavaMaterialTag();
-
-    }
-
-    private static class SignMaterialTag implements MaterialTag {
-
-        private static final SignMaterialTag INSTANCE = new SignMaterialTag();
-
-    }
-
-    private static class DyeMaterialTag implements MaterialTag {
-
-        private static final DyeMaterialTag INSTANCE = new DyeMaterialTag();
-
-    }
-
-    private static class SpawnEggMaterialTag implements MaterialTag {
-
-        private static final SpawnEggMaterialTag INSTANCE = new SpawnEggMaterialTag();
-
-    }
-
-    private static class CarpetMaterialTag implements MaterialTag {
-
-        private static final CarpetMaterialTag INSTANCE = new CarpetMaterialTag();
+        SLAB,
+        WATER,
+        LEGACY,
+        RAIL,
+        MINECART,
+        CHEST,
+        BOAT,
+        LAVA,
+        SIGN,
+        DYE,
+        SPAWN_EGG,
+        CARPET,
+        BED
 
     }
 

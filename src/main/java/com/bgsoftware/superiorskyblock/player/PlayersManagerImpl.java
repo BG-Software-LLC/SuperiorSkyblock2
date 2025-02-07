@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
@@ -168,7 +169,7 @@ public class PlayersManagerImpl extends Manager implements PlayersManager {
             PlayersDatabaseBridge.deletePlayer(originPlayer);
         } else {
             newPlayer.merge(originPlayer);
-            plugin.getEventsBus().callPlayerReplaceEvent(originPlayer, newPlayer);
+            PluginEventsFactory.callPlayerReplaceEvent(originPlayer, newPlayer);
         }
     }
 

@@ -8,35 +8,26 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
+import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
+import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
-import com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Ghast;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.ItemSpawnEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
-import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 
@@ -48,28 +39,23 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class IslandFlagsListener implements Listener {
+public class IslandFlagsListener extends AbstractGameEventListener {
 
     private static final EnumSet<CreatureSpawnEvent.SpawnReason> NATURAL_SPAWN_REASONS = initializeNaturalSpawnReasons();
 
     private final Map<UUID, ProjectileSource> originalFireballsDamager = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
 
-    private final SuperiorSkyblockPlugin plugin;
-
     public IslandFlagsListener(SuperiorSkyblockPlugin plugin) {
-        this.plugin = plugin;
-        this.registerPaperListener();
+        super(plugin);
+        this.registerListeners();
     }
 
     /* ENTITY SPAWNING */
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    private void onEntitySpawn(CreatureSpawnEvent e) {
-        if (preventEntitySpawn(e.getLocation(), e.getSpawnReason(), e.getEntityType()))
-            e.setCancelled(true);
-    }
+    private void onAttemptEntitySpawn(GameEvent<GameEventArgs.AttemptEntitySpawnEvent> e) {
+        EntityType entityType = e.getArgs().entityType;
+        CreatureSpawnEvent.SpawnReason spawnReason = e.getArgs().spawnReason;
 
-    public boolean preventEntitySpawn(Location location, CreatureSpawnEvent.SpawnReason spawnReason, EntityType entityType) {
         IslandFlag actionFlag;
 
         if (spawnReason == CreatureSpawnEvent.SpawnReason.SPAWNER ||
@@ -82,7 +68,7 @@ public class IslandFlagsListener implements Listener {
                     actionFlag = IslandFlags.SPAWNER_MONSTER_SPAWN;
                     break;
                 default:
-                    return false;
+                    return;
             }
         } else if (NATURAL_SPAWN_REASONS.contains(spawnReason)) {
             switch (BukkitEntities.getCategory(entityType)) {
@@ -93,62 +79,71 @@ public class IslandFlagsListener implements Listener {
                     actionFlag = IslandFlags.NATURAL_MONSTER_SPAWN;
                     break;
                 default:
-                    return false;
+                    return;
             }
         } else {
-            return false;
+            return;
         }
 
-        return preventAction(location, actionFlag);
+        Location location = e.getArgs().spawnLocation;
+        if (!preventAction(location, actionFlag))
+            return;
+
+        e.setCancelled();
     }
 
     /* ENTITY EXPLOSIONS */
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    private void onHangingBreakByEntity(HangingBreakByEntityEvent e) {
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location entityLocation = e.getEntity().getLocation(wrapper.getHandle());
+    private void onHangingBreakByEntity(GameEvent<GameEventArgs.HangingBreakEvent> e) {
+        Entity entity = e.getArgs().entity;
 
-            if (e.getCause() == HangingBreakEvent.RemoveCause.EXPLOSION) {
-                if (e.getRemover() instanceof Player) {
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location entityLocation = entity.getLocation(wrapper.getHandle());
+
+            HangingBreakEvent.RemoveCause removeCause = e.getArgs().removeCause;
+            Entity remover = e.getArgs().remover;
+
+            if (removeCause == HangingBreakEvent.RemoveCause.EXPLOSION) {
+                if (remover instanceof Player) {
                     // Explosion was set by TNT.
                     if (preventAction(entityLocation, IslandFlags.TNT_EXPLOSION)) {
-                        e.setCancelled(true);
+                        e.setCancelled();
                         return;
                     }
-                } else if (e.getRemover() instanceof Ghast) {
+                } else if (remover instanceof Ghast) {
                     // Explosion was set by TNT.
                     if (preventAction(entityLocation, IslandFlags.GHAST_FIREBALL)) {
-                        e.setCancelled(true);
+                        e.setCancelled();
                         return;
                     }
                 }
             }
 
-            if (preventEntityExplosion(e.getRemover(), entityLocation)) {
-                e.setCancelled(true);
+            if (preventEntityExplosion(remover, entityLocation)) {
+                e.setCancelled();
             }
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    private void onEntityExplode(EntityExplodeEvent e) {
-        if (preventEntityExplosion(e.getEntity(), e.getLocation()))
-            e.blockList().clear();
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    private void onEntityChangeBlock(EntityChangeBlockEvent e) {
+    private void onEntityExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
+        Entity entity = e.getArgs().entity;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventEntityExplosion(e.getEntity(), e.getBlock().getLocation(wrapper.getHandle())))
-                e.setCancelled(true);
+            if (preventEntityExplosion(entity, entity.getLocation(wrapper.getHandle())))
+                e.getArgs().blocks.clear();
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    private void onFireballDamage(EntityDamageByEntityEvent e) {
-        if (e.getEntity() instanceof Fireball) {
-            originalFireballsDamager.put(e.getEntity().getUniqueId(), ((Fireball) e.getEntity()).getShooter());
+    private void onEntityChangeBlock(GameEvent<GameEventArgs.EntityChangeBlockEvent> e) {
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            if (preventEntityExplosion(e.getArgs().entity, e.getArgs().block.getLocation(wrapper.getHandle())))
+                e.setCancelled();
+        }
+    }
+
+    private void onFireballDamage(GameEvent<GameEventArgs.EntityDamageEvent> e) {
+        Entity entity = e.getArgs().entity;
+        if (entity instanceof Fireball) {
+            originalFireballsDamager.put(entity.getUniqueId(), ((Fireball) entity).getShooter());
         }
     }
 
@@ -185,70 +180,71 @@ public class IslandFlagsListener implements Listener {
 
     /* GENERAL EVENTS */
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    private void onBlockFlow(BlockFromToEvent e) {
-        IslandFlag islandFlag = plugin.getNMSWorld().isWaterLogged(e.getBlock()) ?
+    private void onBlockFlow(GameEvent<GameEventArgs.BlockFromToEvent> e) {
+        Block block = e.getArgs().block;
+        Block toBlock = e.getArgs().toBlock;
+
+        IslandFlag islandFlag = plugin.getNMSWorld().isWaterLogged(block) ?
                 IslandFlags.WATER_FLOW : IslandFlags.LAVA_FLOW;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(e.getToBlock().getLocation(wrapper.getHandle()), islandFlag))
-                e.setCancelled(true);
+            if (preventAction(toBlock.getLocation(wrapper.getHandle()), islandFlag))
+                e.setCancelled();
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    private void onCropsGrowth(BlockGrowEvent e) {
+    private void onCropsGrowth(GameEvent<GameEventArgs.BlockGrowEvent> e) {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(e.getBlock().getLocation(wrapper.getHandle()), IslandFlags.CROPS_GROWTH))
-                e.setCancelled(true);
+            if (preventAction(e.getArgs().block.getLocation(wrapper.getHandle()), IslandFlags.CROPS_GROWTH))
+                e.setCancelled();
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    private void onTreeGrowth(StructureGrowEvent e) {
-        if (preventAction(e.getLocation(), IslandFlags.TREE_GROWTH))
-            e.setCancelled(true);
+    private void onTreeGrowth(GameEvent<GameEventArgs.StructureGrowEvent> e) {
+        if (preventAction(e.getArgs().location, IslandFlags.TREE_GROWTH))
+            e.setCancelled();
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    private void onFireSpread(BlockBurnEvent e) {
+    private void onFireSpread(GameEvent<GameEventArgs.BlockBurnEvent> e) {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(e.getBlock().getLocation(wrapper.getHandle()), IslandFlags.FIRE_SPREAD))
-                e.setCancelled(true);
+            if (preventAction(e.getArgs().block.getLocation(wrapper.getHandle()), IslandFlags.FIRE_SPREAD))
+                e.setCancelled();
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    private void onBlockIgnite(BlockIgniteEvent e) {
-        if (e.getCause() != BlockIgniteEvent.IgniteCause.SPREAD)
+    private void onBlockIgnite(GameEvent<GameEventArgs.BlockIgniteEvent> e) {
+        if (e.getArgs().igniteCause != BlockIgniteEvent.IgniteCause.SPREAD)
             return;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(e.getBlock().getLocation(wrapper.getHandle()), IslandFlags.FIRE_SPREAD))
-                e.setCancelled(true);
+            if (preventAction(e.getArgs().block.getLocation(wrapper.getHandle()), IslandFlags.FIRE_SPREAD))
+                e.setCancelled();
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    private void onEndermanGrief(EntityChangeBlockEvent e) {
-        if (!(e.getEntity() instanceof Enderman))
+    private void onEndermanGrief(GameEvent<GameEventArgs.EntityChangeBlockEvent> e) {
+        if (!(e.getArgs().entity instanceof Enderman))
             return;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(e.getBlock().getLocation(wrapper.getHandle()), IslandFlags.ENDERMAN_GRIEF))
-                e.setCancelled(true);
+            if (preventAction(e.getArgs().block.getLocation(wrapper.getHandle()), IslandFlags.ENDERMAN_GRIEF))
+                e.setCancelled();
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    private void onEggLay(ItemSpawnEvent e) {
-        if (e.getEntity().getItemStack().getType() != Material.EGG)
+    private void onEggLay(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
+        if (!(e.getArgs().entity instanceof Item))
+            return;
+
+        Item item = (Item) e.getArgs().entity;
+
+        if (item.getItemStack().getType() != Material.EGG)
             return;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(e.getEntity().getLocation(wrapper.getHandle()), IslandFlags.EGG_LAY)) {
-                for (Entity entity : e.getEntity().getNearbyEntities(1, 1, 1)) {
+            if (preventAction(item.getLocation(wrapper.getHandle()), IslandFlags.EGG_LAY)) {
+                for (Entity entity : item.getNearbyEntities(1, 1, 1)) {
                     if (entity instanceof Chicken) {
-                        e.setCancelled(true);
+                        e.setCancelled();
                         return;
                     }
                 }
@@ -256,22 +252,24 @@ public class IslandFlagsListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    private void onPoisonAttack(ProjectileHitEvent e) {
-        if (e.getEntityType() != EntityType.SPLASH_POTION)
+    private void onPoisonAttack(GameEvent<GameEventArgs.ProjectileHitEvent> e) {
+        Entity entity = e.getArgs().entity;
+        EntityType entityType = entity.getType();
+
+        if (entityType != EntityType.SPLASH_POTION)
             return;
 
-        BukkitEntities.getPlayerSource(e.getEntity()).ifPresent(shooterPlayer -> {
+        BukkitEntities.getPlayerSource(entity).ifPresent(shooterPlayer -> {
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                if (!preventAction(e.getEntity().getLocation(wrapper.getHandle()), IslandFlags.PVP))
+                if (!preventAction(entity.getLocation(wrapper.getHandle()), IslandFlags.PVP))
                     return;
             }
 
-            List<Entity> nearbyEntities = e.getEntity().getNearbyEntities(2, 2, 2);
+            List<Entity> nearbyEntities = entity.getNearbyEntities(2, 2, 2);
 
-            BukkitExecutor.sync(() -> nearbyEntities.forEach(entity -> {
-                if (entity instanceof LivingEntity && !entity.getUniqueId().equals(shooterPlayer.getUniqueId()))
-                    ((LivingEntity) entity).removePotionEffect(PotionEffectType.POISON);
+            BukkitExecutor.sync(() -> nearbyEntities.forEach(nearbyEntity -> {
+                if (nearbyEntity instanceof LivingEntity && !nearbyEntity.getUniqueId().equals(shooterPlayer.getUniqueId()))
+                    ((LivingEntity) nearbyEntity).removePotionEffect(PotionEffectType.POISON);
             }), 1L);
         });
     }
@@ -292,12 +290,20 @@ public class IslandFlagsListener implements Listener {
         return !island.hasSettingsEnabled(islandFlag);
     }
 
-    private void registerPaperListener() {
-        try {
-            Class.forName("com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent");
-            Bukkit.getPluginManager().registerEvents(new PaperListener(), plugin);
-        } catch (Throwable ignored) {
-        }
+    private void registerListeners() {
+        registerCallback(GameEventType.ATTEMPT_ENTITY_SPAWN_EVENT, GameEventPriority.LOWEST, this::onAttemptEntitySpawn);
+        registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.LOWEST, this::onEntityExplode);
+        registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.LOWEST, this::onEntityChangeBlock);
+        registerCallback(GameEventType.HANGING_BREAK_EVENT, GameEventPriority.LOWEST, this::onHangingBreakByEntity);
+        registerCallback(GameEventType.ENTITY_DAMAGE_EVENT, GameEventPriority.MONITOR, this::onFireballDamage);
+        registerCallback(GameEventType.BLOCK_FROM_TO_EVENT, GameEventPriority.LOWEST, this::onBlockFlow);
+        registerCallback(GameEventType.BLOCK_GROW_EVENT, GameEventPriority.LOWEST, this::onCropsGrowth);
+        registerCallback(GameEventType.STRUCTURE_GROW_EVENT, GameEventPriority.LOWEST, this::onTreeGrowth);
+        registerCallback(GameEventType.BLOCK_BURN_EVENT, GameEventPriority.LOWEST, this::onFireSpread);
+        registerCallback(GameEventType.BLOCK_IGNITE_EVENT, GameEventPriority.LOWEST, this::onBlockIgnite);
+        registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.LOWEST, this::onEndermanGrief);
+        registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.LOWEST, this::onEggLay);
+        registerCallback(GameEventType.PROJECTILE_HIT_EVENT, GameEventPriority.LOWEST, this::onPoisonAttack);
     }
 
     private static EnumSet<CreatureSpawnEvent.SpawnReason> initializeNaturalSpawnReasons() {
@@ -319,18 +325,6 @@ public class IslandFlagsListener implements Listener {
         Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "JOCKEY")).ifPresent(naturalSpawnReasons::add);
 
         return naturalSpawnReasons;
-    }
-
-    private class PaperListener implements Listener {
-
-        @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-        private void onEntitySpawn(PreCreatureSpawnEvent e) {
-            if (preventEntitySpawn(e.getSpawnLocation(), e.getReason(), e.getType())) {
-                e.setCancelled(true);
-                e.setShouldAbortSpawn(true);
-            }
-        }
-
     }
 
     private enum Flag {

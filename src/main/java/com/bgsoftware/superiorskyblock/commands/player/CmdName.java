@@ -4,10 +4,12 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import org.bukkit.Bukkit;
@@ -65,12 +67,12 @@ public class CmdName implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        EventResult<String> eventResult = plugin.getEventsBus().callIslandRenameEvent(island, superiorPlayer, args[1]);
+        PluginEvent<PluginEventArgs.IslandRename> event = PluginEventsFactory.callIslandRenameEvent(island, superiorPlayer, args[1]);
 
-        if (eventResult.isCancelled())
+        if (event.isCancelled())
             return;
 
-        String islandName = eventResult.getResult();
+        String islandName = event.getArgs().islandName;
 
         if (!IslandNames.isValidName(superiorPlayer, island, islandName))
             return;

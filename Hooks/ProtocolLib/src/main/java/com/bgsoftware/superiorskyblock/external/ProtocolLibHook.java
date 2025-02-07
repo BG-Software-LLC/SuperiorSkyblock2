@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.external;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -46,7 +47,7 @@ public class ProtocolLibHook {
             SuperiorPlayer superiorPlayer = ProtocolLibHook.plugin.getPlayers().getPlayersContainer().getSuperiorPlayer(event.getPlayer().getUniqueId());
             if (superiorPlayer != null && PlayerLocales.isValidLocale(newPlayerLocale) &&
                     !superiorPlayer.getUserLocale().equals(newPlayerLocale)) {
-                if (ProtocolLibHook.plugin.getEventsBus().callPlayerChangeLanguageEvent(superiorPlayer, newPlayerLocale))
+                if (PluginEventsFactory.callPlayerChangeLanguageEvent(superiorPlayer, newPlayerLocale))
                     superiorPlayer.setUserLocale(newPlayerLocale);
             }
         }

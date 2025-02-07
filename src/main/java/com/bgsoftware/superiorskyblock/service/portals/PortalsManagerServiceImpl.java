@@ -16,8 +16,9 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
-import com.bgsoftware.superiorskyblock.core.events.EventsBus;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
@@ -186,16 +187,16 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
             boolean ignoreInvalidSchematic;
 
             if (superiorPlayer != null) {
-                EventResult<EventsBus.PortalEventResult> eventResult = plugin.getEventsBus().callIslandEnterPortalEvent(
-                        superiorPlayer, island, portalType, originalDestination, schematicGenerated ? null : originalSchematic,
+                PluginEvent<PluginEventArgs.IslandEnterPortal> event = PluginEventsFactory.callIslandEnterPortalEvent(
+                        island, superiorPlayer, portalType, originalDestination, schematicGenerated ? null : originalSchematic,
                         schematicGenerated);
 
-                if (eventResult.isCancelled())
+                if (event.isCancelled())
                     return EntityPortalResult.PORTAL_EVENT_CANCELLED;
 
-                destination = eventResult.getResult().getDestination();
-                schematic = eventResult.getResult().getSchematic();
-                ignoreInvalidSchematic = eventResult.getResult().isIgnoreInvalidSchematic();
+                destination = event.getArgs().destination;
+                schematic = event.getArgs().schematic;
+                ignoreInvalidSchematic = event.getArgs().ignoreInvalidSchematic;
             } else {
                 destination = originalDestination;
                 schematic = schematicGenerated ? null : originalSchematic;
@@ -248,17 +249,17 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                         if (destinationConfig != null && destinationConfig.isSchematicOffset()) {
                             {
                                 BigDecimal schematicWorth = island.getRawWorth().subtract(originalWorth);
-                                EventResult<BigDecimal> bonusEventResult = plugin.getEventsBus().callIslandChangeWorthBonusEvent(null, island,
-                                        IslandChangeWorthBonusEvent.Reason.SCHEMATIC, island.getBonusWorth().subtract(schematicWorth));
-                                if (!bonusEventResult.isCancelled())
-                                    island.setBonusWorth(bonusEventResult.getResult());
+                                PluginEvent<PluginEventArgs.IslandChangeWorthBonus> event = PluginEventsFactory.callIslandChangeWorthBonusEvent(
+                                        island, (SuperiorPlayer) null, IslandChangeWorthBonusEvent.Reason.SCHEMATIC, island.getBonusWorth().subtract(schematicWorth));
+                                if (!event.isCancelled())
+                                    island.setBonusWorth(event.getArgs().worthBonus);
                             }
                             {
                                 BigDecimal schematicLevel = island.getRawLevel().subtract(originalLevel);
-                                EventResult<BigDecimal> bonusEventResult = plugin.getEventsBus().callIslandChangeLevelBonusEvent(null, island,
-                                        IslandChangeLevelBonusEvent.Reason.SCHEMATIC, island.getBonusLevel().subtract(schematicLevel));
-                                if (!bonusEventResult.isCancelled())
-                                    island.setBonusLevel(bonusEventResult.getResult());
+                                PluginEvent<PluginEventArgs.IslandChangeLevelBonus> event = PluginEventsFactory.callIslandChangeLevelBonusEvent(
+                                        island, (SuperiorPlayer) null, IslandChangeLevelBonusEvent.Reason.SCHEMATIC, island.getBonusLevel().subtract(schematicLevel));
+                                if (!event.isCancelled())
+                                    island.setBonusLevel(event.getArgs().levelBonus);
                             }
                         }
 

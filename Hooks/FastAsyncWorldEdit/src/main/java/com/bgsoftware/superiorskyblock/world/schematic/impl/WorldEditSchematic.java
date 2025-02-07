@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -83,7 +84,7 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
                 try {
                     island.handleBlocksPlace(cachedCounts);
 
-                    plugin.getEventsBus().callIslandSchematicPasteEvent(island, name, location);
+                    PluginEventsFactory.callIslandSchematicPasteEvent(island, null, name, location);
 
                     callback.run();
                 } catch (Throwable ex) {

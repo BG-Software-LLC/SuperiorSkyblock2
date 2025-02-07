@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.core.database.loader.sql.SQLDatabaseLoade
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsDeserializer;
 import com.bgsoftware.superiorskyblock.core.database.serialization.PlayersDeserializer;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -54,7 +55,7 @@ public class DataManager extends Manager {
 
         runState(DatabaseLoader.State.PRE_LOAD_DATA);
 
-        if (plugin.getEventsBus().callPluginLoadDataEvent(plugin)) {
+        if (PluginEventsFactory.callPluginLoadDataEvent()) {
             loadPlayers();
             loadIslands();
             loadGrid();

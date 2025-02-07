@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
@@ -37,7 +38,7 @@ public class DisbandButton extends AbstractMenuViewButton<IslandMenuView> {
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
         Island targetIsland = menuView.getIsland();
 
-        if (getTemplate().disbandIsland && plugin.getEventsBus().callIslandDisbandEvent(inventoryViewer, targetIsland)) {
+        if (getTemplate().disbandIsland && PluginEventsFactory.callIslandDisbandEvent(targetIsland, inventoryViewer)) {
             IslandUtils.sendMessage(targetIsland, Message.DISBAND_ANNOUNCEMENT, Collections.emptyList(), inventoryViewer.getName());
 
             Message.DISBANDED_ISLAND.send(inventoryViewer);

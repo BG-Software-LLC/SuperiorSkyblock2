@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -73,7 +74,7 @@ public class CmdDisband implements IPermissibleCommand {
 
         if (plugin.getSettings().isDisbandConfirm()) {
             plugin.getMenus().openConfirmDisband(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
-        } else if (plugin.getEventsBus().callIslandDisbandEvent(superiorPlayer, island)) {
+        } else if (PluginEventsFactory.callIslandDisbandEvent(island, superiorPlayer)) {
             IslandUtils.sendMessage(island, Message.DISBAND_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
 
             Message.DISBANDED_ISLAND.send(superiorPlayer);

@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
@@ -107,7 +108,7 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
                 newRole = SPlayerRole.guestRole();
         }
 
-        if (plugin.getEventsBus().callIslandChangeRolePrivilegeEvent(island, clickedPlayer, newRole)) {
+        if (PluginEventsFactory.callIslandChangeRolePrivilegeEvent(island, clickedPlayer, newRole)) {
             island.setPermission(newRole, islandPrivilege);
             onSuccessfulPermissionChange(clickedPlayer, Formatters.CAPITALIZED_FORMATTER.format(islandPrivilege.getName()));
         }
@@ -125,7 +126,7 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
 
         boolean currentValue = permissionNode.hasPermission(islandPrivilege);
 
-        if (!plugin.getEventsBus().callIslandChangePlayerPrivilegeEvent(island, clickedPlayer, permissionHolder, !currentValue))
+        if (!PluginEventsFactory.callIslandChangePlayerPrivilegeEvent(island, clickedPlayer, permissionHolder, !currentValue))
             return;
 
         island.setPermission(permissionHolder, islandPrivilege, !currentValue);

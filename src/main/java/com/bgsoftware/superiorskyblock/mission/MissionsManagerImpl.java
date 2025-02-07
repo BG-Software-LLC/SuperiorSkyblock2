@@ -13,8 +13,9 @@ import com.bgsoftware.superiorskyblock.core.Either;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
-import com.bgsoftware.superiorskyblock.core.events.EventsBus;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
 import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
@@ -304,7 +305,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                 commandRewards = new ArrayList<>(missionData.getCommandRewards());
             }
 
-            EventResult<EventsBus.MissionRewards> event = plugin.getEventsBus().callMissionCompleteEvent(
+            PluginEvent<PluginEventArgs.MissionComplete> event = PluginEventsFactory.callMissionCompleteEvent(
                     superiorPlayer, missionsHolder, mission, itemRewards, commandRewards);
 
             if (event.isCancelled()) {
@@ -323,7 +324,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             if (result != null)
                 result.accept(true);
 
-            for (ItemStack itemStack : event.getResult().getItemRewards()) {
+            for (ItemStack itemStack : event.getArgs().itemRewards) {
                 ItemStack toGive = new ItemBuilder(itemStack)
                         .replaceAll("{0}", mission.getName())
                         .replaceAll("{1}", superiorPlayer.getName())
@@ -338,7 +339,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             }
 
             BukkitExecutor.ensureMain(() -> {
-                for (String command : event.getResult().getCommandRewards()) {
+                for (String command : event.getArgs().commandRewards) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
                             .replace("%mission%", mission.getName())
                             .replace("%player%", superiorPlayer.getName())

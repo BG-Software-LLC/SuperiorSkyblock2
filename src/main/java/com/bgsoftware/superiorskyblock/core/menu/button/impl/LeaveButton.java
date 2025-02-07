@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
@@ -34,7 +35,7 @@ public class LeaveButton extends AbstractMenuViewButton<BaseMenuView> {
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
         Island island = inventoryViewer.getIsland();
 
-        if (getTemplate().leaveIsland && island != null && plugin.getEventsBus().callIslandQuitEvent(inventoryViewer, island)) {
+        if (getTemplate().leaveIsland && island != null && PluginEventsFactory.callIslandQuitEvent(island, inventoryViewer)) {
             island.kickMember(inventoryViewer);
 
             IslandUtils.sendMessage(island, Message.LEAVE_ANNOUNCEMENT, Collections.emptyList(), inventoryViewer.getName());

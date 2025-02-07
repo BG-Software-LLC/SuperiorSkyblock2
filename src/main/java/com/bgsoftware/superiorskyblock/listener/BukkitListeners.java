@@ -20,22 +20,24 @@ public class BukkitListeners {
     }
 
     public void registerListeners() {
-        safeEventsRegister(new AdminPlayersListener(this.plugin));
-        safeEventsRegister(new BlockChangesListener(this.plugin));
-        safeEventsRegister(new ChunksListener(this.plugin));
-        safeEventsRegister(new EntityTrackingListener(this.plugin));
-        safeEventsRegister(new FeaturesListener(this.plugin));
-        safeEventsRegister(new IslandFlagsListener(this.plugin));
-        safeEventsRegister(new IslandOutsideListener(this.plugin));
-        safeEventsRegister(new IslandPreviewListener(this.plugin));
-        safeEventsRegister(new IslandWorldEventsListener(this.plugin));
-        safeEventsRegister(new MenusListener());
-        safeEventsRegister(new PlayersListener(this.plugin));
-        safeEventsRegister(new PortalsListener(this.plugin));
-        safeEventsRegister(new ProtectionListener(this.plugin));
-        safeEventsRegister(new SignsListener(this.plugin));
-        safeEventsRegister(new StackedBlocksListener(this.plugin));
-        safeEventsRegister(new WorldDestructionListener(this.plugin));
+        new AdminPlayersListener(this.plugin);
+        new BlockChangesListener(this.plugin);
+        new ChunksListener(this.plugin);
+        new EntityTrackingListener(this.plugin);
+        new FeaturesListener(this.plugin);
+        new IslandFlagsListener(this.plugin);
+        new IslandOutsideListener(this.plugin);
+        new IslandPreviewListener(this.plugin);
+        new IslandWorldEventsListener(this.plugin);
+        new MenusListener(this.plugin);
+        new PlayersListener(this.plugin);
+        new PortalsListener(this.plugin);
+        new ProtectionListener(this.plugin);
+        new SignsListener(this.plugin);
+        new StackedBlocksListener(this.plugin);
+        new WorldDestructionListener(this.plugin);
+
+        safeEventsRegister(new BukkitEventsListener(this.plugin));
     }
 
     public void registerListenerFailureFilter() {

@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -76,20 +77,19 @@ public class CmdAdminSetPermission implements IAdminIslandCommand {
         if (playerRole == null)
             return;
 
-        boolean anyPrivilegesChanged = false;
+        int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            if (!plugin.getEventsBus().callIslandChangeRolePrivilegeEvent(island, playerRole))
-                continue;
-
-            anyPrivilegesChanged = true;
-            island.setPermission(playerRole, islandPrivilege);
+            if (PluginEventsFactory.callIslandChangeRolePrivilegeEvent(island, sender, playerRole)) {
+                island.setPermission(playerRole, islandPrivilege);
+                ++islandsChangedCount;
+            }
         }
 
-        if (!anyPrivilegesChanged)
+        if (islandsChangedCount <= 0)
             return;
 
-        if (islands.size() > 1)
+        if (islandsChangedCount > 1)
             Message.PERMISSION_CHANGED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(islandPrivilege.getName()));
         else if (targetPlayer == null)
             Message.PERMISSION_CHANGED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(islandPrivilege.getName()), islands.get(0).getName());

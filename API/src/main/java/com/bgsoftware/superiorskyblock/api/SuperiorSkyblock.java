@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.RolesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
+import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import org.bukkit.plugin.Plugin;
 
@@ -108,5 +109,21 @@ public interface SuperiorSkyblock extends Plugin {
      *                     When null, the default java script engine will be set instead.
      */
     void setScriptEngine(@Nullable IScriptEngine scriptEngine);
+
+    /**
+     * Get the events dispatcher of the plugin.
+     *
+     * @return The events dispatcher, or null if the default events dispatcher is used.
+     */
+    @Nullable
+    IEventsDispatcher getEventsDispatcher();
+
+    /**
+     * Sets a custom events dispatcher for the plugin.
+     *
+     * @param eventsDispatcher The new events dispatcher to set.
+     *                         When null, the default events dispatcher will be used instead.
+     */
+    void setEventsDispatcher(@Nullable IEventsDispatcher eventsDispatcher);
 
 }

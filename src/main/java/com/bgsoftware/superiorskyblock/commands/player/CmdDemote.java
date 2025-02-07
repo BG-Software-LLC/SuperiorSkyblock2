@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 
@@ -91,7 +92,7 @@ public class CmdDemote implements IPermissibleCommand {
             return;
         }
 
-        if (!plugin.getEventsBus().callPlayerChangeRoleEvent(targetPlayer, previousRole))
+        if (!PluginEventsFactory.callPlayerChangeRoleEvent(targetPlayer, previousRole))
             return;
 
         targetPlayer.setPlayerRole(previousRole);

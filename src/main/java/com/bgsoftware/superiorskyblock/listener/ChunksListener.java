@@ -18,6 +18,10 @@ import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandCalculation
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
+import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
+import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -26,12 +30,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
-import org.bukkit.event.world.WorldUnloadEvent;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,11 +39,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class ChunksListener implements Listener {
+public class ChunksListener extends AbstractGameEventListener {
 
     private final Map<UUID, Set<Chunk>> pendingLoadedChunks = new ArrayMap<>();
 
-    private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {
         @Override
         protected WorldRecordService create() {
@@ -54,20 +51,27 @@ public class ChunksListener implements Listener {
     };
 
     public ChunksListener(SuperiorSkyblockPlugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
+
+        registerCallback(GameEventType.CHUNK_UNLOAD_EVENT, GameEventPriority.MONITOR, this::onChunkUnload);
+        registerCallback(GameEventType.WORLD_UNLOAD_EVENT, GameEventPriority.MONITOR, this::onWorldUnload);
+        registerCallback(GameEventType.CHUNK_LOAD_EVENT, GameEventPriority.MONITOR, this::onChunkLoad);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    private void onChunkUnloadMonitor(ChunkUnloadEvent e) {
-        handleChunkUnload(e.getChunk());
+    private void onChunkUnload(GameEvent<GameEventArgs.ChunkUnloadEvent> e) {
+        handleChunkUnload(e.getArgs().chunk);
     }
 
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    private void onWorldUnload(WorldUnloadEvent e) {
-        for (Chunk loadedChunk : e.getWorld().getLoadedChunks())
+    private void onWorldUnload(GameEvent<GameEventArgs.WorldUnloadEvent> e) {
+        for (Chunk loadedChunk : e.getArgs().world.getLoadedChunks())
             handleChunkUnload(loadedChunk);
     }
+
+    private void onChunkLoad(GameEvent<GameEventArgs.ChunkLoadEvent> e) {
+        handleChunkLoad(e.getArgs().chunk, e.getArgs().isNewChunk);
+    }
+
+    /* INTERNAL */
 
     private void handleChunkUnload(Chunk chunk) {
         if (!plugin.getGrid().isIslandsWorld(chunk.getWorld()))
@@ -90,11 +94,6 @@ public class ChunksListener implements Listener {
             island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
 
         Arrays.stream(chunk.getEntities()).forEach(this.worldRecordService.get()::recordEntityDespawn);
-    }
-
-    @EventHandler
-    private void onChunkLoad(ChunkLoadEvent e) {
-        handleChunkLoad(e.getChunk(), e.isNewChunk());
     }
 
     private void handleChunkLoad(Chunk chunk, boolean isNewChunk) {

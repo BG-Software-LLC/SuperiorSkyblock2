@@ -8,16 +8,14 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 public class CmdAdminUnlockWorld implements IAdminIslandCommand {
 
@@ -78,18 +76,18 @@ public class CmdAdminUnlockWorld implements IAdminIslandCommand {
 
         boolean enable = Boolean.parseBoolean(args[4]);
 
-        boolean anyWorldsChanged = false;
+        int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            if (enable ? !plugin.getEventsBus().callIslandUnlockWorldEvent(island, dimension) :
-                    !plugin.getEventsBus().callIslandLockWorldEvent(island, dimension))
+            if (enable ? !PluginEventsFactory.callIslandUnlockWorldEvent(island, sender, dimension) :
+                    !PluginEventsFactory.callIslandLockWorldEvent(island, sender, dimension))
                 continue;
 
-            anyWorldsChanged = true;
             island.setDimensionEnabled(dimension, enable);
+            ++islandsChangedCount;
         }
 
-        if (anyWorldsChanged)
+        if (islandsChangedCount > 0)
             Message.UNLOCK_WORLD_ANNOUNCEMENT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]));
     }
 
