@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.key.types;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.MaterialKeySource;
@@ -33,6 +34,17 @@ public class MaterialKey extends BaseKey<MaterialKey> {
         }
     }
 
+    private final LazyReference<MaterialKey> apiKeyCache = new LazyReference<MaterialKey>() {
+        @Override
+        protected MaterialKey create() {
+            if (MaterialKey.this.isAPIKey())
+                throw new UnsupportedOperationException();
+
+            return new MaterialKey(MaterialKey.this.type, MaterialKey.this.durability, MaterialKey.this.isGlobalType,
+                    MaterialKey.this.materialKeySource, true);
+        }
+    };
+
     protected final Material type;
     private final short durability;
     private final String durabilityAsString;
@@ -58,7 +70,11 @@ public class MaterialKey extends BaseKey<MaterialKey> {
     }
 
     protected MaterialKey(Material type, short durability, boolean isGlobalType, MaterialKeySource materialKeySource) {
-        super(MaterialKey.class);
+        this(type, durability, isGlobalType, materialKeySource, false);
+    }
+
+    protected MaterialKey(Material type, short durability, boolean isGlobalType, MaterialKeySource materialKeySource, boolean apiKey) {
+        super(MaterialKey.class, apiKey);
         this.type = Preconditions.checkNotNull(type, "type parameter cannot be null");
         this.durability = durability;
         this.durabilityAsString = isGlobalType ? "" : String.valueOf(this.durability);
@@ -103,6 +119,11 @@ public class MaterialKey extends BaseKey<MaterialKey> {
     @Override
     protected int compareToInternal(MaterialKey other) {
         return this.toString().compareTo(other.toString());
+    }
+
+    @Override
+    public MaterialKey createAPIKeyInternal() {
+        return this.apiKeyCache.get();
     }
 
     public Material getMaterial() {

@@ -21,10 +21,11 @@ public abstract class BaseKey<T extends Key> implements Key {
     };
 
     private final Class<T> baseKeyClass;
-    private boolean apiKey = false;
+    private final boolean apiKey;
 
-    protected BaseKey(Class<T> baseKeyClass) {
+    protected BaseKey(Class<T> baseKeyClass, boolean apiKey) {
         this.baseKeyClass = baseKeyClass;
+        this.apiKey = apiKey;
     }
 
     @Override
@@ -43,9 +44,13 @@ public abstract class BaseKey<T extends Key> implements Key {
 
     protected abstract int compareToInternal(T other);
 
+    public abstract T createAPIKeyInternal();
+
     public final T markAPIKey() {
-        this.apiKey = true;
-        return (T) this;
+        if (this.apiKey)
+            return (T) this;
+
+        return createAPIKeyInternal();
     }
 
     public boolean isAPIKey() {

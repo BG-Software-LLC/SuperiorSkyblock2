@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.key.types;
 
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.google.common.base.Preconditions;
 import org.bukkit.entity.EntityType;
@@ -18,6 +19,16 @@ public class EntityTypeKey extends BaseKey<EntityTypeKey> {
         }
     }
 
+    private final LazyReference<EntityTypeKey> apiKeyCache = new LazyReference<EntityTypeKey>() {
+        @Override
+        protected EntityTypeKey create() {
+            if (EntityTypeKey.this.isAPIKey())
+                throw new UnsupportedOperationException();
+
+            return new EntityTypeKey(EntityTypeKey.this.entityType, true);
+        }
+    };
+
     private final EntityType entityType;
 
     public static EntityTypeKey of(EntityType entityType) {
@@ -25,7 +36,11 @@ public class EntityTypeKey extends BaseKey<EntityTypeKey> {
     }
 
     private EntityTypeKey(EntityType entityType) {
-        super(EntityTypeKey.class);
+        this(entityType, false);
+    }
+
+    private EntityTypeKey(EntityType entityType, boolean apiKey) {
+        super(EntityTypeKey.class, apiKey);
         this.entityType = Preconditions.checkNotNull(entityType, "entityType cannot be null");
     }
 
@@ -62,6 +77,11 @@ public class EntityTypeKey extends BaseKey<EntityTypeKey> {
     @Override
     protected boolean equalsInternal(EntityTypeKey other) {
         return this.entityType == other.entityType;
+    }
+
+    @Override
+    public EntityTypeKey createAPIKeyInternal() {
+        return this.apiKeyCache.get();
     }
 
 }
