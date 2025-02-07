@@ -143,7 +143,7 @@ public class BlockChangesListener implements Listener {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             this.worldRecordService.get().recordBlockPlace(Keys.of(e.getNewState()),
                     e.getBlock().getLocation(wrapper.getHandle()),
-                    1, null, REGULAR_RECORD_FLAGS);
+                    1, e.getBlock().getState(), REGULAR_RECORD_FLAGS);
         }
     }
 
