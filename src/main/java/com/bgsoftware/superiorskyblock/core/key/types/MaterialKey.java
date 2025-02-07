@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.key.types;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.MaterialKeySource;
@@ -11,8 +12,10 @@ import java.util.EnumMap;
 
 public class MaterialKey extends BaseKey<MaterialKey> {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private static final EnumMap<Material, MaterialKey> GLOBAL_MATERIAL_KEYS_CACHE = new EnumMap<>(Material.class);
-    private static final EnumMap<Material, MaterialKey> ID_0_MATERIAL_KEYS_CACHE = new EnumMap<>(Material.class);
+    private static final EnumMap<Material, MaterialKey[]> ID_MATERIAL_KEYS_CACHE = new EnumMap<>(Material.class);
 
     static {
         // Load all material type keys
@@ -20,8 +23,12 @@ public class MaterialKey extends BaseKey<MaterialKey> {
             if (material != Materials.SPAWNER.toBukkitType()) {
                 MaterialKey globalKey = of(material);
                 globalKey.loadLazyCaches();
-                MaterialKey id0Key = of(material, (short) 0, MaterialKeySource.BLOCK);
-                id0Key.loadLazyCaches();
+
+                int maxDataValue = plugin.getNMSAlgorithms().getMaxBlockDataValue(material) + 1;
+                for (int i = 0; i < maxDataValue; ++i) {
+                    MaterialKey materialKey = of(material, (short) i, MaterialKeySource.BLOCK);
+                    materialKey.loadLazyCaches();
+                }
             }
         }
     }
@@ -35,9 +42,12 @@ public class MaterialKey extends BaseKey<MaterialKey> {
     public static MaterialKey of(Material type, short durability, MaterialKeySource materialKeySource) {
         Preconditions.checkArgument(type != Materials.SPAWNER.toBukkitType());
 
-        if (durability == 0 && materialKeySource == MaterialKeySource.BLOCK)
-            return ID_0_MATERIAL_KEYS_CACHE.computeIfAbsent(type, unused ->
-                    new MaterialKey(type, (short) 0, false, MaterialKeySource.BLOCK));
+        if (materialKeySource == MaterialKeySource.BLOCK) {
+            MaterialKey[] cachedIds = ID_MATERIAL_KEYS_CACHE.computeIfAbsent(type, MaterialKey::createMaterialKeyCacheForType);
+            if (durability < cachedIds.length) {
+                return cachedIds[durability];
+            }
+        }
 
         return new MaterialKey(type, durability, false, materialKeySource);
     }
@@ -101,6 +111,13 @@ public class MaterialKey extends BaseKey<MaterialKey> {
 
     public short getDurability() {
         return this.durability;
+    }
+
+    private static MaterialKey[] createMaterialKeyCacheForType(Material type) {
+        MaterialKey[] cache = new MaterialKey[plugin.getNMSAlgorithms().getMaxBlockDataValue(type) + 1];
+        for (int i = 0; i < cache.length; ++i)
+            cache[i] = new MaterialKey(type, (short) i, false, MaterialKeySource.BLOCK);
+        return cache;
     }
 
 }

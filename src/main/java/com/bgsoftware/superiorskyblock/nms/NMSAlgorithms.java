@@ -5,6 +5,8 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.io.ClassProcessor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Minecart;
@@ -26,6 +28,12 @@ public interface NMSAlgorithms {
     int getCombinedId(Material material, byte data);
 
     int compareMaterials(Material o1, Material o2);
+
+    short getBlockDataValue(BlockState blockState);
+
+    short getBlockDataValue(Block block);
+
+    short getMaxBlockDataValue(Material material);
 
     Key getBlockKey(int combinedId);
 

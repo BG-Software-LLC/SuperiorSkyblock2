@@ -69,7 +69,7 @@ public class Keys {
             CreatureSpawner creatureSpawner = (CreatureSpawner) block.getState();
             baseKey = getSpawnerKeyFromCreatureSpawner(creatureSpawner);
         } else {
-            short data = ServerVersion.isLegacy() ? block.getData() : 0;
+            short data = plugin.getNMSAlgorithms().getBlockDataValue(block);
             baseKey = MaterialKey.of(blockType, data, MaterialKeySource.BLOCK);
         }
 
@@ -83,7 +83,7 @@ public class Keys {
         if (blockState instanceof CreatureSpawner) {
             baseKey = getSpawnerKeyFromCreatureSpawner((CreatureSpawner) blockState);
         } else {
-            short data = ServerVersion.isLegacy() ? blockState.getRawData() : 0;
+            short data = plugin.getNMSAlgorithms().getBlockDataValue(blockState);
             baseKey = MaterialKey.of(blockState.getType(), data, MaterialKeySource.BLOCK);
         }
 
