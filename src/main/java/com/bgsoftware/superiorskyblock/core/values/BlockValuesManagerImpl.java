@@ -11,9 +11,9 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.values.container.BlockValuesContainer;
@@ -151,8 +151,8 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
     public Key getBlockKey(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        if (((BaseKey<?>) key).isAPIKey() || isValuesMenu(key)) {
-            return getValuesKey(key);
+        if (isValuesMenu(key)) {
+            return markAsAPIIfNeeded(key, getValuesKey(key));
         }
 
         if (blockValuesContainer.containsKeyRaw(key)) {
@@ -162,15 +162,22 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
         if (plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
             Key newKey = plugin.getProviders().getPricesProvider().getBlockKey(key);
             if (newKey != null) {
-                return newKey;
+                return markAsAPIIfNeeded(key, newKey);
             }
         }
 
         Key blockValuesKey = blockValuesContainer.getBlockValueKey(key);
         if (blockValuesKey != key)
-            return blockValuesKey;
+            return markAsAPIIfNeeded(key, blockValuesKey);
 
-        return customBlockKeys.getKey(key, key);
+        return markAsAPIIfNeeded(key, customBlockKeys.getKey(key, key));
+    }
+
+    private Key markAsAPIIfNeeded(Key original, Key newKey) {
+        if (original != newKey && ((BaseKey<?>) original).isAPIKey())
+            newKey = ((BaseKey<?>) newKey).markAPIKey();
+
+        return newKey;
     }
 
     @Override
