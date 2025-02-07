@@ -1,16 +1,26 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
 public class CmdAdminMsg implements IAdminPlayerCommand {
+
+    private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
+        @Override
+        protected PlaceholdersService create() {
+            return SuperiorSkyblockPlugin.getPlugin().getServices().getService(PlaceholdersService.class);
+        }
+    };
 
     @Override
     public List<String> getAliases() {
@@ -57,6 +67,8 @@ public class CmdAdminMsg implements IAdminPlayerCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
         String message = CommandArguments.buildLongString(args, 3, true);
+        if (!Text.isBlank(message))
+            message = placeholdersService.get().parsePlaceholders(targetPlayer.asOfflinePlayer(), message);
         Message.CUSTOM.send(targetPlayer, message, false);
         Message.MESSAGE_SENT.send(sender, targetPlayer.getName());
     }
