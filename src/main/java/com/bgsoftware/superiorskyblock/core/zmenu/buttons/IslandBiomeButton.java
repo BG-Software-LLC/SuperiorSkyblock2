@@ -4,12 +4,10 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
-import com.bgsoftware.superiorskyblock.core.itemstack.GlowEnchantment;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import org.bukkit.block.Biome;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -39,11 +37,7 @@ public class IslandBiomeButton extends SuperiorButton {
 
         if (shouldCurrentBiomeGlow) {
             ItemMeta itemMeta = itemStack.getItemMeta();
-            Enchantment glowEnchant = GlowEnchantment.getGlowEnchant();
-            if (glowEnchant != null) {
-                itemMeta.addEnchant(glowEnchant, 1, true);
-            }
-            itemStack.setItemMeta(itemMeta);
+            plugin.getNMSAlgorithms().makeItemGlow(itemMeta);
         }
         return itemStack;
     }
