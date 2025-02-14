@@ -30,6 +30,7 @@ public class IslandPrivileges {
     public static final IslandPrivilege DISBAND_ISLAND = register("DISBAND_ISLAND");
     public static final IslandPrivilege DISCORD_SHOW = register("DISCORD_SHOW");
     public static final IslandPrivilege DROP_ITEMS = register("DROP_ITEMS");
+    public static final IslandPrivilege DYE_SHEEP = register("DYE_SHEEP");
     public static final IslandPrivilege ENDER_PEARL = register("ENDER_PEARL");
     public static final IslandPrivilege EXPEL_BYPASS = register("EXPEL_BYPASS");
     public static final IslandPrivilege EXPEL_PLAYERS = register("EXPEL_PLAYERS");

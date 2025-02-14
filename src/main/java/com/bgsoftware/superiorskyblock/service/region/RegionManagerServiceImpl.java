@@ -54,6 +54,7 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Mule;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.event.block.Action;
@@ -270,6 +271,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             } else if (usedItem != null && entity instanceof PoweredMinecart &&
                     plugin.getNMSEntities().isMinecartFuel(usedItem, (PoweredMinecart) entity)) {
                 islandPrivilege = IslandPrivileges.MINECART_OPEN;
+            } else if (usedItem != null && entity instanceof Sheep && Materials.isDye(usedItem.getType())) {
+                islandPrivilege = IslandPrivileges.DYE_SHEEP;
             } else {
                 return InteractionResult.SUCCESS;
             }

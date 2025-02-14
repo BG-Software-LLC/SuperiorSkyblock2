@@ -178,6 +178,7 @@ island-roles:
       - CHORUS_FRUIT
       - CROPS_GROWTH
       - DROP_ITEMS
+      - DYE_SHEEP
       - ENDER_PEARL
       - EXPEL_BYPASS
       - FARM_TRAMPING
