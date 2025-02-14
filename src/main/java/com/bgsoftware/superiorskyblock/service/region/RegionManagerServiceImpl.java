@@ -247,24 +247,27 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             Location entityLocation = entity.getLocation(wrapper.getHandle());
             Island island = plugin.getGrid().getIslandAt(entityLocation);
 
+            EntityType entityType = entity.getType();
+            Material usedItemType = usedItem == null ? Material.AIR : usedItem.getType();
+
             IslandPrivilege islandPrivilege;
 
             if (entity instanceof ArmorStand) {
                 islandPrivilege = IslandPrivileges.INTERACT;
             } else if (usedItem != null && entity instanceof Animals && plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) entity)) {
                 islandPrivilege = IslandPrivileges.ANIMAL_BREED;
-            } else if (usedItem != null && usedItem.getType() == Material.NAME_TAG) {
+            } else if (usedItemType == Material.NAME_TAG) {
                 islandPrivilege = IslandPrivileges.NAME_ENTITY;
             } else if (entity instanceof Villager) {
                 islandPrivilege = IslandPrivileges.VILLAGER_TRADING;
                 closeInventory = true;
-            } else if (entity instanceof Horse || entity.getType() == CAMEL_TYPE ||
+            } else if (entity instanceof Horse || entityType == CAMEL_TYPE ||
                     (ServerVersion.isAtLeast(ServerVersion.v1_11) && (entity instanceof Mule || entity instanceof Donkey))) {
                 islandPrivilege = IslandPrivileges.HORSE_INTERACT;
                 closeInventory = true;
-            } else if (usedItem != null && entity instanceof Creeper && usedItem.getType() == Material.FLINT_AND_STEEL) {
+            } else if (usedItemType == Material.FLINT_AND_STEEL && entity instanceof Creeper) {
                 islandPrivilege = IslandPrivileges.IGNITE_CREEPER;
-            } else if (usedItem != null && ServerVersion.isAtLeast(ServerVersion.v1_17) && usedItem.getType() == Material.WATER_BUCKET && entity.getType() == AXOLOTL_TYPE) {
+            } else if (usedItemType == Material.WATER_BUCKET && entityType == AXOLOTL_TYPE && ServerVersion.isAtLeast(ServerVersion.v1_17)) {
                 islandPrivilege = IslandPrivileges.PICKUP_AXOLOTL;
             } else if (entity instanceof ItemFrame) {
                 islandPrivilege = IslandPrivileges.ITEM_FRAME;
@@ -275,7 +278,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             } else if (usedItem != null && entity instanceof PoweredMinecart &&
                     plugin.getNMSEntities().isMinecartFuel(usedItem, (PoweredMinecart) entity)) {
                 islandPrivilege = IslandPrivileges.MINECART_OPEN;
-            } else if (usedItem != null && entity instanceof Sheep && Materials.isDye(usedItem.getType())) {
+            } else if (entity instanceof Sheep && Materials.isDye(usedItemType)) {
                 islandPrivilege = IslandPrivileges.DYE_SHEEP;
             } else {
                 return InteractionResult.SUCCESS;
