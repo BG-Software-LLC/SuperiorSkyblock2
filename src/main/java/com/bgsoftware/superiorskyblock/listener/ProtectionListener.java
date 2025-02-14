@@ -21,17 +21,17 @@ import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Egg;
+import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Trident;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -64,7 +64,6 @@ import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.bukkit.event.raid.RaidTriggerEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
@@ -92,6 +91,8 @@ public class ProtectionListener implements Listener {
     private static final EntityType WIND_CHARGE = EnumHelper.getEnum(EntityType.class, "WIND_CHARGE");
     @Nullable
     private static final Material POINTED_DRIPSTONE = EnumHelper.getEnum(Material.class, "POINTED_DRIPSTONE");
+    @Nullable
+    private static final EntityType TRIDENT = EnumHelper.getEnum(EntityType.class, "TRIDENT");
 
     private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
@@ -491,41 +492,29 @@ public class ProtectionListener implements Listener {
     /* PROJECTILE INTERACTS */
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onPearlTeleport(PlayerTeleportEvent e) {
-        if (e.getCause() != PlayerTeleportEvent.TeleportCause.ENDER_PEARL)
-            return;
+    public void onPlayerLaunchProjectile(ProjectileLaunchEvent e) {
+        BukkitEntities.getPlayerSource(e.getEntity()).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(launcherPlayer -> {
+            IslandPrivilege islandPrivilege;
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-        InteractionResult interactionResult = this.protectionManager.get().handlePlayerEnderPearl(superiorPlayer, e.getTo());
-
-        if (!ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
-            return;
-
-        e.setCancelled(true);
-
-        if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                BukkitItems.addItem(new ItemStack(Material.ENDER_PEARL), e.getPlayer().getInventory(),
-                        e.getPlayer().getLocation(wrapper.getHandle()));
+            if (e.getEntity() instanceof FishHook && !ServerVersion.isLegacy()) {
+                islandPrivilege = IslandPrivileges.FISH;
+            } else if (e.getEntityType() == TRIDENT) {
+                islandPrivilege = IslandPrivileges.PICKUP_DROPS;
+            } else if (e.getEntity() instanceof Egg) {
+                islandPrivilege = IslandPrivileges.ANIMAL_SPAWN;
+            } else if (e.getEntity() instanceof EnderPearl) {
+                islandPrivilege = IslandPrivileges.ENDER_PEARL;
+            } else {
+                return;
             }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onPlayerFish(ProjectileLaunchEvent e) {
-        if (!(e.getEntity() instanceof FishHook) && (ServerVersion.isLegacy() || !(e.getEntity() instanceof Trident)))
-            return;
-
-        BukkitEntities.getPlayerSource(e.getEntity()).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(fisherPlayer -> {
-            IslandPrivilege islandPrivilege = e.getEntity() instanceof FishHook ? IslandPrivileges.FISH : IslandPrivileges.PICKUP_DROPS;
 
             InteractionResult interactionResult;
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 Location entityLocation = e.getEntity().getLocation(wrapper.getHandle());
-                interactionResult = this.protectionManager.get().handleCustomInteraction(fisherPlayer,
+                interactionResult = this.protectionManager.get().handleCustomInteraction(launcherPlayer,
                         entityLocation, islandPrivilege);
             }
-            if (ProtectionHelper.shouldPreventInteraction(interactionResult, fisherPlayer, true))
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, launcherPlayer, true))
                 e.setCancelled(true);
         });
     }
