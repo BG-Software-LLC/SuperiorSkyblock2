@@ -75,6 +75,7 @@ interactables:
   - 'CHERRY_WALL_SIGN'
   - 'CHEST'
   - 'CHIPPED_ANVIL'
+  - 'CHISELED_BOOKSHELF'
   - 'COMMAND'
   - 'COMMAND_BLOCK'
   - 'COMMAND_CHAIN'
