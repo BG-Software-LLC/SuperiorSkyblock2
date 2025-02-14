@@ -144,10 +144,11 @@ public class CmdRankup implements IPermissibleCommand {
         }
 
         SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) currentLevel).getItemData();
-        GameSound sound = hasNextLevel ? itemData.hasNextLevelSound : itemData.noNextLevelSound;
-
-        if (sound != null)
-            superiorPlayer.runIfOnline(player -> GameSoundImpl.playSound(player, sound));
+        if (itemData != null) {
+            GameSound sound = hasNextLevel ? itemData.hasNextLevelSound : itemData.noNextLevelSound;
+            if (sound != null)
+                superiorPlayer.runIfOnline(player -> GameSoundImpl.playSound(player, sound));
+        }
     }
 
     @Override
