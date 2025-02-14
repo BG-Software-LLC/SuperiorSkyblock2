@@ -69,6 +69,7 @@ import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.bukkit.event.raid.RaidTriggerEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
+import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -450,6 +451,22 @@ public class ProtectionListener implements Listener {
                     minecartLocation, IslandPrivileges.MINECART_OPEN);
         }
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
+            e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onPlayerCollideWithVehicle(VehicleEntityCollisionEvent e) {
+        if (!(e.getEntity() instanceof Player))
+            return;
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getEntity());
+        InteractionResult interactionResult;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location vehicleLocation = e.getVehicle().getLocation(wrapper.getHandle());
+            interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer,
+                    vehicleLocation, IslandPrivileges.MINECART_ENTER);
+        }
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, false))
             e.setCancelled(true);
     }
 
