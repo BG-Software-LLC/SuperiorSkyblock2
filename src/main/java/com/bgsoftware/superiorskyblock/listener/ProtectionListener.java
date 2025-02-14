@@ -643,7 +643,7 @@ public class ProtectionListener implements Listener {
 
     private class PlayerArrowPickup implements Listener {
 
-        @EventHandler
+        @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
         public void onPlayerArrowPickup(PlayerPickupArrowEvent e) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
             InteractionResult interactionResult = protectionManager.get().handlePlayerPickupItem(superiorPlayer, e.getItem());
@@ -655,7 +655,7 @@ public class ProtectionListener implements Listener {
 
     private class PlayerTakeLecternBookListener implements Listener {
 
-        @EventHandler
+        @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
         public void onPlayerTakeLecternBook(PlayerTakeLecternBookEvent e) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
             InteractionResult interactionResult = protectionManager.get().handleBlockInteract(superiorPlayer,
@@ -668,7 +668,7 @@ public class ProtectionListener implements Listener {
 
     private class RaidTriggerListener implements Listener {
 
-        @EventHandler
+        @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
         public void onRaidTrigger(RaidTriggerEvent e) {
             if (!plugin.getGrid().isIslandsWorld(e.getWorld()))
                 return;

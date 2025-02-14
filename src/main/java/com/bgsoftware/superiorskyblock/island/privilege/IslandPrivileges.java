@@ -65,6 +65,8 @@ public class IslandPrivileges {
     public static final IslandPrivilege PROMOTE_MEMBERS = register("PROMOTE_MEMBERS");
     public static final IslandPrivilege RANKUP = register("RANKUP");
     public static final IslandPrivilege RATINGS_SHOW = register("RATINGS_SHOW");
+    @Nullable
+    public static final IslandPrivilege SCULK_SENSOR = register("SCULK_SENSOR", ServerVersion.isAtLeast(ServerVersion.v1_17));
     public static final IslandPrivilege SET_BIOME = register("SET_BIOME");
     public static final IslandPrivilege SET_DISCORD = register("SET_DISCORD");
     public static final IslandPrivilege SET_HOME = register("SET_HOME");

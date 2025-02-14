@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_20_3.algorithms.NMSCachedBlock;
 import com.bgsoftware.superiorskyblock.nms.v1_21_4.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_21_4.spawners.TickingSpawnerBlockEntityNotifier;
 import com.bgsoftware.superiorskyblock.nms.v1_21_4.trial.IslandPlayerDetector;
+import com.bgsoftware.superiorskyblock.nms.v1_21_4.vibration.IslandVibrationUser;
 import com.bgsoftware.superiorskyblock.nms.v1_21_4.world.ChunkReaderImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_21_4.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.nms.v1_21_4.world.WorldEditSessionImpl;
@@ -36,6 +37,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.SculkSensorBlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.entity.TickingBlockEntity;
@@ -46,6 +48,7 @@ import net.minecraft.world.level.block.entity.vault.VaultBlockEntity;
 import net.minecraft.world.level.block.entity.vault.VaultConfig;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.gameevent.vibrations.VibrationSystem;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
@@ -78,8 +81,8 @@ public class NMSWorldImpl implements NMSWorld {
     private static final ReflectMethod<Object> LINES_SIGN_CHANGE_EVENT = new ReflectMethod<>(SignChangeEvent.class, "lines");
     private static final ReflectField<List<TickingBlockEntity>> LEVEL_BLOCK_ENTITY_TICKERS_PROTECTED = new ReflectField<>(
             Level.class, List.class, Modifier.PROTECTED | Modifier.FINAL, 1);
-    private static final ReflectField<List<TickingBlockEntity>> LEVEL_BLOCK_ENTITY_TICKERS_PUBLIC = new ReflectField<>(
-            Level.class, List.class, Modifier.PUBLIC | Modifier.FINAL, 1);
+    private static final ReflectField<VibrationSystem.User> SCULK_SENSOR_BLOCK_ENTITY_VIBRATION_USER = new ReflectField<VibrationSystem.User>(
+            SculkSensorBlockEntity.class, VibrationSystem.User.class, Modifier.PRIVATE | Modifier.FINAL, 1).removeFinal();
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -174,6 +177,15 @@ public class NMSWorldImpl implements NMSWorld {
                     trialSpawner.getEntitySelector()
             );
         }
+    }
+
+    @Override
+    public void replaceSculkSensorListener(Island island, Location location) {
+        SculkSensorBlockEntity sculkSensorBlockEntity = NMSUtils.getBlockEntityAt(location, SculkSensorBlockEntity.class);
+        if (sculkSensorBlockEntity == null || sculkSensorBlockEntity.getVibrationUser() instanceof IslandVibrationUser)
+            return;
+
+        SCULK_SENSOR_BLOCK_ENTITY_VIBRATION_USER.set(sculkSensorBlockEntity, new IslandVibrationUser(island, sculkSensorBlockEntity));
     }
 
     @Override

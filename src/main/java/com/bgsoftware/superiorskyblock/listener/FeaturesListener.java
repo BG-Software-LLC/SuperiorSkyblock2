@@ -50,9 +50,10 @@ public class FeaturesListener implements Listener {
 
     @Nullable
     private static final Material VAULT = EnumHelper.getEnum(Material.class, "VAULT");
-
     @Nullable
     private static final Material TRIAL_SPAWNER = EnumHelper.getEnum(Material.class, "TRIAL_SPAWNER");
+    @Nullable
+    private static final Material SCULK_SENSOR = EnumHelper.getEnum(Material.class, "SCULK_SENSOR");
 
     private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
@@ -66,6 +67,8 @@ public class FeaturesListener implements Listener {
         this.plugin = plugin;
         if (VAULT != null && TRIAL_SPAWNER != null)
             plugin.getServer().getPluginManager().registerEvents(new TrialsTracker(), plugin);
+        if (VAULT != null && TRIAL_SPAWNER != null)
+            plugin.getServer().getPluginManager().registerEvents(new SculkSensorTracker(), plugin);
     }
 
     /* EVENT COMMANDS */
@@ -196,6 +199,26 @@ public class FeaturesListener implements Listener {
         }
     }
 
+    /* BLOCKS TRACKING */
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onChunkLoad(ChunkLoadEvent e) {
+        List<Island> chunkIslands = plugin.getGrid().getIslandsAt(e.getChunk());
+        chunkIslands.forEach(island -> handleIslandChunkLoad(island, e.getChunk()));
+    }
+
+    private void handleIslandChunkLoad(Island island, Chunk chunk) {
+        List<Location> blockEntities = plugin.getNMSChunks().getBlockEntities(chunk);
+
+        if (blockEntities.isEmpty())
+            return;
+
+        blockEntities.forEach(blockEntity -> {
+            plugin.getNMSWorld().replaceSculkSensorListener(island, blockEntity);
+            plugin.getNMSWorld().replaceTrialBlockPlayerDetector(island, blockEntity);
+        });
+    }
+
     /* VAULTS & TRIAL SPAWNERS */
 
     private class TrialsTracker implements Listener {
@@ -219,20 +242,29 @@ public class FeaturesListener implements Listener {
             }
         }
 
+    }
+
+    /* SCULK SENSORS */
+
+    private class SculkSensorTracker implements Listener {
+
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onChunkLoad(ChunkLoadEvent e) {
-            List<Island> chunkIslands = plugin.getGrid().getIslandsAt(e.getChunk());
-            chunkIslands.forEach(island -> handleIslandChunkLoad(island, e.getChunk()));
-        }
+        private void onBlockPlace(BlockPlaceEvent e) {
+            Material blockType = e.getBlock().getType();
 
-        private void handleIslandChunkLoad(Island island, Chunk chunk) {
-            List<Location> blockEntities = plugin.getNMSChunks().getBlockEntities(chunk);
-
-            if (blockEntities.isEmpty())
+            if (blockType != SCULK_SENSOR)
                 return;
 
-            blockEntities.forEach(blockEntity ->
-                    plugin.getNMSWorld().replaceTrialBlockPlayerDetector(island, blockEntity));
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location blockLocation = e.getBlock().getLocation(wrapper.getHandle());
+
+                Island island = plugin.getGrid().getIslandAt(blockLocation);
+
+                if (island == null)
+                    return;
+
+                plugin.getNMSWorld().replaceSculkSensorListener(island, blockLocation);
+            }
         }
 
     }

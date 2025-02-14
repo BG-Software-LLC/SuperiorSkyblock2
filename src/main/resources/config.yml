@@ -199,6 +199,7 @@ island-roles:
       - PICKUP_FISH
       - PICKUP_LECTERN_BOOK
       - SIGN_INTERACT
+      - SCULK_SENSOR
       - TURTLE_EGG_TRAMPING
       - USE
       - VILLAGER_TRADING
