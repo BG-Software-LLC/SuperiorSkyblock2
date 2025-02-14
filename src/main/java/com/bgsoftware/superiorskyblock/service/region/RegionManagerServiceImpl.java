@@ -82,7 +82,10 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     @Nullable
     private static final Material OMINOUS_TRIAL_KEY = EnumHelper.getEnum(Material.class, "OMINOUS_TRIAL_KEY");
     @Nullable
-    private static final EntityType AXOLOTL_TYPE = getSafeEntityType("AXOLOTL");
+    private static final EntityType AXOLOTL_TYPE = EnumHelper.getEnum(EntityType.class, "AXOLOTL");
+    @Nullable
+    private static final EntityType CAMEL_TYPE = EnumHelper.getEnum(EntityType.class, "CAMEL");
+
     private static final int MAX_PICKUP_DISTANCE = 1;
     private static EnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
     private static KeySet INTERACTABLES_CACHE;
@@ -255,7 +258,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             } else if (entity instanceof Villager) {
                 islandPrivilege = IslandPrivileges.VILLAGER_TRADING;
                 closeInventory = true;
-            } else if (entity instanceof Horse || (ServerVersion.isAtLeast(ServerVersion.v1_11) && (entity instanceof Mule || entity instanceof Donkey))) {
+            } else if (entity instanceof Horse || entity.getType() == CAMEL_TYPE ||
+                    (ServerVersion.isAtLeast(ServerVersion.v1_11) && (entity instanceof Mule || entity instanceof Donkey))) {
                 islandPrivilege = IslandPrivileges.HORSE_INTERACT;
                 closeInventory = true;
             } else if (usedItem != null && entity instanceof Creeper && usedItem.getType() == Material.FLINT_AND_STEEL) {
@@ -751,15 +755,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         if (toIsland == null) plugin.getNMSWorld().setWorldBorder(superiorPlayer, null);
 
         return MoveResult.SUCCESS;
-    }
-
-    @Nullable
-    private static EntityType getSafeEntityType(String entityType) {
-        try {
-            return EntityType.valueOf(entityType);
-        } catch (IllegalArgumentException error) {
-            return null;
-        }
     }
 
 }
