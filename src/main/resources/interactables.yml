@@ -59,6 +59,7 @@ interactables:
   - 'CANDLE'
   - 'CARTOGRAPHER_TABLE'
   - 'CAULDRON'
+  - 'CAVE_VINES'
   - 'CAVE_VINES_PLANT'
   - 'CHAIN_COMMAND_BLOCK'
   - 'CHERRY_BUTTON'
