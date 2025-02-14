@@ -78,6 +78,7 @@ interactables:
   - 'COMMAND_CHAIN'
   - 'COMMAND_REPEATING'
   - 'COMPARATOR'
+  - 'COMPOSTER'
   - 'COPPER_DOOR'
   - 'COPPER_TRAPDOOR'
   - 'CRAFTER'
