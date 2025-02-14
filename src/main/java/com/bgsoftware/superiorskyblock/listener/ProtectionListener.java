@@ -30,9 +30,9 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
-import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
+import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -440,13 +440,13 @@ public class ProtectionListener implements Listener {
     public void onVehicleOpen(InventoryOpenEvent e) {
         InventoryHolder inventoryHolder = e.getInventory().getHolder();
 
-        if (!(inventoryHolder instanceof Minecart))
+        if (!(inventoryHolder instanceof Vehicle))
             return;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location minecartLocation = ((Minecart) inventoryHolder).getLocation(wrapper.getHandle());
+            Location minecartLocation = ((Vehicle) inventoryHolder).getLocation(wrapper.getHandle());
             interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer,
                     minecartLocation, IslandPrivileges.MINECART_OPEN);
         }
