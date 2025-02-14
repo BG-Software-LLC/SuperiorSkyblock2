@@ -75,6 +75,12 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     @Nullable
     private static final Material LECTERN = EnumHelper.getEnum(Material.class, "LECTERN");
     @Nullable
+    private static final Material VAULT = EnumHelper.getEnum(Material.class, "VAULT");
+    @Nullable
+    private static final Material TRIAL_KEY = EnumHelper.getEnum(Material.class, "TRIAL_KEY");
+    @Nullable
+    private static final Material OMINOUS_TRIAL_KEY = EnumHelper.getEnum(Material.class, "OMINOUS_TRIAL_KEY");
+    @Nullable
     private static final EntityType AXOLOTL_TYPE = getSafeEntityType("AXOLOTL");
     private static final int MAX_PICKUP_DISTANCE = 1;
     private static EnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
@@ -183,6 +189,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             } else if (Materials.isChest(blockType)) {
                 islandPrivilege = IslandPrivileges.CHEST_ACCESS;
             } else if (blockState instanceof InventoryHolder) {
+                islandPrivilege = IslandPrivileges.USE;
+            } else if (usedItem != null && blockType == VAULT && (usedItem.getType() == TRIAL_KEY || usedItem.getType() == OMINOUS_TRIAL_KEY)) {
                 islandPrivilege = IslandPrivileges.USE;
             } else if (blockState instanceof Sign) {
                 islandPrivilege = IslandPrivileges.SIGN_INTERACT;

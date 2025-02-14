@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.nms.v1_20_3.algorithms.NMSCachedBlock;
 import com.bgsoftware.superiorskyblock.nms.v1_21_3.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_21_3.spawners.TickingSpawnerBlockEntityNotifier;
+import com.bgsoftware.superiorskyblock.nms.v1_21_3.trial.IslandPlayerDetector;
 import com.bgsoftware.superiorskyblock.nms.v1_21_3.world.ChunkReaderImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_21_3.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.nms.v1_21_3.world.WorldEditSessionImpl;
@@ -34,9 +35,15 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.entity.TickingBlockEntity;
+import net.minecraft.world.level.block.entity.TrialSpawnerBlockEntity;
+import net.minecraft.world.level.block.entity.trialspawner.PlayerDetector;
+import net.minecraft.world.level.block.entity.trialspawner.TrialSpawner;
+import net.minecraft.world.level.block.entity.vault.VaultBlockEntity;
+import net.minecraft.world.level.block.entity.vault.VaultConfig;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.WorldBorder;
 import org.bukkit.Bukkit;
@@ -125,6 +132,50 @@ public class NMSWorldImpl implements NMSWorld {
 
         if (!tickersToAdd.isEmpty())
             blockEntityTickers.addAll(tickersToAdd);
+    }
+
+    @Override
+    public void replaceTrialBlockPlayerDetector(Island island, Location location) {
+        BlockEntity blockEntity = NMSUtils.getBlockEntityAt(location, BlockEntity.class);
+        if (blockEntity == null)
+            return;
+
+        if (blockEntity instanceof VaultBlockEntity vaultBlockEntity) {
+            VaultConfig vaultConfig = vaultBlockEntity.getConfig();
+
+            PlayerDetector playerDetector = vaultConfig.playerDetector();
+            if (playerDetector instanceof IslandPlayerDetector)
+                return;
+
+            VaultConfig newConfig = new VaultConfig(
+                    vaultConfig.lootTable(),
+                    vaultConfig.activationRange(),
+                    vaultConfig.deactivationRange(),
+                    vaultConfig.keyItem(),
+                    vaultConfig.overrideLootTableToDisplay(),
+                    IslandPlayerDetector.trialVaultPlayerDetector(island, playerDetector),
+                    vaultConfig.entitySelector()
+            );
+
+            vaultBlockEntity.setConfig(newConfig);
+        } else if (blockEntity instanceof TrialSpawnerBlockEntity trialSpawnerBlockEntity) {
+            TrialSpawner trialSpawner = trialSpawnerBlockEntity.getTrialSpawner();
+            PlayerDetector playerDetector = trialSpawner.getPlayerDetector();
+
+            if (playerDetector instanceof IslandPlayerDetector)
+                return;
+
+            trialSpawnerBlockEntity.trialSpawner = new TrialSpawner(
+                    trialSpawner.normalConfig,
+                    trialSpawner.ominousConfig,
+                    trialSpawner.getData(),
+                    trialSpawner.getTargetCooldownLength(),
+                    trialSpawner.getRequiredPlayerRange(),
+                    trialSpawner.stateAccessor,
+                    IslandPlayerDetector.trialSpawnerPlayerDetector(island, playerDetector),
+                    trialSpawner.getEntitySelector()
+            );
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandCreateEvent;
@@ -13,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
@@ -23,14 +25,17 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -43,6 +48,12 @@ public class FeaturesListener implements Listener {
 
     private final Map<Class<? extends Event>, EventMethods> CACHED_EVENT_METHODS = new ArrayMap<>();
 
+    @Nullable
+    private static final Material VAULT = EnumHelper.getEnum(Material.class, "VAULT");
+
+    @Nullable
+    private static final Material TRIAL_SPAWNER = EnumHelper.getEnum(Material.class, "TRIAL_SPAWNER");
+
     private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
         @Override
@@ -53,6 +64,8 @@ public class FeaturesListener implements Listener {
 
     public FeaturesListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+        if (VAULT != null && TRIAL_SPAWNER != null)
+            plugin.getServer().getPluginManager().registerEvents(new TrialsTracker(), plugin);
     }
 
     /* EVENT COMMANDS */
@@ -181,6 +194,47 @@ public class FeaturesListener implements Listener {
             e.setCancelled(true);
             Message.VISITOR_BLOCK_COMMAND.send(superiorPlayer);
         }
+    }
+
+    /* VAULTS & TRIAL SPAWNERS */
+
+    private class TrialsTracker implements Listener {
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        private void onBlockPlace(BlockPlaceEvent e) {
+            Material blockType = e.getBlock().getType();
+
+            if (blockType != VAULT && blockType != TRIAL_SPAWNER)
+                return;
+
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location blockLocation = e.getBlock().getLocation(wrapper.getHandle());
+
+                Island island = plugin.getGrid().getIslandAt(blockLocation);
+
+                if (island == null)
+                    return;
+
+                plugin.getNMSWorld().replaceTrialBlockPlayerDetector(island, blockLocation);
+            }
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onChunkLoad(ChunkLoadEvent e) {
+            List<Island> chunkIslands = plugin.getGrid().getIslandsAt(e.getChunk());
+            chunkIslands.forEach(island -> handleIslandChunkLoad(island, e.getChunk()));
+        }
+
+        private void handleIslandChunkLoad(Island island, Chunk chunk) {
+            List<Location> blockEntities = plugin.getNMSChunks().getBlockEntities(chunk);
+
+            if (blockEntities.isEmpty())
+                return;
+
+            blockEntities.forEach(blockEntity ->
+                    plugin.getNMSWorld().replaceTrialBlockPlayerDetector(island, blockEntity));
+        }
+
     }
 
     /* INTERNAL */

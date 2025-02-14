@@ -25,6 +25,10 @@ public interface NMSWorld {
 
     void listenSpawner(Location location, IntFunction<Integer> delayChangeCallback);
 
+    default void replaceTrialBlockPlayerDetector(Island island, Location location) {
+        // Does not exist.
+    }
+
     void setWorldBorder(SuperiorPlayer superiorPlayer, Island island);
 
     Object getBlockData(Block block);
