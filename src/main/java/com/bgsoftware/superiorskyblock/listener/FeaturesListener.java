@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Bukkit;
@@ -32,6 +33,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -54,6 +56,8 @@ public class FeaturesListener implements Listener {
     private static final Material TRIAL_SPAWNER = EnumHelper.getEnum(Material.class, "TRIAL_SPAWNER");
     @Nullable
     private static final Material SCULK_SENSOR = EnumHelper.getEnum(Material.class, "SCULK_SENSOR");
+    @Nullable
+    private static final Material SCULK_SHRIEKER = EnumHelper.getEnum(Material.class, "SCULK_SHRIEKER");
 
     private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
@@ -249,7 +253,7 @@ public class FeaturesListener implements Listener {
     private class SculkSensorTracker implements Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        private void onBlockPlace(BlockPlaceEvent e) {
+        private void onSculkSensorPlace(BlockPlaceEvent e) {
             Material blockType = e.getBlock().getType();
 
             if (blockType != SCULK_SENSOR)
@@ -265,6 +269,23 @@ public class FeaturesListener implements Listener {
 
                 plugin.getNMSWorld().replaceSculkSensorListener(island, blockLocation);
             }
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        private void onSculkShriekerInteract(PlayerInteractEvent e) {
+            if (e.getAction() != Action.PHYSICAL || !plugin.getGrid().isIslandsWorld(e.getClickedBlock().getWorld()) ||
+                    e.getClickedBlock().getType() != SCULK_SHRIEKER)
+                return;
+
+            InteractionResult interactionResult;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+                Location blockLocation = e.getClickedBlock().getLocation(wrapper.getHandle());
+                interactionResult = protectionManager.get().handleCustomInteraction(superiorPlayer,
+                        blockLocation, IslandPrivileges.SCULK_SENSOR);
+            }
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, null, false))
+                e.setCancelled(true);
         }
 
     }
