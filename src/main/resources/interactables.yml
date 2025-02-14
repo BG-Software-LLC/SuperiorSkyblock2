@@ -32,6 +32,7 @@ interactables:
   - 'BARREL'
   - 'BEACON'
   - 'BED_BLOCK'
+  - 'BEE_NEST'
   - 'BIRCH_BUTTON'
   - 'BIRCH_DOOR'
   - 'BIRCH_FENCE'
