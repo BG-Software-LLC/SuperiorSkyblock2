@@ -22,8 +22,8 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -55,6 +55,7 @@ import org.bukkit.entity.Mule;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -258,6 +259,9 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 islandPrivilege = IslandPrivileges.PAINTING;
             } else if (entity instanceof Fish && !ServerVersion.isLegacy()) {
                 islandPrivilege = IslandPrivileges.PICKUP_FISH;
+            } else if (usedItem != null && entity instanceof PoweredMinecart &&
+                    plugin.getNMSEntities().isMinecartFuel(usedItem, (PoweredMinecart) entity)) {
+                islandPrivilege = IslandPrivileges.MINECART_OPEN;
             } else {
                 return InteractionResult.SUCCESS;
             }
