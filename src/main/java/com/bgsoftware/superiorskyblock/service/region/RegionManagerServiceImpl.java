@@ -258,6 +258,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 islandPrivilege = IslandPrivileges.ANIMAL_BREED;
             } else if (usedItemType == Material.NAME_TAG) {
                 islandPrivilege = IslandPrivileges.NAME_ENTITY;
+            } else if (usedItemType == Material.SADDLE) {
+                islandPrivilege = IslandPrivileges.SADDLE_ENTITY;
             } else if (entity instanceof Villager) {
                 islandPrivilege = IslandPrivileges.VILLAGER_TRADING;
                 closeInventory = true;
