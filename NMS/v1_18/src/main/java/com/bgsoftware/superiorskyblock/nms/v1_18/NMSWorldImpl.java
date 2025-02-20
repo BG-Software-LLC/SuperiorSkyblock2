@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.nms.algorithms.NMSCachedBlock;
 import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.nms.v1_18.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_18.spawners.TickingSpawnerBlockEntityNotifier;
+import com.bgsoftware.superiorskyblock.nms.v1_18.vibration.IslandSculkSensorBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_18.world.ChunkReaderImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_18.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.nms.v1_18.world.WorldEditSessionImpl;
@@ -35,6 +36,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.SculkSensorBlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.entity.TickingBlockEntity;
@@ -118,6 +120,18 @@ public class NMSWorldImpl implements NMSWorld {
 
         if (!tickersToAdd.isEmpty())
             blockEntityTickers.addAll(tickersToAdd);
+    }
+
+    @Override
+    public void replaceSculkSensorListener(Island island, Location location) {
+        SculkSensorBlockEntity sculkSensorBlockEntity = NMSUtils.getBlockEntityAt(location, SculkSensorBlockEntity.class);
+        if (sculkSensorBlockEntity == null || sculkSensorBlockEntity instanceof IslandSculkSensorBlockEntity)
+            return;
+
+        ServerLevel serverLevel = ((CraftWorld) location.getWorld()).getHandle();
+        serverLevel.removeBlockEntity(sculkSensorBlockEntity.getBlockPos());
+
+        serverLevel.setBlockEntity(new IslandSculkSensorBlockEntity(island, sculkSensorBlockEntity));
     }
 
     @Override

@@ -33,6 +33,9 @@ import net.minecraft.server.v1_16_R3.World;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.data.Ageable;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
@@ -123,6 +126,27 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         int firstMaterial = o1.isBlock() ? Block.getCombinedId(CraftMagicNumbers.getBlock(o1).getBlockData()) : o1.ordinal();
         int secondMaterial = o2.isBlock() ? Block.getCombinedId(CraftMagicNumbers.getBlock(o2).getBlockData()) : o2.ordinal();
         return Integer.compare(firstMaterial, secondMaterial);
+    }
+
+    @Override
+    public short getBlockDataValue(BlockState blockState) {
+        BlockData blockData = blockState.getBlockData();
+        return (short) (blockData instanceof Ageable ? ((Ageable) blockData).getAge() : 0);
+    }
+
+    @Override
+    public short getBlockDataValue(org.bukkit.block.Block block) {
+        BlockData blockData = block.getBlockData();
+        return (short) (blockData instanceof Ageable ? ((Ageable) blockData).getAge() : 0);
+    }
+
+    @Override
+    public short getMaxBlockDataValue(Material material) {
+        if (!material.isBlock())
+            return 0;
+
+        BlockData blockData = Bukkit.createBlockData(material);
+        return (short) (blockData instanceof Ageable ? ((Ageable) blockData).getMaximumAge() : 0);
     }
 
     @Override

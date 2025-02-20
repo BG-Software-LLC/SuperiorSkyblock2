@@ -30,6 +30,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
+import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
@@ -40,12 +41,14 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LegacyMasks;
 import com.bgsoftware.superiorskyblock.core.LocationKey;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
@@ -149,6 +152,12 @@ public class SIsland implements Island {
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
     private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
+        @Override
+        protected PlaceholdersService create() {
+            return plugin.getServices().getService(PlaceholdersService.class);
+        }
+    };
 
     private static EnumerateSet<IslandFlag> DEFAULT_FLAGS_CACHE;
 
@@ -2083,7 +2092,14 @@ public class SIsland implements Island {
 
         Log.debug(Debug.SEND_MESSAGE, owner.getName(), message, ignoredList);
 
-        forEachIslandMember(ignoredList, false, islandMember -> Message.CUSTOM.send(islandMember, message, false));
+        forEachIslandMember(ignoredList, false, islandMember -> {
+            String playerMessage = message;
+
+            if (!Text.isBlank(playerMessage))
+                playerMessage = placeholdersService.get().parsePlaceholders(islandMember.asOfflinePlayer(), playerMessage);
+
+            Message.CUSTOM.send(islandMember, playerMessage, false);
+        });
     }
 
     @Override
@@ -2110,9 +2126,19 @@ public class SIsland implements Island {
 
         Log.debug(Debug.SEND_TITLE, owner.getName(), title, subtitle, fadeIn, duration, fadeOut, ignoredList);
 
-        forEachIslandMember(ignoredList, true, islandMember ->
-                plugin.getNMSPlayers().sendTitle(islandMember.asPlayer(), title, subtitle, fadeIn, duration, fadeOut)
-        );
+        forEachIslandMember(ignoredList, true, islandMember -> {
+            String playerTitle = title;
+            String playerSubtitle = subtitle;
+
+            Player player = islandMember.asPlayer();
+
+            if (!Text.isBlank(playerTitle))
+                playerTitle = placeholdersService.get().parsePlaceholders(player, playerTitle);
+            if (!Text.isBlank(playerSubtitle))
+                playerSubtitle = placeholdersService.get().parsePlaceholders(player, playerSubtitle);
+
+            plugin.getNMSPlayers().sendTitle(player, playerTitle, playerSubtitle, fadeIn, duration, fadeOut);
+        });
     }
 
     @Override
@@ -2124,9 +2150,16 @@ public class SIsland implements Island {
 
         Log.debug(Debug.EXECUTE_ISLAND_COMMANDS, owner.getName(), command, onlyOnlineMembers, ignoredList);
 
-        forEachIslandMember(ignoredList, onlyOnlineMembers, islandMember ->
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player-name}", islandMember.getName()))
-        );
+        forEachIslandMember(ignoredList, onlyOnlineMembers, islandMember -> {
+            String playerCommand = command;
+
+            if (!Text.isBlank(playerCommand)) {
+                playerCommand = placeholdersService.get().parsePlaceholders(islandMember.asOfflinePlayer(), playerCommand)
+                        .replace("{player-name}", islandMember.getName());
+            }
+
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), playerCommand);
+        });
     }
 
     @Override

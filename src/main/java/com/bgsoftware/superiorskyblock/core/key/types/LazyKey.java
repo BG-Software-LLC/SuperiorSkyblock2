@@ -10,7 +10,7 @@ public class LazyKey<T extends Key> extends BaseKey<T> {
     private final LazyReference<T> baseKeyLoader;
 
     public LazyKey(Class<T> baseKeyClass, LazyReference<T> baseKeyLoader) {
-        super(baseKeyClass);
+        super(baseKeyClass, false);
         Preconditions.checkArgument(baseKeyClass != BaseKey.class);
         this.baseKeyLoader = baseKeyLoader;
     }
@@ -52,6 +52,11 @@ public class LazyKey<T extends Key> extends BaseKey<T> {
     @Override
     protected final int compareToInternal(T other) {
         return getBaseKey().compareTo(other);
+    }
+
+    @Override
+    public T createAPIKeyInternal() {
+        return ((BaseKey<T>) getBaseKey()).createAPIKeyInternal();
     }
 
 }

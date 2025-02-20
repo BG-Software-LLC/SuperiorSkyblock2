@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.key.types;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.MaterialKeySource;
@@ -11,8 +13,10 @@ import java.util.EnumMap;
 
 public class MaterialKey extends BaseKey<MaterialKey> {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private static final EnumMap<Material, MaterialKey> GLOBAL_MATERIAL_KEYS_CACHE = new EnumMap<>(Material.class);
-    private static final EnumMap<Material, MaterialKey> ID_0_MATERIAL_KEYS_CACHE = new EnumMap<>(Material.class);
+    private static final EnumMap<Material, MaterialKey[]> ID_MATERIAL_KEYS_CACHE = new EnumMap<>(Material.class);
 
     static {
         // Load all material type keys
@@ -20,11 +24,26 @@ public class MaterialKey extends BaseKey<MaterialKey> {
             if (material != Materials.SPAWNER.toBukkitType()) {
                 MaterialKey globalKey = of(material);
                 globalKey.loadLazyCaches();
-                MaterialKey id0Key = of(material, (short) 0, MaterialKeySource.BLOCK);
-                id0Key.loadLazyCaches();
+
+                int maxDataValue = plugin.getNMSAlgorithms().getMaxBlockDataValue(material) + 1;
+                for (int i = 0; i < maxDataValue; ++i) {
+                    MaterialKey materialKey = of(material, (short) i, MaterialKeySource.BLOCK);
+                    materialKey.loadLazyCaches();
+                }
             }
         }
     }
+
+    private final LazyReference<MaterialKey> apiKeyCache = new LazyReference<MaterialKey>() {
+        @Override
+        protected MaterialKey create() {
+            if (MaterialKey.this.isAPIKey())
+                throw new UnsupportedOperationException();
+
+            return new MaterialKey(MaterialKey.this.type, MaterialKey.this.durability, MaterialKey.this.isGlobalType,
+                    MaterialKey.this.materialKeySource, true);
+        }
+    };
 
     protected final Material type;
     private final short durability;
@@ -35,9 +54,12 @@ public class MaterialKey extends BaseKey<MaterialKey> {
     public static MaterialKey of(Material type, short durability, MaterialKeySource materialKeySource) {
         Preconditions.checkArgument(type != Materials.SPAWNER.toBukkitType());
 
-        if (durability == 0 && materialKeySource == MaterialKeySource.BLOCK)
-            return ID_0_MATERIAL_KEYS_CACHE.computeIfAbsent(type, unused ->
-                    new MaterialKey(type, (short) 0, false, MaterialKeySource.BLOCK));
+        if (materialKeySource == MaterialKeySource.BLOCK) {
+            MaterialKey[] cachedIds = ID_MATERIAL_KEYS_CACHE.computeIfAbsent(type, MaterialKey::createMaterialKeyCacheForType);
+            if (durability < cachedIds.length) {
+                return cachedIds[durability];
+            }
+        }
 
         return new MaterialKey(type, durability, false, materialKeySource);
     }
@@ -48,7 +70,11 @@ public class MaterialKey extends BaseKey<MaterialKey> {
     }
 
     protected MaterialKey(Material type, short durability, boolean isGlobalType, MaterialKeySource materialKeySource) {
-        super(MaterialKey.class);
+        this(type, durability, isGlobalType, materialKeySource, false);
+    }
+
+    protected MaterialKey(Material type, short durability, boolean isGlobalType, MaterialKeySource materialKeySource, boolean apiKey) {
+        super(MaterialKey.class, apiKey);
         this.type = Preconditions.checkNotNull(type, "type parameter cannot be null");
         this.durability = durability;
         this.durabilityAsString = isGlobalType ? "" : String.valueOf(this.durability);
@@ -95,12 +121,24 @@ public class MaterialKey extends BaseKey<MaterialKey> {
         return this.toString().compareTo(other.toString());
     }
 
+    @Override
+    public MaterialKey createAPIKeyInternal() {
+        return this.apiKeyCache.get();
+    }
+
     public Material getMaterial() {
         return this.type;
     }
 
     public short getDurability() {
         return this.durability;
+    }
+
+    private static MaterialKey[] createMaterialKeyCacheForType(Material type) {
+        MaterialKey[] cache = new MaterialKey[plugin.getNMSAlgorithms().getMaxBlockDataValue(type) + 1];
+        for (int i = 0; i < cache.length; ++i)
+            cache[i] = new MaterialKey(type, (short) i, false, MaterialKeySource.BLOCK);
+        return cache;
     }
 
 }

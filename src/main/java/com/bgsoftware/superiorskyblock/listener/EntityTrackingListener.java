@@ -35,17 +35,20 @@ public class EntityTrackingListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onEntitySpawn(CreatureSpawnEvent e) {
-        this.worldRecordService.get().recordEntitySpawn(e.getEntity());
+        if (!e.getEntity().isDead())
+            this.worldRecordService.get().recordEntitySpawn(e.getEntity());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onHangingPlace(HangingPlaceEvent e) {
-        this.worldRecordService.get().recordEntitySpawn(e.getEntity());
+        if (!e.getEntity().isDead())
+            this.worldRecordService.get().recordEntitySpawn(e.getEntity());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onVehicleSpawn(VehicleCreateEvent e) {
-        this.worldRecordService.get().recordEntitySpawn(e.getVehicle());
+        if (!e.getVehicle().isDead())
+            this.worldRecordService.get().recordEntitySpawn(e.getVehicle());
     }
 
     /* INTERNAL */

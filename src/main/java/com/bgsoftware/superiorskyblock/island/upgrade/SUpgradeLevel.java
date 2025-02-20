@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.upgrade;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -66,6 +67,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final Value<BigDecimal> bankLimit;
     private final Int2IntMapView roleLimits;
 
+    @Nullable
     private ItemData itemData;
 
     public SUpgradeLevel(int level, UpgradeCost cost, List<String> commands, String permission, Set<UpgradeRequirement> requirements,
@@ -371,6 +373,7 @@ public class SUpgradeLevel implements UpgradeLevel {
         this.itemData = new ItemData(hasNextLevel, noNextLevel, hasNextLevelSound, noNextLevelSound, hasNextLevelCommands, noNextLevelCommands);
     }
 
+    @Nullable
     public ItemData getItemData() {
         return itemData;
     }

@@ -1,19 +1,30 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 public class CmdAdminTitle implements IAdminPlayerCommand {
+
+    private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
+        @Override
+        protected PlaceholdersService create() {
+            return SuperiorSkyblockPlugin.getPlugin().getServices().getService(PlaceholdersService.class);
+        }
+    };
 
     @Override
     public List<String> getAliases() {
@@ -93,7 +104,14 @@ public class CmdAdminTitle implements IAdminPlayerCommand {
             return;
         }
 
-        plugin.getNMSPlayers().sendTitle(targetPlayer.asPlayer(),
+        Player player = targetPlayer.asPlayer();
+
+        if (!Text.isBlank(title))
+            title = placeholdersService.get().parsePlaceholders(player, title);
+        if (!Text.isBlank(subtitle))
+            subtitle = placeholdersService.get().parsePlaceholders(player, subtitle);
+
+        plugin.getNMSPlayers().sendTitle(player,
                 title == null ? null : Formatters.COLOR_FORMATTER.format(title),
                 subtitle == null ? null : Formatters.COLOR_FORMATTER.format(subtitle),
                 fadeIn.getNumber(),

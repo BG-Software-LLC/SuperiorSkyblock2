@@ -19,6 +19,7 @@ import net.minecraft.server.v1_12_R1.World;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.BlockState;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
@@ -78,6 +79,21 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public int compareMaterials(Material o1, Material o2) {
         return Integer.compare(o1.ordinal(), o2.ordinal());
+    }
+
+    @Override
+    public short getBlockDataValue(BlockState blockState) {
+        return blockState.getRawData();
+    }
+
+    @Override
+    public short getBlockDataValue(org.bukkit.block.Block block) {
+        return block.getData();
+    }
+
+    @Override
+    public short getMaxBlockDataValue(Material material) {
+        return 0;
     }
 
     @Override

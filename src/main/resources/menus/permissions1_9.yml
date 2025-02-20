@@ -709,6 +709,42 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  dye_sheep:
+    display-menu: true
+    permission-enabled:
+      type: MONSTER_EGG
+      entity: SHEEP
+      name: '&6Dye Sheep'
+      lore:
+        - '&7Access to dye sheep inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: MONSTER_EGG
+      entity: SHEEP
+      name: '&6Dye Sheep'
+      lore:
+        - '&7Access to dye sheep inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: MONSTER_EGG
+      entity: SHEEP
+      name: '&6Dye Sheep'
+      lore:
+        - '&7Access to dye sheep inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   ender_pearl:
     display-menu: true
     permission-enabled:
@@ -1640,6 +1676,39 @@ permissions:
       name: '&6Ratings Show'
       lore:
         - '&7Access to see all island''s ratings.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  saddle_entity:
+    display-menu: true
+    permission-enabled:
+      type: SADDLE
+      name: '&6Saddle Entity'
+      lore:
+        - '&7Access to add saddle to entities inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: SADDLE
+      name: '&6Saddle Entity'
+      lore:
+        - '&7Access to add saddle to entities inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: SADDLE
+      name: '&6Saddle Entity'
+      lore:
+        - '&7Access to add saddle to entities inside the island.'
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'

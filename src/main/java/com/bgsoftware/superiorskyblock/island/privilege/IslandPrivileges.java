@@ -30,6 +30,7 @@ public class IslandPrivileges {
     public static final IslandPrivilege DISBAND_ISLAND = register("DISBAND_ISLAND");
     public static final IslandPrivilege DISCORD_SHOW = register("DISCORD_SHOW");
     public static final IslandPrivilege DROP_ITEMS = register("DROP_ITEMS");
+    public static final IslandPrivilege DYE_SHEEP = register("DYE_SHEEP");
     public static final IslandPrivilege ENDER_PEARL = register("ENDER_PEARL");
     public static final IslandPrivilege EXPEL_BYPASS = register("EXPEL_BYPASS");
     public static final IslandPrivilege EXPEL_PLAYERS = register("EXPEL_PLAYERS");
@@ -65,6 +66,9 @@ public class IslandPrivileges {
     public static final IslandPrivilege PROMOTE_MEMBERS = register("PROMOTE_MEMBERS");
     public static final IslandPrivilege RANKUP = register("RANKUP");
     public static final IslandPrivilege RATINGS_SHOW = register("RATINGS_SHOW");
+    public static final IslandPrivilege SADDLE_ENTITY = register("SADDLE_ENTITY");
+    @Nullable
+    public static final IslandPrivilege SCULK_SENSOR = register("SCULK_SENSOR", ServerVersion.isAtLeast(ServerVersion.v1_17));
     public static final IslandPrivilege SET_BIOME = register("SET_BIOME");
     public static final IslandPrivilege SET_DISCORD = register("SET_DISCORD");
     public static final IslandPrivilege SET_HOME = register("SET_HOME");

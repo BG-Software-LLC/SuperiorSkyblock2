@@ -16,8 +16,8 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
@@ -38,7 +38,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
@@ -54,11 +53,10 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Directional;
-import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Collection;
@@ -143,7 +141,7 @@ public class BlockChangesListener implements Listener {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             this.worldRecordService.get().recordBlockPlace(Keys.of(e.getNewState()),
                     e.getBlock().getLocation(wrapper.getHandle()),
-                    1, null, REGULAR_RECORD_FLAGS);
+                    1, e.getBlock().getState(), REGULAR_RECORD_FLAGS);
         }
     }
 
@@ -157,12 +155,6 @@ public class BlockChangesListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    private void onPlayerInteract(PlayerInteractEvent e) {
-        onMinecartPlace(e);
-        onSpawnerChange(e);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockSpread(BlockSpreadEvent e) {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             this.worldRecordService.get().recordBlockPlace(Keys.of(e.getNewState()),
@@ -171,33 +163,22 @@ public class BlockChangesListener implements Listener {
         }
     }
 
-    private void onMinecartPlace(PlayerInteractEvent e) {
-        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || !Materials.isRail(e.getClickedBlock().getType()))
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private void onMinecartPlace(VehicleCreateEvent e) {
+        if (e.getVehicle().isDead() || !(e.getVehicle() instanceof Minecart))
             return;
 
-        PlayerHand playerHand = BukkitItems.getHand(e);
-        if (playerHand != PlayerHand.MAIN_HAND)
-            return;
-
-        ItemStack handItem = BukkitItems.getHandItem(e.getPlayer(), playerHand);
-
-        if (handItem == null)
-            return;
-
-        Material handItemType = handItem.getType();
-        if (!Materials.isMinecart(handItemType))
-            return;
-
-        Key minecartBlockKey = getMinecartBlockKey(handItemType);
+        Key minecartBlockKey = getMinecartBlockKey(e.getVehicle().getType());
         if (minecartBlockKey != null) {
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 this.worldRecordService.get().recordBlockPlace(minecartBlockKey,
-                        e.getClickedBlock().getLocation(wrapper.getHandle()),
+                        e.getVehicle().getLocation(wrapper.getHandle()),
                         1, null, REGULAR_RECORD_FLAGS);
             }
         }
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onSpawnerChange(PlayerInteractEvent e) {
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK ||
                 e.getClickedBlock().getType() != Materials.SPAWNER.toBukkitType())
@@ -230,42 +211,6 @@ public class BlockChangesListener implements Listener {
                 }
             }
         }, 1L);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    private void onMinecartPlaceByDispenser(BlockDispenseEvent e) {
-        Material dispenseItemType = e.getItem().getType();
-
-        if (!Materials.isMinecart(dispenseItemType) || e.getBlock().getType() != Material.DISPENSER)
-            return;
-
-        Block targetBlock = null;
-
-        if (ServerVersion.isLegacy()) {
-            MaterialData materialData = e.getBlock().getState().getData();
-            if (materialData instanceof Directional) {
-                targetBlock = e.getBlock().getRelative(((Directional) materialData).getFacing());
-            }
-        } else {
-            Object blockData = plugin.getNMSWorld().getBlockData(e.getBlock());
-            if (blockData instanceof org.bukkit.block.data.Directional) {
-                targetBlock = e.getBlock().getRelative(((org.bukkit.block.data.Directional) blockData).getFacing());
-            }
-        }
-
-        if (targetBlock == null)
-            return;
-
-        if (!Materials.isRail(targetBlock.getType()))
-            return;
-
-        Key minecartBlockKey = getMinecartBlockKey(dispenseItemType);
-        if (minecartBlockKey != null) {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                this.worldRecordService.get().recordBlockPlace(minecartBlockKey, targetBlock.getLocation(wrapper.getHandle()),
-                        1, null, REGULAR_RECORD_FLAGS);
-            }
-        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -423,22 +368,20 @@ public class BlockChangesListener implements Listener {
     }
 
     @Nullable
-    private static Key getMinecartBlockKey(Material minecartType) {
-        switch (minecartType.name()) {
-            case "HOPPER_MINECART":
+    private static Key getMinecartBlockKey(EntityType minecartType) {
+        switch (minecartType) {
+            case MINECART_HOPPER:
                 return ConstantKeys.HOPPER;
-            case "COMMAND_MINECART":
-            case "COMMAND_BLOCK_MINECART":
+            case MINECART_COMMAND:
                 return ConstantKeys.COMMAND_BLOCK;
-            case "EXPLOSIVE_MINECART":
-            case "TNT_MINECART":
+            case MINECART_TNT:
                 return ConstantKeys.TNT;
-            case "POWERED_MINECART":
-            case "FURNACE_MINECART":
+            case MINECART_FURNACE:
                 return ConstantKeys.FURNACE;
-            case "STORAGE_MINECART":
-            case "CHEST_MINECART":
+            case MINECART_CHEST:
                 return ConstantKeys.CHEST;
+            case MINECART_MOB_SPAWNER:
+                return ConstantKeys.MOB_SPAWNER;
         }
 
         return null;

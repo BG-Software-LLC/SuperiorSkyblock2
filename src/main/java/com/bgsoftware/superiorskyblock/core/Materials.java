@@ -102,6 +102,10 @@ public enum Materials {
         return MATERIAL_TAGS.get(material) instanceof SpawnEggMaterialTag;
     }
 
+    public static boolean isCarpet(Material material) {
+        return MATERIAL_TAGS.get(material) instanceof CarpetMaterialTag;
+    }
+
     public static Set<Material> getBlocksNonLegacy() {
         return Collections.unmodifiableSet(BLOCK_NON_LEGACY_MATERIALS);
     }
@@ -152,6 +156,8 @@ public enum Materials {
                 enumMap.put(material, DyeMaterialTag.INSTANCE);
             else if (ServerVersion.isLegacy() ? material == Material.MONSTER_EGG : materialName.contains("_SPAWN_EGG"))
                 enumMap.put(material, SpawnEggMaterialTag.INSTANCE);
+            else if (materialName.contains("CARPET"))
+                enumMap.put(material, CarpetMaterialTag.INSTANCE);
         });
         return enumMap;
     }
@@ -233,6 +239,12 @@ public enum Materials {
     private static class SpawnEggMaterialTag implements MaterialTag {
 
         private static final SpawnEggMaterialTag INSTANCE = new SpawnEggMaterialTag();
+
+    }
+
+    private static class CarpetMaterialTag implements MaterialTag {
+
+        private static final CarpetMaterialTag INSTANCE = new CarpetMaterialTag();
 
     }
 

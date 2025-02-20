@@ -3,11 +3,13 @@ package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.nms.NMSEntities;
 import net.minecraft.server.v1_8_R3.Entity;
+import net.minecraft.server.v1_8_R3.Items;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftAnimals;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Animals;
+import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
@@ -32,6 +34,11 @@ public class NMSEntitiesImpl implements NMSEntities {
     @Override
     public boolean isAnimalFood(ItemStack itemStack, Animals animals) {
         return ((CraftAnimals) animals).getHandle().d(CraftItemStack.asNMSCopy(itemStack));
+    }
+
+    @Override
+    public boolean isMinecartFuel(ItemStack bukkitItem, PoweredMinecart minecart) {
+        return CraftItemStack.asNMSCopy(bukkitItem).getItem() == Items.COAL;
     }
 
     @Override

@@ -22,8 +22,8 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -54,7 +54,9 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Mule;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -74,7 +76,18 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     @Nullable
     private static final Material LECTERN = EnumHelper.getEnum(Material.class, "LECTERN");
     @Nullable
-    private static final EntityType AXOLOTL_TYPE = getSafeEntityType("AXOLOTL");
+    private static final Material VAULT = EnumHelper.getEnum(Material.class, "VAULT");
+    @Nullable
+    private static final Material TRIAL_KEY = EnumHelper.getEnum(Material.class, "TRIAL_KEY");
+    @Nullable
+    private static final Material OMINOUS_TRIAL_KEY = EnumHelper.getEnum(Material.class, "OMINOUS_TRIAL_KEY");
+    @Nullable
+    private static final EntityType AXOLOTL_TYPE = EnumHelper.getEnum(EntityType.class, "AXOLOTL");
+    @Nullable
+    private static final EntityType CAMEL_TYPE = EnumHelper.getEnum(EntityType.class, "CAMEL");
+    @Nullable
+    private static final EntityType LLAMA_TYPE = EnumHelper.getEnum(EntityType.class, "LLAMA");
+
     private static final int MAX_PICKUP_DISTANCE = 1;
     private static EnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
     private static KeySet INTERACTABLES_CACHE;
@@ -183,6 +196,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 islandPrivilege = IslandPrivileges.CHEST_ACCESS;
             } else if (blockState instanceof InventoryHolder) {
                 islandPrivilege = IslandPrivileges.USE;
+            } else if (usedItem != null && blockType == VAULT && (usedItem.getType() == TRIAL_KEY || usedItem.getType() == OMINOUS_TRIAL_KEY)) {
+                islandPrivilege = IslandPrivileges.USE;
             } else if (blockState instanceof Sign) {
                 islandPrivilege = IslandPrivileges.SIGN_INTERACT;
             } else if (blockType == Materials.SPAWNER.toBukkitType()) {
@@ -234,23 +249,29 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             Location entityLocation = entity.getLocation(wrapper.getHandle());
             Island island = plugin.getGrid().getIslandAt(entityLocation);
 
+            EntityType entityType = entity.getType();
+            Material usedItemType = usedItem == null ? Material.AIR : usedItem.getType();
+
             IslandPrivilege islandPrivilege;
 
             if (entity instanceof ArmorStand) {
                 islandPrivilege = IslandPrivileges.INTERACT;
             } else if (usedItem != null && entity instanceof Animals && plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) entity)) {
                 islandPrivilege = IslandPrivileges.ANIMAL_BREED;
-            } else if (usedItem != null && usedItem.getType() == Material.NAME_TAG) {
+            } else if (usedItemType == Material.NAME_TAG) {
                 islandPrivilege = IslandPrivileges.NAME_ENTITY;
+            } else if (usedItemType == Material.SADDLE || (entityType == LLAMA_TYPE && Materials.isCarpet(usedItemType))) {
+                islandPrivilege = IslandPrivileges.SADDLE_ENTITY;
             } else if (entity instanceof Villager) {
                 islandPrivilege = IslandPrivileges.VILLAGER_TRADING;
                 closeInventory = true;
-            } else if (entity instanceof Horse || (ServerVersion.isAtLeast(ServerVersion.v1_11) && (entity instanceof Mule || entity instanceof Donkey))) {
+            } else if (entity instanceof Horse || entityType == CAMEL_TYPE ||
+                    (ServerVersion.isAtLeast(ServerVersion.v1_11) && (entity instanceof Mule || entity instanceof Donkey))) {
                 islandPrivilege = IslandPrivileges.HORSE_INTERACT;
                 closeInventory = true;
-            } else if (usedItem != null && entity instanceof Creeper && usedItem.getType() == Material.FLINT_AND_STEEL) {
+            } else if (usedItemType == Material.FLINT_AND_STEEL && entity instanceof Creeper) {
                 islandPrivilege = IslandPrivileges.IGNITE_CREEPER;
-            } else if (usedItem != null && ServerVersion.isAtLeast(ServerVersion.v1_17) && usedItem.getType() == Material.WATER_BUCKET && entity.getType() == AXOLOTL_TYPE) {
+            } else if (usedItemType == Material.WATER_BUCKET && entityType == AXOLOTL_TYPE && ServerVersion.isAtLeast(ServerVersion.v1_17)) {
                 islandPrivilege = IslandPrivileges.PICKUP_AXOLOTL;
             } else if (entity instanceof ItemFrame) {
                 islandPrivilege = IslandPrivileges.ITEM_FRAME;
@@ -258,6 +279,11 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 islandPrivilege = IslandPrivileges.PAINTING;
             } else if (entity instanceof Fish && !ServerVersion.isLegacy()) {
                 islandPrivilege = IslandPrivileges.PICKUP_FISH;
+            } else if (usedItem != null && entity instanceof PoweredMinecart &&
+                    plugin.getNMSEntities().isMinecartFuel(usedItem, (PoweredMinecart) entity)) {
+                islandPrivilege = IslandPrivileges.MINECART_OPEN;
+            } else if (entity instanceof Sheep && Materials.isDye(usedItemType)) {
+                islandPrivilege = IslandPrivileges.DYE_SHEEP;
             } else {
                 return InteractionResult.SUCCESS;
             }
@@ -736,15 +762,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         if (toIsland == null) plugin.getNMSWorld().setWorldBorder(superiorPlayer, null);
 
         return MoveResult.SUCCESS;
-    }
-
-    @Nullable
-    private static EntityType getSafeEntityType(String entityType) {
-        try {
-            return EntityType.valueOf(entityType);
-        } catch (IllegalArgumentException error) {
-            return null;
-        }
     }
 
 }

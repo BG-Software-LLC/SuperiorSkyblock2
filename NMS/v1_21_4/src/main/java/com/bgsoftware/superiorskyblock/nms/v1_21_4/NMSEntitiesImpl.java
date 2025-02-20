@@ -1,13 +1,16 @@
 package com.bgsoftware.superiorskyblock.nms.v1_21_4;
 
 import com.bgsoftware.superiorskyblock.nms.NMSEntities;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PortalProcessor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.entity.CraftAnimals;
 import org.bukkit.craftbukkit.entity.CraftEntity;
+import org.bukkit.craftbukkit.entity.CraftMinecartFurnace;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Animals;
+import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
@@ -31,6 +34,12 @@ public class NMSEntitiesImpl implements NMSEntities {
     @Override
     public boolean isAnimalFood(ItemStack itemStack, Animals animals) {
         return ((CraftAnimals) animals).getHandle().isFood(CraftItemStack.asNMSCopy(itemStack));
+    }
+
+    @Override
+    public boolean isMinecartFuel(ItemStack bukkitItem, PoweredMinecart minecart) {
+        return ((CraftMinecartFurnace) minecart).getHandle().fuel + 3600 <= 32000 &&
+                CraftItemStack.asNMSCopy(bukkitItem).is(ItemTags.FURNACE_MINECART_FUEL);
     }
 
     @Override
