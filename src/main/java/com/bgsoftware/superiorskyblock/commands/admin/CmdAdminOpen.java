@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -57,7 +58,7 @@ public class CmdAdminOpen implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
-        if (plugin.getEventsBus().callIslandOpenEvent(island, sender)) {
+        if (PluginEventsFactory.callIslandOpenEvent(island, sender)) {
             island.setLocked(false);
             Message.ISLAND_OPENED.send(sender);
         }

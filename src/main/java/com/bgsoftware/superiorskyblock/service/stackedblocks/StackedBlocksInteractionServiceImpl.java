@@ -17,10 +17,11 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
@@ -129,7 +130,7 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
 
             int leftAmount = blockAmount - amountToBreak;
 
-            if (!plugin.getEventsBus().callBlockUnstackEvent(block, onlinePlayer, blockAmount, leftAmount))
+            if (!PluginEventsFactory.callBlockUnstackEvent(block, onlinePlayer, blockAmount, leftAmount))
                 return InteractionResult.EVENT_CANCELLED;
 
             if (!plugin.getStackedBlocks().setStackedBlock(block, leftAmount))
@@ -249,7 +250,7 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
 
         int newStackedBlockAmount = blockAmount + amountToDeposit;
 
-        if (onlinePlayer != null && !plugin.getEventsBus().callBlockStackEvent(stackedBlock, onlinePlayer, blockAmount, newStackedBlockAmount))
+        if (onlinePlayer != null && !PluginEventsFactory.callBlockStackEvent(stackedBlock, onlinePlayer, blockAmount, newStackedBlockAmount))
             return InteractionResult.EVENT_CANCELLED;
 
         if (!plugin.getStackedBlocks().setStackedBlock(stackedBlockLocation, blockKey, newStackedBlockAmount))

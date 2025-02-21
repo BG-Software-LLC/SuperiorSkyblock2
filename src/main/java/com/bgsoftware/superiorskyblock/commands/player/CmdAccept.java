@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
@@ -86,7 +87,7 @@ public class CmdAccept implements ISuperiorCommand {
             return;
         }
 
-        if (!plugin.getEventsBus().callIslandJoinEvent(superiorPlayer, island, IslandJoinEvent.Cause.INVITE))
+        if (!PluginEventsFactory.callIslandJoinEvent(island, superiorPlayer, IslandJoinEvent.Cause.INVITE))
             return;
 
         IslandUtils.sendMessage(island, Message.JOIN_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -71,7 +72,7 @@ public class CmdPanel implements ISuperiorCommand {
                 plugin.getCommands().dispatchSubCommand(sender, "visitors");
                 return;
             } else if (args[1].equalsIgnoreCase("toggle")) {
-                if (!plugin.getEventsBus().callPlayerTogglePanelEvent(superiorPlayer))
+                if (!PluginEventsFactory.callPlayerTogglePanelEvent(superiorPlayer))
                     return;
 
                 if (superiorPlayer.hasToggledPanel()) {

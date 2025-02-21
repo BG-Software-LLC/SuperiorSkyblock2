@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -67,18 +68,18 @@ public class CmdAdminClearGenerator implements IAdminIslandCommand {
         if (dimension == null)
             return;
 
-        boolean anyIslandChanged = false;
+        int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            if (!plugin.getEventsBus().callIslandClearGeneratorRatesEvent(sender, island, dimension))
+            if (!PluginEventsFactory.callIslandClearGeneratorRatesEvent(island, sender, dimension))
                 continue;
 
-            anyIslandChanged = true;
+            ++islandsChangedCount;
 
             island.clearGeneratorAmounts(dimension);
         }
 
-        if (!anyIslandChanged)
+        if (islandsChangedCount <= 0)
             return;
 
         if (islands.size() != 1)

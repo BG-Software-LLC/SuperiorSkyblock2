@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
@@ -38,12 +39,12 @@ public class RateIslandButton extends AbstractMenuViewButton<IslandMenuView> {
         Rating rating = getTemplate().rating;
 
         if (rating == Rating.UNKNOWN) {
-            if (!plugin.getEventsBus().callIslandRemoveRatingEvent(inventoryViewer, inventoryViewer, island))
+            if (!PluginEventsFactory.callIslandRemoveRatingEvent(island, inventoryViewer, inventoryViewer))
                 return;
 
             island.removeRating(inventoryViewer);
         } else {
-            if (!plugin.getEventsBus().callIslandRateEvent(inventoryViewer, inventoryViewer, island, rating))
+            if (!PluginEventsFactory.callIslandRateEvent(island, inventoryViewer, inventoryViewer, rating))
                 return;
 
             island.setRating(inventoryViewer, rating);

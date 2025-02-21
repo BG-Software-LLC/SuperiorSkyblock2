@@ -53,9 +53,11 @@ import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
-import com.bgsoftware.superiorskyblock.core.events.EventsBus;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
@@ -547,7 +549,7 @@ public class SIsland implements Island {
 
         superiorPlayer.setIsland(this);
 
-        if (plugin.getEventsBus().callPlayerChangeRoleEvent(superiorPlayer, playerRole)) {
+        if (PluginEventsFactory.callPlayerChangeRoleEvent(superiorPlayer, playerRole)) {
             superiorPlayer.setPlayerRole(playerRole);
         } else {
             superiorPlayer.setPlayerRole(SPlayerRole.defaultRole());
@@ -1772,7 +1774,7 @@ public class SIsland implements Island {
 
         SuperiorPlayer previousOwner = getOwner();
 
-        if (!plugin.getEventsBus().callIslandTransferEvent(this, previousOwner, superiorPlayer))
+        if (!PluginEventsFactory.callIslandTransferEvent(this, previousOwner, superiorPlayer))
             return false;
 
         Log.debug(Debug.TRANSFER_ISLAND, owner.getName(), superiorPlayer.getName());
@@ -3902,8 +3904,7 @@ public class SIsland implements Island {
         Preconditions.checkArgument(percentage >= 0 && percentage <= 100, "Percentage must be between 0 and 100 - got " + percentage + ".");
 
         if (percentage == 0) {
-            if (callEvent && !plugin.getEventsBus().callIslandRemoveGeneratorRateEvent(
-                    caller, this, key, dimension))
+            if (callEvent && !PluginEventsFactory.callIslandRemoveGeneratorRateEvent(this, caller, key, dimension))
                 return false;
 
             removeGeneratorAmount(key, dimension);
@@ -3915,14 +3916,14 @@ public class SIsland implements Island {
             int generatorRate = 1;
 
             if (callEvent) {
-                EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeGeneratorRateEvent(
-                        caller, this, key, dimension, generatorRate);
-                if (eventResult.isCancelled()) {
+                PluginEvent<PluginEventArgs.IslandChangeGeneratorRate> event =
+                        PluginEventsFactory.callIslandChangeGeneratorRateEvent(this, caller, key, dimension, generatorRate);
+                if (event.isCancelled()) {
                     // Restore the original values
                     worldGeneratorRates.putAll(cobbleGeneratorValuesOriginal);
                     return false;
                 }
-                generatorRate = eventResult.getResult();
+                generatorRate = event.getArgs().generatorRate;
             }
 
             setGeneratorAmount(key, generatorRate, dimension);
@@ -3945,13 +3946,13 @@ public class SIsland implements Island {
                 amount *= 10;
             }
 
-            EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeGeneratorRateEvent(caller,
-                    this, key, dimension, (int) Math.round(amount));
+            PluginEvent<PluginEventArgs.IslandChangeGeneratorRate> event =
+                    PluginEventsFactory.callIslandChangeGeneratorRateEvent(this, caller, key, dimension, (int) Math.round(amount));
 
-            if (eventResult.isCancelled())
+            if (event.isCancelled())
                 return false;
 
-            setGeneratorAmount(key, eventResult.getResult(), dimension);
+            setGeneratorAmount(key, event.getArgs().generatorRate, dimension);
         }
 
         return true;
@@ -4202,15 +4203,15 @@ public class SIsland implements Island {
             }
         }
 
-        EventResult<EventsBus.GenerateBlockResult> eventResult = plugin.getEventsBus().callIslandGenerateBlockEvent(
-                this, location, newStateKey);
+        PluginEvent<PluginEventArgs.IslandGenerateBlock> event =
+                PluginEventsFactory.callIslandGenerateBlockEvent(this, location, newStateKey);
 
-        if (eventResult.isCancelled()) {
+        if (event.isCancelled()) {
             Log.debugResult(Debug.GENERATE_BLOCK, "Return Event Cancelled", "null");
             return null;
         }
 
-        Key generatedBlock = eventResult.getResult().getBlock();
+        Key generatedBlock = event.getArgs().block;
 
         if (optimizeDefaultBlock && generatedBlock.equals(defaultBlockKey)) {
             Log.debugResult(Debug.GENERATE_BLOCK, "Return Default Block", generatedBlock);
@@ -4221,7 +4222,7 @@ public class SIsland implements Island {
         handleBlockPlace(generatedBlock, 1);
 
         // Checking whether the plugin should set the block in the world.
-        if (eventResult.getResult().isPlaceBlock()) {
+        if (event.getArgs().placeBlock) {
             int combinedId;
 
             try {
@@ -4536,7 +4537,7 @@ public class SIsland implements Island {
         BigDecimal newLevel = getIslandLevel();
 
         if (oldLevel.compareTo(newLevel) != 0 || oldWorth.compareTo(newWorth) != 0) {
-            BukkitExecutor.async(() -> plugin.getEventsBus().callIslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel), 0L);
+            BukkitExecutor.async(() -> PluginEventsFactory.callIslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel), 0L);
         }
 
         BigInteger deltaBlockCounts = this.lastSavedBlockCounts.subtract(currentTotalBlocksCount);
@@ -5064,7 +5065,7 @@ public class SIsland implements Island {
     }
 
     private void finishCalcIsland(SuperiorPlayer asker, Runnable callback, BigDecimal islandLevel, BigDecimal islandWorth) {
-        plugin.getEventsBus().callIslandWorthCalculatedEvent(this, asker, islandLevel, islandWorth);
+        PluginEventsFactory.callIslandWorthCalculatedEvent(this, asker, islandLevel, islandWorth);
 
         if (asker != null)
             Message.ISLAND_WORTH_RESULT.send(asker, islandWorth, islandLevel);
@@ -5090,8 +5091,8 @@ public class SIsland implements Island {
                 .values().forEach(chunkPositions -> plugin.getNMSChunks().updateCropsTicker(chunkPositions, newCropGrowthMultiplier));
     }
 
-    public static void registerCallbacks(CallbacksBus bus) {
-        bus.registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, SIsland::onSettingsUpdate);
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, SIsland::onSettingsUpdate);
     }
 
     private static void onSettingsUpdate() {

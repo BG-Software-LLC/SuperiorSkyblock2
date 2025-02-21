@@ -13,6 +13,10 @@ import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
+import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import org.bukkit.Bukkit;
@@ -21,17 +25,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.PortalType;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityPortalEnterEvent;
-import org.bukkit.event.entity.EntityPortalEvent;
-import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-public class PortalsListener implements Listener {
+public class PortalsListener extends AbstractGameEventListener {
 
     private final LazyReference<PortalsManagerService> portalsManager = new LazyReference<PortalsManagerService>() {
         @Override
@@ -40,63 +38,49 @@ public class PortalsListener implements Listener {
         }
     };
 
-    private final SuperiorSkyblockPlugin plugin;
-
     public PortalsListener(SuperiorSkyblockPlugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
+        registerListeners();
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerPortal(PlayerPortalEvent e) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-
-        if (superiorPlayer instanceof SuperiorNPCPlayer)
-            return;
-
-        PortalType portalType = (e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ?
-                PortalType.NETHER : PortalType.ENDER;
-
-        EntityPortalResult portalResult = this.portalsManager.get().handlePlayerPortal(superiorPlayer, e.getFrom(),
-                portalType, e.getTo(), true);
-        handleEntityPortal(portalResult, e);
+    private void registerListeners() {
+        registerCallback(GameEventType.ENTITY_PORTAL_EVENT, GameEventPriority.MONITOR, this::onEntityPortal);
+        registerCallback(GameEventType.ENTITY_ENTER_PORTAL_EVENT, GameEventPriority.HIGHEST, this::onEntityEnterPortal);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onEntityPortal(EntityPortalEvent e) {
-        if (e.getTo() == null || e.getTo().getWorld() == null || e.getFrom() == null || e.getFrom().getWorld() == null)
-            return;
-
-        PortalType portalType = e.getTo().getWorld().getEnvironment() == World.Environment.THE_END ||
-                e.getFrom().getWorld().getEnvironment() == World.Environment.THE_END ? PortalType.ENDER : PortalType.NETHER;
-
-        EntityPortalResult portalResult = this.portalsManager.get().handleEntityPortal(e.getEntity(), e.getFrom(),
-                portalType, e.getTo());
-        handleEntityPortal(portalResult, e);
+    private void onEntityPortal(GameEvent<GameEventArgs.EntityPortalEvent> e) {
+        if (e.getArgs().entity instanceof Player)
+            handlePlayerPortal(e);
+        else
+            handleEntityPortalResult(e);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEntityPortalEnter(EntityPortalEnterEvent e) {
+    private void onEntityEnterPortal(GameEvent<GameEventArgs.EntityEnterPortalEvent> e) {
         // Simulate portals in the following cases:
         //  - Using an end portal in the end
         //  - The target world is disabled
 
+        Entity entity = e.getArgs().entity;
+
         Island island;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            island = plugin.getGrid().getIslandAt(e.getEntity().getLocation(wrapper.getHandle()));
+            island = plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()));
         }
 
         if (island == null)
             return;
 
-        World world = e.getLocation().getWorld();
+        Location portalLocation = e.getArgs().portalLocation;
+
+        World world = portalLocation.getWorld();
 
         // Simulate end portal
         if (world.getEnvironment() == World.Environment.THE_END) {
             /* We teleport the player to his island instead of cancelling the event.
             Therefore, we must prevent the player from acting like he entered another island or left his island.*/
 
-            SuperiorPlayer teleportedPlayer = e.getEntity() instanceof Player ?
-                    plugin.getPlayers().getSuperiorPlayer((Player) e.getEntity()) : null;
+            SuperiorPlayer teleportedPlayer = entity instanceof Player ?
+                    plugin.getPlayers().getSuperiorPlayer((Player) entity) : null;
 
             if (teleportedPlayer != null)
                 teleportedPlayer.setPlayerStatus(PlayerStatus.LEAVING_ISLAND);
@@ -108,7 +92,7 @@ public class PortalsListener implements Listener {
                         if (teleportedPlayer != null)
                             teleportedPlayer.removePlayerStatus(PlayerStatus.LEAVING_ISLAND);
                     }).ifLeft(unused -> {
-                        EntityTeleports.teleportUntilSuccess(e.getEntity(),
+                        EntityTeleports.teleportUntilSuccess(entity,
                                 island.getIslandHome(dimension), 5, () -> {
                                     if (teleportedPlayer != null)
                                         teleportedPlayer.removePlayerStatus(PlayerStatus.LEAVING_ISLAND);
@@ -122,9 +106,9 @@ public class PortalsListener implements Listener {
         if (ServerVersion.isLessThan(ServerVersion.v1_16))
             return;
 
-        boolean isPlayer = e.getEntity() instanceof Player;
+        boolean isPlayer = entity instanceof Player;
 
-        Material originalMaterial = e.getLocation().getBlock().getType();
+        Material originalMaterial = portalLocation.getBlock().getType();
 
         PortalType portalType = originalMaterial == Materials.NETHER_PORTAL.toBukkitType() ? PortalType.NETHER : PortalType.ENDER;
 
@@ -132,21 +116,53 @@ public class PortalsListener implements Listener {
             return;
 
         if (portalType == PortalType.NETHER) {
-            int ticksDelay = !isPlayer ? 0 : ((Player) e.getEntity()).getGameMode() == GameMode.CREATIVE ? 1 : 80;
-            int portalTicks = plugin.getNMSEntities().getPortalTicks(e.getEntity());
+            int ticksDelay = !isPlayer ? 0 : ((Player) entity).getGameMode() == GameMode.CREATIVE ? 1 : 80;
+            int portalTicks = plugin.getNMSEntities().getPortalTicks(entity);
             if (portalTicks != ticksDelay)
                 return;
         }
 
         if (isPlayer) {
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getEntity());
-            this.portalsManager.get().handlePlayerPortalFromIsland(superiorPlayer, island, e.getLocation(), portalType, true);
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(entity);
+            this.portalsManager.get().handlePlayerPortalFromIsland(superiorPlayer, island, portalLocation, portalType, true);
         } else {
-            this.portalsManager.get().handleEntityPortalFromIsland(e.getEntity(), island, e.getLocation(), portalType);
+            this.portalsManager.get().handleEntityPortalFromIsland(entity, island, portalLocation, portalType);
         }
     }
 
-    private void handleEntityPortal(EntityPortalResult portalResult, Cancellable event) {
+    private void handlePlayerPortal(GameEvent<GameEventArgs.EntityPortalEvent> e) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getArgs().entity);
+
+        if (superiorPlayer instanceof SuperiorNPCPlayer)
+            return;
+
+        PortalType portalType = (e.getArgs().cause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ?
+                PortalType.NETHER : PortalType.ENDER;
+
+        EntityPortalResult portalResult = this.portalsManager.get().handlePlayerPortal(
+                superiorPlayer, e.getArgs().from, portalType, e.getArgs().to, true);
+
+        handleEntityPortalResult(portalResult, e);
+    }
+
+    public void handleEntityPortalResult(GameEvent<GameEventArgs.EntityPortalEvent> e) {
+        Location from = e.getArgs().from;
+        Location to = e.getArgs().to;
+
+        if (to == null || to.getWorld() == null || from == null || from.getWorld() == null)
+            return;
+
+        Entity entity = e.getArgs().entity;
+
+        PortalType portalType = (e.getArgs().cause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ?
+                PortalType.NETHER : PortalType.ENDER;
+
+        EntityPortalResult portalResult = this.portalsManager.get().handleEntityPortal(entity, from, portalType, to);
+
+        handleEntityPortalResult(portalResult, e);
+    }
+
+    private void handleEntityPortalResult(EntityPortalResult portalResult, GameEvent<GameEventArgs.EntityPortalEvent> event) {
         switch (portalResult) {
             case PORTAL_NOT_IN_ISLAND:
                 return;
@@ -159,7 +175,7 @@ public class PortalsListener implements Listener {
             case WORLD_NOT_UNLOCKED:
             case DESTINATION_ISLAND_NOT_PERMITTED:
             case SUCCEED:
-                event.setCancelled(true);
+                event.setCancelled();
                 return;
             default:
                 throw new IllegalStateException("No handling for result: " + portalResult);

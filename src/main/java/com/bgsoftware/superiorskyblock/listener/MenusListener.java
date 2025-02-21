@@ -1,85 +1,99 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
+import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
-public class MenusListener implements Listener {
+public class MenusListener extends AbstractGameEventListener {
 
     private final Map<UUID, ItemStack> latestClickedItem = AutoRemovalMap.newHashMap(1, TimeUnit.SECONDS);
 
+    public MenusListener(SuperiorSkyblockPlugin plugin) {
+        super(plugin);
+
+        registerCallback(GameEventType.INVENTORY_CLICK_EVENT, GameEventPriority.MONITOR, false, this::onInventoryClickDupePatch);
+        registerCallback(GameEventType.INVENTORY_CLOSE_EVENT, GameEventPriority.MONITOR, false, this::onInventoryCloseDupePatch);
+        registerCallback(GameEventType.INVENTORY_CLICK_EVENT, GameEventPriority.NORMAL, this::onMenuClick);
+        registerCallback(GameEventType.INVENTORY_CLOSE_EVENT, GameEventPriority.NORMAL, this::onMenuClose);
+    }
+
     /*
      * The following two events are here for patching a dupe glitch caused
-     * by shift clicking and closing the inventory in the same time.
+     * by shift clicking and closing the inventory at the same time.
      */
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    private void onInventoryClickMonitor(InventoryClickEvent e) {
-        if (e.getCurrentItem() != null && e.isCancelled() && e.getClickedInventory().getHolder() instanceof MenuView) {
-            latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
+    private void onInventoryClickDupePatch(GameEvent<GameEventArgs.InventoryClickEvent> e) {
+        if (!e.isCancelled())
+            return;
+
+        ItemStack clickedItem = e.getArgs().bukkitEvent.getCurrentItem();
+        Inventory inventory = e.getArgs().bukkitEvent.getClickedInventory();
+
+        if (clickedItem != null && inventory != null && inventory.getHolder() instanceof MenuView) {
+            latestClickedItem.put(e.getArgs().bukkitEvent.getWhoClicked().getUniqueId(), clickedItem);
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    private void onInventoryCloseMonitor(InventoryCloseEvent e) {
-        ItemStack clickedItem = latestClickedItem.get(e.getPlayer().getUniqueId());
+    private void onInventoryCloseDupePatch(GameEvent<GameEventArgs.InventoryCloseEvent> e) {
+        Player player = (Player) e.getArgs().bukkitEvent.getPlayer();
+        ItemStack clickedItem = latestClickedItem.get(player.getUniqueId());
         if (clickedItem != null) {
             BukkitExecutor.sync(() -> {
-                e.getPlayer().getInventory().removeItem(clickedItem);
-                ((Player) e.getPlayer()).updateInventory();
+                player.getInventory().removeItem(clickedItem);
+                player.updateInventory();
             }, 1L);
         }
     }
 
     /* MENU INTERACTIONS HANDLING */
 
+    private void onMenuClick(GameEvent<GameEventArgs.InventoryClickEvent> e) {
+        InventoryView inventoryView = e.getArgs().bukkitEvent.getView();
+        Inventory clickedInventory = e.getArgs().bukkitEvent.getClickedInventory();
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    private void onMenuClick(InventoryClickEvent e) {
-        if (!(e.getWhoClicked() instanceof Player) || e.getView().getTopInventory() == null ||
-                e.getClickedInventory() == null)
+        Inventory topInventory = inventoryView.getTopInventory();
+
+        if (topInventory == null || clickedInventory == null)
             return;
 
-        InventoryHolder inventoryHolder = e.getView().getTopInventory().getHolder();
+        InventoryHolder inventoryHolder = topInventory.getHolder();
 
         if (inventoryHolder instanceof MenuView) {
-            e.setCancelled(true);
+            e.setCancelled();
 
-            if (e.getClickedInventory().equals(e.getView().getTopInventory())) {
+            if (clickedInventory.equals(topInventory)) {
                 MenuView menuView = (MenuView) inventoryHolder;
-                menuView.getMenu().onClick(e, menuView);
+                menuView.getMenu().onClick(e.getArgs().bukkitEvent, menuView);
             }
         } else if (inventoryHolder instanceof StackedBlocksDepositMenu) {
-            ((StackedBlocksDepositMenu) inventoryHolder).onInteract(e);
+            ((StackedBlocksDepositMenu) inventoryHolder).onInteract(e.getArgs().bukkitEvent);
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    private void onMenuClose(InventoryCloseEvent e) {
-        InventoryHolder inventoryHolder = e.getInventory() == null ? null : e.getInventory().getHolder();
-
-        if (!(e.getPlayer() instanceof Player))
-            return;
+    private void onMenuClose(GameEvent<GameEventArgs.InventoryCloseEvent> e) {
+        Inventory topInventory = e.getArgs().bukkitEvent.getView().getTopInventory();
+        InventoryHolder inventoryHolder = topInventory == null ? null : topInventory.getHolder();
 
         if (inventoryHolder instanceof MenuView) {
             MenuView menuView = (MenuView) inventoryHolder;
-            menuView.getMenu().onClose(e, menuView);
+            menuView.getMenu().onClose(e.getArgs().bukkitEvent, menuView);
         } else if (inventoryHolder instanceof StackedBlocksDepositMenu) {
-            ((StackedBlocksDepositMenu) inventoryHolder).onClose(e);
+            ((StackedBlocksDepositMenu) inventoryHolder).onClose(e.getArgs().bukkitEvent);
         }
     }
 

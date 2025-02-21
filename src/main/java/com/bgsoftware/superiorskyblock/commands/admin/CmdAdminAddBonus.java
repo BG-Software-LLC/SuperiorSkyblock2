@@ -9,7 +9,9 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -72,27 +74,27 @@ public class CmdAdminAddBonus implements IAdminIslandCommand {
         if (bonus == null)
             return;
 
-        boolean anyIslandChanged = false;
+        int islandsChangedCount = 0;
 
         for (Island island : islands) {
             if (isWorthBonus) {
-                EventResult<BigDecimal> eventResult = plugin.getEventsBus().callIslandChangeWorthBonusEvent(sender, island,
-                        IslandChangeWorthBonusEvent.Reason.COMMAND, island.getBonusWorth().add(bonus));
-                if (!eventResult.isCancelled()) {
-                    island.setBonusWorth(eventResult.getResult());
-                    anyIslandChanged = true;
+                PluginEvent<PluginEventArgs.IslandChangeWorthBonus> event = PluginEventsFactory.callIslandChangeWorthBonusEvent(
+                        island, sender, IslandChangeWorthBonusEvent.Reason.COMMAND, island.getBonusWorth().add(bonus));
+                if (!event.isCancelled()) {
+                    island.setBonusWorth(event.getArgs().worthBonus);
+                    ++islandsChangedCount;
                 }
             } else {
-                EventResult<BigDecimal> eventResult = plugin.getEventsBus().callIslandChangeLevelBonusEvent(sender, island,
-                        IslandChangeLevelBonusEvent.Reason.COMMAND, island.getBonusLevel().add(bonus));
-                if (!eventResult.isCancelled()) {
-                    island.setBonusLevel(eventResult.getResult());
-                    anyIslandChanged = true;
+                PluginEvent<PluginEventArgs.IslandChangeLevelBonus> event = PluginEventsFactory.callIslandChangeLevelBonusEvent(
+                        island, sender, IslandChangeLevelBonusEvent.Reason.COMMAND, island.getBonusLevel().add(bonus));
+                if (!event.isCancelled()) {
+                    island.setBonusLevel(event.getArgs().levelBonus);
+                    ++islandsChangedCount;
                 }
             }
         }
 
-        if (!anyIslandChanged)
+        if (islandsChangedCount <= 0)
             return;
 
         Message.BONUS_SET_SUCCESS.send(sender, bonus.toString());

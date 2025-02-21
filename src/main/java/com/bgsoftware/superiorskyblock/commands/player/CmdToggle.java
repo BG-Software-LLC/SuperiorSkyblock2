@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -60,7 +61,7 @@ public class CmdToggle implements ISuperiorCommand {
                 return;
             }
 
-            if (!plugin.getEventsBus().callPlayerToggleBorderEvent(superiorPlayer))
+            if (!PluginEventsFactory.callPlayerToggleBorderEvent(superiorPlayer))
                 return;
 
             if (superiorPlayer.hasWorldBorderEnabled()) {
@@ -79,7 +80,7 @@ public class CmdToggle implements ISuperiorCommand {
                 return;
             }
 
-            if (!plugin.getEventsBus().callPlayerToggleBlocksStackerEvent(superiorPlayer))
+            if (!PluginEventsFactory.callPlayerToggleBlocksStackerEvent(superiorPlayer))
                 return;
 
             if (superiorPlayer.hasBlocksStackerEnabled()) {

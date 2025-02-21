@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -61,21 +62,21 @@ public class CmdAdminRemoveRatings implements IAdminIslandCommand {
         boolean removingAllRatings = targetPlayer == null;
         Collection<Island> iterIslands = removingAllRatings ? islands : plugin.getGrid().getIslands();
 
-        boolean anyIslandChanged = false;
+        int islandsChangedCount = 0;
 
         for (Island island : iterIslands) {
             if (removingAllRatings) {
-                if (plugin.getEventsBus().callIslandClearRatingsEvent(sender, island)) {
-                    anyIslandChanged = true;
+                if (PluginEventsFactory.callIslandClearRatingsEvent(island, sender)) {
+                    ++islandsChangedCount;
                     island.removeRatings();
                 }
-            } else if (plugin.getEventsBus().callIslandRemoveRatingEvent(sender, targetPlayer, island)) {
-                anyIslandChanged = true;
+            } else if (PluginEventsFactory.callIslandRemoveRatingEvent(island, sender, targetPlayer)) {
+                ++islandsChangedCount;
                 island.removeRating(targetPlayer);
             }
         }
 
-        if (!anyIslandChanged)
+        if (islandsChangedCount <= 0)
             return;
 
         if (!removingAllRatings)

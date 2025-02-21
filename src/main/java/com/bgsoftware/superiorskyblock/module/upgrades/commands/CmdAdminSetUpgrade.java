@@ -10,8 +10,9 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
-import com.bgsoftware.superiorskyblock.core.events.EventsBus;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -84,10 +85,10 @@ public class CmdAdminSetUpgrade implements IAdminIslandCommand {
             return;
         }
 
-        EventResult<EventsBus.UpgradeResult> eventResult = plugin.getEventsBus().callIslandUpgradeEvent(
-                sender, island, upgrade, upgrade.getUpgradeLevel(level), IslandUpgradeEvent.Cause.ADMIN_SET_UPGRADE);
+        PluginEvent<PluginEventArgs.IslandUpgrade> event = PluginEventsFactory.callIslandUpgradeEvent(
+                island, sender, upgrade, upgrade.getUpgradeLevel(level), IslandUpgradeEvent.Cause.ADMIN_SET_UPGRADE);
 
-        if (eventResult.isCancelled())
+        if (event.isCancelled())
             return;
 
         island.setUpgradeLevel(upgrade, level);

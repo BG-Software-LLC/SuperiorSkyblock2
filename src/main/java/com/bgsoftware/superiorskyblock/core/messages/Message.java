@@ -12,7 +12,9 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
@@ -393,9 +395,9 @@ public enum Message {
 
                 IMessageComponent messageComponent = ComplexMessageComponent.of(baseComponents);
                 if (messageComponent != null) {
-                    EventResult<IMessageComponent> eventResult = plugin.getEventsBus().callSendMessageEvent(sender, name(), messageComponent, args);
-                    if (!eventResult.isCancelled())
-                        eventResult.getResult().sendMessage(sender, args);
+                    PluginEvent<PluginEventArgs.SendMessage> event = PluginEventsFactory.callSendMessageEvent(sender, name(), messageComponent, args);
+                    if (!event.isCancelled())
+                        event.getArgs().messageComponent.sendMessage(sender, args);
                 }
             }
         }
@@ -946,14 +948,14 @@ public enum Message {
     }
 
     public final void send(SuperiorPlayer superiorPlayer, Object... args) {
-        if (plugin.getEventsBus().callAttemptPlayerSendMessageEvent(superiorPlayer, name(), args))
+        if (PluginEventsFactory.callAttemptPlayerSendMessageEvent(superiorPlayer, name(), args))
             superiorPlayer.runIfOnline(player -> send(player, superiorPlayer.getUserLocale(), args));
     }
 
     public final void send(CommandSender sender, Object... args) {
         if (sender instanceof Player) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-            if (!plugin.getEventsBus().callAttemptPlayerSendMessageEvent(superiorPlayer, name(), args))
+            if (!PluginEventsFactory.callAttemptPlayerSendMessageEvent(superiorPlayer, name(), args))
                 return;
         }
 
@@ -971,9 +973,9 @@ public enum Message {
                 return;
         }
 
-        EventResult<IMessageComponent> eventResult = plugin.getEventsBus().callSendMessageEvent(sender, name(), messageComponent, objects);
-        if (!eventResult.isCancelled()) {
-            eventResult.getResult().sendMessage(sender, objects);
+        PluginEvent<PluginEventArgs.SendMessage> event = PluginEventsFactory.callSendMessageEvent(sender, name(), messageComponent, objects);
+        if (!event.isCancelled()) {
+            event.getArgs().messageComponent.sendMessage(sender, objects);
             if (!(sender instanceof Player) && Log.isDebugged(Debug.SHOW_STACKTRACE)) {
                 Thread.dumpStack();
             }

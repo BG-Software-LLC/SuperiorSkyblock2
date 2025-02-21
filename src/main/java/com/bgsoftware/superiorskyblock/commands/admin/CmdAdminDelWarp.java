@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.warp.SignWarp;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
@@ -70,7 +71,7 @@ public class CmdAdminDelWarp implements IAdminIslandCommand {
         if (islandWarp == null)
             return;
 
-        if (!plugin.getEventsBus().callIslandDeleteWarpEvent(sender, islandWarp.getIsland(), islandWarp))
+        if (!PluginEventsFactory.callIslandDeleteWarpEvent(islandWarp.getIsland(), sender, islandWarp))
             return;
 
         island.deleteWarp(islandWarp.getName());

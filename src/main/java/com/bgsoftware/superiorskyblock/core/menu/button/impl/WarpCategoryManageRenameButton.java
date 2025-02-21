@@ -3,7 +3,9 @@ package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
@@ -44,13 +46,13 @@ public class WarpCategoryManageRenameButton extends AbstractMenuViewButton<MenuW
                     return true;
                 }
 
-                EventResult<String> eventResult = plugin.getEventsBus().callIslandRenameWarpCategoryEvent(
+                PluginEvent<PluginEventArgs.IslandRenameWarpCategory> event = PluginEventsFactory.callIslandRenameWarpCategoryEvent(
                         warpCategory.getIsland(), plugin.getPlayers().getSuperiorPlayer(player), warpCategory, newName);
 
-                if (!eventResult.isCancelled()) {
-                    warpCategory.getIsland().renameCategory(warpCategory, eventResult.getResult());
+                if (!event.isCancelled()) {
+                    warpCategory.getIsland().renameCategory(warpCategory, event.getArgs().categoryName);
 
-                    Message.WARP_CATEGORY_RENAME_SUCCESS.send(player, eventResult.getResult());
+                    Message.WARP_CATEGORY_RENAME_SUCCESS.send(player, event.getArgs().categoryName);
 
                     GameSoundImpl.playSound(player, Menus.MENU_WARP_CATEGORY_MANAGE.getSuccessUpdateSound());
                 }

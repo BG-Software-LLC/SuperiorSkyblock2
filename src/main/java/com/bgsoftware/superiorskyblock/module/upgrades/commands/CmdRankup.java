@@ -15,8 +15,9 @@ import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
-import com.bgsoftware.superiorskyblock.core.events.EventsBus;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -115,10 +116,10 @@ public class CmdRankup implements IPermissibleCommand {
                 Message.CUSTOM.send(superiorPlayer, requiredCheckFailure, false);
                 hasNextLevel = false;
             } else {
-                EventResult<EventsBus.UpgradeResult> event = plugin.getEventsBus().callIslandUpgradeEvent(
-                        superiorPlayer, island, upgrade, currentLevel, nextLevel, IslandUpgradeEvent.Cause.PLAYER_RANKUP);
+                PluginEvent<PluginEventArgs.IslandUpgrade> event = PluginEventsFactory.callIslandUpgradeEvent(
+                        island, superiorPlayer, upgrade, currentLevel, nextLevel, IslandUpgradeEvent.Cause.PLAYER_RANKUP);
 
-                UpgradeCost upgradeCost = event.getResult().getUpgradeCost();
+                UpgradeCost upgradeCost = event.getArgs().upgradeCost;
 
                 if (event.isCancelled()) {
                     hasNextLevel = false;
@@ -130,7 +131,7 @@ public class CmdRankup implements IPermissibleCommand {
                 } else {
                     upgradeCost.withdrawCost(superiorPlayer);
 
-                    for (String command : event.getResult().getCommands()) {
+                    for (String command : event.getArgs().commands) {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                                 placeholdersService.get().parsePlaceholders(superiorPlayer.asOfflinePlayer(), command
                                         .replace("%player%", superiorPlayer.getName())

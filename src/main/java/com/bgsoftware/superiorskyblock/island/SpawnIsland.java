@@ -41,7 +41,8 @@ import com.bgsoftware.superiorskyblock.core.WorldInfoImpl;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
-import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.persistence.EmptyPersistentDataContainer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
@@ -97,8 +98,8 @@ public class SpawnIsland implements Island {
     private static EnumerateSet<IslandFlag> DEFAULT_SPAWN_FLAGS_CACHE;
     private static EnumerateSet<IslandPrivilege> DEFAULT_SPAWN_PRIVILEGES_CACHE;
 
-    public static void registerCallbacks(CallbacksBus bus) {
-        bus.registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, SpawnIsland::onSettingsUpdate);
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, SpawnIsland::onSettingsUpdate);
     }
 
     private static void onSettingsUpdate() {

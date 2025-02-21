@@ -8,7 +8,9 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
@@ -102,7 +104,7 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
 
         AbstractMenu menu = (AbstractMenu) getMenu();
 
-        if (!plugin.getEventsBus().callPlayerOpenMenuEvent(inventoryViewer, this))
+        if (!PluginEventsFactory.callPlayerOpenMenuEvent(inventoryViewer, this))
             return;
 
         Log.debug(Debug.OPEN_MENU, inventoryViewer.getName());
@@ -147,17 +149,17 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
         if (!nextMove && !closeButton && plugin.getSettings().isOnlyBackButton()) {
             BukkitExecutor.sync(this::openView);
         } else if (this.previousMenuView != null && this.menu.isPreviousMoveAllowed()) {
-            EventResult<MenuView<?, ?>> eventResult = plugin.getEventsBus().callPlayerCloseMenuEvent(this.inventoryViewer,
-                    this, previousMove ? this.previousMenuView : null);
+            PluginEvent<PluginEventArgs.PlayerCloseMenu> event = PluginEventsFactory.callPlayerCloseMenuEvent(
+                    this.inventoryViewer, this, previousMove ? this.previousMenuView : null);
 
             if (previousMove) {
-                if (!eventResult.isCancelled()) {
-                    MenuView<?, ?> newMenu = eventResult.getResult();
+                if (!event.isCancelled()) {
+                    MenuView<?, ?> newMenu = event.getArgs().newMenuView;
                     if (newMenu != null)
                         BukkitExecutor.sync(newMenu::refreshView);
 
                 }
-            } else if (eventResult.isCancelled()) {
+            } else if (event.isCancelled()) {
                 BukkitExecutor.sync(this::openView);
             } else {
                 previousMove = true;

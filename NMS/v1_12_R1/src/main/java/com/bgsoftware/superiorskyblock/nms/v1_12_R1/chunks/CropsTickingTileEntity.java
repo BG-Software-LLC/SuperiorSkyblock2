@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
-import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import net.minecraft.server.v1_12_R1.Block;
@@ -33,7 +33,7 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
     private static Set<Block> CROPS_TO_GROW_CACHE;
 
     static {
-        plugin.getCallbacksBus().registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, CropsTickingTileEntity::onSettingsUpdate);
+        plugin.getPluginEventsDispatcher().registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, CropsTickingTileEntity::onSettingsUpdate);
     }
 
     private static final Long2ObjectMapView<CropsTickingTileEntity> tickingChunks = CollectionsFactory.createLong2ObjectHashMap();

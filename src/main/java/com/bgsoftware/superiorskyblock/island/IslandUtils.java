@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -204,7 +205,7 @@ public class IslandUtils {
     }
 
     public static void handleKickPlayer(SuperiorPlayer caller, String callerName, Island island, SuperiorPlayer target) {
-        if (!plugin.getEventsBus().callIslandKickEvent(caller, target, island))
+        if (!PluginEventsFactory.callIslandKickEvent(island, caller, target))
             return;
 
         island.kickMember(target);
@@ -231,7 +232,7 @@ public class IslandUtils {
     }
 
     public static void handleBanPlayer(SuperiorPlayer caller, Island island, SuperiorPlayer target) {
-        if (!plugin.getEventsBus().callIslandBanEvent(caller, target, island))
+        if (!PluginEventsFactory.callIslandBanEvent(island, caller, target))
             return;
 
         island.banMember(target, caller);
@@ -245,7 +246,7 @@ public class IslandUtils {
         plugin.getNMSChunks().deleteChunks(island, chunkPositions, onFinish);
         chunkPositions.forEach(chunkPosition -> {
             plugin.getStackedBlocks().removeStackedBlocks(chunkPosition);
-            plugin.getEventsBus().callIslandChunkResetEvent(island, chunkPosition);
+            PluginEventsFactory.callIslandChunkResetEvent(island, chunkPosition);
         });
     }
 
@@ -263,13 +264,13 @@ public class IslandUtils {
 
     public static boolean handleBorderColorUpdate(SuperiorPlayer superiorPlayer, BorderColor borderColor) {
         if (!superiorPlayer.hasWorldBorderEnabled()) {
-            if (!plugin.getEventsBus().callPlayerToggleBorderEvent(superiorPlayer))
+            if (!PluginEventsFactory.callPlayerToggleBorderEvent(superiorPlayer))
                 return false;
 
             superiorPlayer.toggleWorldBorder();
         }
 
-        if (!plugin.getEventsBus().callPlayerChangeBorderColorEvent(superiorPlayer, borderColor))
+        if (!PluginEventsFactory.callPlayerChangeBorderColorEvent(superiorPlayer, borderColor))
             return false;
 
         superiorPlayer.setBorderColor(borderColor);

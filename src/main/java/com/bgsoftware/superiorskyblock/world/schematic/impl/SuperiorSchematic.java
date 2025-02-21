@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.ByteBigArray;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.VarintArray;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
@@ -301,7 +302,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
                     island.handleBlocksPlace(cachedCounts);
 
-                    plugin.getEventsBus().callIslandSchematicPasteEvent(island, name, location);
+                    PluginEventsFactory.callIslandSchematicPasteEvent(island, null, name, location);
 
                     Profiler.end(profiler);
 

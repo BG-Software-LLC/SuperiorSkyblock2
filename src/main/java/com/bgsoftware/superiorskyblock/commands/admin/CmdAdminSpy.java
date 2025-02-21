@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import org.bukkit.command.CommandSender;
@@ -50,7 +51,7 @@ public class CmdAdminSpy implements ISuperiorCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
-        if (!plugin.getEventsBus().callPlayerToggleSpyEvent(superiorPlayer))
+        if (!PluginEventsFactory.callPlayerToggleSpyEvent(superiorPlayer))
             return;
 
         if (superiorPlayer.hasAdminSpyEnabled()) {

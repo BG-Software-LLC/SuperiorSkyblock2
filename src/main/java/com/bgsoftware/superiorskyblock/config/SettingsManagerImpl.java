@@ -23,7 +23,7 @@ import com.bgsoftware.superiorskyblock.config.section.VoidTeleportSection;
 import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
-import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -83,7 +83,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
         loadContainerFromConfig(cfg);
 
-        plugin.getCallbacksBus().notifyCallbacks(CallbacksBus.CallbackType.SETTINGS_UPDATE);
+        PluginEventsFactory.callSettingsUpdateEvent();
     }
 
     @Override

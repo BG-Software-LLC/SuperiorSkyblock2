@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
@@ -131,7 +132,7 @@ public class CmdSetRole implements IPermissibleCommand {
 
         PlayerRole currentRole = targetPlayer.getPlayerRole();
 
-        if (!plugin.getEventsBus().callPlayerChangeRoleEvent(targetPlayer, playerRole))
+        if (!PluginEventsFactory.callPlayerChangeRoleEvent(targetPlayer, playerRole))
             return;
 
         targetPlayer.setPlayerRole(playerRole);

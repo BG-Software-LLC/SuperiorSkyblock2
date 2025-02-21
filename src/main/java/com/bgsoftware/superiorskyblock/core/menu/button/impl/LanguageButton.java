@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
@@ -34,7 +35,7 @@ public class LanguageButton extends AbstractMenuViewButton<BaseMenuView> {
 
         Locale language = getTemplate().language;
 
-        if (!plugin.getEventsBus().callPlayerChangeLanguageEvent(inventoryViewer, language))
+        if (!PluginEventsFactory.callPlayerChangeLanguageEvent(inventoryViewer, language))
             return;
 
         inventoryViewer.setUserLocale(language);

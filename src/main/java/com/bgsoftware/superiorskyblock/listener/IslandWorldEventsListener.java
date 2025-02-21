@@ -6,16 +6,15 @@ import com.bgsoftware.superiorskyblock.api.service.hologram.HologramsService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
+import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import org.bukkit.Location;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.entity.Entity;
 
-public class IslandWorldEventsListener implements Listener {
+public class IslandWorldEventsListener extends AbstractGameEventListener {
 
-    private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<HologramsService> hologramsService = new LazyReference<HologramsService>() {
         @Override
         protected HologramsService create() {
@@ -24,17 +23,19 @@ public class IslandWorldEventsListener implements Listener {
     };
 
     public IslandWorldEventsListener(SuperiorSkyblockPlugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
+
+        registerCallback(GameEventType.BLOCK_REDSTONE_EVENT, GameEventPriority.HIGHEST, this::onBlockRedstone);
+        registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.HIGHEST, this::onEntitySpawn);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private void onBlockRedstone(BlockRedstoneEvent e) {
+    private void onBlockRedstone(GameEvent<GameEventArgs.BlockRedstoneEvent> e) {
         if (!plugin.getSettings().isDisableRedstoneOffline() && !plugin.getSettings().getAFKIntegrations().isDisableRedstone())
             return;
 
         Island island;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            island = plugin.getGrid().getIslandAt(e.getBlock().getLocation(wrapper.getHandle()));
+            island = plugin.getGrid().getIslandAt(e.getArgs().block.getLocation(wrapper.getHandle()));
         }
 
         if (island == null || island.isSpawn())
@@ -43,25 +44,26 @@ public class IslandWorldEventsListener implements Listener {
         if ((plugin.getSettings().isDisableRedstoneOffline() && !island.isCurrentlyActive()) ||
                 (plugin.getSettings().getAFKIntegrations().isDisableRedstone() &&
                         island.getAllPlayersInside().stream().allMatch(SuperiorPlayer::isAFK))) {
-            e.setNewCurrent(0);
+            e.setCancelled();
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private void onEntitySpawn(CreatureSpawnEvent e) {
+    private void onEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
+        Entity entity = e.getArgs().entity;
+
         if (!plugin.getSettings().getAFKIntegrations().isDisableSpawning() ||
-                hologramsService.get().isHologram(e.getEntity()))
+                hologramsService.get().isHologram(entity))
             return;
 
         Island island;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            island = plugin.getGrid().getIslandAt(e.getEntity().getLocation(wrapper.getHandle()));
+            island = plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()));
         }
 
         if (island == null || island.isSpawn() || !island.getAllPlayersInside().stream().allMatch(SuperiorPlayer::isAFK))
             return;
 
-        e.setCancelled(true);
+        e.setCancelled();
     }
 
 }

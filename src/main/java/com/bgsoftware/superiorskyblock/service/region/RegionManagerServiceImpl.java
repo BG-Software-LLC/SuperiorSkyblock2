@@ -20,7 +20,9 @@ import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
-import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
@@ -98,8 +100,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         this.plugin = plugin;
     }
 
-    public static void registerCallbacks(CallbacksBus bus) {
-        bus.registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, RegionManagerServiceImpl::onSettingsUpdate);
+    public static void registerCallbacks(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, RegionManagerServiceImpl::onSettingsUpdate);
     }
 
     private static void onSettingsUpdate() {
@@ -618,14 +620,14 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         // Checking if the player is banned from the island.
         if (toIsland.isBanned(superiorPlayer) && !superiorPlayer.hasBypassModeEnabled() && !superiorPlayer.hasPermissionWithoutOP("superior.admin.ban.bypass")) {
-            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.BANNED_FROM_ISLAND);
+            PluginEventsFactory.callIslandRestrictMoveEvent(toIsland, superiorPlayer, IslandRestrictMoveEvent.RestrictReason.BANNED_FROM_ISLAND);
             Message.BANNED_FROM_ISLAND.send(superiorPlayer);
             return MoveResult.BANNED_FROM_ISLAND;
         }
 
         // Checking if the player is locked to visitors.
         if (toIsland.isLocked() && !toIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)) {
-            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LOCKED_ISLAND);
+            PluginEventsFactory.callIslandRestrictMoveEvent(toIsland, superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LOCKED_ISLAND);
             Message.NO_CLOSE_BYPASS.send(superiorPlayer);
             return MoveResult.ISLAND_LOCKED;
         }
@@ -637,8 +639,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         boolean fromInsideRange = from != null && fromIsland != null && fromIsland.isInsideRange(from);
         boolean equalWorlds = from != null && to.getWorld().equals(from.getWorld());
 
-        if (toInsideRange && (!equalIslands || !fromInsideRange) && !plugin.getEventsBus().callIslandEnterProtectedEvent(superiorPlayer, toIsland, enterCause)) {
-            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.ENTER_PROTECTED_EVENT_CANCELLED);
+        if (toInsideRange && (!equalIslands || !fromInsideRange) && !PluginEventsFactory.callIslandEnterProtectedEvent(toIsland, superiorPlayer, enterCause)) {
+            PluginEventsFactory.callIslandRestrictMoveEvent(toIsland, superiorPlayer, IslandRestrictMoveEvent.RestrictReason.ENTER_PROTECTED_EVENT_CANCELLED);
             return MoveResult.ENTER_EVENT_CANCELLED;
         }
 
@@ -654,8 +656,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             return MoveResult.SUCCESS;
         }
 
-        if (!plugin.getEventsBus().callIslandEnterEvent(superiorPlayer, toIsland, enterCause)) {
-            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.ENTER_EVENT_CANCELLED);
+        if (!PluginEventsFactory.callIslandEnterEvent(toIsland, superiorPlayer, enterCause)) {
+            PluginEventsFactory.callIslandRestrictMoveEvent(toIsland, superiorPlayer, IslandRestrictMoveEvent.RestrictReason.ENTER_EVENT_CANCELLED);
             return MoveResult.ENTER_EVENT_CANCELLED;
         }
 
@@ -723,15 +725,15 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         //Checking for the stop leaving feature.
         if (plugin.getSettings().isStopLeaving() && fromInsideRange && !toInsideRange && !superiorPlayer.hasBypassModeEnabled() && !fromIsland.isSpawn() && equalWorlds) {
-            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_ISLAND_TO_OUTSIDE);
+            PluginEventsFactory.callIslandRestrictMoveEvent(fromIsland, superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_ISLAND_TO_OUTSIDE);
             superiorPlayer.setPlayerStatus(PlayerStatus.LEAVING_ISLAND);
             return MoveResult.LEAVE_ISLAND_TO_OUTSIDE;
         }
 
         // Handling the leave protected event
         if (fromInsideRange && (!equalIslands || !toInsideRange)) {
-            if (!plugin.getEventsBus().callIslandLeaveProtectedEvent(superiorPlayer, fromIsland, leaveCause, to)) {
-                plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_PROTECTED_EVENT_CANCELLED);
+            if (!PluginEventsFactory.callIslandLeaveProtectedEvent(fromIsland, superiorPlayer, leaveCause, to)) {
+                PluginEventsFactory.callIslandRestrictMoveEvent(fromIsland, superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_PROTECTED_EVENT_CANCELLED);
                 return MoveResult.ENTER_EVENT_CANCELLED;
             }
         }
@@ -739,8 +741,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         if (equalIslands)
             return MoveResult.SUCCESS;
 
-        if (!plugin.getEventsBus().callIslandLeaveEvent(superiorPlayer, fromIsland, leaveCause, to)) {
-            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_EVENT_CANCELLED);
+        if (!PluginEventsFactory.callIslandLeaveEvent(fromIsland, superiorPlayer, leaveCause, to)) {
+            PluginEventsFactory.callIslandRestrictMoveEvent(fromIsland, superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_EVENT_CANCELLED);
             return MoveResult.ENTER_EVENT_CANCELLED;
         }
 

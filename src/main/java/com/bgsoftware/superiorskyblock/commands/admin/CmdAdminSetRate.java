@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -73,11 +74,11 @@ public class CmdAdminSetRate implements IAdminIslandCommand {
             return;
 
         if (rating == Rating.UNKNOWN) {
-            if (plugin.getEventsBus().callIslandRemoveRatingEvent(sender, superiorPlayer, island)) {
+            if (PluginEventsFactory.callIslandRemoveRatingEvent(island, sender, superiorPlayer)) {
                 island.removeRating(targetPlayer);
                 Message.RATE_REMOVE_ALL.send(sender, targetPlayer.getName());
             }
-        } else if (plugin.getEventsBus().callIslandRateEvent(sender, superiorPlayer, island, rating)) {
+        } else if (PluginEventsFactory.callIslandRateEvent(island, sender, superiorPlayer, rating)) {
             island.setRating(targetPlayer, rating);
             Message.RATE_CHANGE_OTHER.send(sender, targetPlayer.getName(), Formatters.CAPITALIZED_FORMATTER.format(rating.name()));
         }

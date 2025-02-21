@@ -11,7 +11,9 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import org.bukkit.command.CommandSender;
@@ -73,34 +75,34 @@ public class CmdAdminSyncBonus implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         boolean isWorthBonus = !args[3].equalsIgnoreCase("level");
 
-        boolean anyIslandChanged = false;
+        int islandsChangedCount = 0;
 
         for (Island island : islands) {
             BigDecimal currentBonus = isWorthBonus ? island.getBonusWorth() : island.getBonusLevel();
             BigDecimal newBonus = calculateValue(island, isWorthBonus);
             if (!newBonus.equals(currentBonus)) {
                 if (isWorthBonus) {
-                    EventResult<BigDecimal> eventResult = plugin.getEventsBus().callIslandChangeWorthBonusEvent(sender, island,
-                            IslandChangeWorthBonusEvent.Reason.COMMAND, newBonus);
-                    if (!eventResult.isCancelled()) {
-                        island.setBonusWorth(eventResult.getResult());
-                        anyIslandChanged = true;
+                    PluginEvent<PluginEventArgs.IslandChangeWorthBonus> event = PluginEventsFactory.callIslandChangeWorthBonusEvent(
+                            island, sender, IslandChangeWorthBonusEvent.Reason.COMMAND, newBonus);
+                    if (!event.isCancelled()) {
+                        island.setBonusWorth(event.getArgs().worthBonus);
+                        ++islandsChangedCount;
                     }
                 } else {
-                    EventResult<BigDecimal> eventResult = plugin.getEventsBus().callIslandChangeLevelBonusEvent(sender, island,
-                            IslandChangeLevelBonusEvent.Reason.COMMAND, newBonus);
-                    if (!eventResult.isCancelled()) {
-                        island.setBonusLevel(eventResult.getResult());
-                        anyIslandChanged = true;
+                    PluginEvent<PluginEventArgs.IslandChangeLevelBonus> event = PluginEventsFactory.callIslandChangeLevelBonusEvent(
+                            island, sender, IslandChangeLevelBonusEvent.Reason.COMMAND, newBonus);
+                    if (!event.isCancelled()) {
+                        island.setBonusLevel(event.getArgs().levelBonus);
+                        ++islandsChangedCount;
                     }
                 }
             }
         }
 
-        if (!anyIslandChanged)
+        if (islandsChangedCount <= 0)
             return;
 
-        if (islands.size() > 1)
+        if (islandsChangedCount > 1)
             Message.BONUS_SYNC_ALL.send(sender);
         else if (targetPlayer == null)
             Message.BONUS_SYNC_NAME.send(sender, islands.get(0).getName());

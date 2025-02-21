@@ -4,7 +4,9 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.google.common.base.Preconditions;
 
 import java.util.Collections;
@@ -32,8 +34,8 @@ public abstract class CommandsMap {
         });
     }
 
-    public static void registerCallbacks(CallbacksBus bus) {
-        bus.registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, CommandsMap::onSettingsUpdate);
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, CommandsMap::onSettingsUpdate);
     }
 
     private final Map<String, SuperiorCommand> subCommands = new LinkedHashMap<>();
@@ -66,7 +68,7 @@ public abstract class CommandsMap {
             superiorCommands.forEach(s -> subCommands.put(s.getAliases().get(0), s));
         }
 
-        plugin.getCallbacksBus().notifyCallbacks(CallbacksBus.CallbackType.COMMANDS_UPDATE);
+        PluginEventsFactory.callCommandsUpdateEvent();
     }
 
     public void unregisterCommand(SuperiorCommand superiorCommand) {
@@ -78,7 +80,7 @@ public abstract class CommandsMap {
 
         removeCommand(label);
 
-        plugin.getCallbacksBus().notifyCallbacks(CallbacksBus.CallbackType.COMMANDS_UPDATE);
+        PluginEventsFactory.callCommandsUpdateEvent();
     }
 
     @Nullable

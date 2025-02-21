@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
@@ -73,7 +74,7 @@ public class CmdAdminAdd implements IAdminIslandCommand {
             return;
         }
 
-        if (!plugin.getEventsBus().callIslandJoinEvent(targetPlayer, island, IslandJoinEvent.Cause.ADMIN))
+        if (!PluginEventsFactory.callIslandJoinEvent(island, targetPlayer, IslandJoinEvent.Cause.ADMIN))
             return;
 
         IslandUtils.sendMessage(island, Message.JOIN_ANNOUNCEMENT, Collections.emptyList(), targetPlayer.getName());

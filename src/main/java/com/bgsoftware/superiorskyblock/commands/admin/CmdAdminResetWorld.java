@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.World;
@@ -80,23 +81,23 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
             return;
         }
 
-        boolean anyIslandChanged = false;
+        int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            if (!plugin.getEventsBus().callIslandWorldResetEvent(sender, island, dimension))
+            if (!PluginEventsFactory.callIslandWorldResetEvent(island, sender, dimension))
                 continue;
 
-            anyIslandChanged = true;
+            ++islandsChangedCount;
 
             IslandWorlds.accessIslandWorldAsync(island, dimension, islandWorldResult -> {
                 islandWorldResult.ifLeft(world -> resetChunksInternal(island, world, dimension));
             });
         }
 
-        if (!anyIslandChanged)
+        if (islandsChangedCount <= 0)
             return;
 
-        if (islands.size() > 1)
+        if (islandsChangedCount > 1)
             Message.RESET_WORLD_SUCCEED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]));
         else if (targetPlayer == null)
             Message.RESET_WORLD_SUCCEED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]), islands.get(0).

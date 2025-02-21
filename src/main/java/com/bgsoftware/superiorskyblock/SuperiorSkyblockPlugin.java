@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
+import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
@@ -25,8 +26,10 @@ import com.bgsoftware.superiorskyblock.core.database.transaction.DatabaseTransac
 import com.bgsoftware.superiorskyblock.core.engine.EnginesFactory;
 import com.bgsoftware.superiorskyblock.core.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
-import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
-import com.bgsoftware.superiorskyblock.core.events.EventsBus;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.factory.FactoriesManagerImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
 import com.bgsoftware.superiorskyblock.core.key.KeysManagerImpl;
@@ -70,6 +73,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventsDispatcher;
 import com.bgsoftware.superiorskyblock.player.PlayersManagerImpl;
 import com.bgsoftware.superiorskyblock.player.container.DefaultPlayersContainer;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
@@ -114,10 +118,12 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
     /* Global handlers */
     private final Updater updater = new Updater(this, "superiorskyblock2");
-    private final EventsBus eventsBus = new EventsBus(this);
-    private final CallbacksBus callbacksBus = new CallbacksBus();
     private final BukkitListeners bukkitListeners = new BukkitListeners(this);
+    private final PluginEventsDispatcher pluginEventsDispatcher = new PluginEventsDispatcher(this);
+    private final GameEventsDispatcher gameEventsDispatcher = new GameEventsDispatcher(this);
     private IScriptEngine scriptEngine = EnginesFactory.createDefaultEngine();
+    @Nullable
+    private IEventsDispatcher eventsDispatcher = null;
 
     /* NMS */
     @Nullable
@@ -139,7 +145,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     @Override
     public void onLoad() {
         plugin = this;
-        callbacksBus.registerDefaultCallbacks();
+        pluginEventsDispatcher.registerDefaultListeners();
 
         DependenciesManager.inject(this);
 
@@ -230,9 +236,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             modulesHandler.runModuleLifecycle(ModuleLoadTime.PLUGIN_INITIALIZE, false);
 
-            EventsBus.PluginInitializeResult eventResult = eventsBus.callPluginInitializeEvent(this);
-            this.playersHandler.setPlayersContainer(Optional.ofNullable(eventResult.getPlayersContainer()).orElse(new DefaultPlayersContainer()));
-            this.gridHandler.setIslandsContainer(Optional.ofNullable(eventResult.getIslandsContainer()).orElse(new DefaultIslandsContainer(this)));
+            PluginEvent<PluginEventArgs.PluginInitialize> event = PluginEventsFactory.callPluginInitializeEvent();
+
+            this.playersHandler.setPlayersContainer(Optional.ofNullable(event.getArgs().playersContainer).orElse(new DefaultPlayersContainer()));
+            this.gridHandler.setIslandsContainer(Optional.ofNullable(event.getArgs().islandsContainer).orElse(new DefaultIslandsContainer(this)));
 
             modulesHandler.runModuleLifecycle(ModuleLoadTime.BEFORE_WORLD_CREATION, false);
 
@@ -314,11 +321,11 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 }
             }, 1L);
 
-            eventsBus.callPluginInitializedEvent(this);
+            PluginEventsFactory.callPluginInitializedEvent();
 
             loadingStage = PluginLoadingStage.ENABLED;
 
-            plugin.getCallbacksBus().notifyCallbacks(CallbacksBus.CallbackType.SETTINGS_UPDATE);
+            PluginEventsFactory.callSettingsUpdateEvent();
         } catch (Throwable error) {
             Log.error(error, "An unexpected error occurred while enabling the plugin:");
             Bukkit.shutdown();
@@ -590,12 +597,23 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         this.scriptEngine = scriptEngine == null ? EnginesFactory.createDefaultEngine() : scriptEngine;
     }
 
-    public EventsBus getEventsBus() {
-        return eventsBus;
+    @Nullable
+    @Override
+    public IEventsDispatcher getEventsDispatcher() {
+        return this.eventsDispatcher;
     }
 
-    public CallbacksBus getCallbacksBus() {
-        return callbacksBus;
+    @Override
+    public void setEventsDispatcher(@Nullable IEventsDispatcher eventsDispatcher) {
+        this.eventsDispatcher = eventsDispatcher;
+    }
+
+    public PluginEventsDispatcher getPluginEventsDispatcher() {
+        return pluginEventsDispatcher;
+    }
+
+    public GameEventsDispatcher getGameEventsDispatcher() {
+        return gameEventsDispatcher;
     }
 
     public ServicesHandler getServices() {

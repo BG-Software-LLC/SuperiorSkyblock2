@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
@@ -72,7 +73,7 @@ public class CmdLeave implements ISuperiorCommand {
             return;
         }
 
-        if (!plugin.getEventsBus().callIslandQuitEvent(superiorPlayer, island))
+        if (!PluginEventsFactory.callIslandQuitEvent(island, superiorPlayer))
             return;
 
         island.kickMember(superiorPlayer);

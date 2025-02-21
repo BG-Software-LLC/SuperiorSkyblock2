@@ -10,7 +10,9 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -94,7 +96,7 @@ public class CmdAdminSetGenerator implements IAdminIslandCommand {
         if (dimension == null)
             return;
 
-        boolean anyIslandChanged = false;
+        int islandsChangedCount = 0;
 
         for (Island island : islands) {
             if (percentage) {
@@ -104,24 +106,24 @@ public class CmdAdminSetGenerator implements IAdminIslandCommand {
                 }
             } else {
                 if (amount <= 0) {
-                    if (!plugin.getEventsBus().callIslandRemoveGeneratorRateEvent(sender, island, material, dimension))
+                    if (!PluginEventsFactory.callIslandRemoveGeneratorRateEvent(island, sender, material, dimension))
                         continue;
 
                     island.removeGeneratorAmount(material, dimension);
                 } else {
-                    EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeGeneratorRateEvent(sender,
-                            island, material, dimension, amount);
+                    PluginEvent<PluginEventArgs.IslandChangeGeneratorRate> event = PluginEventsFactory.callIslandChangeGeneratorRateEvent(
+                            island, sender, material, dimension, amount);
 
-                    if (eventResult.isCancelled())
+                    if (event.isCancelled())
                         continue;
 
-                    island.setGeneratorAmount(material, eventResult.getResult(), dimension);
+                    island.setGeneratorAmount(material, event.getArgs().generatorRate, dimension);
                 }
             }
-            anyIslandChanged = true;
+            ++islandsChangedCount;
         }
 
-        if (!anyIslandChanged)
+        if (islandsChangedCount <= 0)
             return;
 
         if (islands.size() != 1)

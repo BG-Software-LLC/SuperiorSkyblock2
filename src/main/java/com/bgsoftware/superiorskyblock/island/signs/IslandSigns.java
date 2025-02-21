@@ -7,7 +7,9 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
@@ -59,13 +61,13 @@ public class IslandSigns {
             IslandWarp islandWarp = island.getWarp(signLocation);
 
             if (islandWarp != null) {
-                if (!plugin.getEventsBus().callIslandDeleteWarpEvent(superiorPlayer, island, islandWarp))
+                if (!PluginEventsFactory.callIslandDeleteWarpEvent(island, superiorPlayer, islandWarp))
                     return new Result(Reason.EVENT_CANCELLED, true);
 
                 island.deleteWarp(superiorPlayer, signLocation);
             } else {
                 if (sign.getLine(0).equalsIgnoreCase(plugin.getSettings().getVisitorsSign().getActive())) {
-                    if (!plugin.getEventsBus().callIslandRemoveVisitorHomeEvent(superiorPlayer, island))
+                    if (!PluginEventsFactory.callIslandRemoveVisitorHomeEvent(island, superiorPlayer))
                         return new Result(Reason.EVENT_CANCELLED, true);
 
                     island.setVisitorsLocation(null);
@@ -104,7 +106,7 @@ public class IslandSigns {
             result = Reason.NAME_TOO_LONG;
         }
 
-        if (!plugin.getEventsBus().callIslandCreateWarpEvent(superiorPlayer, island, warpName, warpLocation, !privateFlag, null))
+        if (!PluginEventsFactory.callIslandCreateWarpEvent(island, superiorPlayer, warpName, warpLocation, !privateFlag, null))
             result = Reason.EVENT_CANCELLED;
 
         if (result != Reason.SUCCESS)
@@ -132,9 +134,10 @@ public class IslandSigns {
             return new Result(Reason.LIMIT_REACHED, true);
         }
 
-        EventResult<Location> eventResult = plugin.getEventsBus().callIslandSetVisitorHomeEvent(superiorPlayer, island, visitorsLocation);
+        PluginEvent<PluginEventArgs.IslandSetVisitorHome> setVisitorHomeEvent =
+                PluginEventsFactory.callIslandSetVisitorHomeEvent(island, superiorPlayer, visitorsLocation);
 
-        if (eventResult.isCancelled())
+        if (setVisitorHomeEvent.isCancelled())
             return new Result(Reason.EVENT_CANCELLED, false);
 
         StringBuilder descriptionBuilder = new StringBuilder();
@@ -161,12 +164,13 @@ public class IslandSigns {
             oldWelcomeSign.update();
         }
 
-        island.setVisitorsLocation(eventResult.getResult());
+        island.setVisitorsLocation(setVisitorHomeEvent.getArgs().islandVisitorHome);
 
-        EventResult<String> descriptionEventResult = plugin.getEventsBus().callIslandChangeDescriptionEvent(superiorPlayer, island, description);
+        PluginEvent<PluginEventArgs.IslandChangeDescription> changeDescriptionEvent =
+                PluginEventsFactory.callIslandChangeDescriptionEvent(island, superiorPlayer, description);
 
-        if (!descriptionEventResult.isCancelled())
-            island.setDescription(descriptionEventResult.getResult());
+        if (!changeDescriptionEvent.isCancelled())
+            island.setDescription(changeDescriptionEvent.getArgs().description);
 
         if (sendMessage)
             Message.SET_WARP.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(visitorsLocation));

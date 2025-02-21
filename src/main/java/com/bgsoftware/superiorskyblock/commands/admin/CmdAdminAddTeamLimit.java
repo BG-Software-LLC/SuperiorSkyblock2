@@ -7,7 +7,9 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -69,20 +71,21 @@ public class CmdAdminAddTeamLimit implements IAdminIslandCommand {
 
         int limit = arguments.getNumber();
 
-        boolean anyIslandChanged = false;
+        int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeMembersLimitEvent(sender,
-                    island, island.getTeamLimit() + limit);
-            anyIslandChanged |= !eventResult.isCancelled();
-            if (!eventResult.isCancelled())
-                island.setTeamLimit(eventResult.getResult());
+            PluginEvent<PluginEventArgs.IslandChangeMembersLimit> event = PluginEventsFactory.callIslandChangeMembersLimitEvent(
+                    island, sender, island.getTeamLimit() + limit);
+            if (!event.isCancelled()) {
+                island.setTeamLimit(event.getArgs().membersLimit);
+                ++islandsChangedCount;
+            }
         }
 
-        if (!anyIslandChanged)
+        if (islandsChangedCount <= 0)
             return;
 
-        if (islands.size() > 1)
+        if (islandsChangedCount > 1)
             Message.CHANGED_TEAM_LIMIT_ALL.send(sender);
         else if (targetPlayer == null)
             Message.CHANGED_TEAM_LIMIT_NAME.send(sender, islands.get(0).getName());

@@ -5,7 +5,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
@@ -63,12 +65,12 @@ public class CmdAdminName implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
-        EventResult<String> eventResult = plugin.getEventsBus().callIslandRenameEvent(island, args[3]);
+        PluginEvent<PluginEventArgs.IslandRename> event = PluginEventsFactory.callIslandRenameEvent(island, sender, args[3]);
 
-        if (eventResult.isCancelled())
+        if (event.isCancelled())
             return;
 
-        String islandName = eventResult.getResult();
+        String islandName = event.getArgs().islandName;
 
         if (!IslandNames.isValidName(sender, island, islandName))
             return;

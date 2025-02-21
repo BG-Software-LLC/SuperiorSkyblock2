@@ -6,7 +6,9 @@ import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
@@ -71,8 +73,8 @@ public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
         Player player = inventoryViewer.asPlayer();
 
-        EventResult<Biome> event = plugin.getEventsBus().callIslandBiomeChangeEvent(inventoryViewer,
-                menuView.getIsland(), getTemplate().biome);
+        PluginEvent<PluginEventArgs.IslandBiomeChange> event = PluginEventsFactory.callIslandBiomeChangeEvent(
+                menuView.getIsland(), inventoryViewer, getTemplate().biome);
 
         if (event.isCancelled()) {
             GameSoundImpl.playSound(player, getTemplate().getLackPermissionSound());
@@ -84,8 +86,8 @@ public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
         getTemplate().accessCommands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                 command.replace("%player%", inventoryViewer.getName())));
 
-        menuView.getIsland().setBiome(event.getResult());
-        Message.CHANGED_BIOME.send(inventoryViewer, event.getResult().name().toLowerCase(Locale.ENGLISH));
+        menuView.getIsland().setBiome(event.getArgs().biome);
+        Message.CHANGED_BIOME.send(inventoryViewer, event.getArgs().biome.name().toLowerCase(Locale.ENGLISH));
 
         BukkitExecutor.sync(menuView::closeView, 1L);
     }

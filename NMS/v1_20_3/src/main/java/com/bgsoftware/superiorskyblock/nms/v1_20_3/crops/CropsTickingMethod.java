@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_20_3.crops;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import net.minecraft.core.BlockPos;
@@ -30,7 +30,7 @@ public abstract class CropsTickingMethod {
     private static Set<Block> CROPS_TO_GROW_CACHE;
 
     static {
-        plugin.getCallbacksBus().registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, CropsTickingMethod::onSettingsUpdate);
+        plugin.getPluginEventsDispatcher().registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, CropsTickingMethod::onSettingsUpdate);
     }
 
     private static final BlockPos.MutableBlockPos chunkTickMutablePosition = new BlockPos.MutableBlockPos();

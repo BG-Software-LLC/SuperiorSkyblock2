@@ -7,7 +7,8 @@ import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
-import com.bgsoftware.superiorskyblock.core.events.CallbacksBus;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
@@ -20,9 +21,9 @@ public class CmdHelp implements ISuperiorCommand {
 
     private static final Int2ObjectMapView<List<SuperiorCommand>> commandsPerPageCache = CollectionsFactory.createInt2ObjectArrayMap();
 
-    public static void registerCallbacks(CallbacksBus bus) {
-        bus.registerCallback(CallbacksBus.CallbackType.SETTINGS_UPDATE, CmdHelp::onCommandsRefresh);
-        bus.registerCallback(CallbacksBus.CallbackType.COMMANDS_UPDATE, CmdHelp::onCommandsRefresh);
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, CmdHelp::onCommandsRefresh);
+        dispatcher.registerCallback(PluginEventType.COMMANDS_UPDATE_EVENT, CmdHelp::onCommandsRefresh);
     }
 
     private static void onCommandsRefresh() {

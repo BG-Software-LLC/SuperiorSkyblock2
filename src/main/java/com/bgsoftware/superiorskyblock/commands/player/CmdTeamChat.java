@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.Bukkit;
@@ -65,7 +66,7 @@ public class CmdTeamChat implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = arguments.getSuperiorPlayer();
 
         if (args.length == 1) {
-            if (!plugin.getEventsBus().callPlayerToggleTeamChatEvent(superiorPlayer))
+            if (!PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
                 return;
 
             if (superiorPlayer.hasTeamChatEnabled()) {

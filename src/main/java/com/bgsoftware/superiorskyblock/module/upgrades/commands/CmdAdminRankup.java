@@ -12,8 +12,9 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
-import com.bgsoftware.superiorskyblock.core.events.EventsBus;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -89,13 +90,13 @@ public class CmdAdminRankup implements IAdminIslandCommand {
             UpgradeLevel currentLevel = island.getUpgradeLevel(upgrade);
             UpgradeLevel nextLevel = upgrade.getUpgradeLevel(currentLevel.getLevel() + 1);
 
-            EventResult<EventsBus.UpgradeResult> event = plugin.getEventsBus().callIslandUpgradeEvent(
-                    playerSender, island, upgrade, currentLevel, nextLevel, IslandUpgradeEvent.Cause.PLAYER_RANKUP);
+            PluginEvent<PluginEventArgs.IslandUpgrade> event = PluginEventsFactory.callIslandUpgradeEvent(
+                    island, playerSender, upgrade, currentLevel, nextLevel, IslandUpgradeEvent.Cause.PLAYER_RANKUP);
 
             if (!event.isCancelled()) {
                 SuperiorPlayer owner = island.getOwner();
 
-                for (String command : event.getResult().getCommands()) {
+                for (String command : event.getArgs().commands) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                             placeholdersService.get().parsePlaceholders(owner.asOfflinePlayer(), command
                                     .replace("%player%", owner.getName())

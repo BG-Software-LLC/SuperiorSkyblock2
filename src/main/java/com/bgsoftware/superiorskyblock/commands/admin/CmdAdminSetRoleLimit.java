@@ -9,7 +9,9 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
@@ -84,26 +86,28 @@ public class CmdAdminSetRoleLimit implements IAdminIslandCommand {
 
         int limit = arguments.getNumber();
 
-        boolean anyIslandChanged = false;
+        int islandsChangedCount = 0;
 
         for (Island island : islands) {
             if (limit <= 0) {
-                if (plugin.getEventsBus().callIslandRemoveRoleLimitEvent(sender, island, playerRole)) {
-                    anyIslandChanged = true;
+                if (PluginEventsFactory.callIslandRemoveRoleLimitEvent(island, sender, playerRole)) {
+                    ++islandsChangedCount;
                     island.removeRoleLimit(playerRole);
                 }
             } else {
-                EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeRoleLimitEvent(sender, island, playerRole, limit);
-                anyIslandChanged |= !eventResult.isCancelled();
-                if (!eventResult.isCancelled())
-                    island.setRoleLimit(playerRole, eventResult.getResult());
+                PluginEvent<PluginEventArgs.IslandChangeRoleLimit> event = PluginEventsFactory.callIslandChangeRoleLimitEvent(
+                        island, sender, playerRole, limit);
+                if (!event.isCancelled()) {
+                    island.setRoleLimit(playerRole, event.getArgs().roleLimit);
+                    ++islandsChangedCount;
+                }
             }
         }
 
-        if (!anyIslandChanged)
+        if (islandsChangedCount <= 0)
             return;
 
-        if (islands.size() > 1)
+        if (islandsChangedCount > 1)
             Message.CHANGED_ROLE_LIMIT_ALL.send(sender, playerRole);
         else if (targetPlayer == null)
             Message.CHANGED_ROLE_LIMIT_NAME.send(sender, playerRole, islands.get(0).getName());

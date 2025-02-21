@@ -5,7 +5,9 @@ import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
@@ -30,7 +32,7 @@ public class WarpManageLocationButton extends AbstractMenuViewButton<MenuWarpMan
         Player player = (Player) clickEvent.getWhoClicked();
         IslandWarp islandWarp = menuView.getIslandWarp();
 
-        EventResult<Location> eventResult;
+        PluginEvent<PluginEventArgs.IslandChangeWarpLocation> event;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location playerLocation = player.getLocation(wrapper.getHandle());
 
@@ -39,11 +41,11 @@ public class WarpManageLocationButton extends AbstractMenuViewButton<MenuWarpMan
                 return;
             }
 
-            eventResult = plugin.getEventsBus().callIslandChangeWarpLocationEvent(
-                    plugin.getPlayers().getSuperiorPlayer(player), islandWarp.getIsland(), islandWarp, playerLocation);
+            event = PluginEventsFactory.callIslandChangeWarpLocationEvent(
+                    islandWarp.getIsland(), player, islandWarp, playerLocation);
         }
 
-        if (eventResult.isCancelled())
+        if (event.isCancelled())
             return;
 
 
@@ -52,14 +54,14 @@ public class WarpManageLocationButton extends AbstractMenuViewButton<MenuWarpMan
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location warpLocation = islandWarp.getLocation(wrapper.getHandle());
 
-            if (!warpLocation.equals(eventResult.getResult())) {
+            if (!warpLocation.equals(event.getArgs().location)) {
                 ChunksProvider.loadChunk(ChunkPosition.of(warpLocation), ChunkLoadReason.WARP_SIGN_BREAK, chunk -> {
                     SignWarp.trySignWarpBreak(islandWarp, player);
                 });
             }
         }
 
-        islandWarp.setLocation(eventResult.getResult());
+        islandWarp.setLocation(event.getArgs().location);
 
         GameSoundImpl.playSound(player, Menus.MENU_WARP_MANAGE.getSuccessUpdateSound());
     }

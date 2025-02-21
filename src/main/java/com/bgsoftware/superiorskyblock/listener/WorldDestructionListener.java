@@ -4,73 +4,64 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
+import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
-import org.bukkit.event.world.StructureGrowEvent;
 
 import java.util.List;
 import java.util.function.Function;
 
-public class WorldDestructionListener implements Listener {
-
-    private final SuperiorSkyblockPlugin plugin;
+public class WorldDestructionListener extends AbstractGameEventListener {
 
     public WorldDestructionListener(SuperiorSkyblockPlugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
+        registerListeners();
     }
 
     //Checking for structures growing outside island.
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private void onStructureGrow(StructureGrowEvent e) {
-        Island island = plugin.getGrid().getIslandAt(e.getLocation());
-        if (island != null && plugin.getGrid().isIslandsWorld(e.getLocation().getWorld())) {
+    private void onStructureGrow(GameEvent<GameEventArgs.StructureGrowEvent> e) {
+        Location location = e.getArgs().location;
+        Island island = plugin.getGrid().getIslandAt(location);
+        if (island != null && plugin.getGrid().isIslandsWorld(location.getWorld())) {
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                e.getBlocks().removeIf(blockState ->
+                e.getArgs().blocks.removeIf(blockState ->
                         !island.isInsideRange(blockState.getLocation(wrapper.getHandle())));
             }
         }
     }
 
     //Checking for chorus flower spread outside island.
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private void onBlockSpread(BlockSpreadEvent e) {
+    private void onBlockSpread(GameEvent<GameEventArgs.BlockSpreadEvent> e) {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventDestruction(e.getSource().getLocation(wrapper.getHandle())) ||
-                    preventDestruction(e.getBlock().getLocation(wrapper.getHandle())))
-                e.setCancelled(true);
+            if (preventDestruction(e.getArgs().source.getLocation(wrapper.getHandle())) ||
+                    preventDestruction(e.getArgs().block.getLocation(wrapper.getHandle())))
+                e.setCancelled();
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onPistonExtend(BlockPistonExtendEvent e) {
+    public void onPistonExtend(GameEvent<GameEventArgs.PistonExtendEvent> e) {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventMultiDestruction(e.getBlock().getLocation(wrapper.getHandle()), e.getBlocks(), null))
-                e.setCancelled(true);
+            if (preventMultiDestruction(e.getArgs().block.getLocation(wrapper.getHandle()), e.getArgs().blocks, null))
+                e.setCancelled();
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onPistonRetract(BlockPistonRetractEvent e) {
+    public void onPistonRetract(GameEvent<GameEventArgs.PistonRetractEvent> e) {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventMultiDestruction(e.getBlock().getLocation(wrapper.getHandle()), e.getBlocks(),
-                    block -> block.getRelative(e.getDirection())))
-                e.setCancelled(true);
+            if (preventMultiDestruction(e.getArgs().block.getLocation(wrapper.getHandle()), e.getArgs().blocks,
+                    block -> block.getRelative(e.getArgs().direction)))
+                e.setCancelled();
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onBlockFlow(BlockFromToEvent e) {
+    private void onBlockFlow(GameEvent<GameEventArgs.BlockFromToEvent> e) {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location blockLocation = e.getBlock().getRelative(e.getFace()).getLocation(wrapper.getHandle());
+            Location blockLocation = e.getArgs().toBlock.getLocation(wrapper.getHandle());
             if (preventDestruction(blockLocation))
-                e.setCancelled(true);
+                e.setCancelled();
         }
     }
 
@@ -98,6 +89,14 @@ public class WorldDestructionListener implements Listener {
         }
 
         return false;
+    }
+
+    private void registerListeners() {
+        registerCallback(GameEventType.STRUCTURE_GROW_EVENT, GameEventPriority.NORMAL, this::onStructureGrow);
+        registerCallback(GameEventType.BLOCK_SPREAD_EVENT, GameEventPriority.NORMAL, this::onBlockSpread);
+        registerCallback(GameEventType.PISTON_EXTEND_EVENT, GameEventPriority.NORMAL, this::onPistonExtend);
+        registerCallback(GameEventType.PISTON_RETRACT_EVENT, GameEventPriority.NORMAL, this::onPistonRetract);
+        registerCallback(GameEventType.BLOCK_FROM_TO_EVENT, GameEventPriority.NORMAL, this::onBlockFlow);
     }
 
 }

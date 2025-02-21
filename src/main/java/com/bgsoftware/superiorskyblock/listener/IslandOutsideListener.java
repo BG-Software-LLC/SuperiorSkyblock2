@@ -5,121 +5,107 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
+import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.vehicle.VehicleEnterEvent;
-import org.bukkit.event.vehicle.VehicleMoveEvent;
 
-public class IslandOutsideListener implements Listener {
-
-    private final SuperiorSkyblockPlugin plugin;
+public class IslandOutsideListener extends AbstractGameEventListener {
 
     public IslandOutsideListener(SuperiorSkyblockPlugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
+
+        registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.NORMAL, this::onMinecartRightClick);
+        registerCallback(GameEventType.ENTITY_RIDE_EVENT, GameEventPriority.NORMAL, this::onEntityRide);
+        registerCallback(GameEventType.ENTITY_MOVE_EVENT, GameEventPriority.NORMAL, this::onEntityMove);
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    private void onMinecartRightClick(PlayerInteractAtEntityEvent e) {
+    private void onMinecartRightClick(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
         if (!plugin.getSettings().isStopLeaving())
             return;
 
-        if (!plugin.getGrid().isIslandsWorld(e.getRightClicked().getWorld()))
+        Entity rightClicked = e.getArgs().clickedEntity;
+        if (rightClicked == null)
             return;
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        if (!plugin.getGrid().isIslandsWorld(rightClicked.getWorld()))
+            return;
+
+        Player player = e.getArgs().player;
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
         if (superiorPlayer.hasBypassModeEnabled())
             return;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location entityLocation = e.getRightClicked().getLocation(wrapper.getHandle());
+            Location entityLocation = rightClicked.getLocation(wrapper.getHandle());
             Island entityIsland = plugin.getGrid().getIslandAt(entityLocation);
 
             if (entityIsland != null && entityIsland.isInsideRange(entityLocation, 1D))
                 return;
         }
 
-        e.setCancelled(true);
+        e.setCancelled();
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    private void onMinecartRightClick(VehicleEnterEvent e) {
+    private void onEntityRide(GameEvent<GameEventArgs.EntityRideEvent> e) {
         if (!plugin.getSettings().isStopLeaving())
             return;
 
-        if (!plugin.getGrid().isIslandsWorld(e.getVehicle().getWorld()))
+        Entity vehicle = e.getArgs().vehicle;
+
+        if (!plugin.getGrid().isIslandsWorld(vehicle.getWorld()))
             return;
 
-        if (e.getEntered() instanceof Player && plugin.getPlayers().getSuperiorPlayer(e.getEntered()).hasBypassModeEnabled())
+        Entity entity = e.getArgs().entity;
+
+        if (entity instanceof Player && plugin.getPlayers().getSuperiorPlayer(entity).hasBypassModeEnabled())
             return;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location vehicleLocation = e.getVehicle().getLocation(wrapper.getHandle());
+            Location vehicleLocation = vehicle.getLocation(wrapper.getHandle());
             Island entityIsland = plugin.getGrid().getIslandAt(vehicleLocation);
 
             if (entityIsland != null && entityIsland.isInsideRange(vehicleLocation, 1D))
                 return;
         }
 
-        e.setCancelled(true);
+        e.setCancelled();
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    private void onVehicleRide(VehicleMoveEvent e) {
+    private void onEntityMove(GameEvent<GameEventArgs.EntityMoveEvent> e) {
         if (!plugin.getSettings().isStopLeaving())
             return;
 
-        World world = e.getTo().getWorld();
+        Location to = e.getArgs().to;
+        World destinationWorld = to.getWorld();
 
-        if (!plugin.getGrid().isIslandsWorld(world))
+        if (!plugin.getGrid().isIslandsWorld(destinationWorld))
             return;
 
-        if (!e.getVehicle().getWorld().equals(world))
+        Entity entity = e.getArgs().entity;
+
+        if (!entity.getWorld().equals(destinationWorld))
             return;
 
-        Location from = e.getFrom();
-        Location to = e.getTo();
+        Location from = e.getArgs().from;
 
-        if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
-            return;
+        if (entity instanceof Player) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) entity);
+            if (handlePlayerMove(superiorPlayer, from, to, true, false))
+                e.setCancelled();
+        } else {
+            Entity passenger = entity.getPassenger();
+            SuperiorPlayer superiorPlayer = passenger instanceof Player ? plugin.getPlayers().getSuperiorPlayer(passenger) : null;
 
-        Entity passenger = e.getVehicle().getPassenger();
-        SuperiorPlayer superiorPlayer = passenger instanceof Player ? plugin.getPlayers().getSuperiorPlayer(passenger) : null;
+            if (superiorPlayer == null)
+                return;
 
-        if (superiorPlayer == null)
-            return;
-
-        handlePlayerMove(superiorPlayer, from, to, false, true);
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    private void onPlayerMove(PlayerMoveEvent e) {
-        if (!plugin.getSettings().isStopLeaving())
-            return;
-
-        World world = e.getTo().getWorld();
-
-        if (!plugin.getGrid().isIslandsWorld(world))
-            return;
-
-        if (!e.getPlayer().getWorld().equals(world))
-            return;
-
-        Location from = e.getFrom();
-        Location to = e.getTo();
-
-        if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
-            return;
-
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-        if (handlePlayerMove(superiorPlayer, from, to, true, false))
-            e.setCancelled(true);
+            handlePlayerMove(superiorPlayer, from, to, false, true);
+        }
     }
 
     private boolean handlePlayerMove(SuperiorPlayer superiorPlayer, Location from, Location to,

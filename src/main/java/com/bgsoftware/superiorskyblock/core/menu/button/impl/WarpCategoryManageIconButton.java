@@ -4,7 +4,9 @@ import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
@@ -81,13 +83,13 @@ public class WarpCategoryManageIconButton extends AbstractMenuViewButton<MenuWar
                     return true;
                 }
 
-                EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeWarpCategorySlotEvent(
-                        inventoryViewer, warpCategory.getIsland(), warpCategory, slot, rowsSize * 9);
+                PluginEvent<PluginEventArgs.IslandChangeWarpCategorySlot> event = PluginEventsFactory.callIslandChangeWarpCategorySlotEvent(
+                        warpCategory.getIsland(), inventoryViewer, warpCategory, slot, rowsSize * 9);
 
-                if (!eventResult.isCancelled()) {
-                    warpCategory.setSlot(eventResult.getResult());
+                if (!event.isCancelled()) {
+                    warpCategory.setSlot(event.getArgs().slot);
 
-                    Message.WARP_CATEGORY_SLOT_SUCCESS.send(player, eventResult.getResult());
+                    Message.WARP_CATEGORY_SLOT_SUCCESS.send(player, event.getArgs().slot);
 
                     GameSoundImpl.playSound(player, Menus.MENU_WARP_CATEGORY_MANAGE.getSuccessUpdateSound());
                 }
