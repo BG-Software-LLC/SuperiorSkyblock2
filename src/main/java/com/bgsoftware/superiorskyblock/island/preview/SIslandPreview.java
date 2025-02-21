@@ -2,8 +2,10 @@ package com.bgsoftware.superiorskyblock.island.preview;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
+import com.bgsoftware.superiorskyblock.api.menu.MenuIslandCreationConfig;
+import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.menu.Menus;
+import com.bgsoftware.superiorskyblock.core.menu.MenuActions;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.google.common.base.Preconditions;
@@ -16,10 +18,10 @@ public class SIslandPreview implements IslandPreview {
 
     private final SuperiorPlayer superiorPlayer;
     private final Location previewLocation;
-    private final String schematic;
+    private final Schematic schematic;
     private final String islandName;
 
-    public SIslandPreview(SuperiorPlayer superiorPlayer, Location previewLocation, String schematic, String islandName) {
+    public SIslandPreview(SuperiorPlayer superiorPlayer, Location previewLocation, Schematic schematic, String islandName) {
         this.superiorPlayer = superiorPlayer;
         this.previewLocation = previewLocation;
         this.schematic = schematic;
@@ -67,20 +69,19 @@ public class SIslandPreview implements IslandPreview {
 
     @Override
     public String getSchematic() {
-        return schematic;
+        return this.schematic.getName();
     }
 
     @Override
     public String getIslandName() {
-        return islandName;
+        return this.islandName;
     }
 
     @Override
     public void handleConfirm() {
-        Menus.MENU_ISLAND_CREATION.simulateClick(superiorPlayer, islandName, schematic, false, superiorPlayer.getOpenedView());
-        Player player = superiorPlayer.asPlayer();
-        assert player != null;
-        PlayerChat.remove(player);
+        MenuIslandCreationConfig creationConfig = plugin.getProviders().getMenusProvider().getIslandCreationConfig(this.schematic);
+        MenuActions.simulateIslandCreationClick(superiorPlayer, islandName, creationConfig, false, superiorPlayer.getOpenedView());
+        superiorPlayer.runIfOnline(PlayerChat::remove);
     }
 
     @Override

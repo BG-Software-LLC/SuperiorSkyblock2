@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
-import com.bgsoftware.superiorskyblock.core.menu.Menus;
+import com.bgsoftware.superiorskyblock.core.menu.MenuActions;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -73,7 +73,7 @@ public class CmdWithdraw implements ISuperiorCommand {
         }
 
         BankTransaction transaction = island.getIslandBank().withdrawMoney(superiorPlayer, amount, null);
-        Menus.MENU_ISLAND_BANK.handleWithdraw(superiorPlayer, island, transaction, null, null, amount);
+        MenuActions.handleWithdraw(superiorPlayer, island, transaction, null, null, amount);
     }
 
     @Override

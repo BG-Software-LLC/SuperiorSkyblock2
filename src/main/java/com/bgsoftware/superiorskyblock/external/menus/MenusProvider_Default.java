@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.MenusProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -11,12 +12,18 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.MenuIslandCreationConfig;
+import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
+import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.menu.MenuActions;
+import com.bgsoftware.superiorskyblock.core.menu.MenuConfig;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.IslandCreationButton;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmBan;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmKick;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandCreation;
@@ -35,8 +42,14 @@ import com.bgsoftware.superiorskyblock.core.menu.view.args.PlayerViewArgs;
 import com.google.common.base.Preconditions;
 
 import java.io.File;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class MenusProvider_Default implements MenusProvider {
+
+    private final Map<Schematic, MenuIslandCreationConfig> ISLAND_CREATION_CONFIG_CACHE = new IdentityHashMap<>();
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -209,6 +222,14 @@ public class MenusProvider_Default implements MenusProvider {
     public void openIslandChest(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
+        if (Menus.MENU_ISLAND_CHEST.isSkipOneItem()) {
+            IslandChest[] islandChest = targetIsland.getChest();
+            if (islandChest.length == 1) {
+                islandChest[0].openChest(targetPlayer);
+                return;
+            }
+        }
+
         Menus.MENU_ISLAND_CHEST.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
     }
 
@@ -219,9 +240,36 @@ public class MenusProvider_Default implements MenusProvider {
     }
 
     @Override
+    public MenuIslandCreationConfig getIslandCreationConfig(Schematic schematic) {
+        return ISLAND_CREATION_CONFIG_CACHE.computeIfAbsent(schematic, unused -> {
+            for (MenuTemplateButton<MenuIslandCreation.View> button : Menus.MENU_ISLAND_CREATION.getLayout().getButtons()) {
+                if (IslandCreationButton.class.equals(button.getViewButtonType()) &&
+                        ((IslandCreationButton.Template) button).getSchematic().equals(schematic)) {
+                    return ((IslandCreationButton.Template) button).getCreationConfig();
+                }
+            }
+
+            return new MenuConfig.IslandCreation(schematic, null);
+        });
+    }
+
+    @Override
     public void openIslandCreation(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, String islandName) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
+        if (Menus.MENU_ISLAND_CREATION.isSkipOneItem()) {
+            List<Schematic> schematicButtons = Menus.MENU_ISLAND_CREATION.getLayout().getButtons().stream()
+                    .filter(button -> IslandCreationButton.class.equals(button.getViewButtonType()))
+                    .map(button -> ((IslandCreationButton.Template) button).getSchematic())
+                    .collect(Collectors.toList());
+
+            if (schematicButtons.size() == 1) {
+                MenuIslandCreationConfig creationConfig = getIslandCreationConfig(schematicButtons.get(0));
+                MenuActions.simulateIslandCreationClick(targetPlayer, islandName, creationConfig, false, targetPlayer.getOpenedView());
+                return;
+            }
+        }
+
         Menus.MENU_ISLAND_CREATION.createView(targetPlayer, new MenuIslandCreation.Args(islandName), previousMenu);
     }
 
@@ -442,7 +490,17 @@ public class MenusProvider_Default implements MenusProvider {
     public void openWarpCategories(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        Menus.MENU_WARP_CATEGORIES.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+
+        // The warp categories menu should be opened only if:
+        //      A) its enabled
+        //      B) there are more than 1 category
+        if (plugin.getSettings().isWarpCategories() && targetIsland.getWarpCategories().size() > 1) {
+            Menus.MENU_WARP_CATEGORIES.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
+        } else {
+            WarpCategory warpCategory = targetIsland.getWarpCategories().values().stream().findFirst()
+                    .orElseGet(() -> targetIsland.createWarpCategory("Default Category"));
+            openWarps(targetPlayer, previousMenu, warpCategory);
+        }
     }
 
     @Override

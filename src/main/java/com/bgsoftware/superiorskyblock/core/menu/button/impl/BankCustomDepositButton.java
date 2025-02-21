@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.menu.Menus;
+import com.bgsoftware.superiorskyblock.core.menu.MenuActions;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
@@ -46,7 +46,7 @@ public class BankCustomDepositButton extends AbstractMenuViewButton<IslandMenuVi
             try {
                 BigDecimal newAmount = BigDecimal.valueOf(Double.parseDouble(message));
                 BankTransaction bankTransaction = island.getIslandBank().depositMoney(clickedPlayer, newAmount);
-                Menus.MENU_ISLAND_BANK.handleDeposit(clickedPlayer, island, bankTransaction,
+                MenuActions.handleDeposit(clickedPlayer, island, bankTransaction,
                         getTemplate().successSound, getTemplate().failSound, newAmount);
             } catch (IllegalArgumentException ex) {
                 Message.INVALID_AMOUNT.send(clickedPlayer, message);

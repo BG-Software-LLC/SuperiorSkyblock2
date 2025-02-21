@@ -1,12 +1,14 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.menu.MenuIslandCreationConfig;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.menu.Menus;
+import com.bgsoftware.superiorskyblock.core.menu.MenuActions;
+import com.bgsoftware.superiorskyblock.core.menu.MenuConfig;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
@@ -44,8 +46,8 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
     @Override
     public void onButtonClick(InventoryClickEvent clickEvent) {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
-        Menus.MENU_ISLAND_CREATION.simulateClick(clickedPlayer, menuView.getIslandName(), getTemplate(),
-                clickEvent.getClick().isRightClick(), menuView);
+        MenuActions.simulateIslandCreationClick(clickedPlayer, menuView.getIslandName(),
+                getTemplate().getCreationConfig(), clickEvent.getClick().isRightClick(), menuView);
     }
 
     @Override
@@ -137,6 +139,8 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
         @Nullable
         private final BlockOffset spawnOffset;
 
+        private final MenuIslandCreationConfig creationConfig = new MenuConfig.IslandCreation(this);
+
         Template(@Nullable String requiredPermission, @Nullable GameSound lackPermissionSound,
                  @Nullable GameSound accessSound, @Nullable List<String> accessCommands,
                  @Nullable TemplateItem lackPermissionItem, @Nullable List<String> lackPermissionCommands,
@@ -192,6 +196,11 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
         public BlockOffset getSpawnOffset() {
             return spawnOffset;
         }
+
+        public MenuIslandCreationConfig getCreationConfig() {
+            return creationConfig;
+        }
+
     }
 
 }

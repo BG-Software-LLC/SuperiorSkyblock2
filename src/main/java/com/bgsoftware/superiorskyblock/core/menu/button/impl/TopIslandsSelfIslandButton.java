@@ -85,7 +85,8 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
                 if (Menus.MENU_GLOBAL_WARPS.isVisitorWarps()) {
                     plugin.getCommands().dispatchSubCommand(player, "visit", island.getOwner().getName());
                 } else {
-                    Menus.MENU_WARP_CATEGORIES.openMenu(menuView.getInventoryViewer(), menuView, island);
+                    plugin.getProviders().getMenusProvider().openWarpCategories(
+                            menuView.getInventoryViewer(), MenuViewWrapper.fromView(menuView), island);
                 }
             } else if (plugin.getSettings().isValuesMenu()) {
                 plugin.getMenus().openValues(menuView.getInventoryViewer(), MenuViewWrapper.fromView(menuView), island);

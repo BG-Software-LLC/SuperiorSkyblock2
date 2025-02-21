@@ -40,18 +40,6 @@ public class MenuIslandChest extends AbstractPagedMenu<MenuIslandChest.View, Isl
         refreshViews(view -> view.island.equals(island));
     }
 
-    public void openMenu(SuperiorPlayer superiorPlayer, @Nullable MenuView<?, ?> previousMenu, Island island) {
-        if (isSkipOneItem()) {
-            IslandChest[] islandChest = island.getChest();
-            if (islandChest.length == 1) {
-                islandChest[0].openChest(superiorPlayer);
-                return;
-            }
-        }
-
-        plugin.getMenus().openIslandChest(superiorPlayer, MenuViewWrapper.fromView(previousMenu), island);
-    }
-
     @Nullable
     public static MenuIslandChest createInstance() {
         MenuParseResult<View> menuParseResult = MenuParserImpl.getInstance().loadMenu("island-chest.yml",

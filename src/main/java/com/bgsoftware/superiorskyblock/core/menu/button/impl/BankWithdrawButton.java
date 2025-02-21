@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.menu.Menus;
+import com.bgsoftware.superiorskyblock.core.menu.MenuActions;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
@@ -38,7 +38,7 @@ public class BankWithdrawButton extends AbstractMenuViewButton<IslandMenuView> {
                 .multiply(getTemplate().withdrawValue);
 
         BankTransaction bankTransaction = island.getIslandBank().withdrawMoney(clickedPlayer, amount, getTemplate().withdrawCommands);
-        Menus.MENU_ISLAND_BANK.handleWithdraw(clickedPlayer, island, bankTransaction,
+        MenuActions.handleWithdraw(clickedPlayer, island, bankTransaction,
                 getTemplate().successSound, getTemplate().failSound, amount);
     }
 
