@@ -39,17 +39,17 @@ public class MenuConfig {
         }
 
         @Override
-        public GameSound getAccessSound() {
+        public GameSound getSound() {
             return this.template == null ? null : this.template.getAccessSound();
         }
 
         @Override
-        public Collection<String> getAccessCommands() {
+        public Collection<String> getCommands() {
             return this.template == null ? Collections.emptyList() : this.template.getAccessCommands();
         }
 
         @Override
-        public boolean isSchematicOffset() {
+        public boolean shouldOffsetIslandValue() {
             return this.template != null && this.template.isOffset();
         }
 
