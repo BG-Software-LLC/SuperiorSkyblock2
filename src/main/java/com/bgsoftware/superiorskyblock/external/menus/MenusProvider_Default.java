@@ -39,6 +39,7 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuCustom;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.PlayerViewArgs;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.google.common.base.Preconditions;
 
 import java.io.File;
@@ -559,6 +560,21 @@ public class MenusProvider_Default implements MenusProvider {
     public void openWarps(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, WarpCategory targetCategory) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetCategory, "targetCategory parameter cannot be null.");
+
+        // We want skip one item to only work if the player can't edit warps, otherwise he
+        // won't be able to edit them as the menu will get skipped if only one warp exists.
+        if (Menus.MENU_WARPS.isSkipOneItem() && !targetCategory.getIsland().hasPermission(targetPlayer, IslandPrivileges.SET_WARP)) {
+            List<IslandWarp> availableWarps = targetCategory.getIsland().isMember(targetPlayer) ? targetCategory.getWarps() :
+                    targetCategory.getWarps().stream()
+                            .filter(islandWarp -> !islandWarp.hasPrivateFlag())
+                            .collect(Collectors.toList());
+
+            if (availableWarps.size() == 1) {
+                MenuActions.simulateWarpsClick(targetPlayer, targetCategory.getIsland(), availableWarps.get(0));
+                return;
+            }
+        }
+
         Menus.MENU_WARPS.createView(targetPlayer, new MenuWarps.Args(targetCategory), previousMenu);
     }
 

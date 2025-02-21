@@ -20,10 +20,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpPagedObjectButt
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
-import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.warp.WarpIcons;
 import org.bukkit.Material;
@@ -32,10 +29,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MenuWarps extends AbstractPagedMenu<MenuWarps.View, MenuWarps.Args, IslandWarp> {
 
@@ -62,49 +57,6 @@ public class MenuWarps extends AbstractPagedMenu<MenuWarps.View, MenuWarps.Args,
 
     public void closeViews(WarpCategory warpCategory) {
         closeViews(view -> view.getWarpCategory().equals(warpCategory));
-    }
-
-    public void simulateClick(SuperiorPlayer superiorPlayer, Island island, IslandWarp islandWarp) {
-        if (!superiorPlayer.hasBypassModeEnabled() && plugin.getSettings().getChargeOnWarp() > 0) {
-            if (plugin.getProviders().getEconomyProvider().getBalance(superiorPlayer)
-                    .compareTo(BigDecimal.valueOf(plugin.getSettings().getChargeOnWarp())) < 0) {
-                Message.NOT_ENOUGH_MONEY_TO_WARP.send(superiorPlayer);
-                return;
-            }
-
-            plugin.getProviders().getEconomyProvider().withdrawMoney(superiorPlayer,
-                    plugin.getSettings().getChargeOnWarp());
-        }
-
-        BukkitExecutor.sync(() -> {
-            superiorPlayer.runIfOnline(player -> {
-                MenuView<?, ?> currentView = superiorPlayer.getOpenedView();
-                if (currentView == null) {
-                    player.closeInventory();
-                } else {
-                    currentView.closeView();
-                }
-                island.warpPlayer(superiorPlayer, islandWarp.getName());
-            });
-        }, 1L);
-    }
-
-    public void openMenu(SuperiorPlayer superiorPlayer, @Nullable MenuView<?, ?> previousMenu, WarpCategory warpCategory) {
-        // We want skip one item to only work if the player can't edit warps, otherwise he
-        // won't be able to edit them as the menu will get skipped if only one warp exists.
-        if (isSkipOneItem() && !warpCategory.getIsland().hasPermission(superiorPlayer, IslandPrivileges.SET_WARP)) {
-            List<IslandWarp> availableWarps = warpCategory.getIsland().isMember(superiorPlayer) ? warpCategory.getWarps() :
-                    warpCategory.getWarps().stream()
-                            .filter(islandWarp -> !islandWarp.hasPrivateFlag())
-                            .collect(Collectors.toList());
-
-            if (availableWarps.size() == 1) {
-                simulateClick(superiorPlayer, warpCategory.getIsland(), availableWarps.get(0));
-                return;
-            }
-        }
-
-        plugin.getMenus().openWarps(superiorPlayer, MenuViewWrapper.fromView(previousMenu), warpCategory);
     }
 
     @Nullable

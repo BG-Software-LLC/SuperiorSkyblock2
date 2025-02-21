@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.menu.MenuIslandCreationConfig;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
@@ -14,6 +15,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -119,6 +121,31 @@ public class MenuActions {
 
         plugin.getGrid().createIsland(clickedPlayer, schematic.getName(), creationConfig.getBonusWorth(),
                 creationConfig.getBonusLevel(), creationConfig.getBiome(), islandName, offset, spawnOffset);
+    }
+
+    public static void simulateWarpsClick(SuperiorPlayer superiorPlayer, Island island, IslandWarp islandWarp) {
+        if (!superiorPlayer.hasBypassModeEnabled() && plugin.getSettings().getChargeOnWarp() > 0) {
+            if (plugin.getProviders().getEconomyProvider().getBalance(superiorPlayer)
+                    .compareTo(BigDecimal.valueOf(plugin.getSettings().getChargeOnWarp())) < 0) {
+                Message.NOT_ENOUGH_MONEY_TO_WARP.send(superiorPlayer);
+                return;
+            }
+
+            plugin.getProviders().getEconomyProvider().withdrawMoney(superiorPlayer,
+                    plugin.getSettings().getChargeOnWarp());
+        }
+
+        BukkitExecutor.sync(() -> {
+            superiorPlayer.runIfOnline(player -> {
+                MenuView<?, ?> currentView = superiorPlayer.getOpenedView();
+                if (currentView == null) {
+                    player.closeInventory();
+                } else {
+                    currentView.closeView();
+                }
+                island.warpPlayer(superiorPlayer, islandWarp.getName());
+            });
+        }, 1L);
     }
 
     private MenuActions() {
