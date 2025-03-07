@@ -133,7 +133,7 @@ public class ChunkPosition implements ObjectsPool.Releasable, AutoCloseable {
     }
 
     public ChunkPosition copy() {
-        return new ChunkPosition().initialize(this.worldInfo, this.x, this.z);
+        return new ChunkPosition(false).initialize(this.worldInfo, this.x, this.z);
     }
 
     @Override

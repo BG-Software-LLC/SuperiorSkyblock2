@@ -140,7 +140,7 @@ public class NMSUtils {
             if (chunkAccess instanceof LevelChunk levelChunk) {
                 loadedChunks.add(levelChunk);
             } else {
-                unloadedChunks.add(chunkPosition);
+                unloadedChunks.add(chunkPosition.copy());
             }
         });
 

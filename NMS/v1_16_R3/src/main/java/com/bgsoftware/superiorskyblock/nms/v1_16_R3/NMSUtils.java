@@ -108,7 +108,7 @@ public class NMSUtils {
             if (chunkAccess instanceof Chunk) {
                 loadedChunks.add((Chunk) chunkAccess);
             } else {
-                unloadedChunks.add(chunkPosition);
+                unloadedChunks.add(chunkPosition.copy());
             }
         });
 

@@ -103,7 +103,7 @@ public class NMSUtils {
             if (chunk != null) {
                 loadedChunks.add(chunk);
             } else {
-                unloadedChunks.add(chunkPosition);
+                unloadedChunks.add(chunkPosition.copy());
             }
         });
 
