@@ -795,11 +795,15 @@ public class BukkitEventsListener implements Listener {
             if (gameEvent == null)
                 return;
 
-            if (event instanceof Cancellable && ((Cancellable) event).isCancelled())
+            boolean cancelledBeforeDispatch = false;
+
+            if (event instanceof Cancellable && ((Cancellable) event).isCancelled()) {
                 gameEvent.setCancelled();
+                cancelledBeforeDispatch = true;
+            }
 
             plugin.getGameEventsDispatcher().onGameEvent(gameEvent, gameEventPriority);
-            if (gameEvent.isCancelled()) {
+            if (!cancelledBeforeDispatch && gameEvent.isCancelled()) {
                 if (event instanceof Cancellable)
                     ((Cancellable) event).setCancelled(true);
             }
