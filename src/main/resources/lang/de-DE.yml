@@ -521,7 +521,9 @@ INVITE_BANNED_PLAYER: '&c&lError | &7Dieser Spieler ist von der Insel gesperrt u
   kann nicht eingeladen werden.'
 INVITE_TO_FULL_ISLAND: '&c&lError | &7Du kannst keine weiteren Mitglieder auf Ihre
   Insel einladen.'
+ISLAND_ALREADY_CLOSED: '&c&lError | &7The island is already closed to the public.'
 ISLAND_ALREADY_EXIST: '&c&lError | &7Eine Insel mit diesem Namen existiert bereits.'
+ISLAND_ALREADY_OPENED: '&c&lError | &7The island is already opened to the public.'
 ISLAND_BANK_EMPTY: '&e&lBank | &7Inselbank ist leer.'
 ISLAND_BANK_SHOW: '&e&lBank | &7Deine Insel hat ${0}.'
 ISLAND_BANK_SHOW_OTHER: '&e&lBank | Die Insel von &7{0} hat ${1}.'

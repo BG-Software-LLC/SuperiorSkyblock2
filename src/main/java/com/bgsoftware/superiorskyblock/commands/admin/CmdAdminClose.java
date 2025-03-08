@@ -59,7 +59,9 @@ public class CmdAdminClose implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
-        if (PluginEventsFactory.callIslandCloseEvent(island, sender)) {
+        if (island.isLocked()) {
+            Message.ISLAND_ALREADY_CLOSED.send(sender);
+        } else if (PluginEventsFactory.callIslandCloseEvent(island, sender)) {
             island.setLocked(true);
             Message.ISLAND_CLOSED.send(sender);
         }
