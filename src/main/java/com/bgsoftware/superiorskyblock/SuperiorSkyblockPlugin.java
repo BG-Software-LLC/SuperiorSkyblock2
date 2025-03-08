@@ -453,9 +453,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             // The reload was requested by a command. We want to reload the commands, settings and call the
             // module lifecycles that are not called regularly. If the reload was due to a startup, then
             // all of that is called already in the onEnable callback of the plugin.
-            commandsHandler.loadData();
-
             settingsHandler.loadData();
+
+            commandsHandler.loadData();
 
             modulesHandler.runModuleLifecycle(ModuleLoadTime.PLUGIN_INITIALIZE, true);
             modulesHandler.runModuleLifecycle(ModuleLoadTime.BEFORE_WORLD_CREATION, true);
