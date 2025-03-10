@@ -26,6 +26,7 @@ public class ChunkPosition implements ObjectsPool.Releasable, AutoCloseable {
     private final boolean isPool;
 
     private Thread holder = Thread.currentThread();
+    private StackTraceElement[] releaseStackTrace;
 
     public static ChunkPosition of(Location location) {
         World world = location.getWorld();
@@ -81,8 +82,17 @@ public class ChunkPosition implements ObjectsPool.Releasable, AutoCloseable {
     }
 
     private void checkAccess() {
-        if (isPool && Thread.currentThread() != this.holder)
-            throw new RuntimeException("Accessed ChunkPosition from " + Thread.currentThread() + " but holder is " + this.holder);
+        if (isPool && Thread.currentThread() != this.holder) {
+            StringBuilder builder = new StringBuilder("Accessed ChunkPosition from " + Thread.currentThread() + " but holder is " + this.holder);
+            if (this.releaseStackTrace != null && this.releaseStackTrace.length > 0) {
+                builder.append("\n\n\tRelease stacktrace:");
+                for (StackTraceElement traceElement : this.releaseStackTrace) {
+                    builder.append("\n\t\tat ").append(traceElement);
+                }
+                builder.append("\n");
+            }
+            throw new RuntimeException(builder.toString());
+        }
     }
 
     public World getWorld() {
@@ -147,6 +157,7 @@ public class ChunkPosition implements ObjectsPool.Releasable, AutoCloseable {
         this.pairedXZ = -1;
         this.cachedBukkitWorld.clear();
         this.holder = null;
+        this.releaseStackTrace = Thread.currentThread().getStackTrace();
         POOL.release(this);
     }
 
