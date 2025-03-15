@@ -153,6 +153,8 @@ public class ChunkPosition implements ObjectsPool.Releasable, AutoCloseable {
         if (!isPool)
             return;
 
+        checkAccess();
+
         this.worldInfo = null;
         this.pairedXZ = -1;
         this.cachedBukkitWorld.clear();
