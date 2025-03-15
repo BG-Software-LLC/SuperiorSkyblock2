@@ -122,6 +122,9 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             registerPlaceholdersProvider();
             registerChunksProvider();
         });
+
+        registerMessageProviders();
+
         // We try to forcefully load prices after a second the server has enabled.
         BukkitExecutor.sync(this::forcePricesLoad, 60L);
     }
@@ -473,6 +476,13 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
                 registerHook("TimbruSilkSpawnersHook");
             }
         }
+
+    }
+
+    private void registerMessageProviders() {
+        if (isHookEnabled("MiniMessage") && hasMiniMessageSupport()) {
+            registerHook("MiniMessageHook");
+        }
     }
 
     private void registerSpawnersProvider() {
@@ -682,6 +692,15 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private static boolean isOldSlimeWorldManager() {
         try {
             Class.forName("com.grinderwolf.swm.api.SlimePlugin");
+            return true;
+        } catch (ClassNotFoundException error) {
+            return false;
+        }
+    }
+
+    private static boolean hasMiniMessageSupport() {
+        try {
+            Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
             return true;
         } catch (ClassNotFoundException error) {
             return false;

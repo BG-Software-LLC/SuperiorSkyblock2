@@ -28,8 +28,8 @@ import com.bgsoftware.superiorskyblock.core.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.factory.FactoriesManagerImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
 import com.bgsoftware.superiorskyblock.core.key.KeysManagerImpl;
@@ -447,6 +447,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     }
 
     public void reloadPlugin(PluginReloadReason reloadReason) throws ManagerLoadException {
+        providersHandler.loadData();
+
         ItemSkulls.readTextures(this);
 
         if (reloadReason == PluginReloadReason.COMMAND) {
@@ -481,7 +483,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         }
 
         schematicsHandler.loadData();
-        providersHandler.loadData();
         menusHandler.loadData();
         missionsHandler.loadData();
 
