@@ -216,9 +216,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
         int maxChunkZ = maxBlockZ >> 4;
         for (int chunkX = minChunkX; chunkX <= maxChunkX; ++chunkX) {
             for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; ++chunkZ) {
-                try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ)) {
-                    worldReader.prepareChunk(chunkPosition);
-                }
+                worldReader.prepareChunk(ChunkPosition.of(world, chunkX, chunkZ));
             }
         }
 

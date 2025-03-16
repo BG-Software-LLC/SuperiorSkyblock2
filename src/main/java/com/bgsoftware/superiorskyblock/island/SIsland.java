@@ -1984,20 +1984,20 @@ public class SIsland implements Island {
 
             World world = islandWorldResult.getLeft();
 
-            try (ChunkPosition centerChunkPosition = ChunkPosition.of(world,
-                    centerBlockPosition.getX() >> 4, centerBlockPosition.getZ() >> 4)) {
-                ChunksProvider.loadChunk(centerChunkPosition, ChunkLoadReason.BIOME_REQUEST, null)
-                        .thenApply(chunk -> centerBlockPosition.parse(world).getBlock().getBiome())
-                        .whenComplete((biome, error) -> {
-                            if (error != null)
-                                newTask.completeExceptionally(error);
-                            else {
-                                this.biome = biome;
-                                biomeGetterTask.set((CompletableFuture<Biome>) null);
-                                newTask.complete(biome);
-                            }
-                        });
-            }
+            ChunkPosition centerChunkPosition =
+                    ChunkPosition.of(world, centerBlockPosition.getX() >> 4, centerBlockPosition.getZ() >> 4);
+
+            ChunksProvider.loadChunk(centerChunkPosition, ChunkLoadReason.BIOME_REQUEST, null)
+                    .thenApply(chunk -> centerBlockPosition.parse(world).getBlock().getBiome())
+                    .whenComplete((biome, error) -> {
+                        if (error != null)
+                            newTask.completeExceptionally(error);
+                        else {
+                            this.biome = biome;
+                            biomeGetterTask.set((CompletableFuture<Biome>) null);
+                            newTask.complete(biome);
+                        }
+                    });
         });
 
         return newTask;
