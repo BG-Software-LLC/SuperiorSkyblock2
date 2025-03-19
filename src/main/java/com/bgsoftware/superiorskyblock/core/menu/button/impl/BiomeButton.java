@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
@@ -26,7 +27,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
@@ -87,7 +87,8 @@ public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
                 command.replace("%player%", inventoryViewer.getName())));
 
         menuView.getIsland().setBiome(event.getArgs().biome);
-        Message.CHANGED_BIOME.send(inventoryViewer, event.getArgs().biome.name().toLowerCase(Locale.ENGLISH));
+        Message.CHANGED_BIOME.send(inventoryViewer,
+                Formatters.CAPITALIZED_FORMATTER.format(event.getArgs().biome.name()));
 
         BukkitExecutor.sync(menuView::closeView, 1L);
     }
