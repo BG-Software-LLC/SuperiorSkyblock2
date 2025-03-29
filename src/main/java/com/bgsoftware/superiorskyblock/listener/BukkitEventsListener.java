@@ -75,6 +75,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
@@ -154,6 +155,7 @@ public class BukkitEventsListener implements Listener {
         createEventListener(GameEventType.PLAYER_GAMEMODE_CHANGE, PlayerGameModeChangeEvent.class, this::createGameEvent);
         createEventListener(GameEventType.PLAYER_CHANGED_WORLD_EVENT, PlayerChangedWorldEvent.class, this::createGameEvent);
         createEventListener(GameEventType.PLAYER_RESPAWN_EVENT, PlayerRespawnEvent.class, this::createGameEvent);
+        createEventListener(GameEventType.ENTITY_PORTAL_EVENT, PlayerPortalEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_PORTAL_EVENT, EntityPortalEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_ENTER_PORTAL_EVENT, EntityPortalEnterEvent.class, this::createGameEvent);
         createEventListener(GameEventType.PROJECTILE_LAUNCH_EVENT, ProjectileLaunchEvent.class, this::createGameEvent);
@@ -721,12 +723,23 @@ public class BukkitEventsListener implements Listener {
         return eventType.createEvent(playerPickupItemEvent);
     }
 
+    private GameEvent<GameEventArgs.EntityPortalEvent> createGameEvent(GameEventType<GameEventArgs.EntityPortalEvent> eventType, GameEventPriority priority, PlayerPortalEvent e) {
+        GameEventArgs.EntityPortalEvent entityPortalEvent = new GameEventArgs.EntityPortalEvent();
+        entityPortalEvent.entity = e.getPlayer();
+        entityPortalEvent.cause = e.getTo().getWorld().getEnvironment() == World.Environment.THE_END ||
+                e.getFrom().getWorld().getEnvironment() == World.Environment.THE_END ?
+                PlayerTeleportEvent.TeleportCause.END_PORTAL : PlayerTeleportEvent.TeleportCause.NETHER_PORTAL;
+        entityPortalEvent.from = e.getFrom();
+        entityPortalEvent.to = e.getTo();
+        return eventType.createEvent(entityPortalEvent);
+    }
+
     private GameEvent<GameEventArgs.EntityPortalEvent> createGameEvent(GameEventType<GameEventArgs.EntityPortalEvent> eventType, GameEventPriority priority, EntityPortalEvent e) {
         GameEventArgs.EntityPortalEvent entityPortalEvent = new GameEventArgs.EntityPortalEvent();
         entityPortalEvent.entity = e.getEntity();
         entityPortalEvent.cause = e.getTo().getWorld().getEnvironment() == World.Environment.THE_END ||
                 e.getFrom().getWorld().getEnvironment() == World.Environment.THE_END ?
-                PlayerTeleportEvent.TeleportCause.NETHER_PORTAL : PlayerTeleportEvent.TeleportCause.END_PORTAL;
+                PlayerTeleportEvent.TeleportCause.END_PORTAL : PlayerTeleportEvent.TeleportCause.NETHER_PORTAL;
         entityPortalEvent.from = e.getFrom();
         entityPortalEvent.to = e.getTo();
         return eventType.createEvent(entityPortalEvent);
