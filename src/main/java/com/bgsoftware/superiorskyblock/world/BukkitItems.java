@@ -75,11 +75,17 @@ public class BukkitItems {
     public static ItemStack getHandItem(Player onlinePlayer, @Nullable PlayerHand usedHand) {
         if (usedHand == null) {
             return null;
-        } else if (usedHand == PlayerHand.OFF_HAND) {
-            return GET_ITEM_IN_OFF_HAND.invoke(onlinePlayer.getInventory());
-        } else {
-            return onlinePlayer.getItemInHand();
         }
+
+        ItemStack handItem;
+
+        if (usedHand == PlayerHand.OFF_HAND) {
+            handItem = GET_ITEM_IN_OFF_HAND.invoke(onlinePlayer.getInventory());
+        } else {
+            handItem = onlinePlayer.getItemInHand();
+        }
+
+        return handItem == null || handItem.getType() == Material.AIR ? null : handItem;
     }
 
     public static void setHandItem(Player player, PlayerHand playerHand, @Nullable ItemStack itemStack) {
