@@ -25,6 +25,8 @@ items:
   '@':
     type: PLAYER_HEAD
     name: '&e{0}'
+    lore:
+      - '&7Click to uncoop the player.'
   '%':
     type: PAPER
     name: '{0}Previous Page'
