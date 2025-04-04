@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 public class VarintArray {
 
     private static final byte[] VARINT_BUF = new byte[10];
+    private static final byte[] ZERO_BYTE = new byte[]{0};
 
     private final ByteBigArray backend;
     private int size;
@@ -40,6 +41,9 @@ public class VarintArray {
     }
 
     private static byte[] serializeVarint(long value) {
+        if (value == 0)
+            return ZERO_BYTE;
+
         int varintBytesCount = 0;
         while (value != 0) {
             byte nextByte = (byte) (value & 0x7f);

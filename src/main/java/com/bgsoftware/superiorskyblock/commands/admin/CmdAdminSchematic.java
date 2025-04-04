@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -24,7 +24,8 @@ public class CmdAdminSchematic implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin schematic [" + Message.COMMAND_ARGUMENT_SCHEMATIC_NAME.getMessage(locale) + "]";
+        return "admin schematic [" + Message.COMMAND_ARGUMENT_SCHEMATIC_NAME.getMessage(locale) + "] [" +
+                Message.COMMAND_ARGUMENT_SCHEMATIC_SAVE_AIR.getMessage(locale) + "]";
     }
 
     @Override
@@ -39,7 +40,7 @@ public class CmdAdminSchematic implements ISuperiorCommand {
 
     @Override
     public int getMaxArgs() {
-        return 3;
+        return 4;
     }
 
     @Override
@@ -66,9 +67,10 @@ public class CmdAdminSchematic implements ISuperiorCommand {
             }
 
             String schematicName = args[2];
+            boolean saveAir = args.length == 4 && Boolean.parseBoolean(args[3]);
 
             Message.SCHEMATIC_PROCCESS_REQUEST.send(superiorPlayer);
-            plugin.getSchematics().saveSchematic(superiorPlayer, schematicName);
+            plugin.getSchematics().saveSchematic(superiorPlayer, schematicName, saveAir);
         }
     }
 

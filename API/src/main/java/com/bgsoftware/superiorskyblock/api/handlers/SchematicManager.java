@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.schematic.SchematicOptions;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
@@ -41,12 +42,22 @@ public interface SchematicManager {
 
     /**
      * Save a schematic.
-     * Calls the saveSchematic(Location, Location, Integer, Integer, Integer, String, Runnable) method with default values.
+     * Calls the {@link #saveSchematic(SuperiorPlayer, String, boolean)} with saveAir set to false.
      *
      * @param superiorPlayer The player who saves the schematic.
      * @param schematicName  The schematic name.
      */
     void saveSchematic(SuperiorPlayer superiorPlayer, String schematicName);
+
+    /**
+     * Save a schematic.
+     * Calls the {@link #saveSchematic(Location, Location, SchematicOptions, Runnable)} method with default values.
+     *
+     * @param superiorPlayer The player who saves the schematic.
+     * @param schematicName  The schematic name.
+     * @param saveAir        Whether to save air blocks into the schematic.
+     */
+    void saveSchematic(SuperiorPlayer superiorPlayer, String schematicName, boolean saveAir);
 
     /**
      * Save a schematic.
@@ -101,5 +112,24 @@ public interface SchematicManager {
      * @param callable      A runnable that will be ran after the task is completed.
      */
     void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, float yaw, float pitch, String schematicName, @Nullable Runnable callable);
+
+    /**
+     * Save a schematic.
+     *
+     * @param pos1             First position for the schematic.
+     * @param pos2             Second position for the schematic.
+     * @param schematicOptions The options for creating the new schematic.
+     */
+    void saveSchematic(Location pos1, Location pos2, SchematicOptions schematicOptions);
+
+    /**
+     * Save a schematic.
+     *
+     * @param pos1             First position for the schematic.
+     * @param pos2             Second position for the schematic.
+     * @param schematicOptions The options for creating the new schematic.
+     * @param callable         A runnable that will be ran after the task is completed.
+     */
+    void saveSchematic(Location pos1, Location pos2, SchematicOptions schematicOptions, @Nullable Runnable callable);
 
 }

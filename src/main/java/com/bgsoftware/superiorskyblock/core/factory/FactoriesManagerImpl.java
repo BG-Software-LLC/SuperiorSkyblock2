@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
+import com.bgsoftware.superiorskyblock.api.schematic.SchematicOptions;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
@@ -44,6 +45,7 @@ import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.algorithm.DefaultPlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
+import com.bgsoftware.superiorskyblock.world.schematic.options.SchematicOptionsBuilderImpl;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -191,6 +193,12 @@ public class FactoriesManagerImpl implements FactoriesManager {
     public GameSound createGameSound(Sound sound, float volume, float pitch) {
         Preconditions.checkNotNull(sound, "sound parameter cannot be null");
         return new GameSoundImpl(sound, volume, pitch);
+    }
+
+    @Override
+    public SchematicOptions.Builder createSchematicOptionsBuilder(String schematicName) {
+        Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null");
+        return new SchematicOptionsBuilderImpl(schematicName);
     }
 
     public IslandBank createIslandBank(Island island, Supplier<Boolean> isGiveInterestFailed) {

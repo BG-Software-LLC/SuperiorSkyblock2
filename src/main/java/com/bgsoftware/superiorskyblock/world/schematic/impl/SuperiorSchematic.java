@@ -102,7 +102,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
             for (Tag<?> tag : blocksList) {
                 SchematicBlockData schematicBlock = SuperiorSchematicDeserializer.deserializeSchematicBlock((CompoundTag) tag, dataVersion);
-                if (schematicBlock != null && schematicBlock.getCombinedId() > 0) {
+                if (schematicBlock != null) {
                     schematicBlocks.add(schematicBlock);
                     readBlock(schematicBlock);
 

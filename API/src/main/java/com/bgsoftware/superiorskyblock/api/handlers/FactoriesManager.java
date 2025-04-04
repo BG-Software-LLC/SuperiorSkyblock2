@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.factory.IslandsFactory;
 import com.bgsoftware.superiorskyblock.api.factory.PlayersFactory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
+import com.bgsoftware.superiorskyblock.api.schematic.SchematicOptions;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
@@ -169,8 +170,14 @@ public interface FactoriesManager {
      * @param sound  The sound to play.
      * @param volume The volume to play the sound.
      * @param pitch  The pitch to play the sound.
-     * @return
      */
     GameSound createGameSound(Sound sound, float volume, float pitch);
+
+    /**
+     * Create a new builder for a {@link SchematicOptions} object.
+     *
+     * @param schematicName The name of the schematic to create.
+     */
+    SchematicOptions.Builder createSchematicOptionsBuilder(String schematicName);
 
 }

@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.schematic.SchematicOptions;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParseException;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
@@ -135,6 +136,11 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
     @Override
     public void saveSchematic(SuperiorPlayer superiorPlayer, String schematicName) {
+        saveSchematic(superiorPlayer, schematicName, false);
+    }
+
+    @Override
+    public void saveSchematic(SuperiorPlayer superiorPlayer, String schematicName, boolean saveAir) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkArgument(superiorPlayer.isOnline(), "superiorPlayer must be online.");
         Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
@@ -145,17 +151,20 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
         Location offset;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location min = new Location(pos1.getWorld(),
+            offset = superiorPlayer.getLocation(wrapper.getHandle()).subtract(
                     Math.min(pos1.getX(), pos2.getX()),
-                    Math.min(pos1.getY(), pos2.getY()),
+                    Math.min(pos1.getY(), pos2.getY()) + 1,
                     Math.min(pos1.getZ(), pos2.getZ())
             );
-
-            offset = superiorPlayer.getLocation(wrapper.getHandle()).subtract(min.add(0, 1, 0));
         }
 
-        saveSchematic(pos1.parse(), pos2.parse(), offset.getBlockX(), offset.getBlockY(), offset.getBlockZ(),
-                offset.getYaw(), offset.getPitch(), schematicName, () -> Message.SCHEMATIC_SAVED.send(superiorPlayer));
+        SchematicOptions schematicOptions = SchematicOptions.newBuilder(schematicName)
+                .setOffset(offset.getBlockX(), offset.getBlockY(), offset.getBlockZ())
+                .setDirection(offset.getYaw(), offset.getPitch())
+                .setSaveAir(saveAir)
+                .build();
+
+        saveSchematic(pos1.parse(), pos2.parse(), schematicOptions, () -> Message.SCHEMATIC_SAVED.send(superiorPlayer));
 
         superiorPlayer.setSchematicPos1(null);
         superiorPlayer.setSchematicPos2(null);
@@ -186,13 +195,34 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
     }
 
     @Override
-    public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ,
-                              float yaw, float pitch, String schematicName, @Nullable Runnable runnable) {
+    public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, float yaw, float pitch,
+                              String schematicName, @Nullable Runnable callable) {
         Preconditions.checkNotNull(pos1, "pos1 parameter cannot be null.");
         Preconditions.checkNotNull(pos2, "pos2 parameter cannot be null.");
         Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
 
-        Log.debug(Debug.SAVE_SCHEMATIC, pos1, pos2, offsetX, offsetY, offsetZ, yaw, pitch, schematicName);
+        SchematicOptions schematicOptions = SchematicOptions.newBuilder(schematicName)
+                .setOffset(offsetX, offsetY, offsetZ)
+                .setDirection(yaw, pitch)
+                .build();
+
+        saveSchematic(pos1, pos2, schematicOptions, callable);
+    }
+
+    @Override
+    public void saveSchematic(Location pos1, Location pos2, SchematicOptions schematicOptions) {
+        saveSchematic(pos1, pos2, schematicOptions, null);
+    }
+
+    @Override
+    public void saveSchematic(Location pos1, Location pos2, SchematicOptions schematicOptions, @Nullable Runnable callable) {
+        Preconditions.checkNotNull(pos1, "pos1 parameter cannot be null.");
+        Preconditions.checkNotNull(pos2, "pos2 parameter cannot be null.");
+        Preconditions.checkNotNull(schematicOptions, "schematicOptions parameter cannot be null.");
+
+        Log.debug(Debug.SAVE_SCHEMATIC, pos1, pos2, schematicOptions.getOffsetX(), schematicOptions.getOffsetY(),
+                schematicOptions.getOffsetZ(), schematicOptions.getYaw(), schematicOptions.getPitch(),
+                schematicOptions.shouldSaveAir(), schematicOptions.getSchematicName());
 
         World world = pos1.getWorld();
 
@@ -236,7 +266,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
                     for (int chunkBlockY = minBlockY; chunkBlockY <= maxBlockY; ++chunkBlockY) {
                         Material blockType = chunkReader.getType(chunkBlockX, chunkBlockY, chunkBlockZ);
-                        if (blockType == Material.AIR)
+                        if (!schematicOptions.shouldSaveAir() && blockType == Material.AIR)
                             continue;
 
                         short blockData = chunkReader.getData(chunkBlockX, chunkBlockY, chunkBlockZ);
@@ -281,22 +311,22 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             compoundValue.put("zSize", new IntTag(zSize));
             compoundValue.put("blocks", new ListTag(CompoundTag.class, blocks));
             compoundValue.put("entities", new ListTag(CompoundTag.class, entities));
-            compoundValue.put("offsetX", new IntTag(offsetX));
-            compoundValue.put("offsetY", new IntTag(offsetY));
-            compoundValue.put("offsetZ", new IntTag(offsetZ));
-            compoundValue.put("yaw", new FloatTag(yaw));
-            compoundValue.put("pitch", new FloatTag(pitch));
+            compoundValue.put("offsetX", new IntTag(schematicOptions.getOffsetX()));
+            compoundValue.put("offsetY", new IntTag(schematicOptions.getOffsetY()));
+            compoundValue.put("offsetZ", new IntTag(schematicOptions.getOffsetZ()));
+            compoundValue.put("yaw", new FloatTag(schematicOptions.getYaw()));
+            compoundValue.put("pitch", new FloatTag(schematicOptions.getPitch()));
             compoundValue.put("version", new StringTag(ServerVersion.getBukkitVersion()));
             if (!ServerVersion.isLegacy())
                 compoundValue.put("minecraftDataVersion", new IntTag(plugin.getNMSAlgorithms().getDataVersion()));
 
             CompoundTag schematicTag = new CompoundTag(compoundValue);
-            SuperiorSchematic schematic = new SuperiorSchematic(schematicName, schematicTag);
+            SuperiorSchematic schematic = new SuperiorSchematic(schematicOptions.getSchematicName(), schematicTag);
             this.schematicsContainer.addSchematic(schematic);
-            saveIntoFile(schematicName, schematicTag);
+            saveIntoFile(schematicOptions.getSchematicName(), schematicTag);
 
-            if (runnable != null)
-                BukkitExecutor.sync(runnable);
+            if (callable != null)
+                BukkitExecutor.sync(callable);
         });
 
     }
