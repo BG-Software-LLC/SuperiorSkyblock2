@@ -1,11 +1,13 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.menu.MenuIslandCreationConfig;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.core.menu.Menus;
+import com.bgsoftware.superiorskyblock.core.menu.MenuActions;
+import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
 import org.bukkit.command.CommandSender;
@@ -83,7 +85,7 @@ public class CmdCreate implements ISuperiorCommand {
         }
 
         String islandName = "";
-        String schematicName = null;
+        Schematic schematic = null;
 
         if (plugin.getSettings().getIslandNames().isRequiredForCreation()) {
             if (args.length >= 2) {
@@ -95,18 +97,19 @@ public class CmdCreate implements ISuperiorCommand {
 
         if (plugin.getSettings().isSchematicNameArgument() &&
                 args.length == (plugin.getSettings().getIslandNames().isRequiredForCreation() ? 3 : 2)) {
-            schematicName = args[plugin.getSettings().getIslandNames().isRequiredForCreation() ? 2 : 1];
-            Schematic schematic = plugin.getSchematics().getSchematic(schematicName);
+            String schematicName = args[plugin.getSettings().getIslandNames().isRequiredForCreation() ? 2 : 1];
+            schematic = plugin.getSchematics().getSchematic(schematicName);
             if (schematic == null || schematicName.endsWith("_nether") || schematicName.endsWith("_the_end")) {
                 Message.INVALID_SCHEMATIC.send(sender, schematicName);
                 return;
             }
         }
 
-        if (schematicName == null) {
-            Menus.MENU_ISLAND_CREATION.openMenu(superiorPlayer, superiorPlayer.getOpenedView(), islandName);
+        if (schematic == null) {
+            plugin.getMenus().openIslandCreation(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), islandName);
         } else {
-            Menus.MENU_ISLAND_CREATION.simulateClick(superiorPlayer, islandName, schematicName, false, superiorPlayer.getOpenedView());
+            MenuIslandCreationConfig creationConfig = plugin.getProviders().getMenusProvider().getIslandCreationConfig(schematic);
+            MenuActions.simulateIslandCreationClick(superiorPlayer, islandName, creationConfig, false, superiorPlayer.getOpenedView());
         }
     }
 

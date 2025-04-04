@@ -12,10 +12,8 @@ import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpCategoryPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
-import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -53,17 +51,6 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
 
     public void closeViews(Island island) {
         closeViews(view -> view.getIsland().equals(island));
-    }
-
-    public void openMenu(SuperiorPlayer superiorPlayer, @Nullable MenuView<?, ?> previousMenu, Island island) {
-        // The warp categories menu should be opened only if A) its enabled B) there are more than 1 categories
-        if (plugin.getSettings().isWarpCategories() && island.getWarpCategories().size() > 1) {
-            plugin.getMenus().openWarpCategories(superiorPlayer, MenuViewWrapper.fromView(previousMenu), island);
-        } else {
-            WarpCategory warpCategory = island.getWarpCategories().values().stream().findFirst()
-                    .orElseGet(() -> island.createWarpCategory("Default Category"));
-            Menus.MENU_WARPS.openMenu(superiorPlayer, previousMenu, warpCategory);
-        }
     }
 
     @Nullable

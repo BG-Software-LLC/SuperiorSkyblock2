@@ -415,17 +415,22 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     @Override
     public void startIslandPreview(SuperiorPlayer superiorPlayer, String schemName, String islandName) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
+        startIslandPreview(superiorPlayer, plugin.getSchematics().getSchematic(schemName), islandName);
+    }
+
+    public void startIslandPreview(SuperiorPlayer superiorPlayer, Schematic schematic, String islandName) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(schematic, "schematic parameter cannot be null.");
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
 
-        Location previewLocation = plugin.getSettings().getPreviewIslands().get(schemName.toLowerCase(Locale.ENGLISH));
+        Location previewLocation = plugin.getSettings().getPreviewIslands().get(schematic.getName().toLowerCase(Locale.ENGLISH));
         if (previewLocation != null && previewLocation.getWorld() != null) {
             superiorPlayer.teleport(previewLocation, result -> {
                 if (result) {
-                    this.islandPreviews.startIslandPreview(new SIslandPreview(superiorPlayer, previewLocation, schemName, islandName));
+                    this.islandPreviews.startIslandPreview(new SIslandPreview(superiorPlayer, previewLocation, schematic, islandName));
                     BukkitExecutor.ensureMain(() -> superiorPlayer.runIfOnline(player -> player.setGameMode(GameMode.SPECTATOR)));
-                    Message.ISLAND_PREVIEW_START.send(superiorPlayer, schemName);
+                    Message.ISLAND_PREVIEW_START.send(superiorPlayer, schematic.getName());
                 }
             });
         }

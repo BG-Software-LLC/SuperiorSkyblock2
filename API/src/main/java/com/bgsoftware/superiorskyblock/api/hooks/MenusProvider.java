@@ -9,7 +9,9 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.menu.MenuIslandCreationConfig;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
+import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
 public interface MenusProvider {
@@ -204,6 +206,13 @@ public interface MenusProvider {
      * @param island The island to refresh the menus for.
      */
     void refreshIslandChest(Island island);
+
+    /**
+     * Get island creation config for specific schematic.
+     *
+     * @param schematic The schematic to get the creation config for.
+     */
+    MenuIslandCreationConfig getIslandCreationConfig(Schematic schematic);
 
     /**
      * Open the islands-creation menu.

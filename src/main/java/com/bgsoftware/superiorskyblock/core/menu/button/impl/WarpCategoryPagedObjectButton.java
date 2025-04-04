@@ -54,7 +54,7 @@ public class WarpCategoryPagedObjectButton extends AbstractPagedMenuButton<MenuW
         if (menuView.hasManagePerms() && clickEvent.getClick().isRightClick()) {
             plugin.getMenus().openWarpCategoryManage(menuView.getInventoryViewer(), MenuViewWrapper.fromView(menuView), pagedObject);
         } else {
-            Menus.MENU_WARPS.openMenu(menuView.getInventoryViewer(), menuView, pagedObject);
+            plugin.getMenus().openWarps(menuView.getInventoryViewer(), MenuViewWrapper.fromView(menuView), pagedObject);
         }
     }
 
