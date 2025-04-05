@@ -139,7 +139,7 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
         @Nullable
         private final BlockOffset spawnOffset;
 
-        private final MenuIslandCreationConfig creationConfig = new MenuConfig.IslandCreation(this);
+        private final MenuIslandCreationConfig creationConfig;
 
         Template(@Nullable String requiredPermission, @Nullable GameSound lackPermissionSound,
                  @Nullable GameSound accessSound, @Nullable List<String> accessCommands,
@@ -158,6 +158,7 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
             this.isOffset = isOffset;
             this.spawnOffset = spawnOffset;
             this.schematic = Objects.requireNonNull(schematic, "schematic cannot be null");
+            this.creationConfig = new MenuConfig.IslandCreation(this);
         }
 
         public TemplateItem getAccessItem() {
