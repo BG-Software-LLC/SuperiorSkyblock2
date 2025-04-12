@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.ObjectsPool;
-import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.collections.view.LongIterator;
@@ -20,6 +19,7 @@ import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
+import com.google.gson.JsonParseException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -229,32 +229,8 @@ public class WorldEditSessionImpl implements WorldEditSession {
                 blockEntityCompound.putInt("y", blockPos.getY());
                 blockEntityCompound.putInt("z", blockPos.getZ());
 
-                Component[] signLines = new Component[4];
-                Arrays.fill(signLines, Component.empty());
-                boolean hasAnySignLines = false;
-                // We try to convert old text sign lines
-                for (int i = 1; i <= 4; ++i) {
-                    if (blockEntityCompound.contains("SSB.Text" + i)) {
-                        String signLine = blockEntityCompound.getString("SSB.Text" + i);
-                        if (!Text.isBlank(signLine)) {
-                            signLines[i - 1] = CraftChatMessage.fromString(signLine)[0];
-                            hasAnySignLines = true;
-                        }
-                    } else {
-                        String signLine = blockEntityCompound.getString("Text" + i);
-                        if (!Text.isBlank(signLine)) {
-                            signLines[i - 1] = CraftChatMessage.fromJSON(signLine);
-                            hasAnySignLines = true;
-                        }
-                    }
-
-                }
-
-                if (hasAnySignLines) {
-                    SignText signText = new SignText(signLines, signLines, DyeColor.BLACK, false);
-                    SignText.DIRECT_CODEC.encodeStart(NbtOps.INSTANCE, signText).result()
-                            .ifPresent(frontTextNBT -> blockEntityCompound.put("front_text", frontTextNBT));
-                }
+                applySignTextLines(blockEntityCompound, "front_text");
+                applySignTextLines(blockEntityCompound, "back_text");
 
                 BlockEntity worldBlockEntity = serverLevel.getBlockEntity(blockPos);
                 if (worldBlockEntity != null)
@@ -288,6 +264,26 @@ public class WorldEditSessionImpl implements WorldEditSession {
         return blockPos.getX() >= -30000000 && blockPos.getZ() >= -30000000 &&
                 blockPos.getX() < 30000000 && blockPos.getZ() < 30000000 &&
                 blockPos.getY() >= serverLevel.getMinY() && blockPos.getY() < serverLevel.getMaxY();
+    }
+
+    private static void applySignTextLines(net.minecraft.nbt.CompoundTag blockEntityCompound, String key) {
+        if (blockEntityCompound.contains(key)) {
+            net.minecraft.nbt.CompoundTag frontText = blockEntityCompound.getCompound(key);
+            Component[] frontTextLines = new Component[4];
+            Arrays.fill(frontTextLines, Component.empty());
+            int i = 0;
+            for (net.minecraft.nbt.Tag lineTag : frontText.getList("messages", net.minecraft.nbt.Tag.TAG_STRING)) {
+                try {
+                    frontTextLines[i++] = CraftChatMessage.fromJSON(lineTag.getAsString());
+                } catch (JsonParseException error) {
+                    frontTextLines[i++] = CraftChatMessage.fromString(lineTag.getAsString())[0];
+                }
+            }
+
+            SignText signText = new SignText(frontTextLines, frontTextLines, DyeColor.BLACK, false);
+            SignText.DIRECT_CODEC.encodeStart(NbtOps.INSTANCE, signText).result()
+                    .ifPresent(frontTextNBT -> blockEntityCompound.put(key, frontTextNBT));
+        }
     }
 
     private class ChunkData {
