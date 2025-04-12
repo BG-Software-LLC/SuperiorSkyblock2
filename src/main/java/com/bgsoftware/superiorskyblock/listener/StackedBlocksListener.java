@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
@@ -78,10 +79,14 @@ public class StackedBlocksListener extends AbstractGameEventListener {
         PlayerHand usedHand = e.getArgs().usedHand;
         ItemStack inHand = e.getArgs().usedItem;
 
+        if (inHand == null) {
+            Log.error("BlockPlaceEvent with null hand item:", usedHand);
+            throw new RuntimeException("BlockPlaceEvent with null hand item");
+        }
+
         // We do not stack blocks when the hand items has a name or a lore.
         if (inHand.hasItemMeta() && (inHand.getItemMeta().hasDisplayName() || inHand.getItemMeta().hasLore()))
             return;
-
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
