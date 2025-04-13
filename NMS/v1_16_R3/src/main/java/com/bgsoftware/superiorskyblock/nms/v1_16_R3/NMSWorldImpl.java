@@ -57,13 +57,11 @@ import org.bukkit.craftbukkit.v1_16_R3.block.CraftSign;
 import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.SignChangeEvent;
 
 import java.util.function.IntFunction;
 
 public class NMSWorldImpl implements NMSWorld {
 
-    private static final ReflectMethod<Object> LINES_SIGN_CHANGE_EVENT = new ReflectMethod<>(SignChangeEvent.class, "lines");
     private static final ReflectMethod<Float> SOUND_VOLUME = new ReflectMethod<>(SoundEffectType.class, "a");
     private static final ReflectMethod<Float> SOUND_PITCH = new ReflectMethod<>(SoundEffectType.class, "b");
     private static final ReflectField<Object> CHUNK_PACKET_BLOCK_CONTROLLER = new ReflectField<>(World.class,
@@ -253,15 +251,6 @@ public class NMSWorldImpl implements NMSWorld {
         }
 
         System.arraycopy(newLines, 0, tileEntitySign.lines, 0, 4);
-    }
-
-    @Override
-    public void setSignLines(SignChangeEvent signChangeEvent, String[] lines) {
-        if (LINES_SIGN_CHANGE_EVENT.isValid()) {
-            for (int i = 0; i < lines.length; i++)
-                //noinspection deprecation
-                signChangeEvent.setLine(i, lines[i]);
-        }
     }
 
     @Override

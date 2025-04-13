@@ -48,7 +48,6 @@ import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.block.CraftSign;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.material.MaterialData;
 
 import java.lang.reflect.Modifier;
@@ -244,11 +243,6 @@ public class NMSWorldImpl implements NMSWorld {
         }
 
         System.arraycopy(newLines, 0, tileEntitySign.lines, 0, 4);
-    }
-
-    @Override
-    public void setSignLines(SignChangeEvent signChangeEvent, String[] lines) {
-        // Not implemented - only needed for Paper 1.16+
     }
 
     @Override

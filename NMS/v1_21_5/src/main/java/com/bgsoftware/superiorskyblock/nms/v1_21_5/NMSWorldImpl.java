@@ -78,7 +78,6 @@ import java.util.function.IntFunction;
 
 public class NMSWorldImpl implements NMSWorld {
 
-    private static final ReflectMethod<Object> LINES_SIGN_CHANGE_EVENT = new ReflectMethod<>(SignChangeEvent.class, "lines");
     private static final ReflectField<List<TickingBlockEntity>> LEVEL_BLOCK_ENTITY_TICKERS_PROTECTED = new ReflectField<>(
             Level.class, List.class, Modifier.PROTECTED | Modifier.FINAL, 1);
     private static final ReflectField<VibrationSystem.User> SCULK_SENSOR_BLOCK_ENTITY_VIBRATION_USER = new ReflectField<VibrationSystem.User>(
@@ -338,15 +337,6 @@ public class NMSWorldImpl implements NMSWorld {
         }
 
         System.arraycopy(newLines, 0, messages, 0, 4);
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void setSignLines(SignChangeEvent signChangeEvent, String[] lines) {
-        if (LINES_SIGN_CHANGE_EVENT.isValid()) {
-            for (int i = 0; i < lines.length; i++)
-                signChangeEvent.setLine(i, lines[i]);
-        }
     }
 
     @Override

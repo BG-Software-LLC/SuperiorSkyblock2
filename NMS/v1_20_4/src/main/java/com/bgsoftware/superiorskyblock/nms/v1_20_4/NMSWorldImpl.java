@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_20_4;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -61,7 +60,6 @@ import org.bukkit.craftbukkit.block.CraftSign;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.SignChangeEvent;
 
 import java.lang.reflect.Modifier;
 import java.util.Iterator;
@@ -71,9 +69,6 @@ import java.util.function.IntFunction;
 
 public class NMSWorldImpl implements NMSWorld {
 
-    private static final byte[] EMPTY_LIGHTS = new byte[0];
-
-    private static final ReflectMethod<Object> LINES_SIGN_CHANGE_EVENT = new ReflectMethod<>(SignChangeEvent.class, "lines");
     private static final ReflectField<List<TickingBlockEntity>> LEVEL_BLOCK_ENTITY_TICKERS_PROTECTED = new ReflectField<>(
             Level.class, List.class, Modifier.PROTECTED | Modifier.FINAL, 1);
     private static final ReflectField<VibrationSystem.User> SCULK_SENSOR_BLOCK_ENTITY_VIBRATION_USER = new ReflectField<VibrationSystem.User>(
@@ -289,15 +284,6 @@ public class NMSWorldImpl implements NMSWorld {
         }
 
         System.arraycopy(newLines, 0, messages, 0, 4);
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void setSignLines(SignChangeEvent signChangeEvent, String[] lines) {
-        if (LINES_SIGN_CHANGE_EVENT.isValid()) {
-            for (int i = 0; i < lines.length; i++)
-                signChangeEvent.setLine(i, lines[i]);
-        }
     }
 
     @Override

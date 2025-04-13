@@ -15,7 +15,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.event.block.SignChangeEvent;
 
 import java.util.function.IntFunction;
 
@@ -56,8 +55,6 @@ public interface NMSWorld {
     int getDefaultAmount(BlockState blockState);
 
     void placeSign(Island island, Location location);
-
-    void setSignLines(SignChangeEvent signChangeEvent, String[] lines);
 
     void playGeneratorSound(Location location);
 
