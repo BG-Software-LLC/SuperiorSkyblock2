@@ -999,17 +999,4 @@ public enum Message {
         }
     }
 
-    public static Optional<String> replaceArgs(String msg, Object... objects) {
-        if (Text.isBlank(msg))
-            return Optional.empty();
-
-        for (int i = 0; i < objects.length; i++) {
-            String objectString = objects[i] instanceof BigDecimal ?
-                    Formatters.NUMBER_FORMATTER.format((BigDecimal) objects[i]) : objects[i].toString();
-            msg = msg.replace("{" + i + "}", objectString);
-        }
-
-        return msg.isEmpty() ? Optional.empty() : Optional.of(msg);
-    }
-
 }

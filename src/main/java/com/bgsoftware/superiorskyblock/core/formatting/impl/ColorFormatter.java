@@ -29,10 +29,6 @@ public class ColorFormatter implements IFormatter<String> {
         return INSTANCE;
     }
 
-    public static void addTextFormatter(ITextFormatter textFormatter) {
-        TEXT_FORMATTERS.add(textFormatter);
-    }
-
     private ColorFormatter() {
 
     }

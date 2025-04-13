@@ -25,8 +25,11 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 public class MessagesServiceImpl implements MessagesService, IService {
+
+    private final List<CustomComponentParser> customComponentParsers = new LinkedList<>();
 
     public MessagesServiceImpl() {
 
@@ -43,6 +46,11 @@ public class MessagesServiceImpl implements MessagesService, IService {
         if (config.isConfigurationSection(path)) {
             return MultipleComponents.parseSection(config.getConfigurationSection(path));
         } else {
+            for (CustomComponentParser parser : this.customComponentParsers) {
+                Optional<IMessageComponent> res = parser.parse(config, path);
+                if (res.isPresent())
+                    return res.get();
+            }
             return RawMessageComponent.of(Formatters.COLOR_FORMATTER.format(config.getString(path, "")));
         }
     }
@@ -57,6 +65,16 @@ public class MessagesServiceImpl implements MessagesService, IService {
     @Override
     public Builder newBuilder() {
         return new BuilderImpl();
+    }
+
+    public void registerCustomComponentParser(CustomComponentParser parser) {
+        this.customComponentParsers.add(parser);
+    }
+
+    public interface CustomComponentParser {
+
+        Optional<IMessageComponent> parse(YamlConfiguration config, String path);
+
     }
 
     private static class BuilderImpl implements Builder {
