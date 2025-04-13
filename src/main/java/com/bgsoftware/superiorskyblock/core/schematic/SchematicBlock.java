@@ -13,14 +13,10 @@ import org.bukkit.World;
 import org.bukkit.event.inventory.InventoryType;
 
 import java.util.Collections;
-import java.util.function.BiConsumer;
 
 public class SchematicBlock {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
-    private static final BiConsumer<CompoundTag, Island> SIGN_REPLACE_METHOD = ServerVersion.isAtLeast(ServerVersion.v1_20) ?
-            SchematicBlock::backFrontSignLinesReplace : SchematicBlock::legacySignLinesReplace;
 
     private static final String SIGN_ID = ServerVersion.isLegacy() ? "Sign" : "minecraft:sign";
     private static final String CHEST_ID = ServerVersion.isLegacy() ? "Chest" : "minecraft:chest";
@@ -90,7 +86,11 @@ public class SchematicBlock {
         }
 
         if (id.equalsIgnoreCase(SIGN_ID)) {
-            SIGN_REPLACE_METHOD.accept(this.tileEntityData, island);
+            if (this.tileEntityData.containsKey("front_text")) {
+                backFrontSignLinesReplace(this.tileEntityData, island);
+            } else {
+                legacySignLinesReplace(this.tileEntityData, island);
+            }
         } else if (id.equalsIgnoreCase(CHEST_ID)) {
             if (plugin.getSettings().getDefaultContainers().isEnabled()) {
                 String inventoryType = this.tileEntityData.getString("inventoryType");
