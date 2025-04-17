@@ -55,9 +55,9 @@ import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
@@ -67,6 +67,7 @@ import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
 import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -1899,18 +1900,27 @@ public class SIsland implements Island {
     private void setIslandSizeInternal(IntValue islandSize) {
         boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
 
+        MutableObject<List<Chunk>> oldChunks = new MutableObject<>(null);
+
+
         if (cropGrowthEnabled) {
-            // First, we want to remove all the current crop tile entities
-            getLoadedChunks(IslandChunkFlags.ONLY_PROTECTED).forEach(chunk ->
-                    plugin.getNMSChunks().startTickingChunk(this, chunk, true));
+            // We first collect all the chunks that are currently being ticked
+            oldChunks.setValue(getLoadedChunks(IslandChunkFlags.ONLY_PROTECTED));
         }
 
+        // Changing the size of the island
         this.islandSize.set(islandSize);
 
         if (cropGrowthEnabled) {
-            // Now, we want to update the tile entities again
-            getLoadedChunks(IslandChunkFlags.ONLY_PROTECTED).forEach(chunk ->
-                    plugin.getNMSChunks().startTickingChunk(this, chunk, false));
+            // We now collect the new chunks after the size was changed
+            List<Chunk> newChunks = getLoadedChunks(IslandChunkFlags.ONLY_PROTECTED);
+
+            BukkitExecutor.ensureMain(() -> {
+                // We stop all old chunks from being ticked.
+                oldChunks.getValue().forEach(chunk -> plugin.getNMSChunks().startTickingChunk(this, chunk, true));
+                // We start ticking all the new chunks
+                newChunks.forEach(chunk -> plugin.getNMSChunks().startTickingChunk(this, chunk, false));
+            });
         }
 
         updateBorder();

@@ -268,7 +268,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
                     boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
                     if (cropGrowthEnabled && island.isInsideRange(chunk)) {
-                        plugin.getNMSChunks().startTickingChunk(island, chunk, false);
+                        BukkitExecutor.ensureMain(() -> plugin.getNMSChunks().startTickingChunk(island, chunk, false));
                     }
 
                     island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
