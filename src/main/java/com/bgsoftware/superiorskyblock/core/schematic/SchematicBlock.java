@@ -127,6 +127,11 @@ public class SchematicBlock {
         CompoundTag frontText = tileEntityData.getCompound("front_text");
         CompoundTag backText = tileEntityData.getCompound("back_text");
 
+        if (frontText == null || backText == null) {
+            // This should never occur
+            Log.error("Invalid sign tile entity data: ", tileEntityData);
+        }
+
         ListTag frontTextMessages = frontText.getList("messages");
         ListTag backTextMessages = backText.getList("messages");
         ListTag newFrontTextMessages = new ListTag(StringTag.class, Collections.emptyList());
