@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.ChatFormatter;
 import com.bgsoftware.superiorskyblock.core.io.ClassProcessor;
@@ -14,6 +15,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_20_4.menu.MenuBrewingStandBlockEnt
 import com.bgsoftware.superiorskyblock.nms.v1_20_4.menu.MenuDispenserBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_20_4.menu.MenuFurnaceBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_20_4.menu.MenuHopperBlockEntity;
+import com.bgsoftware.superiorskyblock.nms.v1_20_4.world.BlockEntityCache;
 import com.bgsoftware.superiorskyblock.nms.v1_20_4.world.KeyBlocksCache;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
@@ -56,6 +58,7 @@ import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumMap;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
@@ -124,6 +127,18 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         }
 
         return blockState == null ? -1 : Block.getId(blockState);
+    }
+
+    @Override
+    public Optional<String> getTileEntityIdFromCombinedId(int combinedId) {
+        BlockState blockState = Block.stateById(combinedId);
+
+        if (!blockState.hasBlockEntity())
+            return Optional.empty();
+
+        String id = BlockEntityCache.getBlockEntityId(blockState);
+
+        return Text.isBlank(id) ? Optional.empty() : Optional.of(id);
     }
 
     @Override

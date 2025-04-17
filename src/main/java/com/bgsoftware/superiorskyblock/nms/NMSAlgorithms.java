@@ -17,6 +17,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
+import java.util.Optional;
+
 public interface NMSAlgorithms {
 
     void registerCommand(BukkitCommand command);
@@ -26,6 +28,8 @@ public interface NMSAlgorithms {
     int getCombinedId(Location location);
 
     int getCombinedId(Material material, byte data);
+
+    Optional<String> getTileEntityIdFromCombinedId(int combinedId);
 
     int compareMaterials(Material o1, Material o2);
 

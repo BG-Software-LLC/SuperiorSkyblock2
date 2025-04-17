@@ -205,6 +205,16 @@ public class SuperiorSchematicDeserializer {
 
         SchematicBlock.Extra extra = deserializeSchematicBlockExtra(compoundTag, dataVersion);
 
+        if (extra != null) {
+            CompoundTag tileEntityTag = extra.getTileEntity();
+            if (tileEntityTag != null && !tileEntityTag.containsKey("id")) {
+                // We try to detect the id from its combinedId
+                plugin.getNMSAlgorithms().getTileEntityIdFromCombinedId(combinedId).ifPresent(tileEntityId -> {
+                    tileEntityTag.setString("id", tileEntityId);
+                });
+            }
+        }
+
         return new SchematicBlockData(combinedId, blockOffset, extra);
     }
 

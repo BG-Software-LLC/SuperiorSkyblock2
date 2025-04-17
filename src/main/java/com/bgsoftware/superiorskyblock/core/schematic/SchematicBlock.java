@@ -196,6 +196,14 @@ public class SchematicBlock {
             this.tileEntity = tileEntity;
         }
 
+        public CompoundTag getTileEntity() {
+            return tileEntity;
+        }
+
+        public CompoundTag getStatesTag() {
+            return statesTag;
+        }
+
     }
 
 }

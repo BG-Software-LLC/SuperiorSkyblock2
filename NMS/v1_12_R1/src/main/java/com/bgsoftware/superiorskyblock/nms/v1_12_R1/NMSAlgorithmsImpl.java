@@ -3,8 +3,10 @@ package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
+import com.bgsoftware.superiorskyblock.nms.v1_12_R1.world.BlockEntityCache;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.world.KeyBlocksCache;
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -74,6 +76,18 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     public int getCombinedId(Material material, byte data) {
         //noinspection deprecation
         return material.getId() + (data << 12);
+    }
+
+    @Override
+    public Optional<String> getTileEntityIdFromCombinedId(int combinedId) {
+        IBlockData blockData = Block.getByCombinedId(combinedId);
+
+        if (!blockData.getBlock().isTileEntity())
+            return Optional.empty();
+
+        String id = BlockEntityCache.getTileEntityId(blockData);
+
+        return Text.isBlank(id) ? Optional.empty() : Optional.of(id);
     }
 
     @Override

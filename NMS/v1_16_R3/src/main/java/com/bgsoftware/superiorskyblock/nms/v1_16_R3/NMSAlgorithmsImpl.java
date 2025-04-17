@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.ChatFormatter;
 import com.bgsoftware.superiorskyblock.core.io.ClassProcessor;
@@ -15,6 +16,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityBrewing;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityDispenser;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityFurnace;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityHopper;
+import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.BlockEntityCache;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.KeyBlocksCache;
 import io.papermc.paper.chat.ChatComposer;
 import io.papermc.paper.event.player.AsyncChatEvent;
@@ -57,6 +59,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.EnumMap;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
@@ -119,6 +122,18 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         }
 
         return blockData == null ? -1 : Block.getCombinedId(blockData);
+    }
+
+    @Override
+    public Optional<String> getTileEntityIdFromCombinedId(int combinedId) {
+        IBlockData blockData = Block.getByCombinedId(combinedId);
+
+        if (!blockData.getBlock().isTileEntity())
+            return Optional.empty();
+
+        String id = BlockEntityCache.getTileEntityId(blockData);
+
+        return Text.isBlank(id) ? Optional.empty() : Optional.of(id);
     }
 
     @Override
