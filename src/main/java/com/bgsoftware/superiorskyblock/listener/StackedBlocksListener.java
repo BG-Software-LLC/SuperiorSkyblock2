@@ -80,7 +80,7 @@ public class StackedBlocksListener extends AbstractGameEventListener {
         ItemStack inHand = e.getArgs().usedItem;
 
         if (inHand == null) {
-            Log.error("BlockPlaceEvent with null hand item:", usedHand);
+            Log.error("BlockPlaceEvent by player ", player.getName(), " of block ", block.getType().name(), " with null hand item: ", usedHand);
             throw new RuntimeException("BlockPlaceEvent with null hand item");
         }
 
