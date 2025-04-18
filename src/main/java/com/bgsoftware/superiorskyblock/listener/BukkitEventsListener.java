@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
+import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.EventCallback;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -20,6 +21,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
@@ -91,6 +93,7 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.Map;
@@ -254,7 +257,7 @@ public class BukkitEventsListener implements Listener {
         blockPlaceEvent.againstBlock = e.getBlockAgainst();
         blockPlaceEvent.replacedState = e.getBlockReplacedState();
         blockPlaceEvent.usedHand = BukkitItems.getHand(e);
-        blockPlaceEvent.usedItem = BukkitItems.getHandItem(e.getPlayer(), blockPlaceEvent.usedHand);
+        blockPlaceEvent.usedItem = getHandItem(e.getPlayer(), blockPlaceEvent.usedHand, true);
         return eventType.createEvent(blockPlaceEvent);
     }
 
@@ -351,7 +354,7 @@ public class BukkitEventsListener implements Listener {
         playerInteractEvent.player = e.getPlayer();
         playerInteractEvent.action = e.getAction();
         playerInteractEvent.usedHand = BukkitItems.getHand(e);
-        playerInteractEvent.usedItem = BukkitItems.getHandItem(e.getPlayer(), playerInteractEvent.usedHand);
+        playerInteractEvent.usedItem = getHandItem(e.getPlayer(), playerInteractEvent.usedHand, true);
         playerInteractEvent.clickedBlock = e.getClickedBlock();
         return eventType.createEvent(playerInteractEvent);
     }
@@ -504,7 +507,7 @@ public class BukkitEventsListener implements Listener {
         playerInteractEvent.player = e.getPlayer();
         playerInteractEvent.action = Action.RIGHT_CLICK_AIR;
         playerInteractEvent.usedHand = BukkitItems.getHand(e);
-        playerInteractEvent.usedItem = BukkitItems.getHandItem(e.getPlayer(), playerInteractEvent.usedHand);
+        playerInteractEvent.usedItem = getHandItem(e.getPlayer(), playerInteractEvent.usedHand, true);
         playerInteractEvent.clickedEntity = e.getRightClicked();
         return eventType.createEvent(playerInteractEvent);
     }
@@ -514,7 +517,7 @@ public class BukkitEventsListener implements Listener {
         playerInteractEvent.player = e.getPlayer();
         playerInteractEvent.action = Action.RIGHT_CLICK_AIR;
         playerInteractEvent.usedHand = BukkitItems.getHand(e);
-        playerInteractEvent.usedItem = BukkitItems.getHandItem(e.getPlayer(), playerInteractEvent.usedHand);
+        playerInteractEvent.usedItem = getHandItem(e.getPlayer(), playerInteractEvent.usedHand, true);
         playerInteractEvent.clickedEntity = e.getRightClicked();
         return eventType.createEvent(playerInteractEvent);
     }
@@ -823,6 +826,14 @@ public class BukkitEventsListener implements Listener {
             if (applyBukkitEventFunction != null)
                 applyBukkitEventFunction.apply((E) event, gameEvent);
         }, plugin, false);
+    }
+
+    private static ItemStack getHandItem(Player player, PlayerHand usedHand, boolean clone) {
+        ItemStack itemStack = BukkitItems.getHandItem(player, usedHand);
+        if (clone && itemStack != null) {
+            itemStack = itemStack.clone();
+        }
+        return itemStack;
     }
 
     private interface GameEventCreator<Args extends IEventArgs, E extends Event> {
