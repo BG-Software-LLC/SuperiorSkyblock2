@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.external;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandGenerateBlockEvent;
-import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
@@ -13,17 +12,15 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.listener.BlockChangesListener;
 import dev.lone.itemsadder.api.CustomBlock;
 import dev.lone.itemsadder.api.CustomStack;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Locale;
@@ -51,23 +48,60 @@ public class ItemsAdderHook {
 
     private static class ListenerImpl implements Listener {
 
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onBlockPlace(BlockPlaceEvent e) {
-            // ItemsAdder calls BlockPlaceEvent when the block is AIR.
-            if (e.getBlock().getType() != Material.AIR)
+        @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+        public void onItemAdderBlockInteract(PlayerInteractEvent e) {
+            switch (e.getAction()) {
+                case RIGHT_CLICK_BLOCK:
+                    onBlockPlace(e);
+                    break;
+                case LEFT_CLICK_BLOCK:
+                    onBlockBreak(e);
+                    break;
+            }
+        }
+
+        private void onBlockPlace(PlayerInteractEvent e) {
+            if (e.getItem() == null)
                 return;
 
-            BlockState oldState = e.getBlockReplacedState();
+            CustomBlock customBlock = CustomBlock.byItemStack(e.getItem());
+            if (customBlock == null)
+                return;
+
+            CustomBlock clickedBlock = CustomBlock.byAlreadyPlaced(e.getClickedBlock());
+            if (clickedBlock != null)
+                return;
+
+            Block placeBlock = e.getClickedBlock().getRelative(e.getBlockFace());
 
             BukkitExecutor.sync(() -> {
-                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    worldRecordService.get().recordBlockPlace(Keys.of(e.getBlock()),
-                            e.getBlock().getLocation(wrapper.getHandle()), 1,
-                            oldState, WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS);
+                if (placeBlock.getType() == Material.NOTE_BLOCK) {
+                    try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                        Key itemKey = Keys.of(ITEMS_ADDER_PREFIX, customBlock.getId().toUpperCase(Locale.ENGLISH), KeyIndicator.CUSTOM);
+                        worldRecordService.get().recordBlockPlace(itemKey,
+                                placeBlock.getLocation(wrapper.getHandle()), 1,
+                                null, WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS);
+                    }
                 }
-
             }, 1L);
+        }
 
+        private void onBlockBreak(PlayerInteractEvent e) {
+            CustomBlock clickedBlock = CustomBlock.byAlreadyPlaced(e.getClickedBlock());
+            if (clickedBlock != null) {
+                Key blockKey = Key.of(e.getClickedBlock());
+                BukkitExecutor.sync(() -> {
+                    if (e.getClickedBlock().getType() == Material.AIR) {
+                        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                            worldRecordService.get().recordBlockBreak(blockKey,
+                                    e.getClickedBlock().getLocation(wrapper.getHandle()),
+                                    1,
+                                    WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS | WorldRecordFlags.HANDLE_NEARBY_BLOCKS);
+                        }
+                    }
+                }, 1L);
+
+            }
         }
 
         @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
