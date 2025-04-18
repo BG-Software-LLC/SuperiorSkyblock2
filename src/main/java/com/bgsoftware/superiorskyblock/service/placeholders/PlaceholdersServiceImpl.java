@@ -294,8 +294,21 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             }
         }
 
-        return placeholderResult.orElse(plugin.getSettings().getDefaultPlaceholders()
-                .getOrDefault(placeholder, ""));
+        if (placeholderResult.isPresent())
+            return placeholderResult.get();
+
+        String defaultPlaceholderValue = plugin.getSettings().getDefaultPlaceholders().get(placeholder);
+        if (defaultPlaceholderValue != null)
+            return defaultPlaceholderValue;
+
+        // We try to look for prefixes of placeholders
+        for (Map.Entry<String, String> entry : plugin.getSettings().getDefaultPlaceholders().entrySet()) {
+            if (placeholder.startsWith(entry.getKey())) {
+                return entry.getValue();
+            }
+        }
+
+        return "";
     }
 
     @Override
