@@ -97,6 +97,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class BukkitEventsListener implements Listener {
 
@@ -257,7 +258,7 @@ public class BukkitEventsListener implements Listener {
         blockPlaceEvent.againstBlock = e.getBlockAgainst();
         blockPlaceEvent.replacedState = e.getBlockReplacedState();
         blockPlaceEvent.usedHand = BukkitItems.getHand(e);
-        blockPlaceEvent.usedItem = getHandItem(e.getPlayer(), blockPlaceEvent.usedHand, true);
+        blockPlaceEvent.usedItem = getHandItem(e.getPlayer(), blockPlaceEvent.usedHand, true, () -> e.getItemInHand());
         return eventType.createEvent(blockPlaceEvent);
     }
 
@@ -354,7 +355,7 @@ public class BukkitEventsListener implements Listener {
         playerInteractEvent.player = e.getPlayer();
         playerInteractEvent.action = e.getAction();
         playerInteractEvent.usedHand = BukkitItems.getHand(e);
-        playerInteractEvent.usedItem = getHandItem(e.getPlayer(), playerInteractEvent.usedHand, true);
+        playerInteractEvent.usedItem = getHandItem(e.getPlayer(), playerInteractEvent.usedHand, true, () -> e.getItem());
         playerInteractEvent.clickedBlock = e.getClickedBlock();
         return eventType.createEvent(playerInteractEvent);
     }
@@ -507,7 +508,7 @@ public class BukkitEventsListener implements Listener {
         playerInteractEvent.player = e.getPlayer();
         playerInteractEvent.action = Action.RIGHT_CLICK_AIR;
         playerInteractEvent.usedHand = BukkitItems.getHand(e);
-        playerInteractEvent.usedItem = getHandItem(e.getPlayer(), playerInteractEvent.usedHand, true);
+        playerInteractEvent.usedItem = getHandItem(e.getPlayer(), playerInteractEvent.usedHand, true, null);
         playerInteractEvent.clickedEntity = e.getRightClicked();
         return eventType.createEvent(playerInteractEvent);
     }
@@ -517,7 +518,7 @@ public class BukkitEventsListener implements Listener {
         playerInteractEvent.player = e.getPlayer();
         playerInteractEvent.action = Action.RIGHT_CLICK_AIR;
         playerInteractEvent.usedHand = BukkitItems.getHand(e);
-        playerInteractEvent.usedItem = getHandItem(e.getPlayer(), playerInteractEvent.usedHand, true);
+        playerInteractEvent.usedItem = getHandItem(e.getPlayer(), playerInteractEvent.usedHand, true, null);
         playerInteractEvent.clickedEntity = e.getRightClicked();
         return eventType.createEvent(playerInteractEvent);
     }
@@ -828,11 +829,13 @@ public class BukkitEventsListener implements Listener {
         }, plugin, false);
     }
 
-    private static ItemStack getHandItem(Player player, PlayerHand usedHand, boolean clone) {
+    private static ItemStack getHandItem(Player player, PlayerHand usedHand, boolean clone, @Nullable Supplier<ItemStack> defItem) {
         ItemStack itemStack = BukkitItems.getHandItem(player, usedHand);
         if (clone && itemStack != null) {
             itemStack = itemStack.clone();
         }
+        if (defItem != null && (itemStack == null || itemStack.getType() == Material.AIR))
+            itemStack = defItem.get();
         return itemStack;
     }
 
