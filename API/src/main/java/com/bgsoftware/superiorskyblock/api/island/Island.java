@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Chunk;
@@ -876,6 +877,15 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param chunkZ The z-coords of the chunk.
      */
     boolean isInside(World world, int chunkX, int chunkZ);
+
+    /**
+     * Check if a chunk location is inside the island's area.
+     *
+     * @param worldInfo The world of the chunk.
+     * @param chunkX    The x-coords of the chunk.
+     * @param chunkZ    The z-coords of the chunk.
+     */
+    boolean isInside(WorldInfo worldInfo, int chunkX, int chunkZ);
 
     /**
      * Check if the location is inside the island's protected area.
@@ -1757,6 +1767,15 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     boolean isChunkDirty(String worldName, int chunkX, int chunkZ);
 
     /**
+     * Check whether a chunk has blocks inside it.
+     *
+     * @param worldInfo The world of the chunk.
+     * @param chunkX    The x-coords of the chunk.
+     * @param chunkZ    The z-coords of the chunk.
+     */
+    boolean isChunkDirty(WorldInfo worldInfo, int chunkX, int chunkZ);
+
+    /**
      * Mark a chunk as it has blocks inside it.
      *
      * @param world  The world of the chunk.
@@ -1767,6 +1786,16 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void markChunkDirty(World world, int chunkX, int chunkZ, boolean save);
 
     /**
+     * Mark a chunk as it has blocks inside it.
+     *
+     * @param worldInfo The world of the chunk.
+     * @param chunkX    The x-coords of the chunk.
+     * @param chunkZ    The z-coords of the chunk.
+     * @param save      Whether to save the changes to database.
+     */
+    void markChunkDirty(WorldInfo worldInfo, int chunkX, int chunkZ, boolean save);
+
+    /**
      * Mark a chunk as it has no blocks inside it.
      *
      * @param world  The world of the chunk.
@@ -1775,6 +1804,16 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param save   Whether to save the changes to database.
      */
     void markChunkEmpty(World world, int chunkX, int chunkZ, boolean save);
+
+    /**
+     * Mark a chunk as it has no blocks inside it.
+     *
+     * @param worldInfo The world of the chunk.
+     * @param chunkX    The x-coords of the chunk.
+     * @param chunkZ    The z-coords of the chunk.
+     * @param save      Whether to save the changes to database.
+     */
+    void markChunkEmpty(WorldInfo worldInfo, int chunkX, int chunkZ, boolean save);
 
     /**
      * Get the amount of blocks that are on the island.

@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Chunk;
@@ -618,6 +619,11 @@ public class DelegateIsland implements Island {
     @Override
     public boolean isInside(World world, int chunkX, int chunkZ) {
         return this.handle.isInside(world, chunkX, chunkZ);
+    }
+
+    @Override
+    public boolean isInside(WorldInfo worldInfo, int chunkX, int chunkZ) {
+        return this.handle.isInside(worldInfo, chunkX, chunkZ);
     }
 
     @Override
@@ -1265,13 +1271,28 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public boolean isChunkDirty(WorldInfo worldInfo, int chunkX, int chunkZ) {
+        return this.handle.isChunkDirty(worldInfo, chunkX, chunkZ);
+    }
+
+    @Override
     public void markChunkDirty(World world, int chunkX, int chunkZ, boolean save) {
         this.handle.markChunkDirty(world, chunkX, chunkZ, save);
     }
 
     @Override
+    public void markChunkDirty(WorldInfo worldInfo, int chunkX, int chunkZ, boolean save) {
+        this.handle.markChunkDirty(worldInfo, chunkX, chunkZ, save);
+    }
+
+    @Override
     public void markChunkEmpty(World world, int chunkX, int chunkZ, boolean save) {
         this.handle.markChunkEmpty(world, chunkX, chunkZ, save);
+    }
+
+    @Override
+    public void markChunkEmpty(WorldInfo worldInfo, int chunkX, int chunkZ, boolean save) {
+        this.handle.markChunkEmpty(worldInfo, chunkX, chunkZ, save);
     }
 
     @Override

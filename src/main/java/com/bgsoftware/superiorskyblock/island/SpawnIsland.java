@@ -805,6 +805,11 @@ public class SpawnIsland implements Island {
         return world.equals(this.spawnWorld) && isChunkInside(chunkX, chunkZ);
     }
 
+    @Override
+    public boolean isInside(WorldInfo worldInfo, int chunkX, int chunkZ) {
+        return this.spawnWorldInfo.getName().equals(worldInfo.getName()) && isChunkInside(chunkX, chunkZ);
+    }
+
     public boolean isChunkInside(int chunkX, int chunkZ) {
         try (IslandArea islandArea = this.islandArea.copy()) {
             islandArea.rshift(4);
@@ -1416,6 +1421,15 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public boolean isChunkDirty(WorldInfo worldInfo, int chunkX, int chunkZ) {
+        Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
+        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ), "Chunk must be within the island boundaries.");
+        try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)) {
+            return this.dirtyChunksContainer.isMarkedDirty(chunkPosition);
+        }
+    }
+
+    @Override
     public void markChunkDirty(World world, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
@@ -1425,9 +1439,27 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void markChunkDirty(WorldInfo worldInfo, int chunkX, int chunkZ, boolean save) {
+        Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
+        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ), "Chunk must be within the island boundaries.");
+        try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)) {
+            this.dirtyChunksContainer.markDirty(chunkPosition, save);
+        }
+    }
+
+    @Override
     public void markChunkEmpty(World world, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
+        try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)) {
+            this.dirtyChunksContainer.markEmpty(chunkPosition, save);
+        }
+    }
+
+    @Override
+    public void markChunkEmpty(WorldInfo worldInfo, int chunkX, int chunkZ, boolean save) {
+        Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
+        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ), "Chunk must be within the island boundaries.");
         try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)) {
             this.dirtyChunksContainer.markEmpty(chunkPosition, save);
         }

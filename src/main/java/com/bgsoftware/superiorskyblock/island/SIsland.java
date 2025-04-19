@@ -1266,18 +1266,40 @@ public class SIsland implements Island {
 
     @Override
     public void resetChunks(@IslandChunkFlags int flags, @Nullable Runnable onFinish) {
-        LinkedList<List<ChunkPosition>> worldsChunks = new LinkedList<>(
-                IslandUtils.getChunkCoords(this, flags | IslandChunkFlags.NO_EMPTY_CHUNKS).values());
+        final int realFlags = flags | IslandChunkFlags.NO_EMPTY_CHUNKS;
 
-
-        if (worldsChunks.isEmpty()) {
-            if (onFinish != null)
-                onFinish.run();
-            return;
+        for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
+            WorldInfo worldInfo = WorldInfo.of(registeredWorld);
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, realFlags);
+            if (!chunkPositions.isEmpty())
+                IslandUtils.deleteChunks(this, chunkPositions, null);
         }
 
-        for (List<ChunkPosition> chunkPositions : worldsChunks)
-            IslandUtils.deleteChunks(this, chunkPositions, chunkPositions == worldsChunks.getLast() ? onFinish : null);
+        MutableObject<Dimension> lastDimension = new MutableObject<>(null);
+        boolean hasDimension = false;
+
+        for (Dimension dimension : Dimension.values()) {
+            if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension) && wasSchematicGenerated(dimension)) {
+                hasDimension = true;
+                lastDimension.setValue(dimension);
+                IslandWorlds.accessIslandWorldAsync(this, dimension, result -> {
+                    result.ifLeft(world -> {
+                        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
+                        List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, realFlags);
+                        if (!chunkPositions.isEmpty()) {
+                            IslandUtils.deleteChunks(this, chunkPositions,
+                                    dimension == lastDimension.getValue() ? onFinish : null);
+                        }
+                    }).ifRight(err -> {
+                        if (onFinish != null && dimension == lastDimension.getValue())
+                            onFinish.run();
+                    });
+                });
+            }
+        }
+
+        if (!hasDimension && onFinish != null)
+            onFinish.run();
     }
 
     @Override
@@ -1289,18 +1311,20 @@ public class SIsland implements Island {
     public void resetChunks(Dimension dimension, @IslandChunkFlags int flags, @Nullable Runnable onFinish) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null");
 
-        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
+        IslandWorlds.accessIslandWorldAsync(this, dimension, result -> {
+            if (result.getRight() == null) {
+                WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
+                List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this,
+                        worldInfo, flags | IslandChunkFlags.NO_EMPTY_CHUNKS);
+                if (!chunkPositions.isEmpty()) {
+                    IslandUtils.deleteChunks(this, chunkPositions, onFinish);
+                    return;
+                }
+            }
 
-        List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this,
-                worldInfo, flags | IslandChunkFlags.NO_EMPTY_CHUNKS);
-
-        if (chunkPositions.isEmpty()) {
             if (onFinish != null)
                 onFinish.run();
-            return;
-        }
-
-        IslandUtils.deleteChunks(this, chunkPositions, onFinish);
+        });
     }
 
     @Override
@@ -1381,17 +1405,13 @@ public class SIsland implements Island {
     @Override
     public boolean isInside(World world, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
+        return isIslandWorld(world) && isChunkInside(chunkX, chunkZ);
+    }
 
-        if (!isIslandWorld(world))
-            return false;
-
-        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
-                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
-
-        try (IslandArea islandArea = IslandArea.of(this.center, islandDistance)) {
-            islandArea.rshift(4);
-            return islandArea.intercepts(chunkX, chunkZ);
-        }
+    @Override
+    public boolean isInside(WorldInfo worldInfo, int chunkX, int chunkZ) {
+        Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
+        return isIslandWorld(worldInfo) && isChunkInside(chunkX, chunkZ);
     }
 
     private boolean isChunkInside(int chunkX, int chunkZ) {
@@ -1451,6 +1471,18 @@ public class SIsland implements Island {
 
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
         return worldInfo.getName().equals(world.getName());
+    }
+
+    private boolean isIslandWorld(@Nullable WorldInfo worldInfo) {
+        if (worldInfo == null)
+            return false;
+
+        Dimension dimension = worldInfo.getDimension();
+        if (dimension == null)
+            return false;
+
+        WorldInfo realWorldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
+        return realWorldInfo.getName().equals(worldInfo.getName());
     }
 
     @Override
@@ -2033,15 +2065,15 @@ public class SIsland implements Island {
         List<Player> playersToUpdate = new SequentialListBuilder<Player>()
                 .build(getAllPlayersInside(), SuperiorPlayer::asPlayer);
 
-        for (Dimension dimension : Dimension.values()) {
-            if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension) && wasSchematicGenerated(dimension)) {
-                WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
-                Biome worldBiome = plugin.getSettings().getWorlds().getDefaultWorldDimension() == dimension ?
-                        biome : IslandUtils.getDefaultWorldBiome(dimension);
+        IslandWorlds.accessIslandWorldsAsync(this, result -> {
+            result.ifLeft(world -> {
+                WorldInfo worldInfo = WorldInfo.of(world);
+                Biome worldBiome = plugin.getSettings().getWorlds().getDefaultWorldDimension() == worldInfo.getDimension() ?
+                        biome : IslandUtils.getDefaultWorldBiome(worldInfo.getDimension());
                 List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, 0);
                 plugin.getNMSChunks().setBiome(chunkPositions, worldBiome, playersToUpdate);
-            }
-        }
+            });
+        });
 
         for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
             List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(registeredWorld), 0);
@@ -2739,7 +2771,11 @@ public class SIsland implements Island {
     @Override
     public boolean isChunkDirty(String worldName, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null.");
-        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, worldName);
+        return isChunkDirty(plugin.getGrid().getIslandsWorldInfo(this, worldName), chunkX, chunkZ);
+    }
+
+    @Override
+    public boolean isChunkDirty(WorldInfo worldInfo, int chunkX, int chunkZ) {
         Preconditions.checkArgument(worldInfo != null && isChunkInside(chunkX, chunkZ),
                 "Chunk must be within the island boundaries.");
         try (ChunkPosition chunkPosition = ChunkPosition.of(worldInfo, chunkX, chunkZ)) {
@@ -2750,8 +2786,14 @@ public class SIsland implements Island {
     @Override
     public void markChunkDirty(World world, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
-        Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
-        try (ChunkPosition chunkPosition = ChunkPosition.of(WorldInfo.of(world), chunkX, chunkZ)) {
+        markChunkDirty(WorldInfo.of(world), chunkX, chunkZ, save);
+    }
+
+    @Override
+    public void markChunkDirty(WorldInfo worldInfo, int chunkX, int chunkZ, boolean save) {
+        Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
+        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ), "Chunk must be within the island boundaries.");
+        try (ChunkPosition chunkPosition = ChunkPosition.of(worldInfo, chunkX, chunkZ)) {
             this.dirtyChunksContainer.markDirty(chunkPosition, save);
         }
     }
@@ -2759,8 +2801,13 @@ public class SIsland implements Island {
     @Override
     public void markChunkEmpty(World world, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
-        Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
-        try (ChunkPosition chunkPosition = ChunkPosition.of(WorldInfo.of(world), chunkX, chunkZ)) {
+        markChunkEmpty(WorldInfo.of(world), chunkX, chunkZ, save);
+    }
+
+    @Override
+    public void markChunkEmpty(WorldInfo worldInfo, int chunkX, int chunkZ, boolean save) {
+        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ), "Chunk must be within the island boundaries.");
+        try (ChunkPosition chunkPosition = ChunkPosition.of(worldInfo, chunkX, chunkZ)) {
             this.dirtyChunksContainer.markEmpty(chunkPosition, save);
         }
     }
@@ -5096,9 +5143,18 @@ public class SIsland implements Island {
         if (!BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class))
             return;
 
+        final int flags = IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS;
+
         double newCropGrowthMultiplier = newCropGrowth - 1;
-        IslandUtils.getChunkCoords(this, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS)
-                .values().forEach(chunkPositions -> plugin.getNMSChunks().updateCropsTicker(chunkPositions, newCropGrowthMultiplier));
+
+        IslandWorlds.accessIslandWorldsAsync(this, result -> {
+            result.ifLeft(world -> {
+                WorldInfo worldInfo = WorldInfo.of(world);
+                List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, flags);
+                if (!chunkPositions.isEmpty())
+                    plugin.getNMSChunks().updateCropsTicker(chunkPositions, newCropGrowthMultiplier);
+            });
+        });
     }
 
     public static void registerListeners(PluginEventsDispatcher dispatcher) {
