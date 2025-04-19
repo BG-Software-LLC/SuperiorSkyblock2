@@ -25,6 +25,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -273,10 +274,11 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private static void applySignTextLines(net.minecraft.nbt.CompoundTag blockEntityCompound, String key) {
         if (blockEntityCompound.contains(key)) {
             net.minecraft.nbt.CompoundTag frontText = blockEntityCompound.getCompound(key);
-            Component[] frontTextLines = new Component[4];
+            ListTag messages = frontText.getList("messages", net.minecraft.nbt.Tag.TAG_STRING);
+            Component[] frontTextLines = new Component[messages.size()];
             Arrays.fill(frontTextLines, Component.empty());
             int i = 0;
-            for (net.minecraft.nbt.Tag lineTag : frontText.getList("messages", net.minecraft.nbt.Tag.TAG_STRING)) {
+            for (net.minecraft.nbt.Tag lineTag : messages) {
                 try {
                     frontTextLines[i++] = CraftChatMessage.fromJSON(lineTag.getAsString());
                 } catch (JsonParseException error) {
