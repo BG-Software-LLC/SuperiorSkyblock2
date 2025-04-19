@@ -84,7 +84,7 @@ public class MessageContent {
         return content.length() == 0 ? Optional.empty() : Optional.of(content.toString());
     }
 
-    private static String getArgumentString(Object argument) {
+    public static String getArgumentString(Object argument) {
         return argument instanceof BigDecimal ?
                 Formatters.NUMBER_FORMATTER.format((BigDecimal) argument) :
                 String.valueOf(argument);
