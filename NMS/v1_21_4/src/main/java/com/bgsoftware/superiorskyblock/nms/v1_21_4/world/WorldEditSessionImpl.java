@@ -57,6 +57,7 @@ import org.bukkit.craftbukkit.block.CraftBiome;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.generator.ChunkGenerator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -81,6 +82,8 @@ public class WorldEditSessionImpl implements WorldEditSession {
             return false;
         }
     }).get();
+
+    private static final Component[] COMPONENT_ARRAY_TYPE = new Component[0];
 
     private final Long2ObjectMapView<ChunkData> chunks = CollectionsFactory.createLong2ObjectArrayMap();
     private final List<Pair<BlockPos, BlockState>> blocksToUpdate = new LinkedList<>();
@@ -273,18 +276,21 @@ public class WorldEditSessionImpl implements WorldEditSession {
         if (blockEntityCompound.contains(key)) {
             net.minecraft.nbt.CompoundTag frontText = blockEntityCompound.getCompound(key);
             ListTag messages = frontText.getList("messages", net.minecraft.nbt.Tag.TAG_STRING);
-            Component[] frontTextLines = new Component[messages.size()];
-            Arrays.fill(frontTextLines, Component.empty());
-            int i = 0;
+            List<Component> textLines = new ArrayList<>();
             for (net.minecraft.nbt.Tag lineTag : messages) {
                 try {
-                    frontTextLines[i++] = CraftChatMessage.fromJSON(lineTag.getAsString());
+                    textLines.add(CraftChatMessage.fromJSON(lineTag.getAsString()));
                 } catch (JsonParseException error) {
-                    frontTextLines[i++] = CraftChatMessage.fromString(lineTag.getAsString())[0];
+                    textLines.add(CraftChatMessage.fromString(lineTag.getAsString())[0]);
                 }
             }
 
-            SignText signText = new SignText(frontTextLines, frontTextLines, DyeColor.BLACK, false);
+            while (textLines.size() < 4)
+                textLines.add(Component.empty());
+
+            Component[] textLinesArray = textLines.toArray(COMPONENT_ARRAY_TYPE);
+
+            SignText signText = new SignText(textLinesArray, textLinesArray, DyeColor.BLACK, false);
             SignText.DIRECT_CODEC.encodeStart(NbtOps.INSTANCE, signText).result()
                     .ifPresent(frontTextNBT -> blockEntityCompound.put(key, frontTextNBT));
         }
