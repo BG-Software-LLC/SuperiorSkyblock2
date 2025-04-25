@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -157,7 +158,8 @@ public class CmdVisit implements ISuperiorCommand {
             Message.INVALID_VISIT_LOCATION.send(superiorPlayer);
 
             if (!superiorPlayer.hasBypassModeEnabled()) {
-                island.setVisitorsLocation(null);
+                if (PluginEventsFactory.callIslandRemoveVisitorHomeEvent(island, superiorPlayer))
+                    island.setVisitorsLocation(null);
                 return;
             }
 

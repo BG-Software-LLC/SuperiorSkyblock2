@@ -1,7 +1,10 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -17,15 +20,22 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.Directional;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class SignsListener extends AbstractGameEventListener {
 
     private static final BlockFace[] NEARBY_BLOCKS = new BlockFace[]{
             BlockFace.UP, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH, BlockFace.EAST
     };
+
+    @Nullable
+    private static final EntityType WIND_CHARGE = EnumHelper.getEnum(EntityType.class, "WIND_CHARGE");
+    @Nullable
+    private static final EntityType BREEZE_WIND_CHARGE = EnumHelper.getEnum(EntityType.class, "BREEZE_WIND_CHARGE");
 
     public SignsListener(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -80,21 +90,54 @@ public class SignsListener extends AbstractGameEventListener {
         }, 1L);
     }
 
-    public void onSignBreak(GameEvent<GameEventArgs.BlockBreakEvent> e) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
-        Block block = e.getArgs().block;
+    private void onSignBreak(GameEvent<GameEventArgs.BlockBreakEvent> e) {
+        Island island;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            island = plugin.getGrid().getIslandAt(e.getArgs().block.getLocation(wrapper.getHandle()));
+        }
 
-        if (block.getState() instanceof Sign) {
-            IslandSigns.Result result = IslandSigns.handleSignBreak(superiorPlayer, (Sign) block.getState());
-            if (result.isCancelEvent())
-                e.setCancelled();
-
+        if (island == null || island.getIslandWarps().isEmpty())
             return;
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
+
+        IslandSigns.Result result = handleBlockBreak(island, e.getArgs().block, superiorPlayer);
+        if (result.isCancelEvent())
+            e.setCancelled();
+    }
+
+    private void onSignExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
+        EntityType entityType = e.getArgs().entity.getType();
+
+        if (entityType == WIND_CHARGE || entityType == BREEZE_WIND_CHARGE)
+            return;
+
+        Island island;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            island = plugin.getGrid().getIslandAt(e.getArgs().entity.getLocation(wrapper.getHandle()));
+        }
+
+        if (island == null || island.getIslandWarps().isEmpty())
+            return;
+
+        Iterator<Block> iterator = e.getArgs().blocks.iterator();
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+            IslandSigns.Result result = handleBlockBreak(island, block, null);
+            if (result.isCancelEvent())
+                iterator.remove();
+        }
+    }
+
+    private IslandSigns.Result handleBlockBreak(Island island, Block block, @Nullable SuperiorPlayer superiorPlayer) {
+        BlockState blockState = block.getState();
+        if (blockState instanceof Sign) {
+            return IslandSigns.handleSignBreak(island, superiorPlayer, (Sign) blockState);
         }
 
         for (BlockFace blockFace : NEARBY_BLOCKS) {
             Block faceBlock = block.getRelative(blockFace);
-            BlockState blockState = faceBlock.getState();
+            blockState = faceBlock.getState();
             if (!(blockState instanceof Sign))
                 continue;
 
@@ -125,18 +168,17 @@ public class SignsListener extends AbstractGameEventListener {
             }
 
             if (isSignGonnaBreak) {
-                IslandSigns.Result result = IslandSigns.handleSignBreak(superiorPlayer, (Sign) blockState);
-                if (result.isCancelEvent()) {
-                    e.setCancelled();
-                    return;
-                }
+                return IslandSigns.handleSignBreak(null, superiorPlayer, (Sign) blockState);
             }
         }
+
+        return new IslandSigns.Result(IslandSigns.Reason.SUCCESS, false);
     }
 
     private void registerListeners() {
-        registerCallback(GameEventType.SIGN_CHANGE_EVENT, GameEventPriority.NORMAL, this::onSignPlace);
-        registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.NORMAL, this::onSignBreak);
+        registerCallback(GameEventType.SIGN_CHANGE_EVENT, GameEventPriority.MONITOR, this::onSignPlace);
+        registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.MONITOR, this::onSignBreak);
+        registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.MONITOR, this::onSignExplode);
     }
 
 }
