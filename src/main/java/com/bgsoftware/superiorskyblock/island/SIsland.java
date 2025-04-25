@@ -4653,15 +4653,10 @@ public class SIsland implements Island {
 
             superiorPlayer.setTeleportTask(null);
 
-            if (!isInsideRange(location)) {
+            if (!isInsideRange(location) || !WorldBlocks.isSafeBlock(location.getBlock())) {
                 Message.UNSAFE_WARP.send(superiorPlayer);
                 if (plugin.getSettings().getDeleteUnsafeWarps())
                     deleteWarp(islandWarp.getName());
-                return;
-            }
-
-            if (!WorldBlocks.isSafeBlock(location.getBlock())) {
-                Message.UNSAFE_WARP.send(superiorPlayer);
                 return;
             }
 
