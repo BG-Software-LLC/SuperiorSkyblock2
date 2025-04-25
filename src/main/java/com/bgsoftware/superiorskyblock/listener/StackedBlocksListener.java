@@ -286,8 +286,10 @@ public class StackedBlocksListener extends AbstractGameEventListener {
         registerCallback(GameEventType.PISTON_RETRACT_EVENT, GameEventPriority.LOWEST, this::onPistonRetract);
         registerCallback(GameEventType.BLOCK_FORM_EVENT, GameEventPriority.LOWEST, this::onBlockChangeState);
         registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.LOWEST, this::onGolemCreate);
-        registerCallback(GameEventType.BLOCK_PHYSICS_EVENT, GameEventPriority.LOWEST, this::onStackedBlockPhysics);
         registerCallback(GameEventType.SPONGE_ABSORB_EVENT, GameEventPriority.LOWEST, this::onSpongeAbsorb);
+
+        if (plugin.getSettings().isPhysicsListener())
+            registerCallback(GameEventType.BLOCK_PHYSICS_EVENT, GameEventPriority.LOWEST, this::onStackedBlockPhysics);
     }
 
     private static Map<CreatureSpawnEvent.SpawnReason, List<BlockOffset>> buildEntityTemplateOffsetsMap() {

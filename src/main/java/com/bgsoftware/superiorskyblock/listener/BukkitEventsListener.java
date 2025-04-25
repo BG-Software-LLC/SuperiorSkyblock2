@@ -177,6 +177,7 @@ public class BukkitEventsListener implements Listener {
         createEventListener(GameEventType.PLAYER_PICKUP_ITEM_EVENT, PlayerPickupItemEvent.class, this::createGameEvent);
         createEventListener(GameEventType.PROJECTILE_HIT_EVENT, ProjectileHitEvent.class, this::createGameEvent);
         createEventListener(GameEventType.SIGN_CHANGE_EVENT, SignChangeEvent.class, this::createGameEvent);
+        createEventListener(GameEventType.BLOCK_PHYSICS_EVENT, BlockPhysicsEvent.class, this::createGameEvent);
 
         try {
             Class.forName("org.bukkit.event.block.SpongeAbsorbEvent");
@@ -233,10 +234,6 @@ public class BukkitEventsListener implements Listener {
             createEventListener(GameEventType.RAID_TRIGGER_EVENT, org.bukkit.event.raid.RaidTriggerEvent.class, new RaidTriggerEventFunctions());
         } catch (Exception ignored) {
         }
-
-        if (plugin.getSettings().isPhysicsListener())
-            createEventListener(GameEventType.BLOCK_PHYSICS_EVENT, BlockPhysicsEvent.class, this::createGameEvent);
-
     }
 
     private GameEvent<GameEventArgs.PlayerJoinEvent> createGameEvent(GameEventType<GameEventArgs.PlayerJoinEvent> eventType, GameEventPriority priority, PlayerJoinEvent e) {
