@@ -25,14 +25,14 @@ public class IslandWorldEventsListener extends AbstractGameEventListener {
     public IslandWorldEventsListener(SuperiorSkyblockPlugin plugin) {
         super(plugin);
 
-        registerCallback(GameEventType.BLOCK_REDSTONE_EVENT, GameEventPriority.HIGHEST, this::onBlockRedstone);
-        registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.HIGHEST, this::onEntitySpawn);
+        if (plugin.getSettings().isDisableRedstoneOffline() || plugin.getSettings().getAFKIntegrations().isDisableRedstone())
+            registerCallback(GameEventType.BLOCK_REDSTONE_EVENT, GameEventPriority.HIGHEST, this::onBlockRedstone);
+
+        if (plugin.getSettings().getAFKIntegrations().isDisableSpawning())
+            registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.HIGHEST, this::onEntitySpawn);
     }
 
     private void onBlockRedstone(GameEvent<GameEventArgs.BlockRedstoneEvent> e) {
-        if (!plugin.getSettings().isDisableRedstoneOffline() && !plugin.getSettings().getAFKIntegrations().isDisableRedstone())
-            return;
-
         Island island;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             island = plugin.getGrid().getIslandAt(e.getArgs().block.getLocation(wrapper.getHandle()));
@@ -51,8 +51,7 @@ public class IslandWorldEventsListener extends AbstractGameEventListener {
     private void onEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
         Entity entity = e.getArgs().entity;
 
-        if (!plugin.getSettings().getAFKIntegrations().isDisableSpawning() ||
-                hologramsService.get().isHologram(entity))
+        if (hologramsService.get().isHologram(entity))
             return;
 
         Island island;

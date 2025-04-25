@@ -97,9 +97,6 @@ public class FeaturesListener extends AbstractGameEventListener {
     /* OBSIDIAN TO LAVA */
 
     private void onObsidianClick(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
-        if (!plugin.getSettings().isObsidianToLava())
-            return;
-
         Player player = e.getArgs().player;
         ItemStack handItem = e.getArgs().usedItem;
         Block clickedBlock = e.getArgs().clickedBlock;
@@ -148,9 +145,6 @@ public class FeaturesListener extends AbstractGameEventListener {
     /* VISITORS BLOCKED COMMANDS */
 
     private void onPlayerCommand(GameEvent<GameEventArgs.PlayerCommandEvent> e) {
-        if (plugin.getSettings().getBlockedVisitorsCommands().isEmpty())
-            return;
-
         Player player = e.getArgs().player;
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
@@ -259,12 +253,16 @@ public class FeaturesListener extends AbstractGameEventListener {
 
     private void registerListeners() {
         for (PluginEventType<?> eventType : PluginEventType.values()) {
-            if (eventType.getBukkitEventName() != null)
+            String bukkitEventName = eventType.getBukkitEventName();
+            if (bukkitEventName != null && plugin.getSettings().getEventCommands().containsKey(bukkitEventName))
                 plugin.getPluginEventsDispatcher().registerCallback(eventType, this::onGeneralPluginEvent);
         }
 
-        registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.HIGHEST, this::onObsidianClick);
-        registerCallback(GameEventType.PLAYER_COMMAND_EVENT, GameEventPriority.HIGHEST, this::onPlayerCommand);
+        if (plugin.getSettings().isObsidianToLava())
+            registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.HIGHEST, this::onObsidianClick);
+        if (!plugin.getSettings().getBlockedVisitorsCommands().isEmpty())
+            registerCallback(GameEventType.PLAYER_COMMAND_EVENT, GameEventPriority.HIGHEST, this::onPlayerCommand);
+
         registerCallback(GameEventType.CHUNK_LOAD_EVENT, GameEventPriority.MONITOR, this::onChunkLoad);
 
         if (VAULT != null && TRIAL_SPAWNER != null) {
