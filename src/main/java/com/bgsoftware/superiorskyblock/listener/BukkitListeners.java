@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 import java.util.regex.Matcher;
@@ -20,6 +21,8 @@ public class BukkitListeners {
     }
 
     public void registerListeners() {
+        unregisterListeners();
+
         new AdminPlayersListener(this.plugin);
         new BlockChangesListener(this.plugin);
         new ChunksListener(this.plugin);
@@ -38,6 +41,12 @@ public class BukkitListeners {
         new WorldDestructionListener(this.plugin);
 
         safeEventsRegister(new BukkitEventsListener(this.plugin));
+    }
+
+    public void unregisterListeners() {
+        plugin.getGameEventsDispatcher().clearCallbacks();
+        plugin.getPluginEventsDispatcher().clearCallbacks();
+        HandlerList.unregisterAll(this.plugin);
     }
 
     public void registerListenerFailureFilter() {

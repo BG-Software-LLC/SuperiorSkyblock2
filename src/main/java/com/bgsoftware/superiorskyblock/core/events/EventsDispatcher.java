@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +28,10 @@ public class EventsDispatcher<L, T extends EventType<?, ?>, P extends Enum<P>, E
         callbacks.computeIfAbsent(type, t -> new EnumMap<>(this.priorityClass))
                 .computeIfAbsent(priority, p -> new LinkedList<>())
                 .add(new RegisteredListener(listener, ignoreCancelled, callback));
+    }
+
+    public void clearCallbacks() {
+        this.callbacks.clear();
     }
 
     public void onGameEvent(E event, P priority) {

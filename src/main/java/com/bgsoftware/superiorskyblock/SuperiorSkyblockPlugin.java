@@ -259,22 +259,12 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             try {
                 reloadPlugin(PluginReloadReason.STARTUP);
             } catch (ManagerLoadException error) {
+                Log.error(error, "An unexpected error occurred while starting up the plugin:");
                 ManagerLoadException.handle(error);
                 return;
             }
 
             loadingStage = PluginLoadingStage.MANAGERS_INITIALIZED;
-
-            try {
-                bukkitListeners.registerListeners();
-            } catch (RuntimeException ex) {
-                ManagerLoadException handlerError = new ManagerLoadException("Cannot load plugin due to a missing event: " + ex.getMessage() + " - contact @Ome_R!", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
-                Log.error(handlerError, "An error occurred while registering listeners:");
-                Bukkit.shutdown();
-                return;
-            }
-
-            loadingStage = PluginLoadingStage.EVENTS_INITIALIZED;
 
             ChunksProvider.start();
 
@@ -510,6 +500,12 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
         if (reloadReason == PluginReloadReason.STARTUP) {
             modulesHandler.loadModulesData(this);
+        }
+
+        try {
+            bukkitListeners.registerListeners();
+        } catch (RuntimeException ex) {
+            throw new ManagerLoadException("Cannot load plugin due to a missing event: " + ex.getMessage() + " - contact @Ome_R!", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
     }
 
