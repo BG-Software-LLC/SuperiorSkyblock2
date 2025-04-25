@@ -137,6 +137,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public boolean isAutoBlocksTracking() {
+        return this.global.isAutoBlocksTracking();
+    }
+
+    @Override
     public String getIslandTopOrder() {
         return this.global.getIslandTopOrder();
     }

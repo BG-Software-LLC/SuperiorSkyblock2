@@ -85,6 +85,12 @@ public interface SettingsManager {
     boolean isRoundedIslandLevels();
 
     /**
+     * Whether to automatic track block counts when players place and break blocks.
+     * Config path: auto-blocks-tracking
+     */
+    boolean isAutoBlocksTracking();
+
+    /**
      * The default island-top sorting type.
      * Config path: island-top-order
      */

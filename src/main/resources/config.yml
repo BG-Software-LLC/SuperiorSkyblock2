@@ -147,6 +147,11 @@ island-level-formula: '{} / 2'
 # Should the island levels be a rounded integer?
 rounded-island-level: false
 
+# Whether to automatic track block counts when players place and break blocks.
+# If set to true, block counts, worth and levels will automatically be updated upon
+# placement and breaking of blocks.
+auto-blocks-tracking: true
+
 # How should the island top be ordered by default?
 # Use WORTH, LEVEL, RATING or PLAYERS.
 island-top-order: 'WORTH'
