@@ -55,4 +55,9 @@ public class DefaultUpgradesContainer implements UpgradesContainer {
         this.upgrades.put(upgrade.getName().toLowerCase(Locale.ENGLISH), upgrade);
     }
 
+    @Override
+    public void clearUpgrades() {
+        this.upgrades.clear();
+    }
+
 }

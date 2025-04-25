@@ -87,6 +87,7 @@ import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.island.upgrade.DefaultUpgradeLevel;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
+import com.bgsoftware.superiorskyblock.island.upgrade.container.IslandUpgrades;
 import com.bgsoftware.superiorskyblock.island.warp.SIslandWarp;
 import com.bgsoftware.superiorskyblock.island.warp.SWarpCategory;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
@@ -220,7 +221,7 @@ public class SIsland implements Island {
     private final Synchronized<EnumerateMap<Dimension, Location>> visitorHomes = Synchronized.of(new EnumerateMap<>(Dimension.values()));
     private final Map<IslandPrivilege, PlayerRole> rolePermissions = new ConcurrentHashMap<>();
     private final Map<IslandFlag, Byte> islandFlags = new ConcurrentHashMap<>();
-    private final Map<String, Integer> upgrades = new ConcurrentHashMap<>();
+    private final IslandUpgrades upgrades = new IslandUpgrades();
     private final AtomicReference<BigDecimal> islandWorth = new AtomicReference<>(BigDecimal.ZERO);
     private final AtomicReference<BigDecimal> islandLevel = new AtomicReference<>(BigDecimal.ZERO);
     private final AtomicReference<BigDecimal> bonusWorth = new AtomicReference<>(BigDecimal.ZERO);
@@ -290,7 +291,7 @@ public class SIsland implements Island {
         this.playerPermissions.putAll(builder.playerPermissions);
         this.playerPermissions.values().forEach(permissionNode -> permissionNode.setIsland(this));
         this.rolePermissions.putAll(builder.rolePermissions);
-        this.upgrades.putAll(builder.upgrades);
+        this.upgrades.setUpgradeLevels(builder.upgrades);
         this.blockLimits.putAll(builder.blockLimits);
         this.ratings.putAll(builder.ratings);
         this.completedMissions.putAll(builder.completedMissions);
@@ -2955,7 +2956,7 @@ public class SIsland implements Island {
         if (currentLevel == level)
             return;
 
-        upgrades.put(upgrade.getName(), Math.min(upgrade.getMaxUpgradeLevel(), level));
+        this.upgrades.setUpgradeLevel(upgrade, level);
 
         lastUpgradeTime = System.currentTimeMillis();
 
@@ -2975,7 +2976,7 @@ public class SIsland implements Island {
 
     @Override
     public Map<String, Integer> getUpgrades() {
-        return Collections.unmodifiableMap(upgrades);
+        return this.upgrades.getUpgrades();
     }
 
     @Override

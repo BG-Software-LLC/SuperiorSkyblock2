@@ -76,4 +76,8 @@ public class UpgradesManagerImpl extends Manager implements UpgradesManager {
         return this.upgradesContainer.getUpgradeCostLoader(id);
     }
 
+    public void clearUpgrades() {
+        this.upgradesContainer.clearUpgrades();
+    }
+
 }

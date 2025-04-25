@@ -9,15 +9,15 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
-import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
-import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
 import com.bgsoftware.superiorskyblock.core.value.IntValue;
@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgrade;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.island.upgrade.UpgradeRequirement;
+import com.bgsoftware.superiorskyblock.island.upgrade.container.IslandUpgrades;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRankup;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetUpgrade;
@@ -45,8 +46,6 @@ import org.bukkit.potion.PotionEffectType;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -149,25 +148,26 @@ public class UpgradesModule extends BuiltinModule {
         if (config.getBoolean("entity-limits", true))
             enabledUpgrades.add(new UpgradeTypeEntityLimits(plugin));
 
-        if (enabledUpgrades.isEmpty())
-            return;
+        plugin.getUpgrades().clearUpgrades();
 
-        ConfigurationSection upgrades = config.getConfigurationSection("upgrades");
+        if (!enabledUpgrades.isEmpty()) {
+            ConfigurationSection upgrades = config.getConfigurationSection("upgrades");
+            if (upgrades != null) {
+                for (String upgradeName : upgrades.getKeys(false)) {
+                    if (upgradeName.length() > MAX_UPGRADES_NAME_LENGTH)
+                        upgradeName = upgradeName.substring(0, MAX_UPGRADES_NAME_LENGTH);
 
-        if (upgrades == null)
-            return;
+                    SUpgrade upgrade = new SUpgrade(upgradeName);
+                    for (String _level : upgrades.getConfigurationSection(upgradeName).getKeys(false)) {
+                        loadUpgradeLevelFromSection(plugin, upgrade, _level, upgrades.getConfigurationSection(upgradeName + "." + _level));
+                    }
 
-        for (String upgradeName : upgrades.getKeys(false)) {
-            if (upgradeName.length() > MAX_UPGRADES_NAME_LENGTH)
-                upgradeName = upgradeName.substring(0, MAX_UPGRADES_NAME_LENGTH);
-
-            SUpgrade upgrade = new SUpgrade(upgradeName);
-            for (String _level : upgrades.getConfigurationSection(upgradeName).getKeys(false)) {
-                loadUpgradeLevelFromSection(plugin, upgrade, _level, upgrades.getConfigurationSection(upgradeName + "." + _level));
+                    plugin.getUpgrades().addUpgrade(upgrade);
+                }
             }
-
-            plugin.getUpgrades().addUpgrade(upgrade);
         }
+
+        IslandUpgrades.onUpgradesUpdate();
     }
 
     @Nullable
