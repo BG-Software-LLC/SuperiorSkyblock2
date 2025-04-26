@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
@@ -132,11 +133,15 @@ public class CmdRankup implements IPermissibleCommand {
                     upgradeCost.withdrawCost(superiorPlayer);
 
                     for (String command : event.getArgs().commands) {
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                                placeholdersService.get().parsePlaceholders(superiorPlayer.asOfflinePlayer(), command
-                                        .replace("%player%", superiorPlayer.getName())
-                                        .replace("%leader%", island.getOwner().getName()))
-                        );
+                        String parsedCommand = placeholdersService.get().parsePlaceholders(superiorPlayer.asOfflinePlayer(), command
+                                .replace("%player%", superiorPlayer.getName())
+                                .replace("%leader%", island.getOwner().getName()));
+
+                        try {
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsedCommand);
+                        } catch (Throwable error) {
+                            Log.error(error, "An unexpected error occurred while executing command:\n", parsedCommand);
+                        }
                     }
 
                     hasNextLevel = true;
