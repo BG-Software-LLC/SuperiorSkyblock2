@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -77,6 +78,11 @@ public class CmdAdminSetPermission implements IAdminIslandCommand {
         if (playerRole == null)
             return;
 
+        if (islandPrivilege.getType() == IslandPrivilege.Type.COMMAND && !playerRole.isRoleLadder()) {
+            Message.INVALID_ROLE.send(sender, args[4], SPlayerRole.getValuesString());
+            return;
+        }
+
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
@@ -100,7 +106,16 @@ public class CmdAdminSetPermission implements IAdminIslandCommand {
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
         return args.length == 4 ? CommandTabCompletes.getIslandPrivileges(args[3]) :
-                args.length == 5 ? CommandTabCompletes.getPlayerRoles(plugin, args[4]) : Collections.emptyList();
+                args.length == 5 ? CommandTabCompletes.getPlayerRoles(plugin, getIslandPrivilegeSafe(args[3]), args[4]) : Collections.emptyList();
+    }
+
+    @Nullable
+    private static IslandPrivilege getIslandPrivilegeSafe(String name) {
+        try {
+            return IslandPrivilege.getByName(name);
+        } catch (NullPointerException error) {
+            return null;
+        }
     }
 
 }

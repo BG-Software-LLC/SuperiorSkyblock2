@@ -165,6 +165,17 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
 
         @Override
         protected List<IslandPrivilegeInfo> requestObjects() {
+            List<IslandPrivilegeInfo> islandPrivileges = MenuIslandPrivileges.this.islandPrivileges;
+
+            if (this.permissionHolder instanceof SuperiorPlayer &&
+                    !island.isMember((SuperiorPlayer) this.permissionHolder)) {
+                islandPrivileges = new LinkedList<>(islandPrivileges);
+                islandPrivileges.removeIf(info -> {
+                    IslandPrivilege islandPrivilege = info.getIslandPrivilege();
+                    return islandPrivilege != null && islandPrivilege.getType() == IslandPrivilege.Type.COMMAND;
+                });
+            }
+
             return Collections.unmodifiableList(islandPrivileges);
         }
 

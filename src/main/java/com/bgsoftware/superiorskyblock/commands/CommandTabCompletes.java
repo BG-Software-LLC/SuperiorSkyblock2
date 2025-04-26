@@ -149,8 +149,11 @@ public class CommandTabCompletes {
         return filterByArgument(plugin.getUpgrades().getUpgrades(), Upgrade::getName, argument.toLowerCase(Locale.ENGLISH));
     }
 
-    public static List<String> getPlayerRoles(SuperiorSkyblockPlugin plugin, String argument) {
-        return filterByArgument(plugin.getRoles().getRoles(), PlayerRole::getName, argument.toLowerCase(Locale.ENGLISH));
+    public static List<String> getPlayerRoles(SuperiorSkyblockPlugin plugin, @Nullable IslandPrivilege islandPrivilege, String argument) {
+        return new SequentialListBuilder<PlayerRole>()
+                .filter(playerRole -> playerRole.getName().toLowerCase(Locale.ENGLISH).contains(argument) &&
+                        (islandPrivilege == null || islandPrivilege.getType() != IslandPrivilege.Type.COMMAND || playerRole.isRoleLadder()))
+                .map(plugin.getRoles().getRoles(), PlayerRole::getName);
     }
 
     public static List<String> getPlayerRoles(SuperiorSkyblockPlugin plugin, String argument, Predicate<PlayerRole> predicate) {
