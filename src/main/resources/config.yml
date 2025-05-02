@@ -185,6 +185,7 @@ island-roles:
       - DROP_ITEMS
       - DYE_SHEEP
       - ENDER_PEARL
+      - ENTITY_RIDE
       - EXPEL_BYPASS
       - FARM_TRAMPING
       - FERTILIZE
