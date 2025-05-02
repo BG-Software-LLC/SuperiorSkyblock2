@@ -9,6 +9,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -72,29 +73,29 @@ public class ComplexMessageComponent implements IMessageComponent {
 
     @Override
     public String getMessage() {
-        return this.content.getContent().orElse("");
+        return this.content.getContent(null).orElse("");
     }
 
     @Override
     public String getMessage(Object... args) {
-        return this.content.getContent(args).orElse("");
+        return this.content.getContent(null, args).orElse("");
     }
 
     @Override
     public void sendMessage(CommandSender sender, Object... args) {
         if (!(sender instanceof Player)) {
-            this.content.getContent(args).ifPresent(sender::sendMessage);
+            this.content.getContent(null, args).ifPresent(sender::sendMessage);
         } else if (components.length > 0) {
             BaseComponent[] components = new BaseComponent[this.components.length];
             for (int i = 0; i < this.components.length; ++i)
-                components[i] = this.components[i].parse(args);
+                components[i] = this.components[i].parse((Player) sender, args);
             ((Player) sender).spigot().sendMessage(components);
         }
     }
 
     private interface IWrappedComponent {
 
-        BaseComponent parse(Object... args);
+        BaseComponent parse(OfflinePlayer offlinePlayer, Object... args);
 
     }
 
@@ -107,7 +108,7 @@ public class ComplexMessageComponent implements IMessageComponent {
         }
 
         @Override
-        public BaseComponent parse(Object... args) {
+        public BaseComponent parse(OfflinePlayer offlinePlayer, Object... args) {
             return this.handle;
         }
 
@@ -129,10 +130,11 @@ public class ComplexMessageComponent implements IMessageComponent {
         }
 
         @Override
-        public BaseComponent parse(Object... args) {
-            TextComponent textComponent = (TextComponent) TextComponent.fromLegacyText(this.content.getContent(args).orElse(""))[0];
+        public BaseComponent parse(OfflinePlayer offlinePlayer, Object... args) {
+            TextComponent textComponent = (TextComponent) TextComponent.fromLegacyText(
+                    this.content.getContent(offlinePlayer, args).orElse(""))[0];
             if (this.hoverEventContents != null)
-                textComponent.setHoverEvent(this.hoverEventContents.parse(args));
+                textComponent.setHoverEvent(this.hoverEventContents.parse(offlinePlayer, args));
             if (this.clickEvent != null)
                 textComponent.setClickEvent(this.clickEvent);
 
@@ -151,9 +153,9 @@ public class ComplexMessageComponent implements IMessageComponent {
         }
 
         @Override
-        public BaseComponent parse(Object... args) {
+        public BaseComponent parse(OfflinePlayer offlinePlayer, Object... args) {
             BaseComponent newComponent = this.baseComponent.duplicate();
-            newComponent.setHoverEvent(this.hoverEventContents.parse(args));
+            newComponent.setHoverEvent(this.hoverEventContents.parse(offlinePlayer, args));
             return newComponent;
         }
 
@@ -169,10 +171,10 @@ public class ComplexMessageComponent implements IMessageComponent {
             this.components = parseComponents(hoverEvent.getValue());
         }
 
-        HoverEvent parse(Object... args) {
+        HoverEvent parse(OfflinePlayer offlinePlayer, Object... args) {
             BaseComponent[] components = new BaseComponent[this.components.length];
             for (int i = 0; i < components.length; ++i)
-                components[i] = this.components[i].parse(args);
+                components[i] = this.components[i].parse(offlinePlayer, args);
             return new HoverEvent(this.action, components);
         }
 

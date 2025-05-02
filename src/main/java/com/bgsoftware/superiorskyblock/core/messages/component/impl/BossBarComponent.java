@@ -44,18 +44,18 @@ public class BossBarComponent implements IMessageComponent {
 
     @Override
     public String getMessage() {
-        return this.content.getContent().orElse("");
+        return this.content.getContent(null).orElse("");
     }
 
     @Override
     public String getMessage(Object... args) {
-        return this.content.getContent(args).orElse("");
+        return this.content.getContent(null, args).orElse("");
     }
 
     @Override
     public void sendMessage(CommandSender sender, Object... args) {
         if (sender instanceof Player) {
-            this.content.getContent(args).ifPresent(message ->
+            this.content.getContent((Player) sender, args).ifPresent(message ->
                     bossBarsService.get().createBossBar((Player) sender, message, this.color, this.ticksToRun));
         }
     }

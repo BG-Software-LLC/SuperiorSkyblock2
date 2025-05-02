@@ -69,12 +69,12 @@ public class MiniMessageHook {
 
         @Override
         public String getMessage() {
-            return this.content.getContent().orElse("");
+            return this.content.getContent(null).orElse("");
         }
 
         @Override
         public String getMessage(Object... args) {
-            return this.content.getContent(args).orElse("");
+            return this.content.getContent(null, args).orElse("");
         }
 
         @Override

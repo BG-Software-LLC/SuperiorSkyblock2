@@ -41,18 +41,18 @@ public class TitleComponent implements IMessageComponent {
 
     @Override
     public String getMessage() {
-        return this.titleMessage.getContent().orElse("");
+        return this.titleMessage.getContent(null).orElse("");
     }
 
     @Override
     public String getMessage(Object... args) {
-        return this.titleMessage.getContent(args).orElse("");
+        return this.titleMessage.getContent(null, args).orElse("");
     }
 
     @Override
     public void sendMessage(CommandSender sender, Object... args) {
-        String titleMessage = this.titleMessage.getContent(args).orElse(null);
-        String subtitleMessage = this.subtitleMessage.getContent(args).orElse(null);
+        String titleMessage = this.titleMessage.getContent((Player) sender, args).orElse(null);
+        String subtitleMessage = this.subtitleMessage.getContent((Player) sender, args).orElse(null);
         if (titleMessage != null && subtitleMessage != null)
             plugin.getNMSPlayers().sendTitle((Player) sender, titleMessage, subtitleMessage,
                     this.fadeIn, this.duration, this.fadeOut);

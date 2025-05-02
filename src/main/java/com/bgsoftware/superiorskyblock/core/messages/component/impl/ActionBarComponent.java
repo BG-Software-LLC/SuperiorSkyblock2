@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -30,17 +31,17 @@ public class ActionBarComponent implements IMessageComponent {
 
     @Override
     public String getMessage() {
-        return this.content.getContent().orElse("");
+        return this.content.getContent(null).orElse("");
     }
 
     @Override
     public String getMessage(Object... args) {
-        return this.content.getContent(args).orElse("");
+        return this.content.getContent(null, args).orElse("");
     }
 
     @Override
     public void sendMessage(CommandSender sender, Object... args) {
-        this.content.getContent(args).ifPresent(message ->
+        this.content.getContent((Player) sender, args).ifPresent(message ->
                 plugin.getNMSPlayers().sendActionBar((Player) sender, message));
     }
 
