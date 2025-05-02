@@ -1285,42 +1285,6 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
-  monster_damage:
-    display-menu: true
-    permission-enabled:
-      type: SKULL_ITEM
-      data: 2
-      name: '&6Monster Damage'
-      lore:
-        - '&7Access to damage monsters inside the island.'
-        - '&7Currently &aENABLED&7.'
-    permission-disabled:
-      type: SKULL_ITEM
-      data: 2
-      name: '&6Monster Damage'
-      lore:
-        - '&7Access to damage monsters inside the island.'
-        - '&7Currently &cDISABLED&7.'
-    role-permission:
-      type: SKULL_ITEM
-      data: 2
-      name: '&6Monster Damage'
-      lore:
-        - '&7Access to damage monsters inside the island.'
-        - '&7Role: &e{}&7.'
-        - ''
-        - '{0}'
-    has-access:
-      sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
-        volume: 0.2
-        pitch: 0.2
-    no-access:
-      sound:
-        type: BLOCK_ANVIL_PLACE
-        volume: 0.2
-        pitch: 0.2
-
   minecart_damage:
     display-menu: true
     permission-enabled:
@@ -1406,6 +1370,42 @@ permissions:
       name: '&6Minecart Open'
       lore:
         - '&7Access to open minecarts inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  monster_damage:
+    display-menu: true
+    permission-enabled:
+      type: SKULL_ITEM
+      data: 2
+      name: '&6Monster Damage'
+      lore:
+        - '&7Access to damage monsters inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: SKULL_ITEM
+      data: 2
+      name: '&6Monster Damage'
+      lore:
+        - '&7Access to damage monsters inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: SKULL_ITEM
+      data: 2
+      name: '&6Monster Damage'
+      lore:
+        - '&7Access to damage monsters inside the island.'
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'
@@ -2026,39 +2026,6 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
-  uncoop_member:
-    display-menu: true
-    permission-enabled:
-      type: GOLDEN_APPLE
-      name: '&6Uncoop Member'
-      lore:
-        - '&7Access to remove co-op members from the island.'
-        - '&7Currently &aENABLED&7.'
-    permission-disabled:
-      type: GOLDEN_APPLE
-      name: '&6Uncoop Member'
-      lore:
-        - '&7Access to remove co-op members from the island.'
-        - '&7Currently &cDISABLED&7.'
-    role-permission:
-      type: GOLDEN_APPLE
-      name: '&6Uncoop Member'
-      lore:
-        - '&7Access to remove co-op members from the island.'
-        - '&7Role: &e{}&7.'
-        - ''
-        - '{0}'
-    has-access:
-      sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
-        volume: 0.2
-        pitch: 0.2
-    no-access:
-      sound:
-        type: BLOCK_ANVIL_PLACE
-        volume: 0.2
-        pitch: 0.2
-
   sign_interact:
     display-menu: true
     permission-enabled:
@@ -2111,6 +2078,39 @@ permissions:
       name: '&6Spawner Break'
       lore:
         - '&7Access to break spawners inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  uncoop_member:
+    display-menu: true
+    permission-enabled:
+      type: GOLDEN_APPLE
+      name: '&6Uncoop Member'
+      lore:
+        - '&7Access to remove co-op members from the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: GOLDEN_APPLE
+      name: '&6Uncoop Member'
+      lore:
+        - '&7Access to remove co-op members from the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: GOLDEN_APPLE
+      name: '&6Uncoop Member'
+      lore:
+        - '&7Access to remove co-op members from the island.'
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'
