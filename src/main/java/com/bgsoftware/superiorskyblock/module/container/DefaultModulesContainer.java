@@ -84,4 +84,10 @@ public class DefaultModulesContainer implements ModulesContainer {
         this.modulesData.put(pluginModule, moduleData);
     }
 
+    @Override
+    @Nullable
+    public ModuleData getModuleData(PluginModule module) {
+        return this.modulesData.get(module);
+    }
+
 }

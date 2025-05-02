@@ -21,8 +21,6 @@ public class BukkitListeners {
     }
 
     public void registerListeners() {
-        unregisterListeners();
-
         new AdminPlayersListener(this.plugin);
         new ChunksListener(this.plugin);
         new EntityTrackingListener(this.plugin);

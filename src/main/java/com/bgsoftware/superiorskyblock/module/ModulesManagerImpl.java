@@ -203,6 +203,17 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
             Log.error("An unexpected error occurred while reloading the module ", pluginModule.getName(), ".");
             Log.error(error, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");
         }
+
+        // We register listeners again
+        ModuleData moduleData = this.modulesContainer.getModuleData(pluginModule);
+        if (moduleData != null) {
+            Listener[] listeners = moduleData.getListeners();
+            if (listeners != null) {
+                for (Listener listener : listeners)
+                    Bukkit.getPluginManager().registerEvents(listener, plugin);
+            }
+        }
+
     }
 
     public void loadModulesData(SuperiorSkyblockPlugin plugin) {

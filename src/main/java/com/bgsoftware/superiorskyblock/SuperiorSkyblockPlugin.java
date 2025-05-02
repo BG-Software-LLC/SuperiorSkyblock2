@@ -437,6 +437,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     }
 
     public void reloadPlugin(PluginReloadReason reloadReason) throws ManagerLoadException {
+        if (reloadReason == PluginReloadReason.COMMAND) {
+            bukkitListeners.unregisterListeners();
+        }
+
         providersHandler.loadData();
 
         ItemSkulls.readTextures(this);
