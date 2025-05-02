@@ -20,9 +20,9 @@ import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
@@ -46,14 +46,11 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Donkey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fish;
-import org.bukkit.entity.Horse;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Mule;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
@@ -267,8 +264,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             } else if (entity instanceof Villager) {
                 islandPrivilege = IslandPrivileges.VILLAGER_TRADING;
                 closeInventory = true;
-            } else if (entity instanceof Horse || entityType == CAMEL_TYPE ||
-                    (ServerVersion.isAtLeast(ServerVersion.v1_11) && (entity instanceof Mule || entity instanceof Donkey))) {
+            } else if (BukkitEntities.isHorse(entity)) {
                 islandPrivilege = IslandPrivileges.HORSE_INTERACT;
                 closeInventory = true;
             } else if (usedItemType == Material.FLINT_AND_STEEL && entity instanceof Creeper) {
@@ -332,6 +328,22 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             entity.setFireTicks(0);
 
         return interactionResult;
+    }
+
+    @Override
+    public InteractionResult handleEntityRide(SuperiorPlayer superiorPlayer, Entity vehicle) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
+        Preconditions.checkNotNull(vehicle, "vehicle cannot be null");
+
+        IslandPrivilege islandPrivilege = BukkitEntities.isHorse(vehicle) ? IslandPrivileges.HORSE_INTERACT :
+                vehicle instanceof Animals ? IslandPrivileges.ENTITY_RIDE : IslandPrivileges.MINECART_ENTER;
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location entityLocation = vehicle.getLocation(wrapper.getHandle());
+            Island island = plugin.getGrid().getIslandAt(entityLocation);
+            return handleInteractionInternal(superiorPlayer, entityLocation, island, islandPrivilege,
+                    0, true, false);
+        }
     }
 
     @Override

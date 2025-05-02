@@ -1,9 +1,12 @@
 package com.bgsoftware.superiorskyblock.world;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import org.bukkit.Material;
@@ -11,6 +14,7 @@ import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.Ambient;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Donkey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Flying;
@@ -18,6 +22,7 @@ import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
+import org.bukkit.entity.Mule;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -45,6 +50,8 @@ public class BukkitEntities {
     private static final Class<?> HOGLIN_CLASS = getEntityTypeClass("org.bukkit.entity.Hoglin");
     private static final Class<?> SKELETON_HORSE_CLASS = getEntityTypeClass("org.bukkit.entity.SkeletonHorse");
     private static final Class<?> ZOMBIE_HORSE_CLASS = getEntityTypeClass("org.bukkit.entity.ZombieHorse");
+    @Nullable
+    private static final EntityType CAMEL_TYPE = EnumHelper.getEnum(EntityType.class, "CAMEL");
 
     private BukkitEntities() {
 
@@ -156,6 +163,11 @@ public class BukkitEntities {
         }
 
         return EntityCategory.UNKNOWN;
+    }
+
+    public static boolean isHorse(Entity entity) {
+        return entity instanceof Horse || entity.getType() == CAMEL_TYPE ||
+                (ServerVersion.isAtLeast(ServerVersion.v1_11) && (entity instanceof Mule || entity instanceof Donkey));
     }
 
     private static EnumSet<EntityType> createEntityTypesSet(Predicate<EntityType> predicate) {

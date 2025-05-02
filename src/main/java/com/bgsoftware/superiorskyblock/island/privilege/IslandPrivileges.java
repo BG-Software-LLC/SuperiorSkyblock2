@@ -32,6 +32,7 @@ public class IslandPrivileges {
     public static final IslandPrivilege DROP_ITEMS = register("DROP_ITEMS");
     public static final IslandPrivilege DYE_SHEEP = register("DYE_SHEEP");
     public static final IslandPrivilege ENDER_PEARL = register("ENDER_PEARL");
+    public static final IslandPrivilege ENTITY_RIDE = register("ENTITY_RIDE");
     public static final IslandPrivilege EXPEL_BYPASS = register("EXPEL_BYPASS");
     public static final IslandPrivilege EXPEL_PLAYERS = register("EXPEL_PLAYERS", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege FARM_TRAMPING = register("FARM_TRAMPING");

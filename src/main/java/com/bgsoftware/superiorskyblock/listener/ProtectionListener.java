@@ -26,6 +26,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Entity;
@@ -386,14 +387,8 @@ public class ProtectionListener extends AbstractGameEventListener {
         if (!(rider instanceof Player))
             return;
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(rider);
-
-        InteractionResult interactionResult;
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location vehicleLocation = e.getArgs().vehicle.getLocation(wrapper.getHandle());
-            interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer,
-                    vehicleLocation, IslandPrivileges.MINECART_ENTER);
-        }
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) rider);
+        InteractionResult interactionResult = this.protectionManager.get().handleEntityRide(superiorPlayer, e.getArgs().vehicle);
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled();
     }
@@ -404,12 +399,15 @@ public class ProtectionListener extends AbstractGameEventListener {
         if (!(inventoryHolder instanceof Vehicle))
             return;
 
+        IslandPrivilege islandPrivilege = BukkitEntities.isHorse((Vehicle) inventoryHolder) ? IslandPrivileges.HORSE_INTERACT :
+                inventoryHolder instanceof Animals ? IslandPrivileges.ENTITY_RIDE : IslandPrivileges.MINECART_OPEN;
+
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().bukkitEvent.getPlayer());
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location minecartLocation = ((Vehicle) inventoryHolder).getLocation(wrapper.getHandle());
             interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer,
-                    minecartLocation, IslandPrivileges.MINECART_OPEN);
+                    minecartLocation, islandPrivilege);
         }
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled();
