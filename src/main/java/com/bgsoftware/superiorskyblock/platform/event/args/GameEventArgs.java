@@ -237,6 +237,7 @@ public class GameEventArgs implements IEventArgs {
     public static class EntityExplodeEvent extends EntityEvent {
 
         public List<Block> blocks;
+        public boolean isSoftExplosion;
 
     }
 

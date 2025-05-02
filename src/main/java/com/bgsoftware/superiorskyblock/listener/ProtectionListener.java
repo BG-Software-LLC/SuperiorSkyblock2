@@ -529,10 +529,11 @@ public class ProtectionListener extends AbstractGameEventListener {
         });
     }
 
-    private void onWindChargeExplodeEvent(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
-        Entity entity = e.getArgs().entity;
-        if (entity.getType() != WIND_CHARGE)
+    private void onSoftExplodeEvent(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
+        if (!e.getArgs().isSoftExplosion)
             return;
+
+        Entity entity = e.getArgs().entity;
 
         BukkitEntities.getPlayerSource(entity).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(shooterPlayer -> {
             Iterator<Block> blocksIterator = e.getArgs().blocks.iterator();
@@ -596,7 +597,7 @@ public class ProtectionListener extends AbstractGameEventListener {
         registerCallback(GameEventType.PLAYER_PICKUP_ITEM_EVENT, GameEventPriority.NORMAL, this::onPlayerPickupItem);
         registerCallback(GameEventType.PROJECTILE_LAUNCH_EVENT, GameEventPriority.NORMAL, this::onPlayerLaunchProjectile);
         registerCallback(GameEventType.PROJECTILE_HIT_EVENT, GameEventPriority.NORMAL, this::onProjectileHit);
-        registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.NORMAL, this::onWindChargeExplodeEvent);
+        registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.NORMAL, this::onSoftExplodeEvent);
         registerCallback(GameEventType.PLAYER_PICKUP_ARROW_EVENT, GameEventPriority.NORMAL, this::onPlayerPickupArrow);
         registerCallback(GameEventType.RAID_TRIGGER_EVENT, GameEventPriority.NORMAL, this::onRaidTrigger);
     }

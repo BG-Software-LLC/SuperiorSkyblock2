@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
@@ -33,7 +32,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
@@ -46,10 +44,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
     @Nullable
     private static final Material CHORUS_FLOWER = EnumHelper.getEnum(Material.class, "CHORUS_FLOWER");
-    @Nullable
-    private static final EntityType WIND_CHARGE = EnumHelper.getEnum(EntityType.class, "WIND_CHARGE");
-    @Nullable
-    private static final EntityType BREEZE_WIND_CHARGE = EnumHelper.getEnum(EntityType.class, "BREEZE_WIND_CHARGE");
     @Nullable
     private static final Material POINTED_DRIPSTONE = EnumHelper.getEnum(Material.class, "POINTED_DRIPSTONE");
 
@@ -294,15 +288,12 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
     private void onEntityExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
         Entity entity = e.getArgs().entity;
-        EntityType entityType = entity.getType();
-
-        boolean isWindCharge = entityType == WIND_CHARGE || entityType == BREEZE_WIND_CHARGE;
 
         KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         e.getArgs().blocks.forEach(block -> {
             Material blockType = block.getType();
-            // Wind charges only break chorus flowers and pointed drip-stones
-            if (isWindCharge && blockType != CHORUS_FLOWER && blockType != POINTED_DRIPSTONE)
+            // Soft explosions only break chorus flowers and pointed drip-stones
+            if (e.getArgs().isSoftExplosion && blockType != CHORUS_FLOWER && blockType != POINTED_DRIPSTONE)
                 return;
 
             Key blockKey = Keys.of(block);

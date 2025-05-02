@@ -32,7 +32,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -182,10 +182,13 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     }
 
     private void onStackedBlockExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
-        List<Block> blockList = new LinkedList<>(e.getArgs().blocks);
-        ItemStack blockItem;
+        if (e.getArgs().isSoftExplosion)
+            return;
 
-        for (Block block : blockList) {
+        Iterator<Block> blockIterator = e.getArgs().blocks.iterator();
+        while (blockIterator.hasNext()) {
+            Block block = blockIterator.next();
+
             // Check if block is stackable
             if (!plugin.getSettings().getStackedBlocks().getWhitelisted().contains(Keys.of(block)))
                 continue;
@@ -196,9 +199,9 @@ public class StackedBlocksListener extends AbstractGameEventListener {
                 continue;
 
             // All checks are done. We can remove the block from the list.
-            e.getArgs().blocks.remove(block);
+            blockIterator.remove();
 
-            blockItem = block.getState().getData().toItemStack(amount);
+            ItemStack blockItem = block.getState().getData().toItemStack(amount);
 
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 Location location = block.getLocation(wrapper.getHandle());
@@ -213,6 +216,7 @@ public class StackedBlocksListener extends AbstractGameEventListener {
                 // Dropping the item
                 block.getWorld().dropItemNaturally(location, blockItem);
             }
+
         }
     }
 

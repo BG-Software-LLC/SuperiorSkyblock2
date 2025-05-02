@@ -4,7 +4,6 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -20,7 +19,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.Directional;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
@@ -31,11 +29,6 @@ public class SignsListener extends AbstractGameEventListener {
     private static final BlockFace[] NEARBY_BLOCKS = new BlockFace[]{
             BlockFace.UP, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH, BlockFace.EAST
     };
-
-    @Nullable
-    private static final EntityType WIND_CHARGE = EnumHelper.getEnum(EntityType.class, "WIND_CHARGE");
-    @Nullable
-    private static final EntityType BREEZE_WIND_CHARGE = EnumHelper.getEnum(EntityType.class, "BREEZE_WIND_CHARGE");
 
     public SignsListener(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -107,9 +100,7 @@ public class SignsListener extends AbstractGameEventListener {
     }
 
     private void onSignExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
-        EntityType entityType = e.getArgs().entity.getType();
-
-        if (entityType == WIND_CHARGE || entityType == BREEZE_WIND_CHARGE)
+        if (e.getArgs().isSoftExplosion)
             return;
 
         Island island;
