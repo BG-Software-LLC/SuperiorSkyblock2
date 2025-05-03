@@ -1771,6 +1771,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public Map<PotionEffectType, Integer> getCustomPotionEffects() {
+        return Collections.emptyMap();
+    }
+
+    @Override
     public void applyEffects(SuperiorPlayer superiorPlayer) {
         // Do nothing.
     }

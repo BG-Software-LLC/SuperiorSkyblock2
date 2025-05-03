@@ -100,6 +100,10 @@ default-values:
   # Example: '1:5' will set the limit of the role with the id 1 (Moderator by default) to 5.
   role-limits: [ ]
 
+  # List of default island effects for new islands.
+  # Each key in the following section is the effect type, and it's value is the effect level.
+  island-effects: { }
+
 # Set the islands height generation for islands.
 islands-height: 100
 

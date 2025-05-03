@@ -26,7 +26,7 @@ public class DefaultUpgradeLevel extends SUpgradeLevel {
                 Value.syncedSupplied(() -> (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getBlockLimits()),
                 Value.syncedSupplied(() -> (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getEntityLimits()),
                 Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getRealGeneratorsMap()),
-                Value.syncedFixed(Collections.emptyMap()),
+                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getIslandEffects()),
                 Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getBankLimit()),
                 Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getRoleLimitsAsView())
         );

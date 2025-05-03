@@ -2200,6 +2200,12 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     Map<PotionEffectType, Integer> getPotionEffects();
 
     /**
+     * Get a list of all custom active island effects with their levels.
+     */
+    Map<PotionEffectType, Integer> getCustomPotionEffects();
+
+
+    /**
      * Give all the island effects to a player.
      * If the player is offline, nothing will happen.
      *

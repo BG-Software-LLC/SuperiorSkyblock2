@@ -3396,15 +3396,26 @@ public class SIsland implements Island {
     public Map<PotionEffectType, Integer> getPotionEffects() {
         Map<PotionEffectType, Integer> islandEffects = new ArrayMap<>();
 
-        for (PotionEffectType potionEffectType : PotionEffectType.values()) {
-            if (potionEffectType != null) {
-                int level = getPotionEffectLevel(potionEffectType);
-                if (level > 0)
-                    islandEffects.put(potionEffectType, level);
-            }
-        }
+        this.islandEffects.forEach((potionEffectType, levelValue) -> {
+            int level = levelValue.get();
+            if (level > 0)
+                islandEffects.put(potionEffectType, level);
+        });
 
-        return Collections.unmodifiableMap(islandEffects);
+        return islandEffects.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(islandEffects);
+    }
+
+    @Override
+    public Map<PotionEffectType, Integer> getCustomPotionEffects() {
+        Map<PotionEffectType, Integer> islandEffects = new ArrayMap<>();
+
+        this.islandEffects.forEach((potionEffectType, levelValue) -> {
+            int level = levelValue.getNonSynced(-1);
+            if (level > 0)
+                islandEffects.put(potionEffectType, level);
+        });
+
+        return islandEffects.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(islandEffects);
     }
 
     @Override

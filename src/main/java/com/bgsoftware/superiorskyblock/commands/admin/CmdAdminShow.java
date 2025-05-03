@@ -296,7 +296,10 @@ public class CmdAdminShow implements IAdminIslandCommand {
                 StringBuilder blocksString = new StringBuilder();
                 for (Map.Entry<PotionEffectType, Integer> entry : island.getPotionEffects().entrySet()) {
                     blocksString.append(Message.ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE.getMessage(locale,
-                            Formatters.CAPITALIZED_FORMATTER.format(entry.getKey().getName()), entry.getValue())).append("\n");
+                            Formatters.CAPITALIZED_FORMATTER.format(entry.getKey().getName()), entry.getValue()));
+                    if (!island.getCustomPotionEffects().containsKey(entry.getKey()))
+                        blocksString.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
+                    blocksString.append("\n");
                 }
                 infoMessage.append(Message.ISLAND_INFO_ADMIN_ISLAND_EFFECTS.getMessage(locale, blocksString));
             }

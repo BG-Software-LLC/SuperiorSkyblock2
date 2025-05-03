@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
+import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -96,4 +97,8 @@ public class DefaultValuesSection extends SettingsContainerHolder implements Set
         return getContainer().defaultRoleLimits;
     }
 
+    @Override
+    public Map<PotionEffectType, Integer> getIslandEffects() {
+        return getContainer().defaultIslandEffects;
+    }
 }

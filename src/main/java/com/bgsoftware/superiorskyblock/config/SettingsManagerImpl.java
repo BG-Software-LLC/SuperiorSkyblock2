@@ -712,6 +712,8 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         if (cfg.isBoolean("worlds.end.dragon-fight")) {
             cfg.set("worlds.end.dragon-fight.enabled", cfg.getBoolean("worlds.end.dragon-fight"));
         }
+        if (!cfg.contains("default-values.island-effects"))
+            cfg.createSection("default-values.island-effects");
     }
 
     private void convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg) {

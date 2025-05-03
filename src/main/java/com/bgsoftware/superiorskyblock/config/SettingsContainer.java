@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
@@ -33,13 +34,13 @@ import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
-import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,6 +88,7 @@ public class SettingsContainer {
     public final double defaultMobDrops;
     public final BigDecimal defaultBankLimit;
     public final Int2IntMapView defaultRoleLimits;
+    public final Map<PotionEffectType, Integer> defaultIslandEffects;
     public final int islandsHeight;
     public final boolean worldBordersEnabled;
     public final boolean stackedBlocksEnabled;
@@ -245,6 +247,16 @@ public class SettingsContainer {
         loadListOrSection(config, "default-values.entity-limits", "entity limit", (entityType, limit) ->
                 defaultEntityLimits.put(Keys.ofEntityType(entityType), limit));
         this.defaultEntityLimits = KeyMaps.unmodifiableKeyMap(defaultEntityLimits);
+        Map<PotionEffectType, Integer> defaultIslandEffects = new ArrayMap<>();
+        loadListOrSection(config, "default-values.island-effects", "island effect", (effectName, effectLevel) -> {
+            PotionEffectType potionEffectType = PotionEffectType.getByName(effectName);
+            if (potionEffectType == null) {
+                Log.errorFromFile("config.yml", "Invalid potion effect " + effectName + ", skipping...");
+            } else {
+                defaultIslandEffects.put(potionEffectType, effectLevel);
+            }
+        });
+        this.defaultIslandEffects = Collections.unmodifiableMap(defaultIslandEffects);
         defaultTeamLimit = config.getInt("default-values.team-limit", 4);
         defaultWarpsLimit = config.getInt("default-values.warps-limit", 3);
         defaultCoopLimit = config.getInt("default-values.coop-limit", 8);
@@ -602,7 +614,9 @@ public class SettingsContainer {
     }
 
     private static void loadListOrSection(YamlConfiguration config, String path, String parseName, BiConsumer<String, Integer> consumer) {
-        Object value = Preconditions.checkNotNull(config.get(path), "Path '" + path + "' does not exist.");
+        Object value = config.get(path);
+        if (value == null)
+            return;
 
         if (value instanceof List) {
             ((List<String>) value).forEach(line -> {

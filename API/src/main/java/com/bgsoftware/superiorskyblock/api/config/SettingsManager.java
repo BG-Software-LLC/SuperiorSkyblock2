@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -820,6 +821,13 @@ public interface SettingsManager {
          * Config-path: default-values.role-limits
          */
         Map<Integer, Integer> getRoleLimits();
+
+        /**
+         * The default island effects for new islands.
+         * Represented by a map with keys as the effect types, and values as the effect levels.
+         * Config-path: default-values.island-effects
+         */
+        Map<PotionEffectType, Integer> getIslandEffects();
 
     }
 
