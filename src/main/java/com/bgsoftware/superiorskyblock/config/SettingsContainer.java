@@ -36,7 +36,6 @@ import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryType;
@@ -79,7 +78,7 @@ public class SettingsContainer {
     public final int defaultIslandSize;
     public final KeyMap<Integer> defaultBlockLimits;
     public final KeyMap<Integer> defaultEntityLimits;
-    public final KeyMap<Integer>[] defaultGenerator;
+    public final EnumerateMap<Dimension, Map<Key, Integer>> defaultGenerator;
     public final int defaultWarpsLimit;
     public final int defaultTeamLimit;
     public final int defaultCoopLimit;
@@ -381,18 +380,18 @@ public class SettingsContainer {
         rateOwnIsland = config.getBoolean("rate-own-island", false);
         defaultSettings = Collections.unmodifiableList(config.getStringList("default-settings")
                 .stream().map(str -> str.toUpperCase(Locale.ENGLISH)).collect(Collectors.toList()));
-        defaultGenerator = new KeyMap[Dimension.values().size()];
+        defaultGenerator = new EnumerateMap<>(Dimension.values());
         if (config.isConfigurationSection("default-values.generator")) {
             for (String env : config.getConfigurationSection("default-values.generator").getKeys(false)) {
                 try {
-                    World.Environment environment = World.Environment.valueOf(env.toUpperCase(Locale.ENGLISH));
-                    loadGenerator(config, "default-values.generator." + env, environment.ordinal());
+                    Dimension dimension = Dimension.getByName(env.toUpperCase(Locale.ENGLISH));
+                    loadGenerator(config, "default-values.generator." + env, dimension);
                 } catch (Exception error) {
                     Log.errorFromFile(error, "config.yml", "An unexpected error occurred while loading default generator values for ", env + ":");
                 }
             }
         } else {
-            loadGenerator(config, "default-values.generator", 0);
+            loadGenerator(config, "default-values.generator", this.defaultWorldDimension);
         }
         disableRedstoneOffline = config.getBoolean("disable-redstone-offline", true);
         disableRedstoneAFK = config.getBoolean("afk-integrations.disable-redstone", false);
@@ -593,13 +592,13 @@ public class SettingsContainer {
         return KeySets.unmodifiableKeySet(KeySets.createHashSet(KeyIndicator.MATERIAL, safeBlocks));
     }
 
-    private void loadGenerator(YamlConfiguration config, String path, int index) {
+    private void loadGenerator(YamlConfiguration config, String path, Dimension dimension) {
         KeyMap<Integer> defaultGenerator = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         loadListOrSection(config, path, "generator-rates", (key, percentage) -> {
             Key blockKey = Keys.ofMaterialAndData(key);
             defaultGenerator.put(blockKey, percentage);
         });
-        this.defaultGenerator[index] = KeyMaps.unmodifiableKeyMap(defaultGenerator);
+        this.defaultGenerator.put(dimension, KeyMaps.unmodifiableKeyMap(defaultGenerator));
     }
 
     private static void loadListOrSection(YamlConfiguration config, String path, String parseName, BiConsumer<String, Integer> consumer) {

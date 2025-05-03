@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.value;
 
-public class ValueFixed<V extends Number> implements Value<V> {
+public class ValueFixed<V> implements Value<V> {
 
     private final V value;
 

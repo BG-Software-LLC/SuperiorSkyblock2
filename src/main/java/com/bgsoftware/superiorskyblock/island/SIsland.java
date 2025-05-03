@@ -4860,7 +4860,7 @@ public class SIsland implements Island {
 
         this.cobbleGeneratorValues.write(cobbleGeneratorValues -> {
             for (Dimension dimension : Dimension.values()) {
-                Map<Key, Integer> defaultGenerator = plugin.getSettings().getDefaultValues().getGeneratorsUnsafe()[dimension.ordinal()];
+                Map<Key, Integer> defaultGenerator = plugin.getSettings().getDefaultValues().getRealGeneratorsMap().get(dimension);
                 if (defaultGenerator != null) {
                     KeyMap<IntValue> worldGeneratorRates = cobbleGeneratorValues.get(dimension);
 

@@ -269,9 +269,13 @@ public class UpgradesModule extends BuiltinModule {
                 }
             }
         }
-        upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, upgradeCost, commands, permission, requirements,
-                cropGrowth, spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize, blockLimits,
-                entityLimits, generatorRates, islandEffects, bankLimit, rolesLimits));
+
+        SUpgradeLevel upgradeLevel = new SUpgradeLevel(level, upgradeCost, commands, permission, requirements,
+                cropGrowth, spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize,
+                Value.syncedFixed(blockLimits), Value.syncedFixed(entityLimits), Value.syncedFixed(generatorRates),
+                Value.syncedFixed(islandEffects), bankLimit, Value.syncedFixed(rolesLimits));
+
+        upgrade.addUpgradeLevel(level, upgradeLevel);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

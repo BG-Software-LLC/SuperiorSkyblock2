@@ -801,8 +801,18 @@ public interface SettingsManager {
          * Represented by an array of maps with keys as the blocks, and values as the rates.
          * The maps are sorted by the {@link Dimension} they belong to.
          * Config-path: default-values.generator
+         *
+         * @deprecated See {@link #getGeneratorsMap()}
          */
+        @Deprecated
         Map<Key, Integer>[] getGenerators();
+
+        /**
+         * The default generator-rates for new islands.
+         * Represented by maps with keys as the blocks, and values as the rates.
+         * Config-path: default-values.generator
+         */
+        Map<Dimension, Map<Key, Integer>> getGeneratorsMap();
 
         /**
          * The default role-limits for new islands.
