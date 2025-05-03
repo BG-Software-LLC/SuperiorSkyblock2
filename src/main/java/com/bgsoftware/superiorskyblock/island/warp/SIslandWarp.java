@@ -26,7 +26,7 @@ public class SIslandWarp implements IslandWarp {
 
     public SIslandWarp(String name, Location location, WarpCategory warpCategory, boolean isPrivate, @Nullable ItemStack icon) {
         this.name = name;
-        this.location = location.clone().add(0.5, 0, 0.5);
+        this.location = location.clone();
         this.warpCategory = warpCategory;
         this.isPrivate = isPrivate;
         this.icon = icon;

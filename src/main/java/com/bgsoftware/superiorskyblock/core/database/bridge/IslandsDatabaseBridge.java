@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LegacyMasks;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
@@ -48,8 +49,6 @@ import java.util.function.Consumer;
 public class IslandsDatabaseBridge {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
-    private static final Location LOCATION = new Location(null, 0, 100, 0);
 
     private static final Map<UUID, Map<FutureSave, Set<Object>>> SAVE_METHODS_TO_BE_EXECUTED = new ConcurrentHashMap<>();
 
@@ -352,14 +351,18 @@ public class IslandsDatabaseBridge {
     public static void saveWarp(Island island, IslandWarp islandWarp) {
         WarpCategory category = islandWarp.getCategory();
         ItemStack icon = islandWarp.getRawIcon();
-        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("islands_warps",
-                new Pair<>("island", island.getUniqueId().toString()),
-                new Pair<>("name", islandWarp.getName()),
-                new Pair<>("category", category == null ? "" : category.getName()),
-                new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(islandWarp.getLocation(LOCATION))),
-                new Pair<>("private", islandWarp.hasPrivateFlag()),
-                new Pair<>("icon", Serializers.ITEM_STACK_SERIALIZER.serialize(icon))
-        ));
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                databaseBridge.insertObject("islands_warps",
+                        new Pair<>("island", island.getUniqueId().toString()),
+                        new Pair<>("name", islandWarp.getName()),
+                        new Pair<>("category", category == null ? "" : category.getName()),
+                        new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(islandWarp.getLocation(wrapper.getHandle()))),
+                        new Pair<>("private", islandWarp.hasPrivateFlag()),
+                        new Pair<>("icon", Serializers.ITEM_STACK_SERIALIZER.serialize(icon))
+                );
+            }
+        });
     }
 
     public static void updateWarpName(Island island, IslandWarp islandWarp, String oldName) {
@@ -370,10 +373,14 @@ public class IslandsDatabaseBridge {
     }
 
     public static void updateWarpLocation(Island island, IslandWarp islandWarp) {
-        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands_warps",
-                createFilter("island", island, new Pair<>("name", islandWarp.getName())),
-                new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(islandWarp.getLocation(LOCATION)))
-        ));
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                databaseBridge.updateObject("islands_warps",
+                        createFilter("island", island, new Pair<>("name", islandWarp.getName())),
+                        new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(islandWarp.getLocation(wrapper.getHandle())))
+                );
+            }
+        });
     }
 
     public static void updateWarpPrivateStatus(Island island, IslandWarp islandWarp) {
