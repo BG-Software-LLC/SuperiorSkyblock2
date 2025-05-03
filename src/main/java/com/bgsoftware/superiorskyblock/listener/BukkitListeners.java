@@ -49,7 +49,6 @@ public class BukkitListeners {
 
     public void unregisterListeners() {
         plugin.getGameEventsDispatcher().clearCallbacks();
-        plugin.getPluginEventsDispatcher().clearCallbacks();
         HandlerList.unregisterAll(this.plugin);
     }
 
