@@ -3651,15 +3651,31 @@ public class SIsland implements Island {
     }
 
     @Override
-    public void warpPlayer(SuperiorPlayer superiorPlayer, String warp) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        Preconditions.checkNotNull(warp, "warp parameter cannot be null.");
+    public void warpPlayer(SuperiorPlayer superiorPlayer, String warpName) {
+        warpPlayer(superiorPlayer, warpName, false);
+    }
 
-        IslandWarp islandWarp = getWarp(warp);
+    @Override
+    public void warpPlayer(SuperiorPlayer superiorPlayer, String warpName, boolean force) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(warpName, "warp parameter cannot be null.");
+
+        IslandWarp islandWarp = getWarp(warpName);
 
         if (islandWarp == null) {
-            Message.INVALID_WARP.send(superiorPlayer, warp);
+            Message.INVALID_WARP.send(superiorPlayer, warpName);
             return;
+        }
+
+        if (!force && !superiorPlayer.hasBypassModeEnabled() && plugin.getSettings().getChargeOnWarp() > 0) {
+            if (plugin.getProviders().getEconomyProvider().getBalance(superiorPlayer)
+                    .compareTo(BigDecimal.valueOf(plugin.getSettings().getChargeOnWarp())) < 0) {
+                Message.NOT_ENOUGH_MONEY_TO_WARP.send(superiorPlayer);
+                return;
+            }
+
+            plugin.getProviders().getEconomyProvider().withdrawMoney(superiorPlayer,
+                    plugin.getSettings().getChargeOnWarp());
         }
 
         if (plugin.getSettings().getWarpsWarmup() > 0 && !superiorPlayer.hasBypassModeEnabled() &&

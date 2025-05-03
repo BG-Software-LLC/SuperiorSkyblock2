@@ -2362,9 +2362,18 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Teleport a player to a warp.
      *
      * @param superiorPlayer The player to teleport.
-     * @param warp           The warp's name to teleport the player to.
+     * @param warpName       The warp's name to teleport the player to.
      */
-    void warpPlayer(SuperiorPlayer superiorPlayer, String warp);
+    void warpPlayer(SuperiorPlayer superiorPlayer, String warpName);
+
+    /**
+     * Teleport a player to a warp.
+     *
+     * @param superiorPlayer The player to teleport.
+     * @param warpName       The warp's name to teleport the player to.
+     * @param force          Force teleportation of the player
+     */
+    void warpPlayer(SuperiorPlayer superiorPlayer, String warpName, boolean force);
 
     /**
      * Delete a warp from the island.

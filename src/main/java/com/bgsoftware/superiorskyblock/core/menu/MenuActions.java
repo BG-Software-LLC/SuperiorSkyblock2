@@ -124,17 +124,6 @@ public class MenuActions {
     }
 
     public static void simulateWarpsClick(SuperiorPlayer superiorPlayer, Island island, IslandWarp islandWarp) {
-        if (!superiorPlayer.hasBypassModeEnabled() && plugin.getSettings().getChargeOnWarp() > 0) {
-            if (plugin.getProviders().getEconomyProvider().getBalance(superiorPlayer)
-                    .compareTo(BigDecimal.valueOf(plugin.getSettings().getChargeOnWarp())) < 0) {
-                Message.NOT_ENOUGH_MONEY_TO_WARP.send(superiorPlayer);
-                return;
-            }
-
-            plugin.getProviders().getEconomyProvider().withdrawMoney(superiorPlayer,
-                    plugin.getSettings().getChargeOnWarp());
-        }
-
         BukkitExecutor.sync(() -> {
             superiorPlayer.runIfOnline(player -> {
                 MenuView<?, ?> currentView = superiorPlayer.getOpenedView();

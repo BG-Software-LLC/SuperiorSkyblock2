@@ -1881,7 +1881,12 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public void warpPlayer(SuperiorPlayer superiorPlayer, String warp) {
+    public void warpPlayer(SuperiorPlayer superiorPlayer, String warpName) {
+        // Do nothing.
+    }
+
+    @Override
+    public void warpPlayer(SuperiorPlayer superiorPlayer, String warpName, boolean force) {
         // Do nothing.
     }
 

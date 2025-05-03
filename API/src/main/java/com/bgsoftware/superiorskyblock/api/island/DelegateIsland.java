@@ -1716,8 +1716,13 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public void warpPlayer(SuperiorPlayer superiorPlayer, String warp) {
-        this.handle.warpPlayer(superiorPlayer, warp);
+    public void warpPlayer(SuperiorPlayer superiorPlayer, String warpName) {
+        this.handle.warpPlayer(superiorPlayer, warpName);
+    }
+
+    @Override
+    public void warpPlayer(SuperiorPlayer superiorPlayer, String warpName, boolean force) {
+        this.handle.warpPlayer(superiorPlayer, warpName, force);
     }
 
     @Override
