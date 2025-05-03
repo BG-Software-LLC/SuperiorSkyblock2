@@ -12,15 +12,13 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 
@@ -119,19 +117,12 @@ public class CmdVisit implements ISuperiorCommand {
             return;
         }
 
-        if (plugin.getSettings().getVisitWarmup() > 0 && !superiorPlayer.hasBypassModeEnabled()) {
-            Message.TELEPORT_WARMUP.send(superiorPlayer, Formatters.TIME_FORMATTER.format(
-                    Duration.ofMillis(plugin.getSettings().getVisitWarmup()), superiorPlayer.getUserLocale()));
+        Location finalVisitLocation = visitLocation;
 
-            Location finalVisitLocation = visitLocation;
-
-            superiorPlayer.setTeleportTask(BukkitExecutor.sync(() -> teleportPlayerNoWarmup(superiorPlayer,
-                            targetIsland, finalVisitLocation, isVisitorSign, true, true),
-                    plugin.getSettings().getHomeWarmup() / 50));
-        } else {
-            teleportPlayerNoWarmup(superiorPlayer, targetIsland, visitLocation, isVisitorSign,
-                    false, true);
-        }
+        EntityTeleports.warmupTeleport(superiorPlayer, plugin.getSettings().getVisitWarmup(), afterWarmup -> {
+            teleportPlayerNoWarmup(superiorPlayer, targetIsland, finalVisitLocation, isVisitorSign,
+                    afterWarmup /*checkIslandLock*/, true);
+        });
     }
 
     private static void teleportPlayerNoWarmup(SuperiorPlayer superiorPlayer, Island island, Location visitLocation,

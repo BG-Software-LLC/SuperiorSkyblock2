@@ -96,6 +96,7 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
+import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import com.bgsoftware.superiorskyblock.world.GeneratorType;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
@@ -122,7 +123,6 @@ import org.bukkit.scheduler.BukkitTask;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -3678,15 +3678,8 @@ public class SIsland implements Island {
                     plugin.getSettings().getChargeOnWarp());
         }
 
-        if (plugin.getSettings().getWarpsWarmup() > 0 && !superiorPlayer.hasBypassModeEnabled() &&
-                !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
-            Message.TELEPORT_WARMUP.send(superiorPlayer, Formatters.TIME_FORMATTER.format(
-                    Duration.ofMillis(plugin.getSettings().getWarpsWarmup()), superiorPlayer.getUserLocale()));
-            superiorPlayer.setTeleportTask(BukkitExecutor.sync(() ->
-                    warpPlayerWithoutWarmup(superiorPlayer, islandWarp, true), plugin.getSettings().getWarpsWarmup() / 50));
-        } else {
-            warpPlayerWithoutWarmup(superiorPlayer, islandWarp, true);
-        }
+        EntityTeleports.warmupTeleport(superiorPlayer, plugin.getSettings().getWarpsWarmup(),
+                unused -> warpPlayerWithoutWarmup(superiorPlayer, islandWarp, true));
     }
 
     @Override
