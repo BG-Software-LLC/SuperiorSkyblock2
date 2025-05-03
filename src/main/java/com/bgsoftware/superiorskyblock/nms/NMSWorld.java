@@ -54,6 +54,8 @@ public interface NMSWorld {
 
     int getDefaultAmount(BlockState blockState);
 
+    boolean canPlayerSuffocate(Block block);
+
     void placeSign(Island island, Location location);
 
     void playGeneratorSound(Location location);

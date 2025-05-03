@@ -230,6 +230,11 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
+    public boolean canPlayerSuffocate(org.bukkit.block.Block bukkitBlock) {
+        return !bukkitBlock.isPassable();
+    }
+
+    @Override
     public void placeSign(Island island, Location location) {
         TileEntitySign tileEntitySign = NMSUtils.getTileEntityAt(location, TileEntitySign.class);
         if (tileEntitySign == null)

@@ -224,6 +224,16 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
+    public boolean canPlayerSuffocate(org.bukkit.block.Block bukkitBlock) {
+        WorldServer worldServer = ((CraftWorld) bukkitBlock.getWorld()).getHandle();
+        try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
+            blockPosition.c(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
+            return worldServer.getType(blockPosition).getBlock().w();
+        }
+    }
+
+    @Override
     public void placeSign(Island island, Location location) {
         TileEntitySign tileEntitySign = NMSUtils.getTileEntityAt(location, TileEntitySign.class);
         if (tileEntitySign == null)

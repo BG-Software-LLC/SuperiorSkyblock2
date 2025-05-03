@@ -22,17 +22,17 @@ public class WorldBlocks {
     }
 
     public static boolean isSafeBlock(Block block) {
-        return _isSafeBlock(block) || _isSafeBlock(block.getRelative(BlockFace.DOWN));
+        return isSafeBlockInternal(block) || isSafeBlockInternal(block.getRelative(BlockFace.DOWN));
     }
 
-    private static boolean _isSafeBlock(Block block) {
-        Block feetBlock = block.getRelative(BlockFace.UP);
-        Block headBlock = feetBlock.getRelative(BlockFace.UP);
+    private static boolean isSafeBlockInternal(Block block) {
+        // Checks that the block in the parameter is safe for teleportation.
+        // This means that the block below it is considered "safe", and the two blocks above the safe blocks
+        // cannot suffocate the player.
 
-        if (feetBlock.getType().isSolid() || headBlock.getType().isSolid())
-            return false;
-
-        return plugin.getSettings().getSafeBlocks().contains(Keys.of(block));
+        return !plugin.getNMSWorld().canPlayerSuffocate(block) &&
+                !plugin.getNMSWorld().canPlayerSuffocate(block.getRelative(BlockFace.UP)) &&
+                plugin.getSettings().getSafeBlocks().contains(Keys.of(block.getRelative(BlockFace.DOWN)));
     }
 
     public static boolean isSafeBlock(ChunkSnapshot chunkSnapshot, int x, int y, int z) {

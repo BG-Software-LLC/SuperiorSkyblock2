@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_21_5;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -68,7 +67,6 @@ import org.bukkit.craftbukkit.block.CraftSign;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.SignChangeEvent;
 
 import java.lang.reflect.Modifier;
 import java.util.Iterator;
@@ -312,6 +310,11 @@ public class NMSWorldImpl implements NMSWorld {
     private int getDefaultAmount(BlockState blockState) {
         Block block = blockState.getBlock();
         return NMSUtils.isDoubleBlock(block, blockState) ? 2 : 1;
+    }
+
+    @Override
+    public boolean canPlayerSuffocate(org.bukkit.block.Block bukkitBlock) {
+        return !bukkitBlock.isPassable();
     }
 
     @Override
