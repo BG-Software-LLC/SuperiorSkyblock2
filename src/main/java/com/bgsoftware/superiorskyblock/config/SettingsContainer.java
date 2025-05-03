@@ -253,7 +253,7 @@ public class SettingsContainer {
             if (potionEffectType == null) {
                 Log.errorFromFile("config.yml", "Invalid potion effect " + effectName + ", skipping...");
             } else {
-                defaultIslandEffects.put(potionEffectType, effectLevel);
+                defaultIslandEffects.put(potionEffectType, effectLevel - 1);
             }
         });
         this.defaultIslandEffects = Collections.unmodifiableMap(defaultIslandEffects);
