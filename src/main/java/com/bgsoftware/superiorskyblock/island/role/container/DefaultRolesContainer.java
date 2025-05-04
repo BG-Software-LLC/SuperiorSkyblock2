@@ -54,4 +54,10 @@ public class DefaultRolesContainer implements RolesContainer {
         this.rolesByName.put(playerRole.getName().toUpperCase(Locale.ENGLISH), playerRole);
     }
 
+    @Override
+    public void clearRoles() {
+        this.rolesByWeight.clear();
+        this.rolesById.clear();
+        this.rolesByName.clear();
+    }
 }

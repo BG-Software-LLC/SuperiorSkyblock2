@@ -50,8 +50,10 @@ import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
@@ -123,6 +125,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -192,7 +195,7 @@ public class SIsland implements Island {
     private final Synchronized<DoubleValue> spawnerRates = Synchronized.of(DoubleValue.syncedFixed(-1D));
     private final Synchronized<DoubleValue> mobDrops = Synchronized.of(DoubleValue.syncedFixed(-1D));
     private final Synchronized<Value<BigDecimal>> bankLimit = Synchronized.of(Value.syncedFixed(SYNCED_BANK_LIMIT_VALUE));
-    private final Map<PlayerRole, IntValue> roleLimits = new ConcurrentHashMap<>();
+    private final Synchronized<Int2ObjectMapView<IntValue>> roleLimits = Synchronized.of(CollectionsFactory.createInt2ObjectArrayMap());
     private final Synchronized<EnumerateMap<Dimension, KeyMap<IntValue>>> cobbleGeneratorValues = Synchronized.of(new EnumerateMap<>(Dimension.values()));
     private final Map<PotionEffectType, IntValue> islandEffects = new ConcurrentHashMap<>();
     private final KeyMap<IntValue> blockLimits = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
@@ -219,7 +222,7 @@ public class SIsland implements Island {
      */
     private final Synchronized<EnumerateMap<Dimension, Location>> islandHomes = Synchronized.of(new EnumerateMap<>(Dimension.values()));
     private final Synchronized<EnumerateMap<Dimension, Location>> visitorHomes = Synchronized.of(new EnumerateMap<>(Dimension.values()));
-    private final Map<IslandPrivilege, PlayerRole> rolePermissions = new ConcurrentHashMap<>();
+    private final Map<IslandPrivilege, Integer> rolePermissions = new ConcurrentHashMap<>();
     private final Map<IslandFlag, Byte> islandFlags = new ConcurrentHashMap<>();
     private final IslandUpgrades upgrades = new IslandUpgrades();
     private final AtomicReference<BigDecimal> islandWorth = new AtomicReference<>(BigDecimal.ZERO);
@@ -305,7 +308,7 @@ public class SIsland implements Island {
             islandChests[index] = SIslandChest.createChest(this, index, builder.islandChests.get(index));
         }
         this.islandChests.set(islandChests);
-        this.roleLimits.putAll(builder.roleLimits);
+        this.roleLimits.write(roleLimits -> roleLimits.putAll(builder.roleLimits));
         this.visitorHomes.set(builder.visitorHomes);
         this.islandSize.set(builder.islandSize);
         this.teamLimit.set(builder.teamLimit);
@@ -1590,9 +1593,9 @@ public class SIsland implements Island {
 
         Log.debug(Debug.SET_PERMISSION, owner.getName(), playerRole, islandPrivilege);
 
-        PlayerRole oldRole = rolePermissions.put(islandPrivilege, playerRole);
+        Integer oldRoleId = rolePermissions.put(islandPrivilege, playerRole.getId());
 
-        if (oldRole == playerRole)
+        if (oldRoleId != null && oldRoleId == playerRole.getId())
             return;
 
         if (islandPrivilege == IslandPrivileges.FLY) {
@@ -1684,10 +1687,10 @@ public class SIsland implements Island {
     public PlayerRole getRequiredPlayerRole(IslandPrivilege islandPrivilege) {
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
 
-        PlayerRole playerRole = rolePermissions.get(islandPrivilege);
+        Integer playerRoleId = rolePermissions.get(islandPrivilege);
 
-        if (playerRole != null)
-            return playerRole;
+        if (playerRoleId != null)
+            return plugin.getRoles().getPlayerRoleFromId(playerRoleId);
 
         return plugin.getRoles().getRoles().stream()
                 .filter(_playerRole -> {
@@ -1710,7 +1713,10 @@ public class SIsland implements Island {
 
     @Override
     public Map<IslandPrivilege, PlayerRole> getRolePermissions() {
-        return Collections.unmodifiableMap(rolePermissions);
+        return Collections.unmodifiableMap(this.rolePermissions.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> plugin.getRoles().getPlayerRoleFromId(entry.getValue())
+        )));
     }
 
     @Override
@@ -3473,7 +3479,8 @@ public class SIsland implements Island {
 
         Log.debug(Debug.SET_ROLE_LIMIT, owner.getName(), playerRole.getName(), limit);
 
-        IntValue oldRoleLimit = roleLimits.put(playerRole, IntValue.fixed(limit));
+        IntValue oldRoleLimit = roleLimits.writeAndGet(roleLimits ->
+                roleLimits.put(playerRole.getId(), IntValue.fixed(limit)));
 
         if (limit == IntValue.getNonSynced(oldRoleLimit, -1))
             return;
@@ -3487,7 +3494,7 @@ public class SIsland implements Island {
 
         Log.debug(Debug.REMOVE_ROLE_LIMIT, owner.getName(), playerRole.getName());
 
-        IntValue oldRoleLimit = roleLimits.remove(playerRole);
+        IntValue oldRoleLimit = roleLimits.writeAndGet(roleLimits -> roleLimits.remove(playerRole.getId()));
 
         if (oldRoleLimit == null)
             return;
@@ -3498,27 +3505,49 @@ public class SIsland implements Island {
     @Override
     public int getRoleLimit(PlayerRole playerRole) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-        IntValue roleLimit = roleLimits.get(playerRole);
+        IntValue roleLimit = roleLimits.readAndGet(roleLimits -> roleLimits.get(playerRole.getId()));
         return roleLimit == null ? -1 : roleLimit.get();
     }
 
     @Override
     public int getRoleLimitRaw(PlayerRole playerRole) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-        return IntValue.getNonSynced(roleLimits.get(playerRole), -1);
+        return IntValue.getNonSynced(roleLimits.readAndGet(roleLimits -> roleLimits.get(playerRole.getId())), -1);
     }
 
     @Override
     public Map<PlayerRole, Integer> getRoleLimits() {
-        return roleLimits.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()));
+        if (this.roleLimits.readAndGet(Int2ObjectMapView::isEmpty))
+            return Collections.emptyMap();
+
+        Map<PlayerRole, Integer> roleLimits = new HashMap<>();
+        this.roleLimits.read(roleLimitsMap -> {
+            Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimitsMap.entryIterator();
+            while (iterator.hasNext()) {
+                Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
+                roleLimits.put(plugin.getRoles().getPlayerRoleFromId(entry.getKey()), entry.getValue().get());
+            }
+        });
+
+        return Collections.unmodifiableMap(roleLimits);
     }
 
     @Override
     public Map<PlayerRole, Integer> getCustomRoleLimits() {
-        return this.roleLimits.entrySet().stream()
-                .filter(entry -> !entry.getValue().isSynced())
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()));
+        if (this.roleLimits.readAndGet(Int2ObjectMapView::isEmpty))
+            return Collections.emptyMap();
+
+        Map<PlayerRole, Integer> roleLimits = new HashMap<>();
+        this.roleLimits.read(roleLimitsMap -> {
+            Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimitsMap.entryIterator();
+            while (iterator.hasNext()) {
+                Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
+                if (!entry.getValue().isSynced())
+                    roleLimits.put(plugin.getRoles().getPlayerRoleFromId(entry.getKey()), entry.getValue().get());
+            }
+        });
+
+        return Collections.unmodifiableMap(roleLimits);
     }
 
     @Override
@@ -4995,9 +5024,14 @@ public class SIsland implements Island {
                 .filter(entry -> overrideCustom || entry.getValue().isSynced())
                 .forEach(entry -> entry.setValue(IntValue.syncedFixed(-1)));
 
-        roleLimits.entrySet().stream()
-                .filter(entry -> overrideCustom || entry.getValue().isSynced())
-                .forEach(entry -> entry.setValue(IntValue.syncedFixed(-1)));
+        roleLimits.write(roleLimits -> {
+            Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimits.entryIterator();
+            while (iterator.hasNext()) {
+                Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
+                if (overrideCustom || entry.getValue().isSynced())
+                    entry.setValue(IntValue.syncedFixed(-1));
+            }
+        });
 
         if (overrideCustom)
             IslandsDatabaseBridge.clearIslandSettings(this);
@@ -5114,11 +5148,13 @@ public class SIsland implements Island {
             applyEffects();
         }
 
-        for (Map.Entry<PlayerRole, IntValue> entry : upgradeLevel.getRoleLimitsUpgradeValue().entrySet()) {
-            IntValue currentValue = roleLimits.get(entry.getKey());
-            if (currentValue == null || ((overrideCustom || currentValue.isSynced()) && currentValue.get() < entry.getValue().get()))
-                roleLimits.put(entry.getKey(), entry.getValue());
-        }
+        roleLimits.write(roleLimits -> {
+            for (Map.Entry<PlayerRole, IntValue> entry : upgradeLevel.getRoleLimitsUpgradeValue().entrySet()) {
+                IntValue currentValue = roleLimits.get(entry.getKey().getId());
+                if (currentValue == null || ((overrideCustom || currentValue.isSynced()) && currentValue.get() < entry.getValue().get()))
+                    roleLimits.put(entry.getKey().getId(), entry.getValue());
+            }
+        });
     }
 
     private void updateIslandChests() {

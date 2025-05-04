@@ -44,6 +44,16 @@ public interface Int2ObjectMapView<V> {
         return value;
     }
 
+    default void putAll(Int2ObjectMapView<V> other) {
+        if (!other.isEmpty()) {
+            Iterator<Entry<V>> iterator = other.entryIterator();
+            while (iterator.hasNext()) {
+                Entry<V> entry = iterator.next();
+                put(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
     interface AbsentConsumer<V> {
 
         V accept(int key);

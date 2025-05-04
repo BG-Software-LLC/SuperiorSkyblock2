@@ -25,7 +25,6 @@ import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridg
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
@@ -44,6 +43,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
@@ -74,7 +74,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private Island playerIsland = null;
     private String name;
     private String textureValue;
-    private PlayerRole playerRole;
+    private WeakReference<PlayerRole> playerRole;
+    private int playerRoleId;
     private java.util.Locale userLocale;
 
     private boolean worldBorderEnabled;
@@ -98,7 +99,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public SSuperiorPlayer(SuperiorPlayerBuilderImpl builder) {
         this.uuid = builder.uuid;
         this.name = builder.name;
-        this.playerRole = builder.playerRole;
+        setPlayerRoleInternal(builder.playerRole);
         this.disbands = builder.disbands;
         this.userLocale = builder.locale;
         this.textureValue = builder.textureValue;
@@ -503,7 +504,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         this.playerIsland = island;
 
         if (this.playerIsland == null) {
-            this.playerRole = SPlayerRole.guestRole();
+            setPlayerRoleInternal(null);
         }
 
     }
@@ -531,8 +532,18 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public PlayerRole getPlayerRole() {
-        if (playerRole == null || (this.playerIsland == null && this.playerRole != SPlayerRole.guestRole()))
-            setPlayerRole(SPlayerRole.guestRole());
+        PlayerRole playerRole = this.playerRole.get();
+
+        if (playerRole == null) {
+            // Reference doesn't exist anymore, let's get it from roles manager again
+            playerRole = plugin.getRoles().getPlayerRoleFromId(this.playerRoleId);
+            this.playerRole = new WeakReference<>(playerRole);
+        }
+
+        if (this.playerIsland == null && playerRole != SPlayerRole.guestRole()) {
+            setPlayerRoleInternal(null);
+            playerRole = this.playerRole.get();
+        }
 
         return playerRole;
     }
@@ -543,7 +554,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         Log.debug(Debug.SET_PLAYER_ROLE, getName(), playerRole.getName());
 
-        this.playerRole = playerRole;
+        setPlayerRoleInternal(playerRole);
 
         Island island = getIsland();
         if (island != null && island.getOwner() != this)
@@ -916,7 +927,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         this.name = otherPlayer.getName();
         this.playerIsland = otherPlayer.getIsland();
-        this.playerRole = otherPlayer.getPlayerRole();
+        setPlayerRoleInternal(otherPlayer.getPlayerRole());
         this.userLocale = otherPlayer.getUserLocale();
         this.worldBorderEnabled |= otherPlayer.hasWorldBorderEnabled();
         this.blocksStackerEnabled |= otherPlayer.hasBlocksStackerEnabled();
@@ -1080,6 +1091,12 @@ public class SSuperiorPlayer implements SuperiorPlayer {
                 "uuid=[" + uuid + "]," +
                 "name=[" + name + "]" +
                 "}";
+    }
+
+    private void setPlayerRoleInternal(@Nullable PlayerRole playerRole) {
+        PlayerRole newRole = playerRole == null ? SPlayerRole.guestRole() : playerRole;
+        this.playerRole = new WeakReference<>(newRole);
+        this.playerRoleId = newRole.getId();
     }
 
     private static String removeTextureValueTimeStamp(@Nullable String textureValue) {

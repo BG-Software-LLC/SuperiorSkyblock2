@@ -28,6 +28,8 @@ public class RolesManagerImpl extends Manager implements RolesManager {
 
     @Override
     public void loadData() throws ManagerLoadException {
+        this.rolesContainer.clearRoles();
+
         ConfigurationSection rolesSection = plugin.getSettings().getIslandRoles().getSection();
 
         ConfigurationSection guestSection = rolesSection.getConfigurationSection("guest");

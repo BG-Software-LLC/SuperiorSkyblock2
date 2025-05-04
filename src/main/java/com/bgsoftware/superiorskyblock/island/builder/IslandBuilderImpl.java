@@ -20,8 +20,10 @@ import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.DirtyChunk;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LegacyMasks;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
@@ -42,7 +44,9 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -82,7 +86,7 @@ public class IslandBuilderImpl implements Island.Builder {
     public final List<SuperiorPlayer> members = new LinkedList<>();
     public final List<SuperiorPlayer> bannedPlayers = new LinkedList<>();
     public final Map<SuperiorPlayer, PlayerPrivilegeNode> playerPermissions = new LinkedHashMap<>();
-    public final Map<IslandPrivilege, PlayerRole> rolePermissions = new LinkedHashMap<>();
+    public final Map<IslandPrivilege, Integer> rolePermissions = new LinkedHashMap<>();
     public final Map<String, Integer> upgrades = new LinkedHashMap<>();
     public final KeyMap<IntValue> blockLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
     public final Map<UUID, Rating> ratings = new LinkedHashMap<>();
@@ -93,7 +97,7 @@ public class IslandBuilderImpl implements Island.Builder {
     public final KeyMap<IntValue> entityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
     public final Map<PotionEffectType, IntValue> islandEffects = new LinkedHashMap<>();
     public final List<ItemStack[]> islandChests = new ArrayList<>(plugin.getSettings().getIslandChests().getDefaultPages());
-    public final Map<PlayerRole, IntValue> roleLimits = new LinkedHashMap<>();
+    public final Int2ObjectMapView<IntValue> roleLimits = CollectionsFactory.createInt2ObjectArrayMap();
     public final EnumerateMap<Dimension, Location> visitorHomes = new EnumerateMap<>(Dimension.values());
     public IntValue islandSize = IntValue.syncedFixed(-1);
     public IntValue warpsLimit = IntValue.syncedFixed(-1);
@@ -446,13 +450,16 @@ public class IslandBuilderImpl implements Island.Builder {
     public Island.Builder setRolePermission(IslandPrivilege islandPrivilege, PlayerRole requiredRole) {
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
         Preconditions.checkNotNull(requiredRole, "requiredRole parameter cannot be null.");
-        this.rolePermissions.put(islandPrivilege, requiredRole);
+        this.rolePermissions.put(islandPrivilege, requiredRole.getId());
         return this;
     }
 
     @Override
     public Map<IslandPrivilege, PlayerRole> getRolePermissions() {
-        return Collections.unmodifiableMap(this.rolePermissions);
+        return Collections.unmodifiableMap(this.rolePermissions.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> plugin.getRoles().getPlayerRoleFromId(entry.getValue())
+        )));
     }
 
     @Override
@@ -648,13 +655,23 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public Island.Builder setRoleLimit(PlayerRole playerRole, int limit) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-        this.roleLimits.put(playerRole, limit < 0 ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
+        this.roleLimits.put(playerRole.getId(), limit < 0 ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
         return this;
     }
 
     @Override
     public Map<PlayerRole, Integer> getRoleLimits() {
-        return Collections.unmodifiableMap(IntValue.unboxMap(this.roleLimits));
+        if (this.roleLimits.isEmpty())
+            return Collections.emptyMap();
+
+        Map<PlayerRole, Integer> roleLimits = new HashMap<>();
+        Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = this.roleLimits.entryIterator();
+        while (iterator.hasNext()) {
+            Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
+            roleLimits.put(plugin.getRoles().getPlayerRoleFromId(entry.getKey()), entry.getValue().get());
+        }
+
+        return Collections.unmodifiableMap(roleLimits);
     }
 
     @Override
