@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.events.EventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.service.region.RegionManagerServiceImpl;
@@ -37,6 +38,7 @@ public class PluginEventsDispatcher extends EventsDispatcher<
         RegionManagerServiceImpl.registerCallbacks(this);
         CmdHelp.registerListeners(this);
         CmdAdmin.registerCallbacks(this);
+        Message.registerListeners(this);
     }
 
     public void registerCallback(PluginEventType<?> type, Runnable callback) {

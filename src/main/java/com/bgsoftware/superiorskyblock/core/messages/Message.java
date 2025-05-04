@@ -14,6 +14,8 @@ import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.Files;
@@ -30,11 +32,9 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -790,10 +790,6 @@ public enum Message {
     },
 
     PROTECTION(true) {
-
-        @Nullable
-        private Collection<UUID> noInteractMessages;
-
         @Override
         public void send(CommandSender sender, Locale locale, Object... args) {
             if (!(sender instanceof Player))
@@ -835,6 +831,9 @@ public enum Message {
             return plugin.getServices().getService(MessagesService.class);
         }
     };
+
+    @Nullable
+    private static Collection<UUID> noInteractMessages;
 
     private final String defaultMessage;
     private final boolean isCustom;
@@ -997,6 +996,14 @@ public enum Message {
             dest.getParentFile().mkdirs();
             file.renameTo(dest);
         }
+    }
+
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, Message::onSettingsUpdate);
+    }
+
+    private static void onSettingsUpdate() {
+        noInteractMessages = null;
     }
 
 }
