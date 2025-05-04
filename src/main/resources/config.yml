@@ -711,7 +711,8 @@ default-language: 'en-US'
 # Should world borders be enabled by default for new players?
 default-world-border: true
 
-# Should blocks stacking be enabled by default for new players?
+# Should blocks stacking be enabled by default for players?
+# The blocks stacking will reset every restart for all players to this value.
 default-blocks-stacker: true
 
 # Should panels be toggled by default for new players?
