@@ -65,6 +65,8 @@ public class PlayerCommandsMap extends CommandsMap {
         registerCommand(new CmdVisitors(), false);
         registerCommand(new CmdWarp(), false);
         registerCommand(new CmdWarps(), false);
+
+        sortCommands();
     }
 
 }

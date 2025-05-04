@@ -62,13 +62,17 @@ public abstract class CommandsMap {
         }
 
         if (sort) {
-            List<SuperiorCommand> superiorCommands = new LinkedList<>(subCommands.values());
-            superiorCommands.sort(Comparator.comparing(o -> o.getAliases().get(0)));
-            subCommands.clear();
-            superiorCommands.forEach(s -> subCommands.put(s.getAliases().get(0), s));
+            sortCommands();
         }
 
         PluginEventsFactory.callCommandsUpdateEvent();
+    }
+
+    public void sortCommands() {
+        List<SuperiorCommand> superiorCommands = new LinkedList<>(subCommands.values());
+        superiorCommands.sort(Comparator.comparing(o -> o.getAliases().get(0)));
+        subCommands.clear();
+        superiorCommands.forEach(s -> subCommands.put(s.getAliases().get(0), s));
     }
 
     public void unregisterCommand(SuperiorCommand superiorCommand) {
