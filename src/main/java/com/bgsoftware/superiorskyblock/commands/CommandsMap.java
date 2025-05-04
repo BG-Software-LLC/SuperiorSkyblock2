@@ -10,15 +10,14 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.google.common.base.Preconditions;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 public abstract class CommandsMap {
 
@@ -38,7 +37,7 @@ public abstract class CommandsMap {
         dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, CommandsMap::onSettingsUpdate);
     }
 
-    private final Map<String, SuperiorCommand> subCommands = new LinkedHashMap<>();
+    private final Map<String, SuperiorCommand> subCommands = new TreeMap<>();
     private final Map<String, List<SuperiorCommand>> aliasesToCommand = new HashMap<>();
 
     protected final SuperiorSkyblockPlugin plugin;
@@ -49,7 +48,7 @@ public abstract class CommandsMap {
 
     public abstract void loadDefaultCommands();
 
-    public void registerCommand(SuperiorCommand superiorCommand, boolean sort) {
+    public void registerCommand(SuperiorCommand superiorCommand) {
         List<String> aliases = new LinkedList<>(superiorCommand.getAliases());
         String label = aliases.remove(0).toLowerCase(Locale.ENGLISH);
         aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, Collections.emptyList()));
@@ -61,18 +60,7 @@ public abstract class CommandsMap {
             aliasesToCommand.computeIfAbsent(alias.toLowerCase(Locale.ENGLISH), a -> new LinkedList<>()).add(superiorCommand);
         }
 
-        if (sort) {
-            sortCommands();
-        }
-
         PluginEventsFactory.callCommandsUpdateEvent();
-    }
-
-    public void sortCommands() {
-        List<SuperiorCommand> superiorCommands = new LinkedList<>(subCommands.values());
-        superiorCommands.sort(Comparator.comparing(o -> o.getAliases().get(0)));
-        subCommands.clear();
-        superiorCommands.forEach(s -> subCommands.put(s.getAliases().get(0), s));
     }
 
     public void unregisterCommand(SuperiorCommand superiorCommand) {

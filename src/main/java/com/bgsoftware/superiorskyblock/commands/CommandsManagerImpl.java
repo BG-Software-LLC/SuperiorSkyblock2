@@ -86,7 +86,13 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
     @Override
     public void registerCommand(SuperiorCommand superiorCommand) {
         Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
-        registerCommand(superiorCommand, true);
+
+        if (pendingCommands != null) {
+            pendingCommands.add(() -> registerCommand(superiorCommand));
+            return;
+        }
+
+        playerCommandsMap.registerCommand(superiorCommand);
     }
 
     @Override
@@ -102,7 +108,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
         }
 
         Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
-        adminCommandsMap.registerCommand(superiorCommand, true);
+        adminCommandsMap.registerCommand(superiorCommand);
     }
 
     @Override
@@ -168,15 +174,6 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
     public String getLabel() {
         return label;
-    }
-
-    public void registerCommand(SuperiorCommand superiorCommand, boolean sort) {
-        if (pendingCommands != null) {
-            pendingCommands.add(() -> registerCommand(superiorCommand, sort));
-            return;
-        }
-
-        playerCommandsMap.registerCommand(superiorCommand, sort);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
