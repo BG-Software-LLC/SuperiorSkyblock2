@@ -4,9 +4,9 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.google.common.base.Preconditions;
 
 import java.util.Collections;
@@ -22,7 +22,7 @@ import java.util.Set;
 
 public abstract class CommandsMap {
 
-    private static Set<SuperiorCommand> DISABLED_COMMANDS_CACHE;
+    private static Set<String> DISABLED_COMMANDS_CACHE;
 
     private static void onSettingsUpdate() {
         DISABLED_COMMANDS_CACHE = new HashSet<>();
@@ -30,7 +30,7 @@ public abstract class CommandsMap {
         plugin.getSettings().getDisabledCommands().forEach(commandLabel -> {
             SuperiorCommand superiorCommand = plugin.getCommands().getCommand(commandLabel);
             if (superiorCommand != null && !(superiorCommand instanceof IAdminIslandCommand))
-                DISABLED_COMMANDS_CACHE.add(superiorCommand);
+                DISABLED_COMMANDS_CACHE.add(superiorCommand.getAliases().get(0).toLowerCase(Locale.ENGLISH));
         });
     }
 
@@ -110,7 +110,8 @@ public abstract class CommandsMap {
     }
 
     private boolean isCommandEnabled(SuperiorCommand superiorCommand) {
-        return superiorCommand instanceof IAdminIslandCommand || !DISABLED_COMMANDS_CACHE.contains(superiorCommand);
+        return superiorCommand instanceof IAdminIslandCommand ||
+                !DISABLED_COMMANDS_CACHE.contains(superiorCommand.getAliases().get(0).toLowerCase(Locale.ENGLISH));
     }
 
     private void removeCommand(String label) {
