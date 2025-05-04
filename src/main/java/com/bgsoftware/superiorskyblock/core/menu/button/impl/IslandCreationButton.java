@@ -62,6 +62,7 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
         private final Schematic schematic;
         private TemplateItem noAccessItem = null;
         private List<String> noAccessCommands = null;
+        @Nullable
         private Biome biome;
         private BigDecimal bonusWorth;
         private BigDecimal bonusLevel;
@@ -131,6 +132,7 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
         private final List<String> accessCommands;
         private final TemplateItem lackPermissionItem;
         private final List<String> lackPermissionCommands;
+        @Nullable
         private final Biome biome;
         private final BigDecimal bonusWorth;
         private final BigDecimal bonusLevel;
@@ -144,7 +146,7 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
         Template(@Nullable String requiredPermission, @Nullable GameSound lackPermissionSound,
                  @Nullable GameSound accessSound, @Nullable List<String> accessCommands,
                  @Nullable TemplateItem lackPermissionItem, @Nullable List<String> lackPermissionCommands,
-                 Biome biome, @Nullable BigDecimal bonusWorth, @Nullable BigDecimal bonusLevel, boolean isOffset,
+                 @Nullable Biome biome, @Nullable BigDecimal bonusWorth, @Nullable BigDecimal bonusLevel, boolean isOffset,
                  @Nullable TemplateItem accessItem, @Nullable BlockOffset spawnOffset, Schematic schematic) {
             super(accessItem == null ? TemplateItem.AIR : accessItem, null, null, requiredPermission,
                     lackPermissionSound, IslandCreationButton.class, IslandCreationButton::new);
@@ -152,7 +154,7 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
             this.accessCommands = accessCommands == null ? Collections.emptyList() : accessCommands;
             this.lackPermissionItem = lackPermissionItem == null ? TemplateItem.AIR : lackPermissionItem;
             this.lackPermissionCommands = lackPermissionCommands == null ? Collections.emptyList() : lackPermissionCommands;
-            this.biome = Objects.requireNonNull(biome, "biome cannot be null");
+            this.biome = biome;
             this.bonusWorth = bonusWorth == null ? BigDecimal.ZERO : bonusWorth;
             this.bonusLevel = bonusLevel == null ? BigDecimal.ZERO : bonusLevel;
             this.isOffset = isOffset;
@@ -174,6 +176,7 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
             return accessCommands;
         }
 
+        @Nullable
         public Biome getBiome() {
             return biome;
         }

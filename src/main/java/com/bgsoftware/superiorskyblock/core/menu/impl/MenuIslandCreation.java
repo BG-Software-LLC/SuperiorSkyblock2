@@ -70,14 +70,16 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
                 IslandCreationButton.Builder buttonBuilder = new IslandCreationButton.Builder(schematic);
 
                 {
-                    String biomeName = itemSection.getString("biome", "PLAINS");
-                    try {
-                        Biome biome = Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
-                        buttonBuilder.setBiome(biome);
-                    } catch (IllegalArgumentException error) {
-                        Log.warnFromFile("island-creation.yml", "Invalid biome name for item ",
-                                itemSectionName, ": ", biomeName);
-                        continue;
+                    String biomeName = itemSection.getString("biome");
+                    if(biomeName != null) {
+                        try {
+                            Biome biome = Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
+                            buttonBuilder.setBiome(biome);
+                        } catch (IllegalArgumentException error) {
+                            Log.warnFromFile("island-creation.yml", "Invalid biome name for item ",
+                                    itemSectionName, ": ", biomeName);
+                            continue;
+                        }
                     }
                 }
 
