@@ -27,6 +27,7 @@ import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.Entity;
@@ -57,6 +58,7 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,13 +69,22 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class NMSUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(
-            ChunkHolder.class, 1, Packet.class, boolean.class);
+    private static final boolean MOONRISE_SUPPORT = ((Supplier<Boolean>) () -> {
+        for (Method method : ChunkHolder.class.getDeclaredMethods()) {
+            if (method.getName().contains("moonrise$")) {
+                return true;
+            }
+        }
+
+        return false;
+    }).get();
+
     private static final ReflectField<Map<Long, ChunkHolder>> VISIBLE_CHUNKS = new ReflectField<>(
             ChunkMap.class, Map.class, Modifier.PUBLIC | Modifier.VOLATILE, 1);
     private static final ReflectMethod<LevelChunk> CHUNK_CACHE_SERVER_GET_CHUNK_IF_CACHED = new ReflectMethod<>(
@@ -326,19 +337,20 @@ public class NMSUtils {
         ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
         ChunkHolder chunkHolder;
 
-        try {
+        if (MOONRISE_SUPPORT) {
             chunkHolder = chunkMap.getVisibleChunkIfPresent(chunkPos.toLong());
-        } catch (Throwable ex) {
+        } else {
             chunkHolder = VISIBLE_CHUNKS.get(chunkMap).get(chunkPos.toLong());
         }
 
         if (chunkHolder != null) {
-            if (SEND_PACKETS_TO_RELEVANT_PLAYERS.isValid()) {
-                SEND_PACKETS_TO_RELEVANT_PLAYERS.invoke(chunkHolder, packet, false);
+            List<ServerPlayer> relevantPlayers;
+            if (MOONRISE_SUPPORT) {
+                relevantPlayers = chunkHolder.moonrise$getPlayers(false);
             } else {
-                chunkHolder.playerProvider.getPlayers(chunkPos, false).forEach(serverPlayer ->
-                        serverPlayer.connection.send(packet));
+                relevantPlayers = chunkHolder.playerProvider.getPlayers(chunkPos, false);
             }
+            relevantPlayers.forEach(serverPlayer -> serverPlayer.connection.send(packet));
         }
     }
 
