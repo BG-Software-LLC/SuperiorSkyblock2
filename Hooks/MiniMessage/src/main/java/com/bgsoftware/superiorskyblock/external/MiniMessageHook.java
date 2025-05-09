@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
-import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
 import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -46,7 +45,7 @@ public class MiniMessageHook {
 
         String content = config.getString(path);
         if (Text.isBlank(content))
-            return Optional.of(EmptyMessageComponent.getInstance());
+            return Optional.empty();
 
         try {
             Component component = MINI_MESSAGE.deserialize(Formatters.COLOR_FORMATTER.format(content));
