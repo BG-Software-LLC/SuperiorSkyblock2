@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.listener;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
@@ -89,7 +90,7 @@ public class SignsListener extends AbstractGameEventListener {
             island = plugin.getGrid().getIslandAt(e.getArgs().block.getLocation(wrapper.getHandle()));
         }
 
-        if (island == null || island.getIslandWarps().isEmpty())
+        if (!isValidIsland(island))
             return;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
@@ -108,7 +109,7 @@ public class SignsListener extends AbstractGameEventListener {
             island = plugin.getGrid().getIslandAt(e.getArgs().entity.getLocation(wrapper.getHandle()));
         }
 
-        if (island == null || island.getIslandWarps().isEmpty())
+        if (!isValidIsland(island))
             return;
 
         Iterator<Block> iterator = e.getArgs().blocks.iterator();
@@ -170,6 +171,10 @@ public class SignsListener extends AbstractGameEventListener {
         registerCallback(GameEventType.SIGN_CHANGE_EVENT, GameEventPriority.MONITOR, this::onSignPlace);
         registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.MONITOR, this::onSignBreak);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.MONITOR, this::onSignExplode);
+    }
+
+    private static boolean isValidIsland(Island island) {
+        return island == null || (island.getIslandWarps().isEmpty() && island.getVisitorsLocation((Dimension) null) == null);
     }
 
 }
