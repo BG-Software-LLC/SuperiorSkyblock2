@@ -21,7 +21,11 @@ public class AutoRemovalMap<K, V> implements Map<K, V> {
     private final Cache<K, Object> elementsLifeTime;
 
     public static <K, V> AutoRemovalMap<K, V> newHashMap(long removalDelay, TimeUnit timeUnit) {
-        return new AutoRemovalMap<>(removalDelay, timeUnit, HashMap::new);
+        return newMap(removalDelay, timeUnit, HashMap::new);
+    }
+
+    public static <K, V> AutoRemovalMap<K, V> newMap(long removalDelay, TimeUnit timeUnit, Supplier<Map<K, V>> mapSupplier) {
+        return new AutoRemovalMap<>(removalDelay, timeUnit, mapSupplier);
     }
 
     private AutoRemovalMap(long removalDelay, TimeUnit timeUnit, Supplier<Map<K, V>> mapSupplier) {

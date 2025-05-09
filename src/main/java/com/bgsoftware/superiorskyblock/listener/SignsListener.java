@@ -174,7 +174,7 @@ public class SignsListener extends AbstractGameEventListener {
     }
 
     private static boolean isValidIsland(Island island) {
-        return island == null || (island.getIslandWarps().isEmpty() && island.getVisitorsLocation((Dimension) null) == null);
+        return island != null && (!island.getIslandWarps().isEmpty() || island.getVisitorsLocation((Dimension) null) != null);
     }
 
 }

@@ -53,6 +53,7 @@ import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
+import com.bgsoftware.superiorskyblock.core.collections.Location2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
@@ -125,7 +126,6 @@ import org.bukkit.scheduler.BukkitTask;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -215,7 +215,7 @@ public class SIsland implements Island {
      * Island Warps
      */
     private final Map<String, IslandWarp> warpsByName = new ConcurrentHashMap<>();
-    private final Map<LocationKey, IslandWarp> warpsByLocation = new ConcurrentHashMap<>();
+    private final Synchronized<Location2ObjectMap<IslandWarp>> warpsByLocation = Synchronized.of(new Location2ObjectMap<>());
     private final Map<String, WarpCategory> warpCategories = new ConcurrentHashMap<>();
     /*
      * General Settings
@@ -3668,9 +3668,8 @@ public class SIsland implements Island {
     @Override
     public IslandWarp getWarp(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        try (LocationKey locationKey = LocationKey.of(location)) {
-            return warpsByLocation.get(locationKey);
-        }
+        Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
+        return this.warpsByLocation.readAndGet(warpsByLocation -> warpsByLocation.get(location));
     }
 
     @Override
@@ -3714,17 +3713,18 @@ public class SIsland implements Island {
     @Override
     public void deleteWarp(@Nullable SuperiorPlayer superiorPlayer, Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
+        Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
 
-        IslandWarp islandWarp;
-        try (LocationKey locationKey = LocationKey.of(location)) {
-            islandWarp = warpsByLocation.remove(locationKey);
-        }
+        IslandWarp islandWarp = this.warpsByLocation.writeAndGet(
+                warpsByLocation -> warpsByLocation.remove(location));
 
-        if (islandWarp != null) {
-            deleteWarp(islandWarp.getName());
-            if (superiorPlayer != null)
-                Message.DELETE_WARP.send(superiorPlayer, islandWarp.getName());
-        }
+        if (islandWarp == null)
+            return;
+
+        deleteWarp(islandWarp.getName());
+
+        if (superiorPlayer != null)
+            Message.DELETE_WARP.send(superiorPlayer, islandWarp.getName());
     }
 
     @Override
@@ -3737,9 +3737,11 @@ public class SIsland implements Island {
         WarpCategory warpCategory = islandWarp == null ? null : islandWarp.getCategory();
 
         if (islandWarp != null) {
-            try (LocationKey locationKey = LocationKey.of(islandWarp)) {
-                warpsByLocation.remove(locationKey);
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location location = islandWarp.getLocation(wrapper.getHandle());
+                this.warpsByLocation.write(warpsByLocation -> warpsByLocation.remove(location));
             }
+
             warpCategory.getWarps().remove(islandWarp);
 
             IslandsDatabaseBridge.removeWarp(this, islandWarp);
@@ -4569,7 +4571,8 @@ public class SIsland implements Island {
 
         warpsByName.put(warpName, islandWarp);
 
-        warpsByLocation.put(LocationKey.of(location, false), islandWarp);
+        this.warpsByLocation.write(warpsByLocation ->
+                warpsByLocation.put(location, islandWarp));
 
         return islandWarp;
     }
