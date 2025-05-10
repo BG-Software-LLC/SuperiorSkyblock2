@@ -63,11 +63,6 @@ public class CmdAdminAddBlockLimit implements IAdminIslandCommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getMaterials(args[3]) : Collections.emptyList();
-    }
-
-    @Override
     public boolean supportMultipleIslands() {
         return true;
     }
@@ -105,4 +100,8 @@ public class CmdAdminAddBlockLimit implements IAdminIslandCommand {
             Message.CHANGED_BLOCK_LIMIT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()), targetPlayer.getName());
     }
 
+    @Override
+    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
+        return args.length == 4 ? CommandTabCompletes.getMaterials(args[3]) : Collections.emptyList();
+    }
 }
