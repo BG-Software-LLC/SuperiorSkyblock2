@@ -94,7 +94,7 @@ public class CmdAdminUnlockWorld implements IAdminIslandCommand {
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
         if (args.length == 5)
-            return CommandTabCompletes.getCustomComplete(args[3], "true", "false");
+            return CommandTabCompletes.getCustomComplete(args[4], "true", "false");
 
         if (args.length != 4)
             return Collections.emptyList();
