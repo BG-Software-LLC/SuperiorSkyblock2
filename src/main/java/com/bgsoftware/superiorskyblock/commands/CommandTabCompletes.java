@@ -13,9 +13,11 @@ import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
+import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -38,6 +40,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class CommandTabCompletes {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private CommandTabCompletes() {
 
@@ -215,7 +219,8 @@ public class CommandTabCompletes {
     }
 
     public static List<String> getBiomes(String argument) {
-        return getFromEnum(Arrays.asList(Biome.values()), argument.toLowerCase(Locale.ENGLISH));
+        NMSAlgorithms.EnumBridge<Biome> biomeEnumBridge = plugin.getNMSAlgorithms().getBiomeBridge();
+        return filterByArgument(biomeEnumBridge.getValues(), biomeEnumBridge::getName, argument.toLowerCase(Locale.ENGLISH));
     }
 
     public static List<String> getWorlds(String argument) {
@@ -284,6 +289,12 @@ public class CommandTabCompletes {
     }
 
     private static <E> List<String> filterByArgument(Collection<E> collection, Function<E, String> mapper, String argument) {
+        return new SequentialListBuilder<String>()
+                .filter(name -> name.toLowerCase(Locale.ENGLISH).contains(argument))
+                .build(collection, mapper);
+    }
+
+    private static <E> List<String> filterByArgument(E[] collection, Function<E, String> mapper, String argument) {
         return new SequentialListBuilder<String>()
                 .filter(name -> name.toLowerCase(Locale.ENGLISH).contains(argument))
                 .build(collection, mapper);

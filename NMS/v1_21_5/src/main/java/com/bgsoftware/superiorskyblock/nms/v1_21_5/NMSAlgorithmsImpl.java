@@ -38,6 +38,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.Biome;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -68,6 +69,18 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     private static final Multimap<Attribute, AttributeModifier> EMPTY_ATTRIBUTES_MAP =
             MultimapBuilder.hashKeys().hashSetValues().build();
+
+    private static final EnumBridge<Biome> BIOME_ENUM_BRIDGE = new EnumBridge<>() {
+        @Override
+        public Biome[] getValues() {
+            return Biome.values();
+        }
+
+        @Override
+        public String getName(Biome enumValue) {
+            return enumValue.name();
+        }
+    };
 
     private static final EnumMap<InventoryType, MenuCreator> MENUS_HOLDER_CREATORS = new EnumMap<>(InventoryType.class);
 
@@ -256,6 +269,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public void hideAttributes(ItemMeta itemMeta) {
         itemMeta.setAttributeModifiers(EMPTY_ATTRIBUTES_MAP);
+    }
+
+    @Override
+    public EnumBridge<Biome> getBiomeBridge() {
+        return BIOME_ENUM_BRIDGE;
     }
 
     private interface MenuCreator extends BiFunction<InventoryHolder, String, Container> {
