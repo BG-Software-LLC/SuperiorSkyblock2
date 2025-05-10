@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.RolePrivilegeNode;
 import com.google.common.base.Preconditions;
 
@@ -15,7 +16,8 @@ public class SPlayerRole implements PlayerRole {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static String ALL_ROLE_NAMES;
+    private static String LIMIT_ROLE_NAMES;
+    private static String LADDER_ROLE_NAMES;
 
     private final String name;
     private final String displayName;
@@ -65,17 +67,29 @@ public class SPlayerRole implements PlayerRole {
         return plugin.getRoles().getPlayerRole(name);
     }
 
-    public static String getRolesNames() {
-        if (ALL_ROLE_NAMES == null) {
-            ALL_ROLE_NAMES = Formatters.COMMA_FORMATTER.format(plugin.getRoles().getRoles().stream()
+    public static String getRoleLimitsNames() {
+        if (LIMIT_ROLE_NAMES == null) {
+            LIMIT_ROLE_NAMES = Formatters.COMMA_FORMATTER.format(plugin.getRoles().getRoles().stream()
+                    .filter(IslandUtils::isValidRoleForLimit)
                     .map(playerRole -> playerRole.getName().toLowerCase(Locale.ENGLISH)));
         }
 
-        return ALL_ROLE_NAMES;
+        return LIMIT_ROLE_NAMES;
+    }
+
+    public static String getRolesLadderNames() {
+        if (LADDER_ROLE_NAMES == null) {
+            LADDER_ROLE_NAMES = Formatters.COMMA_FORMATTER.format(plugin.getRoles().getRoles().stream()
+                    .filter(PlayerRole::isRoleLadder)
+                    .map(playerRole -> playerRole.getName().toLowerCase(Locale.ENGLISH)));
+        }
+
+        return LADDER_ROLE_NAMES;
     }
 
     public static void refreshRoles() {
-        ALL_ROLE_NAMES = null;
+        LIMIT_ROLE_NAMES = null;
+        LADDER_ROLE_NAMES = null;
     }
 
     @Override

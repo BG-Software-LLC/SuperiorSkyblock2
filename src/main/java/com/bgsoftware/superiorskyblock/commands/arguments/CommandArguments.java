@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
@@ -181,7 +182,7 @@ public class CommandArguments {
         return colorize ? Formatters.COLOR_FORMATTER.format(stringBuilder.substring(1)) : stringBuilder.substring(1);
     }
 
-    public static PlayerRole getPlayerRole(CommandSender sender, String argument) {
+    public static PlayerRole getPlayerRoleFromLadder(CommandSender sender, String argument) {
         PlayerRole playerRole = null;
 
         try {
@@ -189,8 +190,26 @@ public class CommandArguments {
         } catch (IllegalArgumentException ignored) {
         }
 
-        if (playerRole == null)
-            Message.INVALID_ROLE.send(sender, argument, SPlayerRole.getRolesNames());
+        if (playerRole == null || !playerRole.isRoleLadder()) {
+            Message.INVALID_ROLE.send(sender, argument, SPlayerRole.getRolesLadderNames());
+            playerRole = null;
+        }
+
+        return playerRole;
+    }
+
+    public static PlayerRole getPlayerRoleForLimit(CommandSender sender, String argument) {
+        PlayerRole playerRole = null;
+
+        try {
+            playerRole = SPlayerRole.of(argument);
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        if (playerRole == null || !IslandUtils.isValidRoleForLimit(playerRole)) {
+            Message.INVALID_ROLE.send(sender, argument, SPlayerRole.getRoleLimitsNames());
+            playerRole = null;
+        }
 
         return playerRole;
     }
@@ -319,8 +338,9 @@ public class CommandArguments {
         } catch (NullPointerException ignored) {
         }
 
-        if (islandPrivilege == null) {
+        if (islandPrivilege == null || islandPrivilege.getType() == IslandPrivilege.Type.COMMAND) {
             Message.INVALID_ISLAND_PERMISSION.send(sender, argument, IslandPrivileges.getPrivilegesNames());
+            islandPrivilege = null;
         }
 
         return islandPrivilege;

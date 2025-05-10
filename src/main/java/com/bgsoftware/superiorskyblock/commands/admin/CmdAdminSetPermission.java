@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -69,19 +68,12 @@ public class CmdAdminSetPermission implements IAdminIslandCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         IslandPrivilege islandPrivilege = CommandArguments.getIslandPrivilege(sender, args[3]);
-
         if (islandPrivilege == null)
             return;
 
-        PlayerRole playerRole = CommandArguments.getPlayerRole(sender, args[4]);
-
+        PlayerRole playerRole = CommandArguments.getPlayerRoleFromLadder(sender, args[4]);
         if (playerRole == null)
             return;
-
-        if (islandPrivilege.getType() == IslandPrivilege.Type.COMMAND && !playerRole.isRoleLadder()) {
-            Message.INVALID_ROLE.send(sender, args[4], SPlayerRole.getRolesNames());
-            return;
-        }
 
         int islandsChangedCount = 0;
 
@@ -105,8 +97,17 @@ public class CmdAdminSetPermission implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getIslandPrivileges(args[3]) :
-                args.length == 5 ? CommandTabCompletes.getPlayerRoles(plugin, getIslandPrivilegeSafe(args[3]), args[4]) : Collections.emptyList();
+        switch (args.length) {
+            case 4:
+                return CommandTabCompletes.getIslandPrivileges(args[3]);
+            case 5: {
+                IslandPrivilege islandPrivilege = getIslandPrivilegeSafe(args[3]);
+                return islandPrivilege == null || islandPrivilege.getType() == IslandPrivilege.Type.COMMAND ?
+                        Collections.emptyList() : CommandTabCompletes.getPlayerRoles(plugin, args[4], PlayerRole::isRoleLadder);
+            }
+            default:
+                return Collections.emptyList();
+        }
     }
 
     @Nullable
