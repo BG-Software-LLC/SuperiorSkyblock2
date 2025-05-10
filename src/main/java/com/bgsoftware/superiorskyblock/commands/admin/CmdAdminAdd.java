@@ -97,7 +97,7 @@ public class CmdAdminAdd implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getOnlinePlayers(plugin, args[2], false,
+        return args.length == 4 ? CommandTabCompletes.getOnlinePlayers(plugin, args[3], false,
                 superiorPlayer -> superiorPlayer.getIsland() == null) : Collections.emptyList();
     }
 
