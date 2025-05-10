@@ -44,7 +44,6 @@ import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LegacyMasks;
-import com.bgsoftware.superiorskyblock.core.LocationKey;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
@@ -3395,7 +3394,7 @@ public class SIsland implements Island {
     public int getPotionEffectLevel(PotionEffectType type) {
         Preconditions.checkNotNull(type, "potionEffectType parameter cannot be null.");
         IntValue islandEffect = islandEffects.get(type);
-        return islandEffect == null ? -1 : islandEffect.get();
+        return islandEffect == null ? 0 : islandEffect.get();
     }
 
     @Override
