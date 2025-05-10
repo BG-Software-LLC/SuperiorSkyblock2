@@ -19,4 +19,6 @@ public interface SchematicsContainer {
 
     List<SchematicParser> getSchematicParsers();
 
+    void clearSchematics();
+
 }

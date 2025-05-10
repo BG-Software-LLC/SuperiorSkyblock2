@@ -43,4 +43,9 @@ public class DefaultSchematicsContainer implements SchematicsContainer {
         return Collections.unmodifiableList(this.schematicParsers);
     }
 
+    @Override
+    public void clearSchematics() {
+        this.schematicMap.clear();
+    }
+
 }

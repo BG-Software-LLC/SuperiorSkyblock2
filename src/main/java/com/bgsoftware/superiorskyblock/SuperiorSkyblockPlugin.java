@@ -471,12 +471,13 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         if (reloadReason == PluginReloadReason.STARTUP) {
             playersHandler.loadData();
             gridHandler.loadData();
+            schematicsHandler.loadData();
         } else {
             BukkitExecutor.sync(gridHandler::updateSpawn, 1L);
             gridHandler.syncUpgrades();
+            schematicsHandler.loadSchematics();
         }
 
-        schematicsHandler.loadData();
         menusHandler.loadData();
         missionsHandler.loadData();
 

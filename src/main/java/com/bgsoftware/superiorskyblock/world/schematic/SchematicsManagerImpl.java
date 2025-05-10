@@ -85,6 +85,14 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
         loadDefaultSchematicParsers();
 
+        loadSchematics();
+    }
+
+    public void loadSchematics() throws ManagerLoadException {
+        this.schematicsContainer.clearSchematics();
+
+        File schematicsFolder = new File(plugin.getDataFolder(), "schematics");
+
         for (File schemFile : Files.listFolderFiles(schematicsFolder, false)) {
             String schemName = Files.getFileName(schemFile).toLowerCase(Locale.ENGLISH);
             Schematic schematic = loadFromFile(schemName, schemFile);
