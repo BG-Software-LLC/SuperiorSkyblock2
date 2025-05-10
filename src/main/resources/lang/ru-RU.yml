@@ -378,6 +378,7 @@ INVALID_LEVEL: '&c&lОшибка | &7Недопустимый уровень {0}
 INVALID_LIMIT: '&c&lОшибка | &7Недопустимый лимит {0}.'
 INVALID_MATERIAL: '&c&lОшибка | &7Недопустимый материал {0}.'
 INVALID_MATERIAL_DATA: '&c&lОшибка | &7Недопустимые данные материала {0}.'
+INVALID_MENU: '&c&lError | &7Invalid menu {0}.'
 INVALID_MISSION: '&c&lОшибка | &7Недопустимая миссия {0}.'
 INVALID_MODULE: '&c&lОшибка | &7Недопустимый модуль {0}.'
 INVALID_MULTIPLIER: '&c&lОшибка | &7Недопустимый множитель {0}.'
