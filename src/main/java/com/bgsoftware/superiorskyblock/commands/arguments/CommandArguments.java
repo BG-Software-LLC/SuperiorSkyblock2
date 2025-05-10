@@ -15,6 +15,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -27,7 +29,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -165,8 +166,7 @@ public class CommandArguments {
         Upgrade upgrade = plugin.getUpgrades().getUpgrade(argument);
 
         if (upgrade == null) {
-            Message.INVALID_UPGRADE.send(sender, argument, Formatters.COMMA_FORMATTER.format(
-                    plugin.getUpgrades().getUpgrades().stream().map(Upgrade::getName)));
+            Message.INVALID_UPGRADE.send(sender, argument, plugin.getUpgrades().getUpgradesNames());
         }
 
         return upgrade;
@@ -190,7 +190,7 @@ public class CommandArguments {
         }
 
         if (playerRole == null)
-            Message.INVALID_ROLE.send(sender, argument, SPlayerRole.getValuesString());
+            Message.INVALID_ROLE.send(sender, argument, SPlayerRole.getRolesNames());
 
         return playerRole;
     }
@@ -320,10 +320,7 @@ public class CommandArguments {
         }
 
         if (islandPrivilege == null) {
-            Message.INVALID_ISLAND_PERMISSION.send(sender, argument, Formatters.COMMA_FORMATTER.format(
-                    IslandPrivilege.values().stream()
-                            .sorted(Comparator.comparing(IslandPrivilege::getName))
-                            .map(_islandPrivilege -> _islandPrivilege.toString().toLowerCase(Locale.ENGLISH))));
+            Message.INVALID_ISLAND_PERMISSION.send(sender, argument, IslandPrivileges.getPrivilegesNames());
         }
 
         return islandPrivilege;
@@ -350,9 +347,7 @@ public class CommandArguments {
         }
 
         if (islandFlag == null) {
-            Message.INVALID_SETTINGS.send(sender, argument, Formatters.COMMA_FORMATTER.format(IslandFlag.values().stream()
-                    .sorted(Comparator.comparing(IslandFlag::getName))
-                    .map(_islandFlag -> _islandFlag.getName().toLowerCase(Locale.ENGLISH))));
+            Message.INVALID_SETTINGS.send(sender, argument, IslandFlags.getFlagsNames());
         }
 
         return islandFlag;

@@ -79,7 +79,7 @@ public class CmdAdminSetPermission implements IAdminIslandCommand {
             return;
 
         if (islandPrivilege.getType() == IslandPrivilege.Type.COMMAND && !playerRole.isRoleLadder()) {
-            Message.INVALID_ROLE.send(sender, args[4], SPlayerRole.getValuesString());
+            Message.INVALID_ROLE.send(sender, args[4], SPlayerRole.getRolesNames());
             return;
         }
 

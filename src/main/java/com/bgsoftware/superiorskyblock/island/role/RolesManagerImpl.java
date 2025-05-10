@@ -58,6 +58,8 @@ public class RolesManagerImpl extends Manager implements RolesManager {
         SPlayerRole previousRole = coopRole;
         for (ConfigurationSection roleSection : rolesByWeight)
             previousRole = loadRole(roleSection, previousRole.getWeight() + 1, previousRole);
+
+        SPlayerRole.refreshRoles();
     }
 
     @Override

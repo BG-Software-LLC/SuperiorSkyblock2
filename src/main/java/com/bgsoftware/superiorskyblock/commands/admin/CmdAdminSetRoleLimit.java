@@ -75,7 +75,7 @@ public class CmdAdminSetRoleLimit implements IAdminIslandCommand {
             return;
 
         if (!IslandUtils.isValidRoleForLimit(playerRole)) {
-            Message.INVALID_ROLE.send(sender, args[3], SPlayerRole.getValuesString());
+            Message.INVALID_ROLE.send(sender, args[3], SPlayerRole.getRolesNames());
             return;
         }
 

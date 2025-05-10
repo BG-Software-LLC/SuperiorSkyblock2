@@ -4,7 +4,10 @@ import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 
+import java.util.Comparator;
+import java.util.Locale;
 import java.util.Objects;
 
 public class IslandPrivileges {
@@ -89,12 +92,26 @@ public class IslandPrivileges {
     public static final IslandPrivilege WIND_CHARGE = register("WIND_CHARGE", ServerVersion.isAtLeast(ServerVersion.v1_21));
     public static final IslandPrivilege WITHDRAW_MONEY = register("WITHDRAW_MONEY", IslandPrivilege.Type.COMMAND);
 
+    private static String ALL_PRIVILEGE_NAMES;
+    private static int KNOWN_PRIVILEGES_COUNT;
+
     private IslandPrivileges() {
 
     }
 
     public static void registerPrivileges() {
         // Do nothing, only trigger all the register calls
+    }
+
+    public static String getPrivilegesNames() {
+        if (ALL_PRIVILEGE_NAMES == null || KNOWN_PRIVILEGES_COUNT != IslandPrivilege.values().size()) {
+            ALL_PRIVILEGE_NAMES = Formatters.COMMA_FORMATTER.format(IslandPrivilege.values().stream()
+                    .sorted(Comparator.comparing(IslandPrivilege::getName))
+                    .map(islandPrivilege -> islandPrivilege.getName().toLowerCase(Locale.ENGLISH)));
+            KNOWN_PRIVILEGES_COUNT = IslandPrivilege.values().size();
+        }
+
+        return ALL_PRIVILEGE_NAMES;
     }
 
     @NotNull

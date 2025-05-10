@@ -86,7 +86,7 @@ public class CmdSetRole implements IPermissibleCommand {
             return;
 
         if (!playerRole.isRoleLadder()) {
-            Message.INVALID_ROLE.send(sender, args[2], SPlayerRole.getValuesString());
+            Message.INVALID_ROLE.send(sender, args[2], SPlayerRole.getRolesNames());
             return;
         }
 

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.island.role;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.privilege.RolePrivilegeNode;
 import com.google.common.base.Preconditions;
 
@@ -13,6 +14,8 @@ import java.util.Objects;
 public class SPlayerRole implements PlayerRole {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static String ALL_ROLE_NAMES;
 
     private final String name;
     private final String displayName;
@@ -62,10 +65,17 @@ public class SPlayerRole implements PlayerRole {
         return plugin.getRoles().getPlayerRole(name);
     }
 
-    public static String getValuesString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        plugin.getRoles().getRoles().forEach(playerRole -> stringBuilder.append(", ").append(playerRole.toString().toLowerCase(Locale.ENGLISH)));
-        return stringBuilder.substring(2);
+    public static String getRolesNames() {
+        if (ALL_ROLE_NAMES == null) {
+            ALL_ROLE_NAMES = Formatters.COMMA_FORMATTER.format(plugin.getRoles().getRoles().stream()
+                    .map(playerRole -> playerRole.getName().toLowerCase(Locale.ENGLISH)));
+        }
+
+        return ALL_ROLE_NAMES;
+    }
+
+    public static void refreshRoles() {
+        ALL_ROLE_NAMES = null;
     }
 
     @Override
