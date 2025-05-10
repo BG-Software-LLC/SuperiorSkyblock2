@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
@@ -185,7 +184,15 @@ public class CommandTabCompletes {
                         return false;
                     }
                 })
-                .map(Arrays.asList(PotionEffectType.values()), PotionEffectType::getName);
+                .map(PotionEffectType.values(), potionEffectType -> {
+                    String name = potionEffectType.getName();
+                    if (name.startsWith("minecraft:")) {
+                        name = name.substring("minecraft:".length()).toLowerCase(Locale.ENGLISH);
+                    } else {
+                        name = name.toLowerCase(Locale.ENGLISH);
+                    }
+                    return name;
+                });
     }
 
     public static List<String> getEntitiesForLimit(String argument) {

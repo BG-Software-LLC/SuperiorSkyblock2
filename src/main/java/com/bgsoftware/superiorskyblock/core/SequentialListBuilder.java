@@ -70,6 +70,17 @@ public class SequentialListBuilder<E> {
         return completeBuild(sequentialList, null, this.mutable);
     }
 
+    public <O> List<O> map(E[] collection, Function<E, O> mapper) {
+        LinkedList<O> sequentialList = new LinkedList<>();
+
+        for (E element : collection) {
+            if (predicate == null || predicate.test(element))
+                sequentialList.add(mapper.apply(element));
+        }
+
+        return completeBuild(sequentialList, null, this.mutable);
+    }
+
     public <O> List<O> map(Iterator<E> iterator, Function<E, O> mapper) {
         LinkedList<O> sequentialList = new LinkedList<>();
 
