@@ -665,6 +665,9 @@ LEFT_ISLAND_COOP: '&e&lInsel | &7Du bist kein Koop-Mitglied mehr auf der Insel v
   {0}.'
 LEFT_ISLAND_COOP_NAME: '&e&lInsel | &7Du bist kein Genossenschaftsmitglied der Insel
   {0} mehr.'
+LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now locked for all islands!'
+LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now locked for the island {1}!'
+LOCK_WORLD_ANNOUNCEMENT: '&e&lWorlds | &7The world {0} is now locked for {1}''s island!'
 MATERIAL_NOT_SOLID: '&c&lError | &7Du musst festes Material bereitstellen.'
 MAXIMUM_LEVEL: '&c&lError | &7Die maximale Stufe für dieses Upgrade ist {0}.'
 MESSAGE_SENT: '&e&lIsland | &7Die Nachricht wurde erfolgreich an {0} gesendet!'
@@ -920,7 +923,9 @@ UNIGNORED_ISLAND: '&e&lInsel | Die Insel von &7{0} wird jetzt nicht mehr von den
   ignoriert.'
 UNIGNORED_ISLAND_NAME: '&e&lInsel | &7Die Insel {0} wird jetzt von den Top-Inseln
   nicht mehr ignoriert.'
-UNLOCK_WORLD_ANNOUNCEMENT: '&e&lWorlds | &7Ihre {0} Welt ist jetzt freigeschaltet!'
+UNLOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now unlocked for all islands!'
+UNLOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now unlocked for the island {1}!'
+UNLOCK_WORLD_ANNOUNCEMENT: '&e&lWorlds | &7The world {0} is now unlocked for {1}''s island!'
 UNSAFE_WARP: '&e&lInsel | &7&oAnscheinend ist dieser Warp unsicher. Bitte versuche
   es mit einem anderen Warp.'
 UPDATED_PERMISSION: '&e&lInsel | &7Aktualisierte Berechtigungen für {0}.'

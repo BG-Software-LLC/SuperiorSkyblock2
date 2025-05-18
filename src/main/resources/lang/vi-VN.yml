@@ -597,6 +597,9 @@ LEFT_ISLAND_COOP: '&e&lĐảo | &7Bạn không còn là thành viên co-op đả
   nữa.'
 LEFT_ISLAND_COOP_NAME: '&e&lĐảo | &7Bạn không còn là thành viên co-op đảo {0}
   nữa.'
+LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now locked for all islands!'
+LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now locked for the island {1}!'
+LOCK_WORLD_ANNOUNCEMENT: '&e&lWorlds | &7The world {0} is now locked for {1}''s island!'
 MATERIAL_NOT_SOLID: '&c&lLỗi | &7Bạn phải cung cấp một vật liệu rắn.'
 MAXIMUM_LEVEL: '&c&lLỗi | &7Mức tối đa cho việc nâng cấp này là {0}.'
 MESSAGE_SENT: '&e&lĐảo | &7Gửi thành công {0} tin nhắn!'
@@ -818,7 +821,9 @@ UNIGNORED_ISLAND: '&e&lĐảo | &7Đảo của {0} bây giờ không được b�
   đảo hàng đầu.'
 UNIGNORED_ISLAND_NAME: '&e&lĐảo | &7Đảo {0} bây giờ không được bỏ qua từ các
   đảo hàng đầu.'
-UNLOCK_WORLD_ANNOUNCEMENT: '&e&lThế Giới | &7Thế giới {0} của bạn hiện đã được mở khóa!'
+UNLOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now unlocked for all islands!'
+UNLOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now unlocked for the island {1}!'
+UNLOCK_WORLD_ANNOUNCEMENT: '&e&lWorlds | &7The world {0} is now unlocked for {1}''s island!'
 UNSAFE_WARP: '&e&lĐảo | &7&oCó vẻ như khu vực này không an toàn. Vui lòng thử
   lại với khu vực khác.'
 UPDATED_PERMISSION: '&e&lĐảo | &7Đã cập nhật quyền cho {0}.'
