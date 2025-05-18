@@ -1,0 +1,1200 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lIsland Upgrades'
+previous-menu: true
+
+pattern:
+  - '$ $ $ $ $ $ $ $ $'
+  - '% % @ % # % ^ % %'
+  - '% % % ! % + % % %'
+  - '% % * % ~ % & % %'
+  - '$ $ $ $ $ $ $ $ $'
+
+items:
+  '$':
+    type: STAINED_GLASS_PANE
+    data: 9
+    name: '&f'
+  '%':
+    type: STAINED_GLASS_PANE
+    data: 11
+    name: '&f'
+
+sounds:
+  '@':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+
+upgrades:
+  hoppers-limit:
+    item: '@'
+    '1':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: HOPPER
+        name: '&d&lHopper Increase &a(Available)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e2'
+          - '&7'
+          - '&7Purchasing the hopper upgrade'
+          - '&7will increase your island''s'
+          - '&7max hoppers limit.'
+          - '&7'
+          - '&dAmount: &f16x Hoppers'
+          - '&dPrice: &f$1,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: HOPPER
+        name: '&d&lHopper Increase &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e2'
+          - '&7'
+          - '&7Purchasing the hopper upgrade'
+          - '&7will increase your island''s'
+          - '&7max hoppers limit.'
+          - '&7'
+          - '&dAmount: &f16x Hoppers'
+          - '&dPrice: &f$1,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '2':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: HOPPER
+        name: '&d&lHopper Increase &a(Available)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e3'
+          - '&7'
+          - '&7Purchasing the hopper upgrade'
+          - '&7will increase your island''s'
+          - '&7max hoppers limit.'
+          - '&7'
+          - '&dAmount: &f32x Hoppers'
+          - '&dPrice: &f$3,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: HOPPER
+        name: '&d&lHopper Increase &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e3'
+          - '&7'
+          - '&7Purchasing the hopper upgrade'
+          - '&7will increase your island''s'
+          - '&7max hoppers limit.'
+          - '&7'
+          - '&dAmount: &f32x Hoppers'
+          - '&dPrice: &f$3,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '3':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: HOPPER
+        name: '&d&lHopper Increase &a(Available)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e4'
+          - '&7'
+          - '&7Purchasing the hopper upgrade'
+          - '&7will increase your island''s'
+          - '&7max hoppers limit.'
+          - '&7'
+          - '&dAmount: &f64x Hoppers'
+          - '&dPrice: &f$9,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: HOPPER
+        name: '&d&lHopper Increase &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e2'
+          - '&7'
+          - '&7Purchasing the hopper upgrade'
+          - '&7will increase your island''s'
+          - '&7max hoppers limit.'
+          - '&7'
+          - '&dAmount: &f64x Hoppers'
+          - '&dPrice: &f$9,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '4':
+      has-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: HOPPER
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the hoppers limit!'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: HOPPER
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the hoppers limit!'
+  crop-growth:
+    item: '#'
+    '1':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: DIAMOND_HOE
+        name: '&e&lCrop Growth &a(Available)'
+        lore:
+          - '&7'
+          - '&eNext Level: 2'
+          - '&7'
+          - '&7Purchasing the growth upgrade'
+          - '&7gives all crops within your island'
+          - '&7increased growth speed.'
+          - '&7'
+          - '&eGrowth: &fx2 Speed'
+          - '&ePrice: &f$100,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: DIAMOND_HOE
+        name: '&e&lCrop Growth &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&eNext Level: 2'
+          - '&7'
+          - '&7Purchasing the growth upgrade'
+          - '&7gives all crops within your island'
+          - '&7increased growth speed.'
+          - '&7'
+          - '&eGrowth: &fx2 Speed'
+          - '&ePrice: &f$100,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '2':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: DIAMOND_HOE
+        name: '&e&lCrop Growth &a(Available)'
+        lore:
+          - '&7'
+          - '&eNext Level: 3'
+          - '&7'
+          - '&7Purchasing the growth upgrade'
+          - '&7gives all crops within your island'
+          - '&7increased growth speed.'
+          - '&7'
+          - '&eGrowth: &fx3 Speed'
+          - '&ePrice: &f$500,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: DIAMOND_HOE
+        name: '&e&lCrop Growth &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&eNext Level: 3'
+          - '&7'
+          - '&7Purchasing the growth upgrade'
+          - '&7gives all crops within your island'
+          - '&7increased growth speed.'
+          - '&7'
+          - '&eGrowth: &fx3 Speed'
+          - '&ePrice: &f$500,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '3':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: DIAMOND_HOE
+        name: '&e&lCrop Growth &a(Available)'
+        lore:
+          - '&7'
+          - '&eNext Level: 4'
+          - '&7'
+          - '&7Purchasing the growth upgrade'
+          - '&7gives all crops within your island'
+          - '&7increased growth speed.'
+          - '&7'
+          - '&eGrowth: &fx4 Speed'
+          - '&ePrice: &f$1,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: DIAMOND_HOE
+        name: '&e&lCrop Growth &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&eNext Level: 4'
+          - '&7'
+          - '&7Purchasing the growth upgrade'
+          - '&7gives all crops within your island'
+          - '&7increased growth speed.'
+          - '&7'
+          - '&eGrowth: &fx4 Speed'
+          - '&ePrice: &f$1,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '4':
+      has-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: DIAMOND_HOE
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the crop growth!'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: DIAMOND_HOE
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the crop growth!'
+  spawner-rates:
+    item: '^'
+    '1':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: MOB_SPAWNER
+        name: '&b&lSpawner Boost &a(Available)'
+        lore:
+          - '&7'
+          - '&bNext Level: &e2'
+          - '&7'
+          - '&7Purchasing the spawner upgrade'
+          - '&7gives all spawners within your island'
+          - '&7increased spawn speed.'
+          - '&7'
+          - '&bBoost: &fx2 Speed'
+          - '&bPrice: &f$500,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: MOB_SPAWNER
+        name: '&b&lSpawner Boost &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&bNext Level: &e2'
+          - '&7'
+          - '&7Purchasing the spawner upgrade'
+          - '&7gives all spawners within your island'
+          - '&7increased spawn speed.'
+          - '&7'
+          - '&bBoost: &fx2 Speed'
+          - '&bPrice: &f$500,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '2':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: MOB_SPAWNER
+        name: '&b&lSpawner Boost &a(Available)'
+        lore:
+          - '&7'
+          - '&bNext Level: &e3'
+          - '&7'
+          - '&7Purchasing the spawner upgrade'
+          - '&7gives all spawners within your island'
+          - '&7increased spawn speed.'
+          - '&7'
+          - '&bBoost: &fx3 Speed'
+          - '&bPrice: &f$1,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: MOB_SPAWNER
+        name: '&b&lSpawner Boost &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&bNext Level: &e3'
+          - '&7'
+          - '&7Purchasing the spawner upgrade'
+          - '&7gives all spawners within your island'
+          - '&7increased spawn speed.'
+          - '&7'
+          - '&bBoost: &fx3 Speed'
+          - '&bPrice: &f$1,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '3':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: MOB_SPAWNER
+        name: '&b&lSpawner Boost &a(Available)'
+        lore:
+          - '&7'
+          - '&bNext Level: &e4'
+          - '&7'
+          - '&7Purchasing the spawner upgrade'
+          - '&7gives all spawners within your island'
+          - '&7increased spawn speed.'
+          - '&7'
+          - '&bBoost: &fx4 Speed'
+          - '&bPrice: &f$2,500,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: MOB_SPAWNER
+        name: '&b&lSpawner Boost &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&bNext Level: &e4'
+          - '&7'
+          - '&7Purchasing the spawner upgrade'
+          - '&7gives all spawners within your island'
+          - '&7increased spawn speed.'
+          - '&7'
+          - '&bBoost: &fx4 Speed'
+          - '&bPrice: &f$2,500,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '4':
+      has-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: MOB_SPAWNER
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the spawner rates!'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: MOB_SPAWNER
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the spawner rates!'
+  mob-drops:
+    item: '*'
+    '1':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: ROTTEN_FLESH
+        name: '&4&lPremium Drops &a(Available)'
+        lore:
+          - '&7'
+          - '&4Next Level: &e2'
+          - '&7'
+          - '&7Purchasing the drops upgrade'
+          - '&7gives all mobs within your island'
+          - '&7increased loot drops.'
+          - '&7'
+          - '&4Amount: &fx2 Drops'
+          - '&4Price: &f$1,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: ROTTEN_FLESH
+        name: '&4&lPremium Drops &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&4Next Level: &e2'
+          - '&7'
+          - '&7Purchasing the drops upgrade'
+          - '&7gives all mobs within your island'
+          - '&7increased loot drops.'
+          - '&7'
+          - '&4Amount: &fx2 Drops'
+          - '&4Price: &f$1,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '2':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: ROTTEN_FLESH
+        name: '&4&lPremium Drops &a(Available)'
+        lore:
+          - '&7'
+          - '&4Next Level: &e3'
+          - '&7'
+          - '&7Purchasing the drops upgrade'
+          - '&7gives all mobs within your island'
+          - '&7increased loot drops.'
+          - '&7'
+          - '&4Amount: &fx3 Drops'
+          - '&4Price: &f$2,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: ROTTEN_FLESH
+        name: '&4&lPremium Drops &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&4Next Level: &e3'
+          - '&7'
+          - '&7Purchasing the drops upgrade'
+          - '&7gives all mobs within your island'
+          - '&7increased loot drops.'
+          - '&7'
+          - '&4Amount: &fx3 Drops'
+          - '&4Price: &f$2,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '3':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: ROTTEN_FLESH
+        name: '&4&lPremium Drops &a(Available)'
+        lore:
+          - '&7'
+          - '&4Next Level: &e4'
+          - '&7'
+          - '&7Purchasing the drops upgrade'
+          - '&7gives all mobs within your island'
+          - '&7increased loot drops.'
+          - '&7'
+          - '&4Amount: &fx5 Drops'
+          - '&4Price: &f$5,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: ROTTEN_FLESH
+        name: '&4&lPremium Drops &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&4Next Level: &e4'
+          - '&7'
+          - '&7Purchasing the drops upgrade'
+          - '&7gives all mobs within your island'
+          - '&7increased loot drops.'
+          - '&7'
+          - '&4Amount: &fx5 Drops'
+          - '&4Price: &f$5,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '4':
+      has-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: ROTTEN_FLESH
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the mob drops!'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: ROTTEN_FLESH
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the mob drops!'
+  members-limit:
+    item: '~'
+    '1':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: SKULL_ITEM
+        data: 3
+        name: '&2&lMembers Size &a(Available)'
+        lore:
+          - '&7'
+          - '&2Next Level: &e2'
+          - '&7'
+          - '&7Purchasing the members upgrade'
+          - '&7will increase the maximum allowed'
+          - '&7members in your island.'
+          - '&7'
+          - '&2Amount: &f8 Members'
+          - '&2Price: &f$100,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: SKULL_ITEM
+        data: 3
+        name: '&2&lMembers Size &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&2Next Level: &e2'
+          - '&7'
+          - '&7Purchasing the members upgrade'
+          - '&7will increase the maximum allowed'
+          - '&7members in your island.'
+          - '&7'
+          - '&2Amount: &f8 Members'
+          - '&2Price: &f$100,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '2':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: SKULL_ITEM
+        data: 3
+        name: '&2&lMembers Size &a(Available)'
+        lore:
+          - '&7'
+          - '&2Next Level: &e3'
+          - '&7'
+          - '&7Purchasing the members upgrade'
+          - '&7will increase the maximum allowed'
+          - '&7members in your island.'
+          - '&7'
+          - '&2Amount: &f16 Members'
+          - '&2Price: &f$300,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: SKULL_ITEM
+        data: 3
+        name: '&2&lMembers Size &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&2Next Level: &e3'
+          - '&7'
+          - '&7Purchasing the members upgrade'
+          - '&7will increase the maximum allowed'
+          - '&7members in your island.'
+          - '&7'
+          - '&2Amount: &f16 Members'
+          - '&2Price: &f$300,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '3':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: SKULL_ITEM
+        data: 3
+        name: '&2&lMembers Size &a(Available)'
+        lore:
+          - '&7'
+          - '&2Next Level: &e4'
+          - '&7'
+          - '&7Purchasing the members upgrade'
+          - '&7will increase the maximum allowed'
+          - '&7members in your island.'
+          - '&7'
+          - '&2Amount: &f32 Members'
+          - '&2Price: &f$500,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: SKULL_ITEM
+        data: 3
+        name: '&2&lMembers Size &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&2Next Level: &e4'
+          - '&7'
+          - '&7Purchasing the members upgrade'
+          - '&7will increase the maximum allowed'
+          - '&7members in your island.'
+          - '&7'
+          - '&2Amount: &f32 Members'
+          - '&2Price: &f$500,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '4':
+      has-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: SKULL_ITEM
+        data: 3
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the members limit!'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: SKULL_ITEM
+        data: 3
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the members limit!'
+  border-size:
+    item: '!'
+    '1':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: BARRIER
+        name: '&9&lBorder Size &a(Available)'
+        lore:
+          - '&7'
+          - '&9Next Level: &e2'
+          - '&7'
+          - '&7Purchasing the border upgrade'
+          - '&7will increase the radius'
+          - '&7of your island.'
+          - '&7'
+          - '&9Radius: &f50 Blocks'
+          - '&9Price: &f$30,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: BARRIER
+        name: '&9&lBorder Size &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&9Next Level: &e2'
+          - '&7'
+          - '&7Purchasing the border upgrade'
+          - '&7will increase the radius'
+          - '&7of your island.'
+          - '&7'
+          - '&9Radius: &f50 Blocks'
+          - '&9Price: &f$30,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '2':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: BARRIER
+        name: '&9&lBorder Size &a(Available)'
+        lore:
+          - '&7'
+          - '&9Next Level: &e3'
+          - '&7'
+          - '&7Purchasing the border upgrade'
+          - '&7will increase the radius'
+          - '&7of your island.'
+          - '&7'
+          - '&9Radius: &f75 Blocks'
+          - '&9Price: &f$80,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: BARRIER
+        name: '&9&lBorder Size &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&9Next Level: &e3'
+          - '&7'
+          - '&7Purchasing the border upgrade'
+          - '&7will increase the radius'
+          - '&7of your island.'
+          - '&7'
+          - '&9Radius: &f75 Blocks'
+          - '&9Price: &f$80,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '3':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: BARRIER
+        name: '&9&lBorder Size &a(Available)'
+        lore:
+          - '&7'
+          - '&9Next Level: &e4'
+          - '&7'
+          - '&7Purchasing the border upgrade'
+          - '&7will increase the radius'
+          - '&7of your island.'
+          - '&7'
+          - '&9Radius: &f125 Blocks'
+          - '&9Price: &f$150,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: BARRIER
+        name: '&9&lBorder Size &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&9Next Level: &e4'
+          - '&7'
+          - '&7Purchasing the border upgrade'
+          - '&7will increase the radius'
+          - '&7of your island.'
+          - '&7'
+          - '&9Radius: &f125 Blocks'
+          - '&9Price: &f$150,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '4':
+      has-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: BARRIER
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the border size!'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: BARRIER
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the border size!'
+  generator-rates:
+    item: '+'
+    '1':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: COBBLESTONE
+        name: '&3&lGenerator Boost &a(Available)'
+        lore:
+          - '&7'
+          - '&3Next Level: &e2'
+          - '&7'
+          - '&7Purchasing the generator upgrade'
+          - '&7will increase rates of ores from'
+          - '&7cobblestone generators in your island.'
+          - '&7'
+          - '&3Rates:'
+          - ' &7 - &f92% Stone'
+          - ' &7 - &f5% Coal Ore'
+          - ' &7 - &f3% Redstone Ore'
+          - '&7'
+          - '&3Price: &f$25,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: COBBLESTONE
+        name: '&3&lGenerator Boost &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&3Next Level: &e2'
+          - '&7'
+          - '&7Purchasing the generator upgrade'
+          - '&7will increase rates of ores from'
+          - '&7cobblestone generators in your island.'
+          - '&7'
+          - '&3Rates:'
+          - ' &7 - &f92% Stone'
+          - ' &7 - &f5% Coal Ore'
+          - ' &7 - &f3% Redstone Ore'
+          - '&7'
+          - '&3Price: &f$25,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '2':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: COBBLESTONE
+        name: '&3&lGenerator Boost &a(Available)'
+        lore:
+          - '&7'
+          - '&3Next Level: &e3'
+          - '&7'
+          - '&7Purchasing the generator upgrade'
+          - '&7will increase rates of ores from'
+          - '&7cobblestone generators in your island.'
+          - '&7'
+          - '&3Rates:'
+          - ' &7 - &f80% Stone'
+          - ' &7 - &f8% Coal Ore'
+          - ' &7 - &f6% Redstone Ore'
+          - ' &7 - &f4% Lapis Ore'
+          - ' &7 - &f2% Iron Ore'
+          - '&7'
+          - '&3Price: &f$75,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: COBBLESTONE
+        name: '&3&lGenerator Boost &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&3Next Level: &e3'
+          - '&7'
+          - '&7Purchasing the generator upgrade'
+          - '&7will increase rates of ores from'
+          - '&7cobblestone generators in your island.'
+          - '&7'
+          - '&3Rates:'
+          - ' &7 - &f80% Stone'
+          - ' &7 - &f8% Coal Ore'
+          - ' &7 - &f6% Redstone Ore'
+          - ' &7 - &f4% Lapis Ore'
+          - ' &7 - &f2% Iron Ore'
+          - '&7'
+          - '&3Price: &f$75,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '3':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: COBBLESTONE
+        name: '&3&lGenerator Boost &a(Available)'
+        lore:
+          - '&7'
+          - '&3Next Level: &e4'
+          - '&7'
+          - '&7Purchasing the generator upgrade'
+          - '&7will increase rates of ores from'
+          - '&7cobblestone generators in your island.'
+          - '&7'
+          - '&3Rates:'
+          - ' &7 - &f65% Stone'
+          - ' &7 - &f10% Coal Ore'
+          - ' &7 - &f9% Redstone Ore'
+          - ' &7 - &f6% Lapis Ore'
+          - ' &7 - &f4% Iron Ore'
+          - ' &7 - &f3% Gold Ore'
+          - ' &7 - &f2% Diamond Ore'
+          - ' &7 - &f1% Emerald Ore'
+          - '&7'
+          - '&3Price: &f$150,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: COBBLESTONE
+        name: '&3&lGenerator Boost &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&3Next Level: &e4'
+          - '&7'
+          - '&7Purchasing the generator upgrade'
+          - '&7will increase rates of ores from'
+          - '&7cobblestone generators in your island.'
+          - '&7'
+          - '&3Rates:'
+          - ' &7 - &f65% Stone'
+          - ' &7 - &f10% Coal Ore'
+          - ' &7 - &f9% Redstone Ore'
+          - ' &7 - &f6% Lapis Ore'
+          - ' &7 - &f4% Iron Ore'
+          - ' &7 - &f3% Gold Ore'
+          - ' &7 - &f2% Diamond Ore'
+          - ' &7 - &f1% Emerald Ore'
+          - '&7'
+          - '&3Price: &f$150,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '4':
+      has-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: COBBLESTONE
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the generator rates!'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: COBBLESTONE
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the generator rates!'
+  minecarts-limit:
+    item: '&'
+    '1':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: MINECART
+        name: '&d&lMinecart Increase &a(Available)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e2'
+          - '&7'
+          - '&7Purchasing the minecart upgrade'
+          - '&7will increase your island''s'
+          - '&7max minecarts limit.'
+          - '&7'
+          - '&dAmount: &f8x Minecarts'
+          - '&dPrice: &f$1,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: MINECART
+        name: '&d&lHopper Increase &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e2'
+          - '&7'
+          - '&7Purchasing the minecart upgrade'
+          - '&7will increase your island''s'
+          - '&7max minecarts limit.'
+          - '&7'
+          - '&dAmount: &f8x Minecarts'
+          - '&dPrice: &f$1,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '2':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: MINECART
+        name: '&d&lHopper Increase &a(Available)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e3'
+          - '&7'
+          - '&7Purchasing the minecart upgrade'
+          - '&7will increase your island''s'
+          - '&7max minecarts limit.'
+          - '&7'
+          - '&dAmount: &f16x Minecarts'
+          - '&dPrice: &f$3,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: MINECART
+        name: '&d&lHopper Increase &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e3'
+          - '&7'
+          - '&7Purchasing the minecart upgrade'
+          - '&7will increase your island''s'
+          - '&7max minecarts limit.'
+          - '&7'
+          - '&dAmount: &f16x Minecarts'
+          - '&dPrice: &f$3,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '3':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: MINECART
+        name: '&d&lHopper Increase &a(Available)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e4'
+          - '&7'
+          - '&7Purchasing the minecart upgrade'
+          - '&7will increase your island''s'
+          - '&7max minecarts limit.'
+          - '&7'
+          - '&dAmount: &f32x Minecarts'
+          - '&dPrice: &f$9,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: MINECART
+        name: '&d&lHopper Increase &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e4'
+          - '&7'
+          - '&7Purchasing the minecart upgrade'
+          - '&7will increase your island''s'
+          - '&7max minecarts limit.'
+          - '&7'
+          - '&dAmount: &f32x Minecarts'
+          - '&dPrice: &f$9,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '4':
+      has-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: MINECART
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the minecarts limit!'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: MINECART
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the minecarts limit!'

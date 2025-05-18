@@ -1,0 +1,72 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&8&l{}'
+previous-menu: true
+
+pattern:
+  - '$ $ $ $ $ $ $ $ $'
+  - '$ # # # # # # # $'
+  - '$ @ # % # & # * $'
+  - '$ # # # # # # # $'
+  - '$ $ $ $ $ $ $ $ $'
+
+items:
+  '$':
+    type: STAINED_GLASS_PANE
+    data: 15
+    name: '&f'
+  '@':
+    role: Member
+    type: LEATHER_CHESTPLATE
+    name: '&eMember'
+    lore:
+      - '&7Click to set player''s role to member.'
+    flags:
+      - HIDE_ATTRIBUTES
+  '%':
+    role: Moderator
+    type: GOLD_CHESTPLATE
+    name: '&eModerator'
+    lore:
+      - '&7Click to set player''s role to moderator.'
+    flags:
+      - HIDE_ATTRIBUTES
+  '&':
+    role: Admin
+    type: IRON_CHESTPLATE
+    name: '&eAdmin'
+    lore:
+      - '&7Click to set player''s role to admin.'
+    flags:
+      - HIDE_ATTRIBUTES
+  '*':
+    role: Leader
+    type: DIAMOND_CHESTPLATE
+    name: '&eLeader'
+    lore:
+      - '&7Click to transfer leadership to player.'
+    flags:
+      - HIDE_ATTRIBUTES
+
+sounds:
+  '@':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '%':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '&':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '*':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2

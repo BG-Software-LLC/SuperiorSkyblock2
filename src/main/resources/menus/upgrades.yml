@@ -27,7 +27,7 @@ items:
 
 sounds:
   '@':
-    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    type: ORB_PICKUP
     volume: 0.2
     pitch: 0.2
 
@@ -37,7 +37,7 @@ upgrades:
     '1':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: HOPPER
@@ -56,7 +56,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: HOPPER
@@ -76,7 +76,7 @@ upgrades:
     '2':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: HOPPER
@@ -95,7 +95,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: HOPPER
@@ -115,7 +115,7 @@ upgrades:
     '3':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: HOPPER
@@ -134,7 +134,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: HOPPER
@@ -154,7 +154,7 @@ upgrades:
     '4':
       has-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: HOPPER
@@ -164,7 +164,7 @@ upgrades:
           - '&7level of the hoppers limit!'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: HOPPER
@@ -177,7 +177,7 @@ upgrades:
     '1':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: DIAMOND_HOE
@@ -196,7 +196,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: DIAMOND_HOE
@@ -216,7 +216,7 @@ upgrades:
     '2':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: DIAMOND_HOE
@@ -235,7 +235,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: DIAMOND_HOE
@@ -255,7 +255,7 @@ upgrades:
     '3':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: DIAMOND_HOE
@@ -274,7 +274,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: DIAMOND_HOE
@@ -294,7 +294,7 @@ upgrades:
     '4':
       has-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: DIAMOND_HOE
@@ -304,7 +304,7 @@ upgrades:
           - '&7level of the crop growth!'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: DIAMOND_HOE
@@ -317,7 +317,7 @@ upgrades:
     '1':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: MOB_SPAWNER
@@ -336,7 +336,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: MOB_SPAWNER
@@ -356,7 +356,7 @@ upgrades:
     '2':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: MOB_SPAWNER
@@ -375,7 +375,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: MOB_SPAWNER
@@ -395,7 +395,7 @@ upgrades:
     '3':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: MOB_SPAWNER
@@ -414,7 +414,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: MOB_SPAWNER
@@ -434,7 +434,7 @@ upgrades:
     '4':
       has-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: MOB_SPAWNER
@@ -444,7 +444,7 @@ upgrades:
           - '&7level of the spawner rates!'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: MOB_SPAWNER
@@ -457,7 +457,7 @@ upgrades:
     '1':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: ROTTEN_FLESH
@@ -476,7 +476,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: ROTTEN_FLESH
@@ -496,7 +496,7 @@ upgrades:
     '2':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: ROTTEN_FLESH
@@ -515,7 +515,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: ROTTEN_FLESH
@@ -535,7 +535,7 @@ upgrades:
     '3':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: ROTTEN_FLESH
@@ -554,7 +554,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: ROTTEN_FLESH
@@ -574,7 +574,7 @@ upgrades:
     '4':
       has-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: ROTTEN_FLESH
@@ -584,7 +584,7 @@ upgrades:
           - '&7level of the mob drops!'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: ROTTEN_FLESH
@@ -597,7 +597,7 @@ upgrades:
     '1':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: SKULL_ITEM
@@ -617,7 +617,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: SKULL_ITEM
@@ -638,7 +638,7 @@ upgrades:
     '2':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: SKULL_ITEM
@@ -658,7 +658,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: SKULL_ITEM
@@ -679,7 +679,7 @@ upgrades:
     '3':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: SKULL_ITEM
@@ -699,7 +699,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: SKULL_ITEM
@@ -720,7 +720,7 @@ upgrades:
     '4':
       has-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: SKULL_ITEM
@@ -731,7 +731,7 @@ upgrades:
           - '&7level of the members limit!'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: SKULL_ITEM
@@ -745,7 +745,7 @@ upgrades:
     '1':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: BARRIER
@@ -764,7 +764,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: BARRIER
@@ -784,7 +784,7 @@ upgrades:
     '2':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: BARRIER
@@ -803,7 +803,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: BARRIER
@@ -823,7 +823,7 @@ upgrades:
     '3':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: BARRIER
@@ -842,7 +842,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: BARRIER
@@ -862,7 +862,7 @@ upgrades:
     '4':
       has-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: BARRIER
@@ -872,7 +872,7 @@ upgrades:
           - '&7level of the border size!'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: BARRIER
@@ -885,7 +885,7 @@ upgrades:
     '1':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: COBBLESTONE
@@ -908,7 +908,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: COBBLESTONE
@@ -932,7 +932,7 @@ upgrades:
     '2':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: COBBLESTONE
@@ -957,7 +957,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: COBBLESTONE
@@ -983,7 +983,7 @@ upgrades:
     '3':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: COBBLESTONE
@@ -1011,7 +1011,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: COBBLESTONE
@@ -1040,7 +1040,7 @@ upgrades:
     '4':
       has-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: COBBLESTONE
@@ -1050,7 +1050,7 @@ upgrades:
           - '&7level of the generator rates!'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: COBBLESTONE
@@ -1063,7 +1063,7 @@ upgrades:
     '1':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: MINECART
@@ -1082,7 +1082,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: MINECART
@@ -1102,7 +1102,7 @@ upgrades:
     '2':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: MINECART
@@ -1121,7 +1121,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: MINECART
@@ -1141,7 +1141,7 @@ upgrades:
     '3':
       has-next-level:
         sound:
-          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          type: ORB_PICKUP
           volume: 0.2
           pitch: 0.2
         type: MINECART
@@ -1160,7 +1160,7 @@ upgrades:
           - '&aLeft-click to purchase upgrade.'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: MINECART
@@ -1180,7 +1180,7 @@ upgrades:
     '4':
       has-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: MINECART
@@ -1190,7 +1190,7 @@ upgrades:
           - '&7level of the minecarts limit!'
       no-next-level:
         sound:
-          type: BLOCK_ANVIL_PLACE
+          type: ANVIL_LAND
           volume: 0.2
           pitch: 0.2
         type: MINECART

@@ -1,0 +1,50 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lCategory: {0}'
+previous-menu: true
+
+pattern:
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ ! @ @ ~ @ @ $ @'
+  - '@ @ @ @ @ @ @ @ @'
+
+success-update-sound:
+  type: ENTITY_EXPERIENCE_ORB_PICKUP
+  volume: 0.2
+  pitch: 0.2
+
+category-rename: '!'
+category-icon: '~'
+category-warps: '$'
+
+items:
+  '!':
+    type: BOOK
+    name: '&6Rename Category'
+    lore:
+      - '&f '
+      - '&f '
+      - '&7&o(( &f&oClick &7&oto rename the category. ))'
+  '~':
+    type: STONE
+    lore:
+      - '&f '
+      - '&f '
+      - '&7&oYou can use the following placeholders:'
+      - '&7&o{0} is used for the warp''s name.'
+      - '&7&o{1} is used for the warp''s location.'
+      - '&7&o{2} is used for the warp''s public status.'
+      - '&7&o(( &f&oRight-Click &7&oto edit the icon. ))'
+      - '&7&o(( &f&oLeft-Click &7&oto edit the category''s slot. ))'
+  '$':
+    type: ENDER_PEARL
+    name: '&6Island Warps'
+    lore:
+      - '&f '
+      - '&f '
+      - '&7&o(( &f&oClick &7&oto edit the category warps. ))'

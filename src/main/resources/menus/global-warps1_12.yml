@@ -1,0 +1,56 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lIsland Warps'
+previous-menu: true
+
+pattern:
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ @ @ @ @'
+  - '$ $ $ $ $ $ $ $ $'
+  - '# # % # * # ^ # #'
+
+warps: '@'
+previous-page: '%'
+current-page: '*'
+next-page: '^'
+
+# When enabled, instead of showing warps, the visitor warp locations will be shown.
+# To show the description, use the {1} placeholder.
+visitor-warps: false
+
+items:
+  '@':
+    type: SKULL_ITEM
+    data: 3
+    name: '&e{0}''s Island'
+    lore:
+      - '&7Click to see all warps of this island.'
+      - '&8>> &7This island has {2} warps.'
+  '%':
+    type: PAPER
+    name: '{0}Previous Page'
+  '*':
+    type: DOUBLE_PLANT
+    name: '&aCurrent Page'
+    lore:
+      - '&7Page {0}'
+  '^':
+    type: PAPER
+    name: '{0}Next Page'
+  '$':
+    type: STAINED_GLASS_PANE
+    data: 15
+    name: '&f'
+
+sounds:
+  '@':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2

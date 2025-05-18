@@ -1,0 +1,47 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&l{0} Missions'
+previous-menu: true
+
+pattern:
+  - '# # # # # # # # #'
+  - '# # @ @ @ @ @ # #'
+  - '# # # # # # # # #'
+
+slots: '@'
+previous-page: '*'
+current-page: '*'
+next-page: '*'
+
+# Should missions be sorted by their completion status?
+# Not completed -> Can complete -> Completed
+sort-by-completion: false
+
+# Should completed missions not be displayed in the menu?
+remove-completed: false
+
+items:
+  '#':
+    type: STAINED_GLASS_PANE
+    data: 15
+    name: '&f'
+
+sounds:
+  '@':
+    completed:
+      type: BLOCK_ANVIL_PLACE
+      volume: 0.2
+      pitch: 0.2
+    not-completed:
+      type: BLOCK_ANVIL_PLACE
+      volume: 0.2
+      pitch: 0.2
+    can-complete:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2

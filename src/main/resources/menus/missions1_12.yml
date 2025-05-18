@@ -1,0 +1,71 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lMissions'
+previous-menu: true
+
+pattern:
+  - '$ $ $ $ $ $ $ $ $'
+  - '$ * * * * * * * $'
+  - '$ * # @ % ^ & * $'
+  - '$ * * * * * * * $'
+  - '$ $ $ $ $ $ $ $ $'
+
+items:
+  '$':
+    type: STAINED_GLASS_PANE
+    data: 15
+  '#':
+    type: DIAMOND_PICKAXE
+    name: '&eMiner Missions'
+    lore:
+      - '&7Click to start your adventure as a Miner.'
+    flags:
+      - HIDE_ATTRIBUTES
+  '@':
+    type: SKULL_ITEM
+    data: 2
+    name: '&eSlayer Missions'
+    lore:
+      - '&7Click to start your adventure as a Slayer.'
+  '%':
+    type: WHEAT
+    name: '&eFarmer Missions'
+    lore:
+      - '&7Click to start your adventure as a Farmer.'
+  '^':
+    type: FISHING_ROD
+    name: '&eFisherman Missions'
+    lore:
+      - '&7Click to start your adventure as a Fisherman.'
+  '&':
+    type: MAP
+    name: '&eExplorer Missions'
+    lore:
+      - '&7Click to start your adventure as an Explorer.'
+
+sounds:
+  '#':
+    type: BLOCK_CHEST_OPEN
+    volume: 0.8
+    pitch: 1
+  '@':
+    type: BLOCK_CHEST_OPEN
+    volume: 0.8
+    pitch: 1
+  '%':
+    type: BLOCK_CHEST_OPEN
+    volume: 0.8
+    pitch: 1
+  '^':
+    type: BLOCK_CHEST_OPEN
+    volume: 0.8
+    pitch: 1
+  '&':
+    type: BLOCK_CHEST_OPEN
+    volume: 0.8
+    pitch: 1

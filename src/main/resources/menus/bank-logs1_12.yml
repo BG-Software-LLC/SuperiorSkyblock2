@@ -1,0 +1,64 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lTransaction Logs &r{0}'
+previous-menu: true
+
+pattern:
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ @ @ @ @'
+  - '$ $ $ ! $ - $ $ $'
+  - '# # % # * # ^ # #'
+
+slots: '@'
+previous-page: '%'
+current-page: '*'
+next-page: '^'
+
+time-sort: '!'
+money-sort: '-'
+
+items:
+  '@':
+    type: PAPER
+    name: '&e#{0}'
+    lore:
+      - '&7Player: {1}'
+      - '&7Status: {2}'
+      - '&7Time: {3}'
+      - '&7Amount: {4}'
+      - '&7 '
+      - '&7&o(( &f&oRight-Click &7&oto filter transactions by this player. ))'
+  '%':
+    type: PAPER
+    name: '{0}Previous Page'
+  '*':
+    type: DOUBLE_PLANT
+    name: '&aCurrent Page'
+    lore:
+      - '&7Page {0}'
+  '^':
+    type: PAPER
+    name: '{0}Next Page'
+  '$':
+    type: STAINED_GLASS_PANE
+    data: 15
+    name: '&f'
+  '!':
+    type: WATCH
+    name: '&6Sort by creation time'
+  '-':
+    type: EMERALD
+    name: '&6Sort by money'
+
+sounds:
+  '@':
+    type: BLOCK_CHEST_OPEN
+    volume: 0.8
+    pitch: 1
