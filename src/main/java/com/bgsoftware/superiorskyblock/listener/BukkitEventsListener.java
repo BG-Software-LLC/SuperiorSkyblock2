@@ -734,9 +734,10 @@ public class BukkitEventsListener implements Listener {
     private GameEvent<GameEventArgs.EntityPortalEvent> createGameEvent(GameEventType<GameEventArgs.EntityPortalEvent> eventType, GameEventPriority priority, PlayerPortalEvent e) {
         GameEventArgs.EntityPortalEvent entityPortalEvent = new GameEventArgs.EntityPortalEvent();
         entityPortalEvent.entity = e.getPlayer();
-        entityPortalEvent.cause = e.getTo().getWorld().getEnvironment() == World.Environment.THE_END ||
-                e.getFrom().getWorld().getEnvironment() == World.Environment.THE_END ?
-                PlayerTeleportEvent.TeleportCause.END_PORTAL : PlayerTeleportEvent.TeleportCause.NETHER_PORTAL;
+        entityPortalEvent.cause = e.getTo() == null ? e.getCause() :
+                e.getTo().getWorld().getEnvironment() == World.Environment.THE_END ||
+                        e.getFrom().getWorld().getEnvironment() == World.Environment.THE_END ?
+                        PlayerTeleportEvent.TeleportCause.END_PORTAL : PlayerTeleportEvent.TeleportCause.NETHER_PORTAL;
         entityPortalEvent.from = e.getFrom();
         entityPortalEvent.to = e.getTo();
         return eventType.createEvent(entityPortalEvent);
