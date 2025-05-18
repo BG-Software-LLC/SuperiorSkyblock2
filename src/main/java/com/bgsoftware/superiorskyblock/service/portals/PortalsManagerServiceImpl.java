@@ -135,6 +135,10 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                     superiorPlayer.getUserLocale(), Formatters.CAPITALIZED_FORMATTER.format(originalDestination.getName())));
         }
 
+        if (portalResult == EntityPortalResult.DESTINATION_WORLD_DISABLED && !Message.WORLD_NOT_ENABLED.isEmpty(superiorPlayer.getUserLocale())) {
+            Message.SCHEMATICS.send(superiorPlayer, Message.WORLD_NOT_ENABLED.getMessage(superiorPlayer.getUserLocale()));
+        }
+
         return portalResult;
     }
 
