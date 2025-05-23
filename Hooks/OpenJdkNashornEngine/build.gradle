@@ -1,4 +1,4 @@
-group 'Hooks:OpenJdkNashornEngine'
+ group 'Hooks:OpenJdkNashornEngine'
 
 java {
     toolchain {

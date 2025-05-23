@@ -1,5 +1,5 @@
 plugins {
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.11"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.17"
 }
 
 java {
@@ -34,5 +34,5 @@ tasks {
 }
 
 if (project.hasProperty('nms.compile_v1_18') && !Boolean.valueOf(project.findProperty("nms.compile_v1_18").toString())) {
-    project.tasks.all { task -> task.enabled = false }
+    project.tasks.configureEach { task -> task.enabled = false }
 }
