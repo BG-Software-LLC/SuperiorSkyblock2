@@ -15,5 +15,5 @@ dependencies {
 
 if (project.hasProperty('hook.compile_slimeworldmanager') &&
         !Boolean.valueOf(project.findProperty("hook.compile_slimeworldmanager").toString())) {
-    project.tasks.all { task -> task.enabled = false }
+    project.tasks.configureEach { task -> task.enabled = false }
 }

@@ -9,5 +9,5 @@ dependencies {
 
 if (project.hasProperty('hook.compile_placeholderapi') &&
         !Boolean.valueOf(project.findProperty("hook.compile_placeholderapi").toString())) {
-    project.tasks.all { task -> task.enabled = false }
+    project.tasks.configureEach { task -> task.enabled = false }
 }

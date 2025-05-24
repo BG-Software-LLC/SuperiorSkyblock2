@@ -9,5 +9,5 @@ dependencies {
 
 if (project.hasProperty('hook.compile_protocollib') &&
         !Boolean.valueOf(project.findProperty("hook.compile_protocollib").toString())) {
-    project.tasks.all { task -> task.enabled = false }
+    project.tasks.configureEach { task -> task.enabled = false }
 }

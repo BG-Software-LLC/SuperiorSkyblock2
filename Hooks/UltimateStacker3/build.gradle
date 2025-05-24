@@ -9,5 +9,5 @@ dependencies {
 
 if (project.hasProperty('hook.compile_ultimatestacker') &&
         !Boolean.valueOf(project.findProperty("hook.compile_ultimatestacker").toString())) {
-    project.tasks.all { task -> task.enabled = false }
+    project.tasks.configureEach { task -> task.enabled = false }
 }

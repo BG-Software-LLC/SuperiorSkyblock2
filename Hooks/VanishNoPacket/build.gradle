@@ -9,5 +9,5 @@ dependencies {
 
 if (project.hasProperty('hook.compile_vanishnopacket') &&
         !Boolean.valueOf(project.findProperty("hook.compile_vanishnopacket").toString())) {
-    project.tasks.all { task -> task.enabled = false }
+    project.tasks.configureEach { task -> task.enabled = false }
 }

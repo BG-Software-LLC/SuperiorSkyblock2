@@ -8,5 +8,5 @@ dependencies {
 }
 
 if (project.hasProperty('hook.compile_cmi') && !Boolean.valueOf(project.findProperty("hook.compile_cmi").toString())) {
-    project.tasks.all { task -> task.enabled = false }
+    project.tasks.configureEach { task -> task.enabled = false }
 }

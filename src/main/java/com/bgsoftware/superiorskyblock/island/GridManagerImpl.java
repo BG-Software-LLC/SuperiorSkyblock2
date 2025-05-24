@@ -320,7 +320,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         boolean teleportPlayer = islandCreationResult.shouldTeleportPlayer();
 
         List<ChunkPosition> affectedChunks = schematic instanceof BaseSchematic ?
-                ((BaseSchematic) schematic).getAffectedChunks() : null;
+                ((BaseSchematic) schematic).getAffectedChunks() : Collections.emptyList();
         Runnable onTeleportCallback = schematic instanceof BaseSchematic ?
                 ((BaseSchematic) schematic).onTeleportCallback() : null;
 
@@ -372,7 +372,7 @@ public class GridManagerImpl extends Manager implements GridManager {
                             islandLocation), System.currentTimeMillis() - startTime);
 
                     if (result) {
-                        if (affectedChunks != null) {
+                        if (!affectedChunks.isEmpty()) {
                             BukkitExecutor.sync(() -> {
                                 IslandUtils.resetChunksExcludedFromList(island, affectedChunks);
                                 island.setBiome(biome, true);
