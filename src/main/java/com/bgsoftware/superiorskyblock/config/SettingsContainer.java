@@ -152,6 +152,7 @@ public class SettingsContainer {
     public final boolean teleportOnKick;
     public final boolean clearOnJoin;
     public final boolean rateOwnIsland;
+    public final boolean changeIslandRating;
     public final List<String> defaultSettings;
     public final boolean disableRedstoneOffline;
     public final boolean disableRedstoneAFK;
@@ -390,6 +391,7 @@ public class SettingsContainer {
         teleportOnKick = config.getBoolean("teleport-on-kick", false);
         clearOnJoin = config.getBoolean("clear-on-join", false);
         rateOwnIsland = config.getBoolean("rate-own-island", false);
+        changeIslandRating = config.getBoolean("change-island-rating",true);
         defaultSettings = Collections.unmodifiableList(config.getStringList("default-settings")
                 .stream().map(str -> str.toUpperCase(Locale.ENGLISH)).collect(Collectors.toList()));
         defaultGenerator = new EnumerateMap<>(Dimension.values());

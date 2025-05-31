@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
@@ -72,6 +73,11 @@ public class CmdRate implements ISuperiorCommand {
 
         if (!plugin.getSettings().isRateOwnIsland() && island.equals(superiorPlayer.getIsland())) {
             Message.RATE_OWN_ISLAND.send(superiorPlayer);
+            return;
+        }
+
+        if (!plugin.getSettings().isChangeIslandRating() && island.getRating(superiorPlayer) != Rating.UNKNOWN) {
+            Message.RATE_ALREADY_GIVEN.send(superiorPlayer);
             return;
         }
 

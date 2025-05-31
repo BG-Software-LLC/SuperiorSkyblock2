@@ -819,6 +819,7 @@ RANKUP_SUCCESS_ALL: '&e&lInsel | &7Das Upgrade-Level {0} für alle Inseln erfolg
   aktualisiert.'
 RANKUP_SUCCESS_NAME: '&e&lInsel | &7Die Aktualisierungsstufe {0} für {1} wurde erfolgreich
   aktualisiert.'
+RATE_ALREADY_GIVEN: '&c&lError | &7You already rated this island.'
 RATE_ANNOUNCEMENT: '&e&lInsel | &7{0} hat deine Insel mit {1} von 5 Punkten bewertet!.'
 RATE_CHANGE_OTHER: '&e&lInsel | &7Du hast die Bewertung von {0} in {1} geändert.'
 RATE_OWN_ISLAND: '&c&lError | &7Du kannst deine eigene Insel nicht bewerten.'

@@ -645,6 +645,7 @@ PURGED_ISLANDS: |-
 RANKUP_SUCCESS: '&e&lIle | &7Niveau de l''amélioration {0} mis à jour pour l''île de {1}.'
 RANKUP_SUCCESS_ALL: '&e&lIle | &7Niveau de l''amélioration {0} mis à jour pour toutes les îles.'
 RANKUP_SUCCESS_NAME: '&e&lIle | &7Niveau de l''amélioration {0} mis à jour pour l''île {1}.'
+RATE_ALREADY_GIVEN: '&c&lError | &7You already rated this island.'
 RATE_ANNOUNCEMENT: '&e&lIle | &7{0} a noté votre île {1} / 5 !.'
 RATE_CHANGE_OTHER: '&e&lIle | &7Vous avez modifié la note de {0} sur {1}.'
 RATE_OWN_ISLAND: '&c&lErreur | &7Vous ne pouvez pas noter votre île.'

@@ -645,6 +645,7 @@ PURGED_ISLANDS: |-
 RANKUP_SUCCESS: '&e&lWyspa | &7Pomyslnie zaktualizowano poziom uaktualnienia {0} dla wyspy {1}.'
 RANKUP_SUCCESS_ALL: '&e&lWyspa | &7Pomyslnie zaktualizowano poziom aktualizacji {0} dla wszystkich wysp.'
 RANKUP_SUCCESS_NAME: '&e&lWyspa | &7Pomyslnie zaktualizowano poziom uaktualnienia {0} dla {1}.'
+RATE_ALREADY_GIVEN: '&c&lBlad | &7Oceniles juz te wyspe.'
 RATE_ANNOUNCEMENT: '&e&lWyspa | &7{0} ocenilo Twoja wyspe {1} na 5!.'
 RATE_CHANGE_OTHER: '&e&lWyspa | &7Zmieniles ocene z {0} na {1}.'
 RATE_OWN_ISLAND: '&c&lBlad | &7Nie mozesz ocenic wlasnej wyspy.'
