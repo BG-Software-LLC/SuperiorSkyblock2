@@ -69,8 +69,7 @@ import java.util.function.IntFunction;
 
 public class NMSWorldImpl implements NMSWorld {
 
-    private static final ReflectField<List<TickingBlockEntity>> LEVEL_BLOCK_ENTITY_TICKERS_PROTECTED = new ReflectField<>(
-            Level.class, List.class, Modifier.PROTECTED | Modifier.FINAL, 1);
+    private static final ReflectField<List<TickingBlockEntity>> LEVEL_BLOCK_ENTITY_TICKERS = initializeLevelBlockEntityTickersField();
     private static final ReflectField<VibrationSystem.User> SCULK_SENSOR_BLOCK_ENTITY_VIBRATION_USER = new ReflectField<VibrationSystem.User>(
             SculkSensorBlockEntity.class, VibrationSystem.User.class, Modifier.PRIVATE | Modifier.FINAL, 1).removeFinal();
 
@@ -101,13 +100,8 @@ public class NMSWorldImpl implements NMSWorld {
 
         ServerLevel serverLevel = (ServerLevel) spawnerBlockEntity.getLevel();
 
-        List<TickingBlockEntity> blockEntityTickers;
-
-        if (LEVEL_BLOCK_ENTITY_TICKERS_PROTECTED.isValid()) {
-            blockEntityTickers = LEVEL_BLOCK_ENTITY_TICKERS_PROTECTED.get(serverLevel);
-        } else {
-            blockEntityTickers = serverLevel.blockEntityTickers;
-        }
+        List<TickingBlockEntity> blockEntityTickers = LEVEL_BLOCK_ENTITY_TICKERS.isValid() ?
+                LEVEL_BLOCK_ENTITY_TICKERS.get(serverLevel) : serverLevel.blockEntityTickers;
 
         Iterator<TickingBlockEntity> blockEntityTickersIterator = blockEntityTickers.iterator();
         List<TickingBlockEntity> tickersToAdd = new LinkedList<>();
@@ -358,6 +352,16 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public ChunkReader createChunkReader(Chunk chunk) {
         return new ChunkReaderImpl(chunk);
+    }
+
+    private static ReflectField<List<TickingBlockEntity>> initializeLevelBlockEntityTickersField() {
+        ReflectField<List<TickingBlockEntity>> field = new ReflectField<>(
+                Level.class, List.class, Modifier.PROTECTED | Modifier.FINAL, 1);
+
+        if (!field.isValid())
+            field = new ReflectField<>(Level.class, List.class, Modifier.PUBLIC | Modifier.FINAL, 1);
+
+        return field;
     }
 
 }
