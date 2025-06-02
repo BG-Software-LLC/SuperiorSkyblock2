@@ -684,6 +684,7 @@ crops-to-grow:
   - 'CAVE_VINES'
   - 'SWEET_BERRY_BUSH'
   - 'NETHER_WART'
+  - 'NETHER_WARTS'
   - 'KELP'
   - 'CARROT'
   - 'CARROTS'
