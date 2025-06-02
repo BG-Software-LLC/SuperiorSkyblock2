@@ -71,7 +71,7 @@ public class NMSUtils {
 
         try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
             BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
-            blockPosition.setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            blockPosition.c(location.getBlockX(), location.getBlockY(), location.getBlockZ());
             TileEntity tileEntity = worldServer.getTileEntity(blockPosition);
             return !type.isInstance(tileEntity) ? null : type.cast(tileEntity);
         }

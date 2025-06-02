@@ -131,7 +131,7 @@ public class IslandEnderDragonBattle extends EnderDragonBattle {
 
         try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
             BlockPosition.MutableBlockPosition currentPosition = wrapper.getHandle();
-            currentPosition.setValues(this.islandBlockPosition.getX(), 0, this.islandBlockPosition.getZ());
+            currentPosition.d(this.islandBlockPosition.getX(), 0, this.islandBlockPosition.getZ());
             for (int y = highestBlock; y >= 0; --y) {
                 currentPosition.setY(y);
 

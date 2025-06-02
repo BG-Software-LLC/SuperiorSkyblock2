@@ -163,7 +163,7 @@ public class NMSWorldImpl implements NMSWorld {
 
         try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
             BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
-            blockPosition.setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            blockPosition.c(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 
             NMSUtils.setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, combinedId, null);
             NMSUtils.sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
@@ -283,7 +283,7 @@ public class NMSWorldImpl implements NMSWorld {
         WorldServer worldServer = ((CraftWorld) block.getWorld()).getHandle();
         try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
             BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
-            blockPosition.setValues(block.getX(), block.getY(), block.getZ());
+            blockPosition.c(block.getX(), block.getY(), block.getZ());
             worldServer.a(null, 2001, blockPosition, Block.getCombinedId(worldServer.getType(blockPosition)));
         }
     }
@@ -294,7 +294,7 @@ public class NMSWorldImpl implements NMSWorld {
 
         try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
             BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
-            blockPosition.setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            blockPosition.c(location.getBlockX(), location.getBlockY(), location.getBlockZ());
             SoundEffectType soundEffectType = worldServer.getType(blockPosition).getBlock().getStepSound();
 
             worldServer.a(null, blockPosition, soundEffectType.e(), SoundCategory.BLOCKS,
