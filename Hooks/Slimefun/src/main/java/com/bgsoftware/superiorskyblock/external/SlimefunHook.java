@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.external.slimefun.ProtectionModule_Dev999;
 import com.bgsoftware.superiorskyblock.external.slimefun.ProtectionModule_RC13;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
@@ -149,7 +150,11 @@ public class SlimefunHook {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onChunkWipe(IslandChunkResetEvent e) {
-            BLOCK_STORAGE_CLEAR_ALL_BLOCK_INFO_AT_CHUNK_METHOD.invoke(null, e.getWorld(), e.getChunkX(), e.getChunkZ(), true);
+            BukkitExecutor.async(() -> {
+                // Might be unsafe to call async. Should fix:
+                // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/2474
+                BLOCK_STORAGE_CLEAR_ALL_BLOCK_INFO_AT_CHUNK_METHOD.invoke(null, e.getWorld(), e.getChunkX(), e.getChunkZ(), true);
+            });
         }
 
     }
