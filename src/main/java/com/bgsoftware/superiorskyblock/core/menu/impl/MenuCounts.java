@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.CountsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.Material;
 
@@ -56,7 +57,7 @@ public class MenuCounts extends AbstractPagedMenu<MenuCounts.View, IslandViewArg
         return menuParseResult == null ? null : new MenuCounts(menuParseResult);
     }
 
-    public static class View extends AbstractPagedMenuView<View, IslandViewArgs, MenuCounts.BlockCount> {
+    public static class View extends AbstractPagedMenuView<View, IslandViewArgs, MenuCounts.BlockCount> implements IIslandMenuView {
 
         private final Island island;
 
@@ -64,6 +65,11 @@ public class MenuCounts extends AbstractPagedMenu<MenuCounts.View, IslandViewArg
              Menu<View, IslandViewArgs> menu, IslandViewArgs args) {
             super(inventoryViewer, previousMenuView, menu);
             this.island = args.getIsland();
+        }
+
+        @Override
+        public Island getIsland() {
+            return this.island;
         }
 
         @Override

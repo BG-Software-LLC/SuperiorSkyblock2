@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.RatingsPagedObjectB
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -53,7 +54,7 @@ public class MenuIslandRatings extends AbstractPagedMenu<MenuIslandRatings.View,
         return menuParseResult == null ? null : new MenuIslandRatings(menuParseResult);
     }
 
-    public static class View extends AbstractPagedMenuView<MenuIslandRatings.View, IslandViewArgs, MenuIslandRatings.RatingInfo> {
+    public static class View extends AbstractPagedMenuView<MenuIslandRatings.View, IslandViewArgs, MenuIslandRatings.RatingInfo> implements IIslandMenuView {
 
         private final Island island;
 
@@ -61,6 +62,11 @@ public class MenuIslandRatings extends AbstractPagedMenu<MenuIslandRatings.View,
              Menu<View, IslandViewArgs> menu, IslandViewArgs args) {
             super(inventoryViewer, previousMenuView, menu);
             this.island = args.getIsland();
+        }
+
+        @Override
+        public Island getIsland() {
+            return this.island;
         }
 
         @Override

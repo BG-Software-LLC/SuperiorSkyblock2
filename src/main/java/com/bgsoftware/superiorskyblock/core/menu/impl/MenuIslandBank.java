@@ -16,7 +16,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankCustomWithdrawB
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankDepositButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankWithdrawButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.OpenBankLogsButton;
-import com.bgsoftware.superiorskyblock.core.menu.view.IslandMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.impl.IslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.configuration.file.YamlConfiguration;
 

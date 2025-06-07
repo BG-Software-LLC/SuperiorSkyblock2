@@ -31,7 +31,7 @@ public class KickButton extends AbstractMenuViewButton<MenuConfirmKick.View> {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
 
         if (getTemplate().kickPlayer)
-            IslandUtils.handleKickPlayer(clickedPlayer, menuView.getIsland(), menuView.getTargetPlayer());
+            IslandUtils.handleKickPlayer(clickedPlayer, menuView.getIsland(), menuView.getSuperiorPlayer());
 
         BukkitExecutor.sync(menuView::closeView, 1L);
     }

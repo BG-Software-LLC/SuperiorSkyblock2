@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersServ
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
-import com.bgsoftware.superiorskyblock.core.menu.view.PlayerMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IPlayerMenuView;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -62,8 +62,8 @@ public class MenuCommandsImpl implements MenuCommands {
             setClickedCloseButton(menuView);
             clickEvent.getWhoClicked().closeInventory();
         } else {
-            SuperiorPlayer targetPlayer = menuView instanceof PlayerMenuView ?
-                    ((PlayerMenuView) menuView).getSuperiorPlayer() : null;
+            SuperiorPlayer targetPlayer = menuView instanceof IPlayerMenuView ?
+                    ((IPlayerMenuView) menuView).getSuperiorPlayer() : null;
 
             if (targetPlayer != null)
                 command = placeholdersService.get().parsePlaceholders(targetPlayer.asOfflinePlayer(), command);

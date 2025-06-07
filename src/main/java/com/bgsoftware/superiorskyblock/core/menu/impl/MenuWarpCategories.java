@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpCategoryPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -69,7 +70,7 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
         return new MenuWarpCategories(menuParseResult, editLore, rowsSize);
     }
 
-    public static class View extends AbstractPagedMenuView<View, IslandViewArgs, WarpCategory> {
+    public static class View extends AbstractPagedMenuView<View, IslandViewArgs, WarpCategory> implements IIslandMenuView {
 
         private final Island island;
         private final boolean hasManagePerms;
@@ -79,6 +80,11 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
             super(inventoryViewer, previousMenuView, menu);
             this.island = args.getIsland();
             this.hasManagePerms = island.hasPermission(inventoryViewer, IslandPrivileges.SET_WARP);
+        }
+
+        @Override
+        public Island getIsland() {
+            return island;
         }
 
         @Override
@@ -92,10 +98,6 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
                         .ifPresent(unused -> warpCategories.set(warpCategory.getSlot(), warpCategory));
             });
             return warpCategories.toList();
-        }
-
-        public Island getIsland() {
-            return island;
         }
 
         public boolean hasManagePerms() {

@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.UniqueVisitorPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 
 import java.util.List;
@@ -44,7 +45,7 @@ public class MenuIslandUniqueVisitors extends AbstractPagedMenu<MenuIslandUnique
         return menuParseResult == null ? null : new MenuIslandUniqueVisitors(menuParseResult);
     }
 
-    public static class View extends AbstractPagedMenuView<View, IslandViewArgs, UniqueVisitorInfo> {
+    public static class View extends AbstractPagedMenuView<View, IslandViewArgs, UniqueVisitorInfo> implements IIslandMenuView {
 
         private final Island island;
 
@@ -52,6 +53,11 @@ public class MenuIslandUniqueVisitors extends AbstractPagedMenu<MenuIslandUnique
              Menu<View, IslandViewArgs> menu, IslandViewArgs args) {
             super(inventoryViewer, previousMenuView, menu);
             this.island = args.getIsland();
+        }
+
+        @Override
+        public Island getIsland() {
+            return this.island;
         }
 
         @Override
