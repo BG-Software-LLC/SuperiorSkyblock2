@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.external;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
-import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
@@ -31,10 +30,6 @@ public class MiniMessageHook {
     private static final MiniMessage MINI_MESSAGE = MiniMessage.builder().tags(StandardTags.defaults()).build();
 
     private static boolean registered = false;
-
-    public static boolean isCompatible() {
-        return ServerVersion.isAtLeast(ServerVersion.v1_18);
-    }
 
     public static void register(SuperiorSkyblockPlugin plugin) {
         if (!registered) {

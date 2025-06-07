@@ -28,6 +28,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.JavaVersion;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -701,7 +702,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private static boolean hasMiniMessageSupport() {
         try {
             Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
-            return true;
+            return ServerVersion.isAtLeast(ServerVersion.v1_18);
         } catch (ClassNotFoundException error) {
             return false;
         }
