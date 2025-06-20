@@ -10,6 +10,7 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -27,6 +28,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.CraftChunk;
+import org.bukkit.craftbukkit.block.CraftBlockType;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.entity.EntityType;
@@ -41,7 +43,7 @@ import java.util.Map;
 public class ChunkReaderImpl implements ChunkReader {
 
     private static final PalettedContainer<BlockState> EMPTY_STATES = new PalettedContainer<>(
-            Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES, null);
+            Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES);
     private static final byte[] FULL_LIGHT = new byte[2048];
     private static final byte[] EMPTY_LIGHT = new byte[2048];
 
@@ -63,8 +65,9 @@ public class ChunkReaderImpl implements ChunkReader {
         LevelChunk levelChunk = NMSUtils.getCraftChunkHandle((CraftChunk) bukkitChunk);
 
         this.serverLevel = levelChunk.level;
-        this.x = levelChunk.locX;
-        this.z = levelChunk.locZ;
+        ChunkPos chunkPos = levelChunk.getPos();
+        this.x = chunkPos.x;
+        this.z = chunkPos.z;
 
         LevelChunkSection[] levelChunkSections = levelChunk.getSections();
         this.blockids = new PalettedContainerRO[levelChunkSections.length];
@@ -127,7 +130,7 @@ public class ChunkReaderImpl implements ChunkReader {
 
     @Override
     public Material getType(int x, int y, int z) {
-        return getBlockState(x, y, z).getBukkitMaterial();
+        return CraftBlockType.minecraftToBukkit(getBlockState(x, y, z).getBlock());
     }
 
     @Override
