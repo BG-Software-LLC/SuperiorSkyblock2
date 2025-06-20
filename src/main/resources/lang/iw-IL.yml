@@ -665,6 +665,7 @@ PURGED_ISLANDS: |-
 RANKUP_SUCCESS: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for {1}''s island.'
 RANKUP_SUCCESS_ALL: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for all the islands.'
 RANKUP_SUCCESS_NAME: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for {1}.'
+RATE_ALREADY_GIVEN: '&c&lError | &7You already rated this island.'
 RATE_ANNOUNCEMENT: '&e&lיא | &75 ךותמ {1} ךלש יאה תא גריד {0}!'
 RATE_CHANGE_OTHER: '&e&lיא | &7{1} ל {0} לש גורידה תא תיניש.'
 RATE_OWN_ISLAND: '&c&lהאיגש | &7ךלש יאה תא גרדל לוכי אל התא.'

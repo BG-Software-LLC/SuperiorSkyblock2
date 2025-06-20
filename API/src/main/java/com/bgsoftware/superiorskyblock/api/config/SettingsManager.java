@@ -267,6 +267,12 @@ public interface SettingsManager {
     boolean isRateOwnIsland();
 
     /**
+     * Whether players can change island rating or not.
+     * Config-path: change-island-rating
+     */
+    boolean isChangeIslandRating();
+
+    /**
      * All the default island-flags that will be enabled for new islands.
      * Config-path: default-settings
      */

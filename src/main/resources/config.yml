@@ -495,6 +495,9 @@ clear-on-join: false
 # Should players be able to rate their own islands?
 rate-own-island: false
 
+# Should players be able to change island rating?
+change-island-rating: true
+
 # A list of default settings for new islands.
 # You can find a list of settings here: https://wiki.bg-software.com/superiorskyblock/island-settings
 default-settings:
