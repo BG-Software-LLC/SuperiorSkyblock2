@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.view;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
@@ -21,7 +22,7 @@ public class AbstractIconProviderMenu {
 
     }
 
-    public abstract static class View<E> extends AbstractMenuView<View<E>, Args<E>> {
+    public abstract static class View<E> extends AbstractMenuView<View<E>, Args<E>> implements IIslandMenuView {
 
         private final E iconProvider;
         private final TemplateItem iconTemplate;
@@ -40,6 +41,9 @@ public class AbstractIconProviderMenu {
         public TemplateItem getIconTemplate() {
             return iconTemplate;
         }
+
+        @Override
+        public abstract Island getIsland();
 
         @Override
         public abstract String replaceTitle(String title);

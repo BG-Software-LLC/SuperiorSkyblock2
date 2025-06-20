@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
@@ -29,8 +28,6 @@ import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.IBlockState;
 import net.minecraft.server.v1_16_R3.IChunkAccess;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
-import net.minecraft.server.v1_16_R3.Packet;
-import net.minecraft.server.v1_16_R3.PlayerChunk;
 import net.minecraft.server.v1_16_R3.PlayerChunkMap;
 import net.minecraft.server.v1_16_R3.ProtoChunk;
 import net.minecraft.server.v1_16_R3.TileEntity;
@@ -51,10 +48,6 @@ public class NMSUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(
-            PlayerChunkMap.class, Map.class, "visibleChunks");
-    private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(
-            PlayerChunk.class, "a", Packet.class, boolean.class);
     private static final ReflectMethod<Chunk> CHUNK_PROVIDER_SERVER_GET_CHUNK_IF_CACHED = new ReflectMethod<>(
             ChunkProviderServer.class, "getChunkAtIfCachedImmediately", int.class, int.class);
 
@@ -78,7 +71,7 @@ public class NMSUtils {
 
         try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
             BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
-            blockPosition.setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            blockPosition.d(location.getBlockX(), location.getBlockY(), location.getBlockZ());
             TileEntity tileEntity = worldServer.getTileEntity(blockPosition);
             return !type.isInstance(tileEntity) ? null : type.cast(tileEntity);
         }
@@ -202,30 +195,10 @@ public class NMSUtils {
         }
     }
 
-    public static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
-        PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
-        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-        PlayerChunk playerChunk;
-
-        try {
-            playerChunk = playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair());
-        } catch (Throwable ex) {
-            playerChunk = VISIBLE_CHUNKS.get(playerChunkMap).get(chunkCoordIntPair.pair());
-        }
-
-        if (playerChunk != null) {
-            try {
-                playerChunk.sendPacketToTrackedPlayers(packet, false);
-            } catch (Throwable ex) {
-                SEND_PACKETS_TO_RELEVANT_PLAYERS.invoke(playerChunk, packet, false);
-            }
-        }
-    }
-
-    public static void setBlock(Chunk chunk, BlockPosition blockPosition, int combinedId, CompoundTag statesTag,
-                                CompoundTag tileEntity) {
+    public static IBlockData setBlock(Chunk chunk, BlockPosition blockPosition, int combinedId, CompoundTag statesTag,
+                                      CompoundTag tileEntity) {
         if (!isValidPosition(chunk.getWorld(), blockPosition))
-            return;
+            return null;
 
         IBlockData blockData = Block.getByCombinedId(combinedId);
 
@@ -255,7 +228,7 @@ public class NMSUtils {
 
         if ((blockData.getMaterial().isLiquid() && plugin.getSettings().isLiquidUpdate()) || blockData.getBlock() instanceof BlockBed) {
             chunk.world.setTypeAndData(blockPosition, blockData, 3);
-            return;
+            return blockData;
         }
 
         int indexY = blockPosition.getY() >> 4;
@@ -307,6 +280,8 @@ public class NMSUtils {
                     worldTileEntity.load(blockData, tileEntityCompound);
             }
         }
+
+        return blockData;
     }
 
     private static boolean isValidPosition(World world, BlockPosition blockPosition) {

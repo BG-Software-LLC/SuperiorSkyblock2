@@ -13,6 +13,8 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BanButton;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IPlayerMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -58,7 +60,7 @@ public class MenuConfirmBan extends AbstractMenu<MenuConfirmBan.View, MenuConfir
 
     }
 
-    public static class View extends AbstractMenuView<View, Args> {
+    public static class View extends AbstractMenuView<View, Args> implements IIslandMenuView, IPlayerMenuView {
 
         private final Island island;
         private SuperiorPlayer targetPlayer;
@@ -70,16 +72,18 @@ public class MenuConfirmBan extends AbstractMenu<MenuConfirmBan.View, MenuConfir
             this.targetPlayer = args.targetPlayer;
         }
 
+        @Override
         public Island getIsland() {
             return island;
         }
 
-        public void setTargetPlayer(SuperiorPlayer targetPlayer) {
-            this.targetPlayer = targetPlayer;
+        @Override
+        public SuperiorPlayer getSuperiorPlayer() {
+            return targetPlayer;
         }
 
-        public SuperiorPlayer getTargetPlayer() {
-            return targetPlayer;
+        public void setTargetPlayer(SuperiorPlayer targetPlayer) {
+            this.targetPlayer = targetPlayer;
         }
 
     }

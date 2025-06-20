@@ -27,12 +27,12 @@ import com.bgsoftware.superiorskyblock.world.SignType;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.SculkSensorBlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
@@ -69,8 +69,7 @@ import java.util.function.IntFunction;
 
 public class NMSWorldImpl implements NMSWorld {
 
-    private static final ReflectField<List<TickingBlockEntity>> LEVEL_BLOCK_ENTITY_TICKERS_PROTECTED = new ReflectField<>(
-            Level.class, List.class, Modifier.PROTECTED | Modifier.FINAL, 1);
+    private static final ReflectField<List<TickingBlockEntity>> LEVEL_BLOCK_ENTITY_TICKERS = initializeLevelBlockEntityTickersField();
     private static final ReflectField<VibrationSystem.User> SCULK_SENSOR_BLOCK_ENTITY_VIBRATION_USER = new ReflectField<VibrationSystem.User>(
             SculkSensorBlockEntity.class, VibrationSystem.User.class, Modifier.PRIVATE | Modifier.FINAL, 1).removeFinal();
 
@@ -101,13 +100,8 @@ public class NMSWorldImpl implements NMSWorld {
 
         ServerLevel serverLevel = (ServerLevel) spawnerBlockEntity.getLevel();
 
-        List<TickingBlockEntity> blockEntityTickers;
-
-        if (LEVEL_BLOCK_ENTITY_TICKERS_PROTECTED.isValid()) {
-            blockEntityTickers = LEVEL_BLOCK_ENTITY_TICKERS_PROTECTED.get(serverLevel);
-        } else {
-            blockEntityTickers = serverLevel.blockEntityTickers;
-        }
+        List<TickingBlockEntity> blockEntityTickers = LEVEL_BLOCK_ENTITY_TICKERS.isValid() ?
+                LEVEL_BLOCK_ENTITY_TICKERS.get(serverLevel) : serverLevel.blockEntityTickers;
 
         Iterator<TickingBlockEntity> blockEntityTickersIterator = blockEntityTickers.iterator();
         List<TickingBlockEntity> tickersToAdd = new LinkedList<>();
@@ -201,12 +195,15 @@ public class NMSWorldImpl implements NMSWorld {
         ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
         try (ObjectsPools.Wrapper<BlockPos.MutableBlockPos> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
             BlockPos.MutableBlockPos blockPos = wrapper.getHandle();
-
             blockPos.set(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-            NMSUtils.setBlock(serverLevel.getChunkAt(blockPos), blockPos, combinedId, null, null);
 
-            ClientboundBlockUpdatePacket blockUpdatePacket = new ClientboundBlockUpdatePacket(serverLevel, blockPos);
-            NMSUtils.sendPacketToRelevantPlayers(serverLevel, blockPos.getX() >> 4, blockPos.getZ() >> 4, blockUpdatePacket);
+            BlockState blockState =
+                    NMSUtils.setBlock(serverLevel.getChunkAt(blockPos), blockPos, combinedId, null, null);
+
+            if (blockState != null) {
+                serverLevel.getChunkSource().blockChanged(blockPos);
+                serverLevel.chunkPacketBlockController.onBlockChange(serverLevel, blockPos, blockState, Blocks.AIR.defaultBlockState(), 530, 512);
+            }
         }
     }
 
@@ -358,6 +355,16 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public ChunkReader createChunkReader(Chunk chunk) {
         return new ChunkReaderImpl(chunk);
+    }
+
+    private static ReflectField<List<TickingBlockEntity>> initializeLevelBlockEntityTickersField() {
+        ReflectField<List<TickingBlockEntity>> field = new ReflectField<>(
+                Level.class, List.class, Modifier.PROTECTED | Modifier.FINAL, 1);
+
+        if (!field.isValid())
+            field = new ReflectField<>(Level.class, List.class, Modifier.PUBLIC | Modifier.FINAL, 1);
+
+        return field;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
@@ -75,6 +76,11 @@ public class MenuWarpCategoryIconEdit extends AbstractMenu<AbstractIconProviderM
              Menu<AbstractIconProviderMenu.View<WarpCategory>, AbstractIconProviderMenu.Args<WarpCategory>> menu,
              AbstractIconProviderMenu.Args<WarpCategory> args) {
             super(inventoryViewer, previousMenuView, menu, args);
+        }
+
+        @Override
+        public Island getIsland() {
+            return getIconProvider().getIsland();
         }
 
         @Override

@@ -102,7 +102,7 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         IBlockData blockData;
         try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
-            wrapper.getHandle().setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            wrapper.getHandle().d(location.getBlockX(), location.getBlockY(), location.getBlockZ());
             blockData = world.getType(wrapper.getHandle());
         }
         return Block.getCombinedId(blockData);

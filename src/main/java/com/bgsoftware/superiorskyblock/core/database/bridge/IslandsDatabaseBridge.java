@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.database.bridge;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
@@ -623,7 +624,7 @@ public class IslandsDatabaseBridge {
         ));
     }
 
-    public static void insertIsland(Island island, List<ChunkPosition> dirtyChunks) {
+    public static void insertIsland(Island island, @Nullable List<ChunkPosition> dirtyChunks) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
             BlockPosition centerPosition = island.getCenterPosition();
             WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, Dimensions.NORMAL);
@@ -644,7 +645,7 @@ public class IslandsDatabaseBridge {
                     new Pair<>("generated_schematics", LegacyMasks.convertGeneratedSchematicsMask(island.getGeneratedSchematics())),
                     new Pair<>("unlocked_worlds", LegacyMasks.convertUnlockedWorldsMask(island.getUnlockedWorlds())),
                     new Pair<>("last_time_updated", System.currentTimeMillis() / 1000L),
-                    new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunkPositions(dirtyChunks)),
+                    new Pair<>("dirty_chunks", dirtyChunks == null ? "" : IslandsSerializer.serializeDirtyChunkPositions(dirtyChunks)),
                     new Pair<>("block_counts", IslandsSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger())),
                     new Pair<>("entity_counts", IslandsSerializer.serializeEntityCounts(island.getEntitiesTracker().getEntitiesCounts()))
             );

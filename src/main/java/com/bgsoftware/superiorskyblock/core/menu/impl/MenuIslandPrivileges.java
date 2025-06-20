@@ -21,6 +21,8 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.IslandPrivilegePage
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IPlayerMenuView;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -143,7 +145,7 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
 
     }
 
-    public class View extends AbstractPagedMenuView<MenuIslandPrivileges.View, MenuIslandPrivileges.Args, IslandPrivilegeInfo> {
+    public class View extends AbstractPagedMenuView<MenuIslandPrivileges.View, MenuIslandPrivileges.Args, IslandPrivilegeInfo> implements IIslandMenuView, IPlayerMenuView {
 
         private final Island island;
         private final Object permissionHolder;
@@ -155,8 +157,15 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
             this.permissionHolder = args.permissionHolder;
         }
 
+        @Override
         public Island getIsland() {
             return island;
+        }
+
+        @Override
+        @Nullable
+        public SuperiorPlayer getSuperiorPlayer() {
+            return this.permissionHolder instanceof SuperiorPlayer ? (SuperiorPlayer) this.permissionHolder : null;
         }
 
         public Object getPermissionHolder() {

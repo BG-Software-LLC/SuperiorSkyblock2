@@ -9,17 +9,16 @@ import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
-import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMemberRole;
-import com.bgsoftware.superiorskyblock.core.menu.view.PlayerMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.impl.PlayerMenuView;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.List;
 import java.util.Objects;
 
-public class MemberRoleButton extends AbstractMenuViewButton<MenuMemberRole.View> {
+public class MemberRoleButton extends AbstractMenuViewButton<PlayerMenuView> {
 
-    private MemberRoleButton(AbstractMenuTemplateButton<MenuMemberRole.View> templateButton, MenuMemberRole.View menuView) {
+    private MemberRoleButton(AbstractMenuTemplateButton<PlayerMenuView> templateButton, PlayerMenuView menuView) {
         super(templateButton, menuView);
     }
 
@@ -43,7 +42,7 @@ public class MemberRoleButton extends AbstractMenuViewButton<MenuMemberRole.View
         }
     }
 
-    public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<MenuMemberRole.View> {
+    public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<PlayerMenuView> {
 
         private int playerRoleId;
 
@@ -53,13 +52,13 @@ public class MemberRoleButton extends AbstractMenuViewButton<MenuMemberRole.View
         }
 
         @Override
-        public MenuTemplateButton<MenuMemberRole.View> build() {
+        public MenuTemplateButton<PlayerMenuView> build() {
             return new Template(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, playerRoleId);
         }
 
     }
 
-    public static class Template extends MenuTemplateButtonImpl<MenuMemberRole.View> {
+    public static class Template extends MenuTemplateButtonImpl<PlayerMenuView> {
 
         private final int playerRoleId;
 

@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
-import com.bgsoftware.superiorskyblock.core.menu.view.IslandMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.impl.IslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 

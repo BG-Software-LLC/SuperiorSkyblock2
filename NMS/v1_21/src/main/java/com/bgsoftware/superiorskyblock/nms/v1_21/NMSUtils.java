@@ -312,33 +312,12 @@ public class NMSUtils {
                 null);
     }
 
-    public static void sendPacketToRelevantPlayers(ServerLevel serverLevel, int chunkX, int chunkZ, Packet<?> packet) {
-        ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
-        ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
-        ChunkHolder chunkHolder;
-
-        try {
-            chunkHolder = chunkMap.getVisibleChunkIfPresent(chunkPos.toLong());
-        } catch (Throwable ex) {
-            chunkHolder = VISIBLE_CHUNKS.get(chunkMap).get(chunkPos.toLong());
-        }
-
-        if (chunkHolder != null) {
-            if (SEND_PACKETS_TO_RELEVANT_PLAYERS.isValid()) {
-                SEND_PACKETS_TO_RELEVANT_PLAYERS.invoke(chunkHolder, packet, false);
-            } else {
-                chunkHolder.playerProvider.getPlayers(chunkPos, false).forEach(serverPlayer ->
-                        serverPlayer.connection.send(packet));
-            }
-        }
-    }
-
-    public static void setBlock(LevelChunk levelChunk, BlockPos blockPos, int combinedId,
-                                CompoundTag statesTag, CompoundTag tileEntity) {
+    public static BlockState setBlock(LevelChunk levelChunk, BlockPos blockPos, int combinedId,
+                                      CompoundTag statesTag, CompoundTag tileEntity) {
         ServerLevel serverLevel = levelChunk.level;
 
         if (!isValidPosition(serverLevel, blockPos))
-            return;
+            return null;
 
         BlockState blockState = Block.stateById(combinedId);
 
@@ -369,7 +348,7 @@ public class NMSUtils {
         if ((blockState.liquid() && plugin.getSettings().isLiquidUpdate()) ||
                 blockState.getBlock() instanceof BedBlock) {
             serverLevel.setBlock(blockPos, blockState, 3);
-            return;
+            return blockState;
         }
 
         int indexY = serverLevel.getSectionIndex(blockPos.getY());
@@ -409,6 +388,8 @@ public class NMSUtils {
                     worldBlockEntity.loadWithComponents(tileEntityCompound, MinecraftServer.getServer().registryAccess());
             }
         }
+
+        return blockState;
     }
 
     public static boolean isDoubleBlock(Block block, BlockState blockState) {

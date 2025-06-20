@@ -28,6 +28,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.JavaVersion;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -467,6 +468,10 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder"))
             registerHook("ItemsAdderHook");
 
+        if (Bukkit.getPluginManager().isPluginEnabled("CraftEngine"))
+            // We load the hook with an extra delay to let CraftEngine load its data first
+            BukkitExecutor.sync(() -> registerHook("CraftEngineHook"), 5L);
+
         if (canRegisterHook("SmoothTimber"))
             registerHook("SmoothTimberHook");
 
@@ -518,7 +523,9 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         } else if (canRegisterHook("EpicSpawners") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("EpicSpawners"))) {
             String version = Bukkit.getPluginManager().getPlugin("EpicSpawners").getDescription().getVersion();
-            if (version.startsWith("8")) {
+            if (version.startsWith("9")) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_EpicSpawners9");
+            } else if (version.startsWith("8")) {
                 spawnersProvider = createInstance("spawners.SpawnersProvider_EpicSpawners8");
             } else if (version.startsWith("7")) {
                 spawnersProvider = createInstance("spawners.SpawnersProvider_EpicSpawners7");
@@ -701,7 +708,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private static boolean hasMiniMessageSupport() {
         try {
             Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
-            return true;
+            return ServerVersion.isAtLeast(ServerVersion.v1_18);
         } catch (ClassNotFoundException error) {
             return false;
         }

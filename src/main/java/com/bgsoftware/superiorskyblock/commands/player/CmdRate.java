@@ -91,7 +91,8 @@ public class CmdRate implements ISuperiorCommand {
         return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
                 plugin.getSettings().isTabCompleteHideVanished(),
                 (onlinePlayer, onlineIsland) -> onlineIsland != null &&
-                        (plugin.getSettings().isRateOwnIsland() || !onlineIsland.equals(island))) : Collections.emptyList();
+                        (plugin.getSettings().isRateOwnIsland() || !onlineIsland.equals(island)) &&
+                        (plugin.getSettings().isChangeIslandRating() || onlineIsland.getRating(superiorPlayer) == Rating.UNKNOWN) ) : Collections.emptyList();
     }
 
 }
