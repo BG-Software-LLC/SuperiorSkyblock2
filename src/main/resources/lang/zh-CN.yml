@@ -643,6 +643,7 @@ PURGED_ISLANDS: |-
 RANKUP_SUCCESS: '&e&l岛屿 | &7成功更新了玩家 {1} 的岛屿功能 {0} 等级.'
 RANKUP_SUCCESS_ALL: '&e&l岛屿 | &7成功更新了所有岛屿的功能 {0} 等级.'
 RANKUP_SUCCESS_NAME: '&e&l岛屿 | &7成功更新了岛屿 {1} 的功能 {0} 等级.'
+RATE_ALREADY_GIVEN: '&c&lError | &7You already rated this island.'
 RATE_ANNOUNCEMENT: '&e&l岛屿 | &7{0} 为你的岛屿评分 {1}, 满分为 5!.'
 RATE_CHANGE_OTHER: '&e&l岛屿 | &7你将 {0} 的评分修改为了 {1}.'
 RATE_OWN_ISLAND: '&c&l错误 | &7你不能对着自己的岛屿评分.'

@@ -643,6 +643,7 @@ PURGED_ISLANDS: |-
 RANKUP_SUCCESS: '&e&lОстров | &7Успешно обновлен уровень улучшения {0} для острова {1}.'
 RANKUP_SUCCESS_ALL: '&e&lОстров | &7Успешно обновлен уровень улучшения {0} для всех островов.'
 RANKUP_SUCCESS_NAME: '&e&lОстров | &7Успешно обновлен уровень улучшения {0} для {1}.'
+RATE_ALREADY_GIVEN: '&c&lError | &7You already rated this island.'
 RATE_ANNOUNCEMENT: '&e&lОстров | &7{0} оценил ваш остров на {1} из 5.'
 RATE_CHANGE_OTHER: '&e&lОстров | &7Вы изменили рейтинг {0} на {1}.'
 RATE_OWN_ISLAND: '&c&lОшибка | &7Вы не можете оценить свой собственный остров.'
