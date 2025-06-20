@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.ObjectsPool;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.v1_21_4.world.PropertiesMapper;
@@ -350,6 +351,7 @@ public class NMSUtils {
             } else {
                 relevantPlayers = chunkHolder.playerProvider.getPlayers(chunkPos, false);
             }
+            Log.debug(Debug.GENERATE_BLOCK, "Relevant Players", relevantPlayers);
             relevantPlayers.forEach(serverPlayer -> serverPlayer.connection.send(packet));
         }
     }
