@@ -21,8 +21,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
@@ -63,10 +61,6 @@ public class NMSUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(
-            ChunkHolder.class, 1, Packet.class, boolean.class);
-    private static final ReflectField<Map<Long, ChunkHolder>> VISIBLE_CHUNKS = new ReflectField<>(
-            ChunkMap.class, Map.class, Modifier.PUBLIC | Modifier.VOLATILE, 1);
     private static final ReflectMethod<LevelChunk> CHUNK_CACHE_SERVER_GET_CHUNK_IF_CACHED = new ReflectMethod<>(
             ServerChunkCache.class, "getChunkAtIfCachedImmediately", int.class, int.class);
     private static final ReflectField<IOWorker> ENTITY_STORAGE_WORKER = new ReflectField<>(
@@ -276,28 +270,12 @@ public class NMSUtils {
                 null);
     }
 
-    public static void sendPacketToRelevantPlayers(ServerLevel serverLevel, int chunkX, int chunkZ, Packet<?> packet) {
-        ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
-        ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
-        ChunkHolder chunkHolder;
-
-        try {
-            chunkHolder = chunkMap.getVisibleChunkIfPresent(chunkPos.toLong());
-        } catch (Throwable ex) {
-            chunkHolder = VISIBLE_CHUNKS.get(chunkMap).get(chunkPos.toLong());
-        }
-
-        if (chunkHolder != null) {
-            SEND_PACKETS_TO_RELEVANT_PLAYERS.invoke(chunkHolder, packet, false);
-        }
-    }
-
-    public static void setBlock(LevelChunk levelChunk, BlockPos blockPos, int combinedId,
-                                CompoundTag statesTag, CompoundTag tileEntity) {
+    public static BlockState setBlock(LevelChunk levelChunk, BlockPos blockPos, int combinedId,
+                                      CompoundTag statesTag, CompoundTag tileEntity) {
         ServerLevel serverLevel = levelChunk.level;
 
         if (!isValidPosition(serverLevel, blockPos))
-            return;
+            return null;
 
         BlockState blockState = Block.stateById(combinedId);
 
@@ -328,7 +306,7 @@ public class NMSUtils {
         if ((blockState.getMaterial().isLiquid() && plugin.getSettings().isLiquidUpdate()) ||
                 blockState.getBlock() instanceof BedBlock) {
             serverLevel.setBlock(blockPos, blockState, 3);
-            return;
+            return blockState;
         }
 
         int indexY = serverLevel.getSectionIndex(blockPos.getY());
@@ -374,6 +352,8 @@ public class NMSUtils {
                     worldBlockEntity.load(tileEntityCompound);
             }
         }
+
+        return blockState;
     }
 
     public static boolean isDoubleBlock(Block block, BlockState blockState) {

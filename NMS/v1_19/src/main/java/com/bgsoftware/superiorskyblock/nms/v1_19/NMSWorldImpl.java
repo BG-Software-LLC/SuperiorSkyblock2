@@ -34,6 +34,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.SculkSensorBlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
@@ -198,12 +199,15 @@ public class NMSWorldImpl implements NMSWorld {
         ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
         try (ObjectsPools.Wrapper<BlockPos.MutableBlockPos> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
             BlockPos.MutableBlockPos blockPos = wrapper.getHandle();
-
             blockPos.set(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-            NMSUtils.setBlock(serverLevel.getChunkAt(blockPos), blockPos, combinedId, null, null);
 
-            ClientboundBlockUpdatePacket blockUpdatePacket = new ClientboundBlockUpdatePacket(serverLevel, blockPos);
-            NMSUtils.sendPacketToRelevantPlayers(serverLevel, blockPos.getX() >> 4, blockPos.getZ() >> 4, blockUpdatePacket);
+            BlockState blockState =
+                    NMSUtils.setBlock(serverLevel.getChunkAt(blockPos), blockPos, combinedId, null, null);
+
+            if (blockState != null) {
+                serverLevel.getChunkSource().blockChanged(blockPos);
+                serverLevel.chunkPacketBlockController.onBlockChange(serverLevel, blockPos, blockState, Blocks.AIR.defaultBlockState(), 530, 512);
+            }
         }
     }
 

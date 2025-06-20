@@ -30,9 +30,9 @@ import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.BlockPropertySlabType;
 import net.minecraft.server.v1_16_R3.BlockStepAbstract;
+import net.minecraft.server.v1_16_R3.Blocks;
 import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
-import net.minecraft.server.v1_16_R3.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_16_R3.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_16_R3.SoundCategory;
 import net.minecraft.server.v1_16_R3.SoundEffectType;
@@ -169,9 +169,13 @@ public class NMSWorldImpl implements NMSWorld {
             BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
             blockPosition.d(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 
-            NMSUtils.setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, combinedId, null, null);
-            NMSUtils.sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
-                    new PacketPlayOutBlockChange(world, blockPosition));
+            IBlockData blockData =
+                    NMSUtils.setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, combinedId, null, null);
+
+            if (blockData != null) {
+                world.getChunkProvider().flagDirty(blockPosition);
+                world.chunkPacketBlockController.onBlockChange(world, blockPosition, blockData, Blocks.AIR.getBlockData(), 530);
+            }
         }
     }
 

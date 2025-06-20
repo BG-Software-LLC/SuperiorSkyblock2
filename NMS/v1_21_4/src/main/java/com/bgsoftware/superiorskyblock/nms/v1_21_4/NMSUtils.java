@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.ObjectsPool;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
-import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.v1_21_4.world.PropertiesMapper;
@@ -22,13 +21,10 @@ import com.google.common.base.Suppliers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.Entity;
@@ -59,7 +55,6 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Collections;
@@ -70,24 +65,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class NMSUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final boolean MOONRISE_SUPPORT = ((Supplier<Boolean>) () -> {
-        for (Method method : ChunkHolder.class.getDeclaredMethods()) {
-            if (method.getName().contains("moonrise$")) {
-                return true;
-            }
-        }
-
-        return false;
-    }).get();
-
-    private static final ReflectField<Map<Long, ChunkHolder>> VISIBLE_CHUNKS = new ReflectField<>(
-            ChunkMap.class, Map.class, Modifier.PUBLIC | Modifier.VOLATILE, 1);
     private static final ReflectMethod<LevelChunk> CHUNK_CACHE_SERVER_GET_CHUNK_IF_CACHED = new ReflectMethod<>(
             ServerChunkCache.class, "getChunkAtIfCachedImmediately", int.class, int.class);
     private static final ReflectField<PersistentEntitySectionManager<Entity>> SERVER_LEVEL_ENTITY_MANAGER = new ReflectField<>(
@@ -333,35 +315,12 @@ public class NMSUtils {
                 null);
     }
 
-    public static void sendPacketToRelevantPlayers(ServerLevel serverLevel, int chunkX, int chunkZ, Packet<?> packet) {
-        ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
-        ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
-        ChunkHolder chunkHolder;
-
-        if (MOONRISE_SUPPORT) {
-            chunkHolder = chunkMap.getVisibleChunkIfPresent(chunkPos.toLong());
-        } else {
-            chunkHolder = VISIBLE_CHUNKS.get(chunkMap).get(chunkPos.toLong());
-        }
-
-        if (chunkHolder != null) {
-            List<ServerPlayer> relevantPlayers;
-            if (MOONRISE_SUPPORT) {
-                relevantPlayers = chunkHolder.moonrise$getPlayers(false);
-            } else {
-                relevantPlayers = chunkHolder.playerProvider.getPlayers(chunkPos, false);
-            }
-            Log.debug(Debug.GENERATE_BLOCK, "Relevant Players", relevantPlayers);
-            relevantPlayers.forEach(serverPlayer -> serverPlayer.connection.send(packet));
-        }
-    }
-
-    public static void setBlock(LevelChunk levelChunk, BlockPos blockPos, int combinedId,
-                                CompoundTag statesTag, CompoundTag tileEntity) {
+    public static BlockState setBlock(LevelChunk levelChunk, BlockPos blockPos, int combinedId,
+                                      CompoundTag statesTag, CompoundTag tileEntity) {
         ServerLevel serverLevel = levelChunk.level;
 
         if (!isValidPosition(serverLevel, blockPos))
-            return;
+            return null;
 
         BlockState blockState = Block.stateById(combinedId);
 
@@ -392,7 +351,7 @@ public class NMSUtils {
         if ((blockState.liquid() && plugin.getSettings().isLiquidUpdate()) ||
                 blockState.getBlock() instanceof BedBlock) {
             serverLevel.setBlock(blockPos, blockState, 3);
-            return;
+            return blockState;
         }
 
         int indexY = serverLevel.getSectionIndex(blockPos.getY());
@@ -432,6 +391,8 @@ public class NMSUtils {
                     worldBlockEntity.loadWithComponents(tileEntityCompound, MinecraftServer.getServer().registryAccess());
             }
         }
+
+        return blockState;
     }
 
     public static boolean isDoubleBlock(Block block, BlockState blockState) {
