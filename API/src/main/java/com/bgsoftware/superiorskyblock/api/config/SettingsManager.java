@@ -587,6 +587,12 @@ public interface SettingsManager {
     boolean isPublicWarps();
 
     /**
+     * Whether islands should be locked by default or not.
+     * Config-path: locked-islands
+     */
+    boolean isLockedIslands();
+
+    /**
      * Cooldown between recalculations of an island, in seconds.
      * If set to 0, no cooldown is set.
      * Config-path: recalc-task-timeout

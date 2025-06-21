@@ -207,6 +207,7 @@ public class SettingsContainer {
     public final boolean physicsListener;
     public final double chargeOnWarp;
     public final boolean publicWarps;
+    public final boolean lockedIslands;
     public final long recalcTaskTimeout;
     public final boolean autoLanguageDetection;
     public final boolean autoUncoopWhenAlone;
@@ -529,6 +530,7 @@ public class SettingsContainer {
         physicsListener = config.getBoolean("physics-listener", true);
         chargeOnWarp = config.getDouble("charge-on-warp", 0D);
         publicWarps = config.getBoolean("public-warps");
+        lockedIslands = config.getBoolean("locked-islands",false);
         recalcTaskTimeout = config.getLong("recalc-task-timeout");
         autoLanguageDetection = config.getBoolean("auto-language-detection", true);
         autoUncoopWhenAlone = config.getBoolean("auto-uncoop-when-alone", false);
