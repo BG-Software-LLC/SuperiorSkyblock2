@@ -542,6 +542,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public boolean isLockedIslands() {
+        return this.global.isLockedIslands();
+    }
+
+    @Override
     public long getRecalcTaskTimeout() {
         return this.global.getRecalcTaskTimeout();
     }

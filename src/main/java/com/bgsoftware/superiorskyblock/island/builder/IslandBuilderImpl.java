@@ -73,7 +73,7 @@ public class IslandBuilderImpl implements Island.Builder {
     public String paypal = "None";
     public BigDecimal bonusWorth = BigDecimal.ZERO;
     public BigDecimal bonusLevel = BigDecimal.ZERO;
-    public boolean isLocked = false;
+    public boolean isLocked = plugin.getSettings().isLockedIslands();
     public boolean isIgnored = false;
     public String description = "";
     public EnumerateSet<Dimension> generatedSchematics = new EnumerateSet<>(Dimension.values());

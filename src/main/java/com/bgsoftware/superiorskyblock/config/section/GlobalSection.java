@@ -332,6 +332,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().publicWarps;
     }
 
+    public boolean isLockedIslands() {
+        return getContainer().lockedIslands;
+    }
+
     public long getRecalcTaskTimeout() {
         return getContainer().recalcTaskTimeout;
     }
