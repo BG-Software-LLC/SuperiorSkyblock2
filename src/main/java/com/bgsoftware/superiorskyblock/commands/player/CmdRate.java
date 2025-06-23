@@ -71,14 +71,15 @@ public class CmdRate implements ISuperiorCommand {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
-        if (!plugin.getSettings().isRateOwnIsland() && island.equals(superiorPlayer.getIsland())) {
-            Message.RATE_OWN_ISLAND.send(superiorPlayer);
-            return;
-        }
+        RateResult rateResult = canRateIsland(plugin, superiorPlayer, island);
 
-        if (!plugin.getSettings().isChangeIslandRating() && island.getRating(superiorPlayer) != Rating.UNKNOWN) {
-            Message.RATE_ALREADY_GIVEN.send(superiorPlayer);
-            return;
+        switch (rateResult) {
+            case RATE_OWN_ISLAND:
+                Message.RATE_OWN_ISLAND.send(superiorPlayer);
+                return;
+            case ALREADY_RATED:
+                Message.RATE_ALREADY_GIVEN.send(superiorPlayer);
+                return;
         }
 
         plugin.getMenus().openIslandRate(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
@@ -91,8 +92,33 @@ public class CmdRate implements ISuperiorCommand {
         return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
                 plugin.getSettings().isTabCompleteHideVanished(),
                 (onlinePlayer, onlineIsland) -> onlineIsland != null &&
-                        (plugin.getSettings().isRateOwnIsland() || !onlineIsland.equals(island)) &&
-                        (plugin.getSettings().isChangeIslandRating() || onlineIsland.getRating(superiorPlayer) == Rating.UNKNOWN)) : Collections.emptyList();
+                        canRateIsland(plugin, superiorPlayer, island, onlineIsland) == RateResult.SUCCESS) :
+                Collections.emptyList();
+    }
+
+    private static RateResult canRateIsland(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island) {
+        return canRateIsland(plugin, superiorPlayer, superiorPlayer.getIsland(), island);
+    }
+
+    private static RateResult canRateIsland(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer,
+                                            Island playerIsland, Island island) {
+        if (!plugin.getSettings().isRateOwnIsland() && island.equals(playerIsland)) {
+            return RateResult.RATE_OWN_ISLAND;
+        }
+
+        if (!plugin.getSettings().isChangeIslandRating() && island.getRating(superiorPlayer) != Rating.UNKNOWN) {
+            return RateResult.ALREADY_RATED;
+        }
+
+        return RateResult.SUCCESS;
+    }
+
+    private enum RateResult {
+
+        SUCCESS,
+        RATE_OWN_ISLAND,
+        ALREADY_RATED
+
     }
 
 }
