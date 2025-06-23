@@ -104,6 +104,12 @@ public interface SettingsManager {
     boolean isCoopMembers();
 
     /**
+     * Should players be able to edit island privileges for other players?
+     * Config path: edit-player-permissions
+     */
+    boolean isEditPlayerPermissions();
+
+    /**
      * All settings related to the island-roles.
      * Config path: island-roles
      */

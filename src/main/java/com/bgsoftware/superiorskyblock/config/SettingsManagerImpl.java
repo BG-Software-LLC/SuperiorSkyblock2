@@ -152,6 +152,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public boolean isEditPlayerPermissions() {
+        return this.global.isEditPlayerPermissions();
+    }
+
+    @Override
     public IslandRoles getIslandRoles() {
         return this.islandRoles;
     }
