@@ -11,7 +11,7 @@ previous-menu: true
 pattern:
   - '@ @ @ @ @ @ @ @ @'
   - '@ # % * + ^ ~ 1 @'
-  - '@ @ - = @ ! 2 @ @'
+  - '@ @ - = ! 2 3 @ @'
   - '@ @ @ @ @ @ @ @ @'
 
 items:
@@ -92,6 +92,13 @@ items:
     name: '&eGerman'
     lore:
       - '&7Change language to German.'
+  '3':
+    language: 'tr-TR'
+    type: PLAYER_HEAD
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmJiZWFmNTJlMWM0YmZjZDhhMWY0YzY5MTMyMzRiODQwMjQxYWE0ODgyOWMxNWFiYzZmZjhmZGY5MmNkODllIn19fQ=='
+    name: '&eTurkish'
+    lore:
+      - '&7Change language to Turkish.'
 
 sounds:
   '#':

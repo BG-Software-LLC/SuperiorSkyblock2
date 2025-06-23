@@ -890,6 +890,7 @@ public enum Message {
             plugin.saveResource("lang/pl-PL.yml", false);
             plugin.saveResource("lang/pt-BR.yml", false);
             plugin.saveResource("lang/ru-RU.yml", false);
+            plugin.saveResource("lang/tr-TR.yml", false);
             plugin.saveResource("lang/vi-VN.yml", false);
             plugin.saveResource("lang/zh-CN.yml", false);
         }
