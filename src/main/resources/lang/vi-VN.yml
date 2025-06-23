@@ -725,6 +725,7 @@ PURGED_ISLANDS: |-
 RANKUP_SUCCESS: '&e&lĐảo | &7Cập nhật thành công mức độ nâng cấp {0} cho đảo của {1}.'
 RANKUP_SUCCESS_ALL: '&e&lĐảo | &7Cập nhật thành công mức độ nâng cấp {0} cho tất cả các đảo.'
 RANKUP_SUCCESS_NAME: '&e&lĐảo | &7Cập nhật thành công mức độ nâng cấp {0} cho {1}.'
+RATE_ALREADY_GIVEN: '&c&lError | &7You already rated this island.'
 RATE_ANNOUNCEMENT: '&e&lĐánh giá | &7{0} đã đánh giá đảo của bạn {1} trên 5!.'
 RATE_CHANGE_OTHER: '&e&lĐánh giá | &7Bạn đã thay đổi đánh giá của đảo {0} thành {1}.'
 RATE_OWN_ISLAND: '&c&lLỗi | &7Bạn không thể đánh giả đảo của bạn.'

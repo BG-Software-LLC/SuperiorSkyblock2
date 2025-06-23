@@ -144,6 +144,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().rateOwnIsland;
     }
 
+    public boolean isChangeIslandRating() {
+        return getContainer().changeIslandRating;
+    }
+
     public List<String> getDefaultSettings() {
         return getContainer().defaultSettings;
     }

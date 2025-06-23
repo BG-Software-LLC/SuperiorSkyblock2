@@ -292,6 +292,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public boolean isChangeIslandRating() {
+        return this.global.isChangeIslandRating();
+    }
+
+    @Override
     public List<String> getDefaultSettings() {
         return this.global.getDefaultSettings();
     }
