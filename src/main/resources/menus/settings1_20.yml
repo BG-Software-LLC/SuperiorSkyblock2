@@ -349,12 +349,16 @@ settings:
       lore:
         - '&7Allow spawner spawning of animals inside the island.'
         - '&7Currently &aENABLED&7.'
+      flags:
+        - HIDE_ADDITIONAL_TOOLTIP
     settings-disabled:
       type: SPAWNER
       name: '&6Spawner Animals Spawn'
       lore:
         - '&7Allow spawner spawning of animals inside the island.'
         - '&7Currently &cDISABLED&7.'
+      flags:
+        - HIDE_ADDITIONAL_TOOLTIP
     sound:
       type: ENTITY_EXPERIENCE_ORB_PICKUP
       volume: 0.2
@@ -368,12 +372,16 @@ settings:
       lore:
         - '&7Allow spawner spawning of monsters inside the island.'
         - '&7Currently &aENABLED&7.'
+      flags:
+        - HIDE_ADDITIONAL_TOOLTIP
     settings-disabled:
       type: SPAWNER
       name: '&6Spawner Monster Spawn'
       lore:
         - '&7Allow spawner spawning of monsters inside the island.'
         - '&7Currently &cDISABLED&7.'
+      flags:
+        - HIDE_ADDITIONAL_TOOLTIP
     sound:
       type: ENTITY_EXPERIENCE_ORB_PICKUP
       volume: 0.2

@@ -39,6 +39,7 @@ items:
 
 settings:
   always_day:
+    display-menu: true
     settings-enabled:
       type: STAINED_CLAY
       data: 4
@@ -59,6 +60,7 @@ settings:
       pitch: 0.2
 
   always_middle_day:
+    display-menu: true
     settings-enabled:
       type: STAINED_CLAY
       data: 1
@@ -79,6 +81,7 @@ settings:
       pitch: 0.2
 
   always_night:
+    display-menu: true
     settings-enabled:
       type: STAINED_CLAY
       data: 3
@@ -99,6 +102,7 @@ settings:
       pitch: 0.2
 
   always_middle_night:
+    display-menu: true
     settings-enabled:
       type: STAINED_CLAY
       data: 11
@@ -119,6 +123,7 @@ settings:
       pitch: 0.2
 
   always_rain:
+    display-menu: true
     settings-enabled:
       type: WATER_LILY
       name: '&6Always Rain'
@@ -137,6 +142,7 @@ settings:
       pitch: 0.2
 
   always_shiny:
+    display-menu: true
     settings-enabled:
       type: DEAD_BUSH
       name: '&6Always Shiny'
@@ -155,6 +161,7 @@ settings:
       pitch: 0.2
 
   creeper_explosion:
+    display-menu: true
     settings-enabled:
       type: SKULL_ITEM
       data: 4
@@ -175,6 +182,7 @@ settings:
       pitch: 0.2
 
   crops_growth:
+    display-menu: true
     settings-enabled:
       type: SEEDS
       name: '&6Crops Growth'
@@ -193,6 +201,7 @@ settings:
       pitch: 0.2
 
   egg_lay:
+    display-menu: true
     settings-enabled:
       type: EGG
       name: '&6Egg Lay'
@@ -211,6 +220,7 @@ settings:
       pitch: 0.2
 
   enderman_grief:
+    display-menu: true
     settings-enabled:
       type: ENDER_PEARL
       name: '&6Enderman Grief'
@@ -229,6 +239,7 @@ settings:
       pitch: 0.2
 
   fire_spread:
+    display-menu: true
     settings-enabled:
       type: FLINT_AND_STEEL
       name: '&6Fire Spread'
@@ -247,6 +258,7 @@ settings:
       pitch: 0.2
 
   ghast_fireball:
+    display-menu: true
     settings-enabled:
       type: FIREBALL
       name: '&6Ghast Fireball'
@@ -265,6 +277,7 @@ settings:
       pitch: 0.2
 
   lava_flow:
+    display-menu: true
     settings-enabled:
       type: LAVA_BUCKET
       name: '&6Lava Flow'
@@ -283,6 +296,7 @@ settings:
       pitch: 0.2
 
   natural_animals_spawn:
+    display-menu: true
     settings-enabled:
       type: MONSTER_EGG
       data: 90
@@ -303,6 +317,7 @@ settings:
       pitch: 0.2
 
   natural_monster_spawn:
+    display-menu: true
     settings-enabled:
       type: MONSTER_EGG
       data: 54
@@ -323,24 +338,30 @@ settings:
       pitch: 0.2
 
   pvp:
+    display-menu: true
     settings-enabled:
       type: DIAMOND_SWORD
       name: '&6PvP'
       lore:
         - '&7Allow players to pvp inside the island.'
         - '&7Currently &aENABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     settings-disabled:
       type: DIAMOND_SWORD
       name: '&6PvP'
       lore:
         - '&7Allow players to pvp inside the island.'
         - '&7Currently &cDISABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     sound:
       type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   spawner_animals_spawn:
+    display-menu: true
     settings-enabled:
       type: MOB_SPAWNER
       name: '&6Spawner Animals Spawn'
@@ -359,6 +380,7 @@ settings:
       pitch: 0.2
 
   spawner_monster_spawn:
+    display-menu: true
     settings-enabled:
       type: MOB_SPAWNER
       name: '&6Spawner Monster Spawn'
@@ -377,6 +399,7 @@ settings:
       pitch: 0.2
 
   tnt_explosion:
+    display-menu: true
     settings-enabled:
       type: TNT
       name: '&6TNT Explosion'
@@ -395,6 +418,7 @@ settings:
       pitch: 0.2
 
   tree_growth:
+    display-menu: true
     settings-enabled:
       type: SAPLING
       name: '&6Tree Growth'
@@ -413,6 +437,7 @@ settings:
       pitch: 0.2
 
   water_flow:
+    display-menu: true
     settings-enabled:
       type: WATER_BUCKET
       name: '&6Water Flow'
@@ -431,6 +456,7 @@ settings:
       pitch: 0.2
 
   wither_explosion:
+    display-menu: true
     settings-enabled:
       type: SKULL_ITEM
       data: 1
