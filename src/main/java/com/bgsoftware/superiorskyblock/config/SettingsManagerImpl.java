@@ -252,6 +252,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public boolean isTransferConfirm() {
+        return this.global.isTransferConfirm();
+    }
+
+    @Override
     public String getSpawnersProvider() {
         return this.global.getSpawnersProvider();
     }

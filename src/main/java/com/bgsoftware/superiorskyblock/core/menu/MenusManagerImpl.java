@@ -108,6 +108,11 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     }
 
     @Override
+    public void openConfirmTransfer(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland, SuperiorPlayer newOwner) {
+        plugin.getProviders().getMenusProvider().openConfirmTransfer(targetPlayer, previousMenu, targetIsland, newOwner);
+    }
+
+    @Override
     public void openControlPanel(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         plugin.getProviders().getMenusProvider().openControlPanel(targetPlayer, previousMenu, targetIsland);
     }

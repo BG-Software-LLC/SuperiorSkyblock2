@@ -223,6 +223,12 @@ public interface SettingsManager {
     boolean isLeaveConfirm();
 
     /**
+     * Whether confirmation menu should be opened before transfering an island or not.
+     * Config-path: transfer-confirm
+     */
+    boolean isTransferConfirm();
+
+    /**
      * The spawners-provider to use.
      * If set to AUTO, the plugin will automatically detect an available spawners provider and use it.
      * Config-path: spawners-provider

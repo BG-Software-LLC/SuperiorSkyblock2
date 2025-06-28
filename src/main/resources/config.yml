@@ -450,6 +450,9 @@ kick-confirm: true
 # Should a confirm gui be displayed when /is leave is executed.
 leave-confirm: true
 
+# Should a confirm gui be displayed when /is transfer is executed.
+transfer-confirm: true
+
 # If you want a specific spawners provider to use, specify it here.
 # Providers: Auto, WildStacker, EpicSpawners, MergedSpawner, PvpingSpawners, SilkSpawners, RoseStacker
 spawners-provider: 'AUTO'
