@@ -128,6 +128,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().disbandInventoryClear;
     }
 
+    public boolean isTeleportOnCreate() {
+        return getContainer().teleportOnCreate;
+    }
+
     public boolean isTeleportOnJoin() {
         return getContainer().teleportOnJoin;
     }
