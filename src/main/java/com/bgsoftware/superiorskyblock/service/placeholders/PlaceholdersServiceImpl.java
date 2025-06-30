@@ -440,18 +440,20 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             } else if ((matcher = ISLAND_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                 String subPlaceholder = matcher.group(1).toLowerCase(Locale.ENGLISH);
                 Island island;
+                boolean location = false;
                 if (superiorPlayer == null) {
                     island = null;
                 } else if (subPlaceholder.startsWith("location_")) {
-                    placeholder = placeholder.substring(9);
-                    subPlaceholder = subPlaceholder.substring(9);
+                    location = true;
                     try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                         island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation(wrapper.getHandle()));
                     }
                 } else {
                     island = superiorPlayer.getIsland();
                 }
-                placeholderResult = parsePlaceholdersForIsland(island, superiorPlayer, placeholder, subPlaceholder);
+                placeholderResult = parsePlaceholdersForIsland(island, superiorPlayer,
+                        location ? placeholder.substring(9) : placeholder,
+                        location ? subPlaceholder.substring(9) : subPlaceholder);
             }
         }
 
