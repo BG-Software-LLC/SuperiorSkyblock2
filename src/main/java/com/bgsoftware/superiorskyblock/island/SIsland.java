@@ -2919,9 +2919,16 @@ public class SIsland implements Island {
     public BigDecimal getIslandLevel() {
         BigDecimal bonusLevel = this.bonusLevel.get();
         BigDecimal islandLevel = this.islandLevel.get().add(bonusLevel);
+        RoundingMode roundingMode;
+
+        try {
+            roundingMode = RoundingMode.valueOf(plugin.getSettings().getIslandLevelRoundingMode());
+        } catch (IllegalArgumentException error) {
+            roundingMode = RoundingMode.HALF_UP;
+        }
 
         if (plugin.getSettings().isRoundedIslandLevels()) {
-            islandLevel = islandLevel.setScale(0, RoundingMode.HALF_UP);
+            islandLevel = islandLevel.setScale(0, roundingMode);
         }
 
         if (!plugin.getSettings().isNegativeLevel() && islandLevel.compareTo(BigDecimal.ZERO) < 0)
@@ -2933,9 +2940,16 @@ public class SIsland implements Island {
     @Override
     public BigDecimal getRawLevel() {
         BigDecimal islandLevel = this.islandLevel.get();
+        RoundingMode roundingMode;
+
+        try {
+            roundingMode = RoundingMode.valueOf(plugin.getSettings().getIslandLevelRoundingMode());
+        } catch (IllegalArgumentException error) {
+            roundingMode = RoundingMode.HALF_UP;
+        }
 
         if (plugin.getSettings().isRoundedIslandLevels()) {
-            islandLevel = islandLevel.setScale(0, RoundingMode.HALF_UP);
+            islandLevel = islandLevel.setScale(0, roundingMode);
         }
 
         if (!plugin.getSettings().isNegativeLevel() && islandLevel.compareTo(BigDecimal.ZERO) < 0)

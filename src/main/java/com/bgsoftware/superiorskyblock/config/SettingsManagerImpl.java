@@ -137,6 +137,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public String getIslandLevelRoundingMode() {
+        return this.global.getIslandLevelRoundingMode();
+    }
+
+    @Override
     public boolean isAutoBlocksTracking() {
         return this.global.isAutoBlocksTracking();
     }

@@ -101,6 +101,7 @@ public class SettingsContainer {
     public final String stackedBlocksMenuTitle;
     public final String islandLevelFormula;
     public final boolean roundedIslandLevel;
+    public final String islandLevelRoundingMode;
     public final boolean autoBlocksTracking;
     public final String islandTopOrder;
     public boolean coopMembers;
@@ -292,6 +293,7 @@ public class SettingsContainer {
         stackedBlocksMenuTitle = Formatters.COLOR_FORMATTER.format(config.getString("stacked-blocks.deposit-menu.title", "&lDeposit Blocks"));
         islandLevelFormula = config.getString("island-level-formula", "{} / 2");
         roundedIslandLevel = config.getBoolean("rounded-island-level", false);
+        islandLevelRoundingMode = config.getString("island-level-rounding-mode", "HALF_UP").toUpperCase(Locale.ENGLISH);
         autoBlocksTracking = config.getBoolean("auto-blocks-tracking", true);
         islandTopOrder = config.getString("island-top-order", "WORTH").toUpperCase(Locale.ENGLISH);
         coopMembers = config.getBoolean("coop-members", true);

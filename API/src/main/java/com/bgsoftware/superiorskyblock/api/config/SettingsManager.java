@@ -86,6 +86,12 @@ public interface SettingsManager {
     boolean isRoundedIslandLevels();
 
     /**
+     * The rounding mode used for the island level when rounded-island-level feature is enabled.
+     * Config path: island-level-rounding-mode
+     */
+    String getIslandLevelRoundingMode();
+
+    /**
      * Whether to automatic track block counts when players place and break blocks.
      * Config path: auto-blocks-tracking
      */

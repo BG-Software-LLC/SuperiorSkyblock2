@@ -44,6 +44,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().roundedIslandLevel;
     }
 
+    public String getIslandLevelRoundingMode() {
+        return getContainer().islandLevelRoundingMode;
+    }
+
     public boolean isAutoBlocksTracking() {
         return getContainer().autoBlocksTracking;
     }
