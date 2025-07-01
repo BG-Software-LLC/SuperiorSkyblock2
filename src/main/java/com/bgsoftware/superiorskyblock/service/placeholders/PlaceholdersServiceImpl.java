@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -32,6 +33,7 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.potion.PotionEffectType;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
@@ -53,7 +55,11 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern PLAYER_PLACEHOLDER_PATTERN = Pattern.compile("player_(.+)");
 
     private static final Pattern BLOCK_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_block_count_(.+)");
+    private static final Pattern BLOCK_LEVEL_PLACEHOLDER_PATTERN = Pattern.compile("island_block_level_(.+)");
     private static final Pattern BLOCK_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_block_limit_(.+)");
+    private static final Pattern BLOCK_TOTAL_LEVEL_PLACEHOLDER_PATTERN = Pattern.compile("island_block_total_level_(.+)");
+    private static final Pattern BLOCK_TOTAL_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("island_block_total_worth_(.+)");
+    private static final Pattern BLOCK_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("island_block_worth_(.+)");
     private static final Pattern EFFECT_PLACEHOLDER_PATTERN = Pattern.compile("island_effect_(.+)");
     private static final Pattern ENTITY_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_entity_count_(.+)");
     private static final Pattern ENTITY_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_entity_limit_(.+)");
@@ -538,9 +544,27 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 if ((matcher = BLOCK_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
                     return Optional.of(island.getBlockCountAsBigInteger(Keys.ofMaterialAndData(keyName)) + "");
+                } else if ((matcher = BLOCK_LEVEL_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                    String keyName = matcher.group(1);
+                    BlockValue blockValue = plugin.getBlockValues().getBlockValue(Keys.ofMaterialAndData(keyName));
+                    return Optional.of(blockValue.getLevel() + "");
                 } else if ((matcher = BLOCK_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
                     return Optional.of(island.getBlockLimit(Keys.ofMaterialAndData(keyName)) + "");
+                } else if ((matcher = BLOCK_TOTAL_LEVEL_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                    String keyName = matcher.group(1);
+                    BlockValue blockValue = plugin.getBlockValues().getBlockValue(Keys.ofMaterialAndData(keyName));
+                    BigDecimal amount = new BigDecimal(island.getBlockCountAsBigInteger(Keys.ofMaterialAndData(keyName)));
+                    return Optional.of(blockValue.getLevel().multiply(amount) + "");
+                } else if ((matcher = BLOCK_TOTAL_WORTH_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                    String keyName = matcher.group(1);
+                    BlockValue blockValue = plugin.getBlockValues().getBlockValue(Keys.ofMaterialAndData(keyName));
+                    BigDecimal amount = new BigDecimal(island.getBlockCountAsBigInteger(Keys.ofMaterialAndData(keyName)));
+                    return Optional.of(blockValue.getWorth().multiply(amount) + "");
+                } else if ((matcher = BLOCK_WORTH_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                    String keyName = matcher.group(1);
+                    BlockValue blockValue = plugin.getBlockValues().getBlockValue(Keys.ofMaterialAndData(keyName));
+                    return Optional.of(blockValue.getWorth() + "");
                 } else if ((matcher = EFFECT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String effectName = matcher.group(1);
                     PotionEffectType potionEffectType = PotionEffectType.getByName(effectName);
