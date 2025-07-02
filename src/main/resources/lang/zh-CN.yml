@@ -681,6 +681,8 @@ SETTINGS_UPDATED: '&e&l岛屿 | &7成功修改了玩家 {1} 的岛屿设置 {0}.
 SETTINGS_UPDATED_NAME: '&e&l岛屿 | &7S成功修改了岛屿 {1} 的设置 {0}.'
 SETTINGS_UPDATED_ALL: '&e&l岛屿 | &7成功更新了所有岛屿的 {0} 设置.'
 SIZE_BIGGER_MAX: '&c&l错误 | &7你不能将大小设置为超出岛屿最大大小的数值.'
+SPAWN_PROTECTED: '&c&lError | &7Spawn is protected.'
+SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 SPAWN_TELEPORT_SUCCESS: '&e&l主城 | &7成功将玩家 {0} 传送至主城.'
 SPAWN_SET_SUCCESS: '&e&l主城 | &7成功将出生点位置设置为了 {0}.'
 SPY_TEAM_CHAT_FORMAT: '&7[窃听] &e[{0}] {1}&f: &7{2}'
