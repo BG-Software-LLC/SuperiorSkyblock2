@@ -12,6 +12,8 @@ import java.util.Locale;
 
 public interface NMSPlayers {
 
+    void clearEnderChest(OfflinePlayer offlinePlayer);
+
     void clearInventory(OfflinePlayer offlinePlayer);
 
     void setSkinTexture(SuperiorPlayer superiorPlayer);

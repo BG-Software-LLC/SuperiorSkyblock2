@@ -91,7 +91,9 @@ public class CmdAdminAdd implements IAdminIslandCommand {
 
         if (plugin.getSettings().isTeleportOnJoin() && targetPlayer.isOnline())
             targetPlayer.teleport(island);
-        if (plugin.getSettings().isClearOnJoin())
+        if (plugin.getSettings().isClearEnderChestOnJoin())
+            plugin.getNMSPlayers().clearEnderChest(targetPlayer.asOfflinePlayer());
+        if (plugin.getSettings().isClearInventoryOnJoin())
             plugin.getNMSPlayers().clearInventory(targetPlayer.asOfflinePlayer());
     }
 

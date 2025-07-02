@@ -262,11 +262,6 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
-    public boolean isDisbandInventoryClear() {
-        return this.global.isDisbandInventoryClear();
-    }
-
-    @Override
     public IslandNames getIslandNames() {
         return this.islandNames;
     }
@@ -282,8 +277,23 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
-    public boolean isClearOnJoin() {
-        return this.global.isClearOnJoin();
+    public boolean isClearEnderChestOnDisband() {
+        return this.global.isClearEnderChestOnDisband();
+    }
+
+    @Override
+    public boolean isClearEnderChestOnJoin() {
+        return this.global.isClearEnderChestOnJoin();
+    }
+
+    @Override
+    public boolean isClearInventoryOnDisband() {
+        return this.global.isClearInventoryOnDisband();
+    }
+
+    @Override
+    public boolean isClearInventoryOnJoin() {
+        return this.global.isClearInventoryOnJoin();
     }
 
     @Override

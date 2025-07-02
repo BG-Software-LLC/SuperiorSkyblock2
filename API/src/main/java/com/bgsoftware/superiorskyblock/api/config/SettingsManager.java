@@ -237,12 +237,6 @@ public interface SettingsManager {
     String getStackedBlocksProvider();
 
     /**
-     * Whether inventory of island members should be cleared when their island is disbanded or not.
-     * Config-path: disband-inventory-clear
-     */
-    boolean isDisbandInventoryClear();
-
-    /**
      * All settings related to island-names.
      * Config path: island-names
      */
@@ -261,10 +255,28 @@ public interface SettingsManager {
     boolean isTeleportOnKick();
 
     /**
-     * Whether to clear players' inventories when they join a new island or not.
-     * Config-path: clear-on-join
+     * Whether to clear members Ender Chest when their island is disbanded or not.
+     * Config-path: clear-ender-chest-on-disband
      */
-    boolean isClearOnJoin();
+    boolean isClearEnderChestOnDisband();
+
+    /**
+     * Whether to clear players Ender Chest when they join a new island or not.
+     * Config-path: clear-ender-chest-on-join
+     */
+    boolean isClearEnderChestOnJoin();
+
+    /**
+     * Whether to clear players inventory when their island is disbanded or not.
+     * Config-path: clear-inventory-on-disband
+     */
+    boolean isClearInventoryOnDisband();
+
+    /**
+     * Whether to clear players inventory when they join a new island or not.
+     * Config-path: clear-inventory-on-join
+     */
+    boolean isClearInventoryOnJoin();
 
     /**
      * Whether players can rate their own island or not.
