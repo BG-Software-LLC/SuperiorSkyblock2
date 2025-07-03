@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvider;
@@ -60,6 +61,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern BLOCK_TOTAL_LEVEL_PLACEHOLDER_PATTERN = Pattern.compile("island_block_total_level_(.+)");
     private static final Pattern BLOCK_TOTAL_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("island_block_total_worth_(.+)");
     private static final Pattern BLOCK_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("island_block_worth_(.+)");
+    private static final Pattern COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_block_count_(.+)");
     private static final Pattern EFFECT_PLACEHOLDER_PATTERN = Pattern.compile("island_effect_(.+)");
     private static final Pattern ENTITY_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_entity_count_(.+)");
     private static final Pattern ENTITY_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_entity_limit_(.+)");
@@ -338,6 +340,15 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.getWorth().toBigInteger().toString())
                     .put("worth_raw", (island, superiorPlayer) ->
                             island.getWorth().toString())
+                    // Renamed Island Placeholders
+                    .put("hoppers_limit", (island, superiorPlayer) ->
+                            island.getBlockLimit(ConstantKeys.HOPPER) + "")
+                    .put("x", (island, superiorPlayer) ->
+                            island.getCenterPosition().getX() + "")
+                    .put("y", (island, superiorPlayer) ->
+                            island.getCenterPosition().getY() + "")
+                    .put("z", (island, superiorPlayer) ->
+                            island.getCenterPosition().getZ() + "")
                     // Global Placeholders
                     .put("total_level", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(plugin.getGrid().getTotalLevel()))
@@ -446,11 +457,11 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             } else if ((matcher = ISLAND_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                 String subPlaceholder = matcher.group(1).toLowerCase(Locale.ENGLISH);
                 Island island;
-                boolean location = false;
+                boolean isLocationPlaceholder = false;
                 if (superiorPlayer == null) {
                     island = null;
                 } else if (subPlaceholder.startsWith("location_")) {
-                    location = true;
+                    isLocationPlaceholder = true;
                     try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                         island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation(wrapper.getHandle()));
                     }
@@ -458,8 +469,8 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     island = superiorPlayer.getIsland();
                 }
                 placeholderResult = parsePlaceholdersForIsland(island, superiorPlayer,
-                        location ? placeholder.substring(9) : placeholder,
-                        location ? subPlaceholder.substring(9) : subPlaceholder);
+                        isLocationPlaceholder ? placeholder.substring(9) : placeholder,
+                        isLocationPlaceholder ? subPlaceholder.substring(9) : subPlaceholder);
             }
         }
 
@@ -565,6 +576,9 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     String keyName = matcher.group(1);
                     BlockValue blockValue = plugin.getBlockValues().getBlockValue(Keys.ofMaterialAndData(keyName));
                     return Optional.of(blockValue.getWorth() + "");
+                } else if ((matcher = COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                    String keyName = matcher.group(1);
+                    return Optional.of(island.getBlockCountAsBigInteger(Keys.ofMaterialAndData(keyName)) + "");
                 } else if ((matcher = EFFECT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String effectName = matcher.group(1);
                     PotionEffectType potionEffectType = PotionEffectType.getByName(effectName);
