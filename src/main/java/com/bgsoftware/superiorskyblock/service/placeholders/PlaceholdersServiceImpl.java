@@ -243,7 +243,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.hasPermission(superiorPlayer, IslandPrivileges.PAYPAL_SHOW) ? island.getPaypal() : "None")
                     .put("paypal_all", (island, superiorPlayer) ->
                             island.getPaypal())
-                    .put("players", (island, superiorPlayer) ->
+                    .put("players_count", (island, superiorPlayer) ->
                             island.getAllPlayersInside().size() + "")
                     .put("radius", (island, superiorPlayer) ->
                             island.getIslandSize() + "")
