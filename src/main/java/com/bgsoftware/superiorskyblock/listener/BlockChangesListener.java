@@ -196,12 +196,26 @@ public class BlockChangesListener extends AbstractGameEventListener {
     }
 
     private void onEntityChangeBlock(GameEvent<GameEventArgs.EntityChangeBlockEvent> e) {
-        Key blockKey = e.getArgs().newType;
+        Key newBlockKey = e.getArgs().newType;
         Block block = e.getArgs().block;
+        Key oldBlockKey = Keys.of(block);
+
+        if (newBlockKey.equals(oldBlockKey))
+            return;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            this.worldRecordService.get().recordBlockPlace(blockKey, block.getLocation(wrapper.getHandle()), 1,
-                    block.getState(), WorldRecordFlags.SAVE_BLOCK_COUNT);
+            Location blockLocation = block.getLocation(wrapper.getHandle());
+
+            if (!oldBlockKey.equals(ConstantKeys.AIR)) {
+                this.worldRecordService.get().recordBlockBreak(oldBlockKey, blockLocation,
+                        plugin.getNMSWorld().getDefaultAmount(block),
+                        ALL_RECORD_FLAGS);
+            }
+
+            if (!newBlockKey.equals(ConstantKeys.AIR)) {
+                this.worldRecordService.get().recordBlockPlace(newBlockKey, blockLocation, 1,
+                        null, ALL_RECORD_FLAGS);
+            }
         }
     }
 
@@ -213,17 +227,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
     private void onBlockDestroy(GameEvent<GameEventArgs.BlockDestroyEvent> e) {
         this.worldRecordService.get().recordBlockBreak(e.getArgs().block, WorldRecordFlags.DIRTY_CHUNKS);
-    }
-
-    private void onEntityBlockDeath(GameEvent<GameEventArgs.EntityDeathEvent> e) {
-        Entity entity = e.getArgs().entity;
-        if (entity instanceof FallingBlock) {
-            Key blockKey = plugin.getNMSAlgorithms().getFallingBlockType((FallingBlock) entity);
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                this.worldRecordService.get().recordBlockBreak(blockKey, entity.getLocation(wrapper.getHandle()),
-                        1, REGULAR_RECORD_FLAGS);
-            }
-        }
     }
 
     private void onBucketFill(GameEvent<GameEventArgs.PlayerFillBucketEvent> e) {
@@ -273,6 +276,11 @@ public class BlockChangesListener extends AbstractGameEventListener {
     }
 
     private void onBlockFromTo(GameEvent<GameEventArgs.BlockFromToEvent> e) {
+        // Ignore dragon eggs, otherwise it will add +1 to the count of dragon eggs
+        // when right-clicking them
+        if (e.getArgs().block.getType() == Material.DRAGON_EGG)
+            return;
+
         Block toBlock = e.getArgs().toBlock;
 
         if (toBlock.getType() != Material.AIR) {
@@ -360,7 +368,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.MONITOR, this::onEntityChangeBlock);
         registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.MONITOR, this::onBlockBreak);
         registerCallback(GameEventType.BLOCK_DESTROY_EVENT, GameEventPriority.MONITOR, this::onBlockDestroy);
-        registerCallback(GameEventType.ENTITY_DEATH_EVENT, GameEventPriority.MONITOR, this::onEntityBlockDeath);
         registerCallback(GameEventType.PLAYER_FILL_BUCKET_EVENT, GameEventPriority.MONITOR, this::onBucketFill);
         registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.MONITOR, this::onDragonEggDrop);
         registerCallback(GameEventType.PISTON_EXTEND_EVENT, GameEventPriority.MONITOR, this::onPistonExtend);
