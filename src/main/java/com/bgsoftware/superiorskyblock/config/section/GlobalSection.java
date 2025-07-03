@@ -116,6 +116,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().leaveConfirm;
     }
 
+    public boolean isTransferConfirm() {
+        return getContainer().transferConfirm;
+    }
+
     public String getSpawnersProvider() {
         return getContainer().spawnersProvider;
     }

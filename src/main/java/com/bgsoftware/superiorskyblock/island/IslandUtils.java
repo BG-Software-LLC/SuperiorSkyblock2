@@ -186,6 +186,34 @@ public class IslandUtils {
         return totalAmount == 0 ? 0 : (island.getGeneratorAmount(key, dimension) * 100D) / totalAmount;
     }
 
+    public static boolean checkTransferRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
+        if (!superiorPlayer.getPlayerRole().isLastRole()) {
+            Message.NO_TRANSFER_PERMISSION.send(superiorPlayer);
+            return false;
+        }
+
+        if (!island.isMember(targetPlayer)) {
+            Message.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
+            return false;
+        }
+
+        if (island.getOwner().getUniqueId().equals(targetPlayer.getUniqueId())) {
+            Message.TRANSFER_ALREADY_LEADER.send(superiorPlayer);
+            return false;
+        }
+
+        return true;
+    }
+
+    public static void handleTransferIsland(SuperiorPlayer caller, Island island, SuperiorPlayer target) {
+        if (!PluginEventsFactory.callIslandTransferEvent(island, caller, target))
+            return;
+
+        island.transferIsland(target);
+
+        IslandUtils.sendMessage(island, Message.TRANSFER_BROADCAST, Collections.emptyList(), target.getName());
+    }
+
     public static boolean checkKickRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
         if (!island.isMember(targetPlayer)) {
             Message.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);

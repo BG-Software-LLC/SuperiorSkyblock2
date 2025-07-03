@@ -131,6 +131,17 @@ public interface MenusManager {
     void openConfirmLeave(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu);
 
     /**
+     * Open the confirm-transfer menu.
+     * Used to confirm the transfer of an island.
+     *
+     * @param targetPlayer The player to open the menu for.
+     * @param previousMenu The previous menu that was opened, if exists.
+     * @param targetIsland The island to ban the player from.
+     * @param newOwner The player that will be banned.
+     */
+    void openConfirmTransfer(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland, SuperiorPlayer newOwner);
+
+    /**
      * Open the control-panel menu.
      * Used when opening the control panel of an island.
      *

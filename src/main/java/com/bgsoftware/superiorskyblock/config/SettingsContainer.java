@@ -139,6 +139,7 @@ public class SettingsContainer {
     public final boolean disbandConfirm;
     public final boolean kickConfirm;
     public final boolean leaveConfirm;
+    public final boolean transferConfirm;
     public final String spawnersProvider;
     public final String stackedBlocksProvider;
     public final boolean disbandInventoryClear;
@@ -378,6 +379,7 @@ public class SettingsContainer {
         disbandConfirm = config.getBoolean("disband-confirm");
         kickConfirm = config.getBoolean("kick-confirm");
         leaveConfirm = config.getBoolean("leave-confirm");
+        transferConfirm = config.getBoolean("transfer-confirm");
         spawnersProvider = config.getString("spawners-provider", "AUTO");
         stackedBlocksProvider = config.getString("stacked-blocks-provider", "AUTO");
         disbandInventoryClear = config.getBoolean("disband-inventory-clear", true);

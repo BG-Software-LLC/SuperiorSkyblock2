@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmBan;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmDisband;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmKick;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmLeave;
+import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmTransfer;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuControlPanel;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCoops;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCounts;
@@ -56,6 +57,7 @@ public class Menus {
     public static MenuConfirmDisband MENU_CONFIRM_DISBAND;
     public static MenuConfirmKick MENU_CONFIRM_KICK;
     public static MenuConfirmLeave MENU_CONFIRM_LEAVE;
+    public static MenuConfirmTransfer MENU_CONFIRM_TRANSFER;
     public static MenuControlPanel MENU_CONTROL_PANEL;
     public static MenuCoops MENU_COOPS;
     public static MenuCounts MENU_COUNTS;
@@ -102,6 +104,7 @@ public class Menus {
         MENU_CONFIRM_DISBAND = createMenu(MenuConfirmDisband.createInstance());
         MENU_CONFIRM_KICK = createMenu(MenuConfirmKick.createInstance());
         MENU_CONFIRM_LEAVE = createMenu(MenuConfirmLeave.createInstance());
+        MENU_CONFIRM_TRANSFER = createMenu(MenuConfirmTransfer.createInstance());
         MENU_CONTROL_PANEL = createMenu(MenuControlPanel.createInstance());
         MENU_COOPS = createMenu(MenuCoops.createInstance());
         MENU_COUNTS = createMenu(MenuCounts.createInstance());
