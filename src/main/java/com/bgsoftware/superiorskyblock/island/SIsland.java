@@ -1771,6 +1771,9 @@ public class SIsland implements Island {
     public void disbandIsland() {
         long profilerId = Profiler.start(ProfileType.DISBAND_ISLAND, 2);
 
+        boolean clearInventory = plugin.getSettings().isClearInventoryOnDisband();
+        boolean clearEnderChest = plugin.getSettings().isClearEnderChestOnDisband();
+
         forEachIslandMember(Collections.emptyList(), false, islandMember -> {
             if (islandMember.equals(owner)) {
                 owner.setIsland(null);
@@ -1778,10 +1781,8 @@ public class SIsland implements Island {
                 kickMember(islandMember);
             }
 
-            if (plugin.getSettings().isClearEnderChestOnDisband())
-                plugin.getNMSPlayers().clearEnderChest(islandMember.asOfflinePlayer());
-            if (plugin.getSettings().isClearInventoryOnDisband())
-                plugin.getNMSPlayers().clearInventory(islandMember.asOfflinePlayer());
+            if (clearInventory || clearEnderChest)
+                plugin.getNMSPlayers().clearInventory(islandMember.asOfflinePlayer(), clearInventory, clearEnderChest);
 
             for (Mission<?> mission : plugin.getMissions().getPlayerMissions()) {
                 MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);

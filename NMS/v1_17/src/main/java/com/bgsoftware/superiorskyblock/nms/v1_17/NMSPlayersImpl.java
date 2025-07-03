@@ -41,16 +41,16 @@ public class NMSPlayersImpl implements NMSPlayers {
     }
 
     @Override
-    public void clearEnderChest(OfflinePlayer offlinePlayer) {
-        clearInventoryInternal(offlinePlayer, false, true);
+    public void clearInventory(OfflinePlayer offlinePlayer) {
+        clearInventory(offlinePlayer, true, true);
     }
 
     @Override
-    public void clearInventory(OfflinePlayer offlinePlayer) {
-        clearInventoryInternal(offlinePlayer, true, false);
-    }
+    public void clearInventory(OfflinePlayer offlinePlayer, boolean inventory, boolean enderChest) {
+        if (!inventory && !enderChest) {
+            return;
+        }
 
-    public void clearInventoryInternal(OfflinePlayer offlinePlayer, boolean inventory, boolean enderchest) {
         if (offlinePlayer.isOnline() || offlinePlayer instanceof Player) {
             Player player = offlinePlayer instanceof Player ? (Player) offlinePlayer : offlinePlayer.getPlayer();
             assert player != null;
@@ -58,7 +58,7 @@ public class NMSPlayersImpl implements NMSPlayers {
             if (inventory) {
                 player.getInventory().clear();
             }
-            if (enderchest) {
+            if (enderChest) {
                 player.getEnderChest().clear();
             }
 
@@ -78,12 +78,7 @@ public class NMSPlayersImpl implements NMSPlayers {
 
         targetPlayer.loadData();
 
-        if (inventory) {
-            clearInventory(targetPlayer);
-        }
-        if (enderchest) {
-            clearEnderChest(targetPlayer);
-        }
+        clearInventory(offlinePlayer, inventory, enderChest);
 
         //Setting the entity to the spawn location
         Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter(Dimensions.NORMAL);

@@ -12,9 +12,9 @@ import java.util.Locale;
 
 public interface NMSPlayers {
 
-    void clearEnderChest(OfflinePlayer offlinePlayer);
-
     void clearInventory(OfflinePlayer offlinePlayer);
+
+    void clearInventory(OfflinePlayer offlinePlayer, boolean inventory, boolean enderChest);
 
     void setSkinTexture(SuperiorPlayer superiorPlayer);
 

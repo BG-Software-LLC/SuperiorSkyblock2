@@ -137,7 +137,7 @@ public class GlobalSection extends SettingsContainerHolder {
     }
 
     public boolean isClearEnderChestOnJoin() {
-        return getContainer().clearEnderChestOnDisband;
+        return getContainer().clearEnderChestOnJoin;
     }
 
     public boolean isClearInventoryOnDisband() {
