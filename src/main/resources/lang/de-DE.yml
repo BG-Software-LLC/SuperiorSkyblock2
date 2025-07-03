@@ -867,6 +867,8 @@ SETTINGS_UPDATED_ALL: '&e&lInsel | &7Die Einstellungen {0} wurden erfolgreich f�
   alle Inseln aktualisiert.'
 SIZE_BIGGER_MAX: '&c&lError | &7Du kannst keine Größe festlegen, die größer als die
   maximale Inselgröße ist.'
+SPAWN_PROTECTED: '&c&lError | &7Spawn is protected.'
+SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Erfolgreich teleportiert {0} zum Spawn.'
 SPAWN_SET_SUCCESS: '&e&lSpawn | &7Der Spawn-Speicherort wurde erfolgreich auf {0}
   aktualisiert.'

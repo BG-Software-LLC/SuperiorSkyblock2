@@ -4,11 +4,13 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
@@ -27,6 +29,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -695,6 +698,8 @@ public enum Message {
     SET_WARP,
     SET_WARP_OUTSIDE,
     SIZE_BIGGER_MAX,
+    SPAWN_PROTECTED,
+    SPAWN_PROTECTED_OPPED,
     SPAWN_SET_SUCCESS,
     SPAWN_TELEPORT_SUCCESS,
     SPY_TEAM_CHAT_FORMAT,
@@ -812,11 +817,23 @@ public enum Message {
                     return;
             }
 
-            Message.ISLAND_PROTECTED.send(sender, locale, args);
+            boolean isSpawnIsland;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Island island = plugin.getGrid().getIslandAt(((Player) sender).getLocation(wrapper.getHandle()));
+                isSpawnIsland = island != null && island.isSpawn();
+            }
+
+            if (!isSpawnIsland)
+                Message.ISLAND_PROTECTED.send(sender, locale, args);
+            else
+                Message.SPAWN_PROTECTED.send(sender, locale, args);
 
             SuperiorCommand bypassCommand = plugin.getCommands().getAdminCommand("bypass");
             if (CommandsHelper.hasCommandAccess(bypassCommand, sender))
-                Message.ISLAND_PROTECTED_OPPED.send(sender, locale, args);
+                if (!isSpawnIsland)
+                    Message.ISLAND_PROTECTED_OPPED.send(sender, locale, args);
+                else
+                    Message.SPAWN_PROTECTED_OPPED.send(sender, locale, args);
         }
     },
 
