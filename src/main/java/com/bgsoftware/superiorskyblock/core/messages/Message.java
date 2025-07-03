@@ -817,21 +817,20 @@ public enum Message {
                     return;
             }
 
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-            Island island;
-
+            boolean isSpawnIsland;
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation(wrapper.getHandle()));
+                Island island = plugin.getGrid().getIslandAt(((Player) sender).getLocation(wrapper.getHandle()));
+                isSpawnIsland = island != null && island.isSpawn();
             }
 
-            if (island != null && !island.isSpawn())
+            if (!isSpawnIsland)
                 Message.ISLAND_PROTECTED.send(sender, locale, args);
             else
                 Message.SPAWN_PROTECTED.send(sender, locale, args);
 
             SuperiorCommand bypassCommand = plugin.getCommands().getAdminCommand("bypass");
             if (CommandsHelper.hasCommandAccess(bypassCommand, sender))
-                if (island != null && !island.isSpawn())
+                if (!isSpawnIsland)
                     Message.ISLAND_PROTECTED_OPPED.send(sender, locale, args);
                 else
                     Message.SPAWN_PROTECTED_OPPED.send(sender, locale, args);
