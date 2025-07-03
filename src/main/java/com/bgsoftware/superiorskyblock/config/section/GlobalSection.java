@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 import org.bukkit.Location;
 
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().roundedIslandLevel;
     }
 
-    public String getIslandLevelRoundingMode() {
+    public RoundingMode getIslandLevelRoundingMode() {
         return getContainer().islandLevelRoundingMode;
     }
 

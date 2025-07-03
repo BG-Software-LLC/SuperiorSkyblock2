@@ -15,6 +15,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +90,7 @@ public interface SettingsManager {
      * The rounding mode used for the island level when rounded-island-level feature is enabled.
      * Config path: island-level-rounding-mode
      */
-    String getIslandLevelRoundingMode();
+    RoundingMode getIslandLevelRoundingMode();
 
     /**
      * Whether to automatic track block counts when players place and break blocks.
