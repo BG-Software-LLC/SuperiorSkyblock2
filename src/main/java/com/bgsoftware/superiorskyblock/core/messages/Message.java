@@ -848,6 +848,8 @@ public enum Message {
 
     };
 
+    private static final Object[] EMPTY_ARGS = new Object[0];
+
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final LazyReference<MessagesService> messagesService = new LazyReference<MessagesService>() {
         @Override
@@ -970,13 +972,26 @@ public enum Message {
     }
 
     @Nullable
+    public String getMessage(Locale locale) {
+        return getMessage(locale, EMPTY_ARGS);
+    }
+
+    @Nullable
     public String getMessage(Locale locale, Object... args) {
         return isEmpty(locale) ? defaultMessage : messages.get(locale).getMessage(args);
+    }
+
+    public final void send(SuperiorPlayer superiorPlayer) {
+        send(superiorPlayer, EMPTY_ARGS);
     }
 
     public final void send(SuperiorPlayer superiorPlayer, Object... args) {
         if (PluginEventsFactory.callAttemptPlayerSendMessageEvent(superiorPlayer, name(), args))
             superiorPlayer.runIfOnline(player -> send(player, superiorPlayer.getUserLocale(), args));
+    }
+
+    public final void send(CommandSender sender) {
+        send(sender, EMPTY_ARGS);
     }
 
     public final void send(CommandSender sender, Object... args) {
@@ -989,7 +1004,11 @@ public enum Message {
         send(sender, PlayerLocales.getLocale(sender), args);
     }
 
-    public void send(CommandSender sender, Locale locale, Object... objects) {
+    public void send(CommandSender sender, Locale locale) {
+        send(sender, locale, EMPTY_ARGS);
+    }
+
+    public void send(CommandSender sender, Locale locale, Object... args) {
         IMessageComponent messageComponent = getComponent(locale);
         if (messageComponent == null)
             return;
@@ -1000,9 +1019,9 @@ public enum Message {
                 return;
         }
 
-        PluginEvent<PluginEventArgs.SendMessage> event = PluginEventsFactory.callSendMessageEvent(sender, name(), messageComponent, objects);
+        PluginEvent<PluginEventArgs.SendMessage> event = PluginEventsFactory.callSendMessageEvent(sender, name(), messageComponent, args);
         if (!event.isCancelled()) {
-            event.getArgs().messageComponent.sendMessage(sender, objects);
+            event.getArgs().messageComponent.sendMessage(sender, args);
             if (!(sender instanceof Player) && Log.isDebugged(Debug.SHOW_STACKTRACE)) {
                 Thread.dumpStack();
             }
