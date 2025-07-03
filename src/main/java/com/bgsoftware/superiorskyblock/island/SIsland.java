@@ -2921,7 +2921,7 @@ public class SIsland implements Island {
         BigDecimal islandLevel = this.islandLevel.get().add(bonusLevel);
 
         if (plugin.getSettings().isRoundedIslandLevels()) {
-            islandLevel = islandLevel.setScale(0, RoundingMode.HALF_UP);
+            islandLevel = islandLevel.setScale(0, plugin.getSettings().getIslandLevelRoundingMode());
         }
 
         if (!plugin.getSettings().isNegativeLevel() && islandLevel.compareTo(BigDecimal.ZERO) < 0)
@@ -2935,7 +2935,7 @@ public class SIsland implements Island {
         BigDecimal islandLevel = this.islandLevel.get();
 
         if (plugin.getSettings().isRoundedIslandLevels()) {
-            islandLevel = islandLevel.setScale(0, RoundingMode.HALF_UP);
+            islandLevel = islandLevel.setScale(0, plugin.getSettings().getIslandLevelRoundingMode());
         }
 
         if (!plugin.getSettings().isNegativeLevel() && islandLevel.compareTo(BigDecimal.ZERO) < 0)

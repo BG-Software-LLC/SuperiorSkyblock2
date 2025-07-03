@@ -46,6 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -101,6 +102,7 @@ public class SettingsContainer {
     public final String stackedBlocksMenuTitle;
     public final String islandLevelFormula;
     public final boolean roundedIslandLevel;
+    public final RoundingMode islandLevelRoundingMode;
     public final boolean autoBlocksTracking;
     public final String islandTopOrder;
     public boolean coopMembers;
@@ -293,6 +295,9 @@ public class SettingsContainer {
         stackedBlocksMenuTitle = Formatters.COLOR_FORMATTER.format(config.getString("stacked-blocks.deposit-menu.title", "&lDeposit Blocks"));
         islandLevelFormula = config.getString("island-level-formula", "{} / 2");
         roundedIslandLevel = config.getBoolean("rounded-island-level", false);
+        islandLevelRoundingMode = Optional.ofNullable(EnumHelper.getEnum(RoundingMode.class,
+                        config.getString("island-level-rounding-mode").toUpperCase(Locale.ENGLISH)))
+                .orElse(RoundingMode.HALF_UP);
         autoBlocksTracking = config.getBoolean("auto-blocks-tracking", true);
         islandTopOrder = config.getString("island-top-order", "WORTH").toUpperCase(Locale.ENGLISH);
         coopMembers = config.getBoolean("coop-members", true);
