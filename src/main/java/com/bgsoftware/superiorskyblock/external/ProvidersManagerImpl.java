@@ -534,7 +534,11 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             }
         } else if (canRegisterHook("UltimateStacker") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("UltimateStacker"))) {
-            if (Bukkit.getPluginManager().getPlugin("UltimateStacker").getDescription().getVersion().startsWith("3")) {
+            String version = Bukkit.getPluginManager().getPlugin("UltimateStacker").getDescription().getVersion();
+            int majorVersion = Integer.parseInt(String.valueOf(version.charAt(0)));
+            if (majorVersion >= 4) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_UltimateStacker4");
+            } else if (majorVersion == 3) {
                 spawnersProvider = createInstance("spawners.SpawnersProvider_UltimateStacker3");
             } else {
                 spawnersProvider = createInstance("spawners.SpawnersProvider_UltimateStacker");
