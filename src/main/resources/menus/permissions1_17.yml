@@ -116,12 +116,16 @@ permissions:
       lore:
         - '&7Access to damage animals inside the island.'
         - '&7Currently &aENABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     permission-disabled:
       type: DIAMOND_SWORD
       name: '&6Animal Damage'
       lore:
         - '&7Access to damage animals inside the island.'
         - '&7Currently &cDISABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     role-permission:
       type: DIAMOND_SWORD
       name: '&6Animal Damage'
@@ -130,6 +134,8 @@ permissions:
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'
+      flags:
+        - HIDE_ATTRIBUTES
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -248,12 +254,16 @@ permissions:
       lore:
         - '&7Access to break blocks inside the island.'
         - '&7Currently &aENABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     permission-disabled:
       type: DIAMOND_PICKAXE
       name: '&6Break'
       lore:
         - '&7Access to break blocks inside the island.'
         - '&7Currently &cDISABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     role-permission:
       type: DIAMOND_PICKAXE
       name: '&6Break'
@@ -262,6 +272,8 @@ permissions:
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'
+      flags:
+        - HIDE_ATTRIBUTES
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -2064,12 +2076,16 @@ permissions:
       lore:
         - '&7Access to change roles for island members.'
         - '&7Currently &aENABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     permission-disabled:
       type: DIAMOND_CHESTPLATE
       name: '&6Set Role'
       lore:
         - '&7Access to change roles for island members.'
         - '&7Currently &cDISABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     role-permission:
       type: DIAMOND_CHESTPLATE
       name: '&6Set Role'
@@ -2078,6 +2094,8 @@ permissions:
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'
+      flags:
+        - HIDE_ATTRIBUTES
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
