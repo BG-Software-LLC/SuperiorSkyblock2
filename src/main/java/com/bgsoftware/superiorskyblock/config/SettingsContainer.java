@@ -396,7 +396,7 @@ public class SettingsContainer {
         clearEnderChestOnDisband = config.getBoolean("clear-ender-chest-on-disband", true);
         clearEnderChestOnJoin = config.getBoolean("clear-ender-chest-on-join", false);
         clearInventoryOnDisband = config.getBoolean("clear-inventory-on-disband", true);
-        clearInventoryOnJoin = config.getBoolean("clear-inventory-on-join", true);
+        clearInventoryOnJoin = config.getBoolean("clear-inventory-on-join", false);
         rateOwnIsland = config.getBoolean("rate-own-island", false);
         changeIslandRating = config.getBoolean("change-island-rating", true);
         defaultSettings = Collections.unmodifiableList(config.getStringList("default-settings")

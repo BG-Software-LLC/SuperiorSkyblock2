@@ -262,6 +262,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public boolean isDisbandInventoryClear() {
+        return this.global.isClearEnderChestOnDisband() && this.global.isClearInventoryOnDisband();
+    }
+
+    @Override
     public IslandNames getIslandNames() {
         return this.islandNames;
     }
@@ -274,6 +279,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     @Override
     public boolean isTeleportOnKick() {
         return this.global.isTeleportOnKick();
+    }
+
+    @Override
+    public boolean isClearOnJoin() {
+        return this.global.isClearEnderChestOnJoin() && this.global.isClearInventoryOnJoin();
     }
 
     @Override
@@ -655,6 +665,16 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     private void convertData(YamlConfiguration cfg) {
+        if (cfg.contains("disband-inventory-clear")) {
+            cfg.set("clear-ender-chest-on-disband", cfg.getBoolean("disband-inventory-clear"));
+            cfg.set("clear-inventory-on-disband", cfg.getBoolean("disband-inventory-clear"));
+            cfg.set("disband-inventory-clear", null);
+        }
+        if (cfg.contains("clear-on-join")) {
+            cfg.set("clear-ender-chest-on-join", cfg.getBoolean("clear-on-join"));
+            cfg.set("clear-inventory-on-join", cfg.getBoolean("clear-on-join"));
+            cfg.set("clear-on-join", null);
+        }
         if (cfg.contains("default-hoppers-limit")) {
             cfg.set("default-limits", Collections.singletonList("HOPPER:" + cfg.getInt("default-hoppers-limit")));
             cfg.set("default-hoppers-limit", null);

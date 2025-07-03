@@ -237,6 +237,14 @@ public interface SettingsManager {
     String getStackedBlocksProvider();
 
     /**
+     * Return true if both config paths clear-ender-chest-on-disband and clear-inventory-on-disband are true
+     * This method will be deleted in the future!
+     * @deprecated See {@link #isClearEnderChestOnDisband()} and {@link #isClearInventoryOnDisband()}
+     */
+    @Deprecated
+    boolean isDisbandInventoryClear();
+
+    /**
      * All settings related to island-names.
      * Config path: island-names
      */
@@ -253,6 +261,14 @@ public interface SettingsManager {
      * Config-path: teleport-on-kick
      */
     boolean isTeleportOnKick();
+
+    /**
+     * Return true if both config paths clear-ender-chest-on-join and clear-inventory-on-join are true
+     * This method will be deleted in the future!
+     * @deprecated See {@link #isClearEnderChestOnJoin()} and {@link #isClearInventoryOnJoin()}
+     */
+    @Deprecated
+    boolean isClearOnJoin();
 
     /**
      * Whether to clear members Ender Chest when their island is disbanded or not.
