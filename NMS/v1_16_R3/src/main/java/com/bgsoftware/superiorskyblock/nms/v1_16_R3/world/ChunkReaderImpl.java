@@ -15,6 +15,7 @@ import net.minecraft.server.v1_16_R3.BlockStateBoolean;
 import net.minecraft.server.v1_16_R3.BlockStateInteger;
 import net.minecraft.server.v1_16_R3.Blocks;
 import net.minecraft.server.v1_16_R3.Chunk;
+import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
 import net.minecraft.server.v1_16_R3.ChunkSection;
 import net.minecraft.server.v1_16_R3.DataPaletteBlock;
 import net.minecraft.server.v1_16_R3.Entity;
@@ -42,8 +43,7 @@ import java.util.Map;
 
 public class ChunkReaderImpl implements ChunkReader {
 
-    private static final DataPaletteBlock<IBlockData> EMPTY_BLOCKS =
-            new ChunkSection(0, null, null, true).getBlocks();
+    private static final DataPaletteBlock<IBlockData> EMPTY_BLOCKS = new ChunkSection(0).getBlocks();
     private static final byte[] EMPTY_LIGHT = new byte[2048];
 
     private final int x;
@@ -58,8 +58,9 @@ public class ChunkReaderImpl implements ChunkReader {
     public ChunkReaderImpl(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
 
-        this.x = chunk.locX;
-        this.z = chunk.locZ;
+        ChunkCoordIntPair chunkCoords = chunk.getPos();
+        this.x = chunkCoords.x;
+        this.z = chunkCoords.z;
 
         ChunkSection[] chunkSections = chunk.getSections();
         this.blockids = new DataPaletteBlock[chunkSections.length];
@@ -83,7 +84,8 @@ public class ChunkReaderImpl implements ChunkReader {
                     this.skylight[i] = EMPTY_LIGHT;
                 } else {
                     this.skylight[i] = new byte[2048];
-                    System.arraycopy(skyLightArray.getIfSet(), 0, this.skylight[i], 0, 2048);
+                    if (!skyLightArray.c())
+                        System.arraycopy(skyLightArray.asBytes(), 0, this.skylight[i], 0, 2048);
                 }
 
                 NibbleArray emitLightArray = lightEngine.a(EnumSkyBlock.BLOCK).a(SectionPosition.a(this.x, i, this.z));
@@ -91,7 +93,8 @@ public class ChunkReaderImpl implements ChunkReader {
                     this.emitlight[i] = EMPTY_LIGHT;
                 } else {
                     this.emitlight[i] = new byte[2048];
-                    System.arraycopy(emitLightArray.getIfSet(), 0, this.emitlight[i], 0, 2048);
+                    if (!emitLightArray.c())
+                        System.arraycopy(emitLightArray.asBytes(), 0, this.emitlight[i], 0, 2048);
                 }
             }
         }
@@ -126,7 +129,7 @@ public class ChunkReaderImpl implements ChunkReader {
 
     @Override
     public Material getType(int x, int y, int z) {
-        return getBlockData(x, y, z).getBukkitMaterial();
+        return CraftMagicNumbers.getMaterial(getBlockData(x, y, z).getBlock());
     }
 
     @Override
@@ -209,7 +212,7 @@ public class ChunkReaderImpl implements ChunkReader {
         original.a(data, "Palette", "BlockStates");
 
         DataPaletteBlock<IBlockData> blockids = new DataPaletteBlock<>(ChunkSection.GLOBAL_PALETTE, Block.REGISTRY_ID,
-                GameProfileSerializer::c, GameProfileSerializer::a, Blocks.AIR.getBlockData(), null, false);
+                GameProfileSerializer::c, GameProfileSerializer::a, Blocks.AIR.getBlockData());
         blockids.a(data.getList("Palette", 10), data.getLongArray("BlockStates"));
 
         return blockids;

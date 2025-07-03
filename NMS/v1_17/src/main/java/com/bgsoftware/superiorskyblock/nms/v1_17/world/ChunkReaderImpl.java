@@ -39,8 +39,7 @@ import java.util.Map;
 
 public class ChunkReaderImpl implements ChunkReader {
 
-    private static final PalettedContainer<BlockState> EMPTY_STATES =
-            new LevelChunkSection(0, null, null, true).getStates();
+    private static final PalettedContainer<BlockState> EMPTY_STATES = new LevelChunkSection(0).getStates();
     private static final byte[] EMPTY_LIGHT = new byte[2048];
 
     private final ServerLevel serverLevel;
