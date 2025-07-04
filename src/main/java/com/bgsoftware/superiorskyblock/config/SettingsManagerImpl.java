@@ -274,7 +274,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public boolean isDisbandInventoryClear() {
-        return this.global.isDisbandInventoryClear();
+        return this.global.isClearEnderChestOnDisband() && this.global.isClearInventoryOnDisband();
     }
 
     @Override
@@ -299,7 +299,27 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public boolean isClearOnJoin() {
-        return this.global.isClearOnJoin();
+        return this.global.isClearEnderChestOnJoin() && this.global.isClearInventoryOnJoin();
+    }
+
+    @Override
+    public boolean isClearEnderChestOnDisband() {
+        return this.global.isClearEnderChestOnDisband();
+    }
+
+    @Override
+    public boolean isClearEnderChestOnJoin() {
+        return this.global.isClearEnderChestOnJoin();
+    }
+
+    @Override
+    public boolean isClearInventoryOnDisband() {
+        return this.global.isClearInventoryOnDisband();
+    }
+
+    @Override
+    public boolean isClearInventoryOnJoin() {
+        return this.global.isClearInventoryOnJoin();
     }
 
     @Override
@@ -661,6 +681,16 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     private void convertData(YamlConfiguration cfg) {
+        if (cfg.contains("disband-inventory-clear")) {
+            cfg.set("clear-ender-chest-on-disband", cfg.getBoolean("disband-inventory-clear"));
+            cfg.set("clear-inventory-on-disband", cfg.getBoolean("disband-inventory-clear"));
+            cfg.set("disband-inventory-clear", null);
+        }
+        if (cfg.contains("clear-on-join")) {
+            cfg.set("clear-ender-chest-on-join", cfg.getBoolean("clear-on-join"));
+            cfg.set("clear-inventory-on-join", cfg.getBoolean("clear-on-join"));
+            cfg.set("clear-on-join", null);
+        }
         if (cfg.contains("default-hoppers-limit")) {
             cfg.set("default-limits", Collections.singletonList("HOPPER:" + cfg.getInt("default-hoppers-limit")));
             cfg.set("default-hoppers-limit", null);

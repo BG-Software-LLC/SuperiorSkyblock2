@@ -252,7 +252,11 @@ public interface SettingsManager {
     /**
      * Whether inventory of island members should be cleared when their island is disbanded or not.
      * Config-path: disband-inventory-clear
+     * Return true if both config paths clear-ender-chest-on-disband and clear-inventory-on-disband are true
+     * This method will be deleted in the future!
+     * @deprecated See {@link #isClearEnderChestOnDisband()} and {@link #isClearInventoryOnDisband()}
      */
+    @Deprecated
     boolean isDisbandInventoryClear();
 
     /**
@@ -282,8 +286,36 @@ public interface SettingsManager {
     /**
      * Whether to clear players' inventories when they join a new island or not.
      * Config-path: clear-on-join
+     * Return true if both config paths clear-ender-chest-on-join and clear-inventory-on-join are true
+     * This method will be deleted in the future!
+     * @deprecated See {@link #isClearEnderChestOnJoin()} and {@link #isClearInventoryOnJoin()}
      */
+    @Deprecated
     boolean isClearOnJoin();
+
+    /**
+     * Whether to clear members Ender Chest when their island is disbanded or not.
+     * Config-path: clear-ender-chest-on-disband
+     */
+    boolean isClearEnderChestOnDisband();
+
+    /**
+     * Whether to clear players Ender Chest when they join a new island or not.
+     * Config-path: clear-ender-chest-on-join
+     */
+    boolean isClearEnderChestOnJoin();
+
+    /**
+     * Whether to clear players inventory when their island is disbanded or not.
+     * Config-path: clear-inventory-on-disband
+     */
+    boolean isClearInventoryOnDisband();
+
+    /**
+     * Whether to clear players inventory when they join a new island or not.
+     * Config-path: clear-inventory-on-join
+     */
+    boolean isClearInventoryOnJoin();
 
     /**
      * Whether players can rate their own island or not.

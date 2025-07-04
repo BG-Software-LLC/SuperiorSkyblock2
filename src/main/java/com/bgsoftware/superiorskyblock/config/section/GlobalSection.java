@@ -133,10 +133,6 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().stackedBlocksProvider;
     }
 
-    public boolean isDisbandInventoryClear() {
-        return getContainer().disbandInventoryClear;
-    }
-
     public boolean isTeleportOnCreate() {
         return getContainer().teleportOnCreate;
     }
@@ -149,8 +145,20 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().teleportOnKick;
     }
 
-    public boolean isClearOnJoin() {
-        return getContainer().clearOnJoin;
+    public boolean isClearEnderChestOnDisband() {
+        return getContainer().clearEnderChestOnDisband;
+    }
+
+    public boolean isClearEnderChestOnJoin() {
+        return getContainer().clearEnderChestOnJoin;
+    }
+
+    public boolean isClearInventoryOnDisband() {
+        return getContainer().clearInventoryOnDisband;
+    }
+
+    public boolean isClearInventoryOnJoin() {
+        return getContainer().clearInventoryOnJoin;
     }
 
     public boolean isRateOwnIsland() {

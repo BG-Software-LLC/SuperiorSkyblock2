@@ -144,7 +144,6 @@ public class SettingsContainer {
     public final boolean transferConfirm;
     public final String spawnersProvider;
     public final String stackedBlocksProvider;
-    public final boolean disbandInventoryClear;
     public final boolean islandNamesRequiredForCreation;
     public final int islandNamesMaxLength;
     public final int islandNamesMinLength;
@@ -155,7 +154,10 @@ public class SettingsContainer {
     public final boolean teleportOnCreate;
     public final boolean teleportOnJoin;
     public final boolean teleportOnKick;
-    public final boolean clearOnJoin;
+    public final boolean clearEnderChestOnDisband;
+    public final boolean clearEnderChestOnJoin;
+    public final boolean clearInventoryOnDisband;
+    public final boolean clearInventoryOnJoin;
     public final boolean rateOwnIsland;
     public final boolean changeIslandRating;
     public final List<String> defaultSettings;
@@ -388,7 +390,6 @@ public class SettingsContainer {
         transferConfirm = config.getBoolean("transfer-confirm");
         spawnersProvider = config.getString("spawners-provider", "AUTO");
         stackedBlocksProvider = config.getString("stacked-blocks-provider", "AUTO");
-        disbandInventoryClear = config.getBoolean("disband-inventory-clear", true);
         islandNamesRequiredForCreation = config.getBoolean("island-names.required-for-creation", true);
         islandNamesMaxLength = config.getInt("island-names.max-length", 16);
         islandNamesMinLength = config.getInt("island-names.min-length", 3);
@@ -401,7 +402,10 @@ public class SettingsContainer {
         teleportOnCreate = config.getBoolean("teleport-on-create", true);
         teleportOnJoin = config.getBoolean("teleport-on-join", false);
         teleportOnKick = config.getBoolean("teleport-on-kick", true);
-        clearOnJoin = config.getBoolean("clear-on-join", false);
+        clearEnderChestOnDisband = config.getBoolean("clear-ender-chest-on-disband", true);
+        clearEnderChestOnJoin = config.getBoolean("clear-ender-chest-on-join", false);
+        clearInventoryOnDisband = config.getBoolean("clear-inventory-on-disband", true);
+        clearInventoryOnJoin = config.getBoolean("clear-inventory-on-join", false);
         rateOwnIsland = config.getBoolean("rate-own-island", false);
         changeIslandRating = config.getBoolean("change-island-rating", true);
         defaultSettings = Collections.unmodifiableList(config.getStringList("default-settings")

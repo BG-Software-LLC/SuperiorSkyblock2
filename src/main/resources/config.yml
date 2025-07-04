@@ -467,9 +467,6 @@ spawners-provider: 'AUTO'
 # Providers: Auto, WildStacker, RoseStacker
 stacked-blocks-provider: 'AUTO'
 
-# Should inventories of island members get cleared after disbanding their island?
-disband-inventory-clear: true
-
 # All settings related to island names.
 island-names:
   # Should creation of islands will ask for name (/is create <name>)?
@@ -505,8 +502,17 @@ teleport-on-join: false
 # Should players get teleported to spawn when they are kicked from their island?
 teleport-on-kick: true
 
+# Should the Ender Chest of island members get cleared after disbanding their island?
+clear-ender-chest-on-disband: true
+
+# Should the Ender Chest of the players get cleared after they accept an invite?
+clear-ender-chest-on-join: false
+
+# Should the inventory of island members get cleared after disbanding their island?
+clear-inventory-on-disband: true
+
 # Should the inventory of the players get cleared after they accept an invite?
-clear-on-join: false
+clear-inventory-on-join: false
 
 # Should players be able to rate their own islands?
 rate-own-island: false
