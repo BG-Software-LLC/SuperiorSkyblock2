@@ -49,6 +49,7 @@ public class PropertiesMapper {
         fieldsToNames.put(BlockStateProperties.MODE_COMPARATOR, "comparator-mode");
         fieldsToNames.put(BlockStateProperties.PISTON_TYPE, "piston-type");
         fieldsToNames.put(BlockStateProperties.SLAB_TYPE, "slab-type");
+        fieldsToNames.put(BlockStateProperties.TEST_BLOCK_MODE, "test-block-mode");
 
         try {
             for (Field field : BlockStateProperties.class.getFields()) {
