@@ -41,11 +41,6 @@ public class NMSPlayersImpl implements NMSPlayers {
     }
 
     @Override
-    public void clearInventory(OfflinePlayer offlinePlayer) {
-        clearInventory(offlinePlayer, true, true);
-    }
-
-    @Override
     public void clearInventory(OfflinePlayer offlinePlayer, boolean inventory, boolean enderChest) {
         if (!inventory && !enderChest) {
             return;

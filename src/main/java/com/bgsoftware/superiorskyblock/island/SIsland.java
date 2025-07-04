@@ -1781,8 +1781,7 @@ public class SIsland implements Island {
                 kickMember(islandMember);
             }
 
-            if (clearInventory || clearEnderChest)
-                plugin.getNMSPlayers().clearInventory(islandMember.asOfflinePlayer(), clearInventory, clearEnderChest);
+            plugin.getNMSPlayers().clearInventory(islandMember.asOfflinePlayer(), clearInventory, clearEnderChest);
 
             for (Mission<?> mission : plugin.getMissions().getPlayerMissions()) {
                 MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
