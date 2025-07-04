@@ -45,7 +45,7 @@ public class IslandCreateEvent extends IslandEvent implements Cancellable {
      * @param schematic      The schematic that was used.
      * @param teleport       Whether the player should be teleported after creation.
      */
-    public IslandCreateEvent(SuperiorPlayer superiorPlayer, Island island, String schematic, Boolean teleport) {
+    public IslandCreateEvent(SuperiorPlayer superiorPlayer, Island island, String schematic, boolean teleport) {
         super(island);
         this.superiorPlayer = superiorPlayer;
         this.schematic = schematic;
