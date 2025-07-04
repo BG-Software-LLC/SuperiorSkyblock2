@@ -11,7 +11,7 @@ public class IslandCreateEvent extends IslandEvent implements Cancellable {
 
     private final SuperiorPlayer superiorPlayer;
     private final String schematic;
-    private boolean teleport = true;
+    private boolean teleport;
     private boolean cancelled = false;
 
     /**
