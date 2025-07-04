@@ -262,6 +262,12 @@ public interface SettingsManager {
     IslandNames getIslandNames();
 
     /**
+     * Whether to teleport players to their island when they create it or not.
+     * Config path: teleport-on-create
+     */
+    boolean isTeleportOnCreate();
+
+    /**
      * Whether to teleport players to their island when they join it or not.
      * Config-path: teleport-on-join
      */

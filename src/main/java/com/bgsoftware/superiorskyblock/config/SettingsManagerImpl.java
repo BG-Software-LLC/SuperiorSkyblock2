@@ -283,6 +283,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public boolean isTeleportOnCreate() {
+        return this.global.isTeleportOnCreate();
+    }
+
+    @Override
     public boolean isTeleportOnJoin() {
         return this.global.isTeleportOnJoin();
     }
