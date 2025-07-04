@@ -356,7 +356,7 @@ public class GridManagerImpl extends Manager implements GridManager {
             if (updateGamemode)
                 player.setGameMode(GameMode.SURVIVAL);
 
-            if (!teleportPlayer || !plugin.getSettings().isTeleportOnCreate()) {
+            if (!teleportPlayer) {
                 Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Do not teleport player");
 
                 Message.CREATE_ISLAND.send(builder.owner, Formatters.LOCATION_FORMATTER.format(
