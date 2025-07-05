@@ -496,6 +496,9 @@ island-names:
   # Should the plugin prevent players from using player names as island names?
   prevent-player-names: false
 
+# Should players get teleported to the island after they create it?
+teleport-on-create: true
+
 # Should players get teleported to the island after they accept an invite?
 teleport-on-join: false
 

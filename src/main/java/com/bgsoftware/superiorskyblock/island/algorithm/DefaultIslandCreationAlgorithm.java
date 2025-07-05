@@ -92,7 +92,7 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
 
         island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
 
-        PluginEvent<PluginEventArgs.IslandCreate> event = PluginEventsFactory.callIslandCreateEvent(island, builder.owner, builder.islandType);
+        PluginEvent<PluginEventArgs.IslandCreate> event = PluginEventsFactory.callIslandCreateEvent(island, builder.owner, builder.islandType, plugin.getSettings().isTeleportOnCreate());
 
         if (event.isCancelled()) {
             Log.debugResult(Debug.CREATE_ISLAND, "Creation Failed", "Event was cancelled for creating the island '" + builder.islandName + "'.");
