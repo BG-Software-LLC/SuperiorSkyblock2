@@ -89,7 +89,7 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
 
             ++islandsChangedCount;
 
-            IslandWorlds.accessIslandWorldAsync(island, dimension, islandWorldResult -> {
+            IslandWorlds.accessIslandWorldAsync(island, dimension, true, islandWorldResult -> {
                 islandWorldResult.ifLeft(world -> resetChunksInternal(island, world, dimension));
             });
         }

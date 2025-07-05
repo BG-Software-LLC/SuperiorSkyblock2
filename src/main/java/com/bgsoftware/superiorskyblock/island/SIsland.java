@@ -1285,7 +1285,7 @@ public class SIsland implements Island {
             if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension) && wasSchematicGenerated(dimension)) {
                 hasDimension = true;
                 lastDimension.setValue(dimension);
-                IslandWorlds.accessIslandWorldAsync(this, dimension, result -> {
+                IslandWorlds.accessIslandWorldAsync(this, dimension, true, result -> {
                     result.ifLeft(world -> {
                         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
                         List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, realFlags);
@@ -1314,7 +1314,7 @@ public class SIsland implements Island {
     public void resetChunks(Dimension dimension, @IslandChunkFlags int flags, @Nullable Runnable onFinish) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null");
 
-        IslandWorlds.accessIslandWorldAsync(this, dimension, result -> {
+        IslandWorlds.accessIslandWorldAsync(this, dimension, true, result -> {
             if (result.getRight() == null) {
                 WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
                 List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this,
@@ -2024,7 +2024,7 @@ public class SIsland implements Island {
 
         CompletableFuture<Biome> newTask = new CompletableFuture<>();
 
-        IslandWorlds.accessIslandWorldAsync(this, defaultWorldDimension, islandWorldResult -> {
+        IslandWorlds.accessIslandWorldAsync(this, defaultWorldDimension, true, islandWorldResult -> {
             if (islandWorldResult.getRight() != null) {
                 newTask.completeExceptionally(islandWorldResult.getRight());
                 return;
@@ -2071,7 +2071,7 @@ public class SIsland implements Island {
         List<Player> playersToUpdate = new SequentialListBuilder<Player>()
                 .build(getAllPlayersInside(), SuperiorPlayer::asPlayer);
 
-        IslandWorlds.accessIslandWorldsAsync(this, result -> {
+        IslandWorlds.accessIslandWorldsAsync(this, false, result -> {
             result.ifLeft(world -> {
                 WorldInfo worldInfo = WorldInfo.of(world);
                 Biome worldBiome = plugin.getSettings().getWorlds().getDefaultWorldDimension() == worldInfo.getDimension() ?
@@ -5197,11 +5197,14 @@ public class SIsland implements Island {
         if (!BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class))
             return;
 
+        // If the world is not loaded, we can skip this
+
+
         final int flags = IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS;
 
         double newCropGrowthMultiplier = newCropGrowth - 1;
 
-        IslandWorlds.accessIslandWorldsAsync(this, result -> {
+        IslandWorlds.accessIslandWorldsAsync(this, false, result -> {
             result.ifLeft(world -> {
                 WorldInfo worldInfo = WorldInfo.of(world);
                 List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, flags);

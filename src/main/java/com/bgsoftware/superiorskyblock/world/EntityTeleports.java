@@ -88,7 +88,7 @@ public class EntityTeleports {
 
     public static CompletableFuture<Location> findIslandSafeLocation(Island island, Dimension dimension) {
         CompletableFuture<Location> result = new CompletableFuture<>();
-        IslandWorlds.accessIslandWorldAsync(island, dimension, islandWorldResult -> {
+        IslandWorlds.accessIslandWorldAsync(island, dimension, true, islandWorldResult -> {
             islandWorldResult.ifRight(result::completeExceptionally).ifLeft(world ->
                     findIslandSafeLocation(island, dimension, result));
         });
