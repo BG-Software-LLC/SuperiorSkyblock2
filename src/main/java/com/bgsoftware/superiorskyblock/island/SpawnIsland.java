@@ -1961,6 +1961,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void resetSettings() {
+        // Do nothing.
+    }
+
+    @Override
     public void setGeneratorPercentage(Key key, int percentage, Dimension dimension) {
         // Do nothing.
     }

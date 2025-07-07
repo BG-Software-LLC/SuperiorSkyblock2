@@ -263,6 +263,10 @@ public class PluginEventArgs {
 
     }
 
+    public static class IslandClearFlags extends IslandDoActionArgs {
+
+    }
+
     public static class IslandClearGeneratorRates extends IslandDoActionArgs {
 
         public Dimension dimension;

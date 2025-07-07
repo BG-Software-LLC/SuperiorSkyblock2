@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -26,7 +28,7 @@ public class CmdSettings implements IPermissibleCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "settings";
+        return "settings [reset]";
     }
 
     @Override
@@ -41,7 +43,7 @@ public class CmdSettings implements IPermissibleCommand {
 
     @Override
     public int getMaxArgs() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -61,7 +63,21 @@ public class CmdSettings implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        if (args.length == 2)
+            if (args[1].equalsIgnoreCase("reset")) {
+                if (PluginEventsFactory.callIslandClearFlagsEvent(island, superiorPlayer)) {
+                    island.resetSettings();
+                    Message.SETTINGS_RESET.send(superiorPlayer);
+                }
+                return;
+            }
+
         plugin.getMenus().openSettings(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
+    }
+
+    @Override
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        return args.length == 2 ? CommandTabCompletes.getCustomComplete(args[1], "reset") : Collections.emptyList();
     }
 
 }

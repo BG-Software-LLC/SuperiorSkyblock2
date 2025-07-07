@@ -2472,6 +2472,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      */
     void disableSettings(IslandFlag islandFlag);
 
+    /**
+     * Reset the island settings to default values.
+     */
+    void resetSettings();
+
     /*
      *  Generator related methods
      */

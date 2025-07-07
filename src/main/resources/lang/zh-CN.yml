@@ -677,6 +677,7 @@ SET_UPGRADE_LEVEL: '&e&l升级 | &7成功更新了玩家 {1} 的岛屿等级 {0}
 SET_UPGRADE_LEVEL_NAME: '&e&l升级 | &7成功更新了岛屿 {1} 的等级 {0}.'
 SET_WARP: '&e&l岛屿 | &7成功在 {0} 处设置了传送点.'
 SET_WARP_OUTSIDE: '&c&l错误 | &7你不能在岛屿外设置传送点.'
+SETTINGS_RESET: '&e&lIsland | &7Successfully reset all the settings of the island to default values!'
 SETTINGS_UPDATED: '&e&l岛屿 | &7成功修改了玩家 {1} 的岛屿设置 {0}.'
 SETTINGS_UPDATED_NAME: '&e&l岛屿 | &7S成功修改了岛屿 {1} 的设置 {0}.'
 SETTINGS_UPDATED_ALL: '&e&l岛屿 | &7成功更新了所有岛屿的 {0} 设置.'
