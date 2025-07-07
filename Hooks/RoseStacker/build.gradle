@@ -1,7 +1,13 @@
 group 'Hooks:RoseStacker'
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 dependencies {
-    compileOnly 'dev.rosewood:RoseStacker:1.4.1'
+    compileOnly 'dev.rosewood:RoseStacker:1.5.33' // Should be 1.5.33
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
     compileOnly rootProject
