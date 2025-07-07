@@ -501,8 +501,8 @@ ISLAND_PREVIEW_START: |
   &e&lPodglad | &7Wlaczyles tryb podgladu dla schematu {0}.
   &e&lPodglad | &7Wpisz &a&lCONFIRM &7by stworzyc nowa wyspe, lub &c&lCANCEL &7by wylaczyc tryb podladu.
   &e&lPodglad | &7Nie mozesz opuscic terenu wyspy, w przeciwnym razie tryb podgladowy zostanie anulowany.
-ISLAND_PROTECTED: '&c&lBlad | &7Ta wyspa jest zabezpieczona.'
-ISLAND_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
+ISLAND_PROTECTED: '&c&lBlad | &7Ta wyspa jest chroniona.'
+ISLAND_PROTECTED_OPPED: '&7&oMozesz ominac to ograniczenie, uzywajac "/is admin bypass".'
 ISLAND_TEAM_STATUS_FOOTER: ''
 ISLAND_TEAM_STATUS_HEADER: '&e&lWyspa | &7Czlonkowie {0}''s Wyspy &8[&e{1}&8/&e{2}&8]&7:'
 ISLAND_TEAM_STATUS_OFFLINE: '&c(Offline)'
@@ -683,6 +683,8 @@ SETTINGS_UPDATED: '&e&lWyspa | &7Pomyslnie zaktualizowano ustawienia {0} do wysp
 SETTINGS_UPDATED_NAME: '&e&lWyspa | &7Pomyslnie zaktualizowano ustawienia {0} do wyspy {1}.'
 SETTINGS_UPDATED_ALL: '&e&lWyspa | &7Pomyslnie zaktualizowano ustawienia {0} dla wszystkich wysp.'
 SIZE_BIGGER_MAX: '&c&lBlad | &7Nie mozna ustawic rozmiaru wiekszego niz maksymalny rozmiar wyspy.'
+SPAWN_PROTECTED: '&c&lBlad | &7Spawn jest chroniony.'
+SPAWN_PROTECTED_OPPED: '&7&oMozesz ominac to ograniczenie, uzywajac "/is admin bypass".'
 SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Pomyslnie teleportowano {0} do odrodzenia.'
 SPAWN_SET_SUCCESS: '&e&lSpawn | &7Pomyslnie zaktualizowano lokalizacje odradzania do {0}.'
 SPY_TEAM_CHAT_FORMAT: '&7[Szpieg] &e[{0}] {1}&f: &7{2}'

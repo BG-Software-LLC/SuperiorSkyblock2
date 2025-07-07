@@ -45,7 +45,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
     @Override
     public CompletableFuture<Boolean> teleport(Player player, Island island, Dimension dimension) {
         CompletableFuture<Boolean> result = new CompletableFuture<>();
-        IslandWorlds.accessIslandWorldAsync(island, dimension, islandWorldResult -> {
+        IslandWorlds.accessIslandWorldAsync(island, dimension, true, islandWorldResult -> {
             islandWorldResult.ifRight(result::completeExceptionally).ifLeft(world ->
                     teleportInternal(player, island, dimension, result));
         });

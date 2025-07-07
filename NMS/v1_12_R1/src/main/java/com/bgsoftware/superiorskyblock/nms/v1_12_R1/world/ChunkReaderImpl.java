@@ -189,7 +189,7 @@ public class ChunkReaderImpl implements ChunkReader {
             this.x = entity.locX;
             this.y = entity.locY;
             this.z = entity.locZ;
-            this.yaw = entity.getBukkitYaw();
+            this.yaw = entity.yaw;
             this.pitch = entity.pitch;
             this.entityType = entity.getBukkitEntity().getType();
 

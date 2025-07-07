@@ -46,6 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -101,6 +102,7 @@ public class SettingsContainer {
     public final String stackedBlocksMenuTitle;
     public final String islandLevelFormula;
     public final boolean roundedIslandLevel;
+    public final RoundingMode islandLevelRoundingMode;
     public final boolean autoBlocksTracking;
     public final String islandTopOrder;
     public boolean coopMembers;
@@ -139,6 +141,7 @@ public class SettingsContainer {
     public final boolean disbandConfirm;
     public final boolean kickConfirm;
     public final boolean leaveConfirm;
+    public final boolean transferConfirm;
     public final String spawnersProvider;
     public final String stackedBlocksProvider;
     public final boolean disbandInventoryClear;
@@ -149,6 +152,7 @@ public class SettingsContainer {
     public final boolean islandNamesColorSupport;
     public final boolean islandNamesIslandTop;
     public final boolean islandNamesPreventPlayerNames;
+    public final boolean teleportOnCreate;
     public final boolean teleportOnJoin;
     public final boolean teleportOnKick;
     public final boolean clearOnJoin;
@@ -292,6 +296,9 @@ public class SettingsContainer {
         stackedBlocksMenuTitle = Formatters.COLOR_FORMATTER.format(config.getString("stacked-blocks.deposit-menu.title", "&lDeposit Blocks"));
         islandLevelFormula = config.getString("island-level-formula", "{} / 2");
         roundedIslandLevel = config.getBoolean("rounded-island-level", false);
+        islandLevelRoundingMode = Optional.ofNullable(EnumHelper.getEnum(RoundingMode.class,
+                        config.getString("island-level-rounding-mode").toUpperCase(Locale.ENGLISH)))
+                .orElse(RoundingMode.HALF_UP);
         autoBlocksTracking = config.getBoolean("auto-blocks-tracking", true);
         islandTopOrder = config.getString("island-top-order", "WORTH").toUpperCase(Locale.ENGLISH);
         coopMembers = config.getBoolean("coop-members", true);
@@ -378,6 +385,7 @@ public class SettingsContainer {
         disbandConfirm = config.getBoolean("disband-confirm");
         kickConfirm = config.getBoolean("kick-confirm");
         leaveConfirm = config.getBoolean("leave-confirm");
+        transferConfirm = config.getBoolean("transfer-confirm");
         spawnersProvider = config.getString("spawners-provider", "AUTO");
         stackedBlocksProvider = config.getString("stacked-blocks-provider", "AUTO");
         disbandInventoryClear = config.getBoolean("disband-inventory-clear", true);
@@ -390,8 +398,9 @@ public class SettingsContainer {
         islandNamesColorSupport = config.getBoolean("island-names.color-support", true);
         islandNamesIslandTop = config.getBoolean("island-names.island-top", true);
         islandNamesPreventPlayerNames = config.getBoolean("island-names.prevent-player-names", true);
+        teleportOnCreate = config.getBoolean("teleport-on-create", true);
         teleportOnJoin = config.getBoolean("teleport-on-join", false);
-        teleportOnKick = config.getBoolean("teleport-on-kick", false);
+        teleportOnKick = config.getBoolean("teleport-on-kick", true);
         clearOnJoin = config.getBoolean("clear-on-join", false);
         rateOwnIsland = config.getBoolean("rate-own-island", false);
         changeIslandRating = config.getBoolean("change-island-rating", true);

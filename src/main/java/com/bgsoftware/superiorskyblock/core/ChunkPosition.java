@@ -25,9 +25,6 @@ public class ChunkPosition implements ObjectsPool.Releasable, AutoCloseable {
     protected WeakReference<World> cachedBukkitWorld = new WeakReference<>(null);
     private final boolean isPool;
 
-    private Thread holder = Thread.currentThread();
-    private StackTraceElement[] releaseStackTrace;
-
     public static ChunkPosition of(Location location) {
         World world = location.getWorld();
         return of(WorldInfo.of(world), location.getBlockX() >> 4, location.getBlockZ() >> 4).withBukkitWorld(world);
@@ -77,27 +74,10 @@ public class ChunkPosition implements ObjectsPool.Releasable, AutoCloseable {
         this.worldInfo = worldInfo;
         this.x = x;
         this.z = z;
-        this.holder = Thread.currentThread();
         return this;
     }
 
-    private void checkAccess() {
-        if (isPool && Thread.currentThread() != this.holder) {
-            StringBuilder builder = new StringBuilder("Accessed ChunkPosition from " + Thread.currentThread() + " but holder is " + this.holder);
-            if (this.releaseStackTrace != null && this.releaseStackTrace.length > 0) {
-                builder.append("\n\n\tRelease stacktrace:");
-                for (StackTraceElement traceElement : this.releaseStackTrace) {
-                    builder.append("\n\t\tat ").append(traceElement);
-                }
-                builder.append("\n");
-            }
-            throw new RuntimeException(builder.toString());
-        }
-    }
-
     public World getWorld() {
-        checkAccess();
-
         World cachedBukkitWorld = this.cachedBukkitWorld.get();
         if (cachedBukkitWorld == null) {
             cachedBukkitWorld = Bukkit.getWorld(getWorldName());
@@ -108,27 +88,22 @@ public class ChunkPosition implements ObjectsPool.Releasable, AutoCloseable {
     }
 
     public WorldInfo getWorldsInfo() {
-        checkAccess();
         return this.worldInfo;
     }
 
     public String getWorldName() {
-        checkAccess();
         return this.worldInfo.getName();
     }
 
     public int getX() {
-        checkAccess();
         return x;
     }
 
     public int getZ() {
-        checkAccess();
         return z;
     }
 
     public long asPair() {
-        checkAccess();
         if (this.pairedXZ < 0)
             pairedXZ = (long) this.x & 4294967295L | ((long) this.z & 4294967295L) << 32;
 
@@ -136,13 +111,11 @@ public class ChunkPosition implements ObjectsPool.Releasable, AutoCloseable {
     }
 
     public boolean isInsideChunk(Location location) {
-        checkAccess();
         return location.getWorld().getName().equals(worldInfo.getName()) &&
                 location.getBlockX() >> 4 == x && location.getBlockZ() >> 4 == z;
     }
 
     public int distanceSquared(ChunkPosition other) {
-        checkAccess();
         int deltaX = this.x - other.x;
         int deltaZ = this.z - other.z;
         return (deltaX * deltaX) + (deltaZ * deltaZ);
@@ -153,13 +126,9 @@ public class ChunkPosition implements ObjectsPool.Releasable, AutoCloseable {
         if (!isPool)
             return;
 
-        checkAccess();
-
         this.worldInfo = null;
         this.pairedXZ = -1;
         this.cachedBukkitWorld.clear();
-        this.holder = null;
-        this.releaseStackTrace = Thread.currentThread().getStackTrace();
         POOL.release(this);
     }
 
@@ -193,7 +162,6 @@ public class ChunkPosition implements ObjectsPool.Releasable, AutoCloseable {
     }
 
     private ChunkPosition withBukkitWorld(World world) {
-        checkAccess();
         this.cachedBukkitWorld = new WeakReference<>(world);
         return this;
     }

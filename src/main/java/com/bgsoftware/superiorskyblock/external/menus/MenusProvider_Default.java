@@ -26,6 +26,7 @@ import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.IslandCreationButton;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmBan;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmKick;
+import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmTransfer;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandCreation;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandPrivileges;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMissionsCategory;
@@ -147,6 +148,14 @@ public class MenusProvider_Default implements MenusProvider {
     public void openConfirmLeave(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Menus.MENU_CONFIRM_LEAVE.createView(targetPlayer, EmptyViewArgs.INSTANCE, previousMenu);
+    }
+
+    @Override
+    public void openConfirmTransfer(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland, SuperiorPlayer newOwner) {
+        Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
+        Preconditions.checkNotNull(newOwner, "newOwner parameter cannot be null.");
+        Menus.MENU_CONFIRM_TRANSFER.createView(targetPlayer, new MenuConfirmTransfer.Args(targetIsland, newOwner), previousMenu);
     }
 
     @Override

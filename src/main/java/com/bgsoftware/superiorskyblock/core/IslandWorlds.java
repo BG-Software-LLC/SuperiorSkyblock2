@@ -15,15 +15,15 @@ public class IslandWorlds {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    public static void accessIslandWorldsAsync(Island island, Consumer<Either<World, Throwable>> consumer) {
+    public static void accessIslandWorldsAsync(Island island, boolean loadWorld, Consumer<Either<World, Throwable>> consumer) {
         for (Dimension dimension : Dimension.values()) {
             if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension) && island.wasSchematicGenerated(dimension)) {
-                accessIslandWorldAsync(island, dimension, consumer);
+                accessIslandWorldAsync(island, dimension, loadWorld, consumer);
             }
         }
     }
 
-    public static void accessIslandWorldAsync(Island island, Dimension dimension, Consumer<Either<World, Throwable>> consumer) {
+    public static void accessIslandWorldAsync(Island island, Dimension dimension, boolean loadWorld, Consumer<Either<World, Throwable>> consumer) {
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
         if (worldInfo == null) {
             consumer.accept(Either.right(new NullPointerException("Cannot find world for dimension " + dimension.getName())));
@@ -33,6 +33,11 @@ public class IslandWorlds {
         World world = Bukkit.getWorld(worldInfo.getName());
         if (world != null) {
             consumer.accept(Either.left(world));
+            return;
+        }
+
+        if (!loadWorld) {
+            consumer.accept(Either.right(new NullPointerException("World is not loaded for dimension " + dimension.getName())));
             return;
         }
 

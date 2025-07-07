@@ -73,7 +73,7 @@ public class CmdVisit implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Dimension dimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
 
-        IslandWorlds.accessIslandWorldAsync(targetIsland, dimension, islandWorldResult -> {
+        IslandWorlds.accessIslandWorldAsync(targetIsland, dimension, true, islandWorldResult -> {
             islandWorldResult.ifLeft(world -> teleportPlayerInternal(targetIsland, superiorPlayer));
         });
     }

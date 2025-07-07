@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 import org.bukkit.Location;
 
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,10 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public boolean isRoundedIslandLevels() {
         return getContainer().roundedIslandLevel;
+    }
+
+    public RoundingMode getIslandLevelRoundingMode() {
+        return getContainer().islandLevelRoundingMode;
     }
 
     public boolean isAutoBlocksTracking() {
@@ -116,6 +121,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().leaveConfirm;
     }
 
+    public boolean isTransferConfirm() {
+        return getContainer().transferConfirm;
+    }
+
     public String getSpawnersProvider() {
         return getContainer().spawnersProvider;
     }
@@ -126,6 +135,10 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public boolean isDisbandInventoryClear() {
         return getContainer().disbandInventoryClear;
+    }
+
+    public boolean isTeleportOnCreate() {
+        return getContainer().teleportOnCreate;
     }
 
     public boolean isTeleportOnJoin() {

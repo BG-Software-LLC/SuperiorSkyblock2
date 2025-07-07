@@ -708,11 +708,12 @@ public class PluginEventsFactory {
         return !fireEvent(ISLAND_COOP_PLAYER_EVENT, islandCoopPlayer).isCancelled();
     }
 
-    public static PluginEvent<IslandCreate> callIslandCreateEvent(Island island, SuperiorPlayer superiorPlayer, String schematicName) {
+    public static PluginEvent<IslandCreate> callIslandCreateEvent(Island island, SuperiorPlayer superiorPlayer, String schematicName, boolean canTeleport) {
         IslandCreate islandCreate = new IslandCreate();
         islandCreate.island = island;
         islandCreate.superiorPlayer = superiorPlayer;
         islandCreate.schematicName = schematicName;
+        islandCreate.canTeleport = canTeleport;
         return fireEvent(ISLAND_CREATE_EVENT, islandCreate);
     }
 

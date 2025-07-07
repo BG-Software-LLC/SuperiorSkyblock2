@@ -85,7 +85,7 @@ public class DragonBattleServiceImpl implements DragonBattleService, IService {
 
         stopEnderDragonBattle(island, dimension);
 
-        IslandWorlds.accessIslandWorldAsync(island, dimension, islandWorldResult -> {
+        IslandWorlds.accessIslandWorldAsync(island, dimension, true, islandWorldResult -> {
             islandWorldResult.ifRight(Throwable::printStackTrace).ifLeft(world -> {
                 Location islandCenter = island.getCenter(dimension);
                 plugin.getNMSDragonFight().startDragonBattle(island,

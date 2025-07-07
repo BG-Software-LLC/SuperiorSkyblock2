@@ -15,6 +15,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +85,12 @@ public interface SettingsManager {
      * Config path: rounded-island-level
      */
     boolean isRoundedIslandLevels();
+
+    /**
+     * The rounding mode used for the island level when rounded-island-level feature is enabled.
+     * Config path: island-level-rounding-mode
+     */
+    RoundingMode getIslandLevelRoundingMode();
 
     /**
      * Whether to automatic track block counts when players place and break blocks.
@@ -223,6 +230,12 @@ public interface SettingsManager {
     boolean isLeaveConfirm();
 
     /**
+     * Whether confirmation menu should be opened before transfering an island or not.
+     * Config-path: transfer-confirm
+     */
+    boolean isTransferConfirm();
+
+    /**
      * The spawners-provider to use.
      * If set to AUTO, the plugin will automatically detect an available spawners provider and use it.
      * Config-path: spawners-provider
@@ -247,6 +260,12 @@ public interface SettingsManager {
      * Config path: island-names
      */
     IslandNames getIslandNames();
+
+    /**
+     * Whether to teleport players to their island when they create it or not.
+     * Config path: teleport-on-create
+     */
+    boolean isTeleportOnCreate();
 
     /**
      * Whether to teleport players to their island when they join it or not.

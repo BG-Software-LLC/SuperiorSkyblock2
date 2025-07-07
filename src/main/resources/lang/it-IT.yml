@@ -689,6 +689,8 @@ SETTINGS_UPDATED: '&e&lIsola | &7Aggiornate correttamente le impostazioni {0} de
 SETTINGS_UPDATED_NAME: '&e&lIsola | &7Aggiornate correttamente le impostazioni {0} di {1}.'
 SETTINGS_UPDATED_ALL: '&e&lIsola | &7Aggiornate correttamente le impostazioni {0} a tutte le isole.'
 SIZE_BIGGER_MAX: '&c&lErrore | &7Non è possibile impostare una dimensione maggiore della dimensione massima dell''isola.'
+SPAWN_PROTECTED: '&c&lError | &7Spawn is protected.'
+SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Hai teletrasportato {0} con successo allo spawn.'
 SPAWN_SET_SUCCESS: '&e&lSpawn | &7La posizione di spawn è stata aggiornata correttamente alle coordinate: {0}'
 SPY_TEAM_CHAT_FORMAT: '&7[Spy] &e[{0}] {1}&f: &7{2}'

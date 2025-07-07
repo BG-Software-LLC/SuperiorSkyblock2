@@ -31,6 +31,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -134,6 +135,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     @Override
     public boolean isRoundedIslandLevels() {
         return this.global.isRoundedIslandLevels();
+    }
+
+    @Override
+    public RoundingMode getIslandLevelRoundingMode() {
+        return this.global.getIslandLevelRoundingMode();
     }
 
     @Override
@@ -252,6 +258,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public boolean isTransferConfirm() {
+        return this.global.isTransferConfirm();
+    }
+
+    @Override
     public String getSpawnersProvider() {
         return this.global.getSpawnersProvider();
     }
@@ -269,6 +280,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     @Override
     public IslandNames getIslandNames() {
         return this.islandNames;
+    }
+
+    @Override
+    public boolean isTeleportOnCreate() {
+        return this.global.isTeleportOnCreate();
     }
 
     @Override

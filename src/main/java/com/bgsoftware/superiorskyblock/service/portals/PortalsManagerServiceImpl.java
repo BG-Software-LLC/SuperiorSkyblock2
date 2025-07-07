@@ -237,7 +237,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                 return EntityPortalResult.SUCCEED;
             }
 
-            IslandWorlds.accessIslandWorldAsync(island, destination, islandWorldResult -> {
+            IslandWorlds.accessIslandWorldAsync(island, destination, true, islandWorldResult -> {
                 islandWorldResult.ifRight(Throwable::printStackTrace).ifLeft(world -> {
                     Location schematicPlacementLocation = island.getCenter(destination).subtract(0, 1, 0);
                     schematicPlacementLocation.setY(plugin.getSettings().getIslandHeight());

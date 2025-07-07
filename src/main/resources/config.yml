@@ -160,6 +160,12 @@ island-level-formula: '{} / 2'
 # Should the island levels be a rounded integer?
 rounded-island-level: false
 
+# How should the island level be rounded when rounded-island-level feature is enabled?
+# Use UP, DOWN, CEILING, FLOOR, HALF_UP, HALF_DOWN or HALF_EVEN
+# You can see more information about it here:
+# https://docs.oracle.com/javase/8/docs/api/java/math/RoundingMode.html
+island-level-rounding-mode: 'HALF_UP'
+
 # Whether to automatic track block counts when players place and break blocks.
 # If set to true, block counts, worth and levels will automatically be updated upon
 # placement and breaking of blocks.
@@ -450,6 +456,9 @@ kick-confirm: true
 # Should a confirm gui be displayed when /is leave is executed.
 leave-confirm: true
 
+# Should a confirm gui be displayed when /is transfer is executed.
+transfer-confirm: true
+
 # If you want a specific spawners provider to use, specify it here.
 # Providers: Auto, WildStacker, EpicSpawners, MergedSpawner, PvpingSpawners, SilkSpawners, RoseStacker
 spawners-provider: 'AUTO'
@@ -486,6 +495,9 @@ island-names:
 
   # Should the plugin prevent players from using player names as island names?
   prevent-player-names: false
+
+# Should players get teleported to the island after they create it?
+teleport-on-create: true
 
 # Should players get teleported to the island after they accept an invite?
 teleport-on-join: false

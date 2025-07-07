@@ -769,6 +769,8 @@ SETTINGS_UPDATED_NAME: '&e&lĐảo | &7Thay đổi thành công điều chỉnh 
 SETTINGS_UPDATED_ALL: '&e&lĐảo | &7Thay đổi thành công điều chỉnh {0} cho tất
   cả các đảo.'
 SIZE_BIGGER_MAX: '&c&lLỗi | &7Bạn không thể đặt kích thước lớn hơn kích thước tối đa của đảo.'
+SPAWN_PROTECTED: '&c&lError | &7Spawn is protected.'
+SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 SPAWN_TELEPORT_SUCCESS: '&e&lTrung Tâm | &7Dịch chuyển thành công {0} đến trung tâm.'
 SPAWN_SET_SUCCESS: '&e&lTrung Tâm | &7Cập nhật thành công vị trí trung tâm thành {0}.'
 SPY_TEAM_CHAT_FORMAT: '&7[Bí Mật] &e[{0}] {1}&f: &7{2}'

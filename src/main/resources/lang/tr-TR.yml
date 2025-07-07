@@ -811,6 +811,8 @@ SETTINGS_UPDATED: '&e&lAda | &7{1}''in adası için {0} ayarları başarıyla g�
 SETTINGS_UPDATED_NAME: '&e&lAda | &7{1} adası için {0} ayarları başarıyla güncellendi.'
 SETTINGS_UPDATED_ALL: '&e&lAda | &7Tüm adalar için {0} ayarları başarıyla güncellendi.'
 SIZE_BIGGER_MAX: '&c&lHata | &7Maksimum ada boyutundan daha büyük bir boyut ayarlayamazsın.'
+SPAWN_PROTECTED: '&c&lError | &7Spawn is protected.'
+SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 SPAWN_TELEPORT_SUCCESS: '&e&lDoğuş | &7{0} başarıyla doğuşa ışınlandı.'
 SPAWN_SET_SUCCESS: '&e&lDoğuş | &7Doğuş konumu {0} olarak başarıyla güncellendi.'
 SPY_TEAM_CHAT_FORMAT: '&7[Casus] &e[{0}] {1}&f: &7{2}'

@@ -681,6 +681,8 @@ SETTINGS_UPDATED: '&e&lОстров | &7Успешно обновлены нас
 SETTINGS_UPDATED_NAME: '&e&lОстров | &7Успешно обновлены настройки {0} для острова {1}.'
 SETTINGS_UPDATED_ALL: '&e&lОстров | &7Успешно обновлены настройки {0} для всех островов.'
 SIZE_BIGGER_MAX: '&c&lОшибка | &7Вы не можете установить размер больше максимального размера острова.'
+SPAWN_PROTECTED: '&c&lError | &7Spawn is protected.'
+SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 SPAWN_TELEPORT_SUCCESS: '&e&lСпавн | &7Успешно телепортирован {0} на спавн.'
 SPAWN_SET_SUCCESS: '&e&lСпавн | &7Успешно обновлено место спавна на {0}.'
 SPY_TEAM_CHAT_FORMAT: '&7[Шпион] &e[{0}] {1}&f: &7{2}'

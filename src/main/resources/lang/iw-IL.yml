@@ -703,6 +703,8 @@ SETTINGS_UPDATED: '&e&lיא | &7{1} לש יאב החלצהב הנכדוע {0} ה
 SETTINGS_UPDATED_NAME: '&e&lיא | &7{1} יאב החלצהב הנכדוע {0} הרדגהה.'
 SETTINGS_UPDATED_ALL: '&e&lיא | &7םייאה לכב החלצהב הנכדוע {0} הרדגהה.'
 SIZE_BIGGER_MAX: '&c&lError | &7You cannot set a size bigger than the max island size.'
+SPAWN_PROTECTED: '&c&lError | &7Spawn is protected.'
+SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Successfully teleported {0} to spawn.'
 SPAWN_SET_SUCCESS: '&e&lSpawn | &7Successfully updated the spawn location to {0}.'
 SPY_TEAM_CHAT_FORMAT: '&7[יומס] &e[{0}] {1}&f: &7{2}'

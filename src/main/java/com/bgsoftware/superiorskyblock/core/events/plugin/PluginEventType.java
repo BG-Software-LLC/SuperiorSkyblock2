@@ -646,7 +646,7 @@ public abstract class PluginEventType<Args extends PluginEventArgs> extends Even
     public static final PluginEventType<IslandCreate> ISLAND_CREATE_EVENT = new PluginEventType<IslandCreate>(IslandCreateEvent.class) {
         @Override
         public Event createBukkitEvent(IslandCreate args) {
-            return new IslandCreateEvent(args.superiorPlayer, args.island, args.schematicName);
+            return new IslandCreateEvent(args.superiorPlayer, args.island, args.schematicName, args.canTeleport);
         }
 
         @Override
