@@ -63,14 +63,13 @@ public class CmdSettings implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        if (args.length == 2)
-            if (args[1].equalsIgnoreCase("reset")) {
-                if (PluginEventsFactory.callIslandClearFlagsEvent(island, superiorPlayer)) {
-                    island.resetSettings();
-                    Message.SETTINGS_RESET.send(superiorPlayer);
-                }
-                return;
+        if (args.length == 2 && args[1].equalsIgnoreCase("reset")) {
+            if (PluginEventsFactory.callIslandClearFlagsEvent(island, superiorPlayer)) {
+                island.resetSettings();
+                Message.SETTINGS_RESET.send(superiorPlayer);
             }
+            return;
+        }
 
         plugin.getMenus().openSettings(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
     }
