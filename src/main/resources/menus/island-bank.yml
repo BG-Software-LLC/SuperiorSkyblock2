@@ -72,7 +72,7 @@ items:
     name: '&6Balance'
     lore:
       - '&7Your bank currently has ${2}'
-      - '&7Next interest in {7}'
+      - '&7Next interest on {7}'
   '=':
     type: EMERALD_BLOCK
     name: '&f '

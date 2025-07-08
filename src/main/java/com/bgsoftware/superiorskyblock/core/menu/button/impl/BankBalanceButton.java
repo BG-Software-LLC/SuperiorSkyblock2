@@ -12,7 +12,7 @@ import com.bgsoftware.superiorskyblock.core.menu.view.impl.IslandMenuView;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.time.Duration;
+import java.util.Date;
 
 public class BankBalanceButton extends AbstractMenuViewButton<IslandMenuView> {
 
@@ -33,8 +33,8 @@ public class BankBalanceButton extends AbstractMenuViewButton<IslandMenuView> {
                 .replaceAll("{3}", island.getBankLimit() + "")
                 .replaceAll("{4}", Formatters.NUMBER_FORMATTER.format(island.getBankLimit()))
                 .replaceAll("{5}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getBankLimit(), inventoryViewer.getUserLocale()))
-                .replaceAll("{6}", Formatters.TIME_FORMATTER.format(Duration.ofSeconds(island.getLastInterestTime()), inventoryViewer.getUserLocale()))
-                .replaceAll("{7}", Formatters.TIME_FORMATTER.format(Duration.ofSeconds(island.getNextInterest()), inventoryViewer.getUserLocale()))
+                .replaceAll("{6}", Formatters.DATE_FORMATTER.format(new Date(island.getLastInterestTime() * 1000L)))
+                .replaceAll("{7}", Formatters.DATE_FORMATTER.format(new Date(System.currentTimeMillis() + island.getNextInterest() * 1000L)))
                 .build();
     }
 
