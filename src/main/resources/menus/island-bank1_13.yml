@@ -15,6 +15,7 @@ pattern:
   - '- @ $ @ @ @ & @ -'
   - '= - @ @ ~ @ @ - ='
 
+balance: '*'
 logs: '~'
 
 items:
@@ -64,7 +65,7 @@ items:
     type: PAPER
     name: '&6Balance'
     lore:
-      - '&7Your bank currently has $%superior_island_bank_format%'
+      - '&7Your bank currently has ${2}'
   '=':
     type: EMERALD_BLOCK
     name: '&f '
