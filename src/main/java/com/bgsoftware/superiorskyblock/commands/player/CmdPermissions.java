@@ -33,7 +33,7 @@ public class CmdPermissions implements IPermissibleCommand {
     }
 
     @Override
-    public String getUsage(SuperiorSkyblockPlugin plugin, CommandSender sender, java.util.Locale locale) {
+    public String getUsage(SuperiorSkyblockPlugin plugin, CommandSender sender, Locale locale) {
         if (sender.hasPermission("superior.island.permissions.players")) {
             return "permissions [" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "] [reset]";
         } else {
@@ -42,7 +42,7 @@ public class CmdPermissions implements IPermissibleCommand {
     }
 
     @Override
-    public String getDescription(java.util.Locale locale) {
+    public String getDescription(Locale locale) {
         return Message.COMMAND_DESCRIPTION_PERMISSIONS.getMessage(locale);
     }
 
