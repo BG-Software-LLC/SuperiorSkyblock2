@@ -61,10 +61,6 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().coopMembers;
     }
 
-    public boolean isEditPlayerPermissions() {
-        return getContainer().editPlayerPermissions;
-    }
-
     public String getSignWarpLine() {
         return getContainer().signWarpLine;
     }

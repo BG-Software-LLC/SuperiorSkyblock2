@@ -106,7 +106,6 @@ public class SettingsContainer {
     public final boolean autoBlocksTracking;
     public final String islandTopOrder;
     public boolean coopMembers;
-    public boolean editPlayerPermissions;
     public final ConfigurationSection islandRolesSection;
     public final long calcInterval;
     public final String signWarpLine;
@@ -302,7 +301,6 @@ public class SettingsContainer {
         autoBlocksTracking = config.getBoolean("auto-blocks-tracking", true);
         islandTopOrder = config.getString("island-top-order", "WORTH").toUpperCase(Locale.ENGLISH);
         coopMembers = config.getBoolean("coop-members", true);
-        editPlayerPermissions = config.getBoolean("edit-player-permissions", true);
         islandRolesSection = config.getConfigurationSection("island-roles");
         signWarpLine = config.getString("sign-warp-line", "[IslandWarp]");
         List<String> signWarp = Formatters.formatList(config.getStringList("sign-warp"), Formatters.COLOR_FORMATTER);

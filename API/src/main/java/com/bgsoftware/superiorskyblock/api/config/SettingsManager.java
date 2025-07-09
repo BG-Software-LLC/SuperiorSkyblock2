@@ -111,9 +111,10 @@ public interface SettingsManager {
     boolean isCoopMembers();
 
     /**
-     * Should players be able to edit island privileges for other players?
-     * Config path: edit-player-permissions
+     * Removed because introduced permission superior.island.permissions.other
+     * This method will be deleted in the future!
      */
+    @Deprecated
     boolean isEditPlayerPermissions();
 
     /**

@@ -178,10 +178,6 @@ island-top-order: 'WORTH'
 # Whether coop members should be enabled or not.
 coop-members: true
 
-# Should players be able to edit island privileges for other players?
-# When set to false, island privileges could be edited only to island roles.
-edit-player-permissions: true
-
 # All settings related to island roles.
 # You can find a list of permissions here: https://wiki.bg-software.com/superiorskyblock/island-permissions
 island-roles:
