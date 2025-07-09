@@ -267,9 +267,9 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                         return false;
                     }
 
-                    if (args.length < command.getMinArgs() || args.length > command.getMaxArgs()) {
-                        Log.debugResult(Debug.EXECUTE_COMMAND, "Return Incorrect Usage", command.getUsage(locale));
-                        Message.COMMAND_USAGE.send(sender, locale, getLabel() + " " + command.getUsage(locale));
+                    if (args.length < command.getMinArgs(plugin, sender) || args.length > command.getMaxArgs(plugin, sender)) {
+                        Log.debugResult(Debug.EXECUTE_COMMAND, "Return Incorrect Usage", command.getUsage(plugin, sender, locale));
+                        Message.COMMAND_USAGE.send(sender, locale, getLabel() + " " + command.getUsage(plugin, sender, locale));
                         return false;
                     }
 

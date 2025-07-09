@@ -27,8 +27,13 @@ public class CmdToggle implements ISuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "toggle <border/blocks>";
+    public String getUsage(SuperiorSkyblockPlugin plugin, CommandSender sender, java.util.Locale locale) {
+        if (!sender.hasPermission("superior.island.toggle.border"))
+            return "toggle <blocks>";
+        else if (!sender.hasPermission("superior.island.toggle.blocks"))
+            return "toggle <border>";
+        else
+            return "toggle <blocks/border>";
     }
 
     @Override

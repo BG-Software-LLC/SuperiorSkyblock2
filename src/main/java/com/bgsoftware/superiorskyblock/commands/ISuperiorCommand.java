@@ -6,8 +6,51 @@ import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
+import java.util.Locale;
 
 public interface ISuperiorCommand extends SuperiorCommand {
+
+    @Override
+    default String getUsage(Locale locale) {
+        return "";
+    }
+
+    @Override
+    default String getUsage(SuperiorSkyblock plugin, CommandSender sender, Locale locale) {
+        return getUsage((SuperiorSkyblockPlugin) plugin, sender, locale);
+    }
+
+    default String getUsage(SuperiorSkyblockPlugin plugin, CommandSender sender, Locale locale) {
+        return getUsage(locale);
+    }
+
+    @Override
+    default int getMinArgs() {
+        return -1;
+    }
+
+    @Override
+    default int getMinArgs(SuperiorSkyblock plugin, CommandSender sender) {
+        return getMinArgs((SuperiorSkyblockPlugin) plugin, sender);
+    }
+
+    default int getMinArgs(SuperiorSkyblockPlugin plugin, CommandSender sender) {
+        return getMinArgs();
+    }
+
+    @Override
+    default int getMaxArgs() {
+        return -1;
+    }
+
+    @Override
+    default int getMaxArgs(SuperiorSkyblock plugin, CommandSender sender) {
+        return getMaxArgs((SuperiorSkyblockPlugin) plugin, sender);
+    }
+
+    default int getMaxArgs(SuperiorSkyblockPlugin plugin, CommandSender sender) {
+        return getMaxArgs();
+    }
 
     @Override
     default boolean displayCommand() {

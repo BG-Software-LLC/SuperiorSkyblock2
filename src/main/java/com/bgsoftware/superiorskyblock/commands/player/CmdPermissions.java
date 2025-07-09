@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,12 +31,12 @@ public class CmdPermissions implements IPermissibleCommand {
 
     @Override
     public String getPermission() {
-        return "superior.island.permissions";
+        return "superior.island.permissions.roles";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        if (plugin.getSettings().isEditPlayerPermissions()) {
+    public String getUsage(SuperiorSkyblockPlugin plugin, CommandSender sender, java.util.Locale locale) {
+        if (sender.hasPermission("superior.island.permissions.players")) {
             return "permissions [" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "] [reset]";
         } else {
             return "permissions [reset]";
@@ -53,8 +54,8 @@ public class CmdPermissions implements IPermissibleCommand {
     }
 
     @Override
-    public int getMaxArgs() {
-        return plugin.getSettings().isEditPlayerPermissions() ? 3 : 2;
+    public int getMaxArgs(SuperiorSkyblockPlugin plugin, CommandSender sender) {
+        return sender.hasPermission("superior.island.permissions.players") ? 3 : 2;
     }
 
     @Override
@@ -78,7 +79,7 @@ public class CmdPermissions implements IPermissibleCommand {
 
         boolean setToDefault = (args.length == 2 ? args[1] : args.length == 3 ? args[2] : "").equalsIgnoreCase("reset");
 
-        if (plugin.getSettings().isEditPlayerPermissions() && ((!setToDefault && args.length == 2) || args.length == 3)) {
+        if (superiorPlayer.hasPermission("superior.island.permissions.players") && ((!setToDefault && args.length == 2) || args.length == 3)) {
             SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
 
             if (targetPlayer == null) {
@@ -124,11 +125,11 @@ public class CmdPermissions implements IPermissibleCommand {
         if (args.length == 2) {
             if ("reset".contains(args[1].toLowerCase(Locale.ENGLISH)))
                 tabVariables.add("reset");
-            if (plugin.getSettings().isEditPlayerPermissions()) {
+            if (superiorPlayer.hasPermission("superior.island.permissions.players")) {
                 tabVariables.addAll(CommandTabCompletes.getOnlinePlayers(plugin, args[1],
                         plugin.getSettings().isTabCompleteHideVanished()));
             }
-        } else if (plugin.getSettings().isEditPlayerPermissions() && args.length == 3) {
+        } else if (superiorPlayer.hasPermission("superior.island.permissions.players") && args.length == 3) {
             if ("reset".contains(args[2].toLowerCase(Locale.ENGLISH)))
                 tabVariables.add("reset");
         }

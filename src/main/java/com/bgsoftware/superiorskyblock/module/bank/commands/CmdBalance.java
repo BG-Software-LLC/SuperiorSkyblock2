@@ -23,14 +23,18 @@ public class CmdBalance implements ISuperiorCommand {
 
     @Override
     public String getPermission() {
-        return "superior.island.balance";
+        return "superior.island.balance.self";
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "balance [" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
+    public String getUsage(SuperiorSkyblockPlugin plugin, CommandSender sender, java.util.Locale locale) {
+        if (sender.hasPermission("superior.island.balance.others")) {
+            return "balance [" +
+                    Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                    Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
+        } else {
+            return "balance";
+        }
     }
 
     @Override
@@ -44,8 +48,8 @@ public class CmdBalance implements ISuperiorCommand {
     }
 
     @Override
-    public int getMaxArgs() {
-        return 2;
+    public int getMaxArgs(SuperiorSkyblockPlugin plugin, CommandSender sender) {
+        return sender.hasPermission("superior.island.balance.others") ? 2 : 1;
     }
 
     @Override
@@ -77,7 +81,8 @@ public class CmdBalance implements ISuperiorCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return args.length == 2 ? CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
-                plugin.getSettings().isTabCompleteHideVanished()) : Collections.emptyList();
+                plugin.getSettings().isTabCompleteHideVanished(), (onlinePlayer, onlineIsland) ->
+                onlineIsland != null && sender.hasPermission("superior.island.balance.others")) : Collections.emptyList();
     }
 
 }

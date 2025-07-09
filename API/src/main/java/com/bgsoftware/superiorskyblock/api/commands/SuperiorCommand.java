@@ -27,6 +27,14 @@ public interface SuperiorCommand {
     String getUsage(Locale locale);
 
     /**
+     * Get the usage of the sub command.
+     *
+     * @param sender The sender who ran the command.
+     * @param locale The locale of the player.
+     */
+    String getUsage(SuperiorSkyblock plugin, CommandSender sender, Locale locale);
+
+    /**
      * Get the description of the sub command.
      *
      * @param locale The locale of the player.
@@ -40,10 +48,26 @@ public interface SuperiorCommand {
     int getMinArgs();
 
     /**
+     * Get the minimum arguments required for the command.
+     * For example, the command /is example PLAYER_NAME has 2 arguments.
+     *
+     * @param sender The sender who ran the command.
+     */
+    int getMinArgs(SuperiorSkyblock plugin, CommandSender sender);
+
+    /**
      * Get the maximum arguments required for the command.
      * For example, the command /is example PLAYER_NAME has 2 arguments.
      */
     int getMaxArgs();
+
+    /**
+     * Get the maximum arguments required for the command.
+     * For example, the command /is example PLAYER_NAME has 2 arguments.
+     *
+     * @param sender The sender who ran the command.
+     */
+    int getMaxArgs(SuperiorSkyblock plugin, CommandSender sender);
 
     /**
      * Can the command be executed from console?

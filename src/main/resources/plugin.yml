@@ -57,6 +57,11 @@ permissions:
             description: Accept an invitation from a player.
           superior.island.balance:
             description: Check the amount of money inside an island's bank.
+            children:
+              superior.island.balance.others:
+                description: Check the amount of money inside another island's bank.
+              superior.island.balance.self:
+                description: Check the amount of money inside your island's bank.
           superior.island.ban:
             description: Ban a player from your island.
           superior.island.bank:
@@ -74,7 +79,12 @@ permissions:
           superior.island.coops:
             description: Open the coops menu.
           superior.island.counts:
-            description: See block counts in your island.
+            description: See block counts in island.
+            children:
+              superior.island.counts.others:
+                description: See block counts in another player's island.
+              superior.island.counts.self:
+                description: See block counts in your island.
           superior.island.create:
             description: Create a new island.
           superior.island.delwarp:
@@ -112,7 +122,12 @@ permissions:
           superior.island.pardon:
             description: Unban a player from your island.
           superior.island.permissions:
-            description: Get all permissions for an island role.
+            description: Get all permissions.
+            children:
+              superior.island.permissions.players:
+                description: Get all permissions for an player on the island.
+              superior.island.permissions.roles:
+                description: Get all permissions for an island role.
           superior.island.promote:
             description: Promote a member in your island.
           superior.island.rankup:
@@ -137,10 +152,20 @@ permissions:
             description: Create a new island warp.
           superior.island.show:
             description: Get information about an island.
+            children:
+              superior.island.show.others:
+                description: Get information about another player's island.
+              superior.island.show.self:
+                description: Get information about your island.
           superior.island.stacker.*:
             description: Gives the ability to stack blocks.
           superior.island.team:
             description: Get information about island members status.
+            children:
+              superior.island.team.others:
+                description: Get information about members of another island.
+              superior.island.team.self:
+                description: Get information about members of your island.
           superior.island.teamchat:
             description: Toggle team chat mode.
           superior.island.teleport:
@@ -164,6 +189,11 @@ permissions:
             description: Get the worth value of a block.
           superior.island.values:
             description: Open the values menu.
+            children:
+              superior.island.values.others:
+                description: Open the values menu of another island.
+              superior.island.values.self:
+                description: Open the values menu of your island.
           superior.island.visit:
             description: Teleport to the visitors location of an island.
           superior.island.warp:
