@@ -41,8 +41,16 @@ public class CmdHelp implements ISuperiorCommand {
     }
 
     @Override
-    public String getUsage(java.util.Locale locale) {
-        return "help [" + Message.COMMAND_ARGUMENT_PAGE.getMessage(locale) + "]";
+    public String getUsage(SuperiorSkyblockPlugin plugin, CommandSender sender, java.util.Locale locale) {
+        List<SuperiorCommand> subCommands = new SequentialListBuilder<SuperiorCommand>()
+                .filter(subCommand -> CommandsHelper.shouldDisplayCommandForPlayer(subCommand, sender))
+                .build(plugin.getCommands().getSubCommands());
+
+        if (getLastPage(plugin, subCommands) != 1) {
+            return "help [" + Message.COMMAND_ARGUMENT_PAGE.getMessage(locale) + "]";
+        } else {
+            return "help";
+        }
     }
 
     @Override
@@ -56,8 +64,12 @@ public class CmdHelp implements ISuperiorCommand {
     }
 
     @Override
-    public int getMaxArgs() {
-        return 2;
+    public int getMaxArgs(SuperiorSkyblockPlugin plugin, CommandSender sender) {
+        List<SuperiorCommand> subCommands = new SequentialListBuilder<SuperiorCommand>()
+                .filter(subCommand -> CommandsHelper.shouldDisplayCommandForPlayer(subCommand, sender))
+                .build(plugin.getCommands().getSubCommands());
+
+        return (getLastPage(plugin, subCommands) != 1) ? 2 : 1;
     }
 
     @Override
@@ -94,13 +106,7 @@ public class CmdHelp implements ISuperiorCommand {
 
         int commandsPerPageCount = plugin.getSettings().getCommandsPerPage();
 
-        int lastPage;
-        if (commandsPerPageCount > 0) {
-            lastPage = subCommands.size() / commandsPerPageCount;
-            if (subCommands.size() % commandsPerPageCount != 0) lastPage++;
-        } else {
-            lastPage = 1;
-        }
+        int lastPage = getLastPage(plugin, subCommands);
 
         if (page > lastPage) {
             Message.INVALID_AMOUNT.send(sender, page);
@@ -126,7 +132,7 @@ public class CmdHelp implements ISuperiorCommand {
             String description = subCommand.getDescription(locale);
             if (description == null)
                 new NullPointerException("The description of the command " + subCommand.getAliases().get(0) + " is null.").printStackTrace();
-            Message.ISLAND_HELP_LINE.send(sender, plugin.getCommands().getLabel() + " " + subCommand.getUsage(locale), description == null ? "" : description);
+            Message.ISLAND_HELP_LINE.send(sender, plugin.getCommands().getLabel() + " " + subCommand.getUsage(plugin, sender, locale), description == null ? "" : description);
         }
 
         if (page != lastPage)
@@ -146,6 +152,18 @@ public class CmdHelp implements ISuperiorCommand {
                 .filter(subCommand -> CommandsHelper.shouldDisplayCommandForPlayer(subCommand, sender))
                 .build(plugin.getCommands().getSubCommands());
 
+        int lastPage = getLastPage(plugin, subCommands);
+
+        if (lastPage == 1)
+            return Collections.emptyList();
+
+        for (int i = 1; i <= lastPage; i++)
+            list.add(i + "");
+
+        return Collections.unmodifiableList(list);
+    }
+
+    private static int getLastPage(SuperiorSkyblockPlugin plugin, List<SuperiorCommand> subCommands) {
         int commandsPerPageCount = plugin.getSettings().getCommandsPerPage();
 
         int lastPage;
@@ -155,11 +173,7 @@ public class CmdHelp implements ISuperiorCommand {
         } else {
             lastPage = 1;
         }
-
-        for (int i = 1; i <= lastPage; i++)
-            list.add(i + "");
-
-        return Collections.unmodifiableList(list);
+        return lastPage;
     }
 
 }
