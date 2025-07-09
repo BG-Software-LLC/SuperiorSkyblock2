@@ -25,20 +25,6 @@ public interface ISuperiorCommand extends SuperiorCommand {
     }
 
     @Override
-    default int getMinArgs() {
-        return -1;
-    }
-
-    @Override
-    default int getMinArgs(SuperiorSkyblock plugin, CommandSender sender) {
-        return getMinArgs((SuperiorSkyblockPlugin) plugin, sender);
-    }
-
-    default int getMinArgs(SuperiorSkyblockPlugin plugin, CommandSender sender) {
-        return getMinArgs();
-    }
-
-    @Override
     default int getMaxArgs() {
         return -1;
     }

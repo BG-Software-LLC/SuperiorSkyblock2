@@ -22,8 +22,6 @@ import java.util.Locale;
 
 public class CmdPermissions implements IPermissibleCommand {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
     @Override
     public List<String> getAliases() {
         return Arrays.asList("permissions", "perms", "setpermission", "setperm");

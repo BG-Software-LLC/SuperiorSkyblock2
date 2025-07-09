@@ -48,14 +48,6 @@ public interface SuperiorCommand {
     int getMinArgs();
 
     /**
-     * Get the minimum arguments required for the command.
-     * For example, the command /is example PLAYER_NAME has 2 arguments.
-     *
-     * @param sender The sender who ran the command.
-     */
-    int getMinArgs(SuperiorSkyblock plugin, CommandSender sender);
-
-    /**
      * Get the maximum arguments required for the command.
      * For example, the command /is example PLAYER_NAME has 2 arguments.
      */
