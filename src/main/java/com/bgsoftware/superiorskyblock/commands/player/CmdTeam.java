@@ -116,9 +116,9 @@ public class CmdTeam implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 2 ? CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
-                plugin.getSettings().isTabCompleteHideVanished(), (onlinePlayer, onlineIsland) ->
-                onlineIsland != null && sender.hasPermission("superior.island.team.others")) : Collections.emptyList();
+        return args.length == 2 && sender.hasPermission("superior.island.team.others") ?
+                CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
+                plugin.getSettings().isTabCompleteHideVanished()) : Collections.emptyList();
     }
 
 }

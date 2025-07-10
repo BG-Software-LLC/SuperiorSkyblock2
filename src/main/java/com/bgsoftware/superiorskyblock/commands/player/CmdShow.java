@@ -149,9 +149,9 @@ public class CmdShow implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 2 ? CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
-                plugin.getSettings().isTabCompleteHideVanished(), (onlinePlayer, onlineIsland) ->
-                onlineIsland != null && sender.hasPermission("superior.island.show.others")) : Collections.emptyList();
+        return args.length == 2 && sender.hasPermission("superior.island.show.others") ?
+                CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
+                plugin.getSettings().isTabCompleteHideVanished()) : Collections.emptyList();
     }
 
 }
