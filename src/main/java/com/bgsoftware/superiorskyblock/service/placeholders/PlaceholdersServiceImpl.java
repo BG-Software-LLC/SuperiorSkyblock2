@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.IslandPlaceholderParser;
@@ -21,6 +22,7 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
@@ -35,6 +37,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
@@ -150,6 +153,17 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             Formatters.TIME_FORMATTER.format(Duration.ofSeconds(island.getNextInterest()), superiorPlayer.getUserLocale()))
                     .put("bans_count", (island, superiorPlayer) ->
                             island.getBannedPlayers().size() + "")
+                    .put("bans_list", (island, superiorPlayer) -> {
+                        StringBuilder teamBuilder = new StringBuilder();
+                        List<SuperiorPlayer> players = island.getBannedPlayers();
+                        if (players.isEmpty()) {
+                            return "";
+                        }
+                        for (SuperiorPlayer player : players) {
+                            teamBuilder.append(", ").append(player.getName());
+                        }
+                        return teamBuilder.substring(2);
+                    })
                     .put("biome", (island, superiorPlayer) ->
                             Formatters.CAPITALIZED_FORMATTER.format(island.getBiome().name()))
                     .put("bonus_level", (island, superiorPlayer) ->
@@ -180,6 +194,17 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.getChestSize() + "")
                     .put("coop_limit", (island, superiorPlayer) ->
                             island.getCoopLimit() + "")
+                    .put("coop_list", (island, superiorPlayer) -> {
+                        StringBuilder teamBuilder = new StringBuilder();
+                        List<SuperiorPlayer> players = island.getCoopPlayers();
+                        if (players.isEmpty()) {
+                            return "";
+                        }
+                        for (SuperiorPlayer player : players) {
+                            teamBuilder.append(", ").append(player.getName());
+                        }
+                        return teamBuilder.substring(2);
+                    })
                     .put("coop_size", (island, superiorPlayer) ->
                             island.getCoopPlayers().size() + "")
                     .put("creation_time", (island, superiorPlayer) ->
@@ -245,6 +270,17 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.getPaypal())
                     .put("players_count", (island, superiorPlayer) ->
                             island.getAllPlayersInside().size() + "")
+                    .put("players_list", (island, superiorPlayer) -> {
+                        StringBuilder teamBuilder = new StringBuilder();
+                        List<SuperiorPlayer> players = island.getAllPlayersInside();
+                        if (players.isEmpty()) {
+                            return "";
+                        }
+                        for (SuperiorPlayer player : players) {
+                            teamBuilder.append(", ").append(player.getName());
+                        }
+                        return teamBuilder.substring(2);
+                    })
                     .put("radius", (island, superiorPlayer) ->
                             island.getIslandSize() + "")
                     .put("rating", (island, superiorPlayer) ->
@@ -308,16 +344,49 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.getSpawnerRatesMultiplier() + "")
                     .put("team_limit", (island, superiorPlayer) ->
                             island.getTeamLimit() + "")
+                    .put("team_list", (island, superiorPlayer) -> {
+                        StringBuilder teamBuilder = new StringBuilder();
+                        List<SuperiorPlayer> players = island.getIslandMembers(true);
+                        if (players.isEmpty()) {
+                            return "";
+                        }
+                        for (SuperiorPlayer player : players) {
+                            teamBuilder.append(", ").append(player.getName());
+                        }
+                        return teamBuilder.substring(2);
+                    })
                     .put("team_size", (island, superiorPlayer) ->
                             island.getIslandMembers(true).size() + "")
                     .put("team_size_online", (island, superiorPlayer) ->
                             island.getIslandMembers(true).stream().filter(SuperiorPlayer::isShownAsOnline).count() + "")
                     .put("unique_visitors_count", (island, superiorPlayer) ->
                             island.getUniqueVisitors().size() + "")
+                    .put("unique_visitors_list", (island, superiorPlayer) -> {
+                        StringBuilder teamBuilder = new StringBuilder();
+                        List<SuperiorPlayer> players = island.getUniqueVisitors();
+                        if (players.isEmpty()) {
+                            return "";
+                        }
+                        for (SuperiorPlayer player : players) {
+                            teamBuilder.append(", ").append(player.getName());
+                        }
+                        return teamBuilder.substring(2);
+                    })
                     .put("uuid", (island, superiorPlayer) ->
                             island.getUniqueId() + "")
                     .put("visitors_count", (island, superiorPlayer) ->
                             island.getIslandVisitors(false).size() + "")
+                    .put("visitors_list", (island, superiorPlayer) -> {
+                        StringBuilder teamBuilder = new StringBuilder();
+                        List<SuperiorPlayer> players = island.getIslandVisitors();
+                        if (players.isEmpty()) {
+                            return "";
+                        }
+                        for (SuperiorPlayer player : players) {
+                            teamBuilder.append(", ").append(player.getName());
+                        }
+                        return teamBuilder.substring(2);
+                    })
                     .put("visitors_location", (island, superiorPlayer) ->
                             Formatters.LOCATION_FORMATTER.format(island.getVisitorsLocation(getDefaultWorldInfo(island).getDimension())))
                     .put("visitors_location_x", (island, superiorPlayer) ->
@@ -600,15 +669,19 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     return handlePermissionsPlaceholder(island, superiorPlayer, matcher.group(1));
                 } else if ((matcher = ROLE_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String roleName = matcher.group(1);
-                    PlayerRole playerRole = SPlayerRole.of(roleName);
-                    if (playerRole == null) {
+                    PlayerRole playerRole;
+                    try {
+                        playerRole = SPlayerRole.of(roleName);
+                    } catch (IllegalArgumentException error) {
                         return Optional.empty();
                     }
                     return Optional.of(island.getIslandMembers(playerRole).size() + "");
                 } else if ((matcher = ROLE_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String roleName = matcher.group(1);
-                    PlayerRole playerRole = SPlayerRole.of(roleName);
-                    if (playerRole == null) {
+                    PlayerRole playerRole;
+                    try {
+                        playerRole = SPlayerRole.of(roleName);
+                    } catch (IllegalArgumentException error) {
                         return Optional.empty();
                     }
                     return Optional.of(island.getRoleLimit(playerRole) + "");
