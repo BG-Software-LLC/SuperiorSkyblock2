@@ -24,8 +24,10 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.BackButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.DummyButton;
 import com.bgsoftware.superiorskyblock.core.menu.layout.PagedMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularMenuLayoutImpl;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -399,8 +401,63 @@ public class MenuParserImpl implements MenuParser {
             }
         }
 
+        if (section.contains("bannerMeta")) {
+            for (String _dyeColor : section.getConfigurationSection("bannerMeta").getKeys(false)) {
+                DyeColor dyeColor;
+                PatternType patternType;
+
+                try {
+                    dyeColor = DyeColor.valueOf(_dyeColor.toUpperCase(Locale.ENGLISH));
+                } catch (IllegalArgumentException error) {
+                    Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
+                            ".bannerMeta.", _dyeColor.toUpperCase(Locale.ENGLISH), " into an dye color, skipping...");
+                    continue;
+                }
+
+                try {
+                    patternType = PatternType.valueOf(section.getString("bannerMeta." + _dyeColor));
+                } catch (IllegalArgumentException error) {
+                    Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
+                            ".bannerMeta.", _dyeColor.toUpperCase(Locale.ENGLISH), ".",
+                            section.getString("bannerMeta." + _dyeColor), " into an pattern type, skipping...");
+                    continue;
+                }
+
+                itemBuilder.withBannerMeta(dyeColor, patternType);
+            }
+        }
+
         if (section.contains("customModel")) {
             itemBuilder.withCustomModel(section.getInt("customModel"));
+        }
+
+        if (section.contains("itemModel")) {
+            itemBuilder.withItemModel(section.getString("itemModel"));
+        }
+
+        if (section.contains("rarity")) {
+            String rarity = section.getString("rarity");
+
+            try {
+                itemBuilder.withRarity(rarity);
+            } catch (IllegalArgumentException error) {
+                Log.warnFromFile(fileName, "Couldn't convert ", rarity, " into a rarity, skipping...");
+            }
+        }
+
+        if (section.contains("trimMaterial") || section.contains("trimPattern")) {
+            String trimMaterial = section.getString("trimMaterial");
+            String trimPattern = section.getString("trimPattern");
+
+            if (trimMaterial != null && trimPattern != null) {
+                itemBuilder.withTrim(trimMaterial, trimPattern);
+            } else {
+                if (trimMaterial == null) {
+                    Log.warnFromFile(fileName, "Couldn't find trim material for item with trim pattern, skipping...");
+                } else {
+                    Log.warnFromFile(fileName, "Couldn't find trim pattern for item with trim material, skipping...");
+                }
+            }
         }
 
         if (section.contains("leatherColor")) {
