@@ -4,11 +4,13 @@ import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ActionBarComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.BossBarComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.SoundComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.TitleComponent;
+import com.google.gson.JsonParseException;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -65,6 +67,12 @@ public class MultipleComponents implements IMessageComponent {
                 if (commandMessage != null) {
                     for (BaseComponent baseComponent : baseComponents)
                         baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandMessage));
+                }
+
+                String suggestMessage = section.getString(key + ".suggest");
+                if (suggestMessage != null) {
+                    for (BaseComponent baseComponent : baseComponents)
+                        baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggestMessage));
                 }
 
                 messageComponents.add(ComplexMessageComponent.of(baseComponents));
