@@ -14,6 +14,7 @@ public class PlayerCommandsMap extends CommandsMap {
         registerCommand(new CmdAccept());
         registerCommand(new CmdAdmin());
         registerCommand(new CmdBan());
+        registerCommand(new CmdBans());
         registerCommand(new CmdBiome());
         registerCommand(new CmdBorder());
         registerCommand(new CmdChest());

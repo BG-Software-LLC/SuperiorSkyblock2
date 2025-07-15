@@ -235,6 +235,7 @@ COMMAND_DESCRIPTION_ADMIN_WITHDRAW: 'Wyplac pieniadze z banku wyspy innego gracz
 COMMAND_DESCRIPTION_BALANCE: 'Sprawdz ilosc pieniedzy w banku wyspy.'
 COMMAND_DESCRIPTION_BAN: 'Zablokuj gracza na swojej wyspie.'
 COMMAND_DESCRIPTION_BANK: 'Otwórz bank wyspy.'
+COMMAND_DESCRIPTION_BANS: 'Otwórz menu banów.'
 COMMAND_DESCRIPTION_BIOME: 'Zmień biom wyspy.'
 COMMAND_DESCRIPTION_BORDER: 'Zmień kolor bariery wysp.'
 COMMAND_DESCRIPTION_CHEST: 'Otwórz skrzynie wyspy.'

@@ -61,6 +61,8 @@ permissions:
             description: Ban a player from your island.
           superior.island.bank:
             description: Open the island's bank.
+          superior.island.bans:
+            description: Open the bans menu.
           superior.island.biome:
             description: Change the biome of the island.
           superior.island.border:

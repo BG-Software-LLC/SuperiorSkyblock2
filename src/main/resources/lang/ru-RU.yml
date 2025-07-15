@@ -233,6 +233,7 @@ COMMAND_DESCRIPTION_ADMIN_WITHDRAW: 'Снять деньги с банка ос�
 COMMAND_DESCRIPTION_BALANCE: 'Проверить количество денег в банке острова.'
 COMMAND_DESCRIPTION_BAN: 'Забанить игрока на своем острове.'
 COMMAND_DESCRIPTION_BANK: 'Открыть банк острова.'
+COMMAND_DESCRIPTION_BANS: 'Open the bans menu.'
 COMMAND_DESCRIPTION_BIOME: 'Изменить биом острова.'
 COMMAND_DESCRIPTION_BORDER: 'Изменить цвет границы островов.'
 COMMAND_DESCRIPTION_CHEST: 'Открыть сундук острова.'

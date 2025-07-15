@@ -233,6 +233,7 @@ COMMAND_DESCRIPTION_ADMIN_WITHDRAW: 'Withdraw money from another player''s islan
 COMMAND_DESCRIPTION_BALANCE: 'Check the amount of money inside an island''s bank.'
 COMMAND_DESCRIPTION_BAN: 'Ban a player from your island.'
 COMMAND_DESCRIPTION_BANK: 'Open the island''s bank.'
+COMMAND_DESCRIPTION_BANS: 'Open the bans menu.'
 COMMAND_DESCRIPTION_BIOME: 'Change the biome of the island.'
 COMMAND_DESCRIPTION_BORDER: 'Change the border color of the islands.'
 COMMAND_DESCRIPTION_CHEST: 'Open the island''s chest.'

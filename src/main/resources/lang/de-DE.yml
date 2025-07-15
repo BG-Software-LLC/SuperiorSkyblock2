@@ -316,6 +316,7 @@ COMMAND_DESCRIPTION_ADMIN_WITHDRAW: Geld von der Inselbank eines anderen Spieler
 COMMAND_DESCRIPTION_BALANCE: Überprüfe den Geldbetrag in der Bank einer Insel.
 COMMAND_DESCRIPTION_BAN: Banne einen Spieler von deiner Insel.
 COMMAND_DESCRIPTION_BANK: Öffne die Bank der Insel.
+COMMAND_DESCRIPTION_BANS: 'Open the bans menu.'
 COMMAND_DESCRIPTION_BIOME: Ändere das Biom der Insel.
 COMMAND_DESCRIPTION_BORDER: Ändere die Randfarbe der Inseln.
 COMMAND_DESCRIPTION_CHEST: Öffne die Truhe der Insel.

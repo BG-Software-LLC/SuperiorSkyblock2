@@ -244,6 +244,7 @@ COMMAND_DESCRIPTION_ADMIN_WITHDRAW: רחא ןקחש לש יאמ ףסכ איצו�
 COMMAND_DESCRIPTION_BALANCE: 'Check the amount of money inside an island''s bank.'
 COMMAND_DESCRIPTION_BAN: ךלש יאהמ ןקחש קיחרהל.
 COMMAND_DESCRIPTION_BANK: 'Open the island''s bank.'
+COMMAND_DESCRIPTION_BANS: 'Open the bans menu.'
 COMMAND_DESCRIPTION_BIOME: יאה לש םויבה תא ףילחהל.
 COMMAND_DESCRIPTION_BORDER: םייאה לש לובגה עבצ תא ףילחהל.
 COMMAND_DESCRIPTION_CHEST: 'Open the island''s chest.'
