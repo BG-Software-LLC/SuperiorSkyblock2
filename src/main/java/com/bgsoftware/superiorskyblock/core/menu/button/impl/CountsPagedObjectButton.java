@@ -181,7 +181,7 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
             .put("RED_WALL_BANNER", "RED_BANNER")
             .put("REDSTONE_COMPARATOR_OFF", "REDSTONE_COMPARATOR")
             .put("REDSTONE_COMPARATOR_ON", "REDSTONE_COMPARATOR")
-            .put("REDSTONE_LAMP_ON", "REDSTONE_LAMP")
+            .put("REDSTONE_LAMP_ON", "REDSTONE_LAMP_OFF")
             .put("REDSTONE_TORCH_OFF", "REDSTONE_TORCH_ON")
             .put("REDSTONE_WALL_TORCH", "REDSTONE_TORCH")
             .put("REDSTONE_WIRE", "REDSTONE")
