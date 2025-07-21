@@ -344,6 +344,7 @@ public class MenusProvider_Default implements MenusProvider {
 
     @Override
     public void openMissions(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu) {
+        Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         if (Menus.MENU_MISSIONS.isSkipOneItem()) {
             List<MissionCategory> missionCategories = plugin.getMissions().getMissionCategories();
             if (missionCategories.size() == 1) {
@@ -351,7 +352,6 @@ public class MenusProvider_Default implements MenusProvider {
                 return;
             }
         }
-        Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Menus.MENU_MISSIONS.createView(targetPlayer, EmptyViewArgs.INSTANCE, previousMenu);
     }
 
