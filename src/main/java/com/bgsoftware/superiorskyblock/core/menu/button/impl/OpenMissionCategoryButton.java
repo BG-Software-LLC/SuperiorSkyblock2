@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
@@ -10,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.List;
@@ -28,6 +30,13 @@ public class OpenMissionCategoryButton extends AbstractMenuViewButton<BaseMenuVi
 
     @Override
     public void onButtonClick(InventoryClickEvent clickEvent) {
+        boolean requireIsland = getTemplate().missionCategory.getMissions().stream().allMatch(Mission::getIslandMission);
+
+        if (requireIsland && !menuView.getInventoryViewer().hasIsland()) {
+            Message.INVALID_ISLAND.send(menuView.getInventoryViewer());
+            return;
+        }
+
         menuView.setPreviousMove(false);
         plugin.getMenus().openMissionsCategory(menuView.getInventoryViewer(), MenuViewWrapper.fromView(menuView), getTemplate().missionCategory);
     }

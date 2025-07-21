@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.module.missions.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
@@ -51,6 +52,13 @@ public class CmdMissions implements ISuperiorCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+        boolean requireIsland = plugin.getMissions().getAllMissions().stream().allMatch(Mission::getIslandMission);
+
+        if (requireIsland && !superiorPlayer.hasIsland()) {
+            Message.INVALID_ISLAND.send(superiorPlayer);
+            return;
+        }
+
         plugin.getMenus().openMissions(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()));
     }
 
