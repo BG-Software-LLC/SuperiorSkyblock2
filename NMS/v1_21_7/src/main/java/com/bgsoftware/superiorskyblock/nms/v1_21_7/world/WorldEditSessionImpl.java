@@ -301,9 +301,6 @@ public class WorldEditSessionImpl implements WorldEditSession {
                     textLines.set(i, Component.empty());
             }
 
-            while (textLines.size() < 4)
-                textLines.add(Component.empty());
-
             Component[] textLinesArray = textLines.toArray(COMPONENT_ARRAY_TYPE);
 
             SignText signText = new SignText(textLinesArray, textLinesArray, DyeColor.BLACK, false);
