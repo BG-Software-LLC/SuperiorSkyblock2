@@ -26,14 +26,16 @@ public class IslandNames {
                 Formatters.COLOR_FORMATTER.format(islandName) : islandName;
         String strippedName = plugin.getSettings().getIslandNames().isColorSupport() ?
                 Formatters.STRIP_COLOR_FORMATTER.format(coloredName) : islandName;
+        int maxLength = plugin.getSettings().getIslandNames().getMaxLength();
+        int minLength = plugin.getSettings().getIslandNames().getMinLength();
 
-        if (strippedName.length() > plugin.getSettings().getIslandNames().getMaxLength()) {
-            Message.NAME_TOO_LONG.send(sender);
+        if (strippedName.length() > maxLength) {
+            Message.NAME_TOO_LONG.send(sender, maxLength);
             return false;
         }
 
-        if (strippedName.length() < plugin.getSettings().getIslandNames().getMinLength()) {
-            Message.NAME_TOO_SHORT.send(sender);
+        if (strippedName.length() < minLength) {
+            Message.NAME_TOO_SHORT.send(sender, minLength);
             return false;
         }
 
