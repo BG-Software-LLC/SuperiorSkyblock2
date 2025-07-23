@@ -10,13 +10,10 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import org.bukkit.Location;
 import org.bukkit.PortalType;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -96,10 +93,8 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
         if (dimension != plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
             if (!island.wasSchematicGenerated(dimension)) {
                 PortalType portalType = dimension.getEnvironment() == World.Environment.NETHER ? PortalType.NETHER : PortalType.ENDER;
-                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    portalsManager.get().handlePlayerPortalFromIsland(superiorPlayer, island,
-                            ((Player) sender).getLocation(wrapper.getHandle()), portalType, false);
-                }
+                portalsManager.get().handlePlayerPortalFromIsland(superiorPlayer, island,
+                        island.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension()), portalType, false);
                 return;
             }
         }
