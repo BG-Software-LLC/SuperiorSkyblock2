@@ -72,7 +72,7 @@ public abstract class Tag<E> {
         else if (tag.getClass().equals(DoubleTag.CLASS))
             return DoubleTag.fromNBT(tag);
         else if (tag.getClass().equals(EndTag.CLASS))
-            return new EndTag();
+            return EndTag.of();
         else if (tag.getClass().equals(FloatTag.CLASS))
             return FloatTag.fromNBT(tag);
         else if (tag.getClass().equals(IntArrayTag.CLASS))

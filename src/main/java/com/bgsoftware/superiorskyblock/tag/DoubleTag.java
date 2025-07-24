@@ -46,14 +46,27 @@ import java.io.IOException;
  */
 public class DoubleTag extends NumberTag<Double> {
 
+    private static final DoubleTag[] CACHE = new DoubleTag[100];
+
     /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagDouble");
+
+    public static DoubleTag of(double value) {
+        if (value == (int) value && value >= 0 && value < CACHE.length) {
+            DoubleTag tag = CACHE[(int) value];
+            if (tag == null)
+                tag = CACHE[(int) value] = new DoubleTag(value);
+            return tag;
+        } else {
+            return new DoubleTag(value);
+        }
+    }
 
     /**
      * Creates the tag.
      *
      * @param value The value.
      */
-    public DoubleTag(double value) {
+    private DoubleTag(double value) {
         super(value, CLASS, double.class);
     }
 
@@ -62,7 +75,7 @@ public class DoubleTag extends NumberTag<Double> {
 
         try {
             double value = plugin.getNMSTags().getNBTDoubleValue(tag);
-            return new DoubleTag(value);
+            return DoubleTag.of(value);
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while converting tag double from NMS:");
             return null;
@@ -70,7 +83,7 @@ public class DoubleTag extends NumberTag<Double> {
     }
 
     public static DoubleTag fromStream(DataInputStream is) throws IOException {
-        return new DoubleTag(is.readDouble());
+        return DoubleTag.of(is.readDouble());
     }
 
     @Override

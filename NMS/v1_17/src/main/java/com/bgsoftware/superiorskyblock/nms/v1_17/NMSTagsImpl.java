@@ -59,15 +59,16 @@ public class NMSTagsImpl implements NMSTags {
     }
 
     private static org.bukkit.inventory.ItemStack deserializeItemOld(CompoundTag compoundTag) {
-        String typeName = Materials.patchOldMaterialName(compoundTag.getString("type"));
+        String typeName = Materials.patchOldMaterialName(compoundTag.getString("type").orElse(null));
         Material type = Material.valueOf(typeName);
-        int amount = compoundTag.getInt("amount");
-        short data = compoundTag.getShort("data");
-        CompoundTag nbtData = compoundTag.getCompound("NBT");
+        int amount = compoundTag.getInt("amount").orElse(0);
+        short data = (short) compoundTag.getShort("data").orElse(0);
+        CompoundTag nbtData = compoundTag.getCompound("NBT").orElse(null);
 
         org.bukkit.inventory.ItemStack bukkitItem = new org.bukkit.inventory.ItemStack(type, amount, data);
         ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitItem);
-        itemStack.setTag((net.minecraft.nbt.CompoundTag) nbtData.toNBT());
+        if (nbtData != null)
+            itemStack.setTag((net.minecraft.nbt.CompoundTag) nbtData.toNBT());
 
         return CraftItemStack.asCraftMirror(itemStack);
     }

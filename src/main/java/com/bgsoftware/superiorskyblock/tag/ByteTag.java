@@ -46,14 +46,25 @@ import java.io.IOException;
  */
 public class ByteTag extends NumberTag<Byte> {
 
+    private static final ByteTag[] CACHE = new ByteTag[256];
+
     /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagByte");
+
+
+    public static ByteTag of(byte value) {
+        int index = value - Byte.MIN_VALUE;
+        ByteTag tag = CACHE[index];
+        if (tag == null)
+            tag = CACHE[index] = new ByteTag(value);
+        return tag;
+    }
 
     /**
      * Creates the tag.
      *
      * @param value The value.
      */
-    public ByteTag(byte value) {
+    private ByteTag(byte value) {
         super(value, CLASS, byte.class);
     }
 
@@ -62,7 +73,7 @@ public class ByteTag extends NumberTag<Byte> {
 
         try {
             byte value = plugin.getNMSTags().getNBTByteValue(tag);
-            return new ByteTag(value);
+            return ByteTag.of(value);
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while converting tag byte from NMS:");
             return null;
@@ -70,7 +81,7 @@ public class ByteTag extends NumberTag<Byte> {
     }
 
     public static ByteTag fromStream(DataInputStream is) throws IOException {
-        return new ByteTag(is.readByte());
+        return ByteTag.of(is.readByte());
     }
 
     @Override

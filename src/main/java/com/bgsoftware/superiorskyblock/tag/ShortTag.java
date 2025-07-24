@@ -46,9 +46,22 @@ import java.io.IOException;
  */
 public class ShortTag extends NumberTag<Short> {
 
+    private static final ShortTag[] CACHE = new ShortTag[100];
+
     /*package*/  static final Class<?> CLASS = getNNTClass("NBTTagShort");
 
-    public ShortTag(short value) {
+    public static ShortTag of(short value) {
+        if (value >= 0 && value < CACHE.length) {
+            ShortTag tag = CACHE[value];
+            if (tag == null)
+                tag = CACHE[value] = new ShortTag(value);
+            return tag;
+        } else {
+            return new ShortTag(value);
+        }
+    }
+
+    private ShortTag(short value) {
         super(value, CLASS, short.class);
     }
 
@@ -57,7 +70,7 @@ public class ShortTag extends NumberTag<Short> {
 
         try {
             short value = plugin.getNMSTags().getNBTShortValue(tag);
-            return new ShortTag(value);
+            return ShortTag.of(value);
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while converting tag short from NMS:");
             return null;
@@ -65,7 +78,7 @@ public class ShortTag extends NumberTag<Short> {
     }
 
     public static ShortTag fromStream(DataInputStream is) throws IOException {
-        return new ShortTag(is.readShort());
+        return ShortTag.of(is.readShort());
     }
 
     @Override

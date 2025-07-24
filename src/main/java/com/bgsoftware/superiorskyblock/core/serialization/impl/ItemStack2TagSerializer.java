@@ -25,7 +25,7 @@ public class ItemStack2TagSerializer implements ISerializer<ItemStack, CompoundT
     @NotNull
     public CompoundTag serialize(@Nullable ItemStack serializable) {
         if (serializable == null)
-            return new CompoundTag();
+            return CompoundTag.of();
 
         return plugin.getNMSTags().serializeItem(serializable);
     }

@@ -444,7 +444,7 @@ public class SettingsContainer {
             for (String container : config.getConfigurationSection("default-containers.containers").getKeys(false)) {
                 try {
                     InventoryType containerType = InventoryType.valueOf(container.toUpperCase(Locale.ENGLISH));
-                    ListTag items = new ListTag(CompoundTag.class, Collections.emptyList());
+                    ListTag items = ListTag.of(CompoundTag.class);
                     defaultContainersContents.put(containerType, items);
 
                     ConfigurationSection containerSection = config.getConfigurationSection("default-containers.containers." + container);

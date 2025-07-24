@@ -44,12 +44,18 @@ import java.io.IOException;
 @SuppressWarnings("WeakerAccess")
 public class EndTag extends Tag<Object> {
 
+    private static final EndTag INSTANCE = new EndTag();
+
     /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagEnd");
+
+    public static EndTag of() {
+        return INSTANCE;
+    }
 
     /**
      * Creates the tag.
      */
-    public EndTag() {
+    private EndTag() {
         super(null, CLASS);
     }
 
@@ -57,7 +63,7 @@ public class EndTag extends Tag<Object> {
         if (depth == 0) {
             throw new IOException("TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
         } else {
-            return new EndTag();
+            return EndTag.INSTANCE;
         }
     }
 

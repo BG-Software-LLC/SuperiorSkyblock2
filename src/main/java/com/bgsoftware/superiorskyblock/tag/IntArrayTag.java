@@ -53,14 +53,20 @@ import java.util.UUID;
 @SuppressWarnings("WeakerAccess")
 public class IntArrayTag extends Tag<int[]> {
 
+    private static final IntArrayTag EMPTY = new IntArrayTag(new int[0]);
+
     /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagIntArray");
+
+    public static IntArrayTag of(int[] value) {
+        return value.length == 0 ? EMPTY : new IntArrayTag(value);
+    }
 
     /**
      * Creates the tag.
      *
      * @param value The value.
      */
-    public IntArrayTag(int[] value) {
+    private IntArrayTag(int[] value) {
         super(value, CLASS, int[].class);
     }
 
@@ -69,7 +75,7 @@ public class IntArrayTag extends Tag<int[]> {
 
         try {
             int[] value = plugin.getNMSTags().getNBTIntArrayValue(tag);
-            return new IntArrayTag(value);
+            return IntArrayTag.of(value);
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while converting tag int-array from NMS:");
             return null;
@@ -79,7 +85,7 @@ public class IntArrayTag extends Tag<int[]> {
     public static IntArrayTag fromUUID(UUID uuid) {
         long MSB = uuid.getMostSignificantBits();
         long LSB = uuid.getLeastSignificantBits();
-        return new IntArrayTag(new int[]{(int) (MSB >> 32), (int) MSB, (int) (LSB >> 32), (int) LSB});
+        return IntArrayTag.of(new int[]{(int) (MSB >> 32), (int) MSB, (int) (LSB >> 32), (int) LSB});
     }
 
     public static IntArrayTag fromStream(DataInputStream is) throws IOException {
@@ -88,7 +94,7 @@ public class IntArrayTag extends Tag<int[]> {
         for (int i = 0; i < length; i++) {
             data[i] = is.readInt();
         }
-        return new IntArrayTag(data);
+        return IntArrayTag.of(data);
     }
 
     @Override
@@ -97,7 +103,7 @@ public class IntArrayTag extends Tag<int[]> {
         for (int b : value) {
             integers.append(b).append(" ");
         }
-        return "TAG_Int_Array: " + integers.toString();
+        return "TAG_Int_Array: " + integers;
     }
 
     @Override
@@ -107,10 +113,6 @@ public class IntArrayTag extends Tag<int[]> {
             os.writeInt(i);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         int prime = 31;
@@ -119,10 +121,6 @@ public class IntArrayTag extends Tag<int[]> {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(final Object obj) {
         return this == obj || (obj instanceof IntArrayTag && Arrays.equals(value, ((IntArrayTag) obj).value));

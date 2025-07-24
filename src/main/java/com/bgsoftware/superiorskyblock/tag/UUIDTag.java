@@ -8,12 +8,20 @@ import java.util.UUID;
 
 public class UUIDTag extends Tag<UUID> {
 
-    public UUIDTag(UUID value) {
+    public static UUIDTag of(long mostSigBits, long leastSigBits) {
+        return new UUIDTag(new UUID(mostSigBits, leastSigBits));
+    }
+
+    public static UUIDTag of(UUID value) {
+        return new UUIDTag(value);
+    }
+
+    private UUIDTag(UUID value) {
         super(value, null);
     }
 
     public static UUIDTag fromStream(DataInputStream is) throws IOException {
-        return new UUIDTag(new UUID(is.readLong(), is.readLong()));
+        return UUIDTag.of(is.readLong(), is.readLong());
     }
 
     @Override

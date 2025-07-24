@@ -49,14 +49,20 @@ import java.util.Locale;
 @SuppressWarnings("WeakerAccess")
 public class ByteArrayTag extends Tag<byte[]> {
 
+    private static final ByteArrayTag EMPTY = new ByteArrayTag(new byte[0]);
+
     /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagByteArray");
+
+    public static ByteArrayTag of(byte[] value) {
+        return value.length == 0 ? EMPTY : new ByteArrayTag(value);
+    }
 
     /**
      * Creates the tag.
      *
      * @param value The value.
      */
-    public ByteArrayTag(byte[] value) {
+    private ByteArrayTag(byte[] value) {
         super(value, CLASS, byte[].class);
     }
 
@@ -65,7 +71,7 @@ public class ByteArrayTag extends Tag<byte[]> {
 
         try {
             byte[] value = plugin.getNMSTags().getNBTByteArrayValue(tag);
-            return new ByteArrayTag(value);
+            return ByteArrayTag.of(value);
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while converting tag byte-array from NMS:");
             return null;
@@ -76,7 +82,7 @@ public class ByteArrayTag extends Tag<byte[]> {
         int length = is.readInt();
         byte[] bytes = new byte[length];
         is.readFully(bytes);
-        return new ByteArrayTag(bytes);
+        return ByteArrayTag.of(bytes);
     }
 
     @Override

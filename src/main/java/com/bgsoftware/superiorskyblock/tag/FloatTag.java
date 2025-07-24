@@ -47,14 +47,27 @@ import java.io.IOException;
 @SuppressWarnings("WeakerAccess")
 public class FloatTag extends NumberTag<Float> {
 
+    private static final FloatTag[] CACHE = new FloatTag[100];
+
     /*package*/  static final Class<?> CLASS = getNNTClass("NBTTagFloat");
+
+    public static FloatTag of(float value) {
+        if (value == (int) value && value >= 0 && value < CACHE.length) {
+            FloatTag tag = CACHE[(int) value];
+            if (tag == null)
+                tag = CACHE[(int) value] = new FloatTag(value);
+            return tag;
+        } else {
+            return new FloatTag(value);
+        }
+    }
 
     /**
      * Creates the tag.
      *
      * @param value The value.
      */
-    public FloatTag(float value) {
+    private FloatTag(float value) {
         super(value, CLASS, float.class);
     }
 
@@ -63,7 +76,7 @@ public class FloatTag extends NumberTag<Float> {
 
         try {
             float value = plugin.getNMSTags().getNBTFloatValue(tag);
-            return new FloatTag(value);
+            return FloatTag.of(value);
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while converting tag float from NMS:");
             return null;
@@ -71,7 +84,7 @@ public class FloatTag extends NumberTag<Float> {
     }
 
     public static FloatTag fromStream(DataInputStream is) throws IOException {
-        return new FloatTag(is.readFloat());
+        return FloatTag.of(is.readFloat());
     }
 
     @Override

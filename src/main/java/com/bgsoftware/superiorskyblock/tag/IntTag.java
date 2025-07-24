@@ -46,9 +46,22 @@ import java.io.IOException;
  */
 public class IntTag extends NumberTag<Integer> {
 
+    private static final IntTag[] CACHE = new IntTag[100];
+
     /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagInt");
 
-    public IntTag(int value) {
+    public static IntTag of(int value) {
+        if (value >= 0 && value < CACHE.length) {
+            IntTag tag = CACHE[value];
+            if (tag == null)
+                tag = CACHE[value] = new IntTag(value);
+            return tag;
+        } else {
+            return new IntTag(value);
+        }
+    }
+
+    private IntTag(int value) {
         super(value, CLASS, int.class);
     }
 
@@ -57,7 +70,7 @@ public class IntTag extends NumberTag<Integer> {
 
         try {
             int value = plugin.getNMSTags().getNBTIntValue(tag);
-            return new IntTag(value);
+            return IntTag.of(value);
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while converting tag int from NMS:");
             return null;
@@ -65,7 +78,7 @@ public class IntTag extends NumberTag<Integer> {
     }
 
     public static IntTag fromStream(DataInputStream is) throws IOException {
-        return new IntTag(is.readInt());
+        return IntTag.of(is.readInt());
     }
 
     @Override

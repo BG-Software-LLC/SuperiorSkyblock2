@@ -314,21 +314,21 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             }
 
             Map<String, Tag<?>> compoundValue = new HashMap<>();
-            compoundValue.put("xSize", new IntTag(xSize));
-            compoundValue.put("ySize", new IntTag(ySize));
-            compoundValue.put("zSize", new IntTag(zSize));
-            compoundValue.put("blocks", new ListTag(CompoundTag.class, blocks));
-            compoundValue.put("entities", new ListTag(CompoundTag.class, entities));
-            compoundValue.put("offsetX", new IntTag(schematicOptions.getOffsetX()));
-            compoundValue.put("offsetY", new IntTag(schematicOptions.getOffsetY()));
-            compoundValue.put("offsetZ", new IntTag(schematicOptions.getOffsetZ()));
-            compoundValue.put("yaw", new FloatTag(schematicOptions.getYaw()));
-            compoundValue.put("pitch", new FloatTag(schematicOptions.getPitch()));
-            compoundValue.put("version", new StringTag(ServerVersion.getBukkitVersion()));
+            compoundValue.put("xSize", IntTag.of(xSize));
+            compoundValue.put("ySize", IntTag.of(ySize));
+            compoundValue.put("zSize", IntTag.of(zSize));
+            compoundValue.put("blocks", ListTag.of(blocks, CompoundTag.class));
+            compoundValue.put("entities", ListTag.of(entities, CompoundTag.class));
+            compoundValue.put("offsetX", IntTag.of(schematicOptions.getOffsetX()));
+            compoundValue.put("offsetY", IntTag.of(schematicOptions.getOffsetY()));
+            compoundValue.put("offsetZ", IntTag.of(schematicOptions.getOffsetZ()));
+            compoundValue.put("yaw", FloatTag.of(schematicOptions.getYaw()));
+            compoundValue.put("pitch", FloatTag.of(schematicOptions.getPitch()));
+            compoundValue.put("version", StringTag.of(ServerVersion.getBukkitVersion()));
             if (!ServerVersion.isLegacy())
-                compoundValue.put("minecraftDataVersion", new IntTag(plugin.getNMSAlgorithms().getDataVersion()));
+                compoundValue.put("minecraftDataVersion", IntTag.of(plugin.getNMSAlgorithms().getDataVersion()));
 
-            CompoundTag schematicTag = new CompoundTag(compoundValue);
+            CompoundTag schematicTag = CompoundTag.of(compoundValue);
             SuperiorSchematic schematic = new SuperiorSchematic(schematicOptions.getSchematicName(), schematicTag);
             this.schematicsContainer.addSchematic(schematic);
             saveIntoFile(schematicOptions.getSchematicName(), schematicTag);

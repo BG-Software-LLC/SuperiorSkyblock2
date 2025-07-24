@@ -63,14 +63,16 @@ public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
     @Nullable
     private Class<? extends Tag> hintType;
 
-    /**
-     * Creates the tag.
-     *
-     * @param hintType Hint for the type of all items in the list.
-     * @param value    The value.
-     */
-    public ListTag(@Nullable Class<? extends Tag> hintType, List<Tag<?>> value) {
-        this(value, hintType, true);
+    public static ListTag of(@Nullable Class<? extends Tag> hintType) {
+        return new ListTag(new LinkedList<>(), hintType, false);
+    }
+
+    public static ListTag of(List<Tag<?>> value) {
+        return of(value, null);
+    }
+
+    public static ListTag of(List<Tag<?>> value, @Nullable Class<? extends Tag> hintType) {
+        return new ListTag(value, hintType, true);
     }
 
     private ListTag(List<Tag<?>> value, @Nullable Class<? extends Tag> hintType, boolean cloneList) {
@@ -79,7 +81,7 @@ public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
     }
 
     public ListTag copy() {
-        return new ListTag(this.hintType, this.value);
+        return of(this.value, this.hintType);
     }
 
     public void addTag(Tag<?> tag) {

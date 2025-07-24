@@ -9,7 +9,13 @@ import java.io.IOException;
 
 public class PersistentDataTagSerialized extends Tag<byte[]> {
 
-    public PersistentDataTagSerialized(byte[] value) {
+    private static final PersistentDataTagSerialized EMPTY = new PersistentDataTagSerialized(new byte[0]);
+
+    public static PersistentDataTagSerialized of(byte[] value) {
+        return value.length == 0 ? EMPTY : new PersistentDataTagSerialized(value);
+    }
+
+    private PersistentDataTagSerialized(byte[] value) {
         super(value, null);
     }
 
@@ -17,7 +23,7 @@ public class PersistentDataTagSerialized extends Tag<byte[]> {
         PersistentDataTypeContext<E> serializer = type.getContext();
         if (serializer == null)
             throw new IllegalArgumentException("Cannot find a valid serializer for " + type);
-        return new PersistentDataTag<>(serializer.deserialize(value), serializer);
+        return PersistentDataTag.of(serializer.deserialize(value), serializer);
     }
 
     public static PersistentDataTagSerialized fromStream(DataInputStream is) throws IOException {

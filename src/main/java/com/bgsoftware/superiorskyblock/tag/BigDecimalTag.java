@@ -10,7 +10,11 @@ import java.math.MathContext;
 
 public class BigDecimalTag extends Tag<BigDecimal> {
 
-    public BigDecimalTag(BigDecimal value) {
+    public static BigDecimalTag of(BigDecimal value) {
+        return new BigDecimalTag(value);
+    }
+
+    private BigDecimalTag(BigDecimal value) {
         super(value, null);
     }
 
@@ -20,7 +24,7 @@ public class BigDecimalTag extends Tag<BigDecimal> {
         byte[] data = new byte[is.readInt()];
         is.readFully(data);
 
-        return new BigDecimalTag(new BigDecimal(new BigInteger(data), scale, new MathContext(precision)));
+        return BigDecimalTag.of(new BigDecimal(new BigInteger(data), scale, new MathContext(precision)));
     }
 
     @Override

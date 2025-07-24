@@ -47,9 +47,22 @@ import java.io.IOException;
 @SuppressWarnings("WeakerAccess")
 public class LongTag extends NumberTag<Long> {
 
+    private static final LongTag[] CACHE = new LongTag[100];
+
     /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagLong");
 
-    public LongTag(long value) {
+    public static LongTag of(long value) {
+        if (value >= 0 && value < CACHE.length) {
+            LongTag tag = CACHE[(int) value];
+            if (tag == null)
+                tag = CACHE[(int) value] = new LongTag(value);
+            return tag;
+        } else {
+            return new LongTag(value);
+        }
+    }
+
+    private LongTag(long value) {
         super(value, CLASS, long.class);
     }
 
@@ -58,7 +71,7 @@ public class LongTag extends NumberTag<Long> {
 
         try {
             long value = plugin.getNMSTags().getNBTLongValue(tag);
-            return new LongTag(value);
+            return LongTag.of(value);
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while converting tag long from NMS:");
             return null;
@@ -66,7 +79,7 @@ public class LongTag extends NumberTag<Long> {
     }
 
     public static LongTag fromStream(DataInputStream is) throws IOException {
-        return new LongTag(is.readLong());
+        return LongTag.of(is.readLong());
     }
 
     @Override

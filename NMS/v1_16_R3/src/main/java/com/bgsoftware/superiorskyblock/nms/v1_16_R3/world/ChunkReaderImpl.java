@@ -4,11 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.world.ChunkReader;
-import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
-import com.bgsoftware.superiorskyblock.tag.StringTag;
-import com.bgsoftware.superiorskyblock.tag.Tag;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.BlockStateBoolean;
@@ -22,7 +18,6 @@ import net.minecraft.server.v1_16_R3.Entity;
 import net.minecraft.server.v1_16_R3.EnumSkyBlock;
 import net.minecraft.server.v1_16_R3.GameProfileSerializer;
 import net.minecraft.server.v1_16_R3.IBlockData;
-import net.minecraft.server.v1_16_R3.IBlockState;
 import net.minecraft.server.v1_16_R3.LightEngine;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.NBTTagFloat;
@@ -155,24 +150,21 @@ public class ChunkReaderImpl implements ChunkReader {
         if (blockData.getStateMap().isEmpty())
             return null;
 
-        CompoundTag compoundTag = new CompoundTag();
+        CompoundTag compoundTag = CompoundTag.of();
 
-        for (Map.Entry<IBlockState<?>, Comparable<?>> entry : blockData.getStateMap().entrySet()) {
-            Tag<?> value;
-            Class<?> keyClass = entry.getKey().getClass();
-            String name = BlockStatesMapper.getBlockStateName(entry.getKey());
+        blockData.getStateMap().forEach((blockState, value) -> {
+            Class<?> keyClass = blockState.getClass();
+            String name = BlockStatesMapper.getBlockStateName(blockState);
 
             if (keyClass.equals(BlockStateBoolean.class)) {
-                value = new ByteTag((Boolean) entry.getValue() ? (byte) 1 : 0);
+                compoundTag.setByte(name, (Boolean) value ? (byte) 1 : 0);
             } else if (keyClass.equals(BlockStateInteger.class)) {
-                BlockStateInteger key = (BlockStateInteger) entry.getKey();
-                value = new IntArrayTag(new int[]{(Integer) entry.getValue(), key.min, key.max});
+                BlockStateInteger key = (BlockStateInteger) blockState;
+                compoundTag.setIntArray(name, new int[]{(Integer) value, key.min, key.max});
             } else {
-                value = new StringTag(((Enum<?>) entry.getValue()).name());
+                compoundTag.setString(name, ((Enum<?>) value).name());
             }
-
-            compoundTag.setTag(name, value);
-        }
+        });
 
         return compoundTag;
     }

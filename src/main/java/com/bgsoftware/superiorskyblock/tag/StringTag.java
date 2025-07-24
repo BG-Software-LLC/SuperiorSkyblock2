@@ -47,14 +47,20 @@ import java.nio.charset.StandardCharsets;
  */
 public class StringTag extends Tag<String> {
 
+    private static final StringTag EMPTY = new StringTag("");
+
     /*package*/  static final Class<?> CLASS = getNNTClass("NBTTagString");
+
+    public static StringTag of(String value) {
+        return value.isEmpty() ? EMPTY : new StringTag(value);
+    }
 
     /**
      * Creates the tag.
      *
      * @param value The value.
      */
-    public StringTag(String value) {
+    private StringTag(String value) {
         super(value, CLASS, String.class);
     }
 
@@ -63,7 +69,7 @@ public class StringTag extends Tag<String> {
 
         try {
             String value = plugin.getNMSTags().getNBTStringValue(tag);
-            return new StringTag(value);
+            return StringTag.of(value);
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while converting tag string from NMS:");
             return null;
@@ -72,16 +78,19 @@ public class StringTag extends Tag<String> {
 
     public static StringTag fromStream(DataInputStream is) throws IOException {
         int length = is.readShort();
+        if (length <= 0)
+            return EMPTY;
         byte[] bytes = new byte[length];
         is.readFully(bytes);
-        return new StringTag(new String(bytes, StandardCharsets.UTF_8));
+        return StringTag.of(new String(bytes, StandardCharsets.UTF_8));
     }
 
     @Override
     protected void writeData(DataOutputStream os) throws IOException {
         byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
         os.writeShort(bytes.length);
-        os.write(bytes);
+        if (bytes.length > 0)
+            os.write(bytes);
     }
 
 }
