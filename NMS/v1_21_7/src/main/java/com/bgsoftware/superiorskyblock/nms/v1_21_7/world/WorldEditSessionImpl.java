@@ -296,8 +296,10 @@ public class WorldEditSessionImpl implements WorldEditSession {
                 }
             }
 
-            while (textLines.size() < 4)
-                textLines.add(Component.empty());
+            for (int i = 0; i < 4; i++) {
+                if (textLines.get(i) == null)
+                    textLines.set(i, Component.empty());
+            }
 
             Component[] textLinesArray = textLines.toArray(COMPONENT_ARRAY_TYPE);
 
