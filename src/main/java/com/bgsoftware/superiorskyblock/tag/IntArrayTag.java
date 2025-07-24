@@ -53,13 +53,9 @@ import java.util.UUID;
 @SuppressWarnings("WeakerAccess")
 public class IntArrayTag extends Tag<int[]> {
 
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagIntArray", int[].class);
+
     private static final IntArrayTag EMPTY = new IntArrayTag(new int[0]);
-
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagIntArray");
-
-    public static IntArrayTag of(int[] value) {
-        return value.length == 0 ? EMPTY : new IntArrayTag(value);
-    }
 
     /**
      * Creates the tag.
@@ -67,11 +63,49 @@ public class IntArrayTag extends Tag<int[]> {
      * @param value The value.
      */
     private IntArrayTag(int[] value) {
-        super(value, CLASS, int[].class);
+        super(value);
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeInt(value.length);
+        for (int i : value)
+            os.writeInt(i);
+    }
+
+    @Override
+    protected NMSTagConverter getNMSConverter() {
+        return TAG_CONVERTER;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder integers = new StringBuilder();
+        for (int b : value) {
+            integers.append(b).append(" ");
+        }
+        return "TAG_Int_Array: " + integers;
+    }
+
+    @Override
+    public int hashCode() {
+        int prime = 31;
+        int result = super.hashCode();
+        result = (prime * result) + Arrays.hashCode(value);
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return this == obj || (obj instanceof IntArrayTag && Arrays.equals(value, ((IntArrayTag) obj).value));
+    }
+
+    public static IntArrayTag of(int[] value) {
+        return value.length == 0 ? EMPTY : new IntArrayTag(value);
     }
 
     public static IntArrayTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to IntArrayTag!");
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to IntArrayTag!");
 
         try {
             int[] value = plugin.getNMSTags().getNBTIntArrayValue(tag);
@@ -95,35 +129,6 @@ public class IntArrayTag extends Tag<int[]> {
             data[i] = is.readInt();
         }
         return IntArrayTag.of(data);
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder integers = new StringBuilder();
-        for (int b : value) {
-            integers.append(b).append(" ");
-        }
-        return "TAG_Int_Array: " + integers;
-    }
-
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeInt(value.length);
-        for (int i : value)
-            os.writeInt(i);
-    }
-
-    @Override
-    public int hashCode() {
-        int prime = 31;
-        int result = super.hashCode();
-        result = (prime * result) + Arrays.hashCode(value);
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        return this == obj || (obj instanceof IntArrayTag && Arrays.equals(value, ((IntArrayTag) obj).value));
     }
 
 }

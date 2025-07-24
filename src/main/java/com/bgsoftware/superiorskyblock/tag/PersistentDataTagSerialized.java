@@ -11,12 +11,8 @@ public class PersistentDataTagSerialized extends Tag<byte[]> {
 
     private static final PersistentDataTagSerialized EMPTY = new PersistentDataTagSerialized(new byte[0]);
 
-    public static PersistentDataTagSerialized of(byte[] value) {
-        return value.length == 0 ? EMPTY : new PersistentDataTagSerialized(value);
-    }
-
     private PersistentDataTagSerialized(byte[] value) {
-        super(value, null);
+        super(value);
     }
 
     public <E> PersistentDataTag<E> getPersistentDataTag(PersistentDataType<E> type) {
@@ -26,17 +22,21 @@ public class PersistentDataTagSerialized extends Tag<byte[]> {
         return PersistentDataTag.of(serializer.deserialize(value), serializer);
     }
 
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeInt(value.length);
+        os.write(value);
+    }
+
+    public static PersistentDataTagSerialized of(byte[] value) {
+        return value.length == 0 ? EMPTY : new PersistentDataTagSerialized(value);
+    }
+
     public static PersistentDataTagSerialized fromStream(DataInputStream is) throws IOException {
         int length = is.readInt();
         byte[] bytes = new byte[length];
         is.readFully(bytes);
         return new PersistentDataTagSerialized(bytes);
-    }
-
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeInt(value.length);
-        os.write(value);
     }
 
 }

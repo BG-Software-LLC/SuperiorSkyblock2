@@ -44,12 +44,25 @@ import java.io.IOException;
  *
  * @author Graham Edgecombe
  */
-@SuppressWarnings("WeakerAccess")
 public class LongTag extends NumberTag<Long> {
+
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagLong", long.class);
 
     private static final LongTag[] CACHE = new LongTag[100];
 
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagLong");
+    private LongTag(long value) {
+        super(value);
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeLong(value);
+    }
+
+    @Override
+    protected NMSTagConverter getNMSConverter() {
+        return TAG_CONVERTER;
+    }
 
     public static LongTag of(long value) {
         if (value >= 0 && value < CACHE.length) {
@@ -62,12 +75,8 @@ public class LongTag extends NumberTag<Long> {
         }
     }
 
-    private LongTag(long value) {
-        super(value, CLASS, long.class);
-    }
-
     public static LongTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to LongTag!");
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to LongTag!");
 
         try {
             long value = plugin.getNMSTags().getNBTLongValue(tag);
@@ -80,11 +89,6 @@ public class LongTag extends NumberTag<Long> {
 
     public static LongTag fromStream(DataInputStream is) throws IOException {
         return LongTag.of(is.readLong());
-    }
-
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeLong(value);
     }
 
 }

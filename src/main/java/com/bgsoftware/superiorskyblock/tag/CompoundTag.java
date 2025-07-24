@@ -57,42 +57,31 @@ import java.util.Set;
  */
 public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Tag<?>> {
 
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagCompound");
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagCompound");
 
-    public static CompoundTag of() {
-        return new CompoundTag(new HashMap<>(), false);
+    private CompoundTag(Map<String, Tag<?>> value, boolean cloneMap) {
+        super(cloneMap ? new HashMap<>(value) : value);
     }
 
-    public static CompoundTag of(Map<String, Tag<?>> value) {
-        return new CompoundTag(value, true);
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        for (Map.Entry<String, Tag<?>> entry : value.entrySet()) {
+            entry.getValue().write(os);
+
+            byte[] keyBytes = entry.getKey().getBytes(StandardCharsets.UTF_8);
+            os.writeShort(keyBytes.length);
+            os.write(keyBytes);
+        }
+
+        os.writeByte((byte) 0);
     }
 
     public CompoundTag copy() {
         return of(this.value);
     }
 
-    /**
-     * Creates the tag.
-     *
-     * @param value The value.
-     */
-    private CompoundTag(Map<String, Tag<?>> value, boolean cloneMap) {
-        super(cloneMap ? new HashMap<>(value) : value, CLASS);
-    }
-
     public Optional<Tag<?>> getTag(String key) {
         return Optional.ofNullable(getTagInternal(key));
-    }
-
-    @Nullable
-    private Tag<?> getTagInternal(String key) {
-        return this.value.get(key);
-    }
-
-    @Nullable
-    private <T extends Tag<?>> Optional<T> getTagInternal(String key, Class<T> valueType) {
-        Tag<?> tag = this.value.get(key);
-        return valueType.isAssignableFrom(tag.getClass()) ? Optional.of(valueType.cast(tag)) : Optional.empty();
     }
 
     public Optional<byte[]> getByteArray(String key) {
@@ -232,22 +221,9 @@ public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Ta
     }
 
     @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        for (Map.Entry<String, Tag<?>> entry : value.entrySet()) {
-            entry.getValue().write(os);
-
-            byte[] keyBytes = entry.getKey().getBytes(StandardCharsets.UTF_8);
-            os.writeShort(keyBytes.length);
-            os.write(keyBytes);
-        }
-
-        os.writeByte((byte) 0);
-    }
-
-    @Override
     public Object toNBT() {
         try {
-            Object nbtTagCompound = CONSTRUCTOR.newInstance();
+            Object nbtTagCompound = TAG_CONVERTER.toNBT();
 
             for (Map.Entry<String, Tag<?>> entry : value.entrySet()) {
                 plugin.getNMSTags().setNBTCompoundTagValue(nbtTagCompound, entry.getKey(), entry.getValue().toNBT());
@@ -260,8 +236,27 @@ public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Ta
         }
     }
 
+    @Nullable
+    private Tag<?> getTagInternal(String key) {
+        return this.value.get(key);
+    }
+
+    @Nullable
+    private <T extends Tag<?>> Optional<T> getTagInternal(String key, Class<T> valueType) {
+        Tag<?> tag = this.value.get(key);
+        return tag != null && valueType.isAssignableFrom(tag.getClass()) ? Optional.of(valueType.cast(tag)) : Optional.empty();
+    }
+
+    public static CompoundTag of() {
+        return new CompoundTag(new HashMap<>(), false);
+    }
+
+    public static CompoundTag of(Map<String, Tag<?>> value) {
+        return new CompoundTag(value, true);
+    }
+
     public static CompoundTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to CompoundTag!");
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to CompoundTag!");
 
         Map<String, Tag<?>> map = new HashMap<>();
 

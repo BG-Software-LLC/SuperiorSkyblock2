@@ -46,10 +46,23 @@ import java.io.IOException;
  */
 public class ByteTag extends NumberTag<Byte> {
 
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagByte", byte.class);
+
     private static final ByteTag[] CACHE = new ByteTag[256];
 
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagByte");
+    private ByteTag(byte value) {
+        super(value);
+    }
 
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeByte(value);
+    }
+
+    @Override
+    protected NMSTagConverter getNMSConverter() {
+        return TAG_CONVERTER;
+    }
 
     public static ByteTag of(byte value) {
         int index = value - Byte.MIN_VALUE;
@@ -59,17 +72,8 @@ public class ByteTag extends NumberTag<Byte> {
         return tag;
     }
 
-    /**
-     * Creates the tag.
-     *
-     * @param value The value.
-     */
-    private ByteTag(byte value) {
-        super(value, CLASS, byte.class);
-    }
-
     public static ByteTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ByteTag!");
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to ByteTag!");
 
         try {
             byte value = plugin.getNMSTags().getNBTByteValue(tag);
@@ -82,11 +86,6 @@ public class ByteTag extends NumberTag<Byte> {
 
     public static ByteTag fromStream(DataInputStream is) throws IOException {
         return ByteTag.of(is.readByte());
-    }
-
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeByte(value);
     }
 
 }

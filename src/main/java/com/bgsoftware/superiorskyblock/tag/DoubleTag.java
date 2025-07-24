@@ -46,9 +46,23 @@ import java.io.IOException;
  */
 public class DoubleTag extends NumberTag<Double> {
 
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagDouble", double.class);
+
     private static final DoubleTag[] CACHE = new DoubleTag[100];
 
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagDouble");
+    private DoubleTag(double value) {
+        super(value);
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeDouble(value);
+    }
+
+    @Override
+    protected NMSTagConverter getNMSConverter() {
+        return TAG_CONVERTER;
+    }
 
     public static DoubleTag of(double value) {
         if (value == (int) value && value >= 0 && value < CACHE.length) {
@@ -61,17 +75,8 @@ public class DoubleTag extends NumberTag<Double> {
         }
     }
 
-    /**
-     * Creates the tag.
-     *
-     * @param value The value.
-     */
-    private DoubleTag(double value) {
-        super(value, CLASS, double.class);
-    }
-
     public static DoubleTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to DoubleTag!");
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to DoubleTag!");
 
         try {
             double value = plugin.getNMSTags().getNBTDoubleValue(tag);
@@ -84,11 +89,6 @@ public class DoubleTag extends NumberTag<Double> {
 
     public static DoubleTag fromStream(DataInputStream is) throws IOException {
         return DoubleTag.of(is.readDouble());
-    }
-
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeDouble(value);
     }
 
 }

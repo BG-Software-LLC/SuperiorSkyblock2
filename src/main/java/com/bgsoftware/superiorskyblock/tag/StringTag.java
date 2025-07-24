@@ -47,25 +47,33 @@ import java.nio.charset.StandardCharsets;
  */
 public class StringTag extends Tag<String> {
 
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagString", String.class);
+
     private static final StringTag EMPTY = new StringTag("");
 
-    /*package*/  static final Class<?> CLASS = getNNTClass("NBTTagString");
+    private StringTag(String value) {
+        super(value);
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
+        os.writeShort(bytes.length);
+        if (bytes.length > 0)
+            os.write(bytes);
+    }
+
+    @Override
+    protected NMSTagConverter getNMSConverter() {
+        return TAG_CONVERTER;
+    }
 
     public static StringTag of(String value) {
         return value.isEmpty() ? EMPTY : new StringTag(value);
     }
 
-    /**
-     * Creates the tag.
-     *
-     * @param value The value.
-     */
-    private StringTag(String value) {
-        super(value, CLASS, String.class);
-    }
-
     public static StringTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to StringTag!");
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to StringTag!");
 
         try {
             String value = plugin.getNMSTags().getNBTStringValue(tag);
@@ -83,14 +91,6 @@ public class StringTag extends Tag<String> {
         byte[] bytes = new byte[length];
         is.readFully(bytes);
         return StringTag.of(new String(bytes, StandardCharsets.UTF_8));
-    }
-
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
-        os.writeShort(bytes.length);
-        if (bytes.length > 0)
-            os.write(bytes);
     }
 
 }

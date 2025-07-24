@@ -54,8 +54,9 @@ import java.util.RandomAccess;
 @SuppressWarnings("rawtypes")
 public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
 
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagList");
+
     private static final byte DYNAMIC_LIST_INDICATOR = (byte) 0xFF;
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagList");
 
     /**
      * Hint to the type of elements in the list.
@@ -63,20 +64,8 @@ public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
     @Nullable
     private Class<? extends Tag> hintType;
 
-    public static ListTag of(@Nullable Class<? extends Tag> hintType) {
-        return new ListTag(new LinkedList<>(), hintType, false);
-    }
-
-    public static ListTag of(List<Tag<?>> value) {
-        return of(value, null);
-    }
-
-    public static ListTag of(List<Tag<?>> value, @Nullable Class<? extends Tag> hintType) {
-        return new ListTag(value, hintType, true);
-    }
-
     private ListTag(List<Tag<?>> value, @Nullable Class<? extends Tag> hintType, boolean cloneList) {
-        super(cloneListIfNeeded(value, cloneList), null);
+        super(cloneListIfNeeded(value, cloneList));
         this.hintType = hintType;
     }
 
@@ -92,8 +81,80 @@ public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
         }
     }
 
+    @Override
+    public List<Tag<?>> getValue() {
+        return Collections.unmodifiableList(value);
+    }
+
+    @NotNull
+    @Override
+    public Iterator<Tag<?>> iterator() {
+        return value.iterator();
+    }
+
+    public int size() {
+        return this.value.size();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder bldr = new StringBuilder();
+        bldr.append("TAG_List: ").append(value.size()).append(" entries");
+        if (this.hintType != null) {
+            bldr.append(" of type ").append(NBTUtils.getTypeName(hintType));
+        }
+        bldr.append("\r\n{\r\n");
+        for (Tag<?> t : value) {
+            bldr.append("   ").append(t.toString().replaceAll("\r\n", "\r\n   ")).append("\r\n");
+        }
+        bldr.append("}");
+        return bldr.toString();
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        if (this.hintType != null) {
+            writeDataWithHint(os);
+        } else {
+            writeDataWithoutHint(os);
+        }
+    }
+
+    private void writeDataWithHint(DataOutputStream os) throws IOException {
+        int size = value.size();
+        os.writeByte(NBTUtils.getTypeCode(this.hintType));
+        os.writeInt(size);
+        for (Tag<?> _tag : value)
+            _tag.writeData(os);
+    }
+
+    private void writeDataWithoutHint(DataOutputStream os) throws IOException {
+        int size = value.size();
+        os.writeByte(DYNAMIC_LIST_INDICATOR);
+        os.writeInt(size);
+        for (Tag<?> _tag : value)
+            _tag.write(os);
+    }
+
+    @Override
+    public Object toNBT() {
+        return plugin.getNMSTags().parseList(this);
+    }
+
+    public static ListTag of(@Nullable Class<? extends Tag> hintType) {
+        return new ListTag(new LinkedList<>(), hintType, false);
+    }
+
+    public static ListTag of(List<Tag<?>> value) {
+        return of(value, null);
+    }
+
+    public static ListTag of(List<Tag<?>> value, @Nullable Class<? extends Tag> hintType) {
+        return new ListTag(value, hintType, true);
+    }
+
     public static ListTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ListTag!");
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to ListTag!");
 
         List<Tag<?>> list = new LinkedList<>();
 
@@ -157,66 +218,6 @@ public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
         }
 
         return new ListTag(tagList, null, false);
-    }
-
-    @Override
-    public List<Tag<?>> getValue() {
-        return Collections.unmodifiableList(value);
-    }
-
-    @NotNull
-    @Override
-    public Iterator<Tag<?>> iterator() {
-        return value.iterator();
-    }
-
-    public int size() {
-        return this.value.size();
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder bldr = new StringBuilder();
-        bldr.append("TAG_List: ").append(value.size()).append(" entries");
-        if (this.hintType != null) {
-            bldr.append(" of type ").append(NBTUtils.getTypeName(hintType));
-        }
-        bldr.append("\r\n{\r\n");
-        for (Tag<?> t : value) {
-            bldr.append("   ").append(t.toString().replaceAll("\r\n", "\r\n   ")).append("\r\n");
-        }
-        bldr.append("}");
-        return bldr.toString();
-    }
-
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        if (this.hintType != null) {
-            writeDataWithHint(os);
-        } else {
-            writeDataWithoutHint(os);
-        }
-    }
-
-    private void writeDataWithHint(DataOutputStream os) throws IOException {
-        int size = value.size();
-        os.writeByte(NBTUtils.getTypeCode(this.hintType));
-        os.writeInt(size);
-        for (Tag<?> _tag : value)
-            _tag.writeData(os);
-    }
-
-    private void writeDataWithoutHint(DataOutputStream os) throws IOException {
-        int size = value.size();
-        os.writeByte(DYNAMIC_LIST_INDICATOR);
-        os.writeInt(size);
-        for (Tag<?> _tag : value)
-            _tag.write(os);
-    }
-
-    @Override
-    public Object toNBT() {
-        return plugin.getNMSTags().parseList(this);
     }
 
     private static <T> List<T> cloneListIfNeeded(List<T> list, boolean cloneList) {

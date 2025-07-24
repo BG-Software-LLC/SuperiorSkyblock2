@@ -46,43 +46,25 @@ import java.util.Locale;
  *
  * @author Graham Edgecombe
  */
-@SuppressWarnings("WeakerAccess")
 public class ByteArrayTag extends Tag<byte[]> {
+
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagByteArray", byte[].class);
 
     private static final ByteArrayTag EMPTY = new ByteArrayTag(new byte[0]);
 
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagByteArray");
-
-    public static ByteArrayTag of(byte[] value) {
-        return value.length == 0 ? EMPTY : new ByteArrayTag(value);
-    }
-
-    /**
-     * Creates the tag.
-     *
-     * @param value The value.
-     */
     private ByteArrayTag(byte[] value) {
-        super(value, CLASS, byte[].class);
+        super(value);
     }
 
-    public static ByteArrayTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ByteArrayTag!");
-
-        try {
-            byte[] value = plugin.getNMSTags().getNBTByteArrayValue(tag);
-            return ByteArrayTag.of(value);
-        } catch (Exception error) {
-            Log.error(error, "An unexpected error occurred while converting tag byte-array from NMS:");
-            return null;
-        }
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeInt(value.length);
+        os.write(value);
     }
 
-    public static ByteArrayTag fromStream(DataInputStream is) throws IOException {
-        int length = is.readInt();
-        byte[] bytes = new byte[length];
-        is.readFully(bytes);
-        return ByteArrayTag.of(bytes);
+    @Override
+    protected NMSTagConverter getNMSConverter() {
+        return TAG_CONVERTER;
     }
 
     @Override
@@ -98,10 +80,27 @@ public class ByteArrayTag extends Tag<byte[]> {
         return "TAG_Byte_Array: " + hex;
     }
 
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeInt(value.length);
-        os.write(value);
+    public static ByteArrayTag of(byte[] value) {
+        return value.length == 0 ? EMPTY : new ByteArrayTag(value);
+    }
+
+    public static ByteArrayTag fromNBT(Object tag) {
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to ByteArrayTag!");
+
+        try {
+            byte[] value = plugin.getNMSTags().getNBTByteArrayValue(tag);
+            return ByteArrayTag.of(value);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while converting tag byte-array from NMS:");
+            return null;
+        }
+    }
+
+    public static ByteArrayTag fromStream(DataInputStream is) throws IOException {
+        int length = is.readInt();
+        byte[] bytes = new byte[length];
+        is.readFully(bytes);
+        return ByteArrayTag.of(bytes);
     }
 
 }

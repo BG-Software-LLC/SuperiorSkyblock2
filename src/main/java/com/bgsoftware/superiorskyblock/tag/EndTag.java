@@ -41,22 +41,33 @@ import java.io.IOException;
  *
  * @author Graham Edgecombe
  */
-@SuppressWarnings("WeakerAccess")
 public class EndTag extends Tag<Object> {
+
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagEnd");
 
     private static final EndTag INSTANCE = new EndTag();
 
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagEnd");
+    private EndTag() {
+        super(null);
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) {
+        // Do nothing.
+    }
+
+    @Override
+    protected NMSTagConverter getNMSConverter() {
+        return TAG_CONVERTER;
+    }
+
+    @Override
+    public String toString() {
+        return "TAG_End";
+    }
 
     public static EndTag of() {
         return INSTANCE;
-    }
-
-    /**
-     * Creates the tag.
-     */
-    private EndTag() {
-        super(null, CLASS);
     }
 
     public static EndTag fromStream(DataInputStream is, int depth) throws IOException {
@@ -65,16 +76,6 @@ public class EndTag extends Tag<Object> {
         } else {
             return EndTag.INSTANCE;
         }
-    }
-
-    @Override
-    public String toString() {
-        return "TAG_End";
-    }
-
-    @Override
-    protected void writeData(DataOutputStream os) {
-        // Do nothing.
     }
 
 }

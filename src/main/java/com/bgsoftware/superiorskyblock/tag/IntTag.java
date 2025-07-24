@@ -46,9 +46,23 @@ import java.io.IOException;
  */
 public class IntTag extends NumberTag<Integer> {
 
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagInt", int.class);
+
     private static final IntTag[] CACHE = new IntTag[100];
 
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagInt");
+    private IntTag(int value) {
+        super(value);
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeInt(value);
+    }
+
+    @Override
+    protected NMSTagConverter getNMSConverter() {
+        return TAG_CONVERTER;
+    }
 
     public static IntTag of(int value) {
         if (value >= 0 && value < CACHE.length) {
@@ -61,12 +75,8 @@ public class IntTag extends NumberTag<Integer> {
         }
     }
 
-    private IntTag(int value) {
-        super(value, CLASS, int.class);
-    }
-
     public static IntTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to IntTag!");
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to IntTag!");
 
         try {
             int value = plugin.getNMSTags().getNBTIntValue(tag);
@@ -79,11 +89,6 @@ public class IntTag extends NumberTag<Integer> {
 
     public static IntTag fromStream(DataInputStream is) throws IOException {
         return IntTag.of(is.readInt());
-    }
-
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeInt(value);
     }
 
 }
