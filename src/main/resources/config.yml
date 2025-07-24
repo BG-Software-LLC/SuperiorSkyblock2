@@ -568,7 +568,7 @@ number-format: "en-US"
 date-format: "dd/MM/yyyy HH:mm:ss"
 
 # Should players skip menus with only one items inside them?
-# When enabled, creation, island-warps and island-chest menus will be skipped if only one item is inside them.
+# When enabled, creation, island-warps, island-chest and missions menus will be skipped if only one item is inside them.
 skip-one-item-menus: false
 
 # Should visitors get teleported to spawn when pvp is enabled in an island?
