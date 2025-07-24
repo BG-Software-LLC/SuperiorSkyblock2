@@ -30,9 +30,7 @@ public class OpenMissionCategoryButton extends AbstractMenuViewButton<BaseMenuVi
 
     @Override
     public void onButtonClick(InventoryClickEvent clickEvent) {
-        boolean requireIsland = getTemplate().missionCategory.getMissions().stream().allMatch(Mission::getIslandMission);
-
-        if (requireIsland && !menuView.getInventoryViewer().hasIsland()) {
+        if (getTemplate().requireIsland && !menuView.getInventoryViewer().hasIsland()) {
             Message.INVALID_ISLAND.send(menuView.getInventoryViewer());
             return;
         }
@@ -60,12 +58,14 @@ public class OpenMissionCategoryButton extends AbstractMenuViewButton<BaseMenuVi
     public static class Template extends MenuTemplateButtonImpl<BaseMenuView> {
 
         private final MissionCategory missionCategory;
+        private final boolean requireIsland;
 
         Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
                  @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, MissionCategory missionCategory) {
             super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
                     OpenMissionCategoryButton.class, OpenMissionCategoryButton::new);
             this.missionCategory = Objects.requireNonNull(missionCategory, "missionCategory cannot be null");
+            this.requireIsland = missionCategory.getMissions().stream().allMatch(Mission::getIslandMission);
         }
 
     }
