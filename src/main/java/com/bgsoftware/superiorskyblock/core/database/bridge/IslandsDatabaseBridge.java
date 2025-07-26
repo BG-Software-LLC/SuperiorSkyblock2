@@ -677,6 +677,7 @@ public class IslandsDatabaseBridge {
             databaseBridge.deleteObject("islands", createFilter("uuid", island));
             databaseBridge.deleteObject("islands_banks", islandFilter);
             databaseBridge.deleteObject("islands_settings", islandFilter);
+            databaseBridge.deleteObject("bank_transactions", islandFilter);
 
 
             if (!island.getBannedPlayers().isEmpty())
