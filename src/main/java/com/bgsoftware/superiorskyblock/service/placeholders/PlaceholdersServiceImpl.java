@@ -62,6 +62,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern BLOCK_TOTAL_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("island_block_total_worth_(.+)");
     private static final Pattern BLOCK_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("island_block_worth_(.+)");
     private static final Pattern COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_block_count_(.+)");
+    private static final Pattern DATA_PLACEHOLDER_PATTERN = Pattern.compile("island_data_(.+)");
     private static final Pattern EFFECT_PLACEHOLDER_PATTERN = Pattern.compile("island_effect_(.+)");
     private static final Pattern ENTITY_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_entity_count_(.+)");
     private static final Pattern ENTITY_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_entity_limit_(.+)");
@@ -645,6 +646,13 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 } else if ((matcher = COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
                     return Optional.of(island.getBlockCountAsBigInteger(Keys.ofMaterialAndData(keyName)) + "");
+                } else if ((matcher = DATA_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                    String keyName = matcher.group(1);
+                    Object data = island.getPersistentDataContainer().get(keyName);
+                    if (data == null) {
+                        return Optional.empty();
+                    }
+                    return Optional.of(data.toString());
                 } else if ((matcher = EFFECT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String effectName = matcher.group(1);
                     PotionEffectType potionEffectType = PotionEffectType.getByName(effectName);
