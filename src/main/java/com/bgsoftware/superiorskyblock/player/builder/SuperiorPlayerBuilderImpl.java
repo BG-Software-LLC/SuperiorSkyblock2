@@ -24,7 +24,7 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
     public UUID uuid = null;
     public String name = "null";
     public PlayerRole playerRole = SPlayerRole.guestRole();
-    public int disbands = plugin.getSettings().getDisbandCount();
+    public int disbands = plugin.getSettings().getDefaultDisbandCount();
     public Locale locale = PlayerLocales.getDefaultLocale();
     public String textureValue = "";
     public long lastTimeUpdated = -1;
@@ -79,7 +79,6 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
 
     @Override
     public SuperiorPlayer.Builder setDisbands(int disbands) {
-        Preconditions.checkArgument(disbands >= 0, "Cannot set negative disbands count.");
         this.disbands = disbands;
         return this;
     }

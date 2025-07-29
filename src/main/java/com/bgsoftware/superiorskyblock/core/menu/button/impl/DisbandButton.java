@@ -48,7 +48,9 @@ public class DisbandButton extends AbstractMenuViewButton<IslandMenuView> {
                         targetIsland.getIslandBank().getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
             }
 
-            inventoryViewer.setDisbands(inventoryViewer.getDisbands() - 1);
+            if (inventoryViewer.getDisbands() > 0) {
+                inventoryViewer.setDisbands(inventoryViewer.getDisbands() - 1);
+            }
 
             targetIsland.disbandIsland();
         }

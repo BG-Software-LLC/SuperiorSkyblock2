@@ -94,7 +94,7 @@ public class GlobalSection extends SettingsContainerHolder {
     }
 
     public int getDisbandCount() {
-        return getContainer().disbandCount;
+        return getContainer().defaultDisbandCount;
     }
 
     public boolean isIslandTopIncludeLeader() {
@@ -255,6 +255,10 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public boolean isBuildOutsideIsland() {
         return getContainer().buildOutsideIsland;
+    }
+
+    public int getDefaultDisbandCount() {
+        return getContainer().defaultDisbandCount;
     }
 
     public String getDefaultLanguage() {

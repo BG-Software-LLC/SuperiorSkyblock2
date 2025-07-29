@@ -190,7 +190,10 @@ public interface SettingsManager {
      * The default amount of disbands players receive when they first join the server.
      * If 0, then the disbands limit is disabled.
      * Config-path: disband-count
+     *
+     * @deprecated see {@link #getDefaultDisbandCount()}
      */
+    @Deprecated
     int getDisbandCount();
 
     /**
@@ -463,6 +466,13 @@ public interface SettingsManager {
      * Config-path: build-outside-island
      */
     boolean isBuildOutsideIsland();
+
+    /**
+     * The default number of disbands players receive when they first join the server.
+     * If set to -1, players will have unlimited disbands.
+     * Config-path: default-disband-count
+     */
+    int getDefaultDisbandCount();
 
     /**
      * The default language to be set for new players.
