@@ -90,22 +90,30 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
         return title;
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     private void openView() {
+        boolean success = openViewInternal();
+        if (!success) {
+            AbstractMenu menu = (AbstractMenu) getMenu();
+            menu.removeView(this);
+        }
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private boolean openViewInternal() {
         Player player = inventoryViewer.asPlayer();
 
         if (player == null)
-            return;
+            return false;
 
         if (player.isSleeping()) {
             Message.OPEN_MENU_WHILE_SLEEPING.send(inventoryViewer);
-            return;
+            return false;
         }
 
         AbstractMenu menu = (AbstractMenu) getMenu();
 
         if (!PluginEventsFactory.callPlayerOpenMenuEvent(inventoryViewer, this))
-            return;
+            return false;
 
         Log.debug(Debug.OPEN_MENU, inventoryViewer.getName());
 
@@ -113,7 +121,7 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
             if (!(menu instanceof MenuBlank)) {
                 Menus.MENU_BLANK.createView(inventoryViewer, EmptyViewArgs.INSTANCE, previousMenuView);
             }
-            return;
+            return false;
         }
 
         MenuView<?, ?> currentOpenedView = inventoryViewer.getOpenedView();
@@ -122,7 +130,7 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
         }
 
         if (Arrays.equals(player.getOpenInventory().getTopInventory().getContents(), inventory.getContents()))
-            return;
+            return false;
 
         if (previousMenuView != null)
             previousMenuView.setPreviousMove(false);
@@ -141,6 +149,8 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
         GameSoundImpl.playSound(player, menu.getOpeningSound());
 
         this.previousMenuView = previousMenuView != null ? previousMenuView : previousMove ? currentOpenedView : null;
+
+        return true;
     }
 
     public void onClose() {
