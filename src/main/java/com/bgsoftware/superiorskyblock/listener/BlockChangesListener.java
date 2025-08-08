@@ -317,19 +317,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
         }
     }
 
-    private void onMinecartBreak(GameEvent<GameEventArgs.EntityDeathEvent> e) {
-        Entity vehicle = e.getArgs().entity;
-
-        if (vehicle instanceof Minecart) {
-            Key blockKey = plugin.getNMSAlgorithms().getMinecartBlock((Minecart) vehicle);
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                this.worldRecordService.get().recordBlockBreak(blockKey, vehicle.getLocation(wrapper.getHandle()),
-                        1, REGULAR_RECORD_FLAGS);
-            }
-            vehicle.setMetadata("SSB-VehicleDestory", new FixedMetadataValue(plugin, true));
-        }
-    }
-
     private void onChorusHit(GameEvent<GameEventArgs.ProjectileHitEvent> e) {
         BukkitEntities.getPlayerSource(e.getArgs().entity).ifPresent(shooter -> {
             Block hitBlock = e.getArgs().hitBlock;
@@ -374,7 +361,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
         registerCallback(GameEventType.LEAVES_DECAY_EVENT, GameEventPriority.MONITOR, this::onLeavesDecay);
         registerCallback(GameEventType.BLOCK_FROM_TO_EVENT, GameEventPriority.MONITOR, this::onBlockFromTo);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.MONITOR, this::onEntityExplode);
-        registerCallback(GameEventType.ENTITY_DEATH_EVENT, GameEventPriority.MONITOR, this::onMinecartBreak);
         registerCallback(GameEventType.PROJECTILE_HIT_EVENT, GameEventPriority.MONITOR, this::onChorusHit);
         registerCallback(GameEventType.SPONGE_ABSORB_EVENT, GameEventPriority.MONITOR, this::onSpongeAbsorb);
     }

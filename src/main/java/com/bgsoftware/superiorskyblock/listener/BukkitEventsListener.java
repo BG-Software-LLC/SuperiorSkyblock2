@@ -134,14 +134,13 @@ public class BukkitEventsListener implements Listener {
         createEventListener(GameEventType.PLAYER_INTERACT_EVENT, PlayerInteractEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, EntityChangeBlockEvent.class, this::createGameEvent);
         createEventListener(GameEventType.BLOCK_BREAK_EVENT, BlockBreakEvent.class, this::createGameEvent);
-        createEventListener(GameEventType.ENTITY_DEATH_EVENT, EntityDeathEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_SPAWN_EVENT, ItemSpawnEvent.class, this::createGameEvent);
         createEventListener(GameEventType.PISTON_EXTEND_EVENT, BlockPistonExtendEvent.class, this::createGameEvent);
         createEventListener(GameEventType.PISTON_RETRACT_EVENT, BlockPistonRetractEvent.class, this::createGameEvent);
         createEventListener(GameEventType.LEAVES_DECAY_EVENT, LeavesDecayEvent.class, this::createGameEvent);
         createEventListener(GameEventType.BLOCK_FROM_TO_EVENT, BlockFromToEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_EXPLODE_EVENT, EntityExplodeEvent.class, this::createGameEvent);
-        createEventListener(GameEventType.ENTITY_DEATH_EVENT, VehicleDestroyEvent.class, this::createGameEvent);
+//        createEventListener(GameEventType.ENTITY_DEATH_EVENT, VehicleDestroyEvent.class, this::createGameEvent);
         createEventListener(GameEventType.CHUNK_LOAD_EVENT, ChunkLoadEvent.class, this::createGameEvent);
         createEventListener(GameEventType.CHUNK_UNLOAD_EVENT, ChunkUnloadEvent.class, this::createGameEvent);
         createEventListener(GameEventType.WORLD_UNLOAD_EVENT, WorldUnloadEvent.class, this::createGameEvent);
@@ -201,6 +200,7 @@ public class BukkitEventsListener implements Listener {
             Class.forName("com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent");
             createEventListener(GameEventType.ENTITY_DEATH_EVENT, com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent.class, new EntityRemoveFromWorldEventFunction());
         } catch (ClassNotFoundException ignored) {
+            createEventListener(GameEventType.ENTITY_DEATH_EVENT, EntityDeathEvent.class, this::createGameEvent);
         }
 
         try {
