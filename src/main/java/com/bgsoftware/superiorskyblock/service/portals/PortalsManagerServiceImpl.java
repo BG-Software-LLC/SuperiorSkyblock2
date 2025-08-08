@@ -30,6 +30,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.PortalType;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -239,8 +240,8 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
 
             IslandWorlds.accessIslandWorldAsync(island, destination, true, islandWorldResult -> {
                 islandWorldResult.ifRight(Throwable::printStackTrace).ifLeft(world -> {
-                    Location schematicPlacementLocation = island.getCenter(destination).subtract(0, 1, 0);
-                    schematicPlacementLocation.setY(plugin.getSettings().getIslandHeight());
+                    Location centerLocation = island.getCenter(destination);
+                    Location schematicPlacementLocation = centerLocation.getBlock().getRelative(BlockFace.DOWN).getLocation();
 
                     BigDecimal originalWorth = island.getRawWorth();
                     BigDecimal originalLevel = island.getRawLevel();
@@ -267,7 +268,8 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                             }
                         }
 
-                        Location destinationLocation = island.getIslandHome(destination);
+                        Location homeLocation = schematic.adjustRotation(centerLocation);
+                        island.setIslandHome(destination, homeLocation);
 
                         if (destination.getEnvironment() == World.Environment.THE_END && superiorPlayer != null) {
                             plugin.getNMSDragonFight().awardTheEndAchievement((Player) entity);
@@ -275,9 +277,9 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                         }
 
                         if (superiorPlayer != null) {
-                            superiorPlayer.teleport(schematic.adjustRotation(destinationLocation));
+                            superiorPlayer.teleport(homeLocation);
                         } else {
-                            EntityTeleports.teleport(entity, schematic.adjustRotation(destinationLocation));
+                            EntityTeleports.teleport(entity, homeLocation);
                         }
                     }, error -> {
                         generatingSchematicsIslands.remove(island.getUniqueId());
