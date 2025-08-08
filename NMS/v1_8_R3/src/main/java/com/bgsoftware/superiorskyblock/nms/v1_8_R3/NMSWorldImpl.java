@@ -158,8 +158,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public Object getBlockData(org.bukkit.block.Block block) {
-        // Doesn't exist
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -184,6 +183,13 @@ public class NMSWorldImpl implements NMSWorld {
     public boolean isWaterLogged(org.bukkit.block.Block block) {
         Material blockType = block.getType();
         return blockType == Material.WATER || blockType == Material.STATIONARY_WATER;
+    }
+
+    @Override
+    public SignType getSignType(org.bukkit.block.Block block) {
+        Material blockType = block.getType();
+        return blockType == Material.SIGN_POST ? SignType.STANDING_SIGN :
+                blockType == Material.WALL_SIGN ? SignType.WALL_SIGN : SignType.UNKNOWN;
     }
 
     @Override
