@@ -22,7 +22,6 @@ import com.bgsoftware.wildstacker.api.events.BarrelStackEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelUnstackEvent;
 import com.bgsoftware.wildstacker.api.handlers.SystemManager;
 import com.bgsoftware.wildstacker.api.objects.StackedBarrel;
-import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -73,21 +72,19 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
     @Override
     public Collection<Pair<Key, Integer>> getBlocks(World world, int chunkX, int chunkZ) {
-        StackedSnapshot stackedSnapshot;
-
         try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ)) {
-            stackedSnapshot = WildStackerSnapshotsContainer.getSnapshot(chunkPosition);
-        }
-
-        try {
-            return stackedSnapshot.getAllBarrelsItems().values().stream()
-                    .filter(entry -> entry.getValue() != null)
-                    .map(entry -> new Pair<>(Key.of(entry.getValue()), entry.getKey()))
-                    .collect(Collectors.toSet());
-        } catch (Throwable ex) {
-            return stackedSnapshot.getAllBarrels().values().stream()
-                    .map(entry -> new Pair<>(Key.of(entry.getValue(), (short) 0), entry.getKey()))
-                    .collect(Collectors.toSet());
+            return WildStackerSnapshotsContainer.accessStackedSnapshot(chunkPosition, stackedSnapshot -> {
+                try {
+                    return stackedSnapshot.getAllBarrelsItems().values().stream()
+                            .filter(entry -> entry.getValue() != null)
+                            .map(entry -> new Pair<>(Key.of(entry.getValue()), entry.getKey()))
+                            .collect(Collectors.toSet());
+                } catch (Throwable ex) {
+                    return stackedSnapshot.getAllBarrels().values().stream()
+                            .map(entry -> new Pair<>(Key.of(entry.getValue(), (short) 0), entry.getKey()))
+                            .collect(Collectors.toSet());
+                }
+            });
         }
     }
 
