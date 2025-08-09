@@ -644,6 +644,10 @@ public class PluginEventsFactory {
         fireEvent(ISLAND_CHUNK_RESET_EVENT, islandChunkReset);
     }
 
+    public static boolean callIslandClearFlagsEvent(Island island, CommandSender commandSender) {
+        return callIslandClearFlagsEvent(island, commandSenderToSuperiorPlayer(commandSender));
+    }
+
     public static boolean callIslandClearFlagsEvent(Island island, SuperiorPlayer superiorPlayer) {
         IslandClearFlags islandClearFlags = new IslandClearFlags();
         islandClearFlags.island = island;

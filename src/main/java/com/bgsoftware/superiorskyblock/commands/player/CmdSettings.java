@@ -66,7 +66,7 @@ public class CmdSettings implements IPermissibleCommand {
         if (args.length == 2 && args[1].equalsIgnoreCase("reset")) {
             if (PluginEventsFactory.callIslandClearFlagsEvent(island, superiorPlayer)) {
                 island.resetSettings();
-                Message.SETTINGS_RESET.send(superiorPlayer);
+                Message.SETTINGS_RESET_SELF.send(superiorPlayer);
             }
             return;
         }

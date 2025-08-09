@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.event.Cancellable;
@@ -9,6 +10,7 @@ import org.bukkit.event.Cancellable;
  */
 public class IslandClearFlagsEvent extends IslandEvent implements Cancellable {
 
+    @Nullable
     private final SuperiorPlayer superiorPlayer;
 
     private boolean cancelled = false;
@@ -17,16 +19,17 @@ public class IslandClearFlagsEvent extends IslandEvent implements Cancellable {
      * The constructor of the event.
      *
      * @param island         The island that the flags were cleared in.
-     * @param superiorPlayer The player that cleared the flags.
+     * @param superiorPlayer The player that cleared the flags, or null if it was done by console.
      */
-    public IslandClearFlagsEvent(Island island, SuperiorPlayer superiorPlayer) {
+    public IslandClearFlagsEvent(Island island, @Nullable SuperiorPlayer superiorPlayer) {
         super(island);
         this.superiorPlayer = superiorPlayer;
     }
 
     /**
-     * Get the player that cleared the flags to the other player.
+     * Get the player that cleared the flags to the island, or null if it was done by console.
      */
+    @Nullable
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
     }
