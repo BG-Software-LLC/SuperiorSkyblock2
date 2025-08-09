@@ -454,6 +454,11 @@ public class IslandsDatabaseBridge {
         ));
     }
 
+    public static void clearIslandFlags(Island island) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_flags",
+                createFilter("island", island)));
+    }
+
     public static void saveGeneratorRate(Island island, Dimension dimension, Key blockKey, int rate) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("islands_generators",
                 new Pair<>("island", island.getUniqueId().toString()),

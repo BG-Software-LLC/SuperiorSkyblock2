@@ -807,6 +807,7 @@ SET_UPGRADE_LEVEL_NAME: '&e&lYükseltmeler | &7{1} adası için {0} seviyesi ba�
   güncellendi.'
 SET_WARP: '&e&lAda | &7{0} konumunda yeni bir ışınlanma noktası başarıyla oluşturuldu.'
 SET_WARP_OUTSIDE: '&c&lHata | &7Adanın dışında ışınlanma noktası ayarlayamazsın.'
+SETTINGS_RESET: '&e&lIsland | &7Successfully reset all the settings of the island to default values!'
 SETTINGS_UPDATED: '&e&lAda | &7{1}''in adası için {0} ayarları başarıyla güncellendi.'
 SETTINGS_UPDATED_NAME: '&e&lAda | &7{1} adası için {0} ayarları başarıyla güncellendi.'
 SETTINGS_UPDATED_ALL: '&e&lAda | &7Tüm adalar için {0} ayarları başarıyla güncellendi.'

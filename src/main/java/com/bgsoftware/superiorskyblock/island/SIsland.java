@@ -124,7 +124,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -3989,6 +3988,68 @@ public class SIsland implements Island {
         }
 
         IslandsDatabaseBridge.saveIslandFlag(this, settings, 0);
+
+        plugin.getMenus().refreshSettings(this);
+    }
+
+    @Override
+    public void resetSettings() {
+        Log.debug(Debug.RESET_ISLAND_FLAGS, owner.getName());
+
+        if (islandFlags.isEmpty())
+            return;
+
+        islandFlags.clear();
+
+        Long time = null;
+        WeatherType weather = null;
+        boolean enablePvP = false;
+
+        for (String islandFlag : plugin.getSettings().getDefaultSettings()) {
+            switch (islandFlag) {
+                case "ALWAYS_DAY":
+                    time = 0L;
+                    break;
+                case "ALWAYS_MIDDLE_DAY":
+                    time = 6000L;
+                    break;
+                case "ALWAYS_NIGHT":
+                    time = 14000L;
+                    break;
+                case "ALWAYS_MIDDLE_NIGHT":
+                    time = 18000L;
+                    break;
+                case "ALWAYS_SHINY":
+                    weather = WeatherType.CLEAR;
+                    break;
+                case "ALWAYS_RAIN":
+                    weather = WeatherType.DOWNFALL;
+                    break;
+                case "PVP":
+                    enablePvP = true;
+                    break;
+            }
+        }
+
+        boolean teleportOnPvPEnable = plugin.getSettings().isTeleportOnPvPEnable();
+
+        for (SuperiorPlayer superiorPlayer : getAllPlayersInside()) {
+            Player player = superiorPlayer.asPlayer();
+            if (player != null) {
+                if (time == null) player.resetPlayerTime();
+                else player.setPlayerTime(time, false);
+
+                if (weather == null) player.resetPlayerWeather();
+                else player.setPlayerWeather(weather);
+
+                if (enablePvP && teleportOnPvPEnable && isVisitor(superiorPlayer, false)) {
+                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                    Message.ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE.send(superiorPlayer);
+                }
+            }
+        }
+
+        IslandsDatabaseBridge.clearIslandFlags(this);
 
         plugin.getMenus().refreshSettings(this);
     }

@@ -677,6 +677,7 @@ SET_UPGRADE_LEVEL: '&e&lUpgrades | &7Successfully updated the level of {0} for {
 SET_UPGRADE_LEVEL_NAME: '&e&lUpgrades | &7Successfully updated the level of {0} for {1}.'
 SET_WARP: '&e&lIsland | &7Successfully created a new warp at {0}.'
 SET_WARP_OUTSIDE: '&c&lError | &7You cannot set warps outside your island.'
+SETTINGS_RESET: '&e&lIsland | &7Successfully reset all the settings of the island to default values!'
 SETTINGS_UPDATED: '&e&lIsland | &7Successfully updated the settings {0} to {1}''s island.'
 SETTINGS_UPDATED_NAME: '&e&lIsland | &7Successfully updated the settings {0} to the island {1}.'
 SETTINGS_UPDATED_ALL: '&e&lIsland | &7Successfully updated the settings {0} to all the islands.'
