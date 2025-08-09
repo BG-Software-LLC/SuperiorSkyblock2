@@ -87,6 +87,9 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     @Nullable
     private static final EntityType HAPPY_GHAST_TYPE = EnumHelper.getEnum(EntityType.class, "HAPPY_GHAST");
 
+    // Shearing saddles introduced in 1.21.6, when Happy Ghast was added as well.
+    private static final boolean HAS_SHEARING_SADDLE_SUPPORT = HAPPY_GHAST_TYPE != null;
+
     private static final int MAX_PICKUP_DISTANCE = 1;
     private static EnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
     private static KeySet INTERACTABLES_CACHE;
@@ -260,7 +263,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             } else if (usedItemType == Material.NAME_TAG) {
                 islandPrivilege = IslandPrivileges.NAME_ENTITY;
             } else if (usedItemType == Material.SADDLE || (entityType == LLAMA_TYPE && Materials.isCarpet(usedItemType)) ||
-                    (entityType == HAPPY_GHAST_TYPE && (usedItemType == Material.SHEARS || Materials.isHarness(usedItemType)))) {
+                    (entityType == HAPPY_GHAST_TYPE && Materials.isHarness(usedItemType)) ||
+                    (HAS_SHEARING_SADDLE_SUPPORT && usedItemType == Material.SHEARS)) {
                 islandPrivilege = IslandPrivileges.SADDLE_ENTITY;
             } else if (entity instanceof Villager) {
                 islandPrivilege = IslandPrivileges.VILLAGER_TRADING;
