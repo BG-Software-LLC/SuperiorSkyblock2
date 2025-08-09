@@ -25,7 +25,7 @@ public class CmdAdminSchematic implements ISuperiorCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin schematic [" + Message.COMMAND_ARGUMENT_SCHEMATIC_NAME.getMessage(locale) + "] [" +
-                Message.COMMAND_ARGUMENT_SCHEMATIC_SAVE_AIR.getMessage(locale) + "]";
+                Message.COMMAND_ARGUMENT_SCHEMATIC_SAVE_AIR.getMessage(locale) + "[true/false]]";
     }
 
     @Override
