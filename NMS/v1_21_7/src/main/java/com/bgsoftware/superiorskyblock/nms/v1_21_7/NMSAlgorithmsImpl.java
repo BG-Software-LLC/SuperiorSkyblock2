@@ -241,9 +241,14 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         if (itemMeta instanceof ArmorMeta armorMeta) {
             TrimMaterial material = Objects.requireNonNull(Bukkit.getRegistry(TrimMaterial.class)).get(NamespacedKey.minecraft(trimMaterial));
             TrimPattern pattern = Objects.requireNonNull(Bukkit.getRegistry(TrimPattern.class)).get(NamespacedKey.minecraft(trimPattern));
+
             if (material != null && pattern != null) {
                 ArmorTrim armorTrim = new ArmorTrim(material, pattern);
                 armorMeta.setTrim(armorTrim);
+            } else if (material == null) {
+                throw new IllegalArgumentException("material must not be null");
+            } else {
+                throw new IllegalArgumentException("pattern must not be null");
             }
         }
     }

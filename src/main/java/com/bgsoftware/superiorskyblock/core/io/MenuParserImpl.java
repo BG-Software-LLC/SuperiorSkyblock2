@@ -401,25 +401,25 @@ public class MenuParserImpl implements MenuParser {
             }
         }
 
-        if (section.contains("bannerMeta")) {
-            for (String _dyeColor : section.getConfigurationSection("bannerMeta").getKeys(false)) {
+        if (section.isConfigurationSection("bannerMeta")) {
+            for (String dyeColorName : section.getConfigurationSection("bannerMeta").getKeys(false)) {
                 DyeColor dyeColor;
                 PatternType patternType;
 
                 try {
-                    dyeColor = DyeColor.valueOf(_dyeColor.toUpperCase(Locale.ENGLISH));
+                    dyeColor = DyeColor.valueOf(dyeColorName.toUpperCase(Locale.ENGLISH));
                 } catch (IllegalArgumentException error) {
                     Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
-                            ".bannerMeta.", _dyeColor.toUpperCase(Locale.ENGLISH), " into an dye color, skipping...");
+                            ".bannerMeta.", dyeColorName.toUpperCase(Locale.ENGLISH), " into an dye color, skipping...");
                     continue;
                 }
 
                 try {
-                    patternType = PatternType.valueOf(section.getString("bannerMeta." + _dyeColor));
+                    patternType = PatternType.valueOf(section.getString("bannerMeta." + dyeColorName));
                 } catch (IllegalArgumentException error) {
                     Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
-                            ".bannerMeta.", _dyeColor.toUpperCase(Locale.ENGLISH), ".",
-                            section.getString("bannerMeta." + _dyeColor), " into an pattern type, skipping...");
+                            ".bannerMeta.", dyeColorName.toUpperCase(Locale.ENGLISH), ".",
+                            section.getString("bannerMeta." + dyeColorName), " into an pattern type, skipping...");
                     continue;
                 }
 
@@ -427,15 +427,15 @@ public class MenuParserImpl implements MenuParser {
             }
         }
 
-        if (section.contains("customModel")) {
+        if (section.isInt("customModel")) {
             itemBuilder.withCustomModel(section.getInt("customModel"));
         }
 
-        if (section.contains("itemModel")) {
+        if (section.isString("itemModel")) {
             itemBuilder.withItemModel(section.getString("itemModel"));
         }
 
-        if (section.contains("rarity")) {
+        if (section.isString("rarity")) {
             String rarity = section.getString("rarity");
 
             try {
@@ -445,18 +445,26 @@ public class MenuParserImpl implements MenuParser {
             }
         }
 
-        if (section.contains("trimMaterial") || section.contains("trimPattern")) {
-            String trimMaterial = section.getString("trimMaterial");
-            String trimPattern = section.getString("trimPattern");
+        if (section.isConfigurationSection("trim")) {
+            String trimMaterial = section.getString("trim.material");
+            String trimPattern = section.getString("trim.pattern");
 
             if (trimMaterial != null && trimPattern != null) {
-                itemBuilder.withTrim(trimMaterial, trimPattern);
-            } else {
-                if (trimMaterial == null) {
-                    Log.warnFromFile(fileName, "Couldn't find trim material for item with trim pattern, skipping...");
-                } else {
-                    Log.warnFromFile(fileName, "Couldn't find trim pattern for item with trim material, skipping...");
+                try {
+                    itemBuilder.withTrim(trimMaterial, trimPattern);
+                } catch (IllegalArgumentException error) {
+                    String message = error.getMessage();
+                    if (message.contains("material"))
+                        Log.warnFromFile(fileName, "Couldn't convert ", trimMaterial.toUpperCase(Locale.ENGLISH),
+                                " into trim material, skipping...");
+                    else if (message.contains("pattern"))
+                        Log.warnFromFile(fileName, "Couldn't convert ", trimPattern.toUpperCase(Locale.ENGLISH),
+                                " into trim material, skipping...");
                 }
+            } else if (trimMaterial == null) {
+                Log.warnFromFile(fileName, "Couldn't find trim material for item with trim pattern, skipping...");
+            } else {
+                Log.warnFromFile(fileName, "Couldn't find trim pattern for item with trim material, skipping...");
             }
         }
 
