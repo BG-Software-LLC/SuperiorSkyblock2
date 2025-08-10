@@ -580,7 +580,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public boolean hasDisbands() {
-        return disbands != 0;
+        return disbands > 0;
     }
 
     /*

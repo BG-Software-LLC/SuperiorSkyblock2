@@ -469,7 +469,7 @@ public interface SettingsManager {
 
     /**
      * The default number of disbands players receive when they first join the server.
-     * If set to -1, players will have unlimited disbands.
+     * If -1, then the disbands limit is disabled.
      * Config-path: default-disband-count
      */
     int getDefaultDisbandCount();
