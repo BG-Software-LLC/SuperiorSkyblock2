@@ -8,6 +8,11 @@
 # Should missions be enabled on your server?
 enabled: true
 
+# Should mission rewards be automatically claimed outside island worlds?
+# When disabled, rewards for missions with auto-reward enabled will be
+# automatically claimed only in island worlds.
+auto-reward-outside-islands: false
+
 # Settings related to mission categories.
 # A tutorial about configuring missions can be found here:
 # https://wiki.bg-software.com/superiorskyblock/missions

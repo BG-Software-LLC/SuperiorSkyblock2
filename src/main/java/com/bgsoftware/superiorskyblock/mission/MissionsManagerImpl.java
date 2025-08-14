@@ -286,6 +286,13 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                     return;
                 }
 
+                if (checkAutoReward && isAutoReward(mission) && !BuiltinModules.MISSIONS.isAutoRewardOutsideIslands() &&
+                        !plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld())) {
+                    if (result != null)
+                        result.accept(false);
+                    return;
+                }
+
                 if (checkAutoReward && !isAutoReward(mission)) {
                     if (canCompleteAgain(superiorPlayer, mission)) {
                         Message.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());

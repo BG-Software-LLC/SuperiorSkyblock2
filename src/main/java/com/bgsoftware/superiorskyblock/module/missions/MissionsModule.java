@@ -38,6 +38,7 @@ public class MissionsModule extends BuiltinModule {
 
     private final List<Mission<?>> missionsToLoad = new LinkedList<>();
 
+    private boolean autoRewardOutsideIslands = false;
     private boolean enabled = true;
 
     public MissionsModule() {
@@ -156,7 +157,12 @@ public class MissionsModule extends BuiltinModule {
 
     @Override
     protected void updateConfig(SuperiorSkyblockPlugin plugin) {
+        autoRewardOutsideIslands = config.getBoolean("auto-reward-outside-islands");
         enabled = config.getBoolean("enabled");
+    }
+
+    public boolean isAutoRewardOutsideIslands() {
+        return autoRewardOutsideIslands;
     }
 
     @Override
