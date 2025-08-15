@@ -449,22 +449,16 @@ public class MenuParserImpl implements MenuParser {
             String trimMaterial = section.getString("trim.material");
             String trimPattern = section.getString("trim.pattern");
 
-            if (trimMaterial != null && trimPattern != null) {
+            if (trimMaterial == null) {
+                Log.warnFromFile(fileName, "Couldn't find trim material for item with trim pattern, skipping...");
+            } else if (trimPattern == null) {
+                Log.warnFromFile(fileName, "Couldn't find trim pattern for item with trim material, skipping...");
+            } else {
                 try {
                     itemBuilder.withTrim(trimMaterial, trimPattern);
                 } catch (IllegalArgumentException error) {
-                    String message = error.getMessage();
-                    if (message.contains("material"))
-                        Log.warnFromFile(fileName, "Couldn't convert ", trimMaterial.toUpperCase(Locale.ENGLISH),
-                                " into trim material, skipping...");
-                    else if (message.contains("pattern"))
-                        Log.warnFromFile(fileName, "Couldn't convert ", trimPattern.toUpperCase(Locale.ENGLISH),
-                                " into trim material, skipping...");
+                    Log.warnFromFile(fileName, error.getMessage());
                 }
-            } else if (trimMaterial == null) {
-                Log.warnFromFile(fileName, "Couldn't find trim material for item with trim pattern, skipping...");
-            } else {
-                Log.warnFromFile(fileName, "Couldn't find trim pattern for item with trim material, skipping...");
             }
         }
 

@@ -62,9 +62,9 @@ public interface NMSAlgorithms {
 
     void setItemModel(ItemMeta itemMeta, String itemModel);
 
-    void setRarity(ItemMeta itemMeta, String rarity);
+    void setRarity(ItemMeta itemMeta, String rarity) throws IllegalArgumentException;
 
-    void setTrim(ItemMeta itemMeta, String trimMaterial, String trimPattern);
+    void setTrim(ItemMeta itemMeta, String trimMaterial, String trimPattern) throws IllegalArgumentException;
 
     void addPotion(PotionMeta potionMeta, PotionEffect potionEffect);
 

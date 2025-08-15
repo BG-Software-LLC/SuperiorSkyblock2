@@ -65,6 +65,7 @@ import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumMap;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -281,14 +282,15 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
             TrimMaterial material = Objects.requireNonNull(Bukkit.getRegistry(TrimMaterial.class)).get(NamespacedKey.minecraft(trimMaterial));
             TrimPattern pattern = Objects.requireNonNull(Bukkit.getRegistry(TrimPattern.class)).get(NamespacedKey.minecraft(trimPattern));
 
-            if (material != null && pattern != null) {
-                ArmorTrim armorTrim = new ArmorTrim(material, pattern);
-                armorMeta.setTrim(armorTrim);
-            } else if (material == null) {
-                throw new IllegalArgumentException("material must not be null");
-            } else {
-                throw new IllegalArgumentException("pattern must not be null");
-            }
+            if (material == null)
+                throw new IllegalArgumentException("Couldn't convert " + trimMaterial.toUpperCase(Locale.ENGLISH) +
+                        " into trim material, skipping...");
+            if (pattern == null)
+                throw new IllegalArgumentException("Couldn't convert " + trimPattern.toUpperCase(Locale.ENGLISH) +
+                        " into trim pattern, skipping...");
+
+            ArmorTrim armorTrim = new ArmorTrim(material, pattern);
+            armorMeta.setTrim(armorTrim);
         }
     }
 
