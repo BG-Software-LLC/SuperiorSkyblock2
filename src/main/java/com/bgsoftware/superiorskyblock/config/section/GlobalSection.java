@@ -257,10 +257,6 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().buildOutsideIsland;
     }
 
-    public int getDefaultDisbandCount() {
-        return getContainer().defaultDisbandCount;
-    }
-
     public String getDefaultLanguage() {
         return getContainer().defaultLanguage;
     }

@@ -24,7 +24,7 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
     public UUID uuid = null;
     public String name = "null";
     public PlayerRole playerRole = SPlayerRole.guestRole();
-    public int disbands = plugin.getSettings().getDefaultDisbandCount();
+    public int disbands = plugin.getSettings().getDisbandCount();
     public Locale locale = PlayerLocales.getDefaultLocale();
     public String textureValue = "";
     public long lastTimeUpdated = -1;

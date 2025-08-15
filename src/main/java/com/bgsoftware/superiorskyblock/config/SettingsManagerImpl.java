@@ -443,11 +443,6 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
-    public int getDefaultDisbandCount() {
-        return this.global.getDefaultDisbandCount();
-    }
-
-    @Override
     public String getDefaultLanguage() {
         return this.global.getDefaultLanguage();
     }
