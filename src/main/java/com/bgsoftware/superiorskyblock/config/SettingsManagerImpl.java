@@ -661,6 +661,10 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     private void convertData(YamlConfiguration cfg) {
+        if (cfg.contains("disband-count")) {
+            cfg.set("default-disband-count", cfg.getInt("disband-count") == 0 ? -1 : cfg.getInt("disband-count"));
+            cfg.set("disband-count", null);
+        }
         if (cfg.contains("default-hoppers-limit")) {
             cfg.set("default-limits", Collections.singletonList("HOPPER:" + cfg.getInt("default-hoppers-limit")));
             cfg.set("default-hoppers-limit", null);

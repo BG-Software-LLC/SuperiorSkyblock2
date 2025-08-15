@@ -67,7 +67,7 @@ public class CmdDisband implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        if (!superiorPlayer.hasDisbands() && plugin.getSettings().getDisbandCount() > 0) {
+        if (!superiorPlayer.hasDisbands() && plugin.getSettings().getDisbandCount() >= 0) {
             Message.NO_MORE_DISBANDS.send(superiorPlayer);
             return;
         }
@@ -84,7 +84,10 @@ public class CmdDisband implements IPermissibleCommand {
                         island.getIslandBank().getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
             }
 
-            superiorPlayer.setDisbands(superiorPlayer.getDisbands() - 1);
+            if (plugin.getSettings().getDisbandCount() >= 0) {
+                superiorPlayer.setDisbands(superiorPlayer.getDisbands() - 1);
+            }
+
             island.disbandIsland();
         }
 

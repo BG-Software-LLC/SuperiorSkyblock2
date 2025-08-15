@@ -568,8 +568,6 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setDisbands(int disbands) {
-        disbands = Math.max(disbands, 0);
-
         Log.debug(Debug.SET_DISBANDS, getName(), disbands);
 
         if (this.disbands == disbands)
