@@ -109,6 +109,11 @@ permissions:
             description: Open the island to the public.
           superior.island.panel:
             description: Open island panel.
+            children:
+              superior.island.visitors:
+                description: Open the visitors menu.
+              superior.island.members:
+                description: Open the members menu.
           superior.island.pardon:
             description: Unban a player from your island.
           superior.island.permissions:

@@ -22,7 +22,7 @@ public class CmdVisitors implements ISuperiorCommand {
 
     @Override
     public String getPermission() {
-        return "superior.island.panel";
+        return "superior.island.visitors";
     }
 
     @Override
