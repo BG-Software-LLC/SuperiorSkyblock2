@@ -11,9 +11,11 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class CmdPanel implements ISuperiorCommand {
@@ -91,7 +93,23 @@ public class CmdPanel implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 2 ? CommandTabCompletes.getCustomComplete(args[1], "members", "visitors", "toggle") : Collections.emptyList();
+        if (args.length != 2)
+            return Collections.emptyList();
+
+        List<String> extraArgument = new LinkedList<>();
+        extraArgument.add("toggle");
+        if (!(sender instanceof Player)) {
+            extraArgument.add("visitors");
+            extraArgument.add("members");
+        } else {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+            if (superiorPlayer.hasPermission("superior.island.visitors"))
+                extraArgument.add("visitors");
+            if (superiorPlayer.hasPermission("superior.island.members"))
+                extraArgument.add("members");
+        }
+
+        return CommandTabCompletes.getCustomComplete(args[1], extraArgument);
     }
 
 }
