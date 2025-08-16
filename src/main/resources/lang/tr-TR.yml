@@ -670,7 +670,7 @@ NAME_TOO_SHORT: '&c&lHata | &7Ada adları 3 karakterden kısa olamaz.'
 NO_BAN_PERMISSION: '&c&lHata | &7Oyuncuları yasaklayabilmek için en az {0} olmalısın.'
 NO_CLOSE_BYPASS: '&c&lHata | &7Bu ada halka açık değil.'
 NO_CLOSE_PERMISSION: '&c&lHata | &7Adanı halka kapatabilmek için en az {0} olmalısın.'
-NO_COMMAND_PERMISSION: '&fBilinmeyen komut. Yardım için "/help" yaz.'
+NO_COMMAND_PERMISSION: '&c&lError | &7You don''t have permission to use that command. ({0})'
 NO_COOP_PERMISSION: '&c&lHata | &7Oyuncuları co-op üyesi olarak ekleyebilmek için
   en az {0} olmalısın.'
 NO_DELETE_WARP_PERMISSION: '&c&lHata | &7Işınlanmaları silebilmek için en az {0} olmalısın.'
