@@ -32,30 +32,17 @@ public class ControlPanelButton extends AbstractMenuViewButton<IslandMenuView> {
 
     @Override
     public void onButtonClick(InventoryClickEvent clickEvent) {
-        SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
-        Island targetIsland = menuView.getIsland();
-
         switch (getTemplate().controlPanelAction) {
             case OPEN_MEMBERS:
-                plugin.getMenus().openMembers(inventoryViewer, MenuViewWrapper.fromView(menuView), targetIsland);
+                plugin.getCommands().dispatchSubCommand(clickEvent.getWhoClicked(), "members");
                 break;
             case OPEN_SETTINGS:
-                if (inventoryViewer.hasPermission("superior.island.settings")) {
-                    if (!inventoryViewer.hasPermission(IslandPrivileges.SET_SETTINGS)) {
-                        Message.NO_SET_SETTINGS_PERMISSION.send(inventoryViewer,
-                                targetIsland.getRequiredPlayerRole(IslandPrivileges.SET_SETTINGS));
-                        return;
-                    }
-
-                    plugin.getMenus().openSettings(inventoryViewer, MenuViewWrapper.fromView(menuView), targetIsland);
-                }
+                plugin.getCommands().dispatchSubCommand(clickEvent.getWhoClicked(), "settings");
                 break;
             case OPEN_VISITORS:
-                plugin.getMenus().openVisitors(inventoryViewer, MenuViewWrapper.fromView(menuView), targetIsland);
+                plugin.getCommands().dispatchSubCommand(clickEvent.getWhoClicked(), "visitors");
                 break;
         }
-
-        BukkitExecutor.sync(menuView::closeView, 1L);
     }
 
     public enum ControlPanelAction {
