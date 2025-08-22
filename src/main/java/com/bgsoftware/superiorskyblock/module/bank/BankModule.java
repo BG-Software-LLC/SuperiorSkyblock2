@@ -47,8 +47,6 @@ public class BankModule extends BuiltinModule<BankModule.Configuration> {
         if (syncValues("bank-interest", config, oldConfig))
             updatedConfig = true;
 
-        oldConfigFile.delete();
-
         return updatedConfig;
     }
 
