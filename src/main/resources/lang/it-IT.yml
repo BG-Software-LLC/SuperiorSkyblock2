@@ -576,7 +576,7 @@ NAME_TOO_SHORT: '&c&lErrore | &7I nomi delle isole non possono avere una lunghez
 NO_BAN_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per poter vietare i giocatori.'
 NO_CLOSE_BYPASS: '&c&lErrore | &7Quest''isola non è aperta al pubblico.'
 NO_CLOSE_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per chiudere l''isola al pubblico.'
-NO_COMMAND_PERMISSION: '&fComando sconosciuto. Digita "/help" se ti serve aiuto.'
+NO_COMMAND_PERMISSION: '&c&lError | &7You don''t have permission to use that command. ({0})'
 NO_COOP_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per aggiungere giocatori come membri coop.'
 NO_DELETE_WARP_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per eliminare le warp.'
 NO_DEMOTE_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per degradare i giocatori.'
