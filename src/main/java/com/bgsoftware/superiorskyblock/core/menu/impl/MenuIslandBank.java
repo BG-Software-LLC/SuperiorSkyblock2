@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankBalanceButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankCustomDepositButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankCustomWithdrawButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankDepositButton;
@@ -89,6 +90,9 @@ public class MenuIslandBank extends AbstractMenu<IslandMenuView, IslandViewArgs>
                 }
             }
         }
+
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "balance", menuPatternSlots),
+                new BankBalanceButton.Builder());
 
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "logs", menuPatternSlots),
                 new OpenBankLogsButton.Builder());
