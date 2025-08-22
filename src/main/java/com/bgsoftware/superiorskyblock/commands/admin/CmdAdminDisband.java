@@ -72,10 +72,10 @@ public class CmdAdminDisband implements IAdminIslandCommand {
         else
             Message.DISBANDED_ISLAND_OTHER.send(sender, targetPlayer.getName());
 
-        if (BuiltinModules.BANK.disbandRefund > 0) {
+        if (BuiltinModules.BANK.getConfiguration().hasDisbandRefund()) {
+            BigDecimal disbandRefund = BuiltinModules.BANK.getConfiguration().getDisbandRefund();
             Message.DISBAND_ISLAND_BALANCE_REFUND.send(island.getOwner(),
-                    Formatters.NUMBER_FORMATTER.format(island.getIslandBank()
-                            .getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
+                    Formatters.NUMBER_FORMATTER.format(island.getIslandBank().getBalance().multiply(disbandRefund)));
         }
 
         island.disbandIsland();

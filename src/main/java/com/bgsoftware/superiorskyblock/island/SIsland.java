@@ -1790,9 +1790,10 @@ public class SIsland implements Island {
 
         invitedPlayers.forEach(invitedPlayer -> invitedPlayer.removeInvite(this));
 
-        if (BuiltinModules.BANK.disbandRefund > 0)
-            plugin.getProviders().depositMoney(getOwner(), islandBank.getBalance()
-                    .multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund)));
+        if (BuiltinModules.BANK.getConfiguration().hasDisbandRefund()) {
+            BigDecimal disbandRefund = BuiltinModules.BANK.getConfiguration().getDisbandRefund();
+            plugin.getProviders().depositMoney(getOwner(), islandBank.getBalance().multiply(disbandRefund));
+        }
 
         plugin.getMissions().getIslandMissions().forEach(this::resetMission);
 
@@ -2311,14 +2312,17 @@ public class SIsland implements Island {
 
         long currentTime = System.currentTimeMillis() / 1000;
 
-        if (checkOnlineOwner && BuiltinModules.BANK.bankInterestRecentActive > 0 &&
-                currentTime - owner.getLastTimeStatus() > BuiltinModules.BANK.bankInterestRecentActive) {
+        int bankInterestRecentActive = BuiltinModules.BANK.getConfiguration().getBankInterestRecentActive();
+        if (checkOnlineOwner && bankInterestRecentActive > 0 &&
+                currentTime - owner.getLastTimeStatus() > bankInterestRecentActive) {
             Log.debugResult(Debug.GIVE_BANK_INTEREST, "Return Cooldown", owner.getName());
             return false;
         }
 
+        int bankInterestPercentage = BuiltinModules.BANK.getConfiguration().getBankInterestPercentage();
+
         BigDecimal balance = islandBank.getBalance().max(BigDecimal.ONE);
-        BigDecimal balanceToGive = balance.multiply(new BigDecimal(BuiltinModules.BANK.bankInterestPercentage / 100D));
+        BigDecimal balanceToGive = balance.multiply(new BigDecimal(bankInterestPercentage / 100D));
 
         // If the money that will be given exceeds limit, we want to give money later.
         if (!islandBank.canDepositMoney(balanceToGive)) {
@@ -2349,8 +2353,8 @@ public class SIsland implements Island {
         if (this.lastInterest == lastInterest)
             return;
 
-        if (BuiltinModules.BANK.bankInterestEnabled) {
-            long ticksToNextInterest = BuiltinModules.BANK.bankInterestInterval * 20L;
+        if (BuiltinModules.BANK.getConfiguration().isBankInterestEnabled()) {
+            long ticksToNextInterest = BuiltinModules.BANK.getConfiguration().getBankInterestInterval() * 20L;
             this.bankInterestTask.set(bankInterestTask -> {
                 if (bankInterestTask != null)
                     bankInterestTask.cancel();
@@ -2365,7 +2369,8 @@ public class SIsland implements Island {
     @Override
     public long getNextInterest() {
         long currentTime = System.currentTimeMillis() / 1000;
-        return BuiltinModules.BANK.bankInterestInterval - (currentTime - lastInterest);
+        int bankInterestInterval = BuiltinModules.BANK.getConfiguration().getBankInterestInterval();
+        return bankInterestInterval - (currentTime - lastInterest);
     }
 
     /*
@@ -2851,7 +2856,7 @@ public class SIsland implements Island {
 
     @Override
     public BigDecimal getWorth() {
-        double bankWorthRate = BuiltinModules.BANK.bankWorthRate;
+        double bankWorthRate = BuiltinModules.BANK.getConfiguration().getBankWorthRate();
 
         BigDecimal islandWorth = this.islandWorth.get();
         BigDecimal islandBank = this.islandBank.getBalance();
@@ -4929,18 +4934,20 @@ public class SIsland implements Island {
     }
 
     private void startBankInterest() {
-        if (BuiltinModules.BANK.bankInterestEnabled) {
-            long currentTime = System.currentTimeMillis() / 1000;
-            long ticksToNextInterest = (BuiltinModules.BANK.bankInterestInterval - (currentTime - this.lastInterest)) * 20;
-            if (ticksToNextInterest <= 0) {
-                giveInterest(true);
-            } else {
-                this.bankInterestTask.set(bankInterestTask -> {
-                    if (bankInterestTask != null)
-                        bankInterestTask.cancel();
-                    return BukkitExecutor.sync(() -> giveInterest(true), ticksToNextInterest);
-                });
-            }
+        if (!BuiltinModules.BANK.getConfiguration().isBankInterestEnabled())
+            return;
+
+        int bankInterestInterval = BuiltinModules.BANK.getConfiguration().getBankInterestInterval();
+        long currentTime = System.currentTimeMillis() / 1000;
+        long ticksToNextInterest = (bankInterestInterval - (currentTime - this.lastInterest)) * 20;
+        if (ticksToNextInterest <= 0) {
+            giveInterest(true);
+        } else {
+            this.bankInterestTask.set(bankInterestTask -> {
+                if (bankInterestTask != null)
+                    bankInterestTask.cancel();
+                return BukkitExecutor.sync(() -> giveInterest(true), ticksToNextInterest);
+            });
         }
     }
 

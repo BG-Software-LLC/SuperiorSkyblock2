@@ -10,10 +10,11 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.event.Listener;
 
 import java.io.File;
+import java.util.Objects;
 
-public abstract class BuiltinModule extends PluginModule {
+public abstract class BuiltinModule<T extends IModuleConfiguration> extends PluginModule {
 
-    protected CommentedConfiguration config = null;
+    protected T configuration;
 
     public BuiltinModule(String moduleName) {
         super(moduleName, "Ome_R");
@@ -24,9 +25,15 @@ public abstract class BuiltinModule extends PluginModule {
         onEnable((SuperiorSkyblockPlugin) plugin);
     }
 
+    protected abstract void onEnable(SuperiorSkyblockPlugin plugin);
+
     @Override
     public final void onReload(SuperiorSkyblock plugin) {
         onReload((SuperiorSkyblockPlugin) plugin);
+    }
+
+    protected void onReload(SuperiorSkyblockPlugin plugin) {
+        onPluginInit(plugin);
     }
 
     @Override
@@ -34,23 +41,38 @@ public abstract class BuiltinModule extends PluginModule {
         onDisable((SuperiorSkyblockPlugin) plugin);
     }
 
+    protected abstract void onDisable(SuperiorSkyblockPlugin plugin);
+
+    @Override
     public void loadData(SuperiorSkyblock plugin) {
         loadData((SuperiorSkyblockPlugin) plugin);
     }
 
+    protected abstract void loadData(SuperiorSkyblockPlugin plugin);
+
     @Override
     public Listener[] getModuleListeners(SuperiorSkyblock plugin) {
-        return getModuleListeners((SuperiorSkyblockPlugin) plugin);
+        return !isEnabled() ? null : getModuleListeners((SuperiorSkyblockPlugin) plugin);
     }
+
+    protected abstract Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin);
 
     @Override
     public SuperiorCommand[] getSuperiorCommands(SuperiorSkyblock plugin) {
-        return getSuperiorCommands((SuperiorSkyblockPlugin) plugin);
+        return !isEnabled() ? null : getSuperiorCommands((SuperiorSkyblockPlugin) plugin);
     }
+
+    protected abstract SuperiorCommand[] getSuperiorCommands(SuperiorSkyblockPlugin plugin);
 
     @Override
     public SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblock plugin) {
-        return getSuperiorAdminCommands((SuperiorSkyblockPlugin) plugin);
+        return !isEnabled() ? null : getSuperiorAdminCommands((SuperiorSkyblockPlugin) plugin);
+    }
+
+    protected abstract SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin);
+
+    public final T getConfiguration() {
+        return Objects.requireNonNull(this.configuration);
     }
 
     @Override
@@ -59,8 +81,24 @@ public abstract class BuiltinModule extends PluginModule {
     }
 
     protected void onPluginInit(SuperiorSkyblockPlugin plugin) {
-        File configFile = createConfig();
-        config = CommentedConfiguration.loadConfiguration(configFile);
+        File configFile = new File(getModuleFolder(), "config.yml");
+        boolean firstTime = false;
+
+        if (!configFile.exists()) {
+            Resources.saveResource("modules/" + getName() + "/config.yml");
+            firstTime = true;
+        }
+
+        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(configFile);
+
+        boolean commitChanges = onConfigCreate(plugin, config, firstTime);
+        if (commitChanges) {
+            try {
+                config.save(configFile);
+            } catch (Exception error) {
+                Log.error(error, "An error occurred while saving config file for module " + getName() + ":");
+            }
+        }
 
         try {
             config.syncWithConfig(configFile,
@@ -71,37 +109,19 @@ public abstract class BuiltinModule extends PluginModule {
             Log.error(error, "An error occurred while loading config file:");
         }
 
-        updateConfig(plugin);
+
+        this.configuration = createConfigFile(config);
     }
 
-    public File createConfig() {
-        File configFile = new File(getModuleFolder(), "config.yml");
-
-        if (!configFile.exists())
-            Resources.saveResource("modules/" + getName() + "/config.yml");
-
-        return configFile;
+    protected boolean onConfigCreate(SuperiorSkyblockPlugin plugin, CommentedConfiguration config, boolean firstTime) {
+        return false;
     }
 
-    public abstract void onEnable(SuperiorSkyblockPlugin plugin);
-
-    public void onReload(SuperiorSkyblockPlugin plugin) {
-        onPluginInit(plugin);
+    public boolean isEnabled() {
+        return this.configuration.isEnabled() && isInitialized();
     }
 
-    public abstract void onDisable(SuperiorSkyblockPlugin plugin);
-
-    public abstract void loadData(SuperiorSkyblockPlugin plugin);
-
-    public abstract Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin);
-
-    public abstract SuperiorCommand[] getSuperiorCommands(SuperiorSkyblockPlugin plugin);
-
-    public abstract SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin);
-
-    public abstract boolean isEnabled();
-
-    protected abstract void updateConfig(SuperiorSkyblockPlugin plugin);
+    protected abstract T createConfigFile(CommentedConfiguration config);
 
     protected String[] getIgnoredSections() {
         return new String[0];

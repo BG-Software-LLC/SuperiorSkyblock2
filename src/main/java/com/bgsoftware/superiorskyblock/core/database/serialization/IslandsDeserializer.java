@@ -29,7 +29,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
@@ -736,20 +735,22 @@ public class IslandsDeserializer {
     }
 
     public static void deserializeBankTransactions(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
-        if (BuiltinModules.BANK.bankLogs && BuiltinModules.BANK.cacheAllLogs) {
-            databaseBridge.loadAllObjects("bank_transactions", bankTransactionRow -> {
-                DatabaseResult bankTransaction = new DatabaseResult(bankTransactionRow);
+        if (!BuiltinModules.BANK.getConfiguration().isBankLogs() ||
+                !BuiltinModules.BANK.getConfiguration().isCacheAllLogs())
+            return;
 
-                Optional<UUID> uuid = bankTransaction.getUUID("island");
-                if (!uuid.isPresent()) {
-                    Log.warn("Cannot load bank transaction for null islands, skipping...");
-                    return;
-                }
+        databaseBridge.loadAllObjects("bank_transactions", bankTransactionRow -> {
+            DatabaseResult bankTransaction = new DatabaseResult(bankTransactionRow);
 
-                Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-                SBankTransaction.fromDatabase(bankTransaction).ifPresent(builder::addBankTransaction);
-            });
-        }
+            Optional<UUID> uuid = bankTransaction.getUUID("island");
+            if (!uuid.isPresent()) {
+                Log.warn("Cannot load bank transaction for null islands, skipping...");
+                return;
+            }
+
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            SBankTransaction.fromDatabase(bankTransaction).ifPresent(builder::addBankTransaction);
+        });
     }
 
     public static void deserializePersistentDataContainer(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
