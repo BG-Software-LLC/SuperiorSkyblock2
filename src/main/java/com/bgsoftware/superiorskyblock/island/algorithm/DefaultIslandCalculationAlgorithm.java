@@ -59,6 +59,12 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
 
     @Override
     public CompletableFuture<IslandCalculationResult> calculateIsland(Island island) {
+        CompletableFuture<IslandCalculationResult> result = new CompletableFuture<>();
+        BukkitExecutor.ensureMain(() -> calculateIslandInternal(island, result));
+        return result;
+    }
+
+    private void calculateIslandInternal(Island island, CompletableFuture<IslandCalculationResult> result) {
         CompletableFutureList<List<CalculatedChunk>> chunksToLoad = new CompletableFutureList<>(plugin.getSettings().getRecalcTaskTimeout());
 
         long profiler = Profiler.start(ProfileType.CALCULATE_ISLAND);
@@ -87,8 +93,6 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
         }
 
         BlockCountsTracker blockCounts = new BlockCountsTracker();
-        CompletableFuture<IslandCalculationResult> result = new CompletableFuture<>();
-
         Set<SpawnerInfo> spawnersToCheck = new HashSet<>();
         Set<ChunkPosition> chunksToCheck = new HashSet<>();
 
@@ -169,8 +173,6 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
 
             result.complete(blockCounts);
         });
-
-        return result;
     }
 
     private static List<Pair<Key, Key>> createMinecartBlockTypes() {

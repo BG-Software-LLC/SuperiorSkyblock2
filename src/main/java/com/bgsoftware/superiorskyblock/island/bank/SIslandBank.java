@@ -51,7 +51,8 @@ public class SIslandBank implements IslandBank {
     public SIslandBank(Island island, Supplier<Boolean> isGiveInterestFailed) {
         this.island = island;
         this.isGiveInterestFailed = isGiveInterestFailed;
-        this.bankLogs = BuiltinModules.BANK.cacheAllLogs ? new CacheBankLogs() : new DatabaseBankLogs(island);
+        this.bankLogs = BuiltinModules.BANK.getConfiguration().isCacheAllLogs() ?
+                new CacheBankLogs() : new DatabaseBankLogs(island);
     }
 
     @Override
@@ -284,7 +285,7 @@ public class SIslandBank implements IslandBank {
     }
 
     private void addTransaction(BankTransaction bankTransaction, boolean save) {
-        if (!BuiltinModules.BANK.bankLogs)
+        if (!BuiltinModules.BANK.getConfiguration().isBankLogs())
             return;
 
         UUID senderUUID = bankTransaction.getPlayer();

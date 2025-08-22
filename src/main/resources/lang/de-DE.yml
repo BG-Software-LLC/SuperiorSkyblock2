@@ -707,7 +707,7 @@ NO_BAN_PERMISSION: '&c&lError | &7Du musst mindestens {0} sein, um Spieler zu ba
 NO_CLOSE_BYPASS: '&c&lError | &7Diese Insel ist nicht für die Öffentlichkeit zugänglich.'
 NO_CLOSE_PERMISSION: '&c&lError | &7Du musst mindestens {0} sein, um die Insel für
   die Öffentlichkeit zu schließen.'
-NO_COMMAND_PERMISSION: '&fUnbekannter Befehl. Gebe "/is help" ein, um Hilfe zu erhalten.'
+NO_COMMAND_PERMISSION: '&c&lError | &7You don''t have permission to use that command. ({0})'
 NO_COOP_PERMISSION: '&c&lError | &7Du musst mindestens {0} sein, um Spieler als Koop-Mitglieder
   hinzuzufügen.'
 NO_DELETE_WARP_PERMISSION: '&c&lError | &7Du musst mindestens {0} sein, um Warps zu

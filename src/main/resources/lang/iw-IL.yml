@@ -590,7 +590,7 @@ NAME_TOO_SHORT: '&c&lהאיגש | &7םיוות 3 מ תוחפ תויהל םילו
 NO_BAN_PERMISSION: '&c&lהאיגש | &7םינקחש קיחרהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
 NO_CLOSE_BYPASS: '&c&lהאיגש | &7רוביצל חותפ אל הזה יאה.'
 NO_CLOSE_PERMISSION: '&c&lהאיגש | &7רוביצל יאה תא רוגסל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
-NO_COMMAND_PERMISSION: '&fUnknown command. Type "/help" for help.'
+NO_COMMAND_PERMISSION: '&c&lError | &7You don''t have permission to use that command. ({0})'
 NO_COOP_PERMISSION: '&c&lהאיגש | &7הלועפ יפתשמכ םינקחש ףיסוהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
 NO_DELETE_WARP_PERMISSION: '&c&lהאיגש | &7םימוקימ קוחמל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
 NO_DEMOTE_PERMISSION: '&c&lהאיגש | &7המרב םינקחש דירוהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'

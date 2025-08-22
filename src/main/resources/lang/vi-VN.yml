@@ -632,7 +632,7 @@ NAME_TOO_SHORT: '&c&lLỗi | &7Tên đảo không thể ngắn hơn 3 ký tự.'
 NO_BAN_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để cấm người chơi.'
 NO_CLOSE_BYPASS: '&c&lLỗi | &7Hòn đảo này không mở cửa cho công cộng.'
 NO_CLOSE_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để đóng đảo với công cộng.'
-NO_COMMAND_PERMISSION: '&fLệnh không xác định. Nhấn "/help" để được trợ giúp.'
+NO_COMMAND_PERMISSION: '&c&lError | &7You don''t have permission to use that command. ({0})'
 NO_COOP_PERMISSION: '&c&lLỗi | &7Bạn phải là {0} hoặc cao hơn để thêm người chơi
   với tư cách là thành viên co-op.'
 NO_DELETE_WARP_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để xóa khu vực.'
