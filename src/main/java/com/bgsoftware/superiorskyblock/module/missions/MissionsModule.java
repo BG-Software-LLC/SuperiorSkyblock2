@@ -118,10 +118,12 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
     public class Configuration implements IModuleConfiguration {
 
         private final boolean enabled;
+        private final boolean autoRewardOutsideIslands;
         private final List<Mission<?>> missionsToLoad = new LinkedList<>();
 
         Configuration(CommentedConfiguration config) {
             this.enabled = config.getBoolean("enabled");
+            this.autoRewardOutsideIslands = config.getBoolean("auto-reward-outside-islands");
             if (this.enabled) {
                 loadMissionCategories(config);
             }
@@ -130,6 +132,10 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
         @Override
         public boolean isEnabled() {
             return this.enabled;
+        }
+
+        public boolean isAutoRewardOutsideIslands() {
+            return this.autoRewardOutsideIslands;
         }
 
         private void loadMissionCategories(CommentedConfiguration config) {
