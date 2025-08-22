@@ -417,6 +417,12 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("z", (island, superiorPlayer) ->
                             island.getCenterPosition().getZ() + "")
                     // Global Placeholders
+                    .put("total_count", (island, superiorPlayer) ->
+                            Formatters.NUMBER_FORMATTER.format(plugin.getGrid().getIslands().size()))
+                    .put("total_count_format", (island, superiorPlayer) ->
+                            Formatters.FANCY_NUMBER_FORMATTER.format(plugin.getGrid().getIslands().size(), superiorPlayer.getUserLocale()))
+                    .put("total_count_raw", (island, superiorPlayer) ->
+                            plugin.getGrid().getIslands().size() + "")
                     .put("total_level", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(plugin.getGrid().getTotalLevel()))
                     .put("total_level_format", (island, superiorPlayer) ->
