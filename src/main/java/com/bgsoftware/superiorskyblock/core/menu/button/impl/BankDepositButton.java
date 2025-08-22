@@ -40,8 +40,6 @@ public class BankDepositButton extends AbstractMenuViewButton<IslandMenuView> {
         BankTransaction bankTransaction = island.getIslandBank().depositMoney(clickedPlayer, amount);
         MenuActions.handleDeposit(clickedPlayer, island, bankTransaction,
                 getTemplate().successSound, getTemplate().failSound, amount);
-
-        menuView.refreshView();
     }
 
     public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<IslandMenuView> {

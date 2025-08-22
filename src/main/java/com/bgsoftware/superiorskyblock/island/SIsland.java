@@ -2336,7 +2336,6 @@ public class SIsland implements Island {
         giveInterestFailed = false;
 
         islandBank.depositAdminMoney(Bukkit.getConsoleSender(), balanceToGive);
-        plugin.getMenus().refreshIslandBank(this);
 
         setLastInterestTime(currentTime);
 

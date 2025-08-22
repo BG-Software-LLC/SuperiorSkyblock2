@@ -40,8 +40,6 @@ public class BankWithdrawButton extends AbstractMenuViewButton<IslandMenuView> {
         BankTransaction bankTransaction = island.getIslandBank().withdrawMoney(clickedPlayer, amount, getTemplate().withdrawCommands);
         MenuActions.handleWithdraw(clickedPlayer, island, bankTransaction,
                 getTemplate().successSound, getTemplate().failSound, amount);
-
-        menuView.refreshView();
     }
 
     public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<IslandMenuView> {
