@@ -1,81 +1,34 @@
 package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
+import com.bgsoftware.superiorskyblock.nms.player.OfflinePlayerData;
+import com.bgsoftware.superiorskyblock.nms.v1_8_R3.player.OfflinePlayerDataImpl;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
-import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import com.bgsoftware.superiorskyblock.service.bossbar.EmptyBossBar;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
-import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.minecraft.server.v1_8_R3.Entity;
 import net.minecraft.server.v1_8_R3.EntityItem;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.MinecraftServer;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
-import net.minecraft.server.v1_8_R3.PlayerInteractManager;
-import net.minecraft.server.v1_8_R3.WorldServer;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftItem;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
 public class NMSPlayersImpl implements NMSPlayers {
 
-    private final SuperiorSkyblockPlugin plugin;
-
-    public NMSPlayersImpl(SuperiorSkyblockPlugin plugin) {
-        this.plugin = plugin;
-    }
-
     @Override
-    public void clearInventory(OfflinePlayer offlinePlayer, List<ClearAction> clearActions) {
-        if (clearActions.isEmpty())
-            return;
-
-        if (offlinePlayer.isOnline() || offlinePlayer instanceof Player) {
-            Player player = offlinePlayer instanceof Player ? (Player) offlinePlayer : offlinePlayer.getPlayer();
-
-            if (clearActions.contains(ClearActions.INVENTORY))
-                player.getInventory().clear();
-            if (clearActions.contains(ClearActions.ENDER_CHEST))
-                player.getEnderChest().clear();
-
-            return;
-        }
-
-        GameProfile profile = new GameProfile(offlinePlayer.getUniqueId(), Optional.ofNullable(offlinePlayer.getName()).orElse(""));
-
-        MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
-        WorldServer worldServer = server.getWorldServer(0);
-        EntityPlayer entity = new EntityPlayer(server, worldServer, profile, new PlayerInteractManager(worldServer));
-        Player targetPlayer = entity.getBukkitEntity();
-
-        targetPlayer.loadData();
-
-        clearInventory(targetPlayer, clearActions);
-
-        //Setting the entity to the spawn location
-        Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter(Dimensions.NORMAL);
-        entity.world = ((CraftWorld) spawnLocation.getWorld()).getHandle();
-        entity.setPositionRotation(spawnLocation.getX(), spawnLocation.getY(), spawnLocation.getZ(), spawnLocation.getYaw(), spawnLocation.getPitch());
-
-        targetPlayer.saveData();
+    public OfflinePlayerData createOfflinePlayerData(OfflinePlayer offlinePlayer) {
+        return OfflinePlayerDataImpl.create(offlinePlayer);
     }
 
     @Override

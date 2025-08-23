@@ -1,20 +1,19 @@
 package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.nms.player.OfflinePlayerData;
 import com.mojang.authlib.properties.Property;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.Locale;
 
 public interface NMSPlayers {
 
-    void clearInventory(OfflinePlayer offlinePlayer, List<ClearAction> clearActions);
+    OfflinePlayerData createOfflinePlayerData(OfflinePlayer offlinePlayer);
 
     void setSkinTexture(SuperiorPlayer superiorPlayer);
 

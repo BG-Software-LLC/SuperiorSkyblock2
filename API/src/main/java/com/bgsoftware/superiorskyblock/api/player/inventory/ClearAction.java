@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.player.inventory;
 
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
+import org.bukkit.entity.Player;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -33,6 +34,15 @@ public abstract class ClearAction implements Enumerable {
     public final String getName() {
         return name;
     }
+
+    /**
+     * Execute this {@link ClearAction} on the player {@param player};
+     *
+     * @param player The player to run the clear action on.
+     *               The player instance might be fake for offline players.
+     *               Do not save it elsewhere, only run actions that change its data.
+     */
+    public abstract void doClear(Player player);
 
     @Override
     public String toString() {
