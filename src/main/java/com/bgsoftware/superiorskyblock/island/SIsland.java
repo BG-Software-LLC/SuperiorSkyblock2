@@ -1463,28 +1463,15 @@ public class SIsland implements Island {
         }
     }
 
-    private boolean isIslandWorld(@Nullable World world) {
-        if (world == null)
-            return false;
-
-        Dimension dimension = plugin.getGrid().getIslandsWorldDimension(world);
-        if (dimension == null)
-            return false;
-
-        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
-        return worldInfo.getName().equals(world.getName());
+    private static boolean isIslandWorld(@Nullable World world) {
+        return world != null && plugin.getProviders().getWorldsProvider().isIslandsWorld(world);
     }
 
     private boolean isIslandWorld(@Nullable WorldInfo worldInfo) {
         if (worldInfo == null)
             return false;
 
-        Dimension dimension = worldInfo.getDimension();
-        if (dimension == null)
-            return false;
-
-        WorldInfo realWorldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
-        return realWorldInfo.getName().equals(worldInfo.getName());
+        return plugin.getGrid().getIslandsWorldInfo(this, worldInfo.getName()) != null;
     }
 
     @Override
