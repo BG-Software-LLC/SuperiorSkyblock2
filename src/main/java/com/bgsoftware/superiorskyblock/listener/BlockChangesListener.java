@@ -35,7 +35,6 @@ import org.bukkit.entity.Minecart;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
@@ -294,6 +293,21 @@ public class BlockChangesListener extends AbstractGameEventListener {
         }
     }
 
+    private void onBlockFade(GameEvent<GameEventArgs.BlockFadeEvent> e) {
+        BlockState newState = e.getArgs().newState;
+        if (newState.getType() == Material.AIR) {
+            this.worldRecordService.get().recordBlockBreak(e.getArgs().block, REGULAR_RECORD_FLAGS);
+        } else {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                this.worldRecordService.get().recordBlockPlace(Keys.of(newState),
+                        newState.getLocation(wrapper.getHandle()),
+                        1,
+                        e.getArgs().block.getState(),
+                        REGULAR_RECORD_FLAGS);
+            }
+        }
+    }
+
     private void onEntityExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
         Entity entity = e.getArgs().entity;
 
@@ -360,6 +374,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
         registerCallback(GameEventType.PISTON_EXTEND_EVENT, GameEventPriority.MONITOR, this::onPistonExtend);
         registerCallback(GameEventType.LEAVES_DECAY_EVENT, GameEventPriority.MONITOR, this::onLeavesDecay);
         registerCallback(GameEventType.BLOCK_FROM_TO_EVENT, GameEventPriority.MONITOR, this::onBlockFromTo);
+        registerCallback(GameEventType.BLOCK_FADE_EVENT, GameEventPriority.MONITOR, this::onBlockFade);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.MONITOR, this::onEntityExplode);
         registerCallback(GameEventType.PROJECTILE_HIT_EVENT, GameEventPriority.MONITOR, this::onChorusHit);
         registerCallback(GameEventType.SPONGE_ABSORB_EVENT, GameEventPriority.MONITOR, this::onSpongeAbsorb);

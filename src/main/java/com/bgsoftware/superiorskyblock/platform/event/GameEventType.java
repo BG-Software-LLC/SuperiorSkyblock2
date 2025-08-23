@@ -75,6 +75,7 @@ public class GameEventType<Args extends IEventArgs> extends EventType<Args, Game
     public static final GameEventType<RaidTriggerEvent> RAID_TRIGGER_EVENT = register(RaidTriggerEvent.class);
     public static final GameEventType<SignChangeEvent> SIGN_CHANGE_EVENT = register(SignChangeEvent.class);
     public static final GameEventType<BlockPhysicsEvent> BLOCK_PHYSICS_EVENT = register(BlockPhysicsEvent.class);
+    public static final GameEventType<BlockFadeEvent> BLOCK_FADE_EVENT = register(BlockFadeEvent.class);
 
     private GameEventType() {
     }

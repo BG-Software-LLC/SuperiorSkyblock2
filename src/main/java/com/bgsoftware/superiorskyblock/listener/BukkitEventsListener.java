@@ -32,6 +32,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
@@ -183,6 +184,7 @@ public class BukkitEventsListener implements Listener {
         createEventListener(GameEventType.PROJECTILE_HIT_EVENT, ProjectileHitEvent.class, this::createGameEvent);
         createEventListener(GameEventType.SIGN_CHANGE_EVENT, SignChangeEvent.class, this::createGameEvent);
         createEventListener(GameEventType.BLOCK_PHYSICS_EVENT, BlockPhysicsEvent.class, this::createGameEvent);
+        createEventListener(GameEventType.BLOCK_FADE_EVENT, BlockFadeEvent.class, this::createGameEvent);
 
         try {
             Class.forName("org.bukkit.event.block.SpongeAbsorbEvent");
@@ -766,6 +768,13 @@ public class BukkitEventsListener implements Listener {
         GameEventArgs.BlockPhysicsEvent blockPhysicsEvent = new GameEventArgs.BlockPhysicsEvent();
         blockPhysicsEvent.block = e.getBlock();
         return eventType.createEvent(blockPhysicsEvent);
+    }
+
+    private GameEvent<GameEventArgs.BlockFadeEvent> createGameEvent(GameEventType<GameEventArgs.BlockFadeEvent> eventType, GameEventPriority priority, BlockFadeEvent e) {
+        GameEventArgs.BlockFadeEvent blockFadeEvent = new GameEventArgs.BlockFadeEvent();
+        blockFadeEvent.block = e.getBlock();
+        blockFadeEvent.newState = e.getNewState();
+        return eventType.createEvent(blockFadeEvent);
     }
 
     private void cancelVehicleCreateEvent(VehicleCreateEvent bukkitEvent, GameEvent<GameEventArgs.EntitySpawnEvent> gameEvent) {
