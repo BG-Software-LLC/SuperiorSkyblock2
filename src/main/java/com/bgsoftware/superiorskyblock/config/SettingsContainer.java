@@ -154,8 +154,8 @@ public class SettingsContainer {
     public final boolean teleportOnCreate;
     public final boolean teleportOnJoin;
     public final boolean teleportOnKick;
-    public final List<ClearAction> clearOnDisbandActions;
-    public final List<ClearAction> clearOnJoinActions;
+    public final List<ClearAction> clearActionsOnDisbad;
+    public final List<ClearAction> clearActionsOnJoin;
     public final boolean rateOwnIsland;
     public final boolean changeIslandRating;
     public final List<String> defaultSettings;
@@ -400,24 +400,8 @@ public class SettingsContainer {
         teleportOnCreate = config.getBoolean("teleport-on-create", true);
         teleportOnJoin = config.getBoolean("teleport-on-join", false);
         teleportOnKick = config.getBoolean("teleport-on-kick", true);
-        List<ClearAction> clearOnDisbandActions = new LinkedList<>();
-        config.getStringList("clear-on-disband").forEach(clearAction -> {
-            try {
-                clearOnDisbandActions.add(ClearAction.getByName(clearAction));
-            } catch (NullPointerException error) {
-                Log.warnFromFile("config.yml", "Invalid clear on disband action ", clearAction + ", skipping...");
-            }
-        });
-        this.clearOnDisbandActions = Collections.unmodifiableList(clearOnDisbandActions);
-        List<ClearAction> clearOnJoinActions = new LinkedList<>();
-        config.getStringList("clear-on-join").forEach(clearAction -> {
-            try {
-                clearOnJoinActions.add(ClearAction.getByName(clearAction));
-            } catch (NullPointerException error) {
-                Log.warnFromFile("config.yml", "Invalid clear on join action ", clearAction + ", skipping...");
-            }
-        });
-        this.clearOnJoinActions = Collections.unmodifiableList(clearOnJoinActions);
+        clearActionsOnDisbad = loadClearActions(config.getStringList("clear-on-disband"));
+        clearActionsOnJoin = loadClearActions(config.getStringList("clear-on-join"));
         rateOwnIsland = config.getBoolean("rate-own-island", false);
         changeIslandRating = config.getBoolean("change-island-rating", true);
         defaultSettings = Collections.unmodifiableList(config.getStringList("default-settings")
@@ -581,6 +565,18 @@ public class SettingsContainer {
         blockCountsSaveThreshold = BigInteger.valueOf(config.getInt("block-counts-save-threshold", 100));
         chatSigningSupport = config.getBoolean("chat-signing-support", true);
         commandsPerPage = config.getInt("commands-per-page", 7);
+    }
+
+    private List<ClearAction> loadClearActions(List<String> clearActionsNames) {
+        List<ClearAction> clearActions = new LinkedList<>();
+        clearActionsNames.forEach(clearAction -> {
+            try {
+                clearActions.add(ClearAction.getByName(clearAction));
+            } catch (NullPointerException error) {
+                Log.warnFromFile("config.yml", "Invalid clear action ", clearAction + ", skipping...");
+            }
+        });
+        return Collections.unmodifiableList(clearActions);
     }
 
     private List<String> loadInteractables(SuperiorSkyblockPlugin plugin) {

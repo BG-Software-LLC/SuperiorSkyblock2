@@ -146,12 +146,12 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().teleportOnKick;
     }
 
-    public List<ClearAction> getClearOnDisband() {
-        return getContainer().clearOnDisbandActions;
+    public List<ClearAction> getClearActionsOnDisband() {
+        return getContainer().clearActionsOnDisbad;
     }
 
-    public List<ClearAction> getClearOnJoin() {
-        return getContainer().clearOnJoinActions;
+    public List<ClearAction> getClearActionsOnJoin() {
+        return getContainer().clearActionsOnJoin;
     }
 
     public boolean isRateOwnIsland() {

@@ -254,7 +254,7 @@ public interface SettingsManager {
      * Whether inventory of island members should be cleared when their island is disbanded or not.
      * Return true if clear-on-disband contains both ENDER_CHEST and INVENTORY.
      * This method will be deleted in the future!
-     * @deprecated See {@link #getClearOnDisband()}
+     * @deprecated See {@link #getClearActionsOnDisband()}
      */
     @Deprecated
     boolean isDisbandInventoryClear();
@@ -287,7 +287,7 @@ public interface SettingsManager {
      * Whether to clear players' inventories when they join a new island or not.
      * Return true if clear-on-join contains both ENDER_CHEST and INVENTORY.
      * This method will be deleted in the future!
-     * @deprecated See {@link #getClearOnJoin()}
+     * @deprecated See {@link #getClearActionsOnDisband()}
      */
     @Deprecated
     boolean isClearOnJoin();
@@ -296,13 +296,13 @@ public interface SettingsManager {
      * Get the list of clear actions to perform on island members when their island is disbanded.
      * Config-path: clear-on-disband
      */
-    List<ClearAction> getClearOnDisband();
+    List<ClearAction> getClearActionsOnDisband();
 
     /**
      * Get the list of clear actions to perform on players when they accept an invite to join an island.
      * Config-path: clear-on-join
      */
-    List<ClearAction> getClearOnJoin();
+    List<ClearAction> getClearActionsOnJoin();
 
     /**
      * Whether players can rate their own island or not.

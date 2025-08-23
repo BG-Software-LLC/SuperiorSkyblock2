@@ -278,7 +278,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public boolean isDisbandInventoryClear() {
-        List<ClearAction> clearActions = this.global.getClearOnDisband();
+        List<ClearAction> clearActions = this.global.getClearActionsOnDisband();
         return clearActions.contains(ClearActions.ENDER_CHEST) && clearActions.contains(ClearActions.INVENTORY);
     }
 
@@ -304,18 +304,18 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public boolean isClearOnJoin() {
-        List<ClearAction> clearActions = this.global.getClearOnJoin();
+        List<ClearAction> clearActions = this.global.getClearActionsOnJoin();
         return clearActions.contains(ClearActions.ENDER_CHEST) && clearActions.contains(ClearActions.INVENTORY);
     }
 
     @Override
-    public List<ClearAction> getClearOnDisband() {
-        return this.global.getClearOnDisband();
+    public List<ClearAction> getClearActionsOnDisband() {
+        return this.global.getClearActionsOnDisband();
     }
 
     @Override
-    public List<ClearAction> getClearOnJoin() {
-        return this.global.getClearOnJoin();
+    public List<ClearAction> getClearActionsOnJoin() {
+        return this.global.getClearActionsOnJoin();
     }
 
     @Override
