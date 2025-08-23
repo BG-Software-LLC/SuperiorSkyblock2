@@ -35,6 +35,7 @@ import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,6 +54,20 @@ public class BukkitEntities {
     private static final Class<?> ZOMBIE_HORSE_CLASS = getEntityTypeClass("org.bukkit.entity.ZombieHorse");
     @Nullable
     private static final EntityType CAMEL_TYPE = EnumHelper.getEnum(EntityType.class, "CAMEL");
+
+    private static final EnumMap<EntityType, EntityCategory> ENTITY_CATEGORIES_CACHE = new EnumMap<>(EntityType.class);
+
+    static {
+        outerLoop:
+        for (EntityType entityType : EntityType.values()) {
+            for (EntityCategory entityCategory : EntityCategory.values()) {
+                if (entityCategory.isFromCategory(entityType)) {
+                    ENTITY_CATEGORIES_CACHE.put(entityType, entityCategory);
+                    continue outerLoop;
+                }
+            }
+        }
+    }
 
     private BukkitEntities() {
 
@@ -159,12 +174,7 @@ public class BukkitEntities {
     }
 
     public static EntityCategory getCategory(EntityType entityType) {
-        for (EntityCategory entityCategory : EntityCategory.values()) {
-            if (entityCategory.isFromCategory(entityType))
-                return entityCategory;
-        }
-
-        return EntityCategory.UNKNOWN;
+        return ENTITY_CATEGORIES_CACHE.getOrDefault(entityType, EntityCategory.UNKNOWN);
     }
 
     public static boolean isHorse(Entity entity) {
