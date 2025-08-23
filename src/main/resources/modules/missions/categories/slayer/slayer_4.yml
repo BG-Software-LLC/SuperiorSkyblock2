@@ -11,7 +11,7 @@ mission-file: KillsMissions
 # Whether the mission should be given when completing all requirements.
 auto-reward: true
 
-# Should block counts of players get reset when completing the mission?
+# Should entity counts of players get reset when completing the mission?
 reset-after-finish: true
 
 # Rewards given when completing the mission.
@@ -29,7 +29,7 @@ required-missions:
   - 'slayer_2'
   - 'slayer_3'
 
-# List of all required blocks must be gathered in order to complete the mission.
+# List of all required entities must be gathered in order to complete the mission.
 required-entities:
   '1':
     types:
@@ -53,6 +53,7 @@ icons:
       - '&8 - &7Unlock The End'
       - ''
       - '&6Wither Killed: &c&l ✘'
+    amount: 4
   can-complete:
     type: PAPER
     name: '&aSlayer IV'
@@ -69,10 +70,8 @@ icons:
       - ''
       - '&6Wither Killed: &a&l ✔'
       - '&a&l ✔ &7Click to redeem your reward.'
-    enchants:
-      DURABILITY: 1
-    flags:
-      - HIDE_ENCHANTS
+    amount: 4
+    glow: true
   completed:
     type: MAP
     name: '&aSlayer IV'
@@ -86,3 +85,4 @@ icons:
       - ''
       - '&6Wither Killed: &a&l ✔'
       - '&a&l ✔ &7Click to redeem your reward.'
+    amount: 4

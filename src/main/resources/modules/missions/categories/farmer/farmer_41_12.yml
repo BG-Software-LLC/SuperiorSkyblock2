@@ -42,17 +42,21 @@ required-plants:
     amount: 64
   '4':
     types:
-      - 'PUMPKIN'
+      - 'BEETROOT'
     amount: 64
   '5':
     types:
-      - 'MELON'
+      - 'PUMPKIN'
     amount: 64
   '6':
     types:
-      - 'SUGAR_CANE'
+      - 'MELON'
     amount: 64
   '7':
+    types:
+      - 'SUGAR_CANE'
+    amount: 64
+  '8':
     types:
       - 'CACTUS'
     amount: 64
@@ -68,8 +72,8 @@ icons:
       - '&7Plant x64 of each crop.'
       - ''
       - '&6Required Plants:'
-      - '&8 - &7Carrots, Potatoes, Wheat, Pumpkins'
-      - '&8 - &7Melons, Sugar Canes, Cactus'
+      - '&8 - &7Carrots, Potatoes, Wheat, Beetroots,'
+      - '&8 - &7Pumpkins, Melons, Sugar Canes, Cactus'
       - ''
       - '&6Rewards:'
       - '&8 - &7$25,000'
@@ -77,6 +81,7 @@ icons:
       - '&6Grown Carrots: &7{value_carrot}/64'
       - '&6Grown Potatoes: &7{value_potato}/64'
       - '&6Grown Wheat: &7{value_wheat}/64'
+      - '&6Grown Beetroots: &7{value_beetroot}/64'
       - '&6Grown Pumpkins: &7{value_pumpkin}/64'
       - '&6Grown Melons: &7{value_melon}/64'
       - '&6Grown Sugar Canes: &7{value_sugar_cane}/64'
@@ -93,8 +98,8 @@ icons:
       - '&7Plant x64 of each crop.'
       - ''
       - '&6Required Plants:'
-      - '&8 - &7Carrots, Potatoes, Wheat, Pumpkins'
-      - '&8 - &7Melons, Sugar Canes, Cactus'
+      - '&8 - &7Carrots, Potatoes, Wheat, Beetroots,'
+      - '&8 - &7Pumpkins, Melons, Sugar Canes, Cactus'
       - ''
       - '&6Rewards:'
       - '&8 - &7$25,000'
@@ -102,6 +107,7 @@ icons:
       - '&6Grown Carrots: &764/64'
       - '&6Grown Potatoes: &764/64'
       - '&6Grown Wheat: &764/64'
+      - '&6Grown Beetroots: &764/64'
       - '&6Grown Pumpkins: &764/64'
       - '&6Grown Melons: &764/64'
       - '&6Grown Sugar Canes: &764/64'
@@ -124,6 +130,7 @@ icons:
       - '&6Grown Carrots: &764/64'
       - '&6Grown Potatoes: &764/64'
       - '&6Grown Wheat: &764/64'
+      - '&6Grown Beetroots: &764/64'
       - '&6Grown Pumpkins: &764/64'
       - '&6Grown Melons: &764/64'
       - '&6Grown Sugar Canes: &764/64'
