@@ -429,10 +429,6 @@ visitors-damage: false
 # When disabled, coop won't get damaged in islands they are coop with.
 coop-damage: true
 
-# The amount of times a player can disband an island.
-# If you want to disable this feature, set it to 0.
-disband-count: 5
-
 # Should the list of members in island top also include the island leader?
 island-top-include-leader: true
 
@@ -574,7 +570,7 @@ number-format: "en-US"
 date-format: "dd/MM/yyyy HH:mm:ss"
 
 # Should players skip menus with only one items inside them?
-# When enabled, creation, island-warps and island-chest menus will be skipped if only one item is inside them.
+# When enabled, creation, island-warps, island-chest and missions menus will be skipped if only one item is inside them.
 skip-one-item-menus: false
 
 # Should visitors get teleported to spawn when pvp is enabled in an island?
@@ -729,6 +725,10 @@ only-back-button: false
 # All islands will have the size of the max-island-size * 1.5, which means islands will be connected to each other.
 # It's recommended to have a low max island size when this feature is enabled!
 build-outside-island: false
+
+# The default number of times new players can disband their island.
+# If you want to disable this feature, set it to -1.
+default-disband-count: 5
 
 # The default language to be used.
 # This should be the same as your language file's name.

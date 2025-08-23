@@ -33,16 +33,18 @@ POSSIBILITY OF SUCH DAMAGE.
 package com.bgsoftware.superiorskyblock.tag;
 
 import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.RandomAccess;
 
 /**
  * The <code>TAG_List</code> tag.
@@ -52,60 +54,31 @@ import java.util.List;
 @SuppressWarnings("rawtypes")
 public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
 
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagList");
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagList");
+
+    private static final byte DYNAMIC_LIST_INDICATOR = (byte) 0xFF;
 
     /**
-     * The type.
+     * Hint to the type of elements in the list.
      */
-    private final Class<? extends Tag> type;
+    @Nullable
+    private Class<? extends Tag> hintType;
 
-    /**
-     * Creates the tag.
-     *
-     * @param type  The type of item in the list.
-     * @param value The value.
-     */
-    public ListTag(Class<? extends Tag> type, List<Tag<?>> value) {
-        super(new ArrayList<>(value), null);
-        this.type = type;
+    private ListTag(List<Tag<?>> value, @Nullable Class<? extends Tag> hintType, boolean cloneList) {
+        super(cloneListIfNeeded(value, cloneList));
+        this.hintType = hintType;
     }
 
     public ListTag copy() {
-        return new ListTag(type, value);
+        return of(this.value, this.hintType);
     }
 
-    public static ListTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ListTag!");
-
-        List<Tag<?>> list = new ArrayList<>();
-
-        try {
-            int size = plugin.getNMSTags().getNBTTagListSize(tag);
-
-            for (int i = 0; i < size; i++)
-                list.add(Tag.fromNBT(plugin.getNMSTags().getNBTListIndexValue(tag, i)));
-
-            return new ListTag(size == 0 ? EndTag.class : list.get(0).getClass(), list);
-        } catch (Exception error) {
-            Log.error(error, "An unexpected error occurred while converting tag list from NMS:");
-            return null;
+    public void addTag(Tag<?> tag) {
+        this.value.add(tag);
+        // In case the type of the tag is not similar to the hintType, we reset it.
+        if (this.hintType != null && tag.getClass() != this.hintType) {
+            this.hintType = null;
         }
-    }
-
-    public static ListTag fromStream(DataInputStream is, int depth) throws IOException {
-        int childType = is.readByte();
-        int length = is.readInt();
-        List<Tag<?>> tagList = new ArrayList<>();
-
-        for (int i = 0; i < length; i++) {
-            Tag<?> tag = fromStream(is, depth + 1, childType);
-            if (tag instanceof EndTag) {
-                throw new IOException("TAG_End not permitted in a list.");
-            }
-            tagList.add(tag);
-        }
-
-        return new ListTag(NBTUtils.getTypeClass(childType), tagList);
     }
 
     @Override
@@ -126,7 +99,11 @@ public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
     @Override
     public String toString() {
         StringBuilder bldr = new StringBuilder();
-        bldr.append("TAG_List: ").append(value.size()).append(" entries of type ").append(NBTUtils.getTypeName(type)).append("\r\n{\r\n");
+        bldr.append("TAG_List: ").append(value.size()).append(" entries");
+        if (this.hintType != null) {
+            bldr.append(" of type ").append(NBTUtils.getTypeName(hintType));
+        }
+        bldr.append("\r\n{\r\n");
         for (Tag<?> t : value) {
             bldr.append("   ").append(t.toString().replaceAll("\r\n", "\r\n   ")).append("\r\n");
         }
@@ -136,11 +113,27 @@ public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
 
     @Override
     protected void writeData(DataOutputStream os) throws IOException {
+        if (this.hintType != null) {
+            writeDataWithHint(os);
+        } else {
+            writeDataWithoutHint(os);
+        }
+    }
+
+    private void writeDataWithHint(DataOutputStream os) throws IOException {
         int size = value.size();
-        os.writeByte(NBTUtils.getTypeCode(type));
+        os.writeByte(NBTUtils.getTypeCode(this.hintType));
         os.writeInt(size);
         for (Tag<?> _tag : value)
             _tag.writeData(os);
+    }
+
+    private void writeDataWithoutHint(DataOutputStream os) throws IOException {
+        int size = value.size();
+        os.writeByte(DYNAMIC_LIST_INDICATOR);
+        os.writeInt(size);
+        for (Tag<?> _tag : value)
+            _tag.write(os);
     }
 
     @Override
@@ -148,17 +141,87 @@ public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
         return plugin.getNMSTags().parseList(this);
     }
 
-    /**
-     * Gets the type of item in this list.
-     *
-     * @return The type of item in this list.
-     */
-    public Class<? extends Tag> getType() {
-        return type;
+    public static ListTag of(@Nullable Class<? extends Tag> hintType) {
+        return new ListTag(new LinkedList<>(), hintType, false);
     }
 
-    public void addTag(Tag<?> tag) {
-        value.add(tag);
+    public static ListTag of(List<Tag<?>> value) {
+        return of(value, null);
+    }
+
+    public static ListTag of(List<Tag<?>> value, @Nullable Class<? extends Tag> hintType) {
+        return new ListTag(value, hintType, true);
+    }
+
+    public static ListTag fromNBT(Object tag) {
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to ListTag!");
+
+        List<Tag<?>> list = new LinkedList<>();
+
+        try {
+            int size = plugin.getNMSTags().getNBTTagListSize(tag);
+            Class<? extends Tag> lastTagType = null;
+            boolean isSimilarType = true;
+
+            for (int i = 0; i < size; i++) {
+                Tag<?> currTag = Tag.fromNBT(plugin.getNMSTags().getNBTListIndexValue(tag, i));
+                if (isSimilarType) {
+                    if (lastTagType != null && currTag.getClass() != lastTagType) {
+                        isSimilarType = false;
+                    } else {
+                        lastTagType = currTag.getClass();
+                    }
+                }
+                list.add(currTag);
+            }
+
+            return new ListTag(list, !isSimilarType || size == 0 ? null : lastTagType, false);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while converting tag list from NMS:");
+            return null;
+        }
+    }
+
+    public static ListTag fromStream(DataInputStream is, int depth) throws IOException {
+        int childType = is.readByte();
+        return childType == DYNAMIC_LIST_INDICATOR ?
+                fromStreamWithoutHint(is, depth) : fromStreamWithHint(is, depth, childType);
+    }
+
+    private static ListTag fromStreamWithHint(DataInputStream is, int depth, int childType) throws IOException {
+        int length = is.readInt();
+
+        List<Tag<?>> tagList = new LinkedList<>();
+
+        for (int i = 0; i < length; i++) {
+            Tag<?> tag = Tag.fromStream(is, depth + 1, childType);
+            if (tag instanceof EndTag) {
+                throw new IOException("TAG_End not permitted in a list.");
+            }
+            tagList.add(tag);
+        }
+
+        return new ListTag(tagList, NBTUtils.getTypeClass(childType), false);
+    }
+
+    private static ListTag fromStreamWithoutHint(DataInputStream is, int depth) throws IOException {
+        int length = is.readInt();
+
+        List<Tag<?>> tagList = new LinkedList<>();
+
+        for (int i = 0; i < length; i++) {
+            Tag<?> tag = Tag.fromStream(is, depth + 1);
+            if (tag instanceof EndTag) {
+                throw new IOException("TAG_End not permitted in a list.");
+            }
+            tagList.add(tag);
+        }
+
+        return new ListTag(tagList, null, false);
+    }
+
+    private static <T> List<T> cloneListIfNeeded(List<T> list, boolean cloneList) {
+        return cloneList || list instanceof RandomAccess ? new LinkedList<>(list) : list;
     }
 
 }

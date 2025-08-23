@@ -1796,6 +1796,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public void resetSettings() {
+        this.handle.resetSettings();
+    }
+
+    @Override
     @Deprecated
     public void setGeneratorPercentage(Key key, int percentage, World.Environment environment) {
         this.handle.setGeneratorPercentage(key, percentage, environment);

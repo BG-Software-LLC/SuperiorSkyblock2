@@ -13,17 +13,21 @@ public class IslandPosition implements ObjectsPool.Releasable, AutoCloseable {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Nullable
-    private String worldName;
-    private int x;
-    private int z;
+    protected String worldName;
+    protected int x;
+    protected int z;
 
-    private IslandPosition() {
+    @Nullable
+    protected Long cachedPackedPos = null;
+
+    protected IslandPosition() {
     }
 
     private IslandPosition initialize(@Nullable String worldName, int x, int z) {
         this.worldName = worldName;
         this.x = x;
         this.z = z;
+        this.cachedPackedPos = null;
         return this;
     }
 
@@ -44,6 +48,15 @@ public class IslandPosition implements ObjectsPool.Releasable, AutoCloseable {
 
         return islandPosition.initialize(plugin.getProviders().hasCustomWorldsSupport() ? worldName : null,
                 locX < 0 ? -x : x, locZ < 0 ? -z : z);
+    }
+
+    public String getWorldName() {
+        return worldName;
+    }
+
+    public long pack() {
+        return this.cachedPackedPos != null ? this.cachedPackedPos :
+                (this.cachedPackedPos = IslandPosition.calculatePackedPos(this));
     }
 
     @Override
@@ -73,6 +86,24 @@ public class IslandPosition implements ObjectsPool.Releasable, AutoCloseable {
     @Override
     public String toString() {
         return "IslandPosition{x=" + x + ",z=" + z + "}";
+    }
+
+    public static long calculatePackedPos(IslandPosition islandPosition) {
+        return calculatePackedPos(islandPosition.x, islandPosition.z);
+    }
+
+    public static long calculatePackedPos(int posX, int posZ) {
+        long posXLong = (long) posX & 0xFFFFFFFFL;
+        long posZLong = (long) posZ & 0xFFFFFFFFL;
+        return (posXLong) | (posZLong << 32);
+    }
+
+    public static int getXFromPacked(long packedPos) {
+        return (int) (packedPos & 0xFFFFFFFFL);
+    }
+
+    public static int getZFromPacked(long packedPos) {
+        return (int) ((packedPos >>> 32) & 0xFFFFFFFFL);
     }
 
 }

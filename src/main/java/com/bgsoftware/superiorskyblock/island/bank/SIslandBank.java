@@ -51,7 +51,8 @@ public class SIslandBank implements IslandBank {
     public SIslandBank(Island island, Supplier<Boolean> isGiveInterestFailed) {
         this.island = island;
         this.isGiveInterestFailed = isGiveInterestFailed;
-        this.bankLogs = BuiltinModules.BANK.cacheAllLogs ? new CacheBankLogs() : new DatabaseBankLogs(island);
+        this.bankLogs = BuiltinModules.BANK.getConfiguration().isCacheAllLogs() ?
+                new CacheBankLogs() : new DatabaseBankLogs(island);
     }
 
     @Override
@@ -115,7 +116,7 @@ public class SIslandBank implements IslandBank {
                     Formatters.NUMBER_FORMATTER.format(amount));
 
             plugin.getMenus().refreshBankLogs(island);
-            plugin.getMenus().refreshBankLogs(island);
+            plugin.getMenus().refreshIslandBank(island);
         } else {
             Log.debugResult(Debug.DEPOSIT_MONEY, "Return Failure", failureReason);
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.DEPOSIT_FAILED, position,
@@ -156,7 +157,7 @@ public class SIslandBank implements IslandBank {
             increaseBalance(amount);
 
         plugin.getMenus().refreshBankLogs(island);
-        plugin.getMenus().refreshBankLogs(island);
+        plugin.getMenus().refreshIslandBank(island);
 
         return bankTransaction;
     }
@@ -218,7 +219,8 @@ public class SIslandBank implements IslandBank {
                     Formatters.NUMBER_FORMATTER.format(withdrawAmount));
 
             plugin.getMenus().refreshBankLogs(island);
-            plugin.getMenus().refreshBankLogs(island);
+            plugin.getMenus().refreshIslandBank(island);
+
         } else {
             Log.debugResult(Debug.DEPOSIT_MONEY, "Return Failure", failureReason);
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.WITHDRAW_FAILED, position, System.currentTimeMillis(), failureReason, MONEY_FAILURE);
@@ -258,7 +260,7 @@ public class SIslandBank implements IslandBank {
         addTransaction(bankTransaction, true);
 
         plugin.getMenus().refreshBankLogs(island);
-        plugin.getMenus().refreshBankLogs(island);
+        plugin.getMenus().refreshIslandBank(island);
 
         return bankTransaction;
     }
@@ -284,7 +286,7 @@ public class SIslandBank implements IslandBank {
     }
 
     private void addTransaction(BankTransaction bankTransaction, boolean save) {
-        if (!BuiltinModules.BANK.bankLogs)
+        if (!BuiltinModules.BANK.getConfiguration().isBankLogs())
             return;
 
         UUID senderUUID = bankTransaction.getPlayer();

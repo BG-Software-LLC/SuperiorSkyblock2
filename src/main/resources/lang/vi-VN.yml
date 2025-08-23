@@ -632,7 +632,7 @@ NAME_TOO_SHORT: '&c&lLỗi | &7Tên đảo không thể ngắn hơn 3 ký tự.'
 NO_BAN_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để cấm người chơi.'
 NO_CLOSE_BYPASS: '&c&lLỗi | &7Hòn đảo này không mở cửa cho công cộng.'
 NO_CLOSE_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để đóng đảo với công cộng.'
-NO_COMMAND_PERMISSION: '&fLệnh không xác định. Nhấn "/help" để được trợ giúp.'
+NO_COMMAND_PERMISSION: '&c&lError | &7You don''t have permission to use that command. ({0})'
 NO_COOP_PERMISSION: '&c&lLỗi | &7Bạn phải là {0} hoặc cao hơn để thêm người chơi
   với tư cách là thành viên co-op.'
 NO_DELETE_WARP_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để xóa khu vực.'
@@ -762,6 +762,10 @@ SET_UPGRADE_LEVEL: '&e&lNâng Cấp | &7Nâng cấp thành công cấp độ c�
 SET_UPGRADE_LEVEL_NAME: '&e&lNâng Cấp | &7Thay đổi thành công cấp độ {0} cho đảo {1}.'
 SET_WARP: '&e&lĐảo | &7Tạo thành công một khu vực mới tại {0}.'
 SET_WARP_OUTSIDE: '&c&lLỗi | &7Bạn không thể đặt khu vực bên ngoài hòn đảo của bạn.'
+SETTINGS_RESET: '&e&lIsland | &7Successfully reset all the settings of {0}''s island to default values!'
+SETTINGS_RESET_ALL: '&e&lIsland | &7Successfully reset all the settings of all the islands to default values!'
+SETTINGS_RESET_NAME: '&e&lIsland | &7Successfully reset all the settings of the island {0} to default values!'
+SETTINGS_RESET_SELF: '&e&lIsland | &7Successfully reset all the settings of the island to default values!'
 SETTINGS_UPDATED: '&e&lĐảo | &7Thay đổi thành công điều chỉnh {0} cho đảo của
   {1}.'
 SETTINGS_UPDATED_NAME: '&e&lĐảo | &7Thay đổi thành công điều chỉnh {0} cho

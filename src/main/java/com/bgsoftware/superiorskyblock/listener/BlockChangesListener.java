@@ -35,7 +35,6 @@ import org.bukkit.entity.Minecart;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
@@ -294,6 +293,21 @@ public class BlockChangesListener extends AbstractGameEventListener {
         }
     }
 
+    private void onBlockFade(GameEvent<GameEventArgs.BlockFadeEvent> e) {
+        BlockState newState = e.getArgs().newState;
+        if (newState.getType() == Material.AIR) {
+            this.worldRecordService.get().recordBlockBreak(e.getArgs().block, REGULAR_RECORD_FLAGS);
+        } else {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                this.worldRecordService.get().recordBlockPlace(Keys.of(newState),
+                        newState.getLocation(wrapper.getHandle()),
+                        1,
+                        e.getArgs().block.getState(),
+                        REGULAR_RECORD_FLAGS);
+            }
+        }
+    }
+
     private void onEntityExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
         Entity entity = e.getArgs().entity;
 
@@ -314,19 +328,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             this.worldRecordService.get().recordMultiBlocksBreak(blockCounts,
                     entity.getLocation(wrapper.getHandle()), REGULAR_RECORD_FLAGS);
-        }
-    }
-
-    private void onMinecartBreak(GameEvent<GameEventArgs.EntityDeathEvent> e) {
-        Entity vehicle = e.getArgs().entity;
-
-        if (vehicle instanceof Minecart) {
-            Key blockKey = plugin.getNMSAlgorithms().getMinecartBlock((Minecart) vehicle);
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                this.worldRecordService.get().recordBlockBreak(blockKey, vehicle.getLocation(wrapper.getHandle()),
-                        1, REGULAR_RECORD_FLAGS);
-            }
-            vehicle.setMetadata("SSB-VehicleDestory", new FixedMetadataValue(plugin, true));
         }
     }
 
@@ -373,8 +374,8 @@ public class BlockChangesListener extends AbstractGameEventListener {
         registerCallback(GameEventType.PISTON_EXTEND_EVENT, GameEventPriority.MONITOR, this::onPistonExtend);
         registerCallback(GameEventType.LEAVES_DECAY_EVENT, GameEventPriority.MONITOR, this::onLeavesDecay);
         registerCallback(GameEventType.BLOCK_FROM_TO_EVENT, GameEventPriority.MONITOR, this::onBlockFromTo);
+        registerCallback(GameEventType.BLOCK_FADE_EVENT, GameEventPriority.MONITOR, this::onBlockFade);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.MONITOR, this::onEntityExplode);
-        registerCallback(GameEventType.ENTITY_DEATH_EVENT, GameEventPriority.MONITOR, this::onMinecartBreak);
         registerCallback(GameEventType.PROJECTILE_HIT_EVENT, GameEventPriority.MONITOR, this::onChorusHit);
         registerCallback(GameEventType.SPONGE_ABSORB_EVENT, GameEventPriority.MONITOR, this::onSpongeAbsorb);
     }

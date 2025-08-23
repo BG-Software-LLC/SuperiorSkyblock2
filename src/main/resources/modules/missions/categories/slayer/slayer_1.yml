@@ -11,7 +11,7 @@ mission-file: KillsMissions
 # Whether the mission should be given when completing all requirements.
 auto-reward: true
 
-# Should block counts of players get reset when completing the mission?
+# Should entity counts of players get reset when completing the mission?
 reset-after-finish: true
 
 # Rewards given when completing the mission.
@@ -22,7 +22,7 @@ rewards:
     - 'is admin msg %player% &e&lSlayer | &7Your sword hasn''t seen blood yet... Kill more mobs!'
     - 'is admin msg %player% &e&lSlayer | &7&oFor more information about the next mission, checkout /is missions'
 
-# List of all required blocks must be gathered in order to complete the mission.
+# List of all required entities must be gathered in order to complete the mission.
 required-entities:
   '1':
     types:
@@ -64,10 +64,7 @@ icons:
       - '&6Hostiles Killed: &75/5'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Click to redeem your reward.'
-    enchants:
-      DURABILITY: 1
-    flags:
-      - HIDE_ENCHANTS
+    glow: true
   completed:
     type: MAP
     name: '&aSlayer I'

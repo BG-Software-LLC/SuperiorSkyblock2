@@ -305,6 +305,7 @@ COMMAND_DESCRIPTION_ADMIN_SHOW: Informationen über eine Insel abrufen.
 COMMAND_DESCRIPTION_ADMIN_SPAWN: Teleport zum Spawn-Ort.
 COMMAND_DESCRIPTION_ADMIN_SPY: Chat-Spionagemodus umschalten
 COMMAND_DESCRIPTION_ADMIN_STATS: Statistiken über das Plugin anzeigen.
+COMMAND_DESCRIPTION_ADMIN_SYNC_BONUS: 'Sync the bonus of an island with the generated worlds.'
 COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES: Upgrade-Werte für eine Insel synchronisieren.
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: Teleport zur anderen Inseln.
 COMMAND_DESCRIPTION_ADMIN_TITLE: Sende einem Spieler einen Titel.
@@ -487,6 +488,7 @@ INVALID_LEVEL: '&c&lError | &7Ungültige Ebene {0}.'
 INVALID_LIMIT: '&c&lError | &7Ungültiges Limit {0}.'
 INVALID_MATERIAL: '&c&lError | &7Ungültiges Material {0}.'
 INVALID_MATERIAL_DATA: '&c&lError | &7Ungültige Materialdaten {0}.'
+INVALID_MENU: '&c&lError | &7Invalid menu {0}.'
 INVALID_MISSION: '&c&lError | &7Ungültige Mission {0}.'
 INVALID_MODULE: '&c&lError | &7Ungültiges Modul {0}.'
 INVALID_MULTIPLIER: '&c&lError | &7Ungültiger Multiplikator {0}.'
@@ -705,7 +707,7 @@ NO_BAN_PERMISSION: '&c&lError | &7Du musst mindestens {0} sein, um Spieler zu ba
 NO_CLOSE_BYPASS: '&c&lError | &7Diese Insel ist nicht für die Öffentlichkeit zugänglich.'
 NO_CLOSE_PERMISSION: '&c&lError | &7Du musst mindestens {0} sein, um die Insel für
   die Öffentlichkeit zu schließen.'
-NO_COMMAND_PERMISSION: '&fUnbekannter Befehl. Gebe "/is help" ein, um Hilfe zu erhalten.'
+NO_COMMAND_PERMISSION: '&c&lError | &7You don''t have permission to use that command. ({0})'
 NO_COOP_PERMISSION: '&c&lError | &7Du musst mindestens {0} sein, um Spieler als Koop-Mitglieder
   hinzuzufügen.'
 NO_DELETE_WARP_PERMISSION: '&c&lError | &7Du musst mindestens {0} sein, um Warps zu
@@ -859,6 +861,10 @@ SET_UPGRADE_LEVEL_NAME: '&e&lUpgrades | &7Die Ebene von {0} für {1} wurde erfol
   aktualisiert.'
 SET_WARP: '&e&lInsel | &7Erzeugt erfolgreich einen neuen Warp am {0}.'
 SET_WARP_OUTSIDE: '&c&lError | &7Du kannst keine Warps außerhalb Ihrer Insel setzen.'
+SETTINGS_RESET: '&e&lIsland | &7Successfully reset all the settings of {0}''s island to default values!'
+SETTINGS_RESET_ALL: '&e&lIsland | &7Successfully reset all the settings of all the islands to default values!'
+SETTINGS_RESET_NAME: '&e&lIsland | &7Successfully reset all the settings of the island {0} to default values!'
+SETTINGS_RESET_SELF: '&e&lIsland | &7Successfully reset all the settings of the island to default values!'
 SETTINGS_UPDATED: '&e&lInsel | &7Die Einstellungen {0} wurden erfolgreich auf die
   Insel von {1} aktualisiert.'
 SETTINGS_UPDATED_NAME: '&e&lInsel | &7Die Einstellungen {0} wurden erfolgreich auf

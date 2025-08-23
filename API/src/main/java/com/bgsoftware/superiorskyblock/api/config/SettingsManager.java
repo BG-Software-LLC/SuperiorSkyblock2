@@ -188,9 +188,9 @@ public interface SettingsManager {
     boolean isCoopDamage();
 
     /**
-     * The default amount of disbands players receive when they first join the server.
-     * If 0, then the disbands limit is disabled.
-     * Config-path: disband-count
+     * The default number of disbands players receive when they first join the server.
+     * If -1, then the disbands limit is disabled.
+     * Config-path: default-disband-count
      */
     int getDisbandCount();
 

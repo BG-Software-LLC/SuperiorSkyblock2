@@ -81,7 +81,7 @@ public class NBTUtils {
         } else if (clazz.equals(IntArrayTag.class)) {
             return "TAG_Int_Array";
         } else {
-            throw new IllegalArgumentException("Invalid tag classs (" + clazz.getName() + ").");
+            throw new IllegalArgumentException("Invalid tag class (" + clazz.getName() + ").");
         }
     }
 
@@ -124,7 +124,7 @@ public class NBTUtils {
         } else if (clazz.equals(UUIDTag.class)) {
             return NBTTags.TYPE_UUID;
         } else {
-            throw new IllegalArgumentException("Invalid tag classs (" + clazz.getName() + ").");
+            throw new IllegalArgumentException("Invalid tag class (" + clazz.getName() + ").");
         }
     }
 

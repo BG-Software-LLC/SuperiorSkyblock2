@@ -10,17 +10,8 @@ import java.math.MathContext;
 
 public class BigDecimalTag extends Tag<BigDecimal> {
 
-    public BigDecimalTag(BigDecimal value) {
-        super(value, null);
-    }
-
-    public static BigDecimalTag fromStream(DataInputStream is) throws IOException {
-        int scale = is.readInt();
-        int precision = is.readInt();
-        byte[] data = new byte[is.readInt()];
-        is.readFully(data);
-
-        return new BigDecimalTag(new BigDecimal(new BigInteger(data), scale, new MathContext(precision)));
+    private BigDecimalTag(BigDecimal value) {
+        super(value);
     }
 
     @Override
@@ -31,6 +22,19 @@ public class BigDecimalTag extends Tag<BigDecimal> {
         byte[] data = value.toBigIntegerExact().toByteArray();
         os.writeInt(data.length);
         os.write(data);
+    }
+
+    public static BigDecimalTag of(BigDecimal value) {
+        return new BigDecimalTag(value);
+    }
+
+    public static BigDecimalTag fromStream(DataInputStream is) throws IOException {
+        int scale = is.readInt();
+        int precision = is.readInt();
+        byte[] data = new byte[is.readInt()];
+        is.readFully(data);
+
+        return BigDecimalTag.of(new BigDecimal(new BigInteger(data), scale, new MathContext(precision)));
     }
 
 }

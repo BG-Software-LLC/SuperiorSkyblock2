@@ -345,6 +345,13 @@ public class MenusProvider_Default implements MenusProvider {
     @Override
     public void openMissions(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
+        if (Menus.MENU_MISSIONS.isSkipOneItem()) {
+            List<MissionCategory> missionCategories = plugin.getMissions().getMissionCategories();
+            if (missionCategories.size() == 1) {
+                openMissionsCategory(targetPlayer, previousMenu, missionCategories.get(0));
+                return;
+            }
+        }
         Menus.MENU_MISSIONS.createView(targetPlayer, EmptyViewArgs.INSTANCE, previousMenu);
     }
 

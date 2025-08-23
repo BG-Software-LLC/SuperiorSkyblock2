@@ -43,12 +43,15 @@ public class DisbandButton extends AbstractMenuViewButton<IslandMenuView> {
 
             Message.DISBANDED_ISLAND.send(inventoryViewer);
 
-            if (BuiltinModules.BANK.disbandRefund > 0) {
+            if (BuiltinModules.BANK.getConfiguration().hasDisbandRefund()) {
+                BigDecimal disbandRefund = BuiltinModules.BANK.getConfiguration().getDisbandRefund();
                 Message.DISBAND_ISLAND_BALANCE_REFUND.send(targetIsland.getOwner(), Formatters.NUMBER_FORMATTER.format(
-                        targetIsland.getIslandBank().getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
+                        targetIsland.getIslandBank().getBalance().multiply(disbandRefund)));
             }
 
-            inventoryViewer.setDisbands(inventoryViewer.getDisbands() - 1);
+            if (plugin.getSettings().getDisbandCount() >= 0) {
+                inventoryViewer.setDisbands(inventoryViewer.getDisbands() - 1);
+            }
 
             targetIsland.disbandIsland();
         }

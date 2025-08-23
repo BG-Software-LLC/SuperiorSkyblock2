@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.missions;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.google.common.base.Preconditions;
 import org.bukkit.configuration.ConfigurationSection;
@@ -184,9 +183,6 @@ public abstract class Mission<V> {
      */
     public boolean canComplete(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        if (!SuperiorSkyblockAPI.getSuperiorSkyblock().getGrid().isIslandsWorld(superiorPlayer.getWorld()))
-            return false;
-
         return getProgress(superiorPlayer) >= 1.0;
     }
 

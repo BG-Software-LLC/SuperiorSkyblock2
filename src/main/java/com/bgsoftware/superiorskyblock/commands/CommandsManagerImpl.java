@@ -263,7 +263,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
                     if (!CommandsHelper.hasCommandAccess(command, sender)) {
                         Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", command.getPermission());
-                        Message.NO_COMMAND_PERMISSION.send(sender, locale);
+                        Message.NO_COMMAND_PERMISSION.send(sender, locale, command.getPermission());
                         return false;
                     }
 
@@ -333,7 +333,10 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                 }
             }
 
-            Message.NO_COMMAND_PERMISSION.send(sender, locale);
+            // We don't want to end up in an infinite loop
+            if (!"help".equalsIgnoreCase(executedSubCommand)) {
+                dispatchSubCommand(sender, "help");
+            }
 
             return false;
         }

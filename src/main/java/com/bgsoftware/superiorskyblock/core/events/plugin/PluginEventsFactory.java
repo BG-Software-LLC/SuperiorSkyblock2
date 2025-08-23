@@ -79,6 +79,7 @@ import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.I
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChangeWorthBonus;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChat;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChunkReset;
+import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandClearFlags;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandClearGeneratorRates;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandClearPlayerPrivileges;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandClearRatings;
@@ -184,6 +185,7 @@ import static com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType
 import static com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType.ISLAND_CHANGE_WORTH_BONUS_EVENT;
 import static com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType.ISLAND_CHAT_EVENT;
 import static com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType.ISLAND_CHUNK_RESET_EVENT;
+import static com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType.ISLAND_CLEAR_FLAGS_EVENT;
 import static com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType.ISLAND_CLEAR_GENERATOR_RATES_EVENT;
 import static com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType.ISLAND_CLEAR_PLAYER_PRIVILEGES_EVENT;
 import static com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType.ISLAND_CLEAR_RATINGS_EVENT;
@@ -640,6 +642,17 @@ public class PluginEventsFactory {
         islandChunkReset.island = island;
         islandChunkReset.chunkPosition = chunkPosition;
         fireEvent(ISLAND_CHUNK_RESET_EVENT, islandChunkReset);
+    }
+
+    public static boolean callIslandClearFlagsEvent(Island island, CommandSender commandSender) {
+        return callIslandClearFlagsEvent(island, commandSenderToSuperiorPlayer(commandSender));
+    }
+
+    public static boolean callIslandClearFlagsEvent(Island island, SuperiorPlayer superiorPlayer) {
+        IslandClearFlags islandClearFlags = new IslandClearFlags();
+        islandClearFlags.island = island;
+        islandClearFlags.superiorPlayer = superiorPlayer;
+        return !fireEvent(ISLAND_CLEAR_FLAGS_EVENT, islandClearFlags).isCancelled();
     }
 
     public static boolean callIslandClearGeneratorRatesEvent(Island island, CommandSender commandSender, Dimension dimension) {

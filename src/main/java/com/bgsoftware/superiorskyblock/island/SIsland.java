@@ -1284,7 +1284,7 @@ public class SIsland implements Island {
             if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension) && wasSchematicGenerated(dimension)) {
                 hasDimension = true;
                 lastDimension.setValue(dimension);
-                IslandWorlds.accessIslandWorldAsync(this, dimension, result -> {
+                IslandWorlds.accessIslandWorldAsync(this, dimension, true, result -> {
                     result.ifLeft(world -> {
                         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
                         List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, realFlags);
@@ -1313,7 +1313,7 @@ public class SIsland implements Island {
     public void resetChunks(Dimension dimension, @IslandChunkFlags int flags, @Nullable Runnable onFinish) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null");
 
-        IslandWorlds.accessIslandWorldAsync(this, dimension, result -> {
+        IslandWorlds.accessIslandWorldAsync(this, dimension, true, result -> {
             if (result.getRight() == null) {
                 WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
                 List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this,
@@ -1463,28 +1463,15 @@ public class SIsland implements Island {
         }
     }
 
-    private boolean isIslandWorld(@Nullable World world) {
-        if (world == null)
-            return false;
-
-        Dimension dimension = plugin.getGrid().getIslandsWorldDimension(world);
-        if (dimension == null)
-            return false;
-
-        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
-        return worldInfo.getName().equals(world.getName());
+    private static boolean isIslandWorld(@Nullable World world) {
+        return world != null && plugin.getProviders().getWorldsProvider().isIslandsWorld(world);
     }
 
     private boolean isIslandWorld(@Nullable WorldInfo worldInfo) {
         if (worldInfo == null)
             return false;
 
-        Dimension dimension = worldInfo.getDimension();
-        if (dimension == null)
-            return false;
-
-        WorldInfo realWorldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
-        return realWorldInfo.getName().equals(worldInfo.getName());
+        return plugin.getGrid().getIslandsWorldInfo(this, worldInfo.getName()) != null;
     }
 
     @Override
@@ -1789,9 +1776,10 @@ public class SIsland implements Island {
 
         invitedPlayers.forEach(invitedPlayer -> invitedPlayer.removeInvite(this));
 
-        if (BuiltinModules.BANK.disbandRefund > 0)
-            plugin.getProviders().depositMoney(getOwner(), islandBank.getBalance()
-                    .multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund)));
+        if (BuiltinModules.BANK.getConfiguration().hasDisbandRefund()) {
+            BigDecimal disbandRefund = BuiltinModules.BANK.getConfiguration().getDisbandRefund();
+            plugin.getProviders().depositMoney(getOwner(), islandBank.getBalance().multiply(disbandRefund));
+        }
 
         plugin.getMissions().getIslandMissions().forEach(this::resetMission);
 
@@ -2022,7 +2010,7 @@ public class SIsland implements Island {
 
         CompletableFuture<Biome> newTask = new CompletableFuture<>();
 
-        IslandWorlds.accessIslandWorldAsync(this, defaultWorldDimension, islandWorldResult -> {
+        IslandWorlds.accessIslandWorldAsync(this, defaultWorldDimension, true, islandWorldResult -> {
             if (islandWorldResult.getRight() != null) {
                 newTask.completeExceptionally(islandWorldResult.getRight());
                 return;
@@ -2069,7 +2057,7 @@ public class SIsland implements Island {
         List<Player> playersToUpdate = new SequentialListBuilder<Player>()
                 .build(getAllPlayersInside(), SuperiorPlayer::asPlayer);
 
-        IslandWorlds.accessIslandWorldsAsync(this, result -> {
+        IslandWorlds.accessIslandWorldsAsync(this, false, result -> {
             result.ifLeft(world -> {
                 WorldInfo worldInfo = WorldInfo.of(world);
                 Biome worldBiome = plugin.getSettings().getWorlds().getDefaultWorldDimension() == worldInfo.getDimension() ?
@@ -2310,14 +2298,17 @@ public class SIsland implements Island {
 
         long currentTime = System.currentTimeMillis() / 1000;
 
-        if (checkOnlineOwner && BuiltinModules.BANK.bankInterestRecentActive > 0 &&
-                currentTime - owner.getLastTimeStatus() > BuiltinModules.BANK.bankInterestRecentActive) {
+        int bankInterestRecentActive = BuiltinModules.BANK.getConfiguration().getBankInterestRecentActive();
+        if (checkOnlineOwner && bankInterestRecentActive > 0 &&
+                currentTime - owner.getLastTimeStatus() > bankInterestRecentActive) {
             Log.debugResult(Debug.GIVE_BANK_INTEREST, "Return Cooldown", owner.getName());
             return false;
         }
 
+        int bankInterestPercentage = BuiltinModules.BANK.getConfiguration().getBankInterestPercentage();
+
         BigDecimal balance = islandBank.getBalance().max(BigDecimal.ONE);
-        BigDecimal balanceToGive = balance.multiply(new BigDecimal(BuiltinModules.BANK.bankInterestPercentage / 100D));
+        BigDecimal balanceToGive = balance.multiply(new BigDecimal(bankInterestPercentage / 100D));
 
         // If the money that will be given exceeds limit, we want to give money later.
         if (!islandBank.canDepositMoney(balanceToGive)) {
@@ -2331,7 +2322,6 @@ public class SIsland implements Island {
         giveInterestFailed = false;
 
         islandBank.depositAdminMoney(Bukkit.getConsoleSender(), balanceToGive);
-        plugin.getMenus().refreshIslandBank(this);
 
         setLastInterestTime(currentTime);
 
@@ -2348,8 +2338,8 @@ public class SIsland implements Island {
         if (this.lastInterest == lastInterest)
             return;
 
-        if (BuiltinModules.BANK.bankInterestEnabled) {
-            long ticksToNextInterest = BuiltinModules.BANK.bankInterestInterval * 20L;
+        if (BuiltinModules.BANK.getConfiguration().isBankInterestEnabled()) {
+            long ticksToNextInterest = BuiltinModules.BANK.getConfiguration().getBankInterestInterval() * 20L;
             this.bankInterestTask.set(bankInterestTask -> {
                 if (bankInterestTask != null)
                     bankInterestTask.cancel();
@@ -2364,7 +2354,8 @@ public class SIsland implements Island {
     @Override
     public long getNextInterest() {
         long currentTime = System.currentTimeMillis() / 1000;
-        return BuiltinModules.BANK.bankInterestInterval - (currentTime - lastInterest);
+        int bankInterestInterval = BuiltinModules.BANK.getConfiguration().getBankInterestInterval();
+        return bankInterestInterval - (currentTime - lastInterest);
     }
 
     /*
@@ -2850,7 +2841,7 @@ public class SIsland implements Island {
 
     @Override
     public BigDecimal getWorth() {
-        double bankWorthRate = BuiltinModules.BANK.bankWorthRate;
+        double bankWorthRate = BuiltinModules.BANK.getConfiguration().getBankWorthRate();
 
         BigDecimal islandWorth = this.islandWorth.get();
         BigDecimal islandBank = this.islandBank.getBalance();
@@ -3992,6 +3983,68 @@ public class SIsland implements Island {
     }
 
     @Override
+    public void resetSettings() {
+        Log.debug(Debug.RESET_ISLAND_FLAGS, owner.getName());
+
+        if (islandFlags.isEmpty())
+            return;
+
+        islandFlags.clear();
+
+        Long time = null;
+        WeatherType weather = null;
+        boolean enablePvP = false;
+
+        for (String islandFlag : plugin.getSettings().getDefaultSettings()) {
+            switch (islandFlag) {
+                case "ALWAYS_DAY":
+                    time = 0L;
+                    break;
+                case "ALWAYS_MIDDLE_DAY":
+                    time = 6000L;
+                    break;
+                case "ALWAYS_NIGHT":
+                    time = 14000L;
+                    break;
+                case "ALWAYS_MIDDLE_NIGHT":
+                    time = 18000L;
+                    break;
+                case "ALWAYS_SHINY":
+                    weather = WeatherType.CLEAR;
+                    break;
+                case "ALWAYS_RAIN":
+                    weather = WeatherType.DOWNFALL;
+                    break;
+                case "PVP":
+                    enablePvP = true;
+                    break;
+            }
+        }
+
+        boolean teleportOnPvPEnable = plugin.getSettings().isTeleportOnPvPEnable();
+
+        for (SuperiorPlayer superiorPlayer : getAllPlayersInside()) {
+            Player player = superiorPlayer.asPlayer();
+            if (player != null) {
+                if (time == null) player.resetPlayerTime();
+                else player.setPlayerTime(time, false);
+
+                if (weather == null) player.resetPlayerWeather();
+                else player.setPlayerWeather(weather);
+
+                if (enablePvP && teleportOnPvPEnable && isVisitor(superiorPlayer, false)) {
+                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                    Message.ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE.send(superiorPlayer);
+                }
+            }
+        }
+
+        IslandsDatabaseBridge.clearIslandFlags(this);
+
+        plugin.getMenus().refreshSettings(this);
+    }
+
+    @Override
     public void setGeneratorPercentage(Key key, int percentage, Dimension dimension) {
         setGeneratorPercentage(key, percentage, dimension, null, false);
     }
@@ -4866,18 +4919,20 @@ public class SIsland implements Island {
     }
 
     private void startBankInterest() {
-        if (BuiltinModules.BANK.bankInterestEnabled) {
-            long currentTime = System.currentTimeMillis() / 1000;
-            long ticksToNextInterest = (BuiltinModules.BANK.bankInterestInterval - (currentTime - this.lastInterest)) * 20;
-            if (ticksToNextInterest <= 0) {
-                giveInterest(true);
-            } else {
-                this.bankInterestTask.set(bankInterestTask -> {
-                    if (bankInterestTask != null)
-                        bankInterestTask.cancel();
-                    return BukkitExecutor.sync(() -> giveInterest(true), ticksToNextInterest);
-                });
-            }
+        if (!BuiltinModules.BANK.getConfiguration().isBankInterestEnabled())
+            return;
+
+        int bankInterestInterval = BuiltinModules.BANK.getConfiguration().getBankInterestInterval();
+        long currentTime = System.currentTimeMillis() / 1000;
+        long ticksToNextInterest = (bankInterestInterval - (currentTime - this.lastInterest)) * 20;
+        if (ticksToNextInterest <= 0) {
+            giveInterest(true);
+        } else {
+            this.bankInterestTask.set(bankInterestTask -> {
+                if (bankInterestTask != null)
+                    bankInterestTask.cancel();
+                return BukkitExecutor.sync(() -> giveInterest(true), ticksToNextInterest);
+            });
         }
     }
 
@@ -5195,11 +5250,14 @@ public class SIsland implements Island {
         if (!BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class))
             return;
 
+        // If the world is not loaded, we can skip this
+
+
         final int flags = IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS;
 
         double newCropGrowthMultiplier = newCropGrowth - 1;
 
-        IslandWorlds.accessIslandWorldsAsync(this, result -> {
+        IslandWorlds.accessIslandWorldsAsync(this, false, result -> {
             result.ifLeft(world -> {
                 WorldInfo worldInfo = WorldInfo.of(world);
                 List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, flags);

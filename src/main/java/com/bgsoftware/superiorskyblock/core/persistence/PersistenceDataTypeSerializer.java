@@ -28,17 +28,17 @@ import java.util.function.Function;
 public class PersistenceDataTypeSerializer {
 
     private static final Map<Class<?>, Function<Object, Tag<?>>> CLASS_TO_NBT = new ImmutableMap.Builder<Class<?>, Function<Object, Tag<?>>>()
-            .put(BigDecimal.class, value -> new BigDecimalTag((BigDecimal) value))
-            .put(byte[].class, value -> new ByteArrayTag((byte[]) value))
-            .put(Byte.class, value -> new ByteTag((byte) value))
-            .put(Double.class, value -> new DoubleTag((double) value))
-            .put(Float.class, value -> new FloatTag((float) value))
-            .put(int[].class, value -> new IntArrayTag((int[]) value))
-            .put(Integer.class, value -> new IntTag((int) value))
-            .put(Long.class, value -> new LongTag((long) value))
-            .put(Short.class, value -> new ShortTag((short) value))
-            .put(String.class, value -> new StringTag((String) value))
-            .put(UUID.class, value -> new UUIDTag((UUID) value))
+            .put(BigDecimal.class, value -> BigDecimalTag.of((BigDecimal) value))
+            .put(byte[].class, value -> ByteArrayTag.of((byte[]) value))
+            .put(Byte.class, value -> ByteTag.of((byte) value))
+            .put(Double.class, value -> DoubleTag.of((double) value))
+            .put(Float.class, value -> FloatTag.of((float) value))
+            .put(int[].class, value -> IntArrayTag.of((int[]) value))
+            .put(Integer.class, value -> IntTag.of((int) value))
+            .put(Long.class, value -> LongTag.of((long) value))
+            .put(Short.class, value -> ShortTag.of((short) value))
+            .put(String.class, value -> StringTag.of((String) value))
+            .put(UUID.class, value -> UUIDTag.of((UUID) value))
             .build();
 
     private PersistenceDataTypeSerializer() {
@@ -58,7 +58,7 @@ public class PersistenceDataTypeSerializer {
     public static <T> Tag<?> serialize(T value, PersistentDataType<T> type) {
         PersistentDataTypeContext<T> serializer = type.getContext();
         if (serializer != null)
-            return new PersistentDataTag<>(value, serializer);
+            return PersistentDataTag.of(value, serializer);
 
         Tag<?> serializedTag = primitiveSerialize(value);
 

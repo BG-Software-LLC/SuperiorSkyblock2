@@ -135,7 +135,6 @@ public class SettingsContainer {
     public final KeySet safeBlocks;
     public final boolean visitorsDamage;
     public final boolean coopDamage;
-    public final int disbandCount;
     public final boolean islandTopIncludeLeader;
     public final Map<String, String> defaultPlaceholders;
     public final boolean banConfirm;
@@ -187,6 +186,7 @@ public class SettingsContainer {
     public final int cropsInterval;
     public final boolean onlyBackButton;
     public final boolean buildOutsideIsland;
+    public final int defaultDisbandCount;
     public final String defaultLanguage;
     public final boolean defaultWorldBorder;
     public final boolean defaultBlocksStacker;
@@ -376,7 +376,6 @@ public class SettingsContainer {
         safeBlocks = loadSafeBlocks(plugin);
         visitorsDamage = config.getBoolean("visitors-damage", false);
         coopDamage = config.getBoolean("coop-damage", true);
-        disbandCount = config.getInt("disband-count", 5);
         islandTopIncludeLeader = config.getBoolean("island-top-include-leader", true);
         defaultPlaceholders = Collections.unmodifiableMap(config.getStringList("default-placeholders").stream().collect(Collectors.toMap(
                 line -> line.split(":")[0].replace("superior_", "").toLowerCase(Locale.ENGLISH),
@@ -461,7 +460,7 @@ public class SettingsContainer {
             for (String container : config.getConfigurationSection("default-containers.containers").getKeys(false)) {
                 try {
                     InventoryType containerType = InventoryType.valueOf(container.toUpperCase(Locale.ENGLISH));
-                    ListTag items = new ListTag(CompoundTag.class, Collections.emptyList());
+                    ListTag items = ListTag.of(CompoundTag.class);
                     defaultContainersContents.put(containerType, items);
 
                     ConfigurationSection containerSection = config.getConfigurationSection("default-containers.containers." + container);
@@ -512,6 +511,7 @@ public class SettingsContainer {
         cropsInterval = config.getInt("crops-interval", 5);
         onlyBackButton = config.getBoolean("only-back-button", false);
         buildOutsideIsland = config.getBoolean("build-outside-island", false);
+        defaultDisbandCount = config.getInt("default-disband-count", 5);
         defaultLanguage = config.getString("default-language", "en-US");
         defaultWorldBorder = config.getBoolean("default-world-border", true);
         defaultBlocksStacker = config.getBoolean("default-blocks-stacker", true);

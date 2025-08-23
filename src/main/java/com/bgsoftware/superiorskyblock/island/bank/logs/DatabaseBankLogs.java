@@ -25,7 +25,17 @@ public class DatabaseBankLogs implements IBankLogs {
             .build(new CacheLoader<Integer, List<BankTransaction>>() {
                 @Override
                 public List<BankTransaction> load(@NotNull Integer ignored) {
+                    sessionBankTransactions.invalidateAll();
                     return loadTransactionsFromDatabase();
+                }
+            });
+    private final LoadingCache<Integer, List<BankTransaction>> sessionBankTransactions = CacheBuilder.newBuilder()
+            .maximumSize(1)
+            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .build(new CacheLoader<Integer, List<BankTransaction>>() {
+                @Override
+                public List<BankTransaction> load(@NotNull Integer ignored) {
+                    return new LinkedList<>();
                 }
             });
 
@@ -47,20 +57,26 @@ public class DatabaseBankLogs implements IBankLogs {
 
     @Override
     public List<BankTransaction> getTransactions() {
-        return new SequentialListBuilder<BankTransaction>().build(cachedBankTransactions.getUnchecked(0));
+        return collectBankTransactions();
     }
 
     @Override
     public List<BankTransaction> getTransactions(UUID playerUUID) {
         return new SequentialListBuilder<BankTransaction>()
                 .filter(bankTransaction -> playerUUID.equals(bankTransaction.getPlayer()))
-                .build(cachedBankTransactions.getUnchecked(0));
+                .build(collectBankTransactions());
     }
 
     @Override
     public void addTransaction(BankTransaction bankTransaction, UUID senderUUID, boolean loadFromDatabase) {
-        if (cachedBankTransactions.size() != 0)
-            cachedBankTransactions.getUnchecked(0).add(bankTransaction);
+        sessionBankTransactions.getUnchecked(0).add(bankTransaction);
+    }
+
+    private List<BankTransaction> collectBankTransactions() {
+        List<BankTransaction> bankTransactionList = new LinkedList<>();
+        bankTransactionList.addAll(cachedBankTransactions.getUnchecked(0));
+        bankTransactionList.addAll(sessionBankTransactions.getUnchecked(0));
+        return bankTransactionList;
     }
 
     private List<BankTransaction> loadTransactionsFromDatabase() {

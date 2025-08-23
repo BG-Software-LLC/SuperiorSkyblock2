@@ -79,7 +79,6 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
 
     @Override
     public SuperiorPlayer.Builder setDisbands(int disbands) {
-        Preconditions.checkArgument(disbands >= 0, "Cannot set negative disbands count.");
         this.disbands = disbands;
         return this;
     }

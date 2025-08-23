@@ -44,26 +44,43 @@ import java.io.IOException;
  *
  * @author Graham Edgecombe
  */
-@SuppressWarnings("WeakerAccess")
 public class FloatTag extends NumberTag<Float> {
 
-    /*package*/  static final Class<?> CLASS = getNNTClass("NBTTagFloat");
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagFloat", float.class);
 
-    /**
-     * Creates the tag.
-     *
-     * @param value The value.
-     */
-    public FloatTag(float value) {
-        super(value, CLASS, float.class);
+    private static final FloatTag[] CACHE = new FloatTag[100];
+
+    private FloatTag(float value) {
+        super(value);
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeFloat(value);
+    }
+
+    @Override
+    protected NMSTagConverter getNMSConverter() {
+        return TAG_CONVERTER;
+    }
+
+    public static FloatTag of(float value) {
+        if (value == (int) value && value >= 0 && value < CACHE.length) {
+            FloatTag tag = CACHE[(int) value];
+            if (tag == null)
+                tag = CACHE[(int) value] = new FloatTag(value);
+            return tag;
+        } else {
+            return new FloatTag(value);
+        }
     }
 
     public static FloatTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to FloatTag!");
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to FloatTag!");
 
         try {
             float value = plugin.getNMSTags().getNBTFloatValue(tag);
-            return new FloatTag(value);
+            return FloatTag.of(value);
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while converting tag float from NMS:");
             return null;
@@ -71,12 +88,7 @@ public class FloatTag extends NumberTag<Float> {
     }
 
     public static FloatTag fromStream(DataInputStream is) throws IOException {
-        return new FloatTag(is.readFloat());
-    }
-
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeFloat(value);
+        return FloatTag.of(is.readFloat());
     }
 
 }
