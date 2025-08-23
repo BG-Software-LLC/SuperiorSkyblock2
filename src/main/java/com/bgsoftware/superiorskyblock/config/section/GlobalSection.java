@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 import org.bukkit.Location;
@@ -145,20 +146,12 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().teleportOnKick;
     }
 
-    public boolean isClearEnderChestOnDisband() {
-        return getContainer().clearEnderChestOnDisband;
+    public List<ClearAction> getClearOnDisband() {
+        return getContainer().clearOnDisbandActions;
     }
 
-    public boolean isClearEnderChestOnJoin() {
-        return getContainer().clearEnderChestOnJoin;
-    }
-
-    public boolean isClearInventoryOnDisband() {
-        return getContainer().clearInventoryOnDisband;
-    }
-
-    public boolean isClearInventoryOnJoin() {
-        return getContainer().clearInventoryOnJoin;
+    public List<ClearAction> getClearOnJoin() {
+        return getContainer().clearOnJoinActions;
     }
 
     public boolean isRateOwnIsland() {

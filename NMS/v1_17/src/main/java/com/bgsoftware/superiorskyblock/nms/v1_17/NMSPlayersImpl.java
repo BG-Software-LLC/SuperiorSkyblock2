@@ -3,10 +3,12 @@ package com.bgsoftware.superiorskyblock.nms.v1_17;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
+import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import com.bgsoftware.superiorskyblock.service.bossbar.BossBarTask;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.mojang.authlib.GameProfile;
@@ -27,6 +29,7 @@ import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -41,17 +44,17 @@ public class NMSPlayersImpl implements NMSPlayers {
     }
 
     @Override
-    public void clearInventory(OfflinePlayer offlinePlayer, boolean inventory, boolean enderChest) {
-        if (!inventory && !enderChest)
+    public void clearInventory(OfflinePlayer offlinePlayer, List<ClearAction> clearActions) {
+        if (clearActions.isEmpty())
             return;
 
         if (offlinePlayer.isOnline() || offlinePlayer instanceof Player) {
             Player player = offlinePlayer instanceof Player ? (Player) offlinePlayer : offlinePlayer.getPlayer();
             assert player != null;
 
-            if (inventory)
+            if (clearActions.contains(ClearActions.INVENTORY))
                 player.getInventory().clear();
-            if (enderChest)
+            if (clearActions.contains(ClearActions.ENDER_CHEST))
                 player.getEnderChest().clear();
 
             return;
@@ -70,7 +73,7 @@ public class NMSPlayersImpl implements NMSPlayers {
 
         targetPlayer.loadData();
 
-        clearInventory(targetPlayer, inventory, enderChest);
+        clearInventory(targetPlayer, clearActions);
 
         //Setting the entity to the spawn location
         Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter(Dimensions.NORMAL);

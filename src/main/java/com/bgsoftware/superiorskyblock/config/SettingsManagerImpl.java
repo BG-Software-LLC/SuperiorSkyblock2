@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.config.section.AFKIntegrationsSection;
 import com.bgsoftware.superiorskyblock.config.section.DatabaseSection;
@@ -25,6 +26,7 @@ import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -32,6 +34,8 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -274,7 +278,8 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public boolean isDisbandInventoryClear() {
-        return this.global.isClearEnderChestOnDisband() && this.global.isClearInventoryOnDisband();
+        List<ClearAction> clearActions = this.global.getClearOnDisband();
+        return clearActions.contains(ClearActions.ENDER_CHEST) && clearActions.contains(ClearActions.INVENTORY);
     }
 
     @Override
@@ -299,27 +304,18 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public boolean isClearOnJoin() {
-        return this.global.isClearEnderChestOnJoin() && this.global.isClearInventoryOnJoin();
+        List<ClearAction> clearActions = this.global.getClearOnJoin();
+        return clearActions.contains(ClearActions.ENDER_CHEST) && clearActions.contains(ClearActions.INVENTORY);
     }
 
     @Override
-    public boolean isClearEnderChestOnDisband() {
-        return this.global.isClearEnderChestOnDisband();
+    public List<ClearAction> getClearOnDisband() {
+        return this.global.getClearOnDisband();
     }
 
     @Override
-    public boolean isClearEnderChestOnJoin() {
-        return this.global.isClearEnderChestOnJoin();
-    }
-
-    @Override
-    public boolean isClearInventoryOnDisband() {
-        return this.global.isClearInventoryOnDisband();
-    }
-
-    @Override
-    public boolean isClearInventoryOnJoin() {
-        return this.global.isClearInventoryOnJoin();
+    public List<ClearAction> getClearOnJoin() {
+        return this.global.getClearOnJoin();
     }
 
     @Override
@@ -682,14 +678,22 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     private void convertData(YamlConfiguration cfg) {
         if (cfg.contains("disband-inventory-clear")) {
-            cfg.set("clear-ender-chest-on-disband", cfg.getBoolean("disband-inventory-clear"));
-            cfg.set("clear-inventory-on-disband", cfg.getBoolean("disband-inventory-clear"));
+            if (cfg.getBoolean("disband-inventory-clear")) {
+                cfg.set("clear-on-disband", Arrays.asList("ENDER_CHEST", "INVENTORY"));
+            } else {
+                cfg.set("clear-on-disband", new ArrayList<>());
+            }
             cfg.set("disband-inventory-clear", null);
         }
         if (cfg.contains("clear-on-join")) {
-            cfg.set("clear-ender-chest-on-join", cfg.getBoolean("clear-on-join"));
-            cfg.set("clear-inventory-on-join", cfg.getBoolean("clear-on-join"));
-            cfg.set("clear-on-join", null);
+            Object clearOnJoin = cfg.get("clear-on-join");
+            if (clearOnJoin instanceof Boolean) {
+                if ((boolean) clearOnJoin) {
+                    cfg.set("clear-on-join", Arrays.asList("ENDER_CHEST", "INVENTORY"));
+                } else {
+                    cfg.set("clear-on-join", new ArrayList<>());
+                }
+            }
         }
         if (cfg.contains("default-hoppers-limit")) {
             cfg.set("default-limits", Collections.singletonList("HOPPER:" + cfg.getInt("default-hoppers-limit")));

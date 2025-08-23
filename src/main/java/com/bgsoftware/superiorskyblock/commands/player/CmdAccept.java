@@ -101,8 +101,8 @@ public class CmdAccept implements ISuperiorCommand {
 
         if (plugin.getSettings().isTeleportOnJoin())
             superiorPlayer.teleport(island);
-        plugin.getNMSPlayers().clearInventory(superiorPlayer.asPlayer(), plugin.getSettings().isClearInventoryOnJoin(),
-                plugin.getSettings().isClearEnderChestOnJoin());
+
+        plugin.getNMSPlayers().clearInventory(superiorPlayer.asPlayer(), plugin.getSettings().getClearOnJoin());
     }
 
     @Override

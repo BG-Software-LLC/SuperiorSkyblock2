@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
@@ -154,10 +155,8 @@ public class SettingsContainer {
     public final boolean teleportOnCreate;
     public final boolean teleportOnJoin;
     public final boolean teleportOnKick;
-    public final boolean clearEnderChestOnDisband;
-    public final boolean clearEnderChestOnJoin;
-    public final boolean clearInventoryOnDisband;
-    public final boolean clearInventoryOnJoin;
+    public final List<ClearAction> clearOnDisbandActions;
+    public final List<ClearAction> clearOnJoinActions;
     public final boolean rateOwnIsland;
     public final boolean changeIslandRating;
     public final List<String> defaultSettings;
@@ -402,10 +401,24 @@ public class SettingsContainer {
         teleportOnCreate = config.getBoolean("teleport-on-create", true);
         teleportOnJoin = config.getBoolean("teleport-on-join", false);
         teleportOnKick = config.getBoolean("teleport-on-kick", true);
-        clearEnderChestOnDisband = config.getBoolean("clear-ender-chest-on-disband", true);
-        clearEnderChestOnJoin = config.getBoolean("clear-ender-chest-on-join", false);
-        clearInventoryOnDisband = config.getBoolean("clear-inventory-on-disband", true);
-        clearInventoryOnJoin = config.getBoolean("clear-inventory-on-join", false);
+        List<ClearAction> clearOnDisbandActions = new LinkedList<>();
+        config.getStringList("clear-on-disband").forEach(clearAction -> {
+            try {
+                clearOnDisbandActions.add(ClearAction.getByName(clearAction));
+            } catch (NullPointerException error) {
+                Log.warnFromFile("config.yml", "Invalid clear on disband action ", clearAction + ", skipping...");
+            }
+        });
+        this.clearOnDisbandActions = Collections.unmodifiableList(clearOnDisbandActions);
+        List<ClearAction> clearOnJoinActions = new LinkedList<>();
+        config.getStringList("clear-on-join").forEach(clearAction -> {
+            try {
+                clearOnJoinActions.add(ClearAction.getByName(clearAction));
+            } catch (NullPointerException error) {
+                Log.warnFromFile("config.yml", "Invalid clear on join action ", clearAction + ", skipping...");
+            }
+        });
+        this.clearOnJoinActions = Collections.unmodifiableList(clearOnJoinActions);
         rateOwnIsland = config.getBoolean("rate-own-island", false);
         changeIslandRating = config.getBoolean("change-island-rating", true);
         defaultSettings = Collections.unmodifiableList(config.getStringList("default-settings")
