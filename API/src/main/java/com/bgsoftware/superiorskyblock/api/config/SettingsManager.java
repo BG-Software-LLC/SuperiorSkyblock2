@@ -287,7 +287,7 @@ public interface SettingsManager {
      * Whether to clear players' inventories when they join a new island or not.
      * Return true if clear-on-join contains both ENDER_CHEST and INVENTORY.
      * This method will be deleted in the future!
-     * @deprecated See {@link #getClearActionsOnDisband()}
+     * @deprecated See {@link #getClearActionsOnJoin()}
      */
     @Deprecated
     boolean isClearOnJoin();
