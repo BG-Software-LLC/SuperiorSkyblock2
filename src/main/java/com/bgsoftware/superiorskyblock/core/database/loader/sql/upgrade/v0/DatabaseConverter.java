@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0;
 
+import com.bgsoftware.common.databasebridge.sql.query.QueryResult;
+import com.bgsoftware.common.databasebridge.sql.transaction.CustomSQLDatabaseTransaction;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
@@ -9,7 +11,6 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.database.transaction.DatabaseTransactionsExecutor;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.SQLDatabase;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.BankTransactionsAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.attributes.GridAttributes;
@@ -24,10 +25,8 @@ import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deser
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deserializer.JsonDeserializer;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deserializer.MultipleDeserializer;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.deserializer.RawDeserializer;
+import com.bgsoftware.superiorskyblock.core.database.sql.DBSession;
 import com.bgsoftware.superiorskyblock.core.database.sql.ResultSetMapBridge;
-import com.bgsoftware.superiorskyblock.core.database.sql.SQLHelper;
-import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
-import com.bgsoftware.superiorskyblock.core.database.sql.transaction.CustomSQLDatabaseTransaction;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
@@ -80,7 +79,7 @@ public class DatabaseConverter {
     private static void convertDatabase() {
         Log.info("[Database-Converter] Detected old database - starting to convert data...");
 
-        SQLHelper.select("players", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
+        DBSession.select("players", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 loadedPlayers.add(loadPlayer(new ResultSetMapBridge(resultSet)));
             }
@@ -88,7 +87,7 @@ public class DatabaseConverter {
 
         Log.info("[Database-Converter] Found ", loadedPlayers.size(), " players in the database.");
 
-        SQLHelper.select("islands", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
+        DBSession.select("islands", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 loadedIslands.add(loadIsland(new ResultSetMapBridge(resultSet)));
             }
@@ -96,7 +95,7 @@ public class DatabaseConverter {
 
         Log.info("[Database-Converter] Found ", loadedIslands.size(), " islands in the database.");
 
-        SQLHelper.select("stackedBlocks", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
+        DBSession.select("stackedBlocks", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 loadedBlocks.add(loadStackedBlock(new ResultSetMapBridge(resultSet)));
             }
@@ -106,7 +105,7 @@ public class DatabaseConverter {
 
         // Ignoring errors as the bankTransactions table may not exist.
         AtomicBoolean foundBankTransaction = new AtomicBoolean(false);
-        SQLHelper.select("bankTransactions", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
+        DBSession.select("bankTransactions", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             foundBankTransaction.set(true);
             while (resultSet.next()) {
                 loadedBankTransactions.add(loadBankTransaction(new ResultSetMapBridge(resultSet)));
@@ -117,7 +116,7 @@ public class DatabaseConverter {
             Log.info("[Database-Converter] Found ", loadedBankTransactions.size(), " bank transactions in the database.");
         }
 
-        SQLHelper.select("grid", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
+        DBSession.select("grid", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             if (resultSet.next()) {
                 gridAttributes = new GridAttributes()
                         .setValue(GridAttributes.Field.LAST_ISLAND, resultSet.getString("lastIsland"))
@@ -129,11 +128,11 @@ public class DatabaseConverter {
         MutableObject<Throwable> failedBackupError = new MutableObject<>(null);
 
         if (!isRemoteDatabase) {
-            SQLHelper.close();
+            DBSession.close();
             if (!databaseFile.renameTo(new File(databaseFile.getParentFile(), "database-bkp.db"))) {
                 failedBackupError.setValue(new RuntimeException("Failed to rename file to database-bkp.db"));
             } else {
-                SQLHelper.createConnection(plugin);
+                DBSession.createConnection(plugin);
                 SQLDatabase.initializeDatabase();
             }
         }
@@ -165,7 +164,7 @@ public class DatabaseConverter {
 
         AtomicBoolean isOldFormat = new AtomicBoolean(true);
 
-        SQLHelper.select("stackedBlocks", "", new QueryResult<ResultSet>().onFail(error -> {
+        DBSession.select("stackedBlocks", "", new QueryResult<ResultSet>().onFail(error -> {
             isOldFormat.set(false);
         }));
 
@@ -198,8 +197,7 @@ public class DatabaseConverter {
         }
 
         try {
-            DatabaseTransactionsExecutor.addTransactions(playersTransaction,
-                    playersMissionsTransaction, playersSettingsTransaction).get();
+            DBSession.execute(playersMissionsTransaction, playersSettingsTransaction).get();
         } catch (InterruptedException | ExecutionException error) {
             error.printStackTrace();
         }
@@ -265,7 +263,7 @@ public class DatabaseConverter {
         }
 
         try {
-            DatabaseTransactionsExecutor.addTransactions(
+            DBSession.execute(
                     islandsTransaction,
                     islandsBanksTransaction,
                     islandsBansTransaction,
@@ -309,7 +307,7 @@ public class DatabaseConverter {
         }
 
         try {
-            stackedBlocksTransaction.execute().get();
+            DBSession.execute(stackedBlocksTransaction).get();
         } catch (InterruptedException | ExecutionException error) {
             error.printStackTrace();
         }
@@ -334,7 +332,7 @@ public class DatabaseConverter {
         }
 
         try {
-            bankTransactionsTransaction.execute().get();
+            DBSession.execute(bankTransactionsTransaction).get();
         } catch (InterruptedException | ExecutionException error) {
             error.printStackTrace();
         }
@@ -348,7 +346,7 @@ public class DatabaseConverter {
 
         CustomSQLDatabaseTransaction deleteGridTransaction = new CustomSQLDatabaseTransaction("DELETE FROM {prefix}grid;");
         try {
-            deleteGridTransaction.execute().get();
+            DBSession.execute(deleteGridTransaction).get();
         } catch (InterruptedException | ExecutionException error) {
             error.printStackTrace();
         }
@@ -360,7 +358,7 @@ public class DatabaseConverter {
                 .bindObject(gridAttributes.getValue(GridAttributes.Field.MAX_ISLAND_SIZE))
                 .bindObject(gridAttributes.getValue(GridAttributes.Field.WORLD));
         try {
-            insertGridTransaction.execute().get();
+            DBSession.execute(insertGridTransaction).get();
         } catch (InterruptedException | ExecutionException error) {
             error.printStackTrace();
         }

@@ -73,9 +73,8 @@ dependencies {
     implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:b11:all@jar'
     implementation 'com.bgsoftware.common.dependencies:DependenciesManager:b2'
     implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b14'
+    implementation 'com.bgsoftware.common.databasebridge:DatabaseBridge:b1'
 
-    implementation 'com.zaxxer:HikariCP:4.0.3'
-    implementation 'org.slf4j:slf4j-api:2.0.5'
     implementation 'org.bstats:bstats-bukkit:3.0.0'
 
     // Spigot jars
@@ -105,7 +104,6 @@ processResources {
 shadowJar {
     dependsOn(jar)
 
-    relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.libs.com.zaxxer.hikari'
     relocate 'org.bstats', 'com.bgsoftware.superiorskyblock.libs.org.bstats'
     relocate 'com.bgsoftware.common', 'com.bgsoftware.superiorskyblock.libs.com.bgsoftware.common'
 
