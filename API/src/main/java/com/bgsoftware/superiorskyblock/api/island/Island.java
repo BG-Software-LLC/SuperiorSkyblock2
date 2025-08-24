@@ -161,6 +161,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void addMember(SuperiorPlayer superiorPlayer, PlayerRole playerRole);
 
     /**
+     * Leave the island.
+     *
+     * @param superiorPlayer The player who leaves.
+     */
+    void leaveIsland(SuperiorPlayer superiorPlayer);
+
+    /**
      * Kick a member from the island.
      *
      * @param superiorPlayer The player to kick.

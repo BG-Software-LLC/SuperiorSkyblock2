@@ -303,6 +303,12 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public boolean isTeleportOnLeave() {
+        return this.global.isTeleportOnLeave();
+    }
+
+
+    @Override
     public boolean isClearOnJoin() {
         List<ClearAction> clearActions = this.global.getClearActionsOnJoin();
         return clearActions.contains(ClearActions.ENDER_CHEST) && clearActions.contains(ClearActions.INVENTORY);
@@ -316,6 +322,16 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     @Override
     public List<ClearAction> getClearActionsOnJoin() {
         return this.global.getClearActionsOnJoin();
+    }
+
+    @Override
+    public List<ClearAction> getClearActionsOnKick() {
+        return this.global.getClearActionsOnKick();
+    }
+
+    @Override
+    public List<ClearAction> getClearActionsOnLeave() {
+        return this.global.getClearActionsOnLeave();
     }
 
     @Override

@@ -35,12 +35,8 @@ public class LeaveButton extends AbstractMenuViewButton<BaseMenuView> {
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
         Island island = inventoryViewer.getIsland();
 
-        if (getTemplate().leaveIsland && island != null && PluginEventsFactory.callIslandQuitEvent(island, inventoryViewer)) {
-            island.kickMember(inventoryViewer);
-
-            IslandUtils.sendMessage(island, Message.LEAVE_ANNOUNCEMENT, Collections.emptyList(), inventoryViewer.getName());
-
-            Message.LEFT_ISLAND.send(inventoryViewer);
+        if (getTemplate().leaveIsland) {
+            IslandUtils.handleLeaveIsland(inventoryViewer, island);
         }
 
         BukkitExecutor.sync(menuView::closeView, 1L);

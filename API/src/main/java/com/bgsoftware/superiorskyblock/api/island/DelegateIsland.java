@@ -139,6 +139,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public void leaveIsland(SuperiorPlayer superiorPlayer) {
+        this.handle.leaveIsland(superiorPlayer);
+    }
+
+    @Override
     public void kickMember(SuperiorPlayer superiorPlayer) {
         this.handle.kickMember(superiorPlayer);
     }

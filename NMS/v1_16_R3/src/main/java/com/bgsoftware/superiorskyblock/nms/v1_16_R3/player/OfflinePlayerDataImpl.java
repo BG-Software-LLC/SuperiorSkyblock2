@@ -1,18 +1,19 @@
-package com.bgsoftware.superiorskyblock.nms.v1_8_R3.player;
+package com.bgsoftware.superiorskyblock.nms.v1_16_R3.player;
 
 import com.bgsoftware.superiorskyblock.core.ObjectsPool;
 import com.bgsoftware.superiorskyblock.nms.player.OfflinePlayerData;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.MinecraftServer;
-import net.minecraft.server.v1_8_R3.PlayerInteractManager;
-import net.minecraft.server.v1_8_R3.WorldServer;
+import net.minecraft.server.v1_16_R3.EntityPlayer;
+import net.minecraft.server.v1_16_R3.MinecraftServer;
+import net.minecraft.server.v1_16_R3.PlayerInteractManager;
+import net.minecraft.server.v1_16_R3.World;
+import net.minecraft.server.v1_16_R3.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -36,7 +37,8 @@ public class OfflinePlayerDataImpl implements OfflinePlayerData {
                 Optional.ofNullable(offlinePlayer.getName()).orElse(""));
 
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
-        WorldServer worldServer = server.getWorldServer(0);
+        WorldServer worldServer = server.getWorldServer(World.OVERWORLD);
+        assert worldServer != null;
         EntityPlayer entityPlayer = new EntityPlayer(server, worldServer, profile, new PlayerInteractManager(worldServer));
         this.fakePlayer = entityPlayer.getBukkitEntity();
         this.fakePlayer.loadData();

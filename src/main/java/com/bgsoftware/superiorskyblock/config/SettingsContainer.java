@@ -154,8 +154,11 @@ public class SettingsContainer {
     public final boolean teleportOnCreate;
     public final boolean teleportOnJoin;
     public final boolean teleportOnKick;
-    public final List<ClearAction> clearActionsOnDisbad;
+    public final boolean teleportOnLeave;
+    public final List<ClearAction> clearActionsOnDisband;
     public final List<ClearAction> clearActionsOnJoin;
+    public final List<ClearAction> clearActionsOnKick;
+    public final List<ClearAction> clearActionsOnLeave;
     public final boolean rateOwnIsland;
     public final boolean changeIslandRating;
     public final List<String> defaultSettings;
@@ -400,8 +403,11 @@ public class SettingsContainer {
         teleportOnCreate = config.getBoolean("teleport-on-create", true);
         teleportOnJoin = config.getBoolean("teleport-on-join", false);
         teleportOnKick = config.getBoolean("teleport-on-kick", true);
-        clearActionsOnDisbad = loadClearActions(config.getStringList("clear-on-disband"));
+        teleportOnLeave = config.getBoolean("teleport-on-leave", false);
+        clearActionsOnDisband = loadClearActions(config.getStringList("clear-on-disband"));
         clearActionsOnJoin = loadClearActions(config.getStringList("clear-on-join"));
+        clearActionsOnKick = loadClearActions(config.getStringList("clear-on-kick"));
+        clearActionsOnLeave = loadClearActions(config.getStringList("clear-on-leave"));
         rateOwnIsland = config.getBoolean("rate-own-island", false);
         changeIslandRating = config.getBoolean("change-island-rating", true);
         defaultSettings = Collections.unmodifiableList(config.getStringList("default-settings")

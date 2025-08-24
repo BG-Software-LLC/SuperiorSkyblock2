@@ -284,6 +284,12 @@ public interface SettingsManager {
     boolean isTeleportOnKick();
 
     /**
+     * Whether to teleport players to the spawn when they leave an island or not.
+     * Config-path: teleport-on-leave
+     */
+    boolean isTeleportOnLeave();
+
+    /**
      * Whether to clear players' inventories when they join a new island or not.
      * Return true if clear-on-join contains both ENDER_CHEST and INVENTORY.
      * This method will be deleted in the future!
@@ -299,10 +305,22 @@ public interface SettingsManager {
     List<ClearAction> getClearActionsOnDisband();
 
     /**
-     * Get the list of clear actions to perform on players when they accept an invite to join an island.
+     * Get the list of clear actions to perform on players when they accept an invite.
      * Config-path: clear-on-join
      */
     List<ClearAction> getClearActionsOnJoin();
+
+    /**
+     * Get the list of clear actions to perform on players when they are kicked from their island.
+     * Config-path: clear-on-kick
+     */
+    List<ClearAction> getClearActionsOnKick();
+
+    /**
+     * Get the list of clear actions to perform on players when they leave an island.
+     * Config-path: clear-on-leave
+     */
+    List<ClearAction> getClearActionsOnLeave();
 
     /**
      * Whether players can rate their own island or not.

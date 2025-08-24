@@ -257,6 +257,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void leaveIsland(SuperiorPlayer superiorPlayer) {
+        // Do nothing.
+    }
+
+    @Override
     public void kickMember(SuperiorPlayer superiorPlayer) {
         // Do nothing.
     }

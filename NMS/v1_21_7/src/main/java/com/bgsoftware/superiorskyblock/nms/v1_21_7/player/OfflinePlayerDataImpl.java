@@ -1,18 +1,21 @@
-package com.bgsoftware.superiorskyblock.nms.v1_8_R3.player;
+package com.bgsoftware.superiorskyblock.nms.v1_21_7.player;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.core.ObjectsPool;
 import com.bgsoftware.superiorskyblock.nms.player.OfflinePlayerData;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.MinecraftServer;
-import net.minecraft.server.v1_8_R3.PlayerInteractManager;
-import net.minecraft.server.v1_8_R3.WorldServer;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -20,6 +23,7 @@ import java.util.Optional;
 public class OfflinePlayerDataImpl implements OfflinePlayerData {
 
     private static final ObjectsPool<OfflinePlayerDataImpl> POOL = new ObjectsPool<>(OfflinePlayerDataImpl::new);
+    private static final ReflectMethod<Void> ENTITY_SET_LEVEL = new ReflectMethod<>(Entity.class, 1, Level.class);
 
     private Player fakePlayer;
 
@@ -36,9 +40,13 @@ public class OfflinePlayerDataImpl implements OfflinePlayerData {
                 Optional.ofNullable(offlinePlayer.getName()).orElse(""));
 
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
-        WorldServer worldServer = server.getWorldServer(0);
-        EntityPlayer entityPlayer = new EntityPlayer(server, worldServer, profile, new PlayerInteractManager(worldServer));
-        this.fakePlayer = entityPlayer.getBukkitEntity();
+        ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
+
+        if (serverLevel == null)
+            return null;
+
+        ServerPlayer serverPlayer = new ServerPlayer(server, serverLevel, profile, ClientInformation.createDefault());
+        this.fakePlayer = serverPlayer.getBukkitEntity();
         this.fakePlayer.loadData();
 
         return this;
@@ -51,9 +59,10 @@ public class OfflinePlayerDataImpl implements OfflinePlayerData {
 
     @Override
     public void setLocation(Location location) {
-        EntityPlayer entityPlayer = ((CraftPlayer) this.fakePlayer).getHandle();
-        entityPlayer.world = ((CraftWorld) location.getWorld()).getHandle();
-        entityPlayer.setPositionRotation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+        ServerPlayer serverPlayer = ((CraftPlayer) this.fakePlayer).getHandle();
+        ServerLevel serverLevel = ((CraftWorld) location.getWorld()).getHandle();
+        ENTITY_SET_LEVEL.invoke(serverPlayer, serverLevel);
+        serverPlayer.absSnapTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
     }
 
     @Override

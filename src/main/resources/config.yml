@@ -489,26 +489,39 @@ island-names:
   # Should the plugin prevent players from using player names as island names?
   prevent-player-names: false
 
-# Should players get teleported to the island after they create it?
+# Should players get teleported to the island when they create it?
 teleport-on-create: true
 
-# Should players get teleported to the island after they accept an invite?
+# Should players get teleported to the island when they accept an invite?
 teleport-on-join: false
 
 # Should players get teleported to spawn when they are kicked from their island?
 teleport-on-kick: true
 
+# Should players get teleported to spawn when they leave an island?
+teleport-on-leave: false
+
 # List of clear actions to perform on island members when their island is disbanded.
-# You can use the following actions: ENDER_CHEST and INVENTORY
+# Available actions: EFFECTS, ENDER_CHEST, EXPERIENCE, HEALTH, HUNGER, INVENTORY
 # You can disable this feature by setting the section to 'clear-on-disband: []'
 clear-on-disband:
   - ENDER_CHEST
   - INVENTORY
 
-# List of clear actions to perform on players when they accept an invite to join an island.
-# You can use the following actions: ENDER_CHEST and INVENTORY
+# List of clear actions to perform on players when they accept an invite.
+# Available actions: EFFECTS, ENDER_CHEST, EXPERIENCE, HEALTH, HUNGER, INVENTORY
 # You can disable this feature by setting the section to 'clear-on-join: []'
 clear-on-join: []
+
+# List of clear actions to perform on players when they are kicked from their island.
+# Available actions: EFFECTS, ENDER_CHEST, EXPERIENCE, HEALTH, HUNGER, INVENTORY
+# You can disable this feature by setting the section to 'clear-on-kick: []'
+clear-on-kick: []
+
+# List of clear actions to perform on players when they leave an island.
+# Available actions: EFFECTS, ENDER_CHEST, EXPERIENCE, HEALTH, HUNGER, INVENTORY
+# You can disable this feature by setting the section to 'clear-on-leave: []'
+clear-on-leave: []
 
 # Should players be able to rate their own islands?
 rate-own-island: false

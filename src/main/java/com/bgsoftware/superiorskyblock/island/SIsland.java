@@ -97,6 +97,7 @@ import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
+import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import com.bgsoftware.superiorskyblock.world.GeneratorType;
@@ -570,12 +571,7 @@ public class SIsland implements Island {
         IslandsDatabaseBridge.addMember(this, superiorPlayer, System.currentTimeMillis());
     }
 
-    @Override
-    public void kickMember(SuperiorPlayer superiorPlayer) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-
-        Log.debug(Debug.KICK_MEMBER, owner.getName(), superiorPlayer.getName());
-
+    public boolean removeMember(SuperiorPlayer superiorPlayer) {
         boolean removedMember = members.writeAndGet(members -> members.remove(superiorPlayer));
 
         if (!removedMember) {
@@ -587,7 +583,7 @@ public class SIsland implements Island {
 
         // This player is not a member of the island.
         if (!removedMember)
-            return;
+            return false;
 
         superiorPlayer.setIsland(null);
 
@@ -596,12 +592,6 @@ public class SIsland implements Island {
 
             if (openedView != null)
                 openedView.closeView();
-
-            if (plugin.getSettings().isTeleportOnKick() && getAllPlayersInside().contains(superiorPlayer)) {
-                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-            } else {
-                updateIslandFly(superiorPlayer);
-            }
         });
 
         plugin.getMissions().getPlayerMissions().forEach(mission -> {
@@ -615,6 +605,46 @@ public class SIsland implements Island {
         plugin.getMenus().refreshMembers(this);
 
         IslandsDatabaseBridge.removeMember(this, superiorPlayer);
+
+        return true;
+    }
+
+    @Override
+    public void leaveIsland(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
+        Log.debug(Debug.LEAVE_ISLAND, owner.getName(), superiorPlayer.getName());
+
+        if (removeMember(superiorPlayer)) {
+            ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnLeave());
+
+            superiorPlayer.runIfOnline(player -> {
+                if (plugin.getSettings().isTeleportOnLeave() && getAllPlayersInside().contains(superiorPlayer)) {
+                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                } else {
+                    updateIslandFly(superiorPlayer);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void kickMember(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
+        Log.debug(Debug.KICK_MEMBER, owner.getName(), superiorPlayer.getName());
+
+        if (removeMember(superiorPlayer)) {
+            ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnKick());
+
+            superiorPlayer.runIfOnline(player -> {
+                if (plugin.getSettings().isTeleportOnKick() && getAllPlayersInside().contains(superiorPlayer)) {
+                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                } else {
+                    updateIslandFly(superiorPlayer);
+                }
+            });
+        }
     }
 
     @Override
@@ -1764,7 +1794,7 @@ public class SIsland implements Island {
                 kickMember(islandMember);
             }
 
-            plugin.getNMSPlayers().clearInventory(islandMember.asOfflinePlayer(), plugin.getSettings().getClearActionsOnDisband());
+            ClearActions.runClearActions(islandMember.asOfflinePlayer(), true, plugin.getSettings().getClearActionsOnDisband());;
 
             for (Mission<?> mission : plugin.getMissions().getPlayerMissions()) {
                 MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);

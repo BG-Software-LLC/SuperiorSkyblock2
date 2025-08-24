@@ -228,6 +228,17 @@ public class IslandUtils {
         return true;
     }
 
+    public static void handleLeaveIsland(SuperiorPlayer superiorPlayer, Island island) {
+        if (!PluginEventsFactory.callIslandQuitEvent(island, superiorPlayer))
+            return;
+
+        island.leaveIsland(superiorPlayer);
+
+        IslandUtils.sendMessage(island, Message.LEAVE_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
+
+        Message.LEFT_ISLAND.send(superiorPlayer);
+    }
+
     public static void handleKickPlayer(SuperiorPlayer caller, Island island, SuperiorPlayer target) {
         handleKickPlayer(caller, caller.getName(), island, target);
     }
