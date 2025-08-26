@@ -82,7 +82,7 @@ public class MenuMemberManage extends AbstractMenu<PlayerMenuView, PlayerViewArg
 
         int charCounter = 0;
 
-        if (cfg.contains("players-panel.fill-items")) {
+        if (cfg.isConfigurationSection("players-panel.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("players-panel.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

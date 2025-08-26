@@ -52,7 +52,7 @@ public class MenuBorderColor extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
             for (String itemsSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
                 ConfigurationSection itemsSection = cfg.getConfigurationSection("items." + itemsSectionName);
 
-                if (!itemsSection.contains("enable-border") || !itemsSection.contains("disable-border"))
+                if (!itemsSection.isConfigurationSection("enable-border") || !itemsSection.isConfigurationSection("disable-border"))
                     continue;
 
                 patternBuilder.setButtons(menuPatternSlots.getSlots(itemsSectionName),
@@ -96,7 +96,7 @@ public class MenuBorderColor extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
 
         int charCounter = 0;
 
-        if (cfg.contains("border-gui.fill-items")) {
+        if (cfg.isConfigurationSection("border-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("border-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

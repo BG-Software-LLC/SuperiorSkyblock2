@@ -119,7 +119,7 @@ public class MenuIslandRatings extends AbstractPagedMenu<MenuIslandRatings.View,
 
         int charCounter = 0;
 
-        if (cfg.contains("ratings-gui.fill-items")) {
+        if (cfg.isConfigurationSection("ratings-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("ratings-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

@@ -57,7 +57,7 @@ public class MenuIslandUpgrades extends AbstractMenu<IslandMenuView, IslandViewA
         YamlConfiguration cfg = menuParseResult.getConfig();
         MenuLayout.Builder<IslandMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
 
-        if (cfg.contains("upgrades")) {
+        if (cfg.isConfigurationSection("upgrades")) {
             ConfigurationSection upgradesSection = cfg.getConfigurationSection("upgrades");
             for (Upgrade upgrade : plugin.getUpgrades().getUpgrades()) {
                 ConfigurationSection upgradeSection = upgradesSection.getConfigurationSection(upgrade.getName());
@@ -139,12 +139,12 @@ public class MenuIslandUpgrades extends AbstractMenu<IslandMenuView, IslandViewA
 
         int charCounter = 0;
 
-        if (cfg.contains("upgrades-gui.fill-items")) {
+        if (cfg.isConfigurationSection("upgrades-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("upgrades-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        if (cfg.contains("upgrades-gui.upgrades")) {
+        if (cfg.isConfigurationSection("upgrades-gui.upgrades")) {
             for (String upgradeName : cfg.getConfigurationSection("upgrades-gui.upgrades").getKeys(false)) {
                 ConfigurationSection section = cfg.getConfigurationSection("upgrades-gui.upgrades." + upgradeName);
                 char itemChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
