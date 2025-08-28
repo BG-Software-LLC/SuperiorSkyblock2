@@ -273,7 +273,6 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
         BlockValue blockValue = plugin.getBlockValues().getBlockValue(rawKey);
         BigDecimal worthValue = blockValue.getWorth();
         BigDecimal levelValue = blockValue.getLevel();
-        int blockLimit = inventoryViewer.getIsland().getBlockLimit(customKeyItem.getKey());
 
         return itemBuilder
                 .withName(currentMeta.hasDisplayName() ? currentMeta.getDisplayName() : "")
