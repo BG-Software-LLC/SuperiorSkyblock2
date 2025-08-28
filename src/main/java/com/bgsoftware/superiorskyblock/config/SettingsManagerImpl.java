@@ -687,11 +687,19 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     private void convertData(YamlConfiguration cfg) {
         if (cfg.isBoolean("disband-inventory-clear")) {
-            cfg.set("clear-on-disband", Arrays.asList("ENDER_CHEST", "INVENTORY"));
+            if (cfg.getBoolean("disband-inventory-clear")) {
+                cfg.set("clear-on-disband", Arrays.asList("ENDER_CHEST", "INVENTORY"));
+            } else {
+                cfg.set("clear-on-disband", Collections.emptyList());
+            }
             cfg.set("disband-inventory-clear", null);
         }
         if (cfg.isBoolean("clear-on-join")) {
-            cfg.set("clear-on-join", Arrays.asList("ENDER_CHEST", "INVENTORY"));
+            if (cfg.getBoolean("disband-inventory-clear")) {
+                cfg.set("clear-on-join", Arrays.asList("ENDER_CHEST", "INVENTORY"));
+            } else {
+                cfg.set("clear-on-join", Collections.emptyList());
+            }
         }
         if (cfg.isInt("disband-count")) {
             cfg.set("default-disband-count", cfg.getInt("disband-count") == 0 ? -1 : cfg.getInt("disband-count"));
