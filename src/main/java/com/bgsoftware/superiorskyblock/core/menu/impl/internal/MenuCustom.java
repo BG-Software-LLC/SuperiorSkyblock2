@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
@@ -83,8 +84,9 @@ public class MenuCustom extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
                 }
             }
             boolean displayCommand = commandsSection.getBoolean("display-command", false);
+            boolean requireIsland = commandsSection.getBoolean("require-island", false);
 
-            args = new CommandArgs(aliases, permission, descriptions, displayCommand);
+            args = new CommandArgs(aliases, permission, descriptions, displayCommand, requireIsland);
         }
 
         return new MenuCustom(menuParseResult, fileName, args);
@@ -96,12 +98,14 @@ public class MenuCustom extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
         private final String permission;
         private final Map<Locale, IMessageComponent> descriptions;
         private final boolean displayCommand;
+        private final boolean requireIsland;
 
-        CommandArgs(List<String> aliases, String permission, Map<Locale, IMessageComponent> descriptions, boolean displayCommand) {
+        CommandArgs(List<String> aliases, String permission, Map<Locale, IMessageComponent> descriptions, boolean displayCommand, boolean requireIsland) {
             this.aliases = aliases;
             this.permission = permission;
             this.descriptions = descriptions;
             this.displayCommand = displayCommand;
+            this.requireIsland = requireIsland;
         }
 
     }
@@ -157,6 +161,12 @@ public class MenuCustom extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
         @Override
         public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+
+            if (this.args.requireIsland && !superiorPlayer.hasIsland()) {
+                Message.INVALID_ISLAND.send(superiorPlayer);
+                return;
+            }
+
             MenuCustom.this.createView(superiorPlayer, EmptyViewArgs.INSTANCE);
         }
 
