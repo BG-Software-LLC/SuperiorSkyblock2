@@ -120,13 +120,22 @@ public class ComplexMessageComponent implements IMessageComponent {
         @Nullable
         private final HoverEventContents hoverEventContents;
         @Nullable
-        private final ClickEvent clickEvent;
+        private final ClickEvent.Action clickEventAction;
+        @Nullable
+        private final MessageContent clickEventContent;
 
         ContentComponent(TextComponent textComponent) {
             this.content = MessageContent.parse(textComponent.toLegacyText());
             this.hoverEventContents = textComponent.getHoverEvent() == null ? null :
                     new HoverEventContents(textComponent.getHoverEvent());
-            this.clickEvent = textComponent.getClickEvent();
+            ClickEvent clickEvent = textComponent.getClickEvent();
+            if (clickEvent != null) {
+                this.clickEventAction = clickEvent.getAction();
+                this.clickEventContent = MessageContent.parse(clickEvent.getValue());
+            } else {
+                this.clickEventAction = null;
+                this.clickEventContent = null;
+            }
         }
 
         @Override
@@ -135,8 +144,10 @@ public class ComplexMessageComponent implements IMessageComponent {
                     this.content.getContent(offlinePlayer, args).orElse(""))[0];
             if (this.hoverEventContents != null)
                 textComponent.setHoverEvent(this.hoverEventContents.parse(offlinePlayer, args));
-            if (this.clickEvent != null)
-                textComponent.setClickEvent(this.clickEvent);
+            if (this.clickEventAction != null && this.clickEventContent != null) {
+                textComponent.setClickEvent(new ClickEvent(this.clickEventAction,
+                        this.clickEventContent.getContent(offlinePlayer, args).orElse("")));
+            }
 
             return textComponent;
         }
