@@ -54,15 +54,13 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
     @Override
     public CompletableFuture<View> refreshView(View view) {
         CompletableFuture<View> res = new CompletableFuture<>();
-        plugin.getGrid().sortIslands(view.sortingType, () -> {
-            super.refreshView(view).whenComplete((v, err) -> {
-                if (err != null) {
-                    res.completeExceptionally(err);
-                } else {
-                    res.complete(v);
-                }
-            });
-        });
+        plugin.getGrid().sortIslands(view.sortingType, () -> super.refreshView(view).whenComplete((v, err) -> {
+            if (err != null) {
+                res.completeExceptionally(err);
+            } else {
+                res.complete(v);
+            }
+        }));
         return res;
     }
 
@@ -215,7 +213,7 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
 
         int charCounter = 0;
 
-        if (cfg.contains("top-islands.fill-items")) {
+        if (cfg.isConfigurationSection("top-islands.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("top-islands.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
@@ -240,24 +238,24 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
         newMenu.set("sounds." + slotsChar + ".no-island", noIslandItemSection.getConfigurationSection("sound"));
         noIslandItemSection.set("sound", null);
 
-        if (cfg.contains("top-islands.worth-sort")) {
+        if (cfg.isConfigurationSection("top-islands.worth-sort")) {
             MenuConverter.convertItem(cfg.getConfigurationSection("top-islands.worth-sort"), patternChars, worthChar,
                     itemsSection, commandsSection, soundsSection);
         }
-        if (cfg.contains("top-islands.level-sort")) {
+        if (cfg.isConfigurationSection("top-islands.level-sort")) {
             MenuConverter.convertItem(cfg.getConfigurationSection("top-islands.level-sort"), patternChars, levelChar,
                     itemsSection, commandsSection, soundsSection);
         }
-        if (cfg.contains("top-islands.rating-sort")) {
+        if (cfg.isConfigurationSection("top-islands.rating-sort")) {
             MenuConverter.convertItem(cfg.getConfigurationSection("top-islands.rating-sort"), patternChars, ratingChar,
                     itemsSection, commandsSection, soundsSection);
         }
-        if (cfg.contains("top-islands.players-sort")) {
+        if (cfg.isConfigurationSection("top-islands.players-sort")) {
             MenuConverter.convertItem(cfg.getConfigurationSection("top-islands.players-sort"), patternChars, playersChar,
                     itemsSection, commandsSection, soundsSection);
         }
 
-        if (cfg.contains("player-island-slot"))
+        if (cfg.isInt("player-island-slot"))
             patternChars[cfg.getInt("player-island-slot")] = playerIslandChar;
 
         newMenu.set("worth-sort", worthChar);

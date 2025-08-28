@@ -90,13 +90,11 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
         @Override
         protected List<WarpCategory> requestObjects() {
             DynamicArray<WarpCategory> warpCategories = new DynamicArray<>();
-            island.getWarpCategories().values().forEach(warpCategory -> {
-                warpCategory.getWarps()
-                        .stream()
-                        .filter(islandWarp -> island.isMember(getInventoryViewer()) || !islandWarp.hasPrivateFlag())
-                        .findAny()
-                        .ifPresent(unused -> warpCategories.set(warpCategory.getSlot(), warpCategory));
-            });
+            island.getWarpCategories().values().forEach(warpCategory -> warpCategory.getWarps()
+                    .stream()
+                    .filter(islandWarp -> island.isMember(getInventoryViewer()) || !islandWarp.hasPrivateFlag())
+                    .findAny()
+                    .ifPresent(unused -> warpCategories.set(warpCategory.getSlot(), warpCategory)));
             return warpCategories.toList();
         }
 
@@ -107,7 +105,7 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
     }
 
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
-        if (newMenu.contains("slots") || !newMenu.contains("items"))
+        if (newMenu.isString("slots") || !newMenu.isConfigurationSection("items"))
             return false;
 
         String itemChar = newMenu.getConfigurationSection("items")

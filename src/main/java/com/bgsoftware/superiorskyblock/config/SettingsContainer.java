@@ -439,7 +439,7 @@ public class SettingsContainer {
         blockedVisitorsCommands = Collections.unmodifiableList(config.getStringList("blocked-visitors-commands"));
         defaultContainersEnabled = config.getBoolean("default-containers.enabled", false);
         Map<InventoryType, ListTag> defaultContainersContents = new EnumMap<>(InventoryType.class);
-        if (config.contains("default-containers.containers")) {
+        if (config.isConfigurationSection("default-containers.containers")) {
             for (String container : config.getConfigurationSection("default-containers.containers").getKeys(false)) {
                 try {
                     InventoryType containerType = InventoryType.valueOf(container.toUpperCase(Locale.ENGLISH));
@@ -476,7 +476,7 @@ public class SettingsContainer {
         defaultSignLines = Collections.unmodifiableList(
                 Formatters.formatList(config.getStringList("default-signs"), Formatters.COLOR_FORMATTER));
         Map<String, List<String>> eventCommands = new HashMap<>();
-        if (config.contains("event-commands")) {
+        if (config.isConfigurationSection("event-commands")) {
             for (String eventName : config.getConfigurationSection("event-commands").getKeys(false)) {
                 eventCommands.put(eventName.toLowerCase(Locale.ENGLISH), config.getStringList("event-commands." + eventName));
             }

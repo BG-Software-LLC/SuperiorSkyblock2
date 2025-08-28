@@ -35,10 +35,9 @@ public class MenuMissions extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
 
         MenuLayout.Builder<BaseMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
 
-        plugin.getMissions().getMissionCategories().forEach(missionCategory -> {
-            patternBuilder.mapButton(missionCategory.getSlot(),
-                    new OpenMissionCategoryButton.Builder().setMissionsCategory(missionCategory));
-        });
+        plugin.getMissions().getMissionCategories().forEach(
+                missionCategory -> patternBuilder.mapButton(missionCategory.getSlot(),
+                        new OpenMissionCategoryButton.Builder().setMissionsCategory(missionCategory)));
 
         return new MenuMissions(menuParseResult);
     }

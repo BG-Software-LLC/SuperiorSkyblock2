@@ -62,7 +62,7 @@ public class MenuCustom extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
         YamlConfiguration cfg = menuParseResult.getConfig();
         CommandArgs args = null;
 
-        if (cfg.contains("command")) {
+        if (cfg.isConfigurationSection("command")) {
             ConfigurationSection commandsSection = cfg.getConfigurationSection("command");
 
             if (commandsSection == null) {

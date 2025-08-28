@@ -292,7 +292,7 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
 
         int charCounter = 0;
 
-        if (cfg.contains("permissions-gui.fill-items")) {
+        if (cfg.isConfigurationSection("permissions-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("permissions-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
