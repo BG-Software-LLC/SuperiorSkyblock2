@@ -68,7 +68,7 @@ public class OfflinePlayerDataImpl implements OfflinePlayerData {
     @Override
     public void release() {
         this.fakePlayer = null;
-
+        POOL.release(this);
     }
 
 }

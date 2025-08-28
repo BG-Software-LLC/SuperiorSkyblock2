@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
+import com.bgsoftware.superiorskyblock.api.enums.RemoveReason;
 import com.bgsoftware.superiorskyblock.api.hooks.LazyWorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -182,7 +183,7 @@ public class SIsland implements Island {
     private final BlockPosition center;
     private final long creationTime;
     @Nullable
-    private final String schemName;
+    private final String schematicName;
     /*
      * Island Upgrade Values
      */
@@ -273,7 +274,7 @@ public class SIsland implements Island {
         this.creationTime = builder.creationTime;
         this.islandName = builder.islandName;
         this.islandRawName = Formatters.STRIP_COLOR_FORMATTER.format(this.islandName);
-        this.schemName = builder.islandType;
+        this.schematicName = builder.islandType;
         this.discord = builder.discord;
         this.paypal = builder.paypal;
         this.bonusWorth.set(builder.bonusWorth);
@@ -546,7 +547,7 @@ public class SIsland implements Island {
         if (!addedNewMember)
             return;
 
-        // Remove player from being coop, invited and its ratings
+        // Remove player from being cooped, invited and its ratings
         removeCoop(superiorPlayer);
         revokeInvite(superiorPlayer);
         removeRating(superiorPlayer);
@@ -571,7 +572,17 @@ public class SIsland implements Island {
         IslandsDatabaseBridge.addMember(this, superiorPlayer, System.currentTimeMillis());
     }
 
-    public boolean removeMember(SuperiorPlayer superiorPlayer) {
+    @Override
+    public void removeMember(SuperiorPlayer superiorPlayer, RemoveReason removeReason) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(removeReason, "removeReason parameter cannot be null.");
+
+        if (removeReason == RemoveReason.KICK) {
+            Log.debug(Debug.KICK_MEMBER, owner.getName(), superiorPlayer.getName());
+        } else if (removeReason == RemoveReason.LEAVE) {
+            Log.debug(Debug.LEAVE_ISLAND, owner.getName(), superiorPlayer.getName());
+        }
+
         boolean removedMember = members.writeAndGet(members -> members.remove(superiorPlayer));
 
         if (!removedMember) {
@@ -583,15 +594,30 @@ public class SIsland implements Island {
 
         // This player is not a member of the island.
         if (!removedMember)
-            return false;
+            return;
 
         superiorPlayer.setIsland(null);
+
+        if (removeReason == RemoveReason.KICK) {
+            ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnKick());
+        } else if (removeReason == RemoveReason.LEAVE) {
+            ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnLeave());
+        }
 
         superiorPlayer.runIfOnline(player -> {
             MenuView<?, ?> openedView = superiorPlayer.getOpenedView();
 
             if (openedView != null)
                 openedView.closeView();
+
+            boolean shouldTeleport = (removeReason == RemoveReason.KICK && plugin.getSettings().isTeleportOnKick()) ||
+                    (removeReason == RemoveReason.LEAVE && plugin.getSettings().isTeleportOnLeave());
+
+            if (shouldTeleport && getAllPlayersInside().contains(superiorPlayer)) {
+                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+            } else {
+                updateIslandFly(superiorPlayer);
+            }
         });
 
         plugin.getMissions().getPlayerMissions().forEach(mission -> {
@@ -605,46 +631,12 @@ public class SIsland implements Island {
         plugin.getMenus().refreshMembers(this);
 
         IslandsDatabaseBridge.removeMember(this, superiorPlayer);
-
-        return true;
     }
 
     @Override
-    public void leaveIsland(SuperiorPlayer superiorPlayer) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-
-        Log.debug(Debug.LEAVE_ISLAND, owner.getName(), superiorPlayer.getName());
-
-        if (removeMember(superiorPlayer)) {
-            ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnLeave());
-
-            superiorPlayer.runIfOnline(player -> {
-                if (plugin.getSettings().isTeleportOnLeave() && getAllPlayersInside().contains(superiorPlayer)) {
-                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-                } else {
-                    updateIslandFly(superiorPlayer);
-                }
-            });
-        }
-    }
-
-    @Override
+    @Deprecated
     public void kickMember(SuperiorPlayer superiorPlayer) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-
-        Log.debug(Debug.KICK_MEMBER, owner.getName(), superiorPlayer.getName());
-
-        if (removeMember(superiorPlayer)) {
-            ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnKick());
-
-            superiorPlayer.runIfOnline(player -> {
-                if (plugin.getSettings().isTeleportOnKick() && getAllPlayersInside().contains(superiorPlayer)) {
-                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-                } else {
-                    updateIslandFly(superiorPlayer);
-                }
-            });
-        }
+        removeMember(superiorPlayer, RemoveReason.KICK);
     }
 
     @Override
@@ -671,7 +663,7 @@ public class SIsland implements Island {
             return;
 
         if (isMember(superiorPlayer))
-            kickMember(superiorPlayer);
+            removeMember(superiorPlayer, RemoveReason.KICK);
 
         plugin.getMenus().refreshIslandBannedPlayers(this);
 
@@ -1791,10 +1783,10 @@ public class SIsland implements Island {
             if (islandMember.equals(owner)) {
                 owner.setIsland(null);
             } else {
-                kickMember(islandMember);
+                removeMember(islandMember, RemoveReason.DISBAND);
             }
 
-            ClearActions.runClearActions(islandMember.asOfflinePlayer(), true, plugin.getSettings().getClearActionsOnDisband());;
+            ClearActions.runClearActions(islandMember.asOfflinePlayer(), true, plugin.getSettings().getClearActionsOnDisband());
 
             for (Mission<?> mission : plugin.getMissions().getPlayerMissions()) {
                 MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
@@ -4499,7 +4491,7 @@ public class SIsland implements Island {
 
     @Override
     public String getSchematicName() {
-        return this.schemName == null ? "" : this.schemName;
+        return this.schematicName == null ? "" : this.schematicName;
     }
 
     @Override
@@ -4586,7 +4578,7 @@ public class SIsland implements Island {
                         Message.ISLAND_WORTH_TIME_OUT.send(asker);
                 } else {
                     Log.entering(owner.getName(), asker);
-                    Log.error(error, "An unexepcted error occurred while calculating island worth:");
+                    Log.error(error, "An unexpected error occurred while calculating island worth:");
 
                     if (asker != null)
                         Message.ISLAND_WORTH_ERROR.send(asker);

@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
+import com.bgsoftware.superiorskyblock.api.enums.RemoveReason;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
@@ -139,13 +140,14 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public void leaveIsland(SuperiorPlayer superiorPlayer) {
-        this.handle.leaveIsland(superiorPlayer);
+    @Deprecated
+    public void kickMember(SuperiorPlayer superiorPlayer) {
+        this.handle.kickMember(superiorPlayer);
     }
 
     @Override
-    public void kickMember(SuperiorPlayer superiorPlayer) {
-        this.handle.kickMember(superiorPlayer);
+    public void removeMember(SuperiorPlayer superiorPlayer, RemoveReason removeReason) {
+        this.handle.removeMember(superiorPlayer, removeReason);
     }
 
     @Override

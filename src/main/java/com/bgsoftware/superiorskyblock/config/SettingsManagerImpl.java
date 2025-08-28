@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.config.section.AFKIntegrationsSection;
 import com.bgsoftware.superiorskyblock.config.section.DatabaseSection;
@@ -25,6 +26,7 @@ import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -32,11 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @SuppressWarnings("WeakerAccess")
 public class SettingsManagerImpl extends Manager implements SettingsManager {
@@ -274,7 +272,8 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public boolean isDisbandInventoryClear() {
-        return this.global.isDisbandInventoryClear();
+        List<ClearAction> clearActions = this.global.getClearActionsOnDisband();
+        return clearActions.contains(ClearActions.ENDER_CHEST) && clearActions.contains(ClearActions.INVENTORY);
     }
 
     @Override
@@ -298,8 +297,34 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public boolean isTeleportOnLeave() {
+        return this.global.isTeleportOnLeave();
+    }
+
+    @Override
     public boolean isClearOnJoin() {
-        return this.global.isClearOnJoin();
+        List<ClearAction> clearActions = this.global.getClearActionsOnJoin();
+        return clearActions.contains(ClearActions.ENDER_CHEST) && clearActions.contains(ClearActions.INVENTORY);
+    }
+
+    @Override
+    public List<ClearAction> getClearActionsOnDisband() {
+        return this.global.getClearActionsOnDisband();
+    }
+
+    @Override
+    public List<ClearAction> getClearActionsOnJoin() {
+        return this.global.getClearActionsOnJoin();
+    }
+
+    @Override
+    public List<ClearAction> getClearActionsOnKick() {
+        return this.global.getClearActionsOnKick();
+    }
+
+    @Override
+    public List<ClearAction> getClearActionsOnLeave() {
+        return this.global.getClearActionsOnLeave();
     }
 
     @Override
@@ -661,6 +686,13 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     private void convertData(YamlConfiguration cfg) {
+        if (cfg.isBoolean("disband-inventory-clear")) {
+            cfg.set("clear-on-disband", Arrays.asList("ENDER_CHEST", "INVENTORY"));
+            cfg.set("disband-inventory-clear", null);
+        }
+        if (cfg.isBoolean("clear-on-join")) {
+            cfg.set("clear-on-join", Arrays.asList("ENDER_CHEST", "INVENTORY"));
+        }
         if (cfg.isInt("disband-count")) {
             cfg.set("default-disband-count", cfg.getInt("disband-count") == 0 ? -1 : cfg.getInt("disband-count"));
             cfg.set("disband-count", null);

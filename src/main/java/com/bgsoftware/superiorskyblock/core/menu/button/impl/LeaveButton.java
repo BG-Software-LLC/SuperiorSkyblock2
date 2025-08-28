@@ -5,18 +5,15 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-import java.util.Collections;
 import java.util.List;
 
 public class LeaveButton extends AbstractMenuViewButton<BaseMenuView> {
@@ -35,7 +32,7 @@ public class LeaveButton extends AbstractMenuViewButton<BaseMenuView> {
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
         Island island = inventoryViewer.getIsland();
 
-        if (getTemplate().leaveIsland) {
+        if (getTemplate().leaveIsland && island != null) {
             IslandUtils.handleLeaveIsland(inventoryViewer, island);
         }
 
