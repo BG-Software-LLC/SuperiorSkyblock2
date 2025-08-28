@@ -270,6 +270,7 @@ COMMAND_DESCRIPTION_ADMIN_WITHDRAW: Rút tiền từ ngân hàng đảo của ng
 COMMAND_DESCRIPTION_BALANCE: 'Kiểm tra số tiền bên trong ngân hàng của một hòn đảo.'
 COMMAND_DESCRIPTION_BAN: Cấm một người chơi từ đảo của bạn.
 COMMAND_DESCRIPTION_BANK: 'Mở ngân hàng đảo.'
+COMMAND_DESCRIPTION_BANS: 'Open the bans menu.'
 COMMAND_DESCRIPTION_BIOME: Thẩy đổi quần xã của hòn đảo.
 COMMAND_DESCRIPTION_BORDER: Thay đổi màu giới hạn đảo.
 COMMAND_DESCRIPTION_CHEST: 'Mở rương đảo.'

@@ -233,6 +233,7 @@ COMMAND_DESCRIPTION_ADMIN_WITHDRAW: Retirer de l'argent de la banque d'île d'un
 COMMAND_DESCRIPTION_BALANCE: Vérifier la quantité d'argent dans le coffre de l'île spécifiée.
 COMMAND_DESCRIPTION_BAN: Bannir un joueur de votre île.
 COMMAND_DESCRIPTION_BANK: Ouvrir la banque de l'île.
+COMMAND_DESCRIPTION_BANS: 'Open the bans menu.'
 COMMAND_DESCRIPTION_BIOME: Changer le biome de l'île.
 COMMAND_DESCRIPTION_BORDER: Changer la couleur de la bordure de l'île.
 COMMAND_DESCRIPTION_CHEST: Ouvrir le stockage communautaire de l'île.
