@@ -54,7 +54,7 @@ public class MenuIslandBank extends AbstractMenu<IslandMenuView, IslandViewArgs>
 
         if (cfg.isConfigurationSection("items")) {
             for (String itemChar : cfg.getConfigurationSection("items").getKeys(false)) {
-                if (cfg.contains("items." + itemChar + ".bank-action")) {
+                if (cfg.isConfigurationSection("items." + itemChar + ".bank-action")) {
                     List<Integer> slots = menuPatternSlots.getSlots(itemChar);
 
                     if (slots.isEmpty()) {
@@ -77,7 +77,7 @@ public class MenuIslandBank extends AbstractMenu<IslandMenuView, IslandViewArgs>
                         List<String> withdrawCommands = cfg.getStringList("items." + itemChar + ".bank-action.withdraw");
                         patternBuilder.mapButtons(slots, new BankWithdrawButton.Builder(withdrawCommands)
                                 .setFailSound(failSound).setSuccessSound(successSound));
-                    } else if (cfg.contains("items." + itemChar + ".bank-action.deposit")) {
+                    } else if (cfg.isDouble("items." + itemChar + ".bank-action.deposit")) {
                         double depositPercentage = cfg.getDouble("items." + itemChar + ".bank-action.deposit");
                         if (depositPercentage <= 0) {
                             patternBuilder.mapButtons(slots, new BankCustomDepositButton.Builder()

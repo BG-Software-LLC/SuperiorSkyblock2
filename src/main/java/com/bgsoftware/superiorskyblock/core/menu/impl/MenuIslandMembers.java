@@ -90,7 +90,7 @@ public class MenuIslandMembers extends AbstractPagedMenu<MenuIslandMembers.View,
 
         int charCounter = 0;
 
-        if (cfg.contains("members-panel.fill-items")) {
+        if (cfg.isConfigurationSection("members-panel.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("members-panel.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

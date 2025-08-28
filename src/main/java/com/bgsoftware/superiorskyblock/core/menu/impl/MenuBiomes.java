@@ -80,27 +80,27 @@ public class MenuBiomes extends AbstractMenu<IslandMenuView, IslandViewArgs> {
 
                 BiomeButton.Builder buttonBuilder = new BiomeButton.Builder(biome);
 
-                if (itemSection.contains("access")) {
+                if (itemSection.isConfigurationSection("access")) {
                     buttonBuilder.setAccessItem(MenuParserImpl.getInstance().getItemStack("menus/biomes.yml",
                             itemSection.getConfigurationSection("access")));
                 }
-                if (itemSection.contains("no-access")) {
+                if (itemSection.isConfigurationSection("no-access")) {
                     buttonBuilder.setNoAccessItem(MenuParserImpl.getInstance().getItemStack("menus/biomes.yml",
                             itemSection.getConfigurationSection("no-access")));
                 }
                 if (soundSection != null) {
-                    if (soundSection.contains("access")) {
+                    if (soundSection.isConfigurationSection("access")) {
                         buttonBuilder.setAccessSound(MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("access")));
                     }
-                    if (soundSection.contains("no-access")) {
+                    if (soundSection.isConfigurationSection("no-access")) {
                         buttonBuilder.setNoAccessSound(MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("no-access")));
                     }
                 }
                 if (commandSection != null) {
-                    if (commandSection.contains("access")) {
+                    if (commandSection.isList("access")) {
                         buttonBuilder.setAccessCommands(commandSection.getStringList("access"));
                     }
-                    if (commandSection.contains("no-access")) {
+                    if (commandSection.isList("no-access")) {
                         buttonBuilder.setNoAccessCommands(commandSection.getStringList("no-access"));
                     }
                 }
@@ -134,12 +134,12 @@ public class MenuBiomes extends AbstractMenu<IslandMenuView, IslandViewArgs> {
 
         int charCounter = 0;
 
-        if (cfg.contains("biomes-gui.fill-items")) {
+        if (cfg.isConfigurationSection("biomes-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("biomes-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        if (cfg.contains("biomes-gui.biomes")) {
+        if (cfg.isConfigurationSection("biomes-gui.biomes")) {
             for (String biomeName : cfg.getConfigurationSection("biomes-gui.biomes").getKeys(false)) {
                 ConfigurationSection section = cfg.getConfigurationSection("biomes-gui.biomes." + biomeName);
                 char itemChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];

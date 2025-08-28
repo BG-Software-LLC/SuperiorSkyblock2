@@ -64,9 +64,9 @@ public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, Emp
 
         List<Integer> slots = new LinkedList<>();
 
-        if (cfg.contains("warps"))
+        if (cfg.isString("warps"))
             slots.addAll(MenuParserImpl.getInstance().parseButtonSlots(cfg, "warps", menuPatternSlots));
-        if (cfg.contains("slots"))
+        if (cfg.isString("slots"))
             slots.addAll(MenuParserImpl.getInstance().parseButtonSlots(cfg, "slots", menuPatternSlots));
         if (slots.isEmpty())
             slots.add(-1);
@@ -124,7 +124,7 @@ public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, Emp
 
         int charCounter = 0;
 
-        if (cfg.contains("global-gui.fill-items")) {
+        if (cfg.isConfigurationSection("global-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("global-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

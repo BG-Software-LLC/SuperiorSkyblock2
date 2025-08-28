@@ -16,4 +16,9 @@ public interface NMSEntities {
 
     int getPortalTicks(Entity entity);
 
+    default boolean canShearSaddleFromEntity(Entity entity) {
+        // Not implemented for most versions
+        return false;
+    }
+
 }

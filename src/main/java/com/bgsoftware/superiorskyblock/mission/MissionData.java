@@ -41,7 +41,7 @@ public class MissionData {
         this.leaveReset = section.getBoolean("leave-reset", false);
         this.resetAmount = section.getInt("reset-amount", 1);
 
-        if (section.contains("rewards.items")) {
+        if (section.isConfigurationSection("rewards.items")) {
             for (String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
                 TemplateItem templateItem = MenuParserImpl.getInstance().getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key));
                 if (templateItem != null) {

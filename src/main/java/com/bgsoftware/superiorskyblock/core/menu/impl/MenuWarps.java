@@ -151,7 +151,7 @@ public class MenuWarps extends AbstractPagedMenu<MenuWarps.View, MenuWarps.Args,
 
         int charCounter = 0;
 
-        if (cfg.contains("warps-gui.fill-items")) {
+        if (cfg.isConfigurationSection("warps-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("warps-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

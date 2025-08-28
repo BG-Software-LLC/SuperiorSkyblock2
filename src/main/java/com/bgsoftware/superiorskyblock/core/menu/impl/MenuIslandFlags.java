@@ -191,7 +191,7 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
 
         int charCounter = 0;
 
-        if (cfg.contains("settings-gui.fill-items")) {
+        if (cfg.isConfigurationSection("settings-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("settings-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
