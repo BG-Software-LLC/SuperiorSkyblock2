@@ -10,6 +10,7 @@ import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftMinecartFurnace;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Animals;
+import org.bukkit.entity.Steerable;
 import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -49,4 +50,8 @@ public class NMSEntitiesImpl implements NMSEntities {
         return portalProcessor == null ? 0 : portalProcessor.getPortalTime();
     }
 
+    @Override
+    public boolean canShearSaddleFromEntity(org.bukkit.entity.Entity entity) {
+        return entity instanceof Steerable steerable && steerable.hasSaddle();
+    }
 }
