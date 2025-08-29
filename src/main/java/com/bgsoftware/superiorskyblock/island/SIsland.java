@@ -131,6 +131,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -156,6 +157,8 @@ public class SIsland implements Island {
 
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
     private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
+    private static final UUID[] EMPTY_IGNORED_MEMBERS = new UUID[0];
+
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
         @Override
@@ -1757,7 +1760,7 @@ public class SIsland implements Island {
     public void disbandIsland() {
         long profilerId = Profiler.start(ProfileType.DISBAND_ISLAND, 2);
 
-        forEachIslandMember(Collections.emptyList(), false, islandMember -> {
+        forEachIslandMember(EMPTY_IGNORED_MEMBERS, false, islandMember -> {
             if (islandMember.equals(owner)) {
                 owner.setIsland(null);
             } else {
@@ -2125,11 +2128,9 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(message, "message parameter cannot be null.");
         Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
 
-        List<UUID> ignoredList = ignoredMembers.length == 0 ? Collections.emptyList() : Arrays.asList(ignoredMembers);
+        Log.debug(Debug.SEND_MESSAGE, owner.getName(), message, Arrays.toString(ignoredMembers));
 
-        Log.debug(Debug.SEND_MESSAGE, owner.getName(), message, ignoredList);
-
-        forEachIslandMember(ignoredList, false, islandMember -> {
+        forEachIslandMember(ignoredMembers, false, islandMember -> {
             String playerMessage = message;
 
             if (!Text.isBlank(playerMessage))
@@ -2151,7 +2152,10 @@ public class SIsland implements Island {
 
         Log.debug(Debug.SEND_MESSAGE, owner.getName(), messageComponent.getMessage(args), ignoredMembers, Arrays.asList(args));
 
-        forEachIslandMember(ignoredMembers, false, islandMember -> messageComponent.sendMessage(islandMember.asPlayer(), args));
+        Set<UUID> ignoredMembersSet = ignoredMembers.isEmpty() ? Collections.emptySet() : new HashSet<>(ignoredMembers);
+        
+        forEachIslandMember(ignoredMembersSet, false,
+                islandMember -> messageComponent.sendMessage(islandMember.asPlayer(), args));
     }
 
     @Override
@@ -2159,11 +2163,9 @@ public class SIsland implements Island {
                           int fadeOut, UUID... ignoredMembers) {
         Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
 
-        List<UUID> ignoredList = ignoredMembers.length == 0 ? Collections.emptyList() : Arrays.asList(ignoredMembers);
+        Log.debug(Debug.SEND_TITLE, owner.getName(), title, subtitle, fadeIn, duration, fadeOut, Arrays.toString(ignoredMembers));
 
-        Log.debug(Debug.SEND_TITLE, owner.getName(), title, subtitle, fadeIn, duration, fadeOut, ignoredList);
-
-        forEachIslandMember(ignoredList, true, islandMember -> {
+        forEachIslandMember(ignoredMembers, true, islandMember -> {
             String playerTitle = title;
             String playerSubtitle = subtitle;
 
@@ -2183,11 +2185,9 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(command, "command parameter cannot be null.");
         Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
 
-        List<UUID> ignoredList = ignoredMembers.length == 0 ? Collections.emptyList() : Arrays.asList(ignoredMembers);
+        Log.debug(Debug.EXECUTE_ISLAND_COMMANDS, owner.getName(), command, onlyOnlineMembers, Arrays.toString(ignoredMembers));
 
-        Log.debug(Debug.EXECUTE_ISLAND_COMMANDS, owner.getName(), command, onlyOnlineMembers, ignoredList);
-
-        forEachIslandMember(ignoredList, onlyOnlineMembers, islandMember -> {
+        forEachIslandMember(ignoredMembers, onlyOnlineMembers, islandMember -> {
             String playerCommand = command;
 
             if (!Text.isBlank(playerCommand)) {
@@ -5239,7 +5239,19 @@ public class SIsland implements Island {
             callback.run();
     }
 
-    private void forEachIslandMember(List<UUID> ignoredMembers, boolean onlyOnline, Consumer<SuperiorPlayer> islandMemberConsumer) {
+    private void forEachIslandMember(UUID[] ignoredMembersArray, boolean onlyOnline, Consumer<SuperiorPlayer> islandMemberConsumer) {
+        Set<UUID> ignoredMembersSet;
+        if (ignoredMembersArray.length == 0) {
+            ignoredMembersSet = Collections.emptySet();
+        } else {
+            ignoredMembersSet = new HashSet<>();
+            Collections.addAll(ignoredMembersSet, ignoredMembersArray);
+        }
+
+        forEachIslandMember(ignoredMembersSet, onlyOnline, islandMemberConsumer);
+    }
+
+    private void forEachIslandMember(Set<UUID> ignoredMembers, boolean onlyOnline, Consumer<SuperiorPlayer> islandMemberConsumer) {
         for (SuperiorPlayer islandMember : getIslandMembers(true)) {
             if (!ignoredMembers.contains(islandMember.getUniqueId()) && (!onlyOnline || islandMember.isOnline())) {
                 islandMemberConsumer.accept(islandMember);
