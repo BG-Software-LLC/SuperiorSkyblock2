@@ -2234,15 +2234,17 @@ public class SIsland implements Island {
 
         Log.debug(Debug.EXECUTE_ISLAND_COMMANDS, owner.getName(), command, onlyOnlineMembers, Arrays.toString(ignoredMembers));
 
-        forEachIslandMember(ignoredMembers, onlyOnlineMembers, islandMember -> {
-            String playerCommand = command;
+        BukkitExecutor.ensureMain(() -> {
+            forEachIslandMember(ignoredMembers, onlyOnlineMembers, islandMember -> {
+                String playerCommand = command;
 
-            if (!Text.isBlank(playerCommand)) {
-                playerCommand = placeholdersService.get().parsePlaceholders(islandMember.asOfflinePlayer(), playerCommand)
-                        .replace("{player-name}", islandMember.getName());
-            }
+                if (!Text.isBlank(playerCommand)) {
+                    playerCommand = placeholdersService.get().parsePlaceholders(islandMember.asOfflinePlayer(), playerCommand)
+                            .replace("{player-name}", islandMember.getName());
+                }
 
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), playerCommand);
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), playerCommand);
+            });
         });
     }
 
