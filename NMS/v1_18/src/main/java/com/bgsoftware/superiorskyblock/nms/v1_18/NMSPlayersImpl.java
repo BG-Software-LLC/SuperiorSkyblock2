@@ -2,79 +2,34 @@ package com.bgsoftware.superiorskyblock.nms.v1_18;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
+import com.bgsoftware.superiorskyblock.nms.player.OfflinePlayerData;
+import com.bgsoftware.superiorskyblock.nms.v1_18.player.OfflinePlayerDataImpl;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.service.bossbar.BossBarTask;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
-import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
-import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 
 import java.util.Locale;
-import java.util.Optional;
 
 public class NMSPlayersImpl implements NMSPlayers {
 
     private static final ReflectMethod<Locale> PLAYER_LOCALE = new ReflectMethod<>(Player.class, "locale");
 
-    private final SuperiorSkyblockPlugin plugin;
-
-    public NMSPlayersImpl(SuperiorSkyblockPlugin plugin) {
-        this.plugin = plugin;
-    }
-
     @Override
-    public void clearInventory(OfflinePlayer offlinePlayer) {
-        if (offlinePlayer.isOnline() || offlinePlayer instanceof Player) {
-            Player player = offlinePlayer instanceof Player ? (Player) offlinePlayer : offlinePlayer.getPlayer();
-            assert player != null;
-            player.getInventory().clear();
-            player.getEnderChest().clear();
-            return;
-        }
-
-        GameProfile profile = new GameProfile(offlinePlayer.getUniqueId(), Optional.ofNullable(offlinePlayer.getName()).orElse(""));
-
-        MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
-        ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
-
-        if (serverLevel == null)
-            return;
-
-        ServerPlayer serverPlayer = new ServerPlayer(server, serverLevel, profile);
-        Player targetPlayer = serverPlayer.getBukkitEntity();
-
-        targetPlayer.loadData();
-
-        clearInventory(targetPlayer);
-
-        //Setting the entity to the spawn location
-        Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter(Dimensions.NORMAL);
-
-        if (spawnLocation != null) {
-            serverPlayer.setLevel(serverLevel);
-            serverPlayer.absMoveTo(spawnLocation.getX(), spawnLocation.getY(), spawnLocation.getZ(),
-                    spawnLocation.getYaw(), spawnLocation.getPitch());
-        }
-
-        targetPlayer.saveData();
+    public OfflinePlayerData createOfflinePlayerData(OfflinePlayer offlinePlayer) {
+        return OfflinePlayerDataImpl.create(offlinePlayer);
     }
 
     @Override

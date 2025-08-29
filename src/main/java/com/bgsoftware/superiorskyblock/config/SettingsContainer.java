@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
@@ -143,7 +144,6 @@ public class SettingsContainer {
     public final boolean transferConfirm;
     public final String spawnersProvider;
     public final String stackedBlocksProvider;
-    public final boolean disbandInventoryClear;
     public final boolean islandNamesRequiredForCreation;
     public final int islandNamesMaxLength;
     public final int islandNamesMinLength;
@@ -154,7 +154,11 @@ public class SettingsContainer {
     public final boolean teleportOnCreate;
     public final boolean teleportOnJoin;
     public final boolean teleportOnKick;
-    public final boolean clearOnJoin;
+    public final boolean teleportOnLeave;
+    public final List<ClearAction> clearActionsOnDisband;
+    public final List<ClearAction> clearActionsOnJoin;
+    public final List<ClearAction> clearActionsOnKick;
+    public final List<ClearAction> clearActionsOnLeave;
     public final boolean rateOwnIsland;
     public final boolean changeIslandRating;
     public final List<String> defaultSettings;
@@ -387,7 +391,6 @@ public class SettingsContainer {
         transferConfirm = config.getBoolean("transfer-confirm");
         spawnersProvider = config.getString("spawners-provider", "AUTO");
         stackedBlocksProvider = config.getString("stacked-blocks-provider", "AUTO");
-        disbandInventoryClear = config.getBoolean("disband-inventory-clear", true);
         islandNamesRequiredForCreation = config.getBoolean("island-names.required-for-creation", true);
         islandNamesMaxLength = config.getInt("island-names.max-length", 16);
         islandNamesMinLength = config.getInt("island-names.min-length", 3);
@@ -400,7 +403,11 @@ public class SettingsContainer {
         teleportOnCreate = config.getBoolean("teleport-on-create", true);
         teleportOnJoin = config.getBoolean("teleport-on-join", false);
         teleportOnKick = config.getBoolean("teleport-on-kick", true);
-        clearOnJoin = config.getBoolean("clear-on-join", false);
+        teleportOnLeave = config.getBoolean("teleport-on-leave", false);
+        clearActionsOnDisband = loadClearActions(config.getStringList("clear-on-disband"));
+        clearActionsOnJoin = loadClearActions(config.getStringList("clear-on-join"));
+        clearActionsOnKick = loadClearActions(config.getStringList("clear-on-kick"));
+        clearActionsOnLeave = loadClearActions(config.getStringList("clear-on-leave"));
         rateOwnIsland = config.getBoolean("rate-own-island", false);
         changeIslandRating = config.getBoolean("change-island-rating", true);
         defaultSettings = Collections.unmodifiableList(config.getStringList("default-settings")
@@ -564,6 +571,18 @@ public class SettingsContainer {
         blockCountsSaveThreshold = BigInteger.valueOf(config.getInt("block-counts-save-threshold", 100));
         chatSigningSupport = config.getBoolean("chat-signing-support", true);
         commandsPerPage = config.getInt("commands-per-page", 7);
+    }
+
+    private List<ClearAction> loadClearActions(List<String> clearActionsNames) {
+        List<ClearAction> clearActions = new LinkedList<>();
+        clearActionsNames.forEach(clearAction -> {
+            try {
+                clearActions.add(ClearAction.getByName(clearAction));
+            } catch (NullPointerException error) {
+                Log.warnFromFile("config.yml", "Invalid clear action ", clearAction + ", skipping...");
+            }
+        });
+        return Collections.unmodifiableList(clearActions);
     }
 
     private List<String> loadInteractables(SuperiorSkyblockPlugin plugin) {

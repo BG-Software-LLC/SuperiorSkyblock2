@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.island;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
@@ -138,8 +139,14 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public void kickMember(SuperiorPlayer superiorPlayer) {
         this.handle.kickMember(superiorPlayer);
+    }
+
+    @Override
+    public void removeMember(SuperiorPlayer superiorPlayer, MemberRemoveReason memberRemoveReason) {
+        this.handle.removeMember(superiorPlayer, memberRemoveReason);
     }
 
     @Override

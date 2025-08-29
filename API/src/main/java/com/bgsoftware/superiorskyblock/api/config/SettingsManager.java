@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
@@ -141,7 +142,7 @@ public interface SettingsManager {
     VisitorsSign getVisitorsSign();
 
     /**
-     * All settings related to the worlds of the plugin..
+     * All settings related to the worlds of the plugin.
      * Config path: worlds
      */
     Worlds getWorlds();
@@ -251,8 +252,11 @@ public interface SettingsManager {
 
     /**
      * Whether inventory of island members should be cleared when their island is disbanded or not.
-     * Config-path: disband-inventory-clear
+     * Return true if clear-on-disband contains both ENDER_CHEST and INVENTORY.
+     * This method will be deleted in the future!
+     * @deprecated See {@link #getClearActionsOnDisband()}
      */
+    @Deprecated
     boolean isDisbandInventoryClear();
 
     /**
@@ -280,10 +284,43 @@ public interface SettingsManager {
     boolean isTeleportOnKick();
 
     /**
+     * Whether to teleport players to the spawn when they leave an island or not.
+     * Config-path: teleport-on-leave
+     */
+    boolean isTeleportOnLeave();
+
+    /**
      * Whether to clear players' inventories when they join a new island or not.
+     * Return true if clear-on-join contains both ENDER_CHEST and INVENTORY.
+     * This method will be deleted in the future!
+     * @deprecated See {@link #getClearActionsOnJoin()}
+     */
+    @Deprecated
+    boolean isClearOnJoin();
+
+    /**
+     * Get the list of clear actions to perform on island members when their island is disbanded.
+     * Config-path: clear-on-disband
+     */
+    List<ClearAction> getClearActionsOnDisband();
+
+    /**
+     * Get the list of clear actions to perform on players when they accept an invite.
      * Config-path: clear-on-join
      */
-    boolean isClearOnJoin();
+    List<ClearAction> getClearActionsOnJoin();
+
+    /**
+     * Get the list of clear actions to perform on players when they are kicked from their island.
+     * Config-path: clear-on-kick
+     */
+    List<ClearAction> getClearActionsOnKick();
+
+    /**
+     * Get the list of clear actions to perform on players when they leave an island.
+     * Config-path: clear-on-leave
+     */
+    List<ClearAction> getClearActionsOnLeave();
 
     /**
      * Whether players can rate their own island or not.
