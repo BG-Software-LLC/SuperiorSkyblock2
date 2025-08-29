@@ -539,6 +539,10 @@ public class PluginEventArgs {
 
     }
 
+    public static class IslandWarpTeleport extends IslandWarpDoActionArgs {
+
+    }
+
     public static class IslandWorldReset extends IslandDoActionArgs {
 
         public Dimension dimension;

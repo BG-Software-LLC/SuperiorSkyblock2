@@ -67,6 +67,12 @@ public class MultipleComponents implements IMessageComponent {
                         baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandMessage));
                 }
 
+                String suggestMessage = section.getString(key + ".suggest");
+                if (suggestMessage != null) {
+                    for (BaseComponent baseComponent : baseComponents)
+                        baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggestMessage));
+                }
+
                 messageComponents.add(ComplexMessageComponent.of(baseComponents));
             }
         }
