@@ -33,7 +33,6 @@ import org.bukkit.potion.PotionEffectType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -900,8 +899,18 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public void sendMessage(String message) {
+        this.handle.sendMessage(message);
+    }
+
+    @Override
     public void sendMessage(String message, UUID... ignoredMembers) {
         this.handle.sendMessage(message, ignoredMembers);
+    }
+
+    @Override
+    public void sendMessage(IMessageComponent messageComponent) {
+        this.handle.sendMessage(messageComponent);
     }
 
     @Override
@@ -910,13 +919,28 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers) {
+        this.handle.sendMessage(messageComponent, ignoredMembers);
+    }
+
+    @Override
     public void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers, Object... args) {
         this.handle.sendMessage(messageComponent, ignoredMembers, args);
     }
 
     @Override
+    public void sendTitle(@Nullable String title, @Nullable String subtitle, int fadeIn, int duration, int fadeOut) {
+        this.handle.sendTitle(title, subtitle, fadeIn, duration, fadeOut);
+    }
+
+    @Override
     public void sendTitle(@Nullable String title, @Nullable String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers) {
         this.handle.sendTitle(title, subtitle, fadeIn, duration, fadeOut, ignoredMembers);
+    }
+
+    @Override
+    public void executeCommand(String command, boolean onlyOnlineMembers) {
+        this.handle.executeCommand(command, onlyOnlineMembers);
     }
 
     @Override

@@ -158,6 +158,7 @@ public class SIsland implements Island {
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
     private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
     private static final UUID[] EMPTY_IGNORED_MEMBERS = new UUID[0];
+    private static final Object[] EMPTY_MESSAGE_ARGS = new Object[0];
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
@@ -2124,6 +2125,11 @@ public class SIsland implements Island {
     }
 
     @Override
+    public void sendMessage(String message) {
+        sendMessage(message, EMPTY_IGNORED_MEMBERS);
+    }
+
+    @Override
     public void sendMessage(String message, UUID... ignoredMembers) {
         Preconditions.checkNotNull(message, "message parameter cannot be null.");
         Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
@@ -2141,8 +2147,18 @@ public class SIsland implements Island {
     }
 
     @Override
+    public void sendMessage(IMessageComponent messageComponent) {
+        sendMessage(messageComponent, EMPTY_MESSAGE_ARGS);
+    }
+
+    @Override
     public void sendMessage(IMessageComponent messageComponent, Object... args) {
         this.sendMessage(messageComponent, Collections.emptyList(), args);
+    }
+
+    @Override
+    public void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers) {
+        sendMessage(messageComponent, ignoredMembers, EMPTY_MESSAGE_ARGS);
     }
 
     @Override
@@ -2153,9 +2169,14 @@ public class SIsland implements Island {
         Log.debug(Debug.SEND_MESSAGE, owner.getName(), messageComponent.getMessage(args), ignoredMembers, Arrays.asList(args));
 
         Set<UUID> ignoredMembersSet = ignoredMembers.isEmpty() ? Collections.emptySet() : new HashSet<>(ignoredMembers);
-        
+
         forEachIslandMember(ignoredMembersSet, false,
                 islandMember -> messageComponent.sendMessage(islandMember.asPlayer(), args));
+    }
+
+    @Override
+    public void sendTitle(@Nullable String title, @Nullable String subtitle, int fadeIn, int duration, int fadeOut) {
+        sendTitle(title, subtitle, fadeIn, duration, fadeOut, EMPTY_IGNORED_MEMBERS);
     }
 
     @Override
@@ -2178,6 +2199,11 @@ public class SIsland implements Island {
 
             plugin.getNMSPlayers().sendTitle(player, playerTitle, playerSubtitle, fadeIn, duration, fadeOut);
         });
+    }
+
+    @Override
+    public void executeCommand(String command, boolean onlyOnlineMembers) {
+        executeCommand(command, onlyOnlineMembers, EMPTY_IGNORED_MEMBERS);
     }
 
     @Override

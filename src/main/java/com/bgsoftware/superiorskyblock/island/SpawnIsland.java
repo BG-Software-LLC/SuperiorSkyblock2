@@ -1100,7 +1100,17 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void sendMessage(String message) {
+        // Do nothing.
+    }
+
+    @Override
     public void sendMessage(String message, UUID... ignoredMembers) {
+        // Do nothing.
+    }
+
+    @Override
+    public void sendMessage(IMessageComponent messageComponent) {
         // Do nothing.
     }
 
@@ -1110,12 +1120,27 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers) {
+        // Do nothing.
+    }
+
+    @Override
     public void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers, Object... args) {
         // Do nothing.
     }
 
     @Override
+    public void sendTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut) {
+        // Do nothing.
+    }
+
+    @Override
     public void sendTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers) {
+        // Do nothing.
+    }
+
+    @Override
+    public void executeCommand(String command, boolean onlyOnlineMembers) {
         // Do nothing.
     }
 
