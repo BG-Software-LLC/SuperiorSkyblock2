@@ -5,8 +5,8 @@ import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
+import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
-import com.bgsoftware.superiorskyblock.api.enums.RemoveReason;
 import com.bgsoftware.superiorskyblock.api.hooks.LazyWorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -573,13 +573,13 @@ public class SIsland implements Island {
     }
 
     @Override
-    public void removeMember(SuperiorPlayer superiorPlayer, RemoveReason removeReason) {
+    public void removeMember(SuperiorPlayer superiorPlayer, MemberRemoveReason memberRemoveReason) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        Preconditions.checkNotNull(removeReason, "removeReason parameter cannot be null.");
+        Preconditions.checkNotNull(memberRemoveReason, "memberRemoveReason parameter cannot be null.");
 
-        if (removeReason == RemoveReason.KICK) {
+        if (memberRemoveReason == MemberRemoveReason.KICK) {
             Log.debug(Debug.KICK_MEMBER, owner.getName(), superiorPlayer.getName());
-        } else if (removeReason == RemoveReason.LEAVE) {
+        } else if (memberRemoveReason == MemberRemoveReason.LEAVE) {
             Log.debug(Debug.LEAVE_ISLAND, owner.getName(), superiorPlayer.getName());
         }
 
@@ -598,9 +598,9 @@ public class SIsland implements Island {
 
         superiorPlayer.setIsland(null);
 
-        if (removeReason == RemoveReason.KICK) {
+        if (memberRemoveReason == MemberRemoveReason.KICK) {
             ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnKick());
-        } else if (removeReason == RemoveReason.LEAVE) {
+        } else if (memberRemoveReason == MemberRemoveReason.LEAVE) {
             ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnLeave());
         }
 
@@ -610,8 +610,8 @@ public class SIsland implements Island {
             if (openedView != null)
                 openedView.closeView();
 
-            boolean shouldTeleport = (removeReason == RemoveReason.KICK && plugin.getSettings().isTeleportOnKick()) ||
-                    (removeReason == RemoveReason.LEAVE && plugin.getSettings().isTeleportOnLeave());
+            boolean shouldTeleport = (memberRemoveReason == MemberRemoveReason.KICK && plugin.getSettings().isTeleportOnKick()) ||
+                    (memberRemoveReason == MemberRemoveReason.LEAVE && plugin.getSettings().isTeleportOnLeave());
 
             if (shouldTeleport && getAllPlayersInside().contains(superiorPlayer)) {
                 superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
@@ -636,7 +636,7 @@ public class SIsland implements Island {
     @Override
     @Deprecated
     public void kickMember(SuperiorPlayer superiorPlayer) {
-        removeMember(superiorPlayer, RemoveReason.KICK);
+        removeMember(superiorPlayer, MemberRemoveReason.KICK);
     }
 
     @Override
@@ -663,7 +663,7 @@ public class SIsland implements Island {
             return;
 
         if (isMember(superiorPlayer))
-            removeMember(superiorPlayer, RemoveReason.KICK);
+            removeMember(superiorPlayer, MemberRemoveReason.KICK);
 
         plugin.getMenus().refreshIslandBannedPlayers(this);
 
@@ -1783,7 +1783,7 @@ public class SIsland implements Island {
             if (islandMember.equals(owner)) {
                 owner.setIsland(null);
             } else {
-                removeMember(islandMember, RemoveReason.DISBAND);
+                removeMember(islandMember, MemberRemoveReason.DISBAND);
             }
 
             ClearActions.runClearActions(islandMember.asOfflinePlayer(), true, plugin.getSettings().getClearActionsOnDisband());

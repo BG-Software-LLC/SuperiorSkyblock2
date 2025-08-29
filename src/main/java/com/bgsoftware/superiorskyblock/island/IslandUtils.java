@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
-import com.bgsoftware.superiorskyblock.api.enums.RemoveReason;
+import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -233,7 +233,7 @@ public class IslandUtils {
         if (!PluginEventsFactory.callIslandQuitEvent(island, superiorPlayer))
             return;
 
-        island.removeMember(superiorPlayer, RemoveReason.LEAVE);
+        island.removeMember(superiorPlayer, MemberRemoveReason.LEAVE);
 
         IslandUtils.sendMessage(island, Message.LEAVE_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
 
@@ -248,7 +248,7 @@ public class IslandUtils {
         if (!PluginEventsFactory.callIslandKickEvent(island, caller, target))
             return;
 
-        island.removeMember(target, RemoveReason.KICK);
+        island.removeMember(target, MemberRemoveReason.KICK);
 
         IslandUtils.sendMessage(island, Message.KICK_ANNOUNCEMENT, Collections.emptyList(), target.getName(), callerName);
 

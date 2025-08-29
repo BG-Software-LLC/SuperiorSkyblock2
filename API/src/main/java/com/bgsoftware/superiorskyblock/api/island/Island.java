@@ -4,8 +4,8 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
+import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
-import com.bgsoftware.superiorskyblock.api.enums.RemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.SyncStatus;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeGeneratorRateEvent;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
@@ -165,7 +165,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Kick a member from the island.
      *
      * @param superiorPlayer The player to kick.
-     * @deprecated See {@link #removeMember(SuperiorPlayer, RemoveReason)}
+     * @deprecated See {@link #removeMember(SuperiorPlayer, MemberRemoveReason)}
      */
     @Deprecated
     void kickMember(SuperiorPlayer superiorPlayer);
@@ -173,10 +173,10 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     /**
      * Remove a member from the island.
      * 
-     * @param superiorPlayer The player to remove.
-     * @param removeReason   The reason for removal.
+     * @param superiorPlayer     The player to remove.
+     * @param memberRemoveReason The reason for removal.
      */
-    void removeMember(SuperiorPlayer superiorPlayer, RemoveReason removeReason);
+    void removeMember(SuperiorPlayer superiorPlayer, MemberRemoveReason memberRemoveReason);
 
     /**
      * Check whether a player is a member of the island.
