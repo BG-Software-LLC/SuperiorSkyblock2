@@ -22,7 +22,6 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PluginLoadingStage;
 import com.bgsoftware.superiorskyblock.core.PluginReloadReason;
 import com.bgsoftware.superiorskyblock.core.database.DataManager;
-import com.bgsoftware.superiorskyblock.core.database.transaction.DatabaseTransactionsExecutor;
 import com.bgsoftware.superiorskyblock.core.engine.EnginesFactory;
 import com.bgsoftware.superiorskyblock.core.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
@@ -76,6 +75,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventsDispatcher;
 import com.bgsoftware.superiorskyblock.player.PlayersManagerImpl;
 import com.bgsoftware.superiorskyblock.player.container.DefaultPlayersContainer;
+import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
 import com.bgsoftware.superiorskyblock.service.ServicesHandler;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
@@ -179,6 +179,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         IslandPrivileges.registerPrivileges();
         SortingTypes.registerSortingTypes();
         IslandFlags.registerFlags();
+        ClearActions.registerActions();
         RespawnActions.registerActions();
         Dimensions.registerDimensions();
 
@@ -196,8 +197,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         client.start();
 
         loadingStage = PluginLoadingStage.LOADED;
-
-        DatabaseTransactionsExecutor.init();
     }
 
     @Override
@@ -377,8 +376,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             if (loadingStage.isAtLeast(PluginLoadingStage.START_ENABLE)) {
                 Log.info("Shutting down executor");
                 BukkitExecutor.close();
-                Log.info("Shutting down database executor");
-                DatabaseTransactionsExecutor.stop();
             }
 
             if (loadingStage.isAtLeast(PluginLoadingStage.MANAGERS_INITIALIZED)) {

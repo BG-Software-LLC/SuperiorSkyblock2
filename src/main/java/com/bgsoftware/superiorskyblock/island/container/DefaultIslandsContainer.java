@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.IslandPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
+import com.bgsoftware.superiorskyblock.core.collections.IslandPosition2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
@@ -33,7 +34,7 @@ import java.util.function.Consumer;
 
 public class DefaultIslandsContainer implements IslandsContainer {
 
-    private final Map<IslandPosition, Island> islandsByPositions = new ConcurrentHashMap<>();
+    private final Synchronized<IslandPosition2ObjectMap<Island>> islandsByPositions = Synchronized.of(new IslandPosition2ObjectMap<>());
     private final Map<UUID, Island> islandsByUUID = new ConcurrentHashMap<>();
 
     private final Map<SortingType, Synchronized<List<Island>>> sortedIslands = new ConcurrentHashMap<>();
@@ -55,18 +56,23 @@ public class DefaultIslandsContainer implements IslandsContainer {
 
         Preconditions.checkNotNull(defaultWorld, "Default world information cannot be null!");
 
-        this.islandsByPositions.put(IslandPosition.of(defaultWorld.getName(), center.getX(), center.getZ(), false), island);
+        this.islandsByPositions.write(islandsByPositions -> {
+            try (IslandPosition islandPosition = IslandPosition.of(defaultWorld.getName(), center.getX(), center.getZ())) {
+                islandsByPositions.put(islandPosition, island);
+            }
 
-        if (plugin.getProviders().hasCustomWorldsSupport()) {
-            // We don't know the logic of the custom worlds support, therefore we add a position
-            // for every possible world, so there won't be issues with detecting islands later.
-            for (Dimension dimension : Dimension.values()) {
-                if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
-                    runWithCustomWorld(defaultWorld, center, island, dimension,
-                            islandPosition -> this.islandsByPositions.put(islandPosition, island));
+            if (plugin.getProviders().hasCustomWorldsSupport()) {
+                // We don't know the logic of the custom worlds support, therefore we add a position
+                // for every possible world, so there won't be issues with detecting islands later.
+                for (Dimension dimension : Dimension.values()) {
+                    if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
+                        runWithCustomWorld(defaultWorld, center, island, dimension,
+                                islandPosition -> islandsByPositions.put(islandPosition, island));
+                    }
                 }
             }
-        }
+        });
+
 
         this.islandsByUUID.put(island.getUniqueId(), island);
 
@@ -83,18 +89,20 @@ public class DefaultIslandsContainer implements IslandsContainer {
 
         Preconditions.checkNotNull(defaultWorld, "Default world information cannot be null!");
 
-        try (IslandPosition islandPosition = IslandPosition.of(defaultWorld.getName(), center.getX(), center.getZ())) {
-            this.islandsByPositions.remove(islandPosition, island);
-        }
+        this.islandsByPositions.write(islandsByPositions -> {
+            try (IslandPosition islandPosition = IslandPosition.of(defaultWorld.getName(), center.getX(), center.getZ())) {
+                islandsByPositions.remove(islandPosition, island);
+            }
 
-        if (plugin.getProviders().hasCustomWorldsSupport()) {
-            for (Dimension dimension : Dimension.values()) {
-                if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
-                    runWithCustomWorld(defaultWorld, center, island, dimension,
-                            islandPosition -> this.islandsByPositions.remove(islandPosition, island));
+            if (plugin.getProviders().hasCustomWorldsSupport()) {
+                for (Dimension dimension : Dimension.values()) {
+                    if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
+                        runWithCustomWorld(defaultWorld, center, island, dimension,
+                                islandPosition -> islandsByPositions.remove(islandPosition, island));
+                    }
                 }
             }
-        }
+        });
 
         islandsByUUID.remove(island.getUniqueId());
 
@@ -136,7 +144,8 @@ public class DefaultIslandsContainer implements IslandsContainer {
     public Island getIslandAt(Location location) {
         Island island;
         try (IslandPosition islandPosition = IslandPosition.of(location)) {
-            island = this.islandsByPositions.get(islandPosition);
+            island = this.islandsByPositions.readAndGet(islandsByPositions ->
+                    islandsByPositions.get(islandPosition));
         }
         return island == null || !island.isInside(location) ? null : island;
     }
@@ -244,8 +253,11 @@ public class DefaultIslandsContainer implements IslandsContainer {
     private void runWithCustomWorld(WorldInfo defaultWorld, BlockPosition center, Island island,
                                     Dimension dimension, Consumer<IslandPosition> consumer) {
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
-        if (worldInfo != null && !worldInfo.equals(defaultWorld))
-            consumer.accept(IslandPosition.of(worldInfo.getName(), center.getX(), center.getZ(), false));
+        if (worldInfo != null && !worldInfo.equals(defaultWorld)) {
+            try (IslandPosition islandPosition = IslandPosition.of(worldInfo.getName(), center.getX(), center.getZ())) {
+                consumer.accept(islandPosition);
+            }
+        }
     }
 
 }

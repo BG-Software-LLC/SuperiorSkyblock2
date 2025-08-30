@@ -174,11 +174,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         Log.debug(Debug.SET_TEXTURE_VALUE, getName(), textureValue);
 
+        String oldTextureValue = this.textureValue;
+
         // We first update the texture value, even if they are equal.
         this.textureValue = textureValue;
 
         // We now compare them but remove the timestamp when comparing.
-        if (Objects.equals(removeTextureValueTimeStamp(this.textureValue), removeTextureValueTimeStamp(textureValue)))
+        if (Objects.equals(removeTextureValueTimeStamp(oldTextureValue), removeTextureValueTimeStamp(textureValue)))
             return;
 
         // We only save the value if it's actually different.
@@ -568,8 +570,6 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setDisbands(int disbands) {
-        disbands = Math.max(disbands, 0);
-
         Log.debug(Debug.SET_DISBANDS, getName(), disbands);
 
         if (this.disbands == disbands)

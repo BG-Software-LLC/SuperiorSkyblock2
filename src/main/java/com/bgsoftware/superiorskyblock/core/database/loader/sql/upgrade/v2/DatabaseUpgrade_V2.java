@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v2;
 
+import com.bgsoftware.common.databasebridge.sql.query.QueryResult;
+import com.bgsoftware.common.databasebridge.sql.transaction.CustomSQLDatabaseTransaction;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.sql.ResultSetMapBridge;
-import com.bgsoftware.superiorskyblock.core.database.sql.SQLHelper;
-import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
-import com.bgsoftware.superiorskyblock.core.database.sql.transaction.CustomSQLDatabaseTransaction;
+import com.bgsoftware.superiorskyblock.core.database.sql.DBSession;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import org.bukkit.inventory.ItemStack;
@@ -35,7 +35,7 @@ public class DatabaseUpgrade_V2 implements Runnable {
 
         MutableBoolean isFailed = new MutableBoolean(false);
 
-        SQLHelper.select("islands_warps", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
+        DBSession.select("islands_warps", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 DatabaseResult databaseResult = new DatabaseResult(new ResultSetMapBridge(resultSet));
 
@@ -69,7 +69,7 @@ public class DatabaseUpgrade_V2 implements Runnable {
 
         MutableBoolean isFailed = new MutableBoolean(false);
 
-        SQLHelper.select("islands_warp_categories", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
+        DBSession.select("islands_warp_categories", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 DatabaseResult databaseResult = new DatabaseResult(new ResultSetMapBridge(resultSet));
 
@@ -103,7 +103,7 @@ public class DatabaseUpgrade_V2 implements Runnable {
 
         MutableBoolean isFailed = new MutableBoolean(false);
 
-        SQLHelper.select("islands_chests", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
+        DBSession.select("islands_chests", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 DatabaseResult databaseResult = new DatabaseResult(new ResultSetMapBridge(resultSet));
 
@@ -139,7 +139,7 @@ public class DatabaseUpgrade_V2 implements Runnable {
         }
 
         try {
-            updateTransaction.execute().get();
+            DBSession.execute(updateTransaction).get();
         } catch (InterruptedException | ExecutionException ignored) {
         }
     }
@@ -155,7 +155,7 @@ public class DatabaseUpgrade_V2 implements Runnable {
         }
 
         try {
-            updateTransaction.execute().get();
+            DBSession.execute(updateTransaction).get();
         } catch (InterruptedException | ExecutionException ignored) {
         }
     }

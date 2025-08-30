@@ -105,7 +105,7 @@ public class MenuIslandVisitors extends AbstractPagedMenu<MenuIslandVisitors.Vie
 
         int charCounter = 0;
 
-        if (cfg.contains("visitors-panel.fill-items")) {
+        if (cfg.isConfigurationSection("visitors-panel.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("visitors-panel.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

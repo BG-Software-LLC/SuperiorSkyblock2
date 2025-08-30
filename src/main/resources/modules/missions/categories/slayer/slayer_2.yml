@@ -11,7 +11,7 @@ mission-file: KillsMissions
 # Whether the mission should be given when completing all requirements.
 auto-reward: true
 
-# Should block counts of players get reset when completing the mission?
+# Should entity counts of players get reset when completing the mission?
 reset-after-finish: true
 
 # Rewards given when completing the mission.
@@ -27,7 +27,7 @@ rewards:
 required-missions:
   - 'slayer_1'
 
-# List of all required blocks must be gathered in order to complete the mission.
+# List of all required entities must be gathered in order to complete the mission.
 required-entities:
   '1':
     types:
@@ -71,6 +71,7 @@ icons:
       - '&6Creepers Killed: &7{value_creeper}/24'
       - '&6Progress: &7{0}%'
       - '&c&l ✘ &7Not Completed'
+    amount: 2
   can-complete:
     type: PAPER
     name: '&aSlayer II'
@@ -94,10 +95,8 @@ icons:
       - '&6Creepers Killed: &724/24'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Click to redeem your reward.'
-    enchants:
-      DURABILITY: 1
-    flags:
-      - HIDE_ENCHANTS
+    amount: 2
+    glow: true
   completed:
     type: MAP
     name: '&aSlayer II'
@@ -115,3 +114,4 @@ icons:
       - '&6Creepers Killed: &724/24'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Already Claimed.'
+    amount: 2

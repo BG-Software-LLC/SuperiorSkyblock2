@@ -46,18 +46,41 @@ import java.io.IOException;
  */
 public class IntTag extends NumberTag<Integer> {
 
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagInt");
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagInt", int.class);
 
-    public IntTag(int value) {
-        super(value, CLASS, int.class);
+    private static final IntTag[] CACHE = new IntTag[100];
+
+    private IntTag(int value) {
+        super(value);
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeInt(value);
+    }
+
+    @Override
+    protected NMSTagConverter getNMSConverter() {
+        return TAG_CONVERTER;
+    }
+
+    public static IntTag of(int value) {
+        if (value >= 0 && value < CACHE.length) {
+            IntTag tag = CACHE[value];
+            if (tag == null)
+                tag = CACHE[value] = new IntTag(value);
+            return tag;
+        } else {
+            return new IntTag(value);
+        }
     }
 
     public static IntTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to IntTag!");
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to IntTag!");
 
         try {
             int value = plugin.getNMSTags().getNBTIntValue(tag);
-            return new IntTag(value);
+            return IntTag.of(value);
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while converting tag int from NMS:");
             return null;
@@ -65,12 +88,7 @@ public class IntTag extends NumberTag<Integer> {
     }
 
     public static IntTag fromStream(DataInputStream is) throws IOException {
-        return new IntTag(is.readInt());
-    }
-
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeInt(value);
+        return IntTag.of(is.readInt());
     }
 
 }

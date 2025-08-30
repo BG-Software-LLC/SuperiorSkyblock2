@@ -314,11 +314,16 @@ public class GameEventArgs implements IEventArgs {
 
     }
 
-
     public static class BlockDispenseEvent extends BlockEvent {
 
         public ItemStack dispensedItem;
         public Vector velocity;
+
+    }
+
+    public static class BlockFadeEvent extends BlockEvent {
+
+        public BlockState newState;
 
     }
 

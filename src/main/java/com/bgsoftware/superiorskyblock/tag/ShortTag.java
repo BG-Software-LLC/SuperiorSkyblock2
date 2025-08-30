@@ -46,18 +46,41 @@ import java.io.IOException;
  */
 public class ShortTag extends NumberTag<Short> {
 
-    /*package*/  static final Class<?> CLASS = getNNTClass("NBTTagShort");
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagShort", short.class);
 
-    public ShortTag(short value) {
-        super(value, CLASS, short.class);
+    private static final ShortTag[] CACHE = new ShortTag[100];
+
+    private ShortTag(short value) {
+        super(value);
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeShort(value);
+    }
+
+    @Override
+    protected NMSTagConverter getNMSConverter() {
+        return TAG_CONVERTER;
+    }
+
+    public static ShortTag of(short value) {
+        if (value >= 0 && value < CACHE.length) {
+            ShortTag tag = CACHE[value];
+            if (tag == null)
+                tag = CACHE[value] = new ShortTag(value);
+            return tag;
+        } else {
+            return new ShortTag(value);
+        }
     }
 
     public static ShortTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ShortTag!");
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to ShortTag!");
 
         try {
             short value = plugin.getNMSTags().getNBTShortValue(tag);
-            return new ShortTag(value);
+            return ShortTag.of(value);
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while converting tag short from NMS:");
             return null;
@@ -65,12 +88,7 @@ public class ShortTag extends NumberTag<Short> {
     }
 
     public static ShortTag fromStream(DataInputStream is) throws IOException {
-        return new ShortTag(is.readShort());
-    }
-
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeShort(value);
+        return ShortTag.of(is.readShort());
     }
 
 }

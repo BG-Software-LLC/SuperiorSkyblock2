@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
+import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.enums.SyncStatus;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeGeneratorRateEvent;
@@ -164,8 +165,18 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Kick a member from the island.
      *
      * @param superiorPlayer The player to kick.
+     * @deprecated See {@link #removeMember(SuperiorPlayer, MemberRemoveReason)}
      */
+    @Deprecated
     void kickMember(SuperiorPlayer superiorPlayer);
+
+    /**
+     * Remove a member from the island.
+     * 
+     * @param superiorPlayer     The player to remove.
+     * @param memberRemoveReason The reason for removal.
+     */
+    void removeMember(SuperiorPlayer superiorPlayer, MemberRemoveReason memberRemoveReason);
 
     /**
      * Check whether a player is a member of the island.
@@ -1237,10 +1248,24 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     /**
      * Send a plain message to all the members of the island.
      *
+     * @param message The message to send
+     */
+    void sendMessage(String message);
+
+    /**
+     * Send a plain message to all the members of the island.
+     *
      * @param message        The message to send
      * @param ignoredMembers An array of ignored members.
      */
     void sendMessage(String message, UUID... ignoredMembers);
+
+    /**
+     * Send a message to all the members of the island.
+     *
+     * @param messageComponent The message to send
+     */
+    void sendMessage(IMessageComponent messageComponent);
 
     /**
      * Send a message to all the members of the island.
@@ -1255,9 +1280,28 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      *
      * @param messageComponent The message to send
      * @param ignoredMembers   An array of ignored members.
+     */
+    void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers);
+
+    /**
+     * Send a message to all the members of the island.
+     *
+     * @param messageComponent The message to send
+     * @param ignoredMembers   An array of ignored members.
      * @param args             Arguments for the component.
      */
     void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers, Object... args);
+
+    /**
+     * Send a plain message to all the members of the island.
+     *
+     * @param title    The main title to send.
+     * @param subtitle The sub title to send.
+     * @param fadeIn   The fade-in duration in ticks.
+     * @param duration The title duration in ticks.
+     * @param fadeOut  The fade-out duration in ticks.
+     */
+    void sendTitle(@Nullable String title, @Nullable String subtitle, int fadeIn, int duration, int fadeOut);
 
     /**
      * Send a plain message to all the members of the island.
@@ -1270,6 +1314,15 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param ignoredMembers An array of ignored members.
      */
     void sendTitle(@Nullable String title, @Nullable String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers);
+
+    /**
+     * Execute a command on all the members of the island.
+     * You can use {player-name} as a placeholder for the member's name.
+     *
+     * @param command           The command to execute.
+     * @param onlyOnlineMembers Whether the command should be executed only for online members.
+     */
+    void executeCommand(String command, boolean onlyOnlineMembers);
 
     /**
      * Execute a command on all the members of the island.
@@ -2471,6 +2524,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param islandFlag The settings to disable.
      */
     void disableSettings(IslandFlag islandFlag);
+
+    /**
+     * Reset the island settings to default values.
+     */
+    void resetSettings();
 
     /*
      *  Generator related methods

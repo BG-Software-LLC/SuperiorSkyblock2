@@ -57,6 +57,7 @@ icons:
       - '&6Diamond Ore Mined: &7{1}/32'
       - '&6Progress: &7{0}%'
       - '&c&l ✘ &7Not Completed'
+    amount: 5
   can-complete:
     type: PAPER
     name: '&aMiner V'
@@ -73,10 +74,8 @@ icons:
       - '&6Diamond Ore Mined: &732/32'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Click to redeem your reward.'
-    enchants:
-      DURABILITY: 1
-    flags:
-      - HIDE_ENCHANTS
+    amount: 5
+    glow: true
   completed:
     type: MAP
     name: '&aMiner V'
@@ -90,3 +89,4 @@ icons:
       - '&6Diamond Ore Mined: &732/32'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Already Claimed.'
+    amount: 5

@@ -61,6 +61,8 @@ permissions:
             description: Ban a player from your island.
           superior.island.bank:
             description: Open the island's bank.
+          superior.island.bans:
+            description: Open the bans menu.
           superior.island.biome:
             description: Change the biome of the island.
           superior.island.border:
@@ -109,6 +111,11 @@ permissions:
             description: Open the island to the public.
           superior.island.panel:
             description: Open island panel.
+            children:
+              superior.island.visitors:
+                description: Open the visitors menu.
+              superior.island.members:
+                description: Open the members menu.
           superior.island.pardon:
             description: Unban a player from your island.
           superior.island.permissions:
@@ -262,6 +269,8 @@ permissions:
             description: Remove a block limit for an island.
           superior.admin.removeratings:
             description: Remove all ratings given by a player.
+          superior.admin.resetsettings:
+            description: Reset all island settings for a specific island.
           superior.admin.resetworld:
             description: Reset a world for an island.
           superior.admin.schematic:

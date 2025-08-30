@@ -78,7 +78,7 @@ public class MenuControlPanel extends AbstractMenu<IslandMenuView, IslandViewArg
 
         int charCounter = 0;
 
-        if (cfg.contains("main-panel.fill-items")) {
+        if (cfg.isConfigurationSection("main-panel.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("main-panel.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

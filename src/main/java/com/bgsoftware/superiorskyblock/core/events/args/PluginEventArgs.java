@@ -263,6 +263,10 @@ public class PluginEventArgs {
 
     }
 
+    public static class IslandClearFlags extends IslandDoActionArgs {
+
+    }
+
     public static class IslandClearGeneratorRates extends IslandDoActionArgs {
 
         public Dimension dimension;
@@ -532,6 +536,10 @@ public class PluginEventArgs {
         public List<String> commands;
         public IslandUpgradeEvent.Cause upgradeCause;
         public UpgradeCost upgradeCost;
+
+    }
+
+    public static class IslandWarpTeleport extends IslandWarpDoActionArgs {
 
     }
 

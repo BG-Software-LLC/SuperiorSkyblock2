@@ -1,16 +1,15 @@
 package com.bgsoftware.superiorskyblock.core.database.sql;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.databasebridge.sql.query.QueryResult;
+import com.bgsoftware.common.databasebridge.sql.transaction.DeleteSQLDatabaseTransaction;
+import com.bgsoftware.common.databasebridge.sql.transaction.InsertSQLDatabaseTransaction;
+import com.bgsoftware.common.databasebridge.sql.transaction.UpdateSQLDatabaseTransaction;
+import com.bgsoftware.common.databasebridge.transaction.IDatabaseTransaction;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
-import com.bgsoftware.superiorskyblock.core.database.sql.transaction.DeleteSQLDatabaseTransaction;
-import com.bgsoftware.superiorskyblock.core.database.sql.transaction.InsertSQLDatabaseTransaction;
-import com.bgsoftware.superiorskyblock.core.database.sql.transaction.UpdateSQLDatabaseTransaction;
-import com.bgsoftware.superiorskyblock.core.database.transaction.DatabaseTransactionsExecutor;
-import com.bgsoftware.superiorskyblock.core.database.transaction.IDatabaseTransaction;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 
@@ -31,7 +30,7 @@ public class SQLDatabaseBridge implements DatabaseBridge {
 
     @Override
     public void loadAllObjects(String table, Consumer<Map<String, Object>> resultConsumer) {
-        SQLHelper.select(table, "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
+        DBSession.select(table, "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 try {
                     resultConsumer.accept(new ResultSetMapBridge(resultSet));
@@ -48,7 +47,7 @@ public class SQLDatabaseBridge implements DatabaseBridge {
         if (batchOperations) {
             batchTransactions = new LinkedList<>();
         } else if (batchTransactions != null) {
-            DatabaseTransactionsExecutor.addTransactions(batchTransactions);
+            DBSession.execute(batchTransactions);
             batchTransactions = null;
         }
     }
@@ -120,14 +119,14 @@ public class SQLDatabaseBridge implements DatabaseBridge {
 
     @Override
     public void loadObject(String table, DatabaseFilter filter, Consumer<Map<String, Object>> resultConsumer) {
-        MutableObject<String> columnFilter = new MutableObject<>(SQLHelper.getColumnFilter(filter));
+        MutableObject<String> columnFilter = new MutableObject<>(DBSession.getColumnFilter(filter));
 
         filter.forEach((column, value) -> {
             columnFilter.setValue(columnFilter.getValue().replaceFirst("\\?", value instanceof String ?
                     String.format("'%s'", value) : value.toString()));
         });
 
-        SQLHelper.select(table, columnFilter.getValue(), new QueryResult<ResultSet>().onSuccess(resultSet -> {
+        DBSession.select(table, columnFilter.getValue(), new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 try {
                     resultConsumer.accept(new ResultSetMapBridge(resultSet));
@@ -153,7 +152,7 @@ public class SQLDatabaseBridge implements DatabaseBridge {
         if (batchTransactions != null) {
             batchTransactions.add(transaction);
         } else {
-            DatabaseTransactionsExecutor.addTransaction(transaction);
+            DBSession.execute(transaction);
         }
     }
 

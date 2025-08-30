@@ -21,7 +21,6 @@ import com.bgsoftware.wildstacker.api.events.SpawnerPlaceEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerPlaceInventoryEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerStackEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerUnstackEvent;
-import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -57,11 +56,11 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
 
     @Override
     public Pair<Integer, String> getSpawner(Location location) {
-        StackedSnapshot cachedSnapshot;
+        Map.Entry<Integer, EntityType> entry;
         try (ChunkPosition chunkPosition = ChunkPosition.of(location)) {
-            cachedSnapshot = WildStackerSnapshotsContainer.getSnapshot(chunkPosition);
+            entry = WildStackerSnapshotsContainer.accessStackedSnapshot(chunkPosition,
+                    stackedSnapshot -> stackedSnapshot.getStackedSpawner(location));
         }
-        Map.Entry<Integer, EntityType> entry = cachedSnapshot.getStackedSpawner(location);
         return new Pair<>(entry.getKey(), entry.getValue() + "");
     }
 

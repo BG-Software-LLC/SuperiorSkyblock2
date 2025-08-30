@@ -25,6 +25,8 @@ public class InventorySerializer implements ISerializer<ItemStack[], byte[]> {
 
     private static final ItemStack[] EMPTY_CONTENTS = new ItemStack[0];
     private static final byte[] EMPTY_SERIALIZED_DATA = new byte[0];
+    private static final byte[] EMPTY_SLOTS = new byte[0];
+    private static final ListTag EMPTY_ITEMS_LIST = ListTag.of(Collections.emptyList());
 
     private static final InventorySerializer INSTANCE = new InventorySerializer();
 
@@ -44,7 +46,7 @@ public class InventorySerializer implements ISerializer<ItemStack[], byte[]> {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         DataOutputStream dataOutput = new DataOutputStream(outputStream);
 
-        CompoundTag compoundTag = new CompoundTag();
+        CompoundTag compoundTag = CompoundTag.of();
 
         List<ItemStack> serializedItems = new ArrayList<>(serializable.length);
         byte[] slots = new byte[serializable.length * 2];
@@ -70,7 +72,7 @@ public class InventorySerializer implements ISerializer<ItemStack[], byte[]> {
             }
         }
 
-        ListTag items = new ListTag(CompoundTag.class, Collections.emptyList());
+        ListTag items = ListTag.of(CompoundTag.class);
         for (ItemStack itemStack : serializedItems)
             items.addTag(Serializers.ITEM_STACK_TO_TAG_SERIALIZER.serialize(itemStack));
 
@@ -114,16 +116,16 @@ public class InventorySerializer implements ISerializer<ItemStack[], byte[]> {
         ItemStack[] contents;
 
         if (compoundTag.containsKey("Length")) {
-            contents = new ItemStack[compoundTag.getInt("Length")];
+            contents = new ItemStack[compoundTag.getInt("Length").orElse(0)];
 
             for (int i = 0; i < contents.length; i++) {
-                CompoundTag itemCompound = compoundTag.getCompound(i + "");
+                CompoundTag itemCompound = compoundTag.getCompound(i + "").orElse(null);
                 if (itemCompound != null)
                     contents[i] = Serializers.ITEM_STACK_TO_TAG_SERIALIZER.deserialize(itemCompound);
             }
         } else {
-            byte[] slots = compoundTag.getByteArray("Slots");
-            ListTag items = compoundTag.getList("Items");
+            byte[] slots = compoundTag.getByteArray("Slots").orElse(EMPTY_SLOTS);
+            ListTag items = compoundTag.getList("Items").orElse(EMPTY_ITEMS_LIST);
             ItemStack[] serializedItems = new ItemStack[items.size()];
 
             contents = new ItemStack[slots.length / 2];

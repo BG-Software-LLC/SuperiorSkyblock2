@@ -178,16 +178,16 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
 
         int charCounter = 0;
 
-        if (cfg.contains("creation-gui.fill-items")) {
+        if (cfg.isConfigurationSection("creation-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("creation-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        if (cfg.contains("creation-gui.schematics")) {
-            for (String schemName : cfg.getConfigurationSection("creation-gui.schematics").getKeys(false)) {
-                ConfigurationSection section = cfg.getConfigurationSection("creation-gui.schematics." + schemName);
+        if (cfg.isConfigurationSection("creation-gui.schematics")) {
+            for (String schematicName : cfg.getConfigurationSection("creation-gui.schematics").getKeys(false)) {
+                ConfigurationSection section = cfg.getConfigurationSection("creation-gui.schematics." + schematicName);
                 char itemChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];
-                section.set("schematic", schemName);
+                section.set("schematic", schematicName);
                 MenuConverter.convertItemAccess(section, patternChars, itemChar, itemsSection, commandsSection, soundsSection);
             }
         }

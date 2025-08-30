@@ -305,6 +305,7 @@ COMMAND_DESCRIPTION_ADMIN_WITHDRAW: Başka bir oyuncunun ada bankasından para �
 COMMAND_DESCRIPTION_BALANCE: Bir adanın bankasındaki para miktarını kontrol et.
 COMMAND_DESCRIPTION_BAN: Adandan bir oyuncuyu yasakla.
 COMMAND_DESCRIPTION_BANK: Adanın bankasını aç.
+COMMAND_DESCRIPTION_BANS: 'Open the bans menu.'
 COMMAND_DESCRIPTION_BIOME: Adanın biyomunu değiştir.
 COMMAND_DESCRIPTION_BORDER: Adaların sınır rengini değiştir.
 COMMAND_DESCRIPTION_CHEST: Adanın sandığını aç.
@@ -670,7 +671,7 @@ NAME_TOO_SHORT: '&c&lHata | &7Ada adları 3 karakterden kısa olamaz.'
 NO_BAN_PERMISSION: '&c&lHata | &7Oyuncuları yasaklayabilmek için en az {0} olmalısın.'
 NO_CLOSE_BYPASS: '&c&lHata | &7Bu ada halka açık değil.'
 NO_CLOSE_PERMISSION: '&c&lHata | &7Adanı halka kapatabilmek için en az {0} olmalısın.'
-NO_COMMAND_PERMISSION: '&fBilinmeyen komut. Yardım için "/help" yaz.'
+NO_COMMAND_PERMISSION: '&c&lError | &7You don''t have permission to use that command. ({0})'
 NO_COOP_PERMISSION: '&c&lHata | &7Oyuncuları co-op üyesi olarak ekleyebilmek için
   en az {0} olmalısın.'
 NO_DELETE_WARP_PERMISSION: '&c&lHata | &7Işınlanmaları silebilmek için en az {0} olmalısın.'
@@ -807,6 +808,10 @@ SET_UPGRADE_LEVEL_NAME: '&e&lYükseltmeler | &7{1} adası için {0} seviyesi ba�
   güncellendi.'
 SET_WARP: '&e&lAda | &7{0} konumunda yeni bir ışınlanma noktası başarıyla oluşturuldu.'
 SET_WARP_OUTSIDE: '&c&lHata | &7Adanın dışında ışınlanma noktası ayarlayamazsın.'
+SETTINGS_RESET: '&e&lIsland | &7Successfully reset all the settings of {0}''s island to default values!'
+SETTINGS_RESET_ALL: '&e&lIsland | &7Successfully reset all the settings of all the islands to default values!'
+SETTINGS_RESET_NAME: '&e&lIsland | &7Successfully reset all the settings of the island {0} to default values!'
+SETTINGS_RESET_SELF: '&e&lIsland | &7Successfully reset all the settings of the island to default values!'
 SETTINGS_UPDATED: '&e&lAda | &7{1}''in adası için {0} ayarları başarıyla güncellendi.'
 SETTINGS_UPDATED_NAME: '&e&lAda | &7{1} adası için {0} ayarları başarıyla güncellendi.'
 SETTINGS_UPDATED_ALL: '&e&lAda | &7Tüm adalar için {0} ayarları başarıyla güncellendi.'

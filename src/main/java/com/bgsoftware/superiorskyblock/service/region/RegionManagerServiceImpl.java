@@ -83,9 +83,9 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     @Nullable
     private static final EntityType AXOLOTL_TYPE = EnumHelper.getEnum(EntityType.class, "AXOLOTL");
     @Nullable
-    private static final EntityType CAMEL_TYPE = EnumHelper.getEnum(EntityType.class, "CAMEL");
-    @Nullable
     private static final EntityType LLAMA_TYPE = EnumHelper.getEnum(EntityType.class, "LLAMA");
+    @Nullable
+    private static final EntityType HAPPY_GHAST_TYPE = EnumHelper.getEnum(EntityType.class, "HAPPY_GHAST");
 
     private static final int MAX_PICKUP_DISTANCE = 1;
     private static EnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
@@ -259,7 +259,9 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 islandPrivilege = IslandPrivileges.ANIMAL_BREED;
             } else if (usedItemType == Material.NAME_TAG) {
                 islandPrivilege = IslandPrivileges.NAME_ENTITY;
-            } else if (usedItemType == Material.SADDLE || (entityType == LLAMA_TYPE && Materials.isCarpet(usedItemType))) {
+            } else if (usedItemType == Material.SADDLE || (entityType == LLAMA_TYPE && Materials.isCarpet(usedItemType)) ||
+                    (entityType == HAPPY_GHAST_TYPE && Materials.isHarness(usedItemType)) ||
+                    (usedItemType == Material.SHEARS && plugin.getNMSEntities().canShearSaddleFromEntity(entity))) {
                 islandPrivilege = IslandPrivileges.SADDLE_ENTITY;
             } else if (entity instanceof Villager) {
                 islandPrivilege = IslandPrivileges.VILLAGER_TRADING;

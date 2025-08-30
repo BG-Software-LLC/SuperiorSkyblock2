@@ -11,9 +11,6 @@ mission-file: FishingMissions
 # Whether the mission should be given when completing all requirements.
 auto-reward: true
 
-# Should block counts of players get reset when completing the mission?
-reset-after-finish: true
-
 # Rewards given when completing the mission.
 rewards:
   commands:
@@ -22,7 +19,7 @@ rewards:
     - 'is admin msg %player% &e&lFisherman | &7I heard you can find other items as well...'
     - 'is admin msg %player% &e&lFisherman | &7&oFor more information about the next mission, checkout /is missions'
 
-# List of all required blocks must be gathered in order to complete the mission.
+# List of all required caughts must be gathered in order to complete the mission.
 required-caughts:
   '1':
     types:
@@ -63,10 +60,7 @@ icons:
       - '&6Fish Caught: &75/5'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Click to redeem your reward.'
-    enchants:
-      DURABILITY: 1
-    flags:
-      - HIDE_ENCHANTS
+    glow: true
   completed:
     type: MAP
     name: '&aFisherman I'

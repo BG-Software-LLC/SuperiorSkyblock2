@@ -76,10 +76,7 @@ icons:
       - '&6Coal Ore Mined: &716/16'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Click to redeem your reward.'
-    enchants:
-      DURABILITY: 1
-    flags:
-      - HIDE_ENCHANTS
+    glow: true
   completed:
     type: MAP
     name: '&aMiner I'

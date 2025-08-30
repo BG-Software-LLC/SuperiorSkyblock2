@@ -84,7 +84,7 @@ public class MenuIslandRate extends AbstractMenu<IslandMenuView, IslandViewArgs>
 
         int charCounter = 0;
 
-        if (cfg.contains("rate-gui.fill-items")) {
+        if (cfg.isConfigurationSection("rate-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("rate-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

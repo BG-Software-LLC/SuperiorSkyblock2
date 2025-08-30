@@ -26,9 +26,9 @@ public class TitleComponent implements IMessageComponent {
                 EmptyMessageComponent.getInstance() : new TitleComponent(titleMessage, subtitleMessage, fadeIn, duration, fadeOut);
     }
 
-    private TitleComponent(String titleMessage, String subtitleMessage, int fadeIn, int duration, int fadeOut) {
-        this.titleMessage = MessageContent.parse(titleMessage);
-        this.subtitleMessage = MessageContent.parse(subtitleMessage);
+    private TitleComponent(@Nullable String titleMessage, @Nullable String subtitleMessage, int fadeIn, int duration, int fadeOut) {
+        this.titleMessage = Text.isBlank(titleMessage) ? MessageContent.EMPTY : MessageContent.parse(titleMessage);
+        this.subtitleMessage = Text.isBlank(subtitleMessage) ? MessageContent.EMPTY : MessageContent.parse(subtitleMessage);
         this.fadeIn = fadeIn;
         this.duration = duration;
         this.fadeOut = fadeOut;

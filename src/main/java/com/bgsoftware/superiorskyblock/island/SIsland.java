@@ -5,6 +5,7 @@ import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
+import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.hooks.LazyWorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
@@ -97,6 +98,7 @@ import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
+import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import com.bgsoftware.superiorskyblock.world.GeneratorType;
@@ -124,7 +126,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -132,6 +133,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -157,6 +159,9 @@ public class SIsland implements Island {
 
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
     private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
+    private static final UUID[] EMPTY_IGNORED_MEMBERS = new UUID[0];
+    private static final Object[] EMPTY_MESSAGE_ARGS = new Object[0];
+
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
         @Override
@@ -182,7 +187,7 @@ public class SIsland implements Island {
     private final BlockPosition center;
     private final long creationTime;
     @Nullable
-    private final String schemName;
+    private final String schematicName;
     /*
      * Island Upgrade Values
      */
@@ -273,7 +278,7 @@ public class SIsland implements Island {
         this.creationTime = builder.creationTime;
         this.islandName = builder.islandName;
         this.islandRawName = Formatters.STRIP_COLOR_FORMATTER.format(this.islandName);
-        this.schemName = builder.islandType;
+        this.schematicName = builder.islandType;
         this.discord = builder.discord;
         this.paypal = builder.paypal;
         this.bonusWorth.set(builder.bonusWorth);
@@ -546,7 +551,7 @@ public class SIsland implements Island {
         if (!addedNewMember)
             return;
 
-        // Remove player from being coop, invited and its ratings
+        // Remove player from being cooped, invited and its ratings
         removeCoop(superiorPlayer);
         revokeInvite(superiorPlayer);
         removeRating(superiorPlayer);
@@ -572,10 +577,15 @@ public class SIsland implements Island {
     }
 
     @Override
-    public void kickMember(SuperiorPlayer superiorPlayer) {
+    public void removeMember(SuperiorPlayer superiorPlayer, MemberRemoveReason memberRemoveReason) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(memberRemoveReason, "memberRemoveReason parameter cannot be null.");
 
-        Log.debug(Debug.KICK_MEMBER, owner.getName(), superiorPlayer.getName());
+        if (memberRemoveReason == MemberRemoveReason.KICK) {
+            Log.debug(Debug.KICK_MEMBER, owner.getName(), superiorPlayer.getName());
+        } else if (memberRemoveReason == MemberRemoveReason.LEAVE) {
+            Log.debug(Debug.LEAVE_ISLAND, owner.getName(), superiorPlayer.getName());
+        }
 
         boolean removedMember = members.writeAndGet(members -> members.remove(superiorPlayer));
 
@@ -592,13 +602,22 @@ public class SIsland implements Island {
 
         superiorPlayer.setIsland(null);
 
+        if (memberRemoveReason == MemberRemoveReason.KICK) {
+            ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnKick());
+        } else if (memberRemoveReason == MemberRemoveReason.LEAVE) {
+            ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnLeave());
+        }
+
         superiorPlayer.runIfOnline(player -> {
             MenuView<?, ?> openedView = superiorPlayer.getOpenedView();
 
             if (openedView != null)
                 openedView.closeView();
 
-            if (plugin.getSettings().isTeleportOnKick() && getAllPlayersInside().contains(superiorPlayer)) {
+            boolean shouldTeleport = (memberRemoveReason == MemberRemoveReason.KICK && plugin.getSettings().isTeleportOnKick()) ||
+                    (memberRemoveReason == MemberRemoveReason.LEAVE && plugin.getSettings().isTeleportOnLeave());
+
+            if (shouldTeleport && getAllPlayersInside().contains(superiorPlayer)) {
                 superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             } else {
                 updateIslandFly(superiorPlayer);
@@ -616,6 +635,12 @@ public class SIsland implements Island {
         plugin.getMenus().refreshMembers(this);
 
         IslandsDatabaseBridge.removeMember(this, superiorPlayer);
+    }
+
+    @Override
+    @Deprecated
+    public void kickMember(SuperiorPlayer superiorPlayer) {
+        removeMember(superiorPlayer, MemberRemoveReason.KICK);
     }
 
     @Override
@@ -642,7 +667,7 @@ public class SIsland implements Island {
             return;
 
         if (isMember(superiorPlayer))
-            kickMember(superiorPlayer);
+            removeMember(superiorPlayer, MemberRemoveReason.KICK);
 
         plugin.getMenus().refreshIslandBannedPlayers(this);
 
@@ -1464,28 +1489,15 @@ public class SIsland implements Island {
         }
     }
 
-    private boolean isIslandWorld(@Nullable World world) {
-        if (world == null)
-            return false;
-
-        Dimension dimension = plugin.getGrid().getIslandsWorldDimension(world);
-        if (dimension == null)
-            return false;
-
-        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
-        return worldInfo.getName().equals(world.getName());
+    private static boolean isIslandWorld(@Nullable World world) {
+        return world != null && plugin.getProviders().getWorldsProvider().isIslandsWorld(world);
     }
 
     private boolean isIslandWorld(@Nullable WorldInfo worldInfo) {
         if (worldInfo == null)
             return false;
 
-        Dimension dimension = worldInfo.getDimension();
-        if (dimension == null)
-            return false;
-
-        WorldInfo realWorldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
-        return realWorldInfo.getName().equals(worldInfo.getName());
+        return plugin.getGrid().getIslandsWorldInfo(this, worldInfo.getName()) != null;
     }
 
     @Override
@@ -1771,15 +1783,14 @@ public class SIsland implements Island {
     public void disbandIsland() {
         long profilerId = Profiler.start(ProfileType.DISBAND_ISLAND, 2);
 
-        forEachIslandMember(Collections.emptyList(), false, islandMember -> {
+        forEachIslandMember(EMPTY_IGNORED_MEMBERS, false, islandMember -> {
             if (islandMember.equals(owner)) {
                 owner.setIsland(null);
             } else {
-                kickMember(islandMember);
+                removeMember(islandMember, MemberRemoveReason.DISBAND);
             }
 
-            if (plugin.getSettings().isDisbandInventoryClear())
-                plugin.getNMSPlayers().clearInventory(islandMember.asOfflinePlayer());
+            ClearActions.runClearActions(islandMember.asOfflinePlayer(), true, plugin.getSettings().getClearActionsOnDisband());
 
             for (Mission<?> mission : plugin.getMissions().getPlayerMissions()) {
                 MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
@@ -1791,9 +1802,10 @@ public class SIsland implements Island {
 
         invitedPlayers.forEach(invitedPlayer -> invitedPlayer.removeInvite(this));
 
-        if (BuiltinModules.BANK.disbandRefund > 0)
-            plugin.getProviders().depositMoney(getOwner(), islandBank.getBalance()
-                    .multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund)));
+        if (BuiltinModules.BANK.getConfiguration().hasDisbandRefund()) {
+            BigDecimal disbandRefund = BuiltinModules.BANK.getConfiguration().getDisbandRefund();
+            plugin.getProviders().depositMoney(getOwner(), islandBank.getBalance().multiply(disbandRefund));
+        }
 
         plugin.getMissions().getIslandMissions().forEach(this::resetMission);
 
@@ -2134,15 +2146,18 @@ public class SIsland implements Island {
     }
 
     @Override
+    public void sendMessage(String message) {
+        sendMessage(message, EMPTY_IGNORED_MEMBERS);
+    }
+
+    @Override
     public void sendMessage(String message, UUID... ignoredMembers) {
         Preconditions.checkNotNull(message, "message parameter cannot be null.");
         Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
 
-        List<UUID> ignoredList = ignoredMembers.length == 0 ? Collections.emptyList() : Arrays.asList(ignoredMembers);
+        Log.debug(Debug.SEND_MESSAGE, owner.getName(), message, Arrays.toString(ignoredMembers));
 
-        Log.debug(Debug.SEND_MESSAGE, owner.getName(), message, ignoredList);
-
-        forEachIslandMember(ignoredList, false, islandMember -> {
+        forEachIslandMember(ignoredMembers, false, islandMember -> {
             String playerMessage = message;
 
             if (!Text.isBlank(playerMessage))
@@ -2153,8 +2168,18 @@ public class SIsland implements Island {
     }
 
     @Override
+    public void sendMessage(IMessageComponent messageComponent) {
+        sendMessage(messageComponent, EMPTY_MESSAGE_ARGS);
+    }
+
+    @Override
     public void sendMessage(IMessageComponent messageComponent, Object... args) {
         this.sendMessage(messageComponent, Collections.emptyList(), args);
+    }
+
+    @Override
+    public void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers) {
+        sendMessage(messageComponent, ignoredMembers, EMPTY_MESSAGE_ARGS);
     }
 
     @Override
@@ -2164,7 +2189,15 @@ public class SIsland implements Island {
 
         Log.debug(Debug.SEND_MESSAGE, owner.getName(), messageComponent.getMessage(args), ignoredMembers, Arrays.asList(args));
 
-        forEachIslandMember(ignoredMembers, false, islandMember -> messageComponent.sendMessage(islandMember.asPlayer(), args));
+        Set<UUID> ignoredMembersSet = ignoredMembers.isEmpty() ? Collections.emptySet() : new HashSet<>(ignoredMembers);
+
+        forEachIslandMember(ignoredMembersSet, false,
+                islandMember -> messageComponent.sendMessage(islandMember.asPlayer(), args));
+    }
+
+    @Override
+    public void sendTitle(@Nullable String title, @Nullable String subtitle, int fadeIn, int duration, int fadeOut) {
+        sendTitle(title, subtitle, fadeIn, duration, fadeOut, EMPTY_IGNORED_MEMBERS);
     }
 
     @Override
@@ -2172,11 +2205,9 @@ public class SIsland implements Island {
                           int fadeOut, UUID... ignoredMembers) {
         Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
 
-        List<UUID> ignoredList = ignoredMembers.length == 0 ? Collections.emptyList() : Arrays.asList(ignoredMembers);
+        Log.debug(Debug.SEND_TITLE, owner.getName(), title, subtitle, fadeIn, duration, fadeOut, Arrays.toString(ignoredMembers));
 
-        Log.debug(Debug.SEND_TITLE, owner.getName(), title, subtitle, fadeIn, duration, fadeOut, ignoredList);
-
-        forEachIslandMember(ignoredList, true, islandMember -> {
+        forEachIslandMember(ignoredMembers, true, islandMember -> {
             String playerTitle = title;
             String playerSubtitle = subtitle;
 
@@ -2192,23 +2223,28 @@ public class SIsland implements Island {
     }
 
     @Override
+    public void executeCommand(String command, boolean onlyOnlineMembers) {
+        executeCommand(command, onlyOnlineMembers, EMPTY_IGNORED_MEMBERS);
+    }
+
+    @Override
     public void executeCommand(String command, boolean onlyOnlineMembers, UUID... ignoredMembers) {
         Preconditions.checkNotNull(command, "command parameter cannot be null.");
         Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
 
-        List<UUID> ignoredList = ignoredMembers.length == 0 ? Collections.emptyList() : Arrays.asList(ignoredMembers);
+        Log.debug(Debug.EXECUTE_ISLAND_COMMANDS, owner.getName(), command, onlyOnlineMembers, Arrays.toString(ignoredMembers));
 
-        Log.debug(Debug.EXECUTE_ISLAND_COMMANDS, owner.getName(), command, onlyOnlineMembers, ignoredList);
+        BukkitExecutor.ensureMain(() -> {
+            forEachIslandMember(ignoredMembers, onlyOnlineMembers, islandMember -> {
+                String playerCommand = command;
 
-        forEachIslandMember(ignoredList, onlyOnlineMembers, islandMember -> {
-            String playerCommand = command;
+                if (!Text.isBlank(playerCommand)) {
+                    playerCommand = placeholdersService.get().parsePlaceholders(islandMember.asOfflinePlayer(), playerCommand)
+                            .replace("{player-name}", islandMember.getName());
+                }
 
-            if (!Text.isBlank(playerCommand)) {
-                playerCommand = placeholdersService.get().parsePlaceholders(islandMember.asOfflinePlayer(), playerCommand)
-                        .replace("{player-name}", islandMember.getName());
-            }
-
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), playerCommand);
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), playerCommand);
+            });
         });
     }
 
@@ -2312,14 +2348,17 @@ public class SIsland implements Island {
 
         long currentTime = System.currentTimeMillis() / 1000;
 
-        if (checkOnlineOwner && BuiltinModules.BANK.bankInterestRecentActive > 0 &&
-                currentTime - owner.getLastTimeStatus() > BuiltinModules.BANK.bankInterestRecentActive) {
+        int bankInterestRecentActive = BuiltinModules.BANK.getConfiguration().getBankInterestRecentActive();
+        if (checkOnlineOwner && bankInterestRecentActive > 0 &&
+                currentTime - owner.getLastTimeStatus() > bankInterestRecentActive) {
             Log.debugResult(Debug.GIVE_BANK_INTEREST, "Return Cooldown", owner.getName());
             return false;
         }
 
+        int bankInterestPercentage = BuiltinModules.BANK.getConfiguration().getBankInterestPercentage();
+
         BigDecimal balance = islandBank.getBalance().max(BigDecimal.ONE);
-        BigDecimal balanceToGive = balance.multiply(new BigDecimal(BuiltinModules.BANK.bankInterestPercentage / 100D));
+        BigDecimal balanceToGive = balance.multiply(new BigDecimal(bankInterestPercentage / 100D));
 
         // If the money that will be given exceeds limit, we want to give money later.
         if (!islandBank.canDepositMoney(balanceToGive)) {
@@ -2333,7 +2372,6 @@ public class SIsland implements Island {
         giveInterestFailed = false;
 
         islandBank.depositAdminMoney(Bukkit.getConsoleSender(), balanceToGive);
-        plugin.getMenus().refreshIslandBank(this);
 
         setLastInterestTime(currentTime);
 
@@ -2350,8 +2388,8 @@ public class SIsland implements Island {
         if (this.lastInterest == lastInterest)
             return;
 
-        if (BuiltinModules.BANK.bankInterestEnabled) {
-            long ticksToNextInterest = BuiltinModules.BANK.bankInterestInterval * 20L;
+        if (BuiltinModules.BANK.getConfiguration().isBankInterestEnabled()) {
+            long ticksToNextInterest = BuiltinModules.BANK.getConfiguration().getBankInterestInterval() * 20L;
             this.bankInterestTask.set(bankInterestTask -> {
                 if (bankInterestTask != null)
                     bankInterestTask.cancel();
@@ -2366,7 +2404,8 @@ public class SIsland implements Island {
     @Override
     public long getNextInterest() {
         long currentTime = System.currentTimeMillis() / 1000;
-        return BuiltinModules.BANK.bankInterestInterval - (currentTime - lastInterest);
+        int bankInterestInterval = BuiltinModules.BANK.getConfiguration().getBankInterestInterval();
+        return bankInterestInterval - (currentTime - lastInterest);
     }
 
     /*
@@ -2852,7 +2891,7 @@ public class SIsland implements Island {
 
     @Override
     public BigDecimal getWorth() {
-        double bankWorthRate = BuiltinModules.BANK.bankWorthRate;
+        double bankWorthRate = BuiltinModules.BANK.getConfiguration().getBankWorthRate();
 
         BigDecimal islandWorth = this.islandWorth.get();
         BigDecimal islandBank = this.islandBank.getBalance();
@@ -3994,6 +4033,68 @@ public class SIsland implements Island {
     }
 
     @Override
+    public void resetSettings() {
+        Log.debug(Debug.RESET_ISLAND_FLAGS, owner.getName());
+
+        if (islandFlags.isEmpty())
+            return;
+
+        islandFlags.clear();
+
+        Long time = null;
+        WeatherType weather = null;
+        boolean enablePvP = false;
+
+        for (String islandFlag : plugin.getSettings().getDefaultSettings()) {
+            switch (islandFlag) {
+                case "ALWAYS_DAY":
+                    time = 0L;
+                    break;
+                case "ALWAYS_MIDDLE_DAY":
+                    time = 6000L;
+                    break;
+                case "ALWAYS_NIGHT":
+                    time = 14000L;
+                    break;
+                case "ALWAYS_MIDDLE_NIGHT":
+                    time = 18000L;
+                    break;
+                case "ALWAYS_SHINY":
+                    weather = WeatherType.CLEAR;
+                    break;
+                case "ALWAYS_RAIN":
+                    weather = WeatherType.DOWNFALL;
+                    break;
+                case "PVP":
+                    enablePvP = true;
+                    break;
+            }
+        }
+
+        boolean teleportOnPvPEnable = plugin.getSettings().isTeleportOnPvPEnable();
+
+        for (SuperiorPlayer superiorPlayer : getAllPlayersInside()) {
+            Player player = superiorPlayer.asPlayer();
+            if (player != null) {
+                if (time == null) player.resetPlayerTime();
+                else player.setPlayerTime(time, false);
+
+                if (weather == null) player.resetPlayerWeather();
+                else player.setPlayerWeather(weather);
+
+                if (enablePvP && teleportOnPvPEnable && isVisitor(superiorPlayer, false)) {
+                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                    Message.ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE.send(superiorPlayer);
+                }
+            }
+        }
+
+        IslandsDatabaseBridge.clearIslandFlags(this);
+
+        plugin.getMenus().refreshSettings(this);
+    }
+
+    @Override
     public void setGeneratorPercentage(Key key, int percentage, Dimension dimension) {
         setGeneratorPercentage(key, percentage, dimension, null, false);
     }
@@ -4418,7 +4519,7 @@ public class SIsland implements Island {
 
     @Override
     public String getSchematicName() {
-        return this.schemName == null ? "" : this.schemName;
+        return this.schematicName == null ? "" : this.schematicName;
     }
 
     @Override
@@ -4505,7 +4606,7 @@ public class SIsland implements Island {
                         Message.ISLAND_WORTH_TIME_OUT.send(asker);
                 } else {
                     Log.entering(owner.getName(), asker);
-                    Log.error(error, "An unexepcted error occurred while calculating island worth:");
+                    Log.error(error, "An unexpected error occurred while calculating island worth:");
 
                     if (asker != null)
                         Message.ISLAND_WORTH_ERROR.send(asker);
@@ -4868,18 +4969,20 @@ public class SIsland implements Island {
     }
 
     private void startBankInterest() {
-        if (BuiltinModules.BANK.bankInterestEnabled) {
-            long currentTime = System.currentTimeMillis() / 1000;
-            long ticksToNextInterest = (BuiltinModules.BANK.bankInterestInterval - (currentTime - this.lastInterest)) * 20;
-            if (ticksToNextInterest <= 0) {
-                giveInterest(true);
-            } else {
-                this.bankInterestTask.set(bankInterestTask -> {
-                    if (bankInterestTask != null)
-                        bankInterestTask.cancel();
-                    return BukkitExecutor.sync(() -> giveInterest(true), ticksToNextInterest);
-                });
-            }
+        if (!BuiltinModules.BANK.getConfiguration().isBankInterestEnabled())
+            return;
+
+        int bankInterestInterval = BuiltinModules.BANK.getConfiguration().getBankInterestInterval();
+        long currentTime = System.currentTimeMillis() / 1000;
+        long ticksToNextInterest = (bankInterestInterval - (currentTime - this.lastInterest)) * 20;
+        if (ticksToNextInterest <= 0) {
+            giveInterest(true);
+        } else {
+            this.bankInterestTask.set(bankInterestTask -> {
+                if (bankInterestTask != null)
+                    bankInterestTask.cancel();
+                return BukkitExecutor.sync(() -> giveInterest(true), ticksToNextInterest);
+            });
         }
     }
 
@@ -5185,7 +5288,19 @@ public class SIsland implements Island {
             callback.run();
     }
 
-    private void forEachIslandMember(List<UUID> ignoredMembers, boolean onlyOnline, Consumer<SuperiorPlayer> islandMemberConsumer) {
+    private void forEachIslandMember(UUID[] ignoredMembersArray, boolean onlyOnline, Consumer<SuperiorPlayer> islandMemberConsumer) {
+        Set<UUID> ignoredMembersSet;
+        if (ignoredMembersArray.length == 0) {
+            ignoredMembersSet = Collections.emptySet();
+        } else {
+            ignoredMembersSet = new HashSet<>();
+            Collections.addAll(ignoredMembersSet, ignoredMembersArray);
+        }
+
+        forEachIslandMember(ignoredMembersSet, onlyOnline, islandMemberConsumer);
+    }
+
+    private void forEachIslandMember(Set<UUID> ignoredMembers, boolean onlyOnline, Consumer<SuperiorPlayer> islandMemberConsumer) {
         for (SuperiorPlayer islandMember : getIslandMembers(true)) {
             if (!ignoredMembers.contains(islandMember.getUniqueId()) && (!onlyOnline || islandMember.isOnline())) {
                 islandMemberConsumer.accept(islandMember);

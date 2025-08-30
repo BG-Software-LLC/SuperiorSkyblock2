@@ -34,6 +34,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandChangeWarpsLimitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeWorthBonusEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChatEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChunkResetEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandClearFlagsEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandClearGeneratorRatesEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandClearPlayerPrivilegesEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandClearRatingsEvent;
@@ -80,6 +81,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandUnbanEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandUnlockWorldEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandWarpTeleportEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorldResetEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthUpdateEvent;
@@ -150,6 +152,7 @@ import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.I
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChangeWorthBonus;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChat;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChunkReset;
+import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandClearFlags;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandClearGeneratorRates;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandClearPlayerPrivileges;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandClearRatings;
@@ -196,6 +199,7 @@ import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.I
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandUncoopPlayer;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandUnlockWorld;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandUpgrade;
+import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandWarpTeleport;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandWorldReset;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandWorthCalculated;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandWorthUpdate;
@@ -691,6 +695,12 @@ public abstract class PluginEventType<Args extends PluginEventArgs> extends Even
             return new IslandEnableFlagEvent(args.superiorPlayer, args.island, args.islandFlag);
         }
     };
+    public static final PluginEventType<IslandClearFlags> ISLAND_CLEAR_FLAGS_EVENT = new PluginEventType<IslandClearFlags>(IslandClearFlagsEvent.class) {
+        @Override
+        public Event createBukkitEvent(IslandClearFlags args) {
+            return new IslandClearFlagsEvent(args.island, args.superiorPlayer);
+        }
+    };
     public static final PluginEventType<IslandEnter> ISLAND_ENTER_EVENT = new PluginEventType<IslandEnter>(IslandEnterEvent.class) {
         @Override
         public Event createBukkitEvent(IslandEnter args) {
@@ -965,6 +975,12 @@ public abstract class PluginEventType<Args extends PluginEventArgs> extends Even
             super.applyBukkitToPluginEvent(bukkitEvent, pluginEvent);
             pluginEvent.getArgs().commands = ((IslandUpgradeEvent) bukkitEvent).getCommands();
             pluginEvent.getArgs().upgradeCost = ((IslandUpgradeEvent) bukkitEvent).getUpgradeCost();
+        }
+    };
+    public static final PluginEventType<IslandWarpTeleport> ISLAND_WARP_TELEPORT_EVENT = new PluginEventType<IslandWarpTeleport>(IslandUpgradeEvent.class) {
+        @Override
+        public Event createBukkitEvent(IslandWarpTeleport args) {
+            return new IslandWarpTeleportEvent(args.island, args.superiorPlayer, args.islandWarp);
         }
     };
     public static final PluginEventType<IslandWorldReset> ISLAND_WORLD_RESET_EVENT = new PluginEventType<IslandWorldReset>(IslandWorldResetEvent.class) {

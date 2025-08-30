@@ -429,10 +429,6 @@ visitors-damage: false
 # When disabled, coop won't get damaged in islands they are coop with.
 coop-damage: true
 
-# The amount of times a player can disband an island.
-# If you want to disable this feature, set it to 0.
-disband-count: 5
-
 # Should the list of members in island top also include the island leader?
 island-top-include-leader: true
 
@@ -467,9 +463,6 @@ spawners-provider: 'AUTO'
 # Providers: Auto, WildStacker, RoseStacker
 stacked-blocks-provider: 'AUTO'
 
-# Should inventories of island members get cleared after disbanding their island?
-disband-inventory-clear: true
-
 # All settings related to island names.
 island-names:
   # Should creation of islands will ask for name (/is create <name>)?
@@ -496,17 +489,39 @@ island-names:
   # Should the plugin prevent players from using player names as island names?
   prevent-player-names: false
 
-# Should players get teleported to the island after they create it?
+# Should players get teleported to the island when they create it?
 teleport-on-create: true
 
-# Should players get teleported to the island after they accept an invite?
+# Should players get teleported to the island when they accept an invite?
 teleport-on-join: false
 
 # Should players get teleported to spawn when they are kicked from their island?
 teleport-on-kick: true
 
-# Should the inventory of the players get cleared after they accept an invite?
-clear-on-join: false
+# Should players get teleported to spawn when they leave an island?
+teleport-on-leave: false
+
+# List of clear actions to perform on island members when their island is disbanded.
+# Available actions: EFFECTS, ENDER_CHEST, EXPERIENCE, HEALTH, HUNGER, INVENTORY
+# You can disable this feature by setting the section to 'clear-on-disband: []'
+clear-on-disband:
+  - ENDER_CHEST
+  - INVENTORY
+
+# List of clear actions to perform on players when they accept an invite.
+# Available actions: EFFECTS, ENDER_CHEST, EXPERIENCE, HEALTH, HUNGER, INVENTORY
+# You can disable this feature by setting the section to 'clear-on-join: []'
+clear-on-join: []
+
+# List of clear actions to perform on players when they are kicked from their island.
+# Available actions: EFFECTS, ENDER_CHEST, EXPERIENCE, HEALTH, HUNGER, INVENTORY
+# You can disable this feature by setting the section to 'clear-on-kick: []'
+clear-on-kick: []
+
+# List of clear actions to perform on players when they leave an island.
+# Available actions: EFFECTS, ENDER_CHEST, EXPERIENCE, HEALTH, HUNGER, INVENTORY
+# You can disable this feature by setting the section to 'clear-on-leave: []'
+clear-on-leave: []
 
 # Should players be able to rate their own islands?
 rate-own-island: false
@@ -568,7 +583,7 @@ number-format: "en-US"
 date-format: "dd/MM/yyyy HH:mm:ss"
 
 # Should players skip menus with only one items inside them?
-# When enabled, creation, island-warps and island-chest menus will be skipped if only one item is inside them.
+# When enabled, creation, island-warps, island-chest and missions menus will be skipped if only one item is inside them.
 skip-one-item-menus: false
 
 # Should visitors get teleported to spawn when pvp is enabled in an island?
@@ -723,6 +738,10 @@ only-back-button: false
 # All islands will have the size of the max-island-size * 1.5, which means islands will be connected to each other.
 # It's recommended to have a low max island size when this feature is enabled!
 build-outside-island: false
+
+# The default number of times new players can disband their island.
+# If you want to disable this feature, set it to -1.
+default-disband-count: 5
 
 # The default language to be used.
 # This should be the same as your language file's name.

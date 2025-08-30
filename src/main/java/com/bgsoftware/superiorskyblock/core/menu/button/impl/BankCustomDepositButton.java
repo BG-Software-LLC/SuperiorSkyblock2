@@ -54,8 +54,6 @@ public class BankCustomDepositButton extends AbstractMenuViewButton<IslandMenuVi
 
             PlayerChat.remove(player);
 
-            menuView.refreshView();
-
             return true;
         });
     }

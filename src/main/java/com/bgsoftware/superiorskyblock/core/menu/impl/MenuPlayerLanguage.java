@@ -42,7 +42,7 @@ public class MenuPlayerLanguage extends AbstractMenu<BaseMenuView, EmptyViewArgs
         YamlConfiguration cfg = menuParseResult.getConfig();
         MenuLayout.Builder<BaseMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
 
-        if (cfg.contains("items")) {
+        if (cfg.isConfigurationSection("items")) {
             for (String itemsSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
                 ConfigurationSection itemSection = cfg.getConfigurationSection("items." + itemsSectionName);
 

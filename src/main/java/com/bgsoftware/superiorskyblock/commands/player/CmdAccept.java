@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -101,8 +102,8 @@ public class CmdAccept implements ISuperiorCommand {
 
         if (plugin.getSettings().isTeleportOnJoin())
             superiorPlayer.teleport(island);
-        if (plugin.getSettings().isClearOnJoin())
-            plugin.getNMSPlayers().clearInventory(superiorPlayer.asPlayer());
+
+        ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnJoin());
     }
 
     @Override

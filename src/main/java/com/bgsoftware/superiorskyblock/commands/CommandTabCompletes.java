@@ -119,7 +119,11 @@ public class CommandTabCompletes {
     }
 
     public static List<String> getCustomComplete(String argument, String... tabVariables) {
-        return filterByArgument(Arrays.asList(tabVariables), argument.toLowerCase(Locale.ENGLISH));
+        return getCustomComplete(argument, Arrays.asList(tabVariables));
+    }
+
+    public static List<String> getCustomComplete(String argument, Collection<String> tabVariables) {
+        return filterByArgument(tabVariables, argument.toLowerCase(Locale.ENGLISH));
     }
 
     public static List<String> getCustomComplete(String argument, Predicate<String> predicate, String... tabVariables) {
