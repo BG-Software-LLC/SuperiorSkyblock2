@@ -739,6 +739,7 @@ UNSAFE_WARP: '&e&lWyspa | &7&oWyglada na to, ze to wypaczenie jest niebezpieczne
 UPDATED_PERMISSION: '&e&lWyspa | &7Zaktualizowano uprawnienia dla {0}.'
 UPDATED_SETTINGS: '&e&lWyspa | &7Zaktualizowano ustawienia wyspy {0}.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lBlad | &7Mozesz uaktualnic ponownie dopiero za {0}.'
+VAULT_NOT_INSTALLED: '&c&lBlad | &7Na serwerze nie ma zainstalowanego pluginu Vault, wiec transakcje sa wylaczone.'
 VISITOR_BLOCK_COMMAND: '&c&lBlad | &7Nie mozesz uzyc tego polecenia na innych wyspach.'
 WARP_ALREADY_EXIST: '&c&lBlad | &7Istnieje juz warp o tej nazwie.'
 WARP_CATEGORY_ICON_NEW_LORE: |

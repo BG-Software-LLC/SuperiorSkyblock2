@@ -16,12 +16,12 @@ public class EconomyProvider_Default implements EconomyProvider {
 
     @Override
     public EconomyResult depositMoney(SuperiorPlayer superiorPlayer, double amount) {
-        return new EconomyResult("&cServer doesn't have vault installed so transactions are disabled.");
+        return new EconomyResult("Vault is not installed");
     }
 
     @Override
     public EconomyResult withdrawMoney(SuperiorPlayer superiorPlayer, double amount) {
-        return new EconomyResult("&cServer doesn't have vault installed so transactions are disabled.");
+        return new EconomyResult("Vault is not installed");
     }
 
 }

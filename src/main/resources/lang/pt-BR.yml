@@ -739,6 +739,7 @@ UNSAFE_WARP: '&e&lIlha | &7&oParece que este warp não é seguro. Tente outro wa
 UPDATED_PERMISSION: '&e&lIlha | &7Permissões atualizadas para {0}.'
 UPDATED_SETTINGS: '&e&lIlha | &7Configurações da ilha [{0}] atualizado.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lErro | &7Você só pode atualizar novamente em {0}.'
+VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lErro | &7Você não pode usar esse comando em outras ilhas.'
 WARP_ALREADY_EXIST: '&c&lErro | &7Já existe um warp com este nome.'
 WARP_CATEGORY_ICON_NEW_LORE: |

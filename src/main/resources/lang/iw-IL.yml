@@ -761,6 +761,7 @@ UNSAFE_WARP: '&e&lיא | &7&oרחא םוקימ הסנ אנא .חוטב וניא 
 UPDATED_PERMISSION: '&e&lיא | &7{0} ל תואשרהה ונכדוע.'
 UPDATED_SETTINGS: '&e&lיא | &7{0} תורדגהה ונכדוע.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lError | &7You may only upgrade again in {0}.'
+VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lהאיגש | &7םירחא םייאב וזה הדוקפב שמתשהל לוכי אל התא.'
 WARP_ALREADY_EXIST: '&c&lהאיגש | &7הזה םשה םע םוקימ םייק רבכ.'
 WARP_CATEGORY_ICON_NEW_LORE: |

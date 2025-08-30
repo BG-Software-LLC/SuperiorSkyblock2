@@ -51,6 +51,9 @@ public class MenuActions {
                     case "Exceed bank limit":
                         Message.BANK_LIMIT_EXCEED.send(superiorPlayer);
                         break;
+                    case "Vault is not installed":
+                        Message.VAULT_NOT_INSTALLED.send(superiorPlayer);
+                        break;
                     default:
                         Message.DEPOSIT_ERROR.send(superiorPlayer, failureReason);
                         break;
@@ -78,6 +81,9 @@ public class MenuActions {
                         break;
                     case "Bank is empty":
                         Message.ISLAND_BANK_EMPTY.send(superiorPlayer);
+                        break;
+                    case "Vault is not installed":
+                        Message.VAULT_NOT_INSTALLED.send(superiorPlayer);
                         break;
                     default:
                         Message.WITHDRAW_ERROR.send(superiorPlayer, failureReason);
