@@ -739,6 +739,7 @@ UNSAFE_WARP: '&e&l岛屿 | &7&o看起来该传送点不安全. 请尝试使用�
 UPDATED_PERMISSION: '&e&l岛屿 | &7更新了 {0} 的权限.'
 UPDATED_SETTINGS: '&e&l岛屿 | &7更新了岛屿设置 {0}.'
 UPGRADE_COOLDOWN_FORMAT: '&c&l错误 | &7你只能在 {0} 之后才可继续进行升级操作.'
+VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&l错误 | &7你不能对其他岛屿使用该命令.'
 WARP_ALREADY_EXIST: '&c&l错误 | &7已存在同名传送点.'
 WARP_CATEGORY_ICON_NEW_LORE: |

@@ -877,6 +877,7 @@ UNSAFE_WARP: '&e&lAda | &7&oBu ışınlanma güvensiz görünüyor. Lütfen baş
 UPDATED_PERMISSION: '&e&lAda | &7{0} için izinler güncellendi.'
 UPDATED_SETTINGS: '&e&lAda | &7Ada ayarları {0} güncellendi.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lHata | &7Sadece {0} içinde tekrar yükseltme yapabilirsin.'
+VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lHata | &7Bu komutu başka adalarda kullanamazsın.'
 WARP_ALREADY_EXIST: '&c&lHata | &7Bu adla bir ışınlanma noktası zaten var.'
 WARP_CATEGORY_ICON_NEW_LORE: |

@@ -837,6 +837,7 @@ UNSAFE_WARP: '&e&lĐảo | &7&oCó vẻ như khu vực này không an toàn. Vui
 UPDATED_PERMISSION: '&e&lĐảo | &7Đã cập nhật quyền cho {0}.'
 UPDATED_SETTINGS: '&e&lĐảo | &7Thay đổi thành công điều chỉnh của đảo {0}.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lLỗi | &77Bạn có thể nâng cấp lại trong {0}.'
+VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lLỗi | &7Bạn không thể sử dụng lệnh này trên đảo khác.'
 WARP_ALREADY_EXIST: '&c&lLỗi | &7Đã có một khu vực đã được đặt với tên này.'
 WARP_CATEGORY_ICON_NEW_LORE: |

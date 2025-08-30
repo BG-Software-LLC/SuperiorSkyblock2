@@ -941,6 +941,7 @@ UNSAFE_WARP: '&e&lInsel | &7&oAnscheinend ist dieser Warp unsicher. Bitte versuc
 UPDATED_PERMISSION: '&e&lInsel | &7Aktualisierte Berechtigungen für {0}.'
 UPDATED_SETTINGS: '&e&lInsel | &7Die Inseleinstellungen {0} aktualisiert.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lError | &7Du kannst erst in {0} erneut ein Upgrade durchführen.'
+VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lError | &7Du kannst diesen Befehl nicht auf anderen Inseln
   verwenden.'
 WARP_ALREADY_EXIST: '&c&lError | &7Es existiert bereits ein Warp mit diesem Namen.'
