@@ -280,6 +280,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: Lege die Inseleffektstufe der Insel eines 
   Spielers fest.
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Entity-Limit für die Insel eines anderen
   Spielers festlegen.
+COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: Übertrage eine Insel an jemand anderen.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: Lege den Mob-Drop-Multiplikator für die Insel
   eines anderen Spielers fest.
@@ -614,11 +615,12 @@ ISLAND_OPENED: '&e&lIsland | &7Die Insel wurde erfolgreich der Öffentlichkeit z
 ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lVorschau | &7Du hast sich zu weit entfernt und
   befindest dich nicht mehr im Vorschaumodus.'
 ISLAND_PREVIEW_CANCEL: '&e&lVorschau | &7Du hast den Vorschaumodus abgebrochen.'
-ISLAND_PREVIEW_CONFIRM_TEXT: BESTÄTIGEN
-ISLAND_PREVIEW_CANCEL_TEXT: ABBRECHEN
+ISLAND_PREVIEW_CONFIRM_TEXT: 'BESTÄTIGEN'
+ISLAND_PREVIEW_CANCEL_TEXT: 'ABBRECHEN'
+ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
 ISLAND_PREVIEW_START: |
   &e&lVorschau | &7Du hast den Vorschaumodus für den Schaltplan {0} gestartet.
-  &e&lVorschau | &7Gebe &a&lCONFIRM &7 ein, um eine neue Insel zu erstellen, oder &c&lCANCEL &7, um den Vorschaumodus abzubrechen.
+  &e&lVorschau | &7Gebe &a&lBESTÄTIGEN &7 ein, um eine neue Insel zu erstellen, oder &c&lABBRECHEN &7, um den Vorschaumodus abzubrechen.
   &e&lVorschau | &7Du kannst das Inselgebiet nicht verlassen, sonst wird der Vorschaumodus automatisch abgebrochen.
 ISLAND_PROTECTED: '&c&lError | &7Diese Insel ist geschützt.'
 ISLAND_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'

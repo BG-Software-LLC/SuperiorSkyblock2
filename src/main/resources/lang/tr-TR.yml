@@ -268,6 +268,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: Başka bir oyuncunun adasının ada efekt 
   ayarla.
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Başka bir oyuncunun adası için varlık
   limitini ayarla.
+COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: Bir adayı başkasına devret.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: Başka bir oyuncunun adası için mob düşürme
   çarpanını ayarla.
@@ -584,8 +585,9 @@ ISLAND_OPENED: '&e&lAda | &7Ada başarıyla halka açıldı.'
 ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lÖnizleme | &7Çok uzaklaştın ve artık önizleme
   modunda değilsin.'
 ISLAND_PREVIEW_CANCEL: '&e&lÖnizleme | &7Önizleme modunu iptal ettin.'
-ISLAND_PREVIEW_CONFIRM_TEXT: ONAYLA
-ISLAND_PREVIEW_CANCEL_TEXT: İPTAL ET
+ISLAND_PREVIEW_CONFIRM_TEXT: 'ONAYLA'
+ISLAND_PREVIEW_CANCEL_TEXT: 'İPTAL ET'
+ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
 ISLAND_PREVIEW_START: |
   &e&lÖnizleme | &7{0} şematiği için önizleme modunu başlattın.
   &e&lÖnizleme | &7Yeni bir ada oluşturmak için &a&lONAYLA &7yaz, veya önizleme modunu iptal etmek için &c&lİPTAL ET &7yaz.

@@ -207,6 +207,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Définir le multiplicateur de croissa
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: Définir le nombre de suppression d'îles d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: Définir le niveau d'un effet d'île sur l'île du joueur spécifié.
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Définir la limite d'entités pour l'île du joueur spécifié.
+COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: Transférer une île à quelqu'un d'autre.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: Définir le multiplicateur de drops de mobs de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: Définir un rôle nécéssaire à une permission pour toutes les îles.
@@ -498,6 +499,7 @@ ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lPrévisualisation | &7Vous vous êtes trop 
 ISLAND_PREVIEW_CANCEL: '&e&lPrévisualisation | &7Vous avez annulé(e) la prévisualisation.'
 ISLAND_PREVIEW_CONFIRM_TEXT: 'CONFIRMER'
 ISLAND_PREVIEW_CANCEL_TEXT: 'ANNULER'
+ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
 ISLAND_PREVIEW_START: |
   &e&lPrévisualisation | &7Vous avez débuté la prévisualisation de l'île {0}.
   &e&lPrévisualisation | &7Tapez &a&lCONFIRMER &7pour séléctionner cette île, ou &c&lANNULER &7pour annuler la prévisualisation.

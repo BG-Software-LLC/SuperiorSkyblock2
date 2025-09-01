@@ -204,6 +204,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: '设置指定岛屿的作物生长倍
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: '设置岛屿解散所需玩家数量.'
 COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: '设置指定岛屿的效果等级.'
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: '设置指定岛屿的实体数量限制.'
+COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: '将岛屿所有权转移给其他玩家.'
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: '设置指定岛屿的生物掉落物倍率.'
 COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: '设置所有岛屿上的指定权限所需的职位.'
@@ -496,6 +497,7 @@ ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&l结构 | &7你离得太远离了, 已自动
 ISLAND_PREVIEW_CANCEL: '&e&l结构 | &7你退出了预览模式.'
 ISLAND_PREVIEW_CONFIRM_TEXT: '确认'
 ISLAND_PREVIEW_CANCEL_TEXT: '取消'
+ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
 ISLAND_PREVIEW_START: |
   &e&l结构 | &7你正在预览结构 {0}.
   &e&l结构 | &7输入 &a&lCONFIRM &7来创建一个新岛屿, 或 &c&lCANCEL &7取消预览模式.
