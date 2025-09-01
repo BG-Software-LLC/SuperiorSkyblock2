@@ -204,7 +204,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: 'Ustaw mnoznik wzrostu plonów dla wy
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: 'Ustaw ilosc rozwiazanych wysp dla gracza.'
 COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: 'Ustaw level wyspy innego gracza'
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: 'Ustaw limit jednostek dla wyspy innego gracza.'
-COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
+COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Ustaw lokalizacje podgladu dla wyspy.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: 'Przenies wyspe komus innemu.'
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: 'Ustaw mnoznik dropów mobów dla wyspy innego gracza.'
 COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: 'Ustaw wymagana role uprawnień dla wszystkich wysp.'
