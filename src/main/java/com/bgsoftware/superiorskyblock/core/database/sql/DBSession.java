@@ -9,6 +9,7 @@ import com.bgsoftware.common.databasebridge.sql.session.MariaDBDatabaseSession;
 import com.bgsoftware.common.databasebridge.sql.session.MySQLDatabaseSession;
 import com.bgsoftware.common.databasebridge.sql.session.SQLDatabaseSession;
 import com.bgsoftware.common.databasebridge.sql.session.SQLiteDatabaseSession;
+import com.bgsoftware.common.databasebridge.transaction.DatabaseTransactionsExecutor;
 import com.bgsoftware.common.databasebridge.transaction.IDatabaseTransaction;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
@@ -126,8 +127,10 @@ public class DBSession {
     }
 
     public static void close() {
-        if (isReady())
+        if (isReady()) {
+            DatabaseTransactionsExecutor.stopActiveExecutors();
             globalSession.close();
+        }
     }
 
     public static String getColumnFilter(DatabaseFilter filter) {
