@@ -207,6 +207,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Imposta il moltiplicatore della cresc
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: Imposta la quantità di reset dell'isola di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: Imposta il livello dell'effetto dell'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Imposta il limite di entità per l'isola di un altro giocatore.
+COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: Trasferisci un'isola a qualcun altro.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: Imposta il moltiplicatore di drops dei mob per l'isola di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: Imposta un ruolo richiesto per avere un'autorizzazione, in tutte le isole.
@@ -504,9 +505,10 @@ ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lAnteprima | &7Sei andato troppo lontano, no
 ISLAND_PREVIEW_CANCEL: '&e&lAnteprima | &7Hai annullato la modalità di anteprima.'
 ISLAND_PREVIEW_CONFIRM_TEXT: 'CONFERMA'
 ISLAND_PREVIEW_CANCEL_TEXT: 'ANNULLA'
+ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
 ISLAND_PREVIEW_START: |
   &e&lAnteprima | &7Hai avviato la modalità di anteprima per la schematica {0}.
-  &e&lAnteprima | &7Scrivi &a&lCONFIRM &7per creare una nuova isola, oppure &c&lCANCEL &7per annullare la modalità di anteprima.
+  &e&lAnteprima | &7Scrivi &a&lCONFERMA &7per creare una nuova isola, oppure &c&lANNULLA &7per annullare la modalità di anteprima.
   &e&lAnteprima | &7Non è possibile lasciare l'area dell'isola, altrimenti la modalità anteprima verrà annullata automaticamente.
 ISLAND_PROTECTED: '&c&lErrore | &7Quest''isola è protetta.'
 ISLAND_PROTECTED_OPPED: '&7&oPuoi aggirare questa restrizione utilizzando "/is admin bypass".'

@@ -143,8 +143,8 @@ public class CommandTabCompletes {
     public static List<String> getSchematics(SuperiorSkyblockPlugin plugin, String argument) {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
         return new SequentialListBuilder<String>()
-                .filter(schematic -> !schematic.endsWith("_nether") && !schematic.endsWith("_the_end") &&
-                        schematic.toLowerCase(Locale.ENGLISH).contains(lowerArgument))
+                .filter(schematic -> !schematic.endsWith("_nether") && !schematic.endsWith("_normal") &&
+                        !schematic.endsWith("_the_end") && schematic.toLowerCase(Locale.ENGLISH).contains(lowerArgument))
                 .build(plugin.getSchematics().getSchematics());
     }
 

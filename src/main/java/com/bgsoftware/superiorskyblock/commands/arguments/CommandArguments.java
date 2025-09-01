@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -385,6 +386,17 @@ public class CommandArguments {
             Message.INVALID_ENVIRONMENT.send(sender, argument);
 
         return dimension;
+    }
+
+    public static Schematic getSchematic(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
+        Schematic schematic = plugin.getSchematics().getSchematic(argument);
+
+        if (schematic == null || argument.endsWith("_nether") || argument.endsWith("_normal") || argument.endsWith("_the_end")) {
+            Message.INVALID_SCHEMATIC.send(sender, argument);
+            return null;
+        }
+
+        return schematic;
     }
 
     public static NumberArgument<Integer> getInterval(CommandSender sender, String argument) {

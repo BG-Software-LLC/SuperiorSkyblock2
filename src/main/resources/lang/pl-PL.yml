@@ -204,6 +204,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: 'Ustaw mnoznik wzrostu plonów dla wy
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: 'Ustaw ilosc rozwiazanych wysp dla gracza.'
 COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: 'Ustaw level wyspy innego gracza'
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: 'Ustaw limit jednostek dla wyspy innego gracza.'
+COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: 'Przenies wyspe komus innemu.'
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: 'Ustaw mnoznik dropów mobów dla wyspy innego gracza.'
 COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: 'Ustaw wymagana role uprawnień dla wszystkich wysp.'
@@ -494,11 +495,12 @@ ISLAND_INFO_WORTH: '&e&lWyspa | &7Wartosc: {0}'
 ISLAND_OPENED: '&e&lWyspa | &7Pomyslnie zmieniles status wyspy na publiczny.'
 ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lPodglad | &7Odszedles za daleko, nie jestes juz w trybie podgladu.'
 ISLAND_PREVIEW_CANCEL: '&e&lPodglad | &7Anulowales tryb podgladu.'
-ISLAND_PREVIEW_CONFIRM_TEXT: 'CONFIRM'
-ISLAND_PREVIEW_CANCEL_TEXT: 'CANCEL'
+ISLAND_PREVIEW_CONFIRM_TEXT: 'POTWIERDZ'
+ISLAND_PREVIEW_CANCEL_TEXT: 'ANULUJ'
+ISLAND_PREVIEW_SET: '&e&lPodglad | &7Pomyslnie zaktualizowano lokalizacje podgladu dla schematu {0} na {1}.'
 ISLAND_PREVIEW_START: |
   &e&lPodglad | &7Wlaczyles tryb podgladu dla schematu {0}.
-  &e&lPodglad | &7Wpisz &a&lCONFIRM &7by stworzyc nowa wyspe, lub &c&lCANCEL &7by wylaczyc tryb podladu.
+  &e&lPodglad | &7Wpisz &a&lPOTWIERDZ &7by stworzyc nowa wyspe, lub &c&lANULUJ &7by wylaczyc tryb podladu.
   &e&lPodglad | &7Nie mozesz opuscic terenu wyspy, w przeciwnym razie tryb podgladowy zostanie anulowany.
 ISLAND_PROTECTED: '&c&lBlad | &7Ta wyspa jest chroniona.'
 ISLAND_PROTECTED_OPPED: '&7&oMozesz ominac to ograniczenie, uzywajac "/is admin bypass".'

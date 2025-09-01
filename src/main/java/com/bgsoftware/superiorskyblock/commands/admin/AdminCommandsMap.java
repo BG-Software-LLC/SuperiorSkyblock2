@@ -59,6 +59,7 @@ public class AdminCommandsMap extends CommandsMap {
             registerCommand(new CmdAdminSetCoopLimit());
         registerCommand(new CmdAdminSetDisbands());
         registerCommand(new CmdAdminSetEntityLimit());
+        registerCommand(new CmdAdminSetIslandPreview());
         registerCommand(new CmdAdminSetLeader());
         registerCommand(new CmdAdminSetPermission());
         registerCommand(new CmdAdminSetRate());
