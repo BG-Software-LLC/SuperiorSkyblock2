@@ -134,6 +134,21 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
+    public void setItemModel(ItemMeta itemMeta, String itemModel) {
+        // Doesn't exist
+    }
+
+    @Override
+    public void setRarity(ItemMeta itemMeta, String rarity) {
+        // Doesn't exist
+    }
+
+    @Override
+    public void setTrim(ItemMeta itemMeta, String trimMaterial, String trimPattern) {
+        // Doesn't exist
+    }
+
+    @Override
     public void addPotion(PotionMeta potionMeta, PotionEffect potionEffect) {
         if (!potionMeta.hasCustomEffects())
             potionMeta.setColor(potionEffect.getType().getColor());

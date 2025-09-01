@@ -24,8 +24,10 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.BackButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.DummyButton;
 import com.bgsoftware.superiorskyblock.core.menu.layout.PagedMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularMenuLayoutImpl;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -373,7 +375,7 @@ public class MenuParserImpl implements MenuParser {
                     potionEffectType = getMinecraftEnum(PotionEffectType.class, effectName, PotionEffectType::getByName);
                 } catch (IllegalArgumentException error) {
                     Log.warnFromFile(fileName, "Couldn't convert ", effectsSection.getCurrentPath(),
-                            ".", effectName.toUpperCase(Locale.ENGLISH), " into a potion effect type, skipping...");
+                            ".", effectName.toUpperCase(Locale.ENGLISH), " into a potion effect, skipping...");
                     continue;
                 }
 
@@ -399,8 +401,65 @@ public class MenuParserImpl implements MenuParser {
             }
         }
 
+        if (section.isConfigurationSection("bannerMeta")) {
+            for (String dyeColorName : section.getConfigurationSection("bannerMeta").getKeys(false)) {
+                DyeColor dyeColor;
+                PatternType patternType;
+
+                try {
+                    dyeColor = DyeColor.valueOf(dyeColorName.toUpperCase(Locale.ENGLISH));
+                } catch (IllegalArgumentException error) {
+                    Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
+                            ".bannerMeta.", dyeColorName.toUpperCase(Locale.ENGLISH), " into an dye color, skipping...");
+                    continue;
+                }
+
+                try {
+                    patternType = PatternType.valueOf(section.getString("bannerMeta." + dyeColorName));
+                } catch (IllegalArgumentException error) {
+                    Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
+                            ".bannerMeta.", dyeColorName.toUpperCase(Locale.ENGLISH), ".",
+                            section.getString("bannerMeta." + dyeColorName), " into an pattern type, skipping...");
+                    continue;
+                }
+
+                itemBuilder.withBannerMeta(dyeColor, patternType);
+            }
+        }
+
         if (section.isInt("customModel")) {
             itemBuilder.withCustomModel(section.getInt("customModel"));
+        }
+
+        if (section.isString("itemModel")) {
+            itemBuilder.withItemModel(section.getString("itemModel"));
+        }
+
+        if (section.isString("rarity")) {
+            String rarity = section.getString("rarity");
+
+            try {
+                itemBuilder.withRarity(rarity);
+            } catch (IllegalArgumentException error) {
+                Log.warnFromFile(fileName, "Couldn't convert ", rarity, " into a rarity, skipping...");
+            }
+        }
+
+        if (section.isConfigurationSection("trim")) {
+            String trimMaterial = section.getString("trim.material");
+            String trimPattern = section.getString("trim.pattern");
+
+            if (trimMaterial == null) {
+                Log.warnFromFile(fileName, "Couldn't find trim material for item with trim pattern, skipping...");
+            } else if (trimPattern == null) {
+                Log.warnFromFile(fileName, "Couldn't find trim pattern for item with trim material, skipping...");
+            } else {
+                try {
+                    itemBuilder.withTrim(trimMaterial, trimPattern);
+                } catch (IllegalArgumentException error) {
+                    Log.warnFromFile(fileName, error.getMessage());
+                }
+            }
         }
 
         if (section.isString("leatherColor")) {
