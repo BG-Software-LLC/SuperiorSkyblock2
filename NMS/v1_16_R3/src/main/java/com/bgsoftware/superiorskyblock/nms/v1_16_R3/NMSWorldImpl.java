@@ -174,7 +174,9 @@ public class NMSWorldImpl implements NMSWorld {
 
             if (blockData != null) {
                 world.getChunkProvider().flagDirty(blockPosition);
-                world.chunkPacketBlockController.onBlockChange(world, blockPosition, blockData, Blocks.AIR.getBlockData(), 530);
+                if (CHUNK_PACKET_BLOCK_CONTROLLER.isValid()) {
+                    world.chunkPacketBlockController.onBlockChange(world, blockPosition, blockData, Blocks.AIR.getBlockData(), 530);
+                }
             }
         }
     }

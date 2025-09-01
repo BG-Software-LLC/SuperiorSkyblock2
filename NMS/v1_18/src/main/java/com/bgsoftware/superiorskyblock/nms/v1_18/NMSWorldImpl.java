@@ -203,7 +203,9 @@ public class NMSWorldImpl implements NMSWorld {
 
             if (blockState != null) {
                 serverLevel.getChunkSource().blockChanged(blockPos);
-                serverLevel.chunkPacketBlockController.onBlockChange(serverLevel, blockPos, blockState, Blocks.AIR.defaultBlockState(), 530, 512);
+                if (CHUNK_PACKET_BLOCK_CONTROLLER.isValid()) {
+                    serverLevel.chunkPacketBlockController.onBlockChange(serverLevel, blockPos, blockState, Blocks.AIR.defaultBlockState(), 530, 512);
+                }
             }
         }
     }
@@ -335,9 +337,11 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void removeAntiXray(org.bukkit.World bukkitWorld) {
+        if (!CHUNK_PACKET_BLOCK_CONTROLLER.isValid())
+            return;
+
         ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
-        if (CHUNK_PACKET_BLOCK_CONTROLLER.isValid())
-            CHUNK_PACKET_BLOCK_CONTROLLER.set(serverLevel, ChunkPacketBlockController.NO_OPERATION_INSTANCE);
+        CHUNK_PACKET_BLOCK_CONTROLLER.set(serverLevel, ChunkPacketBlockController.NO_OPERATION_INSTANCE);
     }
 
     @Override

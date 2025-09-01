@@ -202,7 +202,9 @@ public class NMSWorldImpl implements NMSWorld {
 
             if (blockState != null) {
                 serverLevel.getChunkSource().blockChanged(blockPos);
-                serverLevel.chunkPacketBlockController.onBlockChange(serverLevel, blockPos, blockState, Blocks.AIR.defaultBlockState(), 530, 512);
+                if (CHUNK_PACKET_BLOCK_CONTROLLER.isValid()) {
+                    serverLevel.chunkPacketBlockController.onBlockChange(serverLevel, blockPos, blockState, Blocks.AIR.defaultBlockState(), 530, 512);
+                }
             }
         }
     }
