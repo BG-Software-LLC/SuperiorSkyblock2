@@ -582,6 +582,7 @@ ISLAND_INFO_ROLES: |
 ISLAND_INFO_VISITORS_COUNT: '&e&lAda | &7Ziyaretçi Sayısı: {0}'
 ISLAND_INFO_WORTH: '&e&lAda | &7Değer: {0}'
 ISLAND_OPENED: '&e&lAda | &7Ada başarıyla halka açıldı.'
+ISLAND_PREVIEW_BLOCK_COMMAND: '&c&lError | &7You cannot use that command in preview mode.'
 ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lÖnizleme | &7Çok uzaklaştın ve artık önizleme
   modunda değilsin.'
 ISLAND_PREVIEW_CANCEL: '&e&lÖnizleme | &7Önizleme modunu iptal ettin.'

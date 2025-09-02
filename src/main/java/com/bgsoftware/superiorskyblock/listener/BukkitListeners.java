@@ -41,7 +41,7 @@ public class BukkitListeners {
         if (plugin.getSettings().isAutoBlocksTracking())
             new BlockChangesListener(this.plugin);
 
-        if (!plugin.getSettings().getPreviewIslands().isEmpty())
+        if (!plugin.getSettings().getIslandPreviews().getLocations().isEmpty())
             new IslandPreviewListener(this.plugin);
 
         safeEventsRegister(new BukkitEventsListener(this.plugin));

@@ -35,6 +35,7 @@ import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -209,7 +210,10 @@ public class SettingsContainer {
     public final int islandChestsDefaultSize;
     public final Map<String, List<String>> commandAliases;
     public final KeySet valuableBlocks;
-    public final Map<String, Location> islandPreviewLocations;
+    public final GameMode islandPreviewsGameMode;
+    public final int islandPreviewsMaxDistance;
+    public final List<String> islandPreviewsBlockedCommands;
+    public final Map<String, Location> islandPreviewsLocations;
     public final boolean tabCompleteHideVanished;
     public final boolean dropsUpgradePlayersMultiply;
     public final long protectedMessageDelay;
@@ -531,18 +535,21 @@ public class SettingsContainer {
         this.commandAliases = Collections.unmodifiableMap(commandAliases);
         valuableBlocks = KeySets.unmodifiableKeySet(
                 KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("valuable-blocks")));
-        Map<String, Location> islandPreviewLocations = new HashMap<>();
-        if (config.isConfigurationSection("preview-islands")) {
-            for (String schematic : config.getConfigurationSection("preview-islands").getKeys(false)) {
+        islandPreviewsGameMode = GameMode.valueOf(config.getString("island-previews.game-mode", "SPECTATOR"));
+        islandPreviewsMaxDistance = config.getInt("island-previews.max-distance", 10000);
+        islandPreviewsBlockedCommands = Collections.unmodifiableList(config.getStringList("island-previews.blocked-commands"));
+        Map<String, Location> islandPreviewsLocations = new HashMap<>();
+        if (config.isConfigurationSection("island-previews.locations")) {
+            for (String schematic : config.getConfigurationSection("island-previews.locations").getKeys(false)) {
                 try {
-                    islandPreviewLocations.put(schematic.toLowerCase(Locale.ENGLISH), Serializers.LOCATION_SERIALIZER
-                            .deserialize(config.getString("preview-islands." + schematic)));
+                    islandPreviewsLocations.put(schematic.toLowerCase(Locale.ENGLISH), Serializers.LOCATION_SERIALIZER
+                            .deserialize(config.getString("island-previews.locations." + schematic)));
                 } catch (Exception error) {
                     Log.warnFromFile("config.yml", "Cannot deserialize island preview for ", schematic, ", skipping...");
                 }
             }
         }
-        this.islandPreviewLocations = Collections.unmodifiableMap(islandPreviewLocations);
+        this.islandPreviewsLocations = Collections.unmodifiableMap(islandPreviewsLocations);
         tabCompleteHideVanished = config.getBoolean("tab-complete-hide-vanished", true);
         dropsUpgradePlayersMultiply = config.getBoolean("drops-upgrade-players-multiply", false);
         protectedMessageDelay = config.getLong("protected-message-delay", 60L);

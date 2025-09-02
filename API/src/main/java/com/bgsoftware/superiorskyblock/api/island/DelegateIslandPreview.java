@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 
 public class DelegateIslandPreview implements IslandPreview {
@@ -34,6 +35,11 @@ public class DelegateIslandPreview implements IslandPreview {
     @Override
     public String getIslandName() {
         return this.handle.getIslandName();
+    }
+
+    @Override
+    public GameMode getPreviousGameMode() {
+        return this.handle.getPreviousGameMode();
     }
 
     @Override

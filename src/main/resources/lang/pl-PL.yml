@@ -492,6 +492,7 @@ ISLAND_INFO_ROLES: |
   {1}
 ISLAND_INFO_VISITORS_COUNT: '&e&lWyspa | &7Odwiedzajacy: {0}'
 ISLAND_INFO_WORTH: '&e&lWyspa | &7Wartosc: {0}'
+ISLAND_PREVIEW_BLOCK_COMMAND: '&c&lBlad | &7Nie mozesz uzyc tej komendy w trybie podgladu.'
 ISLAND_OPENED: '&e&lWyspa | &7Pomyslnie zmieniles status wyspy na publiczny.'
 ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lPodglad | &7Odszedles za daleko, nie jestes juz w trybie podgladu.'
 ISLAND_PREVIEW_CANCEL: '&e&lPodglad | &7Anulowales tryb podgladu.'
