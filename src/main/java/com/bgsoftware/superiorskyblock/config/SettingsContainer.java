@@ -536,7 +536,7 @@ public class SettingsContainer {
         valuableBlocks = KeySets.unmodifiableKeySet(
                 KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("valuable-blocks")));
         islandPreviewsGameMode = GameMode.valueOf(config.getString("island-previews.game-mode", "SPECTATOR"));
-        islandPreviewsMaxDistance = config.getInt("island-previews.max-distance", 10000);
+        islandPreviewsMaxDistance = config.getInt("island-previews.max-distance", 100);
         islandPreviewsBlockedCommands = Collections.unmodifiableList(config.getStringList("island-previews.blocked-commands"));
         Map<String, Location> islandPreviewsLocations = new HashMap<>();
         if (config.isConfigurationSection("island-previews.locations")) {
