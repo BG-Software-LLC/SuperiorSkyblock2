@@ -23,6 +23,8 @@ items:
   '$':
     type: SPAWNER
     name: '&e&lSPAWNERS ->'
+    flags:
+      - HIDE_ATTRIBUTES
   '*':
     type: WRITABLE_BOOK
     name: '&e&lITEMS ->'
