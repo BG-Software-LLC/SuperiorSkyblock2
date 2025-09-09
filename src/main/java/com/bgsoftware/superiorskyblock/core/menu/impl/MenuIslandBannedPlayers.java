@@ -55,6 +55,11 @@ public class MenuIslandBannedPlayers extends AbstractPagedMenu<MenuIslandBannedP
         }
 
         @Override
+        public String replaceTitle(String title) {
+            return title.replace("{0}", String.valueOf(island.getBannedPlayers().size()));
+        }
+
+        @Override
         protected List<SuperiorPlayer> requestObjects() {
             return island.getBannedPlayers();
         }
