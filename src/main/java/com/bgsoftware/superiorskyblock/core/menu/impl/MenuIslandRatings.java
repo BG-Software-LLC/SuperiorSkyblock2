@@ -70,6 +70,11 @@ public class MenuIslandRatings extends AbstractPagedMenu<MenuIslandRatings.View,
         }
 
         @Override
+        public String replaceTitle(String title) {
+            return title.replace("{0}", String.valueOf(island.getTotalRating()));
+        }
+
+        @Override
         protected List<RatingInfo> requestObjects() {
             return new SequentialListBuilder<RatingInfo>()
                     .build(island.getRatings().entrySet(), RATING_INFO_MAPPER);

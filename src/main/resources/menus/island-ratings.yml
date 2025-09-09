@@ -5,7 +5,7 @@
 ##                                                  ##
 ######################################################
 
-title: '&lIsland Ratings (%superior_island_rating%/5)'
+title: '&lIsland Ratings ({0}/5)'
 previous-menu: true
 
 pattern:
