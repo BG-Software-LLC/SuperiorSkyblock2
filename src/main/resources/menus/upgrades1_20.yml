@@ -336,7 +336,7 @@ upgrades:
           - '&7'
           - '&aClick to purchase upgrade.'
         flags:
-          - HIDE_ATTRIBUTES
+          - HIDE_ADDITIONAL_TOOLTIP
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
           volume: 0.2
@@ -357,7 +357,7 @@ upgrades:
           - '&7'
           - '&aClick to purchase upgrade.'
         flags:
-          - HIDE_ATTRIBUTES
+          - HIDE_ADDITIONAL_TOOLTIP
         sound:
           type: BLOCK_ANVIL_PLACE
           volume: 0.2
@@ -379,7 +379,7 @@ upgrades:
           - '&7'
           - '&aClick to purchase upgrade.'
         flags:
-          - HIDE_ATTRIBUTES
+          - HIDE_ADDITIONAL_TOOLTIP
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
           volume: 0.2
@@ -400,7 +400,7 @@ upgrades:
           - '&7'
           - '&aClick to purchase upgrade.'
         flags:
-          - HIDE_ATTRIBUTES
+          - HIDE_ADDITIONAL_TOOLTIP
         sound:
           type: BLOCK_ANVIL_PLACE
           volume: 0.2
@@ -422,7 +422,7 @@ upgrades:
           - '&7'
           - '&aClick to purchase upgrade.'
         flags:
-          - HIDE_ATTRIBUTES
+          - HIDE_ADDITIONAL_TOOLTIP
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
           volume: 0.2
@@ -443,7 +443,7 @@ upgrades:
           - '&7'
           - '&aClick to purchase upgrade.'
         flags:
-          - HIDE_ATTRIBUTES
+          - HIDE_ADDITIONAL_TOOLTIP
         sound:
           type: BLOCK_ANVIL_PLACE
           volume: 0.2
@@ -456,7 +456,7 @@ upgrades:
           - '&7You have reached the maximum'
           - '&7level of the spawner rates!'
         flags:
-          - HIDE_ATTRIBUTES
+          - HIDE_ADDITIONAL_TOOLTIP
         sound:
           type: BLOCK_ANVIL_PLACE
           volume: 0.2
@@ -468,7 +468,7 @@ upgrades:
           - '&7You have reached the maximum'
           - '&7level of the spawner rates!'
         flags:
-          - HIDE_ATTRIBUTES
+          - HIDE_ADDITIONAL_TOOLTIP
         sound:
           type: BLOCK_ANVIL_PLACE
           volume: 0.2

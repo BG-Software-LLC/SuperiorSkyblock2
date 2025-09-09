@@ -1840,19 +1840,19 @@ permissions:
   set_biome:
     display-menu: true
     permission-enabled:
-      type: GRASS
+      type: GRASS_BLOCK
       name: '&6Set Biome'
       lore:
         - '&7Access to change the island''s biome.'
         - '&7Currently &aENABLED&7.'
     permission-disabled:
-      type: GRASS
+      type: GRASS_BLOCK
       name: '&6Set Biome'
       lore:
         - '&7Access to change the island''s biome.'
         - '&7Currently &cDISABLED&7.'
     role-permission:
-      type: GRASS
+      type: GRASS_BLOCK
       name: '&6Set Biome'
       lore:
         - '&7Access to change the island''s biome.'

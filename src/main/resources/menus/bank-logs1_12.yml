@@ -27,14 +27,14 @@ money-sort: '-'
 items:
   '@':
     type: PAPER
-    name: '&e#{0}'
+    name: '&eTransaction #{0}'
     lore:
       - '&7Player: {1}'
       - '&7Status: {2}'
       - '&7Time: {3}'
-      - '&7Amount: {4}'
-      - '&7 '
-      - '&7&o(( &f&oRight-Click &7&oto filter transactions by this player. ))'
+      - '&7Amount: ${4}'
+      - ''
+      - '&7Click to filter transactions by this player.'
   '%':
     type: PAPER
     name: '{0}Previous Page'

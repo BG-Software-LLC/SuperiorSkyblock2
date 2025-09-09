@@ -46,9 +46,3 @@ items:
     type: STAINED_GLASS_PANE
     data: 15
     name: '&f'
-
-sounds:
-  '@':
-    type: ORB_PICKUP
-    volume: 0.2
-    pitch: 0.2
