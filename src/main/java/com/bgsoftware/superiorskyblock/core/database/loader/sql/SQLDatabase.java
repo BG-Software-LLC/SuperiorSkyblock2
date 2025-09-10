@@ -29,6 +29,7 @@ public class SQLDatabase {
         createGridTable();
         createBankTransactionsTable();
         createStackedBlocksTable();
+        createMissionsDataTable();
     }
 
     public static UpgradeResult upgradeDatabase() {
@@ -289,6 +290,14 @@ public class SQLDatabase {
                 new Column("location", "LONG_UNIQUE_TEXT PRIMARY KEY"),
                 new Column("block_type", "TEXT"),
                 new Column("amount", "INTEGER")
+        );
+    }
+
+    private static void createMissionsDataTable() {
+        DBSession.createTable("missions_data",
+                new Column("name", "LONG_UNIQUE_TEXT PRIMARY KEY"),
+                new Column("data", "LONGBLOB"),
+                new Column("updated_at", "BIGINT")
         );
     }
 

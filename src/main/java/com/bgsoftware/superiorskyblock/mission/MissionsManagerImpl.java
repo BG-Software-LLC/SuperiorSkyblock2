@@ -1,6 +1,11 @@
 package com.bgsoftware.superiorskyblock.mission;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.databasebridge.sql.query.QueryResult;
+import com.bgsoftware.common.databasebridge.sql.transaction.DeleteSQLDatabaseTransaction;
+import com.bgsoftware.common.databasebridge.sql.transaction.InsertSQLDatabaseTransaction;
+import com.bgsoftware.common.databasebridge.sql.transaction.UpdateSQLDatabaseTransaction;
+import com.bgsoftware.common.databasebridge.transaction.IDatabaseTransaction;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -13,6 +18,7 @@ import com.bgsoftware.superiorskyblock.core.Either;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.database.sql.DBSession;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
@@ -37,16 +43,18 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import javax.script.ScriptException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.nio.charset.StandardCharsets;
+import java.sql.ResultSet;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class MissionsManagerImpl extends Manager implements MissionsManager {
 
@@ -74,6 +82,70 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             return;
 
         BukkitExecutor.asyncTimer(this::saveMissionsData, 6000L); // Save missions data every 5 minutes
+    }
+
+    private YamlConfiguration readYamlFromDb(String missionName) {
+        final YamlConfiguration[] out = { new YamlConfiguration() };
+        final String safeName = missionName.replace("'", "''"); // échappe les quotes
+
+        DBSession.select(
+                "missions_data",
+                "name = '" + safeName + "'",
+                new QueryResult<ResultSet>()
+                        .onSuccess(rs -> {
+                            byte[] blob = rs.getBytes("data");
+                            String yaml;
+                            try {
+                                yaml = gunzip(blob);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                            out[0] = YamlConfiguration.loadConfiguration(new java.io.StringReader(yaml));
+                        })
+                        .onFail(QueryResult.PRINT_ERROR)
+        );
+
+        return out[0];
+    }
+
+    private void writeYamlToDb(String missionName, YamlConfiguration data) {
+        String payload = data.saveToString();
+        byte[] blob;
+        try { blob = gzip(payload); }
+        catch (IOException e) { Log.error(e, "GZIP failed for mission ", missionName, ":"); return; }
+        long now = System.currentTimeMillis();
+
+        DeleteSQLDatabaseTransaction del = new DeleteSQLDatabaseTransaction(
+                "missions_data", java.util.Arrays.asList("name")
+        );
+        del.bindObjects(java.util.Collections.singletonList(missionName));
+
+        InsertSQLDatabaseTransaction ins = new InsertSQLDatabaseTransaction(
+                "missions_data",
+                java.util.Arrays.asList("name","data","updated_at")
+        );
+        ins.bindObjects(java.util.Arrays.asList(missionName, blob, now));
+
+        java.util.List<IDatabaseTransaction> tx = new java.util.ArrayList<>(2);
+        tx.add(del);
+        tx.add(ins);
+        DBSession.execute(tx);
+    }
+
+    private static byte[] gzip(String s) throws IOException {
+        if (s == null || s.isEmpty()) return new byte[0];
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try (GZIPOutputStream gz = new GZIPOutputStream(bos)) { gz.write(s.getBytes(StandardCharsets.UTF_8)); }
+        return bos.toByteArray();
+    }
+    private static String gunzip(byte[] b) throws IOException {
+        if (b == null || b.length == 0) return "";
+        try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(b))) {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            byte[] buf = new byte[8192]; int r;
+            while ((r = gis.read(buf)) != -1) bos.write(buf, 0, r);
+            return bos.toString(StandardCharsets.UTF_8.name());
+        }
     }
 
     public void clearData() {
@@ -387,38 +459,14 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
         return true;
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void saveMissionsData() {
-        File dataFolder = BuiltinModules.MISSIONS.getDataStoreFolder();
-
-        if (!dataFolder.exists())
-            dataFolder.mkdirs();
-
         for (Mission<?> mission : getAllMissions()) {
             YamlConfiguration data = new YamlConfiguration();
-
-            try {
-                mission.saveProgress(data);
-            } catch (Throwable error) {
-                Log.error(error, "An unexpected error while saving mission data for ", mission.getName(), ":");
-                continue;
-            }
-
-            if (data.getKeys(true).isEmpty())
-                continue;
-
-            File dataFile = new File(dataFolder, mission.getName() + ".yml");
-
-            try {
-                if (!dataFile.exists())
-                    dataFile.createNewFile();
-                synchronized (DATA_FOLDER_MUTEX) {
-                    data.save(dataFile);
-                }
-            } catch (IOException error) {
-                Log.error(error, "An unexpected error occurred while saving missions data to file ", dataFile.getName(), ":");
-            }
+            try { mission.saveProgress(data); }
+            catch (Throwable t) { Log.error(t, "Error saving ", mission.getName(), ":"); continue; }
+            if (data.getKeys(true).isEmpty()) continue;
+            writeYamlToDb(mission.getName(), data);
         }
     }
 
@@ -429,32 +477,55 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
     @Override
     public void loadMissionsData(List<Mission<?>> missionsList) {
-        Preconditions.checkNotNull(missionsList, "missionsList parameter cannot be null.");
+        Preconditions.checkNotNull(missionsList, "missionsList cannot be null.");
+        migrateFilesToDbIfAny();
+        for (Mission<?> mission : missionsList) {
+            try { mission.loadProgress(readYamlFromDb(mission.getName())); }
+            catch (Throwable t) { Log.error(t, "Error loading ", mission.getName(), ":"); }
+        }
+    }
 
-        // Convert old data file to new format.
+    private void migrateFilesToDbIfAny() {
         convertOldMissionsData();
 
         File dataFolder = BuiltinModules.MISSIONS.getDataStoreFolder();
-
-        if (!moveOldDataFolder(dataFolder))
-            throw new IllegalStateException("Failed moving old missions folder.");
-
         if (!dataFolder.exists())
             return;
 
-        for (Mission<?> mission : missionsList) {
-            File dataFile = new File(dataFolder, mission.getName() + ".yml");
-            if (dataFile.exists()) {
-                try {
-                    synchronized (DATA_FOLDER_MUTEX) {
-                        mission.loadProgress(YamlConfiguration.loadConfiguration(dataFile));
-                    }
-                } catch (Throwable error) {
-                    Log.error(error, "An unexpected error occurred while loading mission data for ", mission.getName(), ":");
+        File[] files = dataFolder.listFiles((dir, name) -> name.toLowerCase(java.util.Locale.ENGLISH).endsWith(".yml"));
+        if (files == null || files.length == 0)
+            return;
+
+        for (File f : files) {
+            try {
+                YamlConfiguration data;
+                synchronized (DATA_FOLDER_MUTEX) {
+                    data = YamlConfiguration.loadConfiguration(f);
                 }
+                if (data.getKeys(true).isEmpty()) {
+                    if (!f.delete())
+                        Log.info("Could not delete empty mission data file " + f.getName());
+                    continue;
+                }
+
+                String missionName = f.getName().substring(0, f.getName().length() - 4); // trim ".yml"
+                writeYamlToDb(missionName, data);
+
+                if (!f.delete())
+                    Log.info("Could not delete migrated mission data file " + f.getName());
+                else
+                    Log.info("Migrated mission data file " + f.getName() + " -> DB");
+            } catch (Throwable t) {
+                Log.error(t, "Failed migrating mission data file ", f.getName(), ":");
             }
         }
+
+        String[] remaining = dataFolder.list();
+        if (remaining != null && remaining.length == 0 && !dataFolder.delete()) {
+            Log.info("Could not delete empty missions data folder: " + dataFolder.getAbsolutePath());
+        }
     }
+
 
     public void convertPlayerData(SuperiorPlayer oldPlayer, SuperiorPlayer newPlayer) {
         getAllMissions().forEach(mission -> mission.transferData(oldPlayer, newPlayer));
