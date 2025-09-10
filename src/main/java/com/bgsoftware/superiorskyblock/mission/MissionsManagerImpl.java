@@ -86,7 +86,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
     private YamlConfiguration readYamlFromDb(String missionName) {
         final YamlConfiguration[] out = { new YamlConfiguration() };
-        final String safeName = missionName.replace("'", "''"); // échappe les quotes
+        final String safeName = missionName.replace("'", "''");
 
         DBSession.select(
                 "missions_data",
