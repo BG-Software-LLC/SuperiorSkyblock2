@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.hooks.LazyWorldsProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandBlockFlags;
@@ -898,12 +899,7 @@ public class SIsland implements Island {
         if (islandHome == null)
             return null;
 
-        World world = plugin.getGrid().getIslandsWorld(this, dimension);
-
-        islandHome = islandHome.clone();
-        islandHome.setWorld(world);
-
-        return islandHome;
+        return IslandWorlds.setWorldToLocation(this, dimension, islandHome);
     }
 
     @Override
@@ -985,10 +981,7 @@ public class SIsland implements Island {
         if (adjustLocationToCenterOfBlock(visitorsLocation))
             IslandsDatabaseBridge.saveVisitorLocation(this, defaultWorldDimension, visitorsLocation);
 
-        World world = plugin.getGrid().getIslandsWorld(this, defaultWorldDimension);
-        visitorsLocation.setWorld(world);
-
-        return visitorsLocation.clone();
+        return IslandWorlds.setWorldToLocation(this, defaultWorldDimension, visitorsLocation);
     }
 
     @Override
