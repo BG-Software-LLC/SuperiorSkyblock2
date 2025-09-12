@@ -490,7 +490,7 @@ ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |
   &e&lWyspa | &7{0}s:
   {1}
-ISLAND_INFO_VISITORS_COUNT: '&e&lWyspa | &7Odwiedzajacy: {0}'
+ISLAND_INFO_VISITORS_COUNT: '&e&lWyspa | &7Odwiedzajacy: {0} ({1} unikalnych odwiedzajacych)'
 ISLAND_INFO_WORTH: '&e&lWyspa | &7Wartosc: {0}'
 ISLAND_NAME_NONE: Brak
 ISLAND_OPENED: '&e&lWyspa | &7Pomyslnie zmieniles status wyspy na publiczny.'

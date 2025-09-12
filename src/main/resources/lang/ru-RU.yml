@@ -490,7 +490,7 @@ ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |
   &e&lОстров | &7{0}ы:
   {1}
-ISLAND_INFO_VISITORS_COUNT: '&e&lОстров | &7Количество посетителей: {0}'
+ISLAND_INFO_VISITORS_COUNT: '&e&lОстров | &7Количество посетителей: {0} ({1} unique visitors)'
 ISLAND_INFO_WORTH: '&e&lОстров | &7Стоимость: {0}'
 ISLAND_NAME_NONE: None
 ISLAND_OPENED: '&e&lОстров | &7Остров успешно открыт для публики.'

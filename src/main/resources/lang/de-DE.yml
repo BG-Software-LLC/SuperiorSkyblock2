@@ -608,7 +608,7 @@ ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |-
   &e&lInsel | &7{0}s:
   {1}
-ISLAND_INFO_VISITORS_COUNT: '&e&lInsel | &7Besucheranzahl: {0}'
+ISLAND_INFO_VISITORS_COUNT: '&e&lInsel | &7Besucheranzahl: {0} ({1} unique visitors)'
 ISLAND_INFO_WORTH: '&e&lInsel | &7Wert: {0}'
 ISLAND_NAME_NONE: None
 ISLAND_OPENED: '&e&lIsland | &7Die Insel wurde erfolgreich der Öffentlichkeit zugänglich

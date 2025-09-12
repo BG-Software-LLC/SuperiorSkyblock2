@@ -490,7 +490,7 @@ ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |
   &e&lIsla | &7{0}s:
   {1}
-ISLAND_INFO_VISITORS_COUNT: '&e&lIsla | &7Número de visitantes: {0}'
+ISLAND_INFO_VISITORS_COUNT: '&e&lIsla | &7Número de visitantes: {0} ({1} unique visitors)'
 ISLAND_INFO_WORTH: '&e&lIsla | &7Valor: {0}'
 ISLAND_NAME_NONE: None
 ISLAND_OPENED: '&e&lIsla | &7Abrió con éxito la isla al público.'

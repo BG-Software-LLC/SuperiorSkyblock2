@@ -100,12 +100,14 @@ public class CmdShow implements ISuperiorCommand {
             infoMessage.append(Message.ISLAND_INFO_WORTH.getMessage(locale, island.getWorth())).append("\n");
         if (!Message.ISLAND_INFO_LEVEL.isEmpty(locale))
             infoMessage.append(Message.ISLAND_INFO_LEVEL.getMessage(locale, island.getIslandLevel())).append("\n");
-        if (!Message.ISLAND_INFO_DISCORD.isEmpty(locale) && island.hasPermission(sender, IslandPrivileges.DISCORD_SHOW))
+        if (!Message.ISLAND_INFO_DISCORD.isEmpty(locale) && !"None".equals(island.getDiscord()) && island.hasPermission(sender, IslandPrivileges.DISCORD_SHOW)) {
             infoMessage.append(Message.ISLAND_INFO_DISCORD.getMessage(locale, island.getDiscord())).append("\n");
-        if (!Message.ISLAND_INFO_PAYPAL.isEmpty(locale) && island.hasPermission(sender, IslandPrivileges.PAYPAL_SHOW))
+        }
+        if (!Message.ISLAND_INFO_PAYPAL.isEmpty(locale) && !"None".equals(island.getPaypal()) && island.hasPermission(sender, IslandPrivileges.PAYPAL_SHOW)) {
             infoMessage.append(Message.ISLAND_INFO_PAYPAL.getMessage(locale, island.getPaypal())).append("\n");
+        }
         if (!Message.ISLAND_INFO_VISITORS_COUNT.isEmpty(locale))
-            infoMessage.append(Message.ISLAND_INFO_VISITORS_COUNT.getMessage(locale, island.getUniqueVisitorsWithTimes().size())).append("\n");
+            infoMessage.append(Message.ISLAND_INFO_VISITORS_COUNT.getMessage(locale, island.getIslandVisitors(false).size(), island.getUniqueVisitorsWithTimes().size())).append("\n");
 
         if (!Message.ISLAND_INFO_ROLES.isEmpty(locale)) {
             Map<PlayerRole, StringBuilder> rolesStrings = new ArrayMap<>();
@@ -128,8 +130,11 @@ public class CmdShow implements ISuperiorCommand {
 
             rolesStrings.keySet().stream()
                     .sorted(Collections.reverseOrder(Comparator.comparingInt(PlayerRole::getWeight)))
-                    .forEach(playerRole ->
-                            infoMessage.append(Message.ISLAND_INFO_ROLES.getMessage(locale, playerRole, rolesStrings.get(playerRole))));
+                    .forEach(playerRole -> {
+                        StringBuilder players = rolesStrings.get(playerRole);
+                        if (players != null && players.length() > 0)
+                            infoMessage.append(Message.ISLAND_INFO_ROLES.getMessage(locale, playerRole, players));
+                    });
         }
 
         if (!Message.ISLAND_INFO_FOOTER.isEmpty(locale))
