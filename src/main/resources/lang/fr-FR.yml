@@ -494,7 +494,9 @@ ISLAND_INFO_ROLES: |
   {1}
 ISLAND_INFO_VISITORS_COUNT: '&e&lIle | &7Nombre de visiteurs: {0}'
 ISLAND_INFO_WORTH: '&e&lIle | &7Valeur: {0}'
+ISLAND_NAME_NONE: None
 ISLAND_OPENED: '&e&lIle | &7L''île est désormais ouverte au public.'
+ISLAND_OWNER_NONE: None
 ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lPrévisualisation | &7Vous vous êtes trop éloigné(e). La prévisualisation à donc été désactivée.'
 ISLAND_PREVIEW_CANCEL: '&e&lPrévisualisation | &7Vous avez annulé(e) la prévisualisation.'
 ISLAND_PREVIEW_CONFIRM_TEXT: 'CONFIRMER'

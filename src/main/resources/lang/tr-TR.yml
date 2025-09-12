@@ -581,7 +581,9 @@ ISLAND_INFO_ROLES: |
   {1}
 ISLAND_INFO_VISITORS_COUNT: '&e&lAda | &7Ziyaretçi Sayısı: {0}'
 ISLAND_INFO_WORTH: '&e&lAda | &7Değer: {0}'
+ISLAND_NAME_NONE: None
 ISLAND_OPENED: '&e&lAda | &7Ada başarıyla halka açıldı.'
+ISLAND_OWNER_NONE: None
 ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lÖnizleme | &7Çok uzaklaştın ve artık önizleme
   modunda değilsin.'
 ISLAND_PREVIEW_CANCEL: '&e&lÖnizleme | &7Önizleme modunu iptal ettin.'
