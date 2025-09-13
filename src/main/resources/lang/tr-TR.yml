@@ -250,6 +250,7 @@ COMMAND_DESCRIPTION_ADMIN_RELOAD: Eklentinin tüm yapılandırmalarını ve gör
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Bir adadan blok limitini kaldır.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Bir oyuncu tarafından verilen tüm değerlendirmeleri
   kaldır.
+COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Bir ada için bir dünyayı sıfırla.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Eklenti için şematikler oluştur.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Bir adaya banka limiti belirle.
@@ -744,6 +745,9 @@ PERSISTENT_DATA_SHOW_PATH: '&b{0}&f: '
 PERSISTENT_DATA_SHOW_SPACER: '&f, '
 PERSISTENT_DATA_SHOW_VALUE: '&6{0}&c{1}&f'
 PERSISTENT_DATA_REMOVED: '&e&lVeri | &7{0} için {1} yolundan veri başarıyla kaldırıldı.'
+PERMISSIONS_RESET: '&e&lIsland | &7Successfully reset all the permissions of {0}''s island to default values!'
+PERMISSIONS_RESET_ALL: '&e&lIsland | &7Successfully reset all the permissions of all the islands to default values!'
+PERMISSIONS_RESET_NAME: '&e&lIsland | &7Successfully reset all the permissions of the island {0} to default values!'
 PERMISSIONS_RESET_PLAYER: '&e&lAda | &7{0} için tüm izinler varsayılan değerlere başarıyla
   sıfırlandı!'
 PERMISSIONS_RESET_ROLES: '&e&lAda | &7Adanın tüm izinleri varsayılan değerlere başarıyla

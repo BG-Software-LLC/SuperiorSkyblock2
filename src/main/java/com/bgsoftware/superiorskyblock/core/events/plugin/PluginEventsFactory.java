@@ -476,6 +476,10 @@ public class PluginEventsFactory {
         return !fireEvent(ISLAND_CLEAR_RATINGS_EVENT, islandClearRatings).isCancelled();
     }
 
+    public static boolean callIslandClearRolesPrivilegesEvent(Island island, CommandSender commandSender) {
+        return callIslandClearRolesPrivilegesEvent(island, commandSenderToSuperiorPlayer(commandSender));
+    }
+
     public static boolean callIslandClearRolesPrivilegesEvent(Island island, SuperiorPlayer superiorPlayer) {
         IslandClearRolesPrivileges islandClearRolesPrivileges = new IslandClearRolesPrivileges();
         islandClearRolesPrivileges.island = island;

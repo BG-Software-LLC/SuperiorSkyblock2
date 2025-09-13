@@ -195,6 +195,7 @@ COMMAND_DESCRIPTION_ADMIN_RECALC: Re-calculer la valeur d'une île.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Recharger toutes les configurations du plugin.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Retirer la limite de bloc d'une île.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Suppimer toutes les notes attribuées par un joueur.
+COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Réinitialiser l'île d'un monde précis pour l'île spécifiée.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Créer des schematics pour le plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Définir la limite bancaire d'une île.
@@ -626,6 +627,9 @@ PERSISTENT_DATA_SHOW_PATH: '&b{0}&f: '
 PERSISTENT_DATA_SHOW_SPACER: '&f, '
 PERSISTENT_DATA_SHOW_VALUE: '&6{0}&c{1}&f'
 PERSISTENT_DATA_REMOVED: '&e&lData | &7Successfully removed data for {0} from path {1}.'
+PERMISSIONS_RESET: '&e&lIsland | &7Successfully reset all the permissions of {0}''s island to default values!'
+PERMISSIONS_RESET_ALL: '&e&lIsland | &7Successfully reset all the permissions of all the islands to default values!'
+PERMISSIONS_RESET_NAME: '&e&lIsland | &7Successfully reset all the permissions of the island {0} to default values!'
 PERMISSIONS_RESET_PLAYER: '&e&lIle | &7Réinitialisation de toutes les permissions de {0} !'
 PERMISSIONS_RESET_ROLES: '&e&lIle | &7Réinitialisation de toutes les permissions de l''île !'
 PLACEHOLDER_NO: 'No'

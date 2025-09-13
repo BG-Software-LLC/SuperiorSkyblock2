@@ -269,6 +269,8 @@ permissions:
             description: Remove a block limit for an island.
           superior.admin.removeratings:
             description: Remove all ratings given by a player.
+          superior.admin.resetpermissions:
+            description: Reset all island permissions for a specific island.
           superior.admin.resetsettings:
             description: Reset all island settings for a specific island.
           superior.admin.resetworld:
