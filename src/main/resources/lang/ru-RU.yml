@@ -192,7 +192,7 @@ COMMAND_DESCRIPTION_ADMIN_RECALC: 'Пересчитать стоимость о�
 COMMAND_DESCRIPTION_ADMIN_RELOAD: 'Перезагрузить все настройки и задачи плагина.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Удалить лимит блоков с острова.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: 'Удалить все оценки, выставленные игроком.'
-COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all the settings of an island.'
+COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Сбросить мир для острова.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: 'Создать схемы для плагина.'
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Установить лимит банка для острова.'
