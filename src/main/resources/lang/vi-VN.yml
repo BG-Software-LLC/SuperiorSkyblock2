@@ -546,7 +546,7 @@ ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |
   &e&lĐảo | &7{0}s:
   {1}
-ISLAND_INFO_VISITORS_COUNT: '&e&lĐảo | &7Số lượt khách: {0}'
+ISLAND_INFO_VISITORS_COUNT: '&e&lĐảo | &7Số lượt khách: {0} ({1} unique visitors)'
 ISLAND_INFO_WORTH: '&e&lĐảo | &7Đáng giá: {0}'
 ISLAND_NAME_NONE: None
 ISLAND_OPENED: '&e&lĐảo | &7Mở đảo thành công cho công cộng.'
