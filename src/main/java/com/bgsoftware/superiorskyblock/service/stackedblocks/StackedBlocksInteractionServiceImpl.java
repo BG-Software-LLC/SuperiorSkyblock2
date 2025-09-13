@@ -248,19 +248,21 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
             }
         }
 
-        int newStackedBlockAmount = blockAmount + amountToDeposit;
+        if (amountToDeposit > 0) {
+            int newStackedBlockAmount = blockAmount + amountToDeposit;
 
-        if (onlinePlayer != null && !PluginEventsFactory.callBlockStackEvent(stackedBlock, onlinePlayer, blockAmount, newStackedBlockAmount))
-            return InteractionResult.EVENT_CANCELLED;
+            if (onlinePlayer != null && !PluginEventsFactory.callBlockStackEvent(stackedBlock, onlinePlayer, blockAmount, newStackedBlockAmount))
+                return InteractionResult.EVENT_CANCELLED;
 
-        if (!plugin.getStackedBlocks().setStackedBlock(stackedBlockLocation, blockKey, newStackedBlockAmount))
-            return InteractionResult.GLITCHED_STACKED_BLOCK;
+            if (!plugin.getStackedBlocks().setStackedBlock(stackedBlockLocation, blockKey, newStackedBlockAmount))
+                return InteractionResult.GLITCHED_STACKED_BLOCK;
 
-        if (island != null)
-            island.handleBlockPlace(blockKey, amountToDeposit);
+            if (island != null)
+                island.handleBlockPlace(blockKey, amountToDeposit);
 
-        plugin.getProviders().notifyStackedBlocksListeners(onlinePlayer == null ? superiorPlayer.asOfflinePlayer() : onlinePlayer,
-                stackedBlock, IStackedBlocksListener.Action.BLOCK_PLACE);
+            plugin.getProviders().notifyStackedBlocksListeners(onlinePlayer == null ? superiorPlayer.asOfflinePlayer() : onlinePlayer,
+                    stackedBlock, IStackedBlocksListener.Action.BLOCK_PLACE);
+        }
 
         final int finalAmountToDeposit = amountToDeposit;
 
