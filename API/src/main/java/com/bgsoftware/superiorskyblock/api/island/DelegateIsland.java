@@ -1558,6 +1558,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public void removeEntityLimit(Key key) {
+        this.handle.removeEntityLimit(key);
+    }
+
+    @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType) {
         return this.handle.hasReachedEntityLimit(entityType);
     }

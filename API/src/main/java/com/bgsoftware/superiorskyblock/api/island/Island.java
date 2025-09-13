@@ -2155,6 +2155,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setEntityLimit(Key key, int limit);
 
     /**
+     * Remove the limit of an entity.
+     *
+     * @param key The entity's key to remove it's limit.
+     */
+    void removeEntityLimit(Key key);
+
+    /**
      * A method to check if a specific entity has reached the limit.
      *
      * @param entityType The entity's type to check.

@@ -302,6 +302,12 @@ public class IslandsDatabaseBridge {
                 createFilter("island", island)));
     }
 
+    public static void removeEntityLimit(Island island, Key entity) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_entity_limits",
+                createFilter("island", island, new Pair<>("entity", entity.toString()))
+        ));
+    }
+
     public static void saveTeamLimit(Island island) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands_settings",
                 createFilter("island", island),
