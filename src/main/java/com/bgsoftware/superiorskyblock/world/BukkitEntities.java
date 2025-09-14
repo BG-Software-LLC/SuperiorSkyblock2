@@ -20,6 +20,7 @@ import org.bukkit.entity.Mule;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.inventory.AbstractHorseInventory;
 import org.bukkit.inventory.HorseInventory;
@@ -163,6 +164,10 @@ public class BukkitEntities {
 
     public static EntityCategory getCategory(EntityType entityType) {
         return ENTITY_CATEGORIES_CACHE.getOrDefault(entityType, EntityCategory.UNKNOWN);
+    }
+
+    public static boolean isTameable(Entity entity) {
+        return entity instanceof Tameable && ((Tameable) entity).isTamed();
     }
 
     public static boolean isHorse(Entity entity) {

@@ -83,6 +83,7 @@ public class IslandPrivileges {
     public static final IslandPrivilege SET_WARP = register("SET_WARP", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege SIGN_INTERACT = register("SIGN_INTERACT");
     public static final IslandPrivilege SPAWNER_BREAK = register("SPAWNER_BREAK");
+    public static final IslandPrivilege TAMED_ANIMAL_DAMAGE = register("TAMED_ANIMAL_DAMAGE");
     @Nullable
     public static final IslandPrivilege TURTLE_EGG_TRAMPING = register("TURTLE_EGG_TRAMPING", !ServerVersion.isLegacy());
     public static final IslandPrivilege UNCOOP_MEMBER = register("UNCOOP_MEMBER", IslandPrivilege.Type.COMMAND);
