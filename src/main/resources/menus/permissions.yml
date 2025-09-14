@@ -2087,13 +2087,13 @@ permissions:
         - '&7Currently &aENABLED&7.'
     permission-disabled:
       type: BONE
-      name: '&6Animal Damage'
+      name: '&6Tamed Animal Damage'
       lore:
         - '&7Access to damage tamed animals inside the island.'
         - '&7Currently &cDISABLED&7.'
     role-permission:
       type: BONE
-      name: '&6Animal Damage'
+      name: '&6Tamed Animal Damage'
       lore:
         - '&7Access to damage tamed animals inside the island.'
         - '&7Role: &e{}&7.'
