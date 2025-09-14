@@ -255,6 +255,7 @@ island-roles:
         - FLY
         - ISLAND_CHEST
         - MONSTER_SPAWN
+        - RAID_TRIGGER
         - RANKUP
         - SPAWNER_BREAK
     mod:

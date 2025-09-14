@@ -559,15 +559,11 @@ public class ProtectionListener extends AbstractGameEventListener {
     /* WORLD EVENTS */
 
     private void onRaidTrigger(GameEvent<GameEventArgs.RaidTriggerEvent> e) {
-        if (!plugin.getGrid().isIslandsWorld(e.getArgs().world))
-            return;
-
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
         Location raidLocation = e.getArgs().raidLocation;
 
-        Island island = plugin.getGrid().getIslandAt(raidLocation);
-
-        if (island == null || island.isSpawn() || !island.isInside(raidLocation) || !island.isMember(superiorPlayer))
+        InteractionResult interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer, raidLocation, IslandPrivileges.RAID_TRIGGER);
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled();
     }
 

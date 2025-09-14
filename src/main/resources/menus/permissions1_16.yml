@@ -1738,6 +1738,39 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  raid_trigger:
+    display-menu: true
+    permission-enabled:
+      type: CROSSBOW
+      name: '&6Raid Trigger'
+      lore:
+        - '&7Access to trigger raids inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: CROSSBOW
+      name: '&6Raid Trigger'
+      lore:
+        - '&7Access to trigger raids inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: CROSSBOW
+      name: '&6Raid Trigger'
+      lore:
+        - '&7Access to trigger raids inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   rankup:
     display-menu: true
     permission-enabled:

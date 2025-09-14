@@ -68,6 +68,8 @@ public class IslandPrivileges {
     @Nullable
     public static final IslandPrivilege PICKUP_LECTERN_BOOK = register("PICKUP_LECTERN_BOOK", ServerVersion.isAtLeast(ServerVersion.v1_14));
     public static final IslandPrivilege PROMOTE_MEMBERS = register("PROMOTE_MEMBERS", IslandPrivilege.Type.COMMAND);
+    @Nullable
+    public static final IslandPrivilege RAID_TRIGGER = register("RAID_TRIGGER", ServerVersion.isAtLeast(ServerVersion.v1_14));
     public static final IslandPrivilege RANKUP = register("RANKUP", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege RATINGS_SHOW = register("RATINGS_SHOW", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege SADDLE_ENTITY = register("SADDLE_ENTITY");
