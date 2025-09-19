@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTracker
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
+import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -51,6 +52,7 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandEntitiesTrackerAlgorithm;
+import com.bgsoftware.superiorskyblock.island.cache.IslandCacheImpl;
 import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
@@ -123,6 +125,12 @@ public class SpawnIsland implements Island {
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
     private final DirtyChunksContainer dirtyChunksContainer;
+    private final LazyReference<IslandCache> islandCache = new LazyReference<IslandCache>() {
+        @Override
+        protected IslandCache create() {
+            return new IslandCacheImpl(SpawnIsland.this);
+        }
+    };
 
     private final BlockPosition center;
     private final World spawnWorld;
@@ -190,6 +198,11 @@ public class SpawnIsland implements Island {
     @Override
     public void updateDatesFormatter() {
         // Do nothing.
+    }
+
+    @Override
+    public IslandCache getCache() {
+        return this.islandCache.get();
     }
 
     @Override

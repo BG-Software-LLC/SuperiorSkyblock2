@@ -14,10 +14,12 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
+import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Counter;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
@@ -30,6 +32,7 @@ import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
+import com.bgsoftware.superiorskyblock.player.cache.PlayerCacheImpl;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -65,6 +68,12 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private final PlayerTeleportAlgorithm playerTeleportAlgorithm;
     @Nullable
     private PersistentDataContainer persistentDataContainer; // Lazy loading
+    private LazyReference<PlayerCache> playerCache = new LazyReference<PlayerCache>() {
+        @Override
+        protected PlayerCache create() {
+            return new PlayerCacheImpl(SSuperiorPlayer.this);
+        }
+    };
 
     private final Map<MissionReference, Counter> completedMissions = new ConcurrentHashMap<>();
     private final List<UUID> pendingInvites = new LinkedList<>();
@@ -167,6 +176,11 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public PlayerCache getCache() {
+        return this.playerCache.get();
     }
 
     @Override

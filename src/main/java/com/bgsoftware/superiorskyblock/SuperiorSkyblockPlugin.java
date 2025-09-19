@@ -45,6 +45,7 @@ import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
 import com.bgsoftware.superiorskyblock.core.values.container.BlockValuesContainer;
 import com.bgsoftware.superiorskyblock.external.ProvidersManagerImpl;
 import com.bgsoftware.superiorskyblock.island.GridManagerImpl;
+import com.bgsoftware.superiorskyblock.island.cache.IslandCacheKeys;
 import com.bgsoftware.superiorskyblock.island.container.DefaultIslandsContainer;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.preview.DefaultIslandPreviews;
@@ -182,6 +183,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         ClearActions.registerActions();
         RespawnActions.registerActions();
         Dimensions.registerDimensions();
+        IslandCacheKeys.registerCacheKeys();
 
         try {
             SortingComparators.initializeTopIslandMembersSorting();

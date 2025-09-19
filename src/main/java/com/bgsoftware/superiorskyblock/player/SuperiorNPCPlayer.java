@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
+import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -65,6 +66,11 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
     @Override
     public String getName() {
         return "NPC-Citizens";
+    }
+
+    @Override
+    public PlayerCache getCache() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

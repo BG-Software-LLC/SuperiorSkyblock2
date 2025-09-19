@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
@@ -10,11 +11,11 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandCalculationAlgorithm;
+import com.bgsoftware.superiorskyblock.island.cache.IslandCacheKeys;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
@@ -35,13 +36,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 public class ChunksListener extends AbstractGameEventListener {
-
-    private final Map<UUID, Set<Chunk>> pendingLoadedChunks = new ArrayMap<>();
 
     private final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {
         @Override
@@ -133,7 +130,10 @@ public class ChunksListener extends AbstractGameEventListener {
 
         plugin.getNMSChunks().injectChunkSections(chunk);
 
-        Set<Chunk> pendingLoadedChunksForIsland = this.pendingLoadedChunks.computeIfAbsent(island.getUniqueId(), u -> new LinkedHashSet<>());
+        IslandCache islandCache = island.getCache();
+
+        Set<Chunk> pendingLoadedChunksForIsland = islandCache.computeIfAbsent(IslandCacheKeys.PENDING_LOADED_CHUNKS,
+                k -> new LinkedHashSet<>());
         pendingLoadedChunksForIsland.add(chunk);
 
         boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
@@ -185,7 +185,7 @@ public class ChunksListener extends AbstractGameEventListener {
             if (recalculateEntities.get()) {
                 island.getEntitiesTracker().recalculateEntityCounts();
                 pendingLoadedChunksForIsland.clear();
-                this.pendingLoadedChunks.remove(island.getUniqueId());
+                islandCache.remove(IslandCacheKeys.PENDING_LOADED_CHUNKS);
             }
         }, 2L);
 

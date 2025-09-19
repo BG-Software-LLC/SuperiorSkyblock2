@@ -6,7 +6,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
@@ -35,16 +36,13 @@ import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public class IslandFlagsListener extends AbstractGameEventListener {
 
     private static final EnumSet<CreatureSpawnEvent.SpawnReason> NATURAL_SPAWN_REASONS = initializeNaturalSpawnReasons();
 
-    private final Map<UUID, ProjectileSource> originalFireballsDamager = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
+    private final Int2ObjectMapView<ProjectileSource> originalFireballsDamager = CollectionsFactory.createInt2ObjectArrayMap();
 
     private final World spawnIslandWorld;
 
@@ -180,7 +178,8 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         }
 
         if (entity instanceof Fireball) {
-            originalFireballsDamager.put(entity.getUniqueId(), ((Fireball) entity).getShooter());
+            originalFireballsDamager.put(entity.getEntityId(), ((Fireball) entity).getShooter());
+            BukkitExecutor.sync(() -> originalFireballsDamager.remove(entity.getEntityId()), 40L);
         }
     }
 
@@ -200,7 +199,7 @@ public class IslandFlagsListener extends AbstractGameEventListener {
                 islandFlag = IslandFlags.WITHER_EXPLOSION;
                 break;
             case FIREBALL: {
-                ProjectileSource projectileSource = originalFireballsDamager.get(source.getUniqueId());
+                ProjectileSource projectileSource = originalFireballsDamager.remove(source.getEntityId());
                 if (projectileSource == null)
                     projectileSource = ((Fireball) source).getShooter();
                 if (projectileSource instanceof Ghast) {

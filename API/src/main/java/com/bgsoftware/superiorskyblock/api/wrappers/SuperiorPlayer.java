@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
+import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -42,6 +43,11 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * Get the last known name of the player.
      */
     String getName();
+
+    /**
+     * Get the player cache.
+     */
+    PlayerCache getCache();
 
     /**
      * Get the last known skin-texture value of the player.

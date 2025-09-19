@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
+import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -42,6 +43,11 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     @Override
     public String getName() {
         return this.handle.getName();
+    }
+
+    @Override
+    public PlayerCache getCache() {
+        return this.handle.getCache();
     }
 
     @Override
