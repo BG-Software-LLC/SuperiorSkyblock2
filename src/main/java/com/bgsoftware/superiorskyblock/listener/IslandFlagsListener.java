@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
@@ -15,6 +16,7 @@ import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Enderman;
@@ -31,7 +33,6 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +46,17 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
     private final Map<UUID, ProjectileSource> originalFireballsDamager = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
 
+    private final World spawnIslandWorld;
+
     public IslandFlagsListener(SuperiorSkyblockPlugin plugin) {
         super(plugin);
+
+        // We want to optimize island checks only for island worlds
+        // However, if the spawn world is not an islands world, we want to check it as well.
+        Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter(
+                plugin.getSettings().getWorlds().getDefaultWorldDimension());
+        this.spawnIslandWorld = spawnLocation.getWorld();
+
         this.registerListeners();
     }
 
@@ -86,6 +96,11 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         }
 
         Location location = e.getArgs().spawnLocation;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(location.getWorld()))
+            return;
+
         if (!preventAction(location, actionFlag))
             return;
 
@@ -96,6 +111,11 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
     private void onHangingBreakByEntity(GameEvent<GameEventArgs.HangingBreakEvent> e) {
         Entity entity = e.getArgs().entity;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(entity.getWorld())) {
+            return;
+        }
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location entityLocation = entity.getLocation(wrapper.getHandle());
@@ -127,6 +147,11 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
     private void onEntityExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
         Entity entity = e.getArgs().entity;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(entity.getWorld()))
+            return;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             if (preventEntityExplosion(entity, entity.getLocation(wrapper.getHandle())))
                 e.getArgs().blocks.clear();
@@ -134,14 +159,26 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     }
 
     private void onEntityChangeBlock(GameEvent<GameEventArgs.EntityChangeBlockEvent> e) {
+        Block block = e.getArgs().block;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(block.getWorld()))
+            return;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventEntityExplosion(e.getArgs().entity, e.getArgs().block.getLocation(wrapper.getHandle())))
+            if (preventEntityExplosion(e.getArgs().entity, block.getLocation(wrapper.getHandle())))
                 e.setCancelled();
         }
     }
 
     private void onFireballDamage(GameEvent<GameEventArgs.EntityDamageEvent> e) {
         Entity entity = e.getArgs().entity;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(entity.getWorld())) {
+            return;
+        }
+
         if (entity instanceof Fireball) {
             originalFireballsDamager.put(entity.getUniqueId(), ((Fireball) entity).getShooter());
         }
@@ -184,6 +221,11 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         Block block = e.getArgs().block;
         Block toBlock = e.getArgs().toBlock;
 
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(toBlock.getWorld())) {
+            return;
+        }
+
         IslandFlag islandFlag = plugin.getNMSWorld().isWaterLogged(block) ?
                 IslandFlags.WATER_FLOW : IslandFlags.LAVA_FLOW;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -193,20 +235,41 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     }
 
     private void onCropsGrowth(GameEvent<GameEventArgs.BlockGrowEvent> e) {
+        Block block = e.getArgs().block;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(block.getWorld())) {
+            return;
+        }
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(e.getArgs().block.getLocation(wrapper.getHandle()), IslandFlags.CROPS_GROWTH))
+            if (preventAction(block.getLocation(wrapper.getHandle()), IslandFlags.CROPS_GROWTH))
                 e.setCancelled();
         }
     }
 
     private void onTreeGrowth(GameEvent<GameEventArgs.StructureGrowEvent> e) {
-        if (preventAction(e.getArgs().location, IslandFlags.TREE_GROWTH))
+        Location location = e.getArgs().location;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(location.getWorld())) {
+            return;
+        }
+
+        if (preventAction(location, IslandFlags.TREE_GROWTH))
             e.setCancelled();
     }
 
     private void onFireSpread(GameEvent<GameEventArgs.BlockBurnEvent> e) {
+        Block block = e.getArgs().block;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(block.getWorld())) {
+            return;
+        }
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(e.getArgs().block.getLocation(wrapper.getHandle()), IslandFlags.FIRE_SPREAD))
+            if (preventAction(block.getLocation(wrapper.getHandle()), IslandFlags.FIRE_SPREAD))
                 e.setCancelled();
         }
     }
@@ -215,8 +278,15 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         if (e.getArgs().igniteCause != BlockIgniteEvent.IgniteCause.SPREAD)
             return;
 
+        Block block = e.getArgs().block;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(block.getWorld())) {
+            return;
+        }
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(e.getArgs().block.getLocation(wrapper.getHandle()), IslandFlags.FIRE_SPREAD))
+            if (preventAction(block.getLocation(wrapper.getHandle()), IslandFlags.FIRE_SPREAD))
                 e.setCancelled();
         }
     }
@@ -225,8 +295,15 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         if (!(e.getArgs().entity instanceof Enderman))
             return;
 
+        Block block = e.getArgs().block;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(block.getWorld())) {
+            return;
+        }
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(e.getArgs().block.getLocation(wrapper.getHandle()), IslandFlags.ENDERMAN_GRIEF))
+            if (preventAction(block.getLocation(wrapper.getHandle()), IslandFlags.ENDERMAN_GRIEF))
                 e.setCancelled();
         }
     }
@@ -239,6 +316,11 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
         if (item.getItemStack().getType() != Material.EGG)
             return;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(item.getWorld())) {
+            return;
+        }
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             if (preventAction(item.getLocation(wrapper.getHandle()), IslandFlags.EGG_LAY)) {
@@ -259,6 +341,11 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         if (entityType != EntityType.SPLASH_POTION)
             return;
 
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(entity.getWorld())) {
+            return;
+        }
+
         BukkitEntities.getPlayerSource(entity).ifPresent(shooterPlayer -> {
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 if (!preventAction(entity.getLocation(wrapper.getHandle()), IslandFlags.PVP))
@@ -276,13 +363,10 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
     /* INTERNAL */
 
-    private boolean preventAction(Location location, IslandFlag islandFlag, Flag... flags) {
+    private boolean preventAction(Location location, IslandFlag islandFlag) {
         Island island = plugin.getGrid().getIslandAt(location);
-
-        if (island == null) {
-            EnumSet<Flag> flagsSet = flags.length == 0 ? EnumSet.noneOf(Flag.class) : EnumSet.copyOf(Arrays.asList(flags));
-            return !flagsSet.contains(Flag.ALLOW_OUTSIDE) && plugin.getGrid().isIslandsWorld(location.getWorld());
-        }
+        if (island == null)
+            return false;
 
         if (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
             return false;
@@ -306,6 +390,10 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         registerCallback(GameEventType.PROJECTILE_HIT_EVENT, GameEventPriority.LOWEST, this::onPoisonAttack);
     }
 
+    private boolean shouldIgnoreWorldEvents(@Nullable World world) {
+        return world == null || (world != this.spawnIslandWorld && !plugin.getGrid().isIslandsWorld(world));
+    }
+
     private static EnumSet<CreatureSpawnEvent.SpawnReason> initializeNaturalSpawnReasons() {
         EnumSet<CreatureSpawnEvent.SpawnReason> naturalSpawnReasons = EnumSet.noneOf(CreatureSpawnEvent.SpawnReason.class);
 
@@ -325,12 +413,6 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "JOCKEY")).ifPresent(naturalSpawnReasons::add);
 
         return naturalSpawnReasons;
-    }
-
-    private enum Flag {
-
-        ALLOW_OUTSIDE
-
     }
 
 }

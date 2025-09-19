@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
+import org.bukkit.entity.Entity;
 
 public class EntityTrackingListener extends AbstractGameEventListener {
 
@@ -23,11 +24,23 @@ public class EntityTrackingListener extends AbstractGameEventListener {
     }
 
     private void onEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
-        this.worldRecordService.get().recordEntitySpawn(e.getArgs().entity);
+        Entity entity = e.getArgs().entity;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
+            return;
+
+        this.worldRecordService.get().recordEntitySpawn(entity);
     }
 
     private void onEntityDeath(GameEvent<GameEventArgs.EntityDeathEvent> e) {
-        worldRecordService.get().recordEntityDespawn(e.getArgs().entity);
+        Entity entity = e.getArgs().entity;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
+            return;
+
+        worldRecordService.get().recordEntityDespawn(entity);
     }
 
     /* INTERNAL */

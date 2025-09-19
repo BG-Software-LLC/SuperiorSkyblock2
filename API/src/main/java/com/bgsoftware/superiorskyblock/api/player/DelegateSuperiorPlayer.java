@@ -254,6 +254,21 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void addCoop(Island island) {
+        this.handle.addCoop(island);
+    }
+
+    @Override
+    public void removeCoop(Island island) {
+        this.handle.removeCoop(island);
+    }
+
+    @Override
+    public List<Island> getCoopIslands() {
+        return this.handle.getCoopIslands();
+    }
+
+    @Override
     public PlayerRole getPlayerRole() {
         return this.handle.getPlayerRole();
     }

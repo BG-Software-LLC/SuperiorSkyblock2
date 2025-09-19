@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -67,6 +68,11 @@ public class StackedBlocksListener extends AbstractGameEventListener {
 
     private void onStackedBlockPlace(GameEvent<GameEventArgs.BlockPlaceEvent> e) {
         Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
         Block againstBlock = e.getArgs().againstBlock;
 
         if (againstBlock.equals(block))
@@ -97,6 +103,9 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     }
 
     private boolean handleStackedBlockPlace(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
+        if (!plugin.getSettings().getStackedBlocks().isEnabled())
+            return false;
+
         boolean cancelled = false;
 
         Player player = e.getArgs().player;
@@ -149,6 +158,10 @@ public class StackedBlocksListener extends AbstractGameEventListener {
 
         Block clickedBlock = e.getArgs().clickedBlock;
 
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(clickedBlock.getWorld()))
+            return false;
+
         if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) <= 1)
             return false;
 
@@ -183,6 +196,10 @@ public class StackedBlocksListener extends AbstractGameEventListener {
 
     private void onStackedBlockExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
         if (e.getArgs().isSoftExplosion)
+            return;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().entity.getWorld()))
             return;
 
         Iterator<Block> blockIterator = e.getArgs().blocks.iterator();
@@ -223,6 +240,10 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     /* STACKED-BLOCKS PROTECTION */
 
     private void onPistonExtend(GameEvent<GameEventArgs.PistonExtendEvent> e) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().block.getWorld()))
+            return;
+
         for (Block block : e.getArgs().blocks) {
             if (plugin.getStackedBlocks().getStackedBlockAmount(block) > 1) {
                 e.setCancelled();
@@ -232,6 +253,10 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     }
 
     public void onPistonRetract(GameEvent<GameEventArgs.PistonRetractEvent> e) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().block.getWorld()))
+            return;
+
         for (Block block : e.getArgs().blocks) {
             if (plugin.getStackedBlocks().getStackedBlockAmount(block) > 1) {
                 e.setCancelled();
@@ -241,18 +266,27 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     }
 
     private void onBlockChangeState(GameEvent<GameEventArgs.BlockFormEvent> e) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().block.getWorld()))
+            return;
+
         if (plugin.getStackedBlocks().getStackedBlockAmount(e.getArgs().block) > 1)
             e.setCancelled();
     }
 
     private void onGolemCreate(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
         List<BlockOffset> entityTemplateOffsets = ENTITY_TEMPLATE_OFFSETS.get(e.getArgs().spawnReason);
-
         if (entityTemplateOffsets == null)
             return;
 
+        Entity entity = e.getArgs().entity;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
+            return;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location entityLocation = e.getArgs().entity.getLocation(wrapper.getHandle());
+            Location entityLocation = entity.getLocation(wrapper.getHandle());
 
             if (plugin.getStackedBlocks().getStackedBlockAmount(entityLocation) > 1) {
                 e.setCancelled();
@@ -269,11 +303,19 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     }
 
     private void onSpongeAbsorb(GameEvent<GameEventArgs.SpongeAbsorbEvent> e) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().block.getWorld()))
+            return;
+
         if (plugin.getStackedBlocks().getStackedBlockAmount(e.getArgs().block) > 1)
             e.setCancelled();
     }
 
     private void onStackedBlockPhysics(GameEvent<GameEventArgs.BlockPhysicsEvent> e) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().block.getWorld()))
+            return;
+
         if (plugin.getStackedBlocks().getStackedBlockAmount(e.getArgs().block) > 1)
             e.setCancelled();
     }
@@ -281,7 +323,15 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     /* INTERNAL */
 
     private void registerListeners() {
-        registerCallback(GameEventType.BLOCK_PLACE_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockPlace);
+        if (!plugin.getSettings().getStackedBlocks().isEnabled()) {
+            // Even if stacked blocks are disabled, we might want to keep the break or change related listeners.
+            // We only want to keep them if there are any stacked blocks registered.
+            if (!plugin.getStackedBlocks().hasStackedBlocks())
+                return;
+        } else {
+            registerCallback(GameEventType.BLOCK_PLACE_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockPlace);
+        }
+
         registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockBreak);
         registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockInteract);
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockBreakByEntity);

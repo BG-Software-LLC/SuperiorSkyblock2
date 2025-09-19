@@ -338,6 +338,28 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     List<Island> getInvites();
 
     /**
+     * Mark player as a coop of an island.
+     * !Can cause issues if not used properly!
+     *
+     * @param island The island to mark the player as coop.
+     * @throws IllegalArgumentException if island doesn't contain player as a coop.
+     */
+    void addCoop(Island island);
+
+    /**
+     * Remove mark of the player as a coop of an island.
+     * !Can cause issues if not used properly!
+     *
+     * @param island The island to remove the mark of the player as coop.
+     */
+    void removeCoop(Island island);
+
+    /**
+     * Get all islands that the player is coop of.
+     */
+    List<Island> getCoopIslands();
+
+    /**
      * Get the role of the player.
      */
     PlayerRole getPlayerRole();

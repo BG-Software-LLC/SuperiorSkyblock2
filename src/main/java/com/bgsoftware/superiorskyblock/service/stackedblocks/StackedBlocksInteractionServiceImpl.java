@@ -67,6 +67,10 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
         if (!plugin.getSettings().getStackedBlocks().isEnabled())
             return InteractionResult.STACKED_BLOCKS_DISABLED;
 
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return InteractionResult.DISABLED_WORLD;
+
         Player onlinePlayer = superiorPlayer.asPlayer();
         ItemStack handItem = onlinePlayer == null ? null : BukkitItems.getHandItem(onlinePlayer, PlayerHand.of(usedHand));
 
@@ -89,6 +93,10 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
         if (!plugin.getSettings().getStackedBlocks().isEnabled())
             return InteractionResult.STACKED_BLOCKS_DISABLED;
 
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return InteractionResult.DISABLED_WORLD;
+
         InteractionResult interactionResult = checkBlockStackInternal(superiorPlayer, block, null);
         if (interactionResult != InteractionResult.SUCCESS)
             return interactionResult;
@@ -102,12 +110,20 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
         Preconditions.checkNotNull(block, "block parameter cannot be null");
         Preconditions.checkNotNull(itemStack, "itemStack parameter cannot be null");
 
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return InteractionResult.DISABLED_WORLD;
+
         return checkBlockStackInternal(superiorPlayer, block, itemStack);
     }
 
     @Override
     public InteractionResult handleStackedBlockBreak(Block block, @Nullable SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(block, "block cannot be null");
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return InteractionResult.DISABLED_WORLD;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());

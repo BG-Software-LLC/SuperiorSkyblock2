@@ -68,6 +68,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     private final Map<MissionReference, Counter> completedMissions = new ConcurrentHashMap<>();
     private final List<UUID> pendingInvites = new LinkedList<>();
+    private final List<Island> coopIslands = new LinkedList<>();
 
     private final UUID uuid;
 
@@ -130,6 +131,11 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         // Checks for pvp warm-up
         if (player.hasPlayerStatus(PlayerStatus.PVP_IMMUNED))
             return target ? HitActionResult.TARGET_PVP_WARMUP : HitActionResult.PVP_WARMUP;
+
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(player.getWorld()))
+            return HitActionResult.SUCCESS;
 
         Island standingIsland;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -530,6 +536,24 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public List<Island> getInvites() {
         return new SequentialListBuilder<UUID>()
                 .map(this.pendingInvites, uuid -> plugin.getGrid().getIslandByUUID(uuid));
+    }
+
+    @Override
+    public void addCoop(Island island) {
+        Preconditions.checkNotNull(island, "island parameter cannot be null");
+        Preconditions.checkArgument(island.isCoop(this), "player is not coop of given island");
+        this.coopIslands.add(island);
+    }
+
+    @Override
+    public void removeCoop(Island island) {
+        Preconditions.checkNotNull(island, "island parameter cannot be null");
+        this.coopIslands.remove(island);
+    }
+
+    @Override
+    public List<Island> getCoopIslands() {
+        return new SequentialListBuilder<Island>().build(this.coopIslands);
     }
 
     @Override

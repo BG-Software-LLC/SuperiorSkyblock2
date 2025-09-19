@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.hooks.LazyWorldsProvider;
-import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandBlockFlags;
@@ -713,8 +712,11 @@ public class SIsland implements Island {
 
         boolean coopPlayer = coopPlayers.add(superiorPlayer);
 
-        if (coopPlayer)
-            plugin.getMenus().refreshCoops(this);
+        if (!coopPlayer)
+            return;
+
+        superiorPlayer.addCoop(this);
+        plugin.getMenus().refreshCoops(this);
     }
 
     @Override
@@ -728,6 +730,8 @@ public class SIsland implements Island {
         // This player was not coop.
         if (!uncoopPlayer)
             return;
+
+        superiorPlayer.removeCoop(this);
 
         superiorPlayer.runIfOnline(player -> {
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -1794,6 +1798,7 @@ public class SIsland implements Island {
         });
 
         invitedPlayers.forEach(invitedPlayer -> invitedPlayer.removeInvite(this));
+        coopPlayers.forEach(coopPlayer -> coopPlayer.removeCoop(this));
 
         if (BuiltinModules.BANK.getConfiguration().hasDisbandRefund()) {
             BigDecimal disbandRefund = BuiltinModules.BANK.getConfiguration().getDisbandRefund();

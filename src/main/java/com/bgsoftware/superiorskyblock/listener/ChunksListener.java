@@ -59,10 +59,18 @@ public class ChunksListener extends AbstractGameEventListener {
     }
 
     private void onChunkUnload(GameEvent<GameEventArgs.ChunkUnloadEvent> e) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().chunk.getWorld()))
+            return;
+
         handleChunkUnload(e.getArgs().chunk);
     }
 
     private void onWorldUnload(GameEvent<GameEventArgs.WorldUnloadEvent> e) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().world))
+            return;
+
         for (Chunk loadedChunk : e.getArgs().world.getLoadedChunks())
             handleChunkUnload(loadedChunk);
     }
@@ -74,9 +82,6 @@ public class ChunksListener extends AbstractGameEventListener {
     /* INTERNAL */
 
     private void handleChunkUnload(Chunk chunk) {
-        if (!plugin.getGrid().isIslandsWorld(chunk.getWorld()))
-            return;
-
         plugin.getStackedBlocks().removeStackedBlockHolograms(chunk);
 
         List<Island> chunkIslands = plugin.getGrid().getIslandsAt(chunk);
@@ -97,6 +102,7 @@ public class ChunksListener extends AbstractGameEventListener {
     }
 
     private void handleChunkLoad(Chunk chunk, boolean isNewChunk) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
         if (!plugin.getGrid().isIslandsWorld(chunk.getWorld()))
             return;
 

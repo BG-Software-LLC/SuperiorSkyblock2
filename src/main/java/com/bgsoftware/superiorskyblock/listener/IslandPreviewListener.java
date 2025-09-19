@@ -24,8 +24,10 @@ public class IslandPreviewListener extends AbstractGameEventListener {
         Player player = e.getArgs().player;
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
-        if (superiorPlayer instanceof SuperiorNPCPlayer)
+        if (superiorPlayer instanceof SuperiorNPCPlayer) {
+            ((SuperiorNPCPlayer) superiorPlayer).release();
             return;
+        }
 
         // Cancelling island preview mode
         if (plugin.getGrid().getIslandPreview(superiorPlayer) != null) {
@@ -45,8 +47,10 @@ public class IslandPreviewListener extends AbstractGameEventListener {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) entity);
 
-        if (superiorPlayer instanceof SuperiorNPCPlayer)
+        if (superiorPlayer instanceof SuperiorNPCPlayer) {
+            ((SuperiorNPCPlayer) superiorPlayer).release();
             return;
+        }
 
         if (((Player) entity).getGameMode() == GameMode.SPECTATOR &&
                 plugin.getGrid().getIslandPreview(superiorPlayer) != null)
