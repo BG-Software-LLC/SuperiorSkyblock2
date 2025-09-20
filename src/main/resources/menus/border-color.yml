@@ -31,7 +31,7 @@ items:
   '#':
     type: STAINED_GLASS_PANE
     data: 15
-    name: '&f '
+    name: '&f'
   '@':
     type: SKULL_ITEM
     data: 3

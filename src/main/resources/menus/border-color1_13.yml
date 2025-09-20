@@ -28,7 +28,7 @@ items:
       name: '&cDisable Border'
   '#':
     type: BLACK_STAINED_GLASS_PANE
-    name: '&f '
+    name: '&f'
   '@':
     type: PLAYER_HEAD
     skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzc0NzJkNjA4ODIxZjQ1YTg4MDUzNzZlYzBjNmZmY2I3ODExNzgyOWVhNWY5NjAwNDFjMmEwOWQxMGUwNGNiNCJ9fX0='
