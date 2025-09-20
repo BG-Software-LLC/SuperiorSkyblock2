@@ -48,6 +48,7 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminRemoveBlockLimit());
         registerCommand(new CmdAdminRemoveEntityLimit());
         registerCommand(new CmdAdminRemoveRatings());
+        registerCommand(new CmdAdminResetPermissions());
         registerCommand(new CmdAdminResetSettings());
         registerCommand(new CmdAdminResetWorld());
         registerCommand(new CmdAdminSchematic());
