@@ -60,10 +60,6 @@ public class CmdFly implements ISuperiorCommand {
             return;
 
         Player player = (Player) sender;
-        Island island;
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            island = plugin.getGrid().getIslandAt(player.getLocation(wrapper.getHandle()));
-        }
 
         if (superiorPlayer.hasIslandFlyEnabled()) {
             player.setAllowFlight(false);
@@ -71,6 +67,11 @@ public class CmdFly implements ISuperiorCommand {
 
             Message.TOGGLED_FLY_OFF.send(superiorPlayer);
         } else {
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(player.getLocation(wrapper.getHandle()));
+            }
+
             if (island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
                 player.setAllowFlight(true);
                 player.setFlying(true);

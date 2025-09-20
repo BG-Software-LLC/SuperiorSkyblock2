@@ -31,6 +31,7 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminDelWarp());
         registerCommand(new CmdAdminDemote());
         registerCommand(new CmdAdminDisband());
+        registerCommand(new CmdAdminFly());
         registerCommand(new CmdAdminIgnore());
         registerCommand(new CmdAdminJoin());
         registerCommand(new CmdAdminKick());

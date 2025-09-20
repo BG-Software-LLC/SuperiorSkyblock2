@@ -229,6 +229,7 @@ COMMAND_DESCRIPTION_ADMIN_DEL_WARP: Bir ada için bir ışınlanma noktasını s
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Başka bir oyuncunun adasındaki bir üyeyi rütbe düşür.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Başka bir oyuncunun ada bankasına para yatır.
 COMMAND_DESCRIPTION_ADMIN_DISBAND: Başka bir oyuncunun adasını kalıcı olarak dağıt.
+COMMAND_DESCRIPTION_ADMIN_FLY: 'Toggle island fly for a player.'
 COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: Bir oyuncuya ada dağıtma hakkı ver.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: En iyi adalardan bir adayı yoksay.
 COMMAND_DESCRIPTION_ADMIN_JOIN: Davet olmadan bir adaya katıl.
@@ -846,6 +847,8 @@ TOGGLED_BYPASS_OFF: '&e&lBypass | &7Bypass modu &cKAPALI&7.'
 TOGGLED_BYPASS_ON: '&e&lBypass | &7Bypass modu &aAÇIK&7.'
 TOGGLED_FLY_OFF: '&e&lUçuş | &7Ada uçuşu &cKAPALI&7.'
 TOGGLED_FLY_ON: '&e&lUçuş | &7Ada uçuşu &aAÇIK&7.'
+TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
+TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
 TOGGLED_SCHEMATIC_OFF: '&e&lŞematikler | &7Şematik modu &cKAPALI&7.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lŞematikler | &7Şematik modu &aAÇIK&7.

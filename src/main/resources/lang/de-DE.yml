@@ -238,6 +238,7 @@ COMMAND_DESCRIPTION_ADMIN_DEMOTE: Ein Mitglied auf der Insel eines anderen Spiel
   degradieren.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Geld auf die Inselbank eines anderen Spielers einzahlen.
 COMMAND_DESCRIPTION_ADMIN_DISBAND: Die Insel eines anderen Spielers dauerhaft auflösen.
+COMMAND_DESCRIPTION_ADMIN_FLY: 'Toggle island fly for a player.'
 COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: Gib einem Spieler Auflösungen.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: Ignoriere eine Insel von den Top-Inseln.
 COMMAND_DESCRIPTION_ADMIN_JOIN: Treten Sie ohne Einladung einer Insel bei.
@@ -908,6 +909,8 @@ TOGGLED_BYPASS_OFF: '&e&lBypass | &7Umgehungsmodus &cOFF&7 umgeschaltet.'
 TOGGLED_BYPASS_ON: '&e&lBypass | &7Umgehungsmodus &aON&7 umgeschaltet.'
 TOGGLED_FLY_OFF: '&e&lFly | &7Inselflug umgeschaltet &cOFF&7.'
 TOGGLED_FLY_ON: '&e&lFly | &7Inselflug umgeschaltet &aON&7.'
+TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
+TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
 TOGGLED_SCHEMATIC_OFF: '&e&lSchematics | &7Schematicsmodus &cOFF&7 umschalten.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lSchaltpläne | &7Schematicsmodus umschalten &aON&7.
