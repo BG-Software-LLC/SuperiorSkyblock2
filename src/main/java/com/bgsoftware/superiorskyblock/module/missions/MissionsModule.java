@@ -53,6 +53,8 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
         if (convertNonCategorizedMissions(plugin, config))
             updatedConfig = true;
 
+        generateDefaultMissionJars();
+
         if (firstTime) {
             generateDefaultFiles();
         }
@@ -352,17 +354,6 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
     }
 
     private void generateDefaultFiles() {
-        Resources.copyResource("modules/missions/BlocksMissions");
-        Resources.copyResource("modules/missions/BrewingMissions");
-        Resources.copyResource("modules/missions/CraftingMissions");
-        Resources.copyResource("modules/missions/EnchantingMissions");
-        Resources.copyResource("modules/missions/FarmingMissions");
-        Resources.copyResource("modules/missions/FishingMissions");
-        Resources.copyResource("modules/missions/IslandMissions");
-        Resources.copyResource("modules/missions/ItemsMissions");
-        Resources.copyResource("modules/missions/KillsMissions");
-        Resources.copyResource("modules/missions/StatisticsMissions");
-
         File categoriesFolder = new File(getModuleFolder(), "categories");
 
         if ((!categoriesFolder.exists() || !categoriesFolder.isDirectory()) && categoriesFolder.mkdirs()) {
@@ -386,6 +377,19 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
             Resources.saveResource("modules/missions/categories/explorer/explorer_1.yml");
             Resources.saveResource("modules/missions/categories/explorer/explorer_2.yml");
         }
+    }
+
+    private void generateDefaultMissionJars() {
+        Resources.copyResource("modules/missions/BlocksMissions");
+        Resources.copyResource("modules/missions/BrewingMissions");
+        Resources.copyResource("modules/missions/CraftingMissions");
+        Resources.copyResource("modules/missions/EnchantingMissions");
+        Resources.copyResource("modules/missions/FarmingMissions");
+        Resources.copyResource("modules/missions/FishingMissions");
+        Resources.copyResource("modules/missions/IslandMissions");
+        Resources.copyResource("modules/missions/ItemsMissions");
+        Resources.copyResource("modules/missions/KillsMissions");
+        Resources.copyResource("modules/missions/StatisticsMissions");
     }
 
     private static class MissionsComparator implements Comparator<Mission<?>> {
