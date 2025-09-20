@@ -405,4 +405,8 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().commandsPerPage;
     }
 
+    public boolean isCacheSchematics() {
+        return getContainer().cacheSchematics;
+    }
+
 }

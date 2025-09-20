@@ -1840,19 +1840,19 @@ permissions:
   set_biome:
     display-menu: true
     permission-enabled:
-      type: GRASS
+      type: GRASS_BLOCK
       name: '&6Set Biome'
       lore:
         - '&7Access to change the island''s biome.'
         - '&7Currently &aENABLED&7.'
     permission-disabled:
-      type: GRASS
+      type: GRASS_BLOCK
       name: '&6Set Biome'
       lore:
         - '&7Access to change the island''s biome.'
         - '&7Currently &cDISABLED&7.'
     role-permission:
-      type: GRASS
+      type: GRASS_BLOCK
       name: '&6Set Biome'
       lore:
         - '&7Access to change the island''s biome.'
@@ -2203,6 +2203,39 @@ permissions:
     no-access:
       sound:
         type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  tamed_animal_damage:
+    display-menu: true
+    permission-enabled:
+      type: BONE
+      name: '&6Tamed Animal Damage'
+      lore:
+        - '&7Access to damage tamed animals inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: BONE
+      name: '&6Tamed Animal Damage'
+      lore:
+        - '&7Access to damage tamed animals inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: BONE
+      name: '&6Tamed Animal Damage'
+      lore:
+        - '&7Access to damage tamed animals inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 

@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 
 public class IslandWorldEventsListener extends AbstractGameEventListener {
@@ -33,9 +34,15 @@ public class IslandWorldEventsListener extends AbstractGameEventListener {
     }
 
     private void onBlockRedstone(GameEvent<GameEventArgs.BlockRedstoneEvent> e) {
+        Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
         Island island;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            island = plugin.getGrid().getIslandAt(e.getArgs().block.getLocation(wrapper.getHandle()));
+            island = plugin.getGrid().getIslandAt(block.getLocation(wrapper.getHandle()));
         }
 
         if (island == null || island.isSpawn())
@@ -52,6 +59,10 @@ public class IslandWorldEventsListener extends AbstractGameEventListener {
         Entity entity = e.getArgs().entity;
 
         if (hologramsService.get().isHologram(entity))
+            return;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
             return;
 
         Island island;

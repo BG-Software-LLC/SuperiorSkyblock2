@@ -6,7 +6,10 @@ import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import org.bukkit.Material;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.ArmorStand;
@@ -20,6 +23,7 @@ import org.bukkit.entity.Mule;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.inventory.AbstractHorseInventory;
 import org.bukkit.inventory.HorseInventory;
@@ -31,15 +35,12 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class BukkitEntities {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final Map<UUID, List<ItemStack>> entityContent = new ConcurrentHashMap<>();
+    private static final Synchronized<Int2ObjectMapView<List<ItemStack>>> entityContent = Synchronized.of(CollectionsFactory.createInt2ObjectArrayMap());
     @Nullable
     private static final EntityType CAMEL_TYPE = EnumHelper.getEnum(EntityType.class, "CAMEL");
 
@@ -62,8 +63,8 @@ public class BukkitEntities {
     }
 
     public static boolean isEquipment(LivingEntity livingEntity, ItemStack itemStack) {
-        List<ItemStack> entityEquipment = entityContent.computeIfAbsent(livingEntity.getUniqueId(), u ->
-                cacheEntityEquipmentInternal(livingEntity));
+        List<ItemStack> entityEquipment = entityContent.writeAndGet(entityContent ->
+                entityContent.computeIfAbsent(livingEntity.getEntityId(), u -> cacheEntityEquipmentInternal(livingEntity)));
 
         return entityEquipment.stream().anyMatch(equipmentItem -> equipmentItem != null &&
                 equipmentItem.getType() == itemStack.getType());
@@ -71,7 +72,8 @@ public class BukkitEntities {
 
     public static void cacheEntityEquipment(LivingEntity livingEntity) {
         List<ItemStack> entityEquipment = cacheEntityEquipmentInternal(livingEntity);
-        entityContent.put(livingEntity.getUniqueId(), entityEquipment);
+        entityContent.write(entityContent ->
+                entityContent.put(livingEntity.getEntityId(), entityEquipment));
     }
 
     private static List<ItemStack> cacheEntityEquipmentInternal(LivingEntity livingEntity) {
@@ -117,7 +119,7 @@ public class BukkitEntities {
     }
 
     public static void clearEntityEquipment(LivingEntity livingEntity) {
-        entityContent.remove(livingEntity.getUniqueId());
+        entityContent.write(entityContent -> entityContent.remove(livingEntity.getEntityId()));
     }
 
     public static Optional<Player> getPlayerSource(Entity damager) {
@@ -163,6 +165,10 @@ public class BukkitEntities {
 
     public static EntityCategory getCategory(EntityType entityType) {
         return ENTITY_CATEGORIES_CACHE.getOrDefault(entityType, EntityCategory.UNKNOWN);
+    }
+
+    public static boolean isTameable(Entity entity) {
+        return entity instanceof Tameable && ((Tameable) entity).isTamed();
     }
 
     public static boolean isHorse(Entity entity) {

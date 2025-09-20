@@ -660,6 +660,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         return this.global.getCommandsPerPage();
     }
 
+    @Override
+    public boolean isCacheSchematics() {
+        return this.global.isCacheSchematics();
+    }
+
     public void updateValue(String path, Object value) throws IOException {
         File file = new File(plugin.getDataFolder(), "config.yml");
 

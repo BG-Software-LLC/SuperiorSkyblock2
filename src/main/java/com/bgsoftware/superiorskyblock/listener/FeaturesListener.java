@@ -106,6 +106,7 @@ public class FeaturesListener extends AbstractGameEventListener {
                 clickedBlock.getType() != Material.OBSIDIAN)
             return;
 
+        // We do not care about spawn island, and therefore only island worlds are relevant.
         if (!plugin.getGrid().isIslandsWorld(clickedBlock.getWorld()))
             return;
 
@@ -147,6 +148,11 @@ public class FeaturesListener extends AbstractGameEventListener {
 
     private void onPlayerCommandAsVisitor(GameEvent<GameEventArgs.PlayerCommandEvent> e) {
         Player player = e.getArgs().player;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(player.getWorld()))
+            return;
+
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
         if (superiorPlayer.hasBypassModeEnabled())
@@ -196,8 +202,9 @@ public class FeaturesListener extends AbstractGameEventListener {
     /* BLOCKS TRACKING */
 
     private void onChunkLoad(GameEvent<GameEventArgs.ChunkLoadEvent> e) {
-        List<Island> chunkIslands = plugin.getGrid().getIslandsAt(e.getArgs().chunk);
-        chunkIslands.forEach(island -> handleIslandChunkLoad(island, e.getArgs().chunk));
+        Chunk chunk = e.getArgs().chunk;
+        List<Island> chunkIslands = plugin.getGrid().getIslandsAt(chunk);
+        chunkIslands.forEach(island -> handleIslandChunkLoad(island, chunk));
     }
 
     private void handleIslandChunkLoad(Island island, Chunk chunk) {
@@ -258,8 +265,7 @@ public class FeaturesListener extends AbstractGameEventListener {
         Action action = e.getArgs().action;
         Block clickedBlock = e.getArgs().clickedBlock;
 
-        if (action != Action.PHYSICAL || !plugin.getGrid().isIslandsWorld(clickedBlock.getWorld()) ||
-                clickedBlock.getType() != SCULK_SHRIEKER)
+        if (action != Action.PHYSICAL || clickedBlock.getType() != SCULK_SHRIEKER)
             return;
 
         InteractionResult interactionResult;

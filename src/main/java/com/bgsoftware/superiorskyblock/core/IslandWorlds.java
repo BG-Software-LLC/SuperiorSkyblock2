@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.function.Consumer;
@@ -48,6 +49,27 @@ public class IslandWorlds {
         } else {
             loadedWorldCallback(worldInfo, consumer);
         }
+    }
+
+    public static Location setWorldToLocation(Island island, Dimension dimension, Location location) {
+        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
+        World world = Bukkit.getWorld(worldInfo.getName());
+        if (world != null) {
+            location = location.clone();
+            location.setWorld(world);
+        } else {
+            WorldsProvider worldsProvider = plugin.getProviders().getWorldsProvider();
+            if (worldsProvider instanceof LazyWorldsProvider) {
+                location = new LazyWorldLocation(worldInfo.getName(), location.getX(), location.getY(),
+                        location.getZ(), location.getYaw(), location.getPitch());
+            } else {
+                location = location.clone();
+                world = plugin.getGrid().getIslandsWorld(island, dimension);
+                location.setWorld(world);
+            }
+        }
+
+        return location;
     }
 
     private static void loadedWorldCallback(WorldInfo worldInfo, Consumer<Either<World, Throwable>> consumer) {

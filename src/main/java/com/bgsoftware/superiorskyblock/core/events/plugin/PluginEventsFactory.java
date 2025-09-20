@@ -476,6 +476,10 @@ public class PluginEventsFactory {
         return !fireEvent(ISLAND_CLEAR_RATINGS_EVENT, islandClearRatings).isCancelled();
     }
 
+    public static boolean callIslandClearRolesPrivilegesEvent(Island island, CommandSender commandSender) {
+        return callIslandClearRolesPrivilegesEvent(island, commandSenderToSuperiorPlayer(commandSender));
+    }
+
     public static boolean callIslandClearRolesPrivilegesEvent(Island island, SuperiorPlayer superiorPlayer) {
         IslandClearRolesPrivileges islandClearRolesPrivileges = new IslandClearRolesPrivileges();
         islandClearRolesPrivileges.island = island;
@@ -741,6 +745,18 @@ public class PluginEventsFactory {
         islandRemoveEffect.superiorPlayer = superiorPlayer;
         islandRemoveEffect.effectType = effectType;
         return !fireEvent(ISLAND_REMOVE_EFFECT_EVENT, islandRemoveEffect).isCancelled();
+    }
+
+    public static boolean callIslandRemoveEntityLimitEvent(Island island, CommandSender commandSender, Key entity) {
+        return callIslandRemoveEntityLimitEvent(island, commandSenderToSuperiorPlayer(commandSender), entity);
+    }
+
+    public static boolean callIslandRemoveEntityLimitEvent(Island island, @Nullable SuperiorPlayer superiorPlayer, Key entity) {
+        IslandRemoveEntityLimit islandRemoveEntityLimit = new IslandRemoveEntityLimit();
+        islandRemoveEntityLimit.island = island;
+        islandRemoveEntityLimit.superiorPlayer = superiorPlayer;
+        islandRemoveEntityLimit.entity = entity;
+        return !fireEvent(ISLAND_REMOVE_ENTITY_LIMIT_EVENT, islandRemoveEntityLimit).isCancelled();
     }
 
     public static boolean callIslandRemoveGeneratorRateEvent(Island island, CommandSender commandSender, Key block, Dimension dimension) {

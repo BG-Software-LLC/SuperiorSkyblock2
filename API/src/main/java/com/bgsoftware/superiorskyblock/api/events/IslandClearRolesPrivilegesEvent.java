@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.event.Cancellable;
@@ -17,16 +18,17 @@ public class IslandClearRolesPrivilegesEvent extends IslandEvent implements Canc
      * The constructor of the event.
      *
      * @param island         The island that the privileges were cleared in.
-     * @param superiorPlayer The player that cleared the privileges.
+     * @param superiorPlayer The player that cleared the privileges, or null if it was done by console.
      */
-    public IslandClearRolesPrivilegesEvent(Island island, SuperiorPlayer superiorPlayer) {
+    public IslandClearRolesPrivilegesEvent(Island island, @Nullable SuperiorPlayer superiorPlayer) {
         super(island);
         this.superiorPlayer = superiorPlayer;
     }
 
     /**
-     * Get the player that cleared the privileges to the other player.
+     * Get the player that cleared the privileges to the island, or null if it was done by console.
      */
+    @Nullable
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
     }

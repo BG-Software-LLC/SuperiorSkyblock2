@@ -62,6 +62,12 @@ public class MenuIslandMembers extends AbstractPagedMenu<MenuIslandMembers.View,
         }
 
         @Override
+        public String replaceTitle(String title) {
+            return title.replace("{0}", String.valueOf(island.getIslandMembers(true).size())).
+                    replace("{1}", String.valueOf(island.getTeamLimit()));
+        }
+
+        @Override
         protected List<SuperiorPlayer> requestObjects() {
             return island.getIslandMembers(true);
         }

@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.io.Files;
@@ -32,6 +33,7 @@ import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.world.WorldReader;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.schematic.container.SchematicsContainer;
+import com.bgsoftware.superiorskyblock.world.schematic.impl.CachedSuperiorSchematic;
 import com.bgsoftware.superiorskyblock.world.schematic.impl.SuperiorSchematic;
 import com.bgsoftware.superiorskyblock.world.schematic.parser.DefaultSchematicParser;
 import com.google.common.base.Preconditions;
@@ -101,12 +103,34 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             }
         }
 
-        if (this.schematicsContainer.getSchematicNames().isEmpty()) {
+        if (this.schematicsContainer.getSchematics().isEmpty()) {
             throw new ManagerLoadException("&cThere were no valid schematics.",
                     ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
 
         System.gc();
+    }
+
+    public void cacheSchematics() {
+        if (!plugin.getSettings().isCacheSchematics() || plugin.getSettings().getMaxIslandSize() % 4 != 0)
+            return;
+
+        List<Schematic> newSchematics = new LinkedList<>();
+        boolean cachedSchematic = false;
+
+        for (Schematic schematic : this.schematicsContainer.getSchematics().values()) {
+            if (schematic instanceof SuperiorSchematic) {
+                schematic = new CachedSuperiorSchematic((SuperiorSchematic) schematic);
+                cachedSchematic = true;
+            }
+            newSchematics.add(schematic);
+        }
+
+        if (!cachedSchematic)
+            return;
+
+        this.schematicsContainer.clearSchematics();
+        newSchematics.forEach(this.schematicsContainer::addSchematic);
     }
 
     private void loadDefaultSchematicParsers() {
@@ -128,7 +152,8 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
     @Override
     public List<String> getSchematics() {
-        return this.schematicsContainer.getSchematicNames();
+        return new SequentialListBuilder<String>()
+                .build(this.schematicsContainer.getSchematics().keySet());
     }
 
     @Override
@@ -341,7 +366,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
     public String getDefaultSchematic(Dimension dimension) {
         String suffix = "_" + dimension.getName().toLowerCase(Locale.ENGLISH);
-        for (String schematicName : this.schematicsContainer.getSchematicNames()) {
+        for (String schematicName : this.schematicsContainer.getSchematics().keySet()) {
             if (getSchematic(schematicName + suffix) != null)
                 return schematicName;
         }

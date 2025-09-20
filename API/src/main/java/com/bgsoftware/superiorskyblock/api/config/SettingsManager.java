@@ -255,6 +255,7 @@ public interface SettingsManager {
      * Whether inventory of island members should be cleared when their island is disbanded or not.
      * Return true if clear-on-disband contains both ENDER_CHEST and INVENTORY.
      * This method will be deleted in the future!
+     *
      * @deprecated See {@link #getClearActionsOnDisband()}
      */
     @Deprecated
@@ -294,6 +295,7 @@ public interface SettingsManager {
      * Whether to clear players' inventories when they join a new island or not.
      * Return true if clear-on-join contains both ENDER_CHEST and INVENTORY.
      * This method will be deleted in the future!
+     *
      * @deprecated See {@link #getClearActionsOnJoin()}
      */
     @Deprecated
@@ -730,6 +732,12 @@ public interface SettingsManager {
      * Config-path: commands-per-page
      */
     int getCommandsPerPage();
+
+    /**
+     * Whether the plugin should cache schematics for faster placement of schematics.
+     * Config-path: cache-schematics
+     */
+    boolean isCacheSchematics();
 
     interface Database {
 

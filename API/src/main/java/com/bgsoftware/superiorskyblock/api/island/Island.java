@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAl
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
+import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -78,6 +79,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Re-sync the island with a new dates formatter.
      */
     void updateDatesFormatter();
+
+    /**
+     * Get the island cache.
+     */
+    IslandCache getCache();
 
     /*
      *  Player related methods
@@ -172,7 +178,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Remove a member from the island.
-     * 
+     *
      * @param superiorPlayer     The player to remove.
      * @param memberRemoveReason The reason for removal.
      */
@@ -2153,6 +2159,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param limit The limit to set.
      */
     void setEntityLimit(Key key, int limit);
+
+    /**
+     * Remove the limit of an entity.
+     *
+     * @param key The entity's key to remove it's limit.
+     */
+    void removeEntityLimit(Key key);
 
     /**
      * A method to check if a specific entity has reached the limit.

@@ -238,6 +238,7 @@ COMMAND_DESCRIPTION_ADMIN_DEMOTE: Ein Mitglied auf der Insel eines anderen Spiel
   degradieren.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Geld auf die Inselbank eines anderen Spielers einzahlen.
 COMMAND_DESCRIPTION_ADMIN_DISBAND: Die Insel eines anderen Spielers dauerhaft auflösen.
+COMMAND_DESCRIPTION_ADMIN_FLY: 'Toggle island fly for a player.'
 COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: Gib einem Spieler Auflösungen.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: Ignoriere eine Insel von den Top-Inseln.
 COMMAND_DESCRIPTION_ADMIN_JOIN: Treten Sie ohne Einladung einer Insel bei.
@@ -259,7 +260,10 @@ COMMAND_DESCRIPTION_ADMIN_RECALC: Berechnet den Wert einer Insel neu.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Alle Konfigurationen und Aufgaben des Plugins neu
   laden.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Entferne ein Blocklimit von einer Insel.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Alle Bewertungen eines Spielers entfernen.
+COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
+COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Setze eine Welt für eine Insel zurück.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Schaltpläne für das Plugin erstellen.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Banklimit für eine Insel festlegen.
@@ -608,11 +612,12 @@ ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |-
   &e&lInsel | &7{0}s:
   {1}
-ISLAND_INFO_VISITORS_COUNT: '&e&lInsel | &7Besucheranzahl: {0}'
+ISLAND_INFO_VISITORS_COUNT: '&e&lInsel | &7Besucheranzahl: {0} ({1} unique visitors)'
 ISLAND_INFO_WORTH: '&e&lInsel | &7Wert: {0}'
+ISLAND_NAME_NONE: None
 ISLAND_OPENED: '&e&lIsland | &7Die Insel wurde erfolgreich der Öffentlichkeit zugänglich
   gemacht.'
-ISLAND_PREVIEW_BLOCK_COMMAND: '&c&lError | &7You cannot use that command in preview mode.'
+ISLAND_OWNER_NONE: None
 ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lVorschau | &7Du hast sich zu weit entfernt und
   befindest dich nicht mehr im Vorschaumodus.'
 ISLAND_PREVIEW_CANCEL: '&e&lVorschau | &7Du hast den Vorschaumodus abgebrochen.'
@@ -791,6 +796,9 @@ PERSISTENT_DATA_SHOW_PATH: '&b{0}&f: '
 PERSISTENT_DATA_SHOW_SPACER: '&f, '
 PERSISTENT_DATA_SHOW_VALUE: '&6{0}&c{1}&f'
 PERSISTENT_DATA_REMOVED: '&e&lData | &7Successfully removed data for {0} from path {1}.'
+PERMISSIONS_RESET: '&e&lIsland | &7Successfully reset all the permissions of {0}''s island to default values!'
+PERMISSIONS_RESET_ALL: '&e&lIsland | &7Successfully reset all the permissions of all the islands to default values!'
+PERMISSIONS_RESET_NAME: '&e&lIsland | &7Successfully reset all the permissions of the island {0} to default values!'
 PERMISSIONS_RESET_PLAYER: '&e&lInsel | &7Alle Berechtigungen für {0} erfolgreich auf
   Standardwerte zurückgesetzt!'
 PERMISSIONS_RESET_ROLES: '&e&lInsel | &7Alle Berechtigungen der Insel erfolgreich
@@ -907,6 +915,8 @@ TOGGLED_BYPASS_OFF: '&e&lBypass | &7Umgehungsmodus &cOFF&7 umgeschaltet.'
 TOGGLED_BYPASS_ON: '&e&lBypass | &7Umgehungsmodus &aON&7 umgeschaltet.'
 TOGGLED_FLY_OFF: '&e&lFly | &7Inselflug umgeschaltet &cOFF&7.'
 TOGGLED_FLY_ON: '&e&lFly | &7Inselflug umgeschaltet &aON&7.'
+TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
+TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
 TOGGLED_SCHEMATIC_OFF: '&e&lSchematics | &7Schematicsmodus &cOFF&7 umschalten.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lSchaltpläne | &7Schematicsmodus umschalten &aON&7.

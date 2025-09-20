@@ -179,6 +179,7 @@ COMMAND_DESCRIPTION_ADMIN_DATA: 'Interact with persistent data of players or isl
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Dégrader un membre de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Déposer de l'argent sur le compte de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_DISBAND: Supprimer l'île d'un joueur.
+COMMAND_DESCRIPTION_ADMIN_FLY: 'Toggle island fly for a player.'
 COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: Donner des suppressions d'île à un joueur.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: Masquer une île du top des îles.
 COMMAND_DESCRIPTION_ADMIN_JOIN: Rejoindre une île sans invitation.
@@ -194,7 +195,10 @@ COMMAND_DESCRIPTION_ADMIN_PROMOTE: Promouvoir un membre d'une île.
 COMMAND_DESCRIPTION_ADMIN_RECALC: Re-calculer la valeur d'une île.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Recharger toutes les configurations du plugin.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Retirer la limite de bloc d'une île.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Suppimer toutes les notes attribuées par un joueur.
+COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
+COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Réinitialiser l'île d'un monde précis pour l'île spécifiée.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Créer des schematics pour le plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Définir la limite bancaire d'une île.
@@ -492,10 +496,11 @@ ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |
   &e&lIle | &7{0}s:
   {1}
-ISLAND_INFO_VISITORS_COUNT: '&e&lIle | &7Nombre de visiteurs: {0}'
+ISLAND_INFO_VISITORS_COUNT: '&e&lIle | &7Nombre de visiteurs: {0} ({1} unique visitors)'
 ISLAND_INFO_WORTH: '&e&lIle | &7Valeur: {0}'
+ISLAND_NAME_NONE: None
 ISLAND_OPENED: '&e&lIle | &7L''île est désormais ouverte au public.'
-ISLAND_PREVIEW_BLOCK_COMMAND: '&c&lError | &7You cannot use that command in preview mode.'
+ISLAND_OWNER_NONE: None
 ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lPrévisualisation | &7Vous vous êtes trop éloigné(e). La prévisualisation à donc été désactivée.'
 ISLAND_PREVIEW_CANCEL: '&e&lPrévisualisation | &7Vous avez annulé(e) la prévisualisation.'
 ISLAND_PREVIEW_CONFIRM_TEXT: 'CONFIRMER'
@@ -625,6 +630,9 @@ PERSISTENT_DATA_SHOW_PATH: '&b{0}&f: '
 PERSISTENT_DATA_SHOW_SPACER: '&f, '
 PERSISTENT_DATA_SHOW_VALUE: '&6{0}&c{1}&f'
 PERSISTENT_DATA_REMOVED: '&e&lData | &7Successfully removed data for {0} from path {1}.'
+PERMISSIONS_RESET: '&e&lIsland | &7Successfully reset all the permissions of {0}''s island to default values!'
+PERMISSIONS_RESET_ALL: '&e&lIsland | &7Successfully reset all the permissions of all the islands to default values!'
+PERMISSIONS_RESET_NAME: '&e&lIsland | &7Successfully reset all the permissions of the island {0} to default values!'
 PERMISSIONS_RESET_PLAYER: '&e&lIle | &7Réinitialisation de toutes les permissions de {0} !'
 PERMISSIONS_RESET_ROLES: '&e&lIle | &7Réinitialisation de toutes les permissions de l''île !'
 PLACEHOLDER_NO: 'No'
@@ -713,6 +721,8 @@ TOGGLED_BYPASS_OFF: '&e&lBypass | &7Mode bypass &cDÉSACTIVÉ&7.'
 TOGGLED_BYPASS_ON: '&e&lBypass | &7Mode bypass &aACTIVÉ&7.'
 TOGGLED_FLY_OFF: '&e&lVol | &7Mode de fly d''île &cDÉSACTIVÉ&7.'
 TOGGLED_FLY_ON: '&e&lVol | &7Mode de fly d''île &aACTIVÉ&7.'
+TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
+TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
 TOGGLED_SCHEMATIC_OFF: '&e&lSchémas | &7Mode de création de schematics &cDÉSACTIVÉ&7.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lSchémas | &7Mode de création de schematics &aACTIVÉ&7.
