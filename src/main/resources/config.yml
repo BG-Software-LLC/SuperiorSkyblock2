@@ -257,6 +257,7 @@ island-roles:
         - MONSTER_SPAWN
         - RANKUP
         - SPAWNER_BREAK
+        - TAMED_ANIMAL_DAMAGE
     mod:
       id: 1
       name: 'Moderator'

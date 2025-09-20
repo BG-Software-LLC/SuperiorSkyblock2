@@ -346,7 +346,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location entityLocation = entity.getLocation(wrapper.getHandle());
-            IslandPrivilege islandPrivilege = BukkitEntities.getCategory(entity.getType()).getDamagePrivilege();
+            IslandPrivilege islandPrivilege = BukkitEntities.isTameable(entity) ? IslandPrivileges.TAMED_ANIMAL_DAMAGE :
+                    BukkitEntities.getCategory(entity.getType()).getDamagePrivilege();
 
             interactionResult = handleInteractionInternal(damagerSource.get(), entityLocation, islandPrivilege,
                     0, true, false);
