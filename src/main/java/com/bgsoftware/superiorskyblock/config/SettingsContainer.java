@@ -536,7 +536,15 @@ public class SettingsContainer {
         this.commandAliases = Collections.unmodifiableMap(commandAliases);
         valuableBlocks = KeySets.unmodifiableKeySet(
                 KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("valuable-blocks")));
-        islandPreviewsGameMode = GameMode.valueOf(config.getString("island-previews.game-mode", "SPECTATOR"));
+        GameMode islandPreviewsGameMode;
+        String islandPreviewsGameModeName = config.getString("island-previews.game-mode", "SPECTATOR").toUpperCase(Locale.ENGLISH);
+        try {
+            islandPreviewsGameMode = GameMode.valueOf(islandPreviewsGameModeName);
+        } catch (IllegalArgumentException error) {
+            islandPreviewsGameMode = GameMode.SPECTATOR;
+            Log.warnFromFile("config.yml", "Invalid game mode ", islandPreviewsGameModeName + ", using SPECTATOR instead.");
+        }
+        this.islandPreviewsGameMode = islandPreviewsGameMode;
         islandPreviewsMaxDistance = config.getInt("island-previews.max-distance", 100);
         islandPreviewsBlockedCommands = Collections.unmodifiableList(config.getStringList("island-previews.blocked-commands"));
         Map<String, Location> islandPreviewsLocations = new HashMap<>();
