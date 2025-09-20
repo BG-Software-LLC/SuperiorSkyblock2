@@ -209,6 +209,10 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
         return Collections.unmodifiableMap(allStackedBlocks);
     }
 
+    public boolean hasStackedBlocks() {
+        return this.stackedBlocksContainer.size() > 0;
+    }
+
     @Override
     public void updateStackedBlockHologram(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");

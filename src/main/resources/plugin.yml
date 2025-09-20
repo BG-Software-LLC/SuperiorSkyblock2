@@ -233,6 +233,8 @@ permissions:
             description: Deposit money into another player's island bank.
           superior.admin.disband:
             description: Disband another player's island permanently.
+          superior.admin.fly:
+            description: Toggle island fly for another player.
           superior.admin.givedisbands:
             description: Give disbands to a player.
           superior.admin.ignore:
@@ -267,6 +269,8 @@ permissions:
             description: Reload all configurations and tasks of the plugin.
           superior.admin.removeblocklimit:
             description: Remove a block limit for an island.
+          superior.admin.removeentitylimit:
+            description: Remove an entity limit for an island.
           superior.admin.removeratings:
             description: Remove all ratings given by a player.
           superior.admin.resetsettings:

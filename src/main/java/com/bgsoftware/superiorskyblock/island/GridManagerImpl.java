@@ -553,14 +553,18 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     @Override
-    public Island getIslandAt(Location location) {
+    public Island getIslandAt(@Nullable Location location) {
         if (location == null)
+            return null;
+
+        World world = location.getWorld();
+        if (world == null)
             return null;
 
         if (spawnIsland != null && spawnIsland.isInside(location))
             return spawnIsland;
 
-        return this.islandsContainer.getIslandAt(location);
+        return isIslandsWorld(world) ? this.islandsContainer.getIslandAt(location) : null;
     }
 
     @Override

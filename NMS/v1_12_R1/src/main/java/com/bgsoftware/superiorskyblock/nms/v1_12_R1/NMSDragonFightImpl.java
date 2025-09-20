@@ -50,7 +50,7 @@ public class NMSDragonFightImpl implements NMSDragonFight {
             return null;
 
         EndWorldEnderDragonBattleHandler dragonBattleHandler = (EndWorldEnderDragonBattleHandler) worldEnderDragonBattle;
-        IslandEnderDragonBattle enderDragonBattle = dragonBattleHandler.getDragonBattle(island.getUniqueId());
+        IslandEnderDragonBattle enderDragonBattle = dragonBattleHandler.getDragonBattle(island.getCache());
 
         return enderDragonBattle == null ? null : enderDragonBattle.getEnderDragon().getBukkitEntity();
     }
@@ -73,7 +73,7 @@ public class NMSDragonFightImpl implements NMSDragonFight {
             return;
 
         EndWorldEnderDragonBattleHandler dragonBattleHandler = (EndWorldEnderDragonBattleHandler) enderDragonBattle;
-        dragonBattleHandler.addDragonBattle(island.getUniqueId(), new IslandEnderDragonBattle(island, worldServer, location));
+        dragonBattleHandler.addDragonBattle(island.getCache(), new IslandEnderDragonBattle(island, worldServer, location));
     }
 
     @Override
@@ -94,7 +94,7 @@ public class NMSDragonFightImpl implements NMSDragonFight {
             return;
 
         EndWorldEnderDragonBattleHandler dragonBattleHandler = (EndWorldEnderDragonBattleHandler) worldEnderDragonBattle;
-        IslandEnderDragonBattle enderDragonBattle = dragonBattleHandler.removeDragonBattle(island.getUniqueId());
+        IslandEnderDragonBattle enderDragonBattle = dragonBattleHandler.removeDragonBattle(island.getCache());
         if (enderDragonBattle != null) {
             enderDragonBattle.removeBattlePlayers();
             enderDragonBattle.getEnderDragon().die();

@@ -19,6 +19,7 @@ items:
   '$':
     type: STAINED_GLASS_PANE
     data: 15
+    name: '&f'
   '#':
     type: DIAMOND_PICKAXE
     name: '&eMiner Missions'

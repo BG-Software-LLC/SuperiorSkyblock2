@@ -179,6 +179,7 @@ COMMAND_DESCRIPTION_ADMIN_DATA: 'Interact with persistent data of players or isl
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Dégrader un membre de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Déposer de l'argent sur le compte de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_DISBAND: Supprimer l'île d'un joueur.
+COMMAND_DESCRIPTION_ADMIN_FLY: 'Toggle island fly for a player.'
 COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: Donner des suppressions d'île à un joueur.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: Masquer une île du top des îles.
 COMMAND_DESCRIPTION_ADMIN_JOIN: Rejoindre une île sans invitation.
@@ -194,7 +195,9 @@ COMMAND_DESCRIPTION_ADMIN_PROMOTE: Promouvoir un membre d'une île.
 COMMAND_DESCRIPTION_ADMIN_RECALC: Re-calculer la valeur d'une île.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Recharger toutes les configurations du plugin.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Retirer la limite de bloc d'une île.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Suppimer toutes les notes attribuées par un joueur.
+COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Réinitialiser l'île d'un monde précis pour l'île spécifiée.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Créer des schematics pour le plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Définir la limite bancaire d'une île.
@@ -714,6 +717,8 @@ TOGGLED_BYPASS_OFF: '&e&lBypass | &7Mode bypass &cDÉSACTIVÉ&7.'
 TOGGLED_BYPASS_ON: '&e&lBypass | &7Mode bypass &aACTIVÉ&7.'
 TOGGLED_FLY_OFF: '&e&lVol | &7Mode de fly d''île &cDÉSACTIVÉ&7.'
 TOGGLED_FLY_ON: '&e&lVol | &7Mode de fly d''île &aACTIVÉ&7.'
+TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
+TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
 TOGGLED_SCHEMATIC_OFF: '&e&lSchémas | &7Mode de création de schematics &cDÉSACTIVÉ&7.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lSchémas | &7Mode de création de schematics &aACTIVÉ&7.

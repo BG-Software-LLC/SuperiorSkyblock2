@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTracker
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
+import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -71,6 +72,11 @@ public class DelegateIsland implements Island {
     @Override
     public void updateDatesFormatter() {
         this.handle.updateDatesFormatter();
+    }
+
+    @Override
+    public IslandCache getCache() {
+        return this.handle.getCache();
     }
 
     @Override
@@ -1555,6 +1561,11 @@ public class DelegateIsland implements Island {
     @Override
     public void setEntityLimit(Key key, int limit) {
         this.handle.setEntityLimit(key, limit);
+    }
+
+    @Override
+    public void removeEntityLimit(Key key) {
+        this.handle.removeEntityLimit(key);
     }
 
     @Override
