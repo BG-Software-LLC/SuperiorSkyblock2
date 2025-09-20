@@ -2,9 +2,6 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeLevelBonusEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeWorthBonusEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
@@ -16,8 +13,6 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -26,7 +21,6 @@ import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -178,9 +172,8 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
         List<String> environments = new ArrayList<>();
 
         for (Dimension dimension : Dimension.values()) {
-            if (dimension != plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
-                if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension))
-                    environments.add(dimension.getName().toLowerCase(Locale.ENGLISH));
+            if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
+                environments.add(dimension.getName().toLowerCase(Locale.ENGLISH));
             }
         }
 
