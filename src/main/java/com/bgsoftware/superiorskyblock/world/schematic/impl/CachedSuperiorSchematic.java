@@ -182,7 +182,7 @@ public class CachedSuperiorSchematic extends BaseSchematic implements Schematic 
             }
         }
         Preconditions.checkState(islandsWorld != null, "Cannot find valid islands world");
-        Location location = new Location(islandsWorld, x, plugin.getSettings().getIslandHeight(), z);
+        Location location = new Location(islandsWorld, x, plugin.getSettings().getIslandHeight() - 1, z);
         List<SchematicBlock> prePlaceTasks = new LinkedList<>();
         List<SchematicBlock> postPlaceTasks = new LinkedList<>();
         WorldEditSession session = this.baseSchematic.createSessionWithSchematicBlocks(location, prePlaceTasks, postPlaceTasks);
