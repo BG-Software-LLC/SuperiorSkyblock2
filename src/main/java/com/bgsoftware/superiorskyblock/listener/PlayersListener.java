@@ -335,8 +335,8 @@ public class PlayersListener extends AbstractGameEventListener {
 
             if (island != null) {
                 if (island.isSpawn() ? (plugin.getSettings().getSpawn().isProtected() && !plugin.getSettings().getSpawn().isPlayersDamage()) :
-                        ((!plugin.getSettings().isVisitorsDamage() && island.isVisitor(targetPlayer, false)) ||
-                                (!plugin.getSettings().isCoopDamage() && island.isCoop(targetPlayer))))
+                        ((!plugin.getSettings().isCoopDamage() && island.isCoop(targetPlayer)) ||
+                                (!plugin.getSettings().isVisitorsDamage() && island.isVisitor(targetPlayer, true))))
                     e.setCancelled();
             }
 
