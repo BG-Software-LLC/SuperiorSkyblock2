@@ -3,10 +3,9 @@ package com.bgsoftware.superiorskyblock.world.schematic.container;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -14,7 +13,7 @@ import java.util.Map;
 
 public class DefaultSchematicsContainer implements SchematicsContainer {
 
-    private final Map<String, Schematic> schematicMap = new HashMap<>();
+    private final Map<String, Schematic> schematicMap = new LinkedHashMap<>();
     private final List<SchematicParser> schematicParsers = new LinkedList<>();
 
     @Nullable
@@ -29,8 +28,8 @@ public class DefaultSchematicsContainer implements SchematicsContainer {
     }
 
     @Override
-    public List<String> getSchematicNames() {
-        return new SequentialListBuilder<String>().build(this.schematicMap.keySet());
+    public Map<String, Schematic> getSchematics() {
+        return Collections.unmodifiableMap(this.schematicMap);
     }
 
     @Override

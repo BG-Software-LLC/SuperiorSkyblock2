@@ -228,6 +228,7 @@ public class SettingsContainer {
     public final BigInteger blockCountsSaveThreshold;
     public final boolean chatSigningSupport;
     public final int commandsPerPage;
+    public final boolean cacheSchematics;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws ManagerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
@@ -571,6 +572,7 @@ public class SettingsContainer {
         blockCountsSaveThreshold = BigInteger.valueOf(config.getInt("block-counts-save-threshold", 100));
         chatSigningSupport = config.getBoolean("chat-signing-support", true);
         commandsPerPage = config.getInt("commands-per-page", 7);
+        cacheSchematics = config.getBoolean("cache-schematics", true);
     }
 
     private List<ClearAction> loadClearActions(List<String> clearActionsNames) {

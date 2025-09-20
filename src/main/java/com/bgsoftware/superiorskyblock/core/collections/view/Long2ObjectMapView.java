@@ -17,6 +17,14 @@ public interface Long2ObjectMapView<V> {
         return value == null ? def : value;
     }
 
+    default void putAll(Long2ObjectMapView<V> other) {
+        Iterator<Entry<V>> iterator = other.entryIterator();
+        while (iterator.hasNext()) {
+            Entry<V> entry = iterator.next();
+            put(entry.getKey(), entry.getValue());
+        }
+    }
+
     @Nullable
     V remove(long key);
 

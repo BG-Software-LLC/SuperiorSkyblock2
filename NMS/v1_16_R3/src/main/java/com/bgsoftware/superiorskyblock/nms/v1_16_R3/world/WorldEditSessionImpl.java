@@ -45,6 +45,7 @@ import net.minecraft.server.v1_16_R3.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R3.generator.CustomChunkGenerator;
 import org.bukkit.generator.ChunkGenerator;
@@ -53,6 +54,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +84,8 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private final Set<ChunkCoordIntPair> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
     private WorldServer worldServer;
     private Dimension dimension;
+
+    private Location baseLocationForCache = null;
 
     public static WorldEditSessionImpl obtain(WorldServer worldServer) {
         return POOL.obtain().initialize(worldServer);
@@ -179,6 +183,9 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     @Override
     public void applyBlocks(org.bukkit.Chunk bukkitChunk) {
+        if (baseLocationForCache != null)
+            throw new IllegalStateException("Cannot call applyBlocks on WorldEditSession cache object");
+
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         ChunkCoordIntPair chunkCoord = chunk.getPos();
 
@@ -221,6 +228,9 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     @Override
     public void finish(Island island) {
+        if (baseLocationForCache != null)
+            throw new IllegalStateException("Cannot call finish on WorldEditSession cache object");
+
         // Update blocks
         blocksToUpdate.forEach(data -> worldServer.setTypeAndData(data.getKey(), data.getValue(), 3));
 
@@ -250,7 +260,65 @@ public class WorldEditSessionImpl implements WorldEditSession {
     }
 
     @Override
+    public void markForCache(Location location) {
+        this.baseLocationForCache = location.clone();
+    }
+
+    @Override
+    public WorldEditSession buildFromCache(Location location) {
+        if (this.baseLocationForCache == null)
+            throw new IllegalStateException("Cannot call buildFromCache for non-cache WorldEditSessions");
+
+        int chunkPosXAxisDelta = (location.getBlockX() >> 4) - (baseLocationForCache.getBlockX() >> 4);
+        int chunkPosZAxisDelta = (location.getBlockZ() >> 4) - (baseLocationForCache.getBlockZ() >> 4);
+        int xAxisDelta = location.getBlockX() - baseLocationForCache.getBlockX();
+        int zAxisDelta = location.getBlockZ() - baseLocationForCache.getBlockZ();
+
+        WorldServer worldServer = ((CraftWorld) location.getWorld()).getHandle();
+
+        WorldEditSessionImpl worldEditSession = obtain(worldServer);
+
+        // We need to transform all data to the new base location values
+        Iterator<Long2ObjectMapView.Entry<ChunkData>> chunksIterator = this.chunks.entryIterator();
+        while (chunksIterator.hasNext()) {
+            Long2ObjectMapView.Entry<ChunkData> entry = chunksIterator.next();
+            long newPos = ChunkCoordIntPair.pair(ChunkCoordIntPair.getX(entry.getKey()) + chunkPosXAxisDelta,
+                    ChunkCoordIntPair.getZ(entry.getKey()) + chunkPosZAxisDelta);
+
+            ChunkSection[] sections = entry.getValue().chunkSections;
+            Map<HeightMap.Type, HeightMap> heightmaps = entry.getValue().heightmaps;
+            List<BlockPosition> lights = entry.getValue().lights.isEmpty() ? Collections.emptyList() : new LinkedList<>();
+            entry.getValue().lights.forEach(blockPos -> {
+                lights.add(blockPos.add(xAxisDelta, 0, zAxisDelta));
+            });
+
+            ChunkData newChunkData = new ChunkData(sections, heightmaps, lights);
+            worldEditSession.chunks.put(newPos, newChunkData);
+        }
+
+        this.blocksToUpdate.forEach(blockToUpdatePair -> {
+            BlockPosition newPos = blockToUpdatePair.getKey().add(xAxisDelta, 0, zAxisDelta);
+            worldEditSession.blocksToUpdate.add(new Pair<>(newPos, blockToUpdatePair.getValue()));
+        });
+
+        this.blockEntities.forEach(blockEntityPair -> {
+            BlockPosition newPos = blockEntityPair.getKey().add(xAxisDelta, 0, zAxisDelta);
+            worldEditSession.blockEntities.add(new Pair<>(newPos, blockEntityPair.getValue()));
+        });
+
+        this.lightenChunks.forEach(lightenChunk -> {
+            worldEditSession.lightenChunks.add(new ChunkCoordIntPair(
+                    lightenChunk.x + chunkPosXAxisDelta, lightenChunk.z + chunkPosZAxisDelta));
+        });
+
+        return worldEditSession;
+    }
+
+    @Override
     public void release() {
+        if (this.baseLocationForCache != null)
+            return;
+
         this.chunks.clear();
         this.blocksToUpdate.clear();
         this.blockEntities.clear();
@@ -267,12 +335,14 @@ public class WorldEditSessionImpl implements WorldEditSession {
     }
 
     private class ChunkData {
-        private final ChunkSection[] chunkSections = new ChunkSection[16];
-        private final Map<HeightMap.Type, HeightMap> heightmaps = new EnumMap<>(HeightMap.Type.class);
-        private final List<BlockPosition> lights = new LinkedList<>();
 
+        private final ChunkSection[] chunkSections;
+        private final Map<HeightMap.Type, HeightMap> heightmaps;
+        private final List<BlockPosition> lights;
 
         public ChunkData(long chunkKey) {
+            this(new ChunkSection[16], new EnumMap<>(HeightMap.Type.class), new LinkedList<>());
+
             ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(chunkKey);
 
             createChunkSections();
@@ -294,6 +364,12 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
             createHeightmaps(tempChunk);
             runCustomWorldGenerator(tempChunk);
+        }
+
+        public ChunkData(ChunkSection[] chunkSections, Map<HeightMap.Type, HeightMap> heightmaps, List<BlockPosition> lights) {
+            this.chunkSections = chunkSections;
+            this.heightmaps = heightmaps;
+            this.lights = lights;
         }
 
         private void createChunkSections() {

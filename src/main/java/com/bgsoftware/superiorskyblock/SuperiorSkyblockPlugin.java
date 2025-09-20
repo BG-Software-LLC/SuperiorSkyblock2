@@ -485,6 +485,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             stackedBlocksHandler.loadData();
         }
 
+        BukkitExecutor.sync(schematicsHandler::cacheSchematics);
+
         modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_MODULE_DATA_LOAD, reloadReason == PluginReloadReason.COMMAND);
 
         BukkitExecutor.sync(() -> {
