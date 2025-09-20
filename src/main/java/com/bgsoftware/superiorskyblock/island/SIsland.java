@@ -3306,6 +3306,20 @@ public class SIsland implements Island {
     }
 
     @Override
+    public void removeEntityLimit(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        Log.debug(Debug.REMOVE_ENTITY_LIMIT, owner.getName(), key);
+
+        IntValue oldEntityLimit = entityLimits.remove(key);
+
+        if (oldEntityLimit == null)
+            return;
+
+        IslandsDatabaseBridge.removeEntityLimit(this, key);
+    }
+
+    @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
         return hasReachedEntityLimit(Keys.of(entityType));

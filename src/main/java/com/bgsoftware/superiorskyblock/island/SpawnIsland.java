@@ -1741,6 +1741,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void removeEntityLimit(Key key) {
+        // Do nothing.
+    }
+
+    @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType) {
         return hasReachedEntityLimit(entityType, 1);
     }
