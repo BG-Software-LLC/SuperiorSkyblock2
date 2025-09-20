@@ -233,6 +233,8 @@ permissions:
             description: Deposit money into another player's island bank.
           superior.admin.disband:
             description: Disband another player's island permanently.
+          superior.admin.fly:
+            description: Toggle island fly for another player.
           superior.admin.givedisbands:
             description: Give disbands to a player.
           superior.admin.ignore:
