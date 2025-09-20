@@ -5,7 +5,7 @@
 ##                                                  ##
 ######################################################
 
-title: '&lIsland Banned Players'
+title: '&lIsland Banned Players ({0})'
 previous-menu: true
 
 pattern:

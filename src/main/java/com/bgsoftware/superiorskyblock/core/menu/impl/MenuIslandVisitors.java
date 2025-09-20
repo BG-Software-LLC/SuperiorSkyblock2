@@ -77,6 +77,11 @@ public class MenuIslandVisitors extends AbstractPagedMenu<MenuIslandVisitors.Vie
         }
 
         @Override
+        public String replaceTitle(String title) {
+            return title.replace("{0}", String.valueOf(island.getIslandVisitors(false).size()));
+        }
+
+        @Override
         protected List<SuperiorPlayer> requestObjects() {
             return island.getIslandVisitors(false);
         }

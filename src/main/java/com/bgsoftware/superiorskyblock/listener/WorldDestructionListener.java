@@ -24,8 +24,14 @@ public class WorldDestructionListener extends AbstractGameEventListener {
     //Checking for structures growing outside island.
     private void onStructureGrow(GameEvent<GameEventArgs.StructureGrowEvent> e) {
         Location location = e.getArgs().location;
+
+        // We care about destruction of island worlds only
+        if (!plugin.getGrid().isIslandsWorld(location.getWorld())) {
+            return;
+        }
+
         Island island = plugin.getGrid().getIslandAt(location);
-        if (island != null && plugin.getGrid().isIslandsWorld(location.getWorld())) {
+        if (island != null) {
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 e.getArgs().blocks.removeIf(blockState ->
                         !island.isInsideRange(blockState.getLocation(wrapper.getHandle())));
@@ -35,31 +41,59 @@ public class WorldDestructionListener extends AbstractGameEventListener {
 
     //Checking for chorus flower spread outside island.
     private void onBlockSpread(GameEvent<GameEventArgs.BlockSpreadEvent> e) {
+        Block block = e.getArgs().block;
+
+        // We care about destruction of island worlds only
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld())) {
+            return;
+        }
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             if (preventDestruction(e.getArgs().source.getLocation(wrapper.getHandle())) ||
-                    preventDestruction(e.getArgs().block.getLocation(wrapper.getHandle())))
+                    preventDestruction(block.getLocation(wrapper.getHandle())))
                 e.setCancelled();
         }
     }
 
     public void onPistonExtend(GameEvent<GameEventArgs.PistonExtendEvent> e) {
+        Block block = e.getArgs().block;
+
+        // We care about destruction of island worlds only
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld())) {
+            return;
+        }
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventMultiDestruction(e.getArgs().block.getLocation(wrapper.getHandle()), e.getArgs().blocks, null))
+            if (preventMultiDestruction(block.getLocation(wrapper.getHandle()), e.getArgs().blocks, null))
                 e.setCancelled();
         }
     }
 
     public void onPistonRetract(GameEvent<GameEventArgs.PistonRetractEvent> e) {
+        Block pistonBlock = e.getArgs().block;
+
+        // We care about destruction of island worlds only
+        if (!plugin.getGrid().isIslandsWorld(pistonBlock.getWorld())) {
+            return;
+        }
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventMultiDestruction(e.getArgs().block.getLocation(wrapper.getHandle()), e.getArgs().blocks,
+            if (preventMultiDestruction(pistonBlock.getLocation(wrapper.getHandle()), e.getArgs().blocks,
                     block -> block.getRelative(e.getArgs().direction)))
                 e.setCancelled();
         }
     }
 
     private void onBlockFlow(GameEvent<GameEventArgs.BlockFromToEvent> e) {
+        Block block = e.getArgs().toBlock;
+
+        // We care about destruction of island worlds only
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld())) {
+            return;
+        }
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location blockLocation = e.getArgs().toBlock.getLocation(wrapper.getHandle());
+            Location blockLocation = block.getLocation(wrapper.getHandle());
             if (preventDestruction(blockLocation))
                 e.setCancelled();
         }
@@ -69,7 +103,7 @@ public class WorldDestructionListener extends AbstractGameEventListener {
 
     private boolean preventDestruction(Location location) {
         Island island = plugin.getGrid().getIslandAt(location);
-        return island == null ? plugin.getGrid().isIslandsWorld(location.getWorld()) : !island.isInsideRange(location);
+        return island == null || !island.isInsideRange(location);
     }
 
     private boolean preventMultiDestruction(Location islandLocation, List<Block> blockList,
@@ -77,7 +111,7 @@ public class WorldDestructionListener extends AbstractGameEventListener {
         Island island = plugin.getGrid().getIslandAt(islandLocation);
 
         if (island == null)
-            return plugin.getGrid().isIslandsWorld(islandLocation.getWorld());
+            return true;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             for (Block block : blockList) {

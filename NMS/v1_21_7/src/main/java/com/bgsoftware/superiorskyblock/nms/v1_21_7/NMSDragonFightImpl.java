@@ -69,7 +69,7 @@ public class NMSDragonFightImpl implements NMSDragonFight {
         if (!(serverLevel.getDragonFight() instanceof EndWorldEndDragonFightHandler dragonFightHandler))
             return null;
 
-        IslandEndDragonFight enderDragonBattle = dragonFightHandler.getDragonFight(island.getUniqueId());
+        IslandEndDragonFight enderDragonBattle = dragonFightHandler.getDragonFight(island.getCache());
         return enderDragonBattle == null ? null : enderDragonBattle.getEnderDragon().getBukkitEntity();
     }
 
@@ -85,7 +85,7 @@ public class NMSDragonFightImpl implements NMSDragonFight {
         if (!(serverLevel.getDragonFight() instanceof EndWorldEndDragonFightHandler dragonFightHandler))
             return;
 
-        dragonFightHandler.addDragonFight(island.getUniqueId(), new IslandEndDragonFight(island, serverLevel, location));
+        dragonFightHandler.addDragonFight(island.getCache(), new IslandEndDragonFight(island, serverLevel, location));
     }
 
     @Override
@@ -100,7 +100,7 @@ public class NMSDragonFightImpl implements NMSDragonFight {
         if (!(serverLevel.getDragonFight() instanceof EndWorldEndDragonFightHandler dragonFightHandler))
             return;
 
-        EndDragonFight endDragonFight = dragonFightHandler.removeDragonFight(island.getUniqueId());
+        EndDragonFight endDragonFight = dragonFightHandler.removeDragonFight(island.getCache());
 
         if (endDragonFight instanceof IslandEndDragonFight islandEndDragonFight) {
             islandEndDragonFight.removeBattlePlayers();

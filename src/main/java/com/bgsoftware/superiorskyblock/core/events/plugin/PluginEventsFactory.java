@@ -747,6 +747,18 @@ public class PluginEventsFactory {
         return !fireEvent(ISLAND_REMOVE_EFFECT_EVENT, islandRemoveEffect).isCancelled();
     }
 
+    public static boolean callIslandRemoveEntityLimitEvent(Island island, CommandSender commandSender, Key entity) {
+        return callIslandRemoveEntityLimitEvent(island, commandSenderToSuperiorPlayer(commandSender), entity);
+    }
+
+    public static boolean callIslandRemoveEntityLimitEvent(Island island, @Nullable SuperiorPlayer superiorPlayer, Key entity) {
+        IslandRemoveEntityLimit islandRemoveEntityLimit = new IslandRemoveEntityLimit();
+        islandRemoveEntityLimit.island = island;
+        islandRemoveEntityLimit.superiorPlayer = superiorPlayer;
+        islandRemoveEntityLimit.entity = entity;
+        return !fireEvent(ISLAND_REMOVE_ENTITY_LIMIT_EVENT, islandRemoveEntityLimit).isCancelled();
+    }
+
     public static boolean callIslandRemoveGeneratorRateEvent(Island island, CommandSender commandSender, Key block, Dimension dimension) {
         return callIslandRemoveGeneratorRateEvent(island, commandSenderToSuperiorPlayer(commandSender), block, dimension);
     }

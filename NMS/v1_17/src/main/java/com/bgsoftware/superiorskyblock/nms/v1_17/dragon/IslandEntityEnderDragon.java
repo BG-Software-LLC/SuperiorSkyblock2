@@ -97,7 +97,7 @@ public class IslandEntityEnderDragon extends EnderDragon {
         this.islandBlockPos = new BlockPos(middleBlock.getBlockX(), middleBlock.getBlockY(), middleBlock.getBlockZ());
 
         IslandEndDragonFight dragonBattle = new IslandEndDragonFight(island, this.serverLevel, this.islandBlockPos, this);
-        dragonBattleHandler.addDragonFight(island.getUniqueId(), dragonBattle);
+        dragonBattleHandler.addDragonFight(island.getCache(), dragonBattle);
     }
 
 }

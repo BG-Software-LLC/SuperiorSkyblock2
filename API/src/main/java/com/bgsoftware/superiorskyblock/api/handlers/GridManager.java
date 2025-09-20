@@ -245,7 +245,9 @@ public interface GridManager extends IDatabaseBridgeHolder {
      *
      * @param oldOwner The old owner of the island.
      * @param newOwner The new owner of the island.
+     * @deprecated Does nothing. See {@link Island#transferIsland(SuperiorPlayer)}
      */
+    @Deprecated
     void transferIsland(UUID oldOwner, UUID newOwner);
 
     /**

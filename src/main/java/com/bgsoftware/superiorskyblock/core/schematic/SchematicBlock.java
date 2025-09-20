@@ -52,6 +52,10 @@ public class SchematicBlock {
         return location.getWorld();
     }
 
+    public Location getLocation() {
+        return location;
+    }
+
     public int getCombinedId() {
         return this.blockId;
     }
@@ -77,7 +81,6 @@ public class SchematicBlock {
 
         if (originalTileEntity == null)
             return;
-
 
         this.tileEntityData = CompoundTag.fromNBT(originalTileEntity.toNBT());
         String id = this.tileEntityData.getString("id").orElse(null);
@@ -189,6 +192,10 @@ public class SchematicBlock {
 
         if (needSignFormat)
             tileEntityData.setByte("SSB.HasSignLines", (byte) 1);
+    }
+
+    public SchematicBlock setLocation(Location newBlockLoc) {
+        return new SchematicBlock(newBlockLoc, this.blockId, this.extra);
     }
 
     public static class Extra {

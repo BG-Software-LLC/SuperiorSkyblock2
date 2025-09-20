@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.hooks.LazyWorldsProvider;
-import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandBlockFlags;
@@ -23,6 +22,7 @@ import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTracker
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
+import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -81,6 +81,7 @@ import com.bgsoftware.superiorskyblock.core.value.IntValue;
 import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
+import com.bgsoftware.superiorskyblock.island.cache.IslandCacheImpl;
 import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -180,6 +181,12 @@ public class SIsland implements Island {
     private final IslandEntitiesTrackerAlgorithm entitiesTracker;
     private final Synchronized<BukkitTask> bankInterestTask = Synchronized.of(null);
     private final DirtyChunksContainer dirtyChunksContainer;
+    private final LazyReference<IslandCache> islandCache = new LazyReference<IslandCache>() {
+        @Override
+        protected IslandCache create() {
+            return new IslandCacheImpl(SIsland.this);
+        }
+    };
 
     /*
      * Island Identifiers
@@ -438,6 +445,11 @@ public class SIsland implements Island {
     @Override
     public void updateDatesFormatter() {
         this.creationTimeDate = Formatters.DATE_FORMATTER.format(new Date(creationTime * 1000));
+    }
+
+    @Override
+    public IslandCache getCache() {
+        return this.islandCache.get();
     }
 
     @Override
@@ -713,8 +725,11 @@ public class SIsland implements Island {
 
         boolean coopPlayer = coopPlayers.add(superiorPlayer);
 
-        if (coopPlayer)
-            plugin.getMenus().refreshCoops(this);
+        if (!coopPlayer)
+            return;
+
+        superiorPlayer.addCoop(this);
+        plugin.getMenus().refreshCoops(this);
     }
 
     @Override
@@ -728,6 +743,8 @@ public class SIsland implements Island {
         // This player was not coop.
         if (!uncoopPlayer)
             return;
+
+        superiorPlayer.removeCoop(this);
 
         superiorPlayer.runIfOnline(player -> {
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -1794,6 +1811,7 @@ public class SIsland implements Island {
         });
 
         invitedPlayers.forEach(invitedPlayer -> invitedPlayer.removeInvite(this));
+        coopPlayers.forEach(coopPlayer -> coopPlayer.removeCoop(this));
 
         if (BuiltinModules.BANK.getConfiguration().hasDisbandRefund()) {
             BigDecimal disbandRefund = BuiltinModules.BANK.getConfiguration().getDisbandRefund();
@@ -3285,6 +3303,20 @@ public class SIsland implements Island {
             return;
 
         IslandsDatabaseBridge.saveEntityLimit(this, key, limit);
+    }
+
+    @Override
+    public void removeEntityLimit(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        Log.debug(Debug.REMOVE_ENTITY_LIMIT, owner.getName(), key);
+
+        IntValue oldEntityLimit = entityLimits.remove(key);
+
+        if (oldEntityLimit == null)
+            return;
+
+        IslandsDatabaseBridge.removeEntityLimit(this, key);
     }
 
     @Override

@@ -437,6 +437,12 @@ public class PluginEventArgs {
 
     }
 
+    public static class IslandRemoveEntityLimit extends IslandDoActionArgs {
+
+        public Key entity;
+
+    }
+
     public static class IslandRemoveGeneratorRate extends IslandDoActionArgs {
 
         public Key block;

@@ -148,6 +148,7 @@ public class BukkitEventsListener implements Listener {
         createEventListener(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, EntityChangeBlockEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_COLLISION_EVENT, VehicleEntityCollisionEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_DAMAGE_EVENT, EntityDamageByEntityEvent.class, this::createGameEvent);
+        createEventListener(GameEventType.ENTITY_DAMAGE_EVENT, EntityDamageEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_DAMAGE_EVENT, VehicleDamageEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_ENTER_PORTAL_EVENT, EntityPortalEnterEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_EXPLODE_EVENT, EntityExplodeEvent.class, this::createGameEvent);
@@ -448,6 +449,14 @@ public class BukkitEventsListener implements Listener {
         entityDamageEvent.entity = e.getEntity();
         entityDamageEvent.damageCause = e.getCause();
         entityDamageEvent.damager = e.getDamager();
+        return eventType.createEvent(entityDamageEvent);
+    }
+
+    private GameEvent<GameEventArgs.EntityDamageEvent> createGameEvent(GameEventType<GameEventArgs.EntityDamageEvent> eventType, GameEventPriority priority, EntityDamageEvent e) {
+        GameEventArgs.EntityDamageEvent entityDamageEvent = new GameEventArgs.EntityDamageEvent();
+        entityDamageEvent.entity = e.getEntity();
+        entityDamageEvent.damageCause = e.getCause();
+        entityDamageEvent.damager = null;
         return eventType.createEvent(entityDamageEvent);
     }
 

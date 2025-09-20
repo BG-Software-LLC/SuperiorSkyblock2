@@ -133,8 +133,10 @@ public class PortalsListener extends AbstractGameEventListener {
     private void handlePlayerPortal(GameEvent<GameEventArgs.EntityPortalEvent> e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getArgs().entity);
 
-        if (superiorPlayer instanceof SuperiorNPCPlayer)
+        if (superiorPlayer instanceof SuperiorNPCPlayer) {
+            ((SuperiorNPCPlayer) superiorPlayer).release();
             return;
+        }
 
         PortalType portalType = (e.getArgs().cause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ?
                 PortalType.NETHER : PortalType.ENDER;
