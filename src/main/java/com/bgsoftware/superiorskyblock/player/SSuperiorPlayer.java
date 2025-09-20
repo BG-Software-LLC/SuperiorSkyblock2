@@ -23,8 +23,11 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.config.PvPWorldsCache;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
@@ -63,6 +66,8 @@ import java.util.function.Function;
 public class SSuperiorPlayer implements SuperiorPlayer {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static PvPWorldsCache pvpWorldsCache = null;
 
     private final DatabaseBridge databaseBridge;
     private final PlayerTeleportAlgorithm playerTeleportAlgorithm;
@@ -382,8 +387,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         World world = getWorld();
 
         // Checks for island teammates pvp
-        if (getIslandLeader().equals(otherPlayer.getIslandLeader()) &&
-                (world == null || !plugin.getSettings().getPvPWorlds().contains(world.getName())))
+        if (getIsland() == otherPlayer.getIsland() && (world == null || !isPvPWorldInternal(world.getName())))
             return HitActionResult.ISLAND_TEAM_PVP;
 
         // Checks if this player can bypass all pvp restrictions
@@ -1137,11 +1141,26 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         this.playerRoleId = newRole.getId();
     }
 
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, SSuperiorPlayer::onSettingsUpdate);
+    }
+
     private static String removeTextureValueTimeStamp(@Nullable String textureValue) {
         // The texture value string is a json containing a timestamp value.
         // However, when we compare texture values, we want to emit the timestamp value.
         // This value is found at index 35->41 (6 chars in length).
         return textureValue == null || textureValue.length() <= 42 ? null : textureValue.substring(0, 35) + textureValue.substring(42);
+    }
+
+    private static boolean isPvPWorldInternal(String worldName) {
+        if (pvpWorldsCache == null)
+            pvpWorldsCache = new PvPWorldsCache(plugin.getSettings().getPvPWorlds());
+
+        return pvpWorldsCache.isPvPWorld(worldName);
+    }
+
+    private static void onSettingsUpdate() {
+        pvpWorldsCache = null;
     }
 
 }
