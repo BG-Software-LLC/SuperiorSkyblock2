@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -40,7 +40,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class CmdAdminShow implements ISuperiorCommand {
+public class CmdAdminShow implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
@@ -77,6 +77,11 @@ public class CmdAdminShow implements ISuperiorCommand {
     @Override
     public boolean canBeExecutedByConsole() {
         return true;
+    }
+
+    @Override
+    public boolean supportMultipleIslands() {
+        return false;
     }
 
     @Override
