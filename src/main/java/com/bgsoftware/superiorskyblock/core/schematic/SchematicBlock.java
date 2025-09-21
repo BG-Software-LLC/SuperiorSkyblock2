@@ -20,9 +20,6 @@ public class SchematicBlock {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final String SIGN_ID = ServerVersion.isLegacy() ? "Sign" : "minecraft:sign";
-    private static final String CHEST_ID = ServerVersion.isLegacy() ? "Chest" : "minecraft:chest";
-
     private final Location location;
     private final int blockId;
     @Nullable
@@ -90,23 +87,21 @@ public class SchematicBlock {
             throw new RuntimeException("Detected tile-entity data with no 'id' key.");
         }
 
-        if (id.equalsIgnoreCase(SIGN_ID)) {
+        if (isSignId(id)) {
             if (this.tileEntityData.containsKey("front_text")) {
                 backFrontSignLinesReplace(this.tileEntityData, island);
             } else {
                 legacySignLinesReplace(this.tileEntityData, island);
             }
-        } else if (id.equalsIgnoreCase(CHEST_ID)) {
-            if (plugin.getSettings().getDefaultContainers().isEnabled()) {
-                String inventoryType = this.tileEntityData.getString("inventoryType").orElse(null);
-                if (inventoryType != null) {
-                    try {
-                        InventoryType containerType = InventoryType.valueOf(inventoryType);
-                        ListTag items = plugin.getSettings().getDefaultContainers().getContents(containerType);
-                        if (items != null)
-                            this.tileEntityData.setTag("Items", items.copy());
-                    } catch (Exception ignored) {
-                    }
+        } else if (plugin.getSettings().getDefaultContainers().isEnabled() && isChestId(id)) {
+            String inventoryType = this.tileEntityData.getString("inventoryType").orElse(null);
+            if (inventoryType != null) {
+                try {
+                    InventoryType containerType = InventoryType.valueOf(inventoryType);
+                    ListTag items = plugin.getSettings().getDefaultContainers().getContents(containerType);
+                    if (items != null)
+                        this.tileEntityData.setTag("Items", items.copy());
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -117,7 +112,7 @@ public class SchematicBlock {
             return false;
 
         String id = this.tileEntityData.getString("id").orElse(null);
-        return id != null && id.equalsIgnoreCase(SIGN_ID);
+        return id != null && isSignId(id);
     }
 
     public void doPostPlace(Island island) {
@@ -196,6 +191,14 @@ public class SchematicBlock {
 
     public SchematicBlock setLocation(Location newBlockLoc) {
         return new SchematicBlock(newBlockLoc, this.blockId, this.extra);
+    }
+
+    private static boolean isSignId(String id) {
+        return id.equals("Sign") || id.equals("minecraft:sign");
+    }
+
+    private static boolean isChestId(String id) {
+        return id.equals("Chest") || id.equals("minecraft:chest");
     }
 
     public static class Extra {
