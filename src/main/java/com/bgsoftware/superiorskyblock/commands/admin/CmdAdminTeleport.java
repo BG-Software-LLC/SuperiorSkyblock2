@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.PortalType;
 import org.bukkit.World;
@@ -99,9 +98,6 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
                 return;
             }
         }
-
-        if (!PluginEventsFactory.callIslandHomeTeleportEvent(island, superiorPlayer, dimension))
-            return;
 
         superiorPlayer.teleport(island, dimension, result -> {
             if (!result) {

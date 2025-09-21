@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.event.Cancellable;
 
 /**
- * IslandWarpTeleportEvent is called when a player teleports to island visitor home.
+ * IslandVisitorHomeTeleportEvent is called when a player teleports to island visitor home.
  */
 public class IslandVisitorHomeTeleportEvent extends IslandEvent implements Cancellable {
 
