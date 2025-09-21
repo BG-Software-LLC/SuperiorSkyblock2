@@ -628,6 +628,14 @@ public class PluginEventsFactory {
         return fireEvent(ISLAND_GENERATE_BLOCK_EVENT, islandGenerateBlock);
     }
 
+    public static boolean callIslandHomeTeleportEvent(Island island, SuperiorPlayer superiorPlayer, Dimension dimension) {
+        IslandHomeTeleport islandHomeTeleport = new IslandHomeTeleport();
+        islandHomeTeleport.island = island;
+        islandHomeTeleport.superiorPlayer = superiorPlayer;
+        islandHomeTeleport.dimension = dimension;
+        return !fireEvent(ISLAND_HOME_TELEPORT_EVENT, islandHomeTeleport).isCancelled();
+    }
+
     public static boolean callIslandInviteEvent(Island island, SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer) {
         IslandInvite islandInvite = new IslandInvite();
         islandInvite.island = island;
@@ -946,6 +954,14 @@ public class PluginEventsFactory {
         islandUpgrade.upgradeCause = upgradeCause;
         islandUpgrade.upgradeCost = upgradeCost;
         return fireEvent(ISLAND_UPGRADE_EVENT, islandUpgrade);
+    }
+
+    public static boolean callIslandVisitorHomeTeleportEvent(Island island, SuperiorPlayer superiorPlayer, Dimension dimension) {
+        IslandVisitorHomeTeleport islandVisitorHomeTeleport = new IslandVisitorHomeTeleport();
+        islandVisitorHomeTeleport.island = island;
+        islandVisitorHomeTeleport.superiorPlayer = superiorPlayer;
+        islandVisitorHomeTeleport.dimension = dimension;
+        return !fireEvent(ISLAND_VISITOR_HOME_TELEPORT_EVENT, islandVisitorHomeTeleport).isCancelled();
     }
 
     public static boolean callIslandWarpTeleportEvent(Island island, SuperiorPlayer superiorPlayer, IslandWarp islandWarp) {

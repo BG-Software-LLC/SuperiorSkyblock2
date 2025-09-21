@@ -53,6 +53,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterPortalEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandGenerateBlockEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandHomeTeleportEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandInviteEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandJoinEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandKickEvent;
@@ -82,6 +83,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandUnbanEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandUnlockWorldEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandVisitorHomeTeleportEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWarpTeleportEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorldResetEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
@@ -172,6 +174,7 @@ import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.I
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandEnterPortal;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandEnterProtected;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandGenerateBlock;
+import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandHomeTeleport;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandInvite;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandJoin;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandKick;
@@ -201,6 +204,7 @@ import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.I
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandUncoopPlayer;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandUnlockWorld;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandUpgrade;
+import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandVisitorHomeTeleport;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandWarpTeleport;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandWorldReset;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandWorthCalculated;
@@ -761,6 +765,12 @@ public abstract class PluginEventType<Args extends PluginEventArgs> extends Even
             pluginEvent.getArgs().placeBlock = ((IslandGenerateBlockEvent) bukkitEvent).isPlaceBlock();
         }
     };
+    public static final PluginEventType<IslandHomeTeleport> ISLAND_HOME_TELEPORT_EVENT = new PluginEventType<IslandHomeTeleport>(IslandHomeTeleportEvent.class) {
+        @Override
+        public Event createBukkitEvent(IslandHomeTeleport args) {
+            return new IslandHomeTeleportEvent(args.island, args.superiorPlayer, args.dimension);
+        }
+    };
     public static final PluginEventType<IslandInvite> ISLAND_INVITE_EVENT = new PluginEventType<IslandInvite>(IslandInviteEvent.class) {
         @Override
         public Event createBukkitEvent(IslandInvite args) {
@@ -983,7 +993,13 @@ public abstract class PluginEventType<Args extends PluginEventArgs> extends Even
             pluginEvent.getArgs().upgradeCost = ((IslandUpgradeEvent) bukkitEvent).getUpgradeCost();
         }
     };
-    public static final PluginEventType<IslandWarpTeleport> ISLAND_WARP_TELEPORT_EVENT = new PluginEventType<IslandWarpTeleport>(IslandUpgradeEvent.class) {
+    public static final PluginEventType<IslandVisitorHomeTeleport> ISLAND_VISITOR_HOME_TELEPORT_EVENT = new PluginEventType<IslandVisitorHomeTeleport>(IslandVisitorHomeTeleportEvent.class) {
+        @Override
+        public Event createBukkitEvent(IslandVisitorHomeTeleport args) {
+            return new IslandVisitorHomeTeleportEvent(args.island, args.superiorPlayer, args.dimension);
+        }
+    };
+    public static final PluginEventType<IslandWarpTeleport> ISLAND_WARP_TELEPORT_EVENT = new PluginEventType<IslandWarpTeleport>(IslandWarpTeleportEvent.class) {
         @Override
         public Event createBukkitEvent(IslandWarpTeleport args) {
             return new IslandWarpTeleportEvent(args.island, args.superiorPlayer, args.islandWarp);
