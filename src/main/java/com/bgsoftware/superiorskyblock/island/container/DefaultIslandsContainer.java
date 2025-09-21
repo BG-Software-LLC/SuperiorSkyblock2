@@ -25,14 +25,20 @@ import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
+import java.lang.ref.WeakReference;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class DefaultIslandsContainer implements IslandsContainer {
+
+    private static final int MAX_ISLANDS_POSITION_CACHE = 250;
 
     private final Synchronized<IslandPosition2ObjectMap<Island>> islandsByPositions = Synchronized.of(new IslandPosition2ObjectMap<>());
     private final Map<UUID, Island> islandsByUUID = new ConcurrentHashMap<>();
@@ -41,11 +47,12 @@ public class DefaultIslandsContainer implements IslandsContainer {
 
     private final EnumerateSet<SortingType> notifiedValues = new EnumerateSet<>(SortingType.values());
 
+    private final IslandsCache islandsCache = new IslandsCache();
+
     private final SuperiorSkyblockPlugin plugin;
 
     public DefaultIslandsContainer(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-
     }
 
     @Override
@@ -56,23 +63,25 @@ public class DefaultIslandsContainer implements IslandsContainer {
 
         Preconditions.checkNotNull(defaultWorld, "Default world information cannot be null!");
 
-        this.islandsByPositions.write(islandsByPositions -> {
-            try (IslandPosition islandPosition = IslandPosition.of(defaultWorld.getName(), center.getX(), center.getZ())) {
-                islandsByPositions.put(islandPosition, island);
-            }
+        try (IslandPosition islandPosition = IslandPosition.of(defaultWorld.getName(), center.getX(), center.getZ())) {
+            // Insert to cache if we can access it
+            accessIslandsCache(islandsCache -> islandsCache.insert(islandPosition, island));
 
-            if (plugin.getProviders().hasCustomWorldsSupport()) {
-                // We don't know the logic of the custom worlds support, therefore we add a position
-                // for every possible world, so there won't be issues with detecting islands later.
-                for (Dimension dimension : Dimension.values()) {
-                    if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
-                        runWithCustomWorld(defaultWorld, center, island, dimension,
-                                islandPosition -> islandsByPositions.put(islandPosition, island));
+            this.islandsByPositions.write(islandsByPositions -> {
+                islandsByPositions.put(islandPosition, island);
+
+                if (plugin.getProviders().hasCustomWorldsSupport()) {
+                    // We don't know the logic of the custom worlds support, therefore we add a position
+                    // for every possible world, so there won't be issues with detecting islands later.
+                    for (Dimension dimension : Dimension.values()) {
+                        if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
+                            runWithCustomWorld(defaultWorld, center, island, dimension,
+                                    islandPositionCustomWorld -> islandsByPositions.put(islandPositionCustomWorld, island));
+                        }
                     }
                 }
-            }
-        });
-
+            });
+        }
 
         this.islandsByUUID.put(island.getUniqueId(), island);
 
@@ -89,20 +98,23 @@ public class DefaultIslandsContainer implements IslandsContainer {
 
         Preconditions.checkNotNull(defaultWorld, "Default world information cannot be null!");
 
-        this.islandsByPositions.write(islandsByPositions -> {
-            try (IslandPosition islandPosition = IslandPosition.of(defaultWorld.getName(), center.getX(), center.getZ())) {
-                islandsByPositions.remove(islandPosition, island);
-            }
+        try (IslandPosition islandPosition = IslandPosition.of(defaultWorld.getName(), center.getX(), center.getZ())) {
+            // Remove from cache if we can access it
+            accessIslandsCache(islandsCache -> islandsCache.remove(islandPosition));
 
-            if (plugin.getProviders().hasCustomWorldsSupport()) {
-                for (Dimension dimension : Dimension.values()) {
-                    if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
-                        runWithCustomWorld(defaultWorld, center, island, dimension,
-                                islandPosition -> islandsByPositions.remove(islandPosition, island));
+            this.islandsByPositions.write(islandsByPositions -> {
+                islandsByPositions.remove(islandPosition, island);
+
+                if (plugin.getProviders().hasCustomWorldsSupport()) {
+                    for (Dimension dimension : Dimension.values()) {
+                        if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
+                            runWithCustomWorld(defaultWorld, center, island, dimension,
+                                    islandPositionCustomWorld -> islandsByPositions.remove(islandPositionCustomWorld, island));
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
 
         islandsByUUID.remove(island.getUniqueId());
 
@@ -144,8 +156,9 @@ public class DefaultIslandsContainer implements IslandsContainer {
     public Island getIslandAt(Location location) {
         Island island;
         try (IslandPosition islandPosition = IslandPosition.of(location)) {
-            island = this.islandsByPositions.readAndGet(islandsByPositions ->
-                    islandsByPositions.get(islandPosition));
+            island = readIslandsCache(islandsCache -> islandsCache.get(islandPosition),
+                    () -> this.islandsByPositions.readAndGet(islandsByPositions ->
+                            islandsByPositions.get(islandPosition)));
         }
         return island == null || !island.isInside(location) ? null : island;
     }
@@ -258,6 +271,69 @@ public class DefaultIslandsContainer implements IslandsContainer {
                 consumer.accept(islandPosition);
             }
         }
+    }
+
+    private void accessIslandsCache(Consumer<IslandsCache> consumer) {
+        if (Bukkit.isPrimaryThread()) {
+            consumer.accept(islandsCache);
+        }
+    }
+
+    private <R> R readIslandsCache(Function<IslandsCache, R> function, Supplier<R> onInvalidAccess) {
+        if (Bukkit.isPrimaryThread()) {
+            return function.apply(islandsCache);
+        }
+
+        return onInvalidAccess.get();
+    }
+
+    private class IslandsCache {
+
+        // Implemented with CacheHolder so IslandPositions with no islands will not trigger access to global `islandsByPositions`
+        private final IslandPosition2ObjectMap<CacheHolder> islandsByPositionCache = new IslandPosition2ObjectMap<>();
+
+        private Island get(IslandPosition islandPosition) {
+            CacheHolder holder = islandsByPositionCache.get(islandPosition);
+            if (holder != null)
+                return holder.island.get();
+
+            Island island = islandsByPositions.readAndGet(islandsByPositions ->
+                    islandsByPositions.get(islandPosition));
+
+            insert(islandPosition, island);
+
+            return island;
+        }
+
+        private void insert(IslandPosition islandPosition, Island island) {
+            if (islandsByPositionCache.size() > MAX_ISLANDS_POSITION_CACHE) {
+                // Remove one position
+                Iterator<?> iterator = islandsByPositionCache.entrySet().iterator();
+                if (iterator.hasNext()) {
+                    iterator.next();
+                    iterator.remove();
+                }
+            }
+
+            islandsByPositionCache.put(islandPosition, island == null ? CacheHolder.NULL : new CacheHolder(island));
+        }
+
+        private void remove(IslandPosition islandPosition) {
+            this.islandsByPositionCache.remove(islandPosition);
+        }
+
+    }
+
+    private static class CacheHolder {
+
+        private static final CacheHolder NULL = new CacheHolder(null);
+
+        private final WeakReference<Island> island;
+
+        CacheHolder(Island island) {
+            this.island = new WeakReference<>(island);
+        }
+
     }
 
 }
