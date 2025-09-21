@@ -120,8 +120,13 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
         for (Schematic schematic : this.schematicsContainer.getSchematics().values()) {
             if (schematic instanceof SuperiorSchematic) {
-                schematic = new CachedSuperiorSchematic((SuperiorSchematic) schematic);
-                cachedSchematic = true;
+                try {
+                    schematic = new CachedSuperiorSchematic((SuperiorSchematic) schematic);
+                    cachedSchematic = true;
+                } catch (Throwable error) {
+                    Log.warn("Cannot cache schematic ", schematic.getName(), ", skipping...");
+                    error.printStackTrace();
+                }
             }
             newSchematics.add(schematic);
         }

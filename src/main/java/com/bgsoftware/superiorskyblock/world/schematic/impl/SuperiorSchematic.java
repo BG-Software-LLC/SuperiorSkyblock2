@@ -204,10 +204,8 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         }
     }
 
-    public WorldEditSession createSessionWithSchematicBlocks(Location location, List<SchematicBlock> prePlaceTasks,
-                                                             List<SchematicBlock> postPlaceTasks) {
-        WorldEditSession worldEditSession = plugin.getNMSWorld().createEditSession(location.getWorld());
-
+    public void populateSessionWithSchematicBlocks(WorldEditSession worldEditSession, Location location,
+                                                   List<SchematicBlock> prePlaceTasks, List<SchematicBlock> postPlaceTasks) {
         Location min = this.data.offset.applyToLocation(location);
 
         VarintArray.Itr blockIdsIterator = new VarintArray(this.data.blockIds).iterator();
@@ -234,8 +232,6 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
         if (blockIdsIterator.hasNext())
             throw new IllegalStateException("Not all blocks were read from varint iterator");
-
-        return worldEditSession;
     }
 
     public void finishPlaceSchematic(WorldEditSession worldEditSession, List<SchematicBlock> postPlaceTasks,
@@ -331,7 +327,8 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
         long placeProfiler = Profiler.start(ProfileType.SCHEMATIC_BLOCKS_PLACE, getName());
 
-        WorldEditSession worldEditSession = createSessionWithSchematicBlocks(location, prePlaceTasks, postPlaceTasks);
+        WorldEditSession worldEditSession = plugin.getNMSWorld().createEditSession(location.getWorld());
+        populateSessionWithSchematicBlocks(worldEditSession, location, prePlaceTasks, postPlaceTasks);
 
         prePlaceTasks.forEach(schematicBlock -> {
             schematicBlock.doPrePlace(island);
@@ -360,7 +357,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
     public Runnable onTeleportCallback() {
         return this.onTeleportCallback;
     }
-    
+
     public SuperiorSchematic copy(String newName) {
         return new SuperiorSchematic(newName, this.data, this.cachedCounts);
     }

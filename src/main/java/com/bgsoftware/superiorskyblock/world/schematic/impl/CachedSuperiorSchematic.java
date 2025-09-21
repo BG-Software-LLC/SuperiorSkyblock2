@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.world.schematic.impl;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
@@ -14,16 +15,16 @@ import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import com.bgsoftware.superiorskyblock.core.schematic.SchematicBlock;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
-import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.world.WorldGenerator;
+import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
-import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -31,10 +32,14 @@ public class CachedSuperiorSchematic extends BaseSchematic implements Schematic 
 
     private final Int2ObjectMapView<WorldEditSessionCache> cachedSessions = CollectionsFactory.createInt2ObjectArrayMap();
     private final SuperiorSchematic baseSchematic;
+    private final Dimension schematicDimension;
 
     public CachedSuperiorSchematic(SuperiorSchematic baseSchematic) {
         super(baseSchematic.getName(), KeyMaps.createEmptyMap());
         this.baseSchematic = baseSchematic;
+        this.schematicDimension = getSchematicDimension(baseSchematic.getName());
+        if (!(WorldGenerator.getWorldGenerator(this.schematicDimension) instanceof IslandsGenerator))
+            throw new IllegalStateException("Cannot use cached schematics with custom generators");
         populateCache();
     }
 
@@ -85,7 +90,8 @@ public class CachedSuperiorSchematic extends BaseSchematic implements Schematic 
         if (worldEditSessionCache == null)
             throw new IllegalStateException("Cannot find cache for (" + chunkX + "," + chunkZ + ")");
 
-        WorldEditSession worldEditSession = worldEditSessionCache.session.buildFromCache(location);
+        WorldEditSession worldEditSession = plugin.getNMSWorld().createEditSession(location.getWorld());
+        worldEditSession.applyData(worldEditSessionCache.sessionData, location);
 
         worldEditSessionCache.prePlaceTasks.forEach(schematicBlock -> {
             schematicBlock.doPrePlace(island);
@@ -174,20 +180,15 @@ public class CachedSuperiorSchematic extends BaseSchematic implements Schematic 
     }
 
     private WorldEditSessionCache createSessionCache(int x, int z) {
-        World islandsWorld = null;
-        for (World world : Bukkit.getWorlds()) {
-            if (plugin.getProviders().getWorldsProvider().isIslandsWorld(world)) {
-                islandsWorld = world;
-                break;
-            }
-        }
-        Preconditions.checkState(islandsWorld != null, "Cannot find valid islands world");
-        Location location = new Location(islandsWorld, x, plugin.getSettings().getIslandHeight() - 1, z);
+        Location location = new Location(null, x, plugin.getSettings().getIslandHeight() - 1, z);
         List<SchematicBlock> prePlaceTasks = new LinkedList<>();
         List<SchematicBlock> postPlaceTasks = new LinkedList<>();
-        WorldEditSession session = this.baseSchematic.createSessionWithSchematicBlocks(location, prePlaceTasks, postPlaceTasks);
-        session.markForCache(location);
-        return new WorldEditSessionCache(session, prePlaceTasks, postPlaceTasks, location);
+
+        WorldEditSession worldEditSession = plugin.getNMSWorld().createPartialEditSession(this.schematicDimension);
+        this.baseSchematic.populateSessionWithSchematicBlocks(worldEditSession, location, prePlaceTasks, postPlaceTasks);
+        WorldEditSession.Data sessionData = worldEditSession.readData(location);
+        worldEditSession.release();
+        return new WorldEditSessionCache(sessionData, prePlaceTasks, postPlaceTasks, location);
     }
 
     private static int posKey(int x, int z) {
@@ -209,15 +210,24 @@ public class CachedSuperiorSchematic extends BaseSchematic implements Schematic 
         }
     }
 
+    private static Dimension getSchematicDimension(String name) {
+        for (Dimension dimension : Dimension.values()) {
+            if (name.endsWith("_" + dimension.getName().toLowerCase(Locale.ENGLISH)))
+                return dimension;
+        }
+
+        return plugin.getSettings().getWorlds().getDefaultWorldDimension();
+    }
+
     private static class WorldEditSessionCache {
 
-        private final WorldEditSession session;
+        private final WorldEditSession.Data sessionData;
         private final List<SchematicBlock> prePlaceTasks;
         private final List<SchematicBlock> postPlaceTasks;
         private final Location baseLocation;
 
-        WorldEditSessionCache(WorldEditSession session, List<SchematicBlock> prePlaceTasks, List<SchematicBlock> postPlaceTasks, Location baseLocation) {
-            this.session = session;
+        WorldEditSessionCache(WorldEditSession.Data sessionData, List<SchematicBlock> prePlaceTasks, List<SchematicBlock> postPlaceTasks, Location baseLocation) {
+            this.sessionData = sessionData;
             this.prePlaceTasks = prePlaceTasks;
             this.postPlaceTasks = postPlaceTasks;
             this.baseLocation = baseLocation;

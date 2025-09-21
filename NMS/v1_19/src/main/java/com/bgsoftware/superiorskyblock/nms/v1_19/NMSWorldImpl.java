@@ -359,6 +359,11 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
+    public WorldEditSession createPartialEditSession(Dimension dimension) {
+        return WorldEditSessionImpl.obtain(dimension);
+    }
+
+    @Override
     public ChunkReader createChunkReader(Chunk chunk) {
         return new ChunkReaderImpl(chunk);
     }

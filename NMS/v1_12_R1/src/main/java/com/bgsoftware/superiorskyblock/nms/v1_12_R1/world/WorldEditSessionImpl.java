@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_12_R1.chunks.EmptyCounterChunkSect
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
+import com.google.common.base.Preconditions;
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockBed;
@@ -34,14 +35,12 @@ import net.minecraft.server.v1_12_R1.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_12_R1.generator.CustomChunkGenerator;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -57,21 +56,32 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private final List<Pair<BlockPosition, IBlockData>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPosition, CompoundTag>> blockEntities = new LinkedList<>();
     private final List<BlockPosition> lights = new LinkedList<>();
-    private WorldServer worldServer;
+
     private Dimension dimension;
 
-    private Location baseLocationForCache = null;
+    @Nullable
+    private WorldServer worldServer;
 
     public static WorldEditSessionImpl obtain(WorldServer worldServer) {
         return POOL.obtain().initialize(worldServer);
     }
 
+    public static WorldEditSessionImpl obtain(Dimension dimension) {
+        return POOL.obtain().initialize(dimension);
+    }
+
     private WorldEditSessionImpl() {
     }
 
-    public WorldEditSessionImpl initialize(WorldServer worldServer) {
+    private WorldEditSessionImpl initialize(WorldServer worldServer) {
         this.worldServer = worldServer;
         this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(worldServer.getWorld());
+        return this;
+    }
+
+    private WorldEditSessionImpl initialize(Dimension dimension) {
+        this.worldServer = null;
+        this.dimension = dimension;
         return this;
     }
 
@@ -112,6 +122,8 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     @Override
     public List<ChunkPosition> getAffectedChunks() {
+        Preconditions.checkState(this.worldServer != null, "Cannot call WorldEditSession#getAffectedChunks on partial initialized session");
+
         if (chunks.isEmpty())
             return Collections.emptyList();
 
@@ -129,8 +141,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     @Override
     public void applyBlocks(org.bukkit.Chunk bukkitChunk) {
-        if (baseLocationForCache != null)
-            throw new IllegalStateException("Cannot call applyBlocks on WorldEditSession cache object");
+        Preconditions.checkState(this.worldServer != null, "Cannot call WorldEditSession#applyBlocks on partial initialized session");
 
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
 
@@ -158,8 +169,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     @Override
     public void finish(Island island) {
-        if (baseLocationForCache != null)
-            throw new IllegalStateException("Cannot call finish on WorldEditSession cache object");
+        Preconditions.checkState(this.worldServer != null, "Cannot call WorldEditSession#finish on partial initialized session");
 
         // Update blocks
         blocksToUpdate.forEach(data -> worldServer.setTypeAndData(data.getKey(), data.getValue(), 3));
@@ -203,56 +213,30 @@ public class WorldEditSessionImpl implements WorldEditSession {
     }
 
     @Override
-    public void markForCache(Location location) {
-        this.baseLocationForCache = location.clone();
+    public Data readData(Location baseLocation) {
+        return new WorldEditSessionDataImpl(baseLocation, this.chunks, this.blocksToUpdate, this.blockEntities, this.lights);
     }
 
     @Override
-    public WorldEditSession buildFromCache(Location location) {
-        if (this.baseLocationForCache == null)
-            throw new IllegalStateException("Cannot call buildFromCache for non-cache WorldEditSessions");
+    public void applyData(Data data, Location baseLocation) {
+        WorldEditSessionDataImpl dataImpl = (WorldEditSessionDataImpl) data;
 
-        int chunkPosXAxisDelta = (location.getBlockX() >> 4) - (baseLocationForCache.getBlockX() >> 4);
-        int chunkPosZAxisDelta = (location.getBlockZ() >> 4) - (baseLocationForCache.getBlockZ() >> 4);
-        int xAxisDelta = location.getBlockX() - baseLocationForCache.getBlockX();
-        int zAxisDelta = location.getBlockZ() - baseLocationForCache.getBlockZ();
-
-        WorldServer worldServer = ((CraftWorld) location.getWorld()).getHandle();
-
-        WorldEditSessionImpl worldEditSession = obtain(worldServer);
+        int baseBlockPosXAxis = baseLocation.getBlockX();
+        int baseBlockPosYAxis = baseLocation.getBlockY();
+        int baseBlockPosZAxis = baseLocation.getBlockZ();
+        int baseChunkPosXAxis = baseBlockPosXAxis >> 4;
+        int baseChunkPosZAxis = baseBlockPosZAxis >> 4;
 
         // We need to transform all data to the new base location values
-        Iterator<Long2ObjectMapView.Entry<ChunkData>> chunksIterator = this.chunks.entryIterator();
-        while (chunksIterator.hasNext()) {
-            Long2ObjectMapView.Entry<ChunkData> entry = chunksIterator.next();
-            long newPos = ChunkCoordIntPair.a(getChunkCoordX(entry.getKey()) + chunkPosXAxisDelta,
-                    getChunkCoordZ(entry.getKey()) + chunkPosZAxisDelta);
-            worldEditSession.chunks.put(newPos, entry.getValue());
-        }
 
-        this.blocksToUpdate.forEach(blockToUpdatePair -> {
-            BlockPosition newPos = blockToUpdatePair.getKey().a(xAxisDelta, 0, zAxisDelta);
-            worldEditSession.blocksToUpdate.add(new Pair<>(newPos, blockToUpdatePair.getValue()));
-        });
-
-        this.blockEntities.forEach(blockEntityPair -> {
-            BlockPosition newPos = blockEntityPair.getKey().a(xAxisDelta, 0, zAxisDelta);
-            worldEditSession.blockEntities.add(new Pair<>(newPos, blockEntityPair.getValue()));
-        });
-
-        this.lights.forEach(lightPosition -> {
-            BlockPosition newPos = lightPosition.a(xAxisDelta, 0, zAxisDelta);
-            worldEditSession.lights.add(newPos);
-        });
-
-        return worldEditSession;
+        dataImpl.readChunks(baseChunkPosXAxis, baseChunkPosZAxis, this.chunks);
+        dataImpl.readBlocksToUpdate(baseBlockPosXAxis, baseBlockPosYAxis, baseBlockPosZAxis, this.blocksToUpdate);
+        dataImpl.readBlockEntities(baseBlockPosXAxis, baseBlockPosYAxis, baseBlockPosZAxis, this.blockEntities);
+        dataImpl.readLights(baseBlockPosXAxis, baseBlockPosYAxis, baseBlockPosZAxis, this.lights);
     }
 
     @Override
     public void release() {
-        if (this.baseLocationForCache != null)
-            return;
-
         this.chunks.clear();
         this.blocksToUpdate.clear();
         this.blockEntities.clear();
@@ -265,31 +249,26 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private boolean isValidPosition(BlockPosition blockPosition) {
         return blockPosition.getX() >= -30000000 && blockPosition.getZ() >= -30000000 &&
                 blockPosition.getX() < 30000000 && blockPosition.getZ() < 30000000 &&
-                blockPosition.getY() >= 0 && blockPosition.getY() < worldServer.getHeight();
+                blockPosition.getY() >= 0 && blockPosition.getY() < 256;
     }
 
-    private static int getChunkCoordX(long i) {
-        return (int) (i & 4294967295L);
-    }
-
-    private static int getChunkCoordZ(long i) {
-        return (int) (i >>> 32 & 4294967295L);
-    }
-
-    private class ChunkData {
+    public class ChunkData {
 
         private final ChunkSection[] chunkSections = new ChunkSection[16];
 
-        public ChunkData(long chunkKey) {
+        private ChunkData(long chunkKey) {
             ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair((int) chunkKey, (int) (chunkKey >> 32));
             createChunkSections();
-            runCustomWorldGenerator(chunkCoord);
+            if (worldServer != null)
+                runCustomWorldGenerator(chunkCoord);
         }
 
         private void createChunkSections() {
+            boolean hasSkyLight = dimension.getEnvironment() != World.Environment.THE_END;
+
             for (int i = 0; i < this.chunkSections.length; ++i) {
                 int chunkSectionPos = i << 4;
-                this.chunkSections[i] = EmptyCounterChunkSection.of(new ChunkSection(chunkSectionPos, worldServer.worldProvider.m()));
+                this.chunkSections[i] = EmptyCounterChunkSection.of(new ChunkSection(chunkSectionPos, hasSkyLight));
             }
         }
 
