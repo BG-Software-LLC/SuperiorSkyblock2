@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.config.section.DefaultValuesSection;
 import com.bgsoftware.superiorskyblock.config.section.GlobalSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandChestsSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandNamesSection;
+import com.bgsoftware.superiorskyblock.config.section.IslandPreviewsSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandRolesSection;
 import com.bgsoftware.superiorskyblock.config.section.SpawnSection;
 import com.bgsoftware.superiorskyblock.config.section.StackedBlocksSection;
@@ -46,7 +47,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     private static final String[] IGNORED_SECTIONS = new String[]{
             "config.yml", "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases",
-            "preview-islands", "default-values.block-limits", "default-values.entity-limits",
+            "island-previews.locations", "default-values.block-limits", "default-values.entity-limits",
             "default-values.role-limits", "stacked-blocks.limits", "default-values.generator"
     };
 
@@ -63,6 +64,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     private final AFKIntegrationsSection afkIntegrations = new AFKIntegrationsSection();
     private final DefaultContainersSection defaultContainers = new DefaultContainersSection();
     private final IslandChestsSection islandChests = new IslandChestsSection();
+    private final IslandPreviewsSection islandPreviews = new IslandPreviewsSection();
 
     public SettingsManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -424,7 +426,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public long getVisitWarmup() {
-        return this.global.getHomeWarmup();
+        return this.global.getVisitWarmup();
     }
 
     @Override
@@ -558,8 +560,14 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    @Deprecated
     public Map<String, Location> getPreviewIslands() {
-        return this.global.getPreviewIslands();
+        return this.islandPreviews.getLocations();
+    }
+
+    @Override
+    public IslandPreviewsSection getIslandPreviews() {
+        return this.islandPreviews;
     }
 
     @Override
@@ -665,7 +673,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         cfg.syncWithConfig(file, plugin.getResource("config.yml"), "config.yml",
-                "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "preview-islands");
+                "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "island-previews.locations");
 
         cfg.set(path, value);
 
@@ -693,9 +701,14 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         this.afkIntegrations.setContainer(container);
         this.defaultContainers.setContainer(container);
         this.islandChests.setContainer(container);
+        this.islandPreviews.setContainer(container);
     }
 
     private void convertData(YamlConfiguration cfg) {
+        if (cfg.isConfigurationSection("preview-islands")) {
+            cfg.set("island-previews.locations", cfg.getConfigurationSection("preview-islands"));
+            cfg.set("preview-islands", null);
+        }
         if (cfg.isBoolean("disband-inventory-clear")) {
             if (cfg.getBoolean("disband-inventory-clear")) {
                 cfg.set("clear-on-disband", Arrays.asList("ENDER_CHEST", "INVENTORY"));

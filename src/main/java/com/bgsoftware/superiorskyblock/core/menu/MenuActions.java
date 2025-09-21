@@ -100,7 +100,7 @@ public class MenuActions {
 
         // Checking for preview of islands.
         if (isPreviewMode) {
-            Location previewLocation = plugin.getSettings().getPreviewIslands().get(schematic.getName().toLowerCase(Locale.ENGLISH));
+            Location previewLocation = plugin.getSettings().getIslandPreviews().getLocations().get(schematic.getName().toLowerCase(Locale.ENGLISH));
             if (previewLocation != null) {
                 plugin.getGrid().startIslandPreview(clickedPlayer, schematic, islandName);
                 return;

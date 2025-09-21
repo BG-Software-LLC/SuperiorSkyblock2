@@ -817,13 +817,25 @@ command-aliases:
 # These blocks require the "VALUABLE_BREAK" permission in order to break them.
 valuable-blocks: [ ]
 
-# Set preview locations for schematics.
-# You can disable this feature by setting the section to 'preview-islands: {}'
-# Make sure you follow the location format: '<world>, <x>, <y>, <z>'
-preview-islands:
-  normal: world, 0, 100, 0
-  mycel: world, 0, 100, 0
-  desert: world, 0, 100, 0
+# Settings related to the island previews.
+island-previews:
+  # The game mode that will be set for the player when they enter preview mode.
+  # Use ADVENTURE, CREATIVE, SPECTATOR or SURVIVAL.
+  game-mode: SPECTATOR
+
+  # The maximum distance a player can move before the preview mode is canceled.
+  max-distance: 100
+
+  # A list of commands that cannot be executed by players in preview mode.
+  blocked-commands: []
+
+  # Preview locations for schematics.
+  # You can disable this feature by setting the section to 'locations: []'
+  # Make sure you follow the location format: '<world>, <x>, <y>, <z>, <pitch>, <yaw>'
+  locations:
+    normal: world, 0, 100, 0
+    mycel: world, 0, 100, 0
+    desert: world, 0, 100, 0
 
 # Should vanished players be hidden in tab completes?
 tab-complete-hide-vanished: true

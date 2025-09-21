@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
@@ -145,7 +146,7 @@ public class FeaturesListener extends AbstractGameEventListener {
 
     /* VISITORS BLOCKED COMMANDS */
 
-    private void onPlayerCommand(GameEvent<GameEventArgs.PlayerCommandEvent> e) {
+    private void onPlayerCommandAsVisitor(GameEvent<GameEventArgs.PlayerCommandEvent> e) {
         Player player = e.getArgs().player;
 
         // We do not care about spawn island, and therefore only island worlds are relevant.
@@ -172,6 +173,29 @@ public class FeaturesListener extends AbstractGameEventListener {
         if (plugin.getSettings().getBlockedVisitorsCommands().stream().anyMatch(commandLabel::contains)) {
             e.setCancelled();
             Message.VISITOR_BLOCK_COMMAND.send(superiorPlayer);
+        }
+    }
+
+    /* PREVIEW BLOCKED COMMANDS */
+
+    private void onPlayerCommandWhilePreview(GameEvent<GameEventArgs.PlayerCommandEvent> e) {
+        Player player = e.getArgs().player;
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+
+        if (superiorPlayer.hasBypassModeEnabled())
+            return;
+
+        IslandPreview islandPreview = plugin.getGrid().getIslandPreview(superiorPlayer);
+        if (islandPreview == null)
+            return;
+
+        String[] message = e.getArgs().command.toLowerCase(Locale.ENGLISH).split(" ");
+
+        String commandLabel = message[0].toCharArray()[0] == '/' ? message[0].substring(1) : message[0];
+
+        if (plugin.getSettings().getIslandPreviews().getBlockedCommands().stream().anyMatch(commandLabel::contains)) {
+            e.setCancelled();
+            Message.ISLAND_PREVIEW_BLOCK_COMMAND.send(superiorPlayer);
         }
     }
 
@@ -267,7 +291,9 @@ public class FeaturesListener extends AbstractGameEventListener {
         if (plugin.getSettings().isObsidianToLava())
             registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.HIGHEST, this::onObsidianClick);
         if (!plugin.getSettings().getBlockedVisitorsCommands().isEmpty())
-            registerCallback(GameEventType.PLAYER_COMMAND_EVENT, GameEventPriority.HIGHEST, this::onPlayerCommand);
+            registerCallback(GameEventType.PLAYER_COMMAND_EVENT, GameEventPriority.HIGHEST, this::onPlayerCommandAsVisitor);
+        if (!plugin.getSettings().getIslandPreviews().getBlockedCommands().isEmpty())
+            registerCallback(GameEventType.PLAYER_COMMAND_EVENT, GameEventPriority.HIGHEST, this::onPlayerCommandWhilePreview);
 
         registerCallback(GameEventType.CHUNK_LOAD_EVENT, GameEventPriority.MONITOR, this::onChunkLoad);
 

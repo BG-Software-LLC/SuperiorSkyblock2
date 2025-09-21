@@ -70,7 +70,7 @@ public class CmdAdminSetIslandPreview implements ISuperiorCommand {
         }
 
         try {
-            plugin.getSettings().updateValue("preview-islands." + schematic.getName(), schematicPreviewLocation);
+            plugin.getSettings().updateValue("island-previews.locations." + schematic.getName(), schematicPreviewLocation);
         } catch (Exception error) {
             Log.entering("ENTER", schematicPreviewLocation);
             Log.error(error, "An unexpected error occurred while setting schematic preview:");

@@ -566,6 +566,19 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Island fromIsland = null;
         boolean lookupFromIsland = true;
 
+        //Checking for out of distance from preview location.
+        IslandPreview islandPreview = plugin.getGrid().getIslandPreview(superiorPlayer);
+        if (islandPreview != null) {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location islandPreviewLocation = islandPreview.getLocation(wrapper.getHandle());
+                if (!islandPreviewLocation.getWorld().equals(to.getWorld()) ||
+                        islandPreviewLocation.distance(to) > plugin.getSettings().getIslandPreviews().getMaxDistance()) {
+                    islandPreview.handleEscape();
+                    return MoveResult.ISLAND_PREVIEW_MOVED_TOO_FAR;
+                }
+            }
+        }
+
         if (from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()) {
             // Handle moving while in teleport warmup.
             BukkitTask teleportTask = superiorPlayer.getTeleportTask();
@@ -573,19 +586,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 teleportTask.cancel();
                 superiorPlayer.setTeleportTask(null);
                 Message.TELEPORT_WARMUP_CANCEL.send(superiorPlayer);
-            }
-
-            //Checking for out of distance from preview location.
-            IslandPreview islandPreview = plugin.getGrid().getIslandPreview(superiorPlayer);
-            if (islandPreview != null) {
-                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    Location islandPreviewLocation = islandPreview.getLocation(wrapper.getHandle());
-                    if (!islandPreviewLocation.getWorld().equals(to.getWorld()) ||
-                            islandPreviewLocation.distanceSquared(to) > 10000) {
-                        islandPreview.handleEscape();
-                        return MoveResult.ISLAND_PREVIEW_MOVED_TOO_FAR;
-                    }
-                }
             }
 
             MoveResult moveResult;
