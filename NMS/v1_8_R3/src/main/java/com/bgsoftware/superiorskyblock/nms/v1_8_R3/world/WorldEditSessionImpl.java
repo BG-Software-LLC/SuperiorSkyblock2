@@ -34,14 +34,12 @@ import net.minecraft.server.v1_8_R3.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_8_R3.generator.CustomChunkGenerator;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -261,7 +259,8 @@ public class WorldEditSessionImpl implements WorldEditSession {
         private ChunkData(long chunkKey) {
             ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair((int) chunkKey, (int) (chunkKey >> 32));
             createChunkSections();
-            runCustomWorldGenerator(chunkCoord);
+            if (worldServer != null)
+                runCustomWorldGenerator(chunkCoord);
         }
 
         private void createChunkSections() {
