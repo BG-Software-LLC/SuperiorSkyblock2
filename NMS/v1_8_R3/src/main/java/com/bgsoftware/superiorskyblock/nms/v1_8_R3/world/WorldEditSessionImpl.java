@@ -265,9 +265,11 @@ public class WorldEditSessionImpl implements WorldEditSession {
         }
 
         private void createChunkSections() {
+            boolean hasSkyLight = dimension.getEnvironment() != World.Environment.THE_END;
+
             for (int i = 0; i < this.chunkSections.length; ++i) {
                 int chunkSectionPos = i << 4;
-                this.chunkSections[i] = new ChunkSection(chunkSectionPos, !worldServer.worldProvider.o());
+                this.chunkSections[i] = new ChunkSection(chunkSectionPos, hasSkyLight);
             }
         }
 
