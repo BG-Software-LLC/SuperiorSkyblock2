@@ -504,6 +504,24 @@ public class PlayersListener extends AbstractGameEventListener {
         }
     }
 
+    private void onPlayerRespawnMonitor(GameEvent<GameEventArgs.PlayerRespawnEvent> e) {
+        Location respawnLocation = e.getArgs().bukkitEvent.getRespawnLocation();
+        Player player = e.getArgs().player;
+
+        BukkitExecutor.sync(() -> {
+            if (!player.isOnline())
+                return;
+
+            Island respawnAtIsland = plugin.getGrid().getIslandAt(respawnLocation);
+            if (respawnAtIsland != null) {
+                SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+                superiorPlayer.updateWorldBorder(respawnAtIsland);
+            }
+        }, 2L);
+
+
+    }
+
     /* INTERNAL */
 
     private void registerListeners() {
@@ -520,6 +538,7 @@ public class PlayersListener extends AbstractGameEventListener {
         registerCallback(GameEventType.INVENTORY_CLICK_EVENT, GameEventPriority.LOWEST, this::onIslandChestInteract);
         registerCallback(GameEventType.ENTITY_DAMAGE_EVENT, GameEventPriority.NORMAL, this::onPlayerFall);
         registerCallback(GameEventType.PLAYER_RESPAWN_EVENT, GameEventPriority.NORMAL, this::onPlayerRespawn);
+        registerCallback(GameEventType.PLAYER_RESPAWN_EVENT, GameEventPriority.MONITOR, this::onPlayerRespawnMonitor);
         // PlayerChat should be on LOWEST priority so other chat plugins don't conflict.
         registerCallback(GameEventType.PLAYER_CHAT_EVENT, GameEventPriority.LOWEST, this::onPlayerChatLowest);
         registerCallback(GameEventType.PLAYER_CHAT_EVENT, GameEventPriority.NORMAL, this::onPlayerChat);
