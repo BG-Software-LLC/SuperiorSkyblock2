@@ -391,7 +391,7 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.LOWEST, this::onEndermanGrief);
         registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.LOWEST, this::onEggLay);
         registerCallback(GameEventType.PROJECTILE_HIT_EVENT, GameEventPriority.LOWEST, this::onPoisonAttack);
-        plugin.getPluginEventsDispatcher().registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, this::onSpawnUpdate);
+        plugin.getPluginEventsDispatcher().registerCallback(PluginEventType.SPAWN_UPDATE_EVENT, this::onSpawnUpdate);
     }
 
     private boolean shouldIgnoreWorldEvents(@Nullable World world) {
