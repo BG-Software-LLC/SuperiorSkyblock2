@@ -27,8 +27,7 @@ public class ChatFormatter implements IFormatter<ChatFormatter.ChatFormatArgs> {
     @Override
     public String format(ChatFormatter.ChatFormatArgs args) {
         String islandNameFormat = Message.NAME_CHAT_FORMAT.getMessage(PlayerLocales.getDefaultLocale(),
-                args.island == null ? "" : plugin.getSettings().getIslandNames().isColorSupport() ?
-                        Formatters.COLOR_FORMATTER.format(args.island.getName()) : args.island.getName());
+                args.island == null ? "" : args.island.getName());
 
         return args.format
                 .replace("{island-level}", String.valueOf(args.island == null ? 0 : args.island.getIslandLevel()))
