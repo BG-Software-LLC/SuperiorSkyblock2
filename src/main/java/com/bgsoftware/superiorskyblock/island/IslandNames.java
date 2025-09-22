@@ -70,4 +70,8 @@ public class IslandNames {
         return island.getFormattedName().replace(ChatColor.COLOR_CHAR, '&');
     }
 
+    public static String getNameForLookup(String name) {
+        return Formatters.STRIP_COLOR_FORMATTER.format(name).toLowerCase(Locale.ENGLISH);
+    }
+
 }

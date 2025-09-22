@@ -1759,10 +1759,10 @@ public class SIsland implements Island {
 
         String oldName = this.strippedName;
 
+        setNameInternal(islandName);
+
         if (Objects.equals(strippedName, oldName))
             return;
-
-        setNameInternal(islandName);
 
         plugin.getGrid().getIslandsContainer().updateIslandName(this, oldName);
 

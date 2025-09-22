@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.collections.IslandPosition2ObjectMap
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
+import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.island.top.metadata.IslandSortMetadata;
@@ -29,7 +30,6 @@ import org.bukkit.Location;
 import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,7 +84,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
         });
 
         this.islandsByUUID.put(island.getUniqueId(), island);
-        this.islandsByNames.put(island.getStrippedName().toLowerCase(Locale.ENGLISH), island);
+        this.islandsByNames.put(IslandNames.getNameForLookup(island.getStrippedName()), island);
 
         sortedIslands.values().forEach(sortedIslands -> {
             sortedIslands.write(_sortedIslands -> _sortedIslands.add(island));
@@ -117,7 +117,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
         });
 
         this.islandsByUUID.remove(island.getUniqueId());
-        this.islandsByNames.remove(island.getStrippedName().toLowerCase(Locale.ENGLISH));
+        this.islandsByNames.remove(IslandNames.getNameForLookup(island.getStrippedName()));
 
         sortedIslands.values().forEach(sortedIslands -> {
             sortedIslands.write(_sortedIslands -> _sortedIslands.remove(island));
@@ -132,14 +132,14 @@ public class DefaultIslandsContainer implements IslandsContainer {
 
     @Override
     public Island getIslandByName(String name) {
-        return this.islandsByNames.get(name.toLowerCase(Locale.ENGLISH));
+        return this.islandsByNames.get(IslandNames.getNameForLookup(name));
     }
 
     @Override
     public void updateIslandName(Island island, String oldName) {
-        Island currentIsland = this.islandsByNames.remove(oldName.toLowerCase(Locale.ENGLISH));
+        Island currentIsland = this.islandsByNames.remove(IslandNames.getNameForLookup(oldName));
         if (currentIsland == island)
-            this.islandsByNames.put(island.getStrippedName().toLowerCase(Locale.ENGLISH), island);
+            this.islandsByNames.put(IslandNames.getNameForLookup(island.getStrippedName()), island);
     }
 
     @Nullable
