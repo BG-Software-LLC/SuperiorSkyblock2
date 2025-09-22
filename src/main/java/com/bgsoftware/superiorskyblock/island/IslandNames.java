@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import javax.annotation.Nullable;
 import java.util.Locale;
 
 public class IslandNames {
@@ -18,7 +19,7 @@ public class IslandNames {
 
     }
 
-    public static boolean isValidName(SuperiorPlayer superiorPlayer, Island currentIsland, String islandName) {
+    public static boolean isValidName(SuperiorPlayer superiorPlayer, @Nullable Island currentIsland, String islandName) {
         return isValidName(superiorPlayer.asPlayer(), currentIsland, islandName);
     }
 
@@ -56,11 +57,12 @@ public class IslandNames {
                 Message.SAME_NAME_CHANGE.send(sender);
                 return false;
             }
+        }
 
-            if (!currentIsland.getStrippedName().equals(strippedName) && plugin.getGrid().getIsland(strippedName) != null) {
-                Message.ISLAND_ALREADY_EXIST.send(sender);
-                return false;
-            }
+        Island islandWithName = plugin.getGrid().getIsland(strippedName);
+        if (islandWithName != null && islandWithName != currentIsland) {
+            Message.ISLAND_ALREADY_EXIST.send(sender);
+            return false;
         }
 
         return true;
