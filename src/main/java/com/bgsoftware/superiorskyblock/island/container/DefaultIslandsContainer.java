@@ -135,6 +135,13 @@ public class DefaultIslandsContainer implements IslandsContainer {
         return this.islandsByNames.get(name.toLowerCase(Locale.ENGLISH));
     }
 
+    @Override
+    public void updateIslandName(Island island, String oldName) {
+        Island currentIsland = this.islandsByNames.remove(oldName.toLowerCase(Locale.ENGLISH));
+        if (currentIsland == island)
+            this.islandsByNames.put(island.getStrippedName().toLowerCase(Locale.ENGLISH), island);
+    }
+
     @Nullable
     @Override
     public Island getIslandAtPosition(int position, SortingType sortingType) {

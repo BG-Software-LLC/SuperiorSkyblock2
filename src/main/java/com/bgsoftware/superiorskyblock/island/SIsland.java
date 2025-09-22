@@ -1757,10 +1757,14 @@ public class SIsland implements Island {
 
         Log.debug(Debug.SET_NAME, owner.getName(), strippedName);
 
-        if (Objects.equals(strippedName, this.strippedName))
+        String oldName = this.strippedName;
+
+        if (Objects.equals(strippedName, oldName))
             return;
 
         setNameInternal(islandName);
+
+        plugin.getGrid().getIslandsContainer().updateIslandName(this, oldName);
 
         IslandsDatabaseBridge.saveName(this);
     }
