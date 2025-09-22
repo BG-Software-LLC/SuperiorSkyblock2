@@ -79,8 +79,7 @@ public class CmdName implements IPermissibleCommand {
 
         island.setName(islandName);
 
-        String coloredName = plugin.getSettings().getIslandNames().isColorSupport() ?
-                Formatters.COLOR_FORMATTER.format(islandName) : islandName;
+        String coloredName = island.getName();
 
         for (Player player : Bukkit.getOnlinePlayers())
             Message.NAME_ANNOUNCEMENT.send(player, superiorPlayer.getName(), coloredName);

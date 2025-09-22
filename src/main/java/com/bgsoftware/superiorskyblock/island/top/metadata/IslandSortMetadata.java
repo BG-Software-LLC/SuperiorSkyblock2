@@ -10,7 +10,7 @@ public abstract class IslandSortMetadata<T extends IslandSortMetadata<T>> implem
 
     protected IslandSortMetadata(Island island) {
         this.island = island;
-        this.islandName = island.getName().isEmpty() ? island.getOwner().getName() : island.getName();
+        this.islandName = island.getStrippedName().isEmpty() ? island.getOwner().getName() : island.getStrippedName();
     }
 
     public Island getIsland() {

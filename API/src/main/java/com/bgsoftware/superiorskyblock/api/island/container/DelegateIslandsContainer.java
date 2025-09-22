@@ -32,6 +32,16 @@ public class DelegateIslandsContainer implements IslandsContainer {
         return this.handle.getIslandByUUID(uuid);
     }
 
+    @Override
+    public Island getIslandByName(String name) {
+        return this.handle.getIslandByName(name);
+    }
+
+    @Override
+    public void updateIslandName(Island island, String oldName) {
+        this.handle.updateIslandName(island, oldName);
+    }
+
     @Nullable
     @Override
     @Deprecated

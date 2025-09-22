@@ -1092,11 +1092,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     boolean isSpawn();
 
     /**
-     * Get the name of the island.
-     */
-    String getName();
-
-    /**
      * Set the name of the island.
      *
      * @param islandName The name to set.
@@ -1104,9 +1099,30 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setName(String islandName);
 
     /**
-     * Get the name of the island, unformatted.
+     * Get the name of the island in respect to color-support.
+     * This method will call {@link #getFormattedName()} or {@link #getStrippedName()}, depends on color-support.
      */
+    String getName();
+
+    /**
+     * Get the name of the island in its stripped form.
+     *
+     * @deprecated See {@link #getStrippedName()}
+     */
+    @Deprecated
     String getRawName();
+
+    /**
+     * Get the name of the island in its stripped form.
+     * Unlike {@link #getName()}, this method will always return the stripped form of the name.
+     */
+    String getStrippedName();
+
+    /**
+     * Get the name of the island in its color-formatted form.
+     * Unlike {@link #getName()}, this method will always return the color-formatted form of the name.
+     */
+    String getFormattedName();
 
     /**
      * Get the description of the island.

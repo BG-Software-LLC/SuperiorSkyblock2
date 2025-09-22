@@ -15,8 +15,8 @@ public class SortingType implements Comparator<Island>, Enumerable {
     private static int ordinalCounter = 0;
 
     private static final Comparator<Island> ISLAND_NAMES_COMPARATOR = (o1, o2) -> {
-        String firstName = o1.getName().isEmpty() ? o1.getOwner() == null ? "null" : o1.getOwner().getName() : o1.getName();
-        String secondName = o2.getName().isEmpty() ? o2.getOwner() == null ? "null" : o2.getOwner().getName() : o2.getName();
+        String firstName = o1.getStrippedName().isEmpty() ? o1.getOwner() == null ? "null" : o1.getOwner().getName() : o1.getStrippedName();
+        String secondName = o2.getStrippedName().isEmpty() ? o2.getOwner() == null ? "null" : o2.getOwner().getName() : o2.getStrippedName();
         return firstName.compareTo(secondName);
     };
 

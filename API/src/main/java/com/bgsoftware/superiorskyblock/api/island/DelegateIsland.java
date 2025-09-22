@@ -787,8 +787,19 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public String getRawName() {
         return this.handle.getRawName();
+    }
+
+    @Override
+    public String getStrippedName() {
+        return this.handle.getStrippedName();
+    }
+
+    @Override
+    public String getFormattedName() {
+        return this.handle.getFormattedName();
     }
 
     @Override

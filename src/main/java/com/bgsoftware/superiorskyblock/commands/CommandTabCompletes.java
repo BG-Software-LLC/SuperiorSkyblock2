@@ -101,8 +101,8 @@ public class CommandTabCompletes {
                 if (predicate == null || predicate.test(onlinePlayer, onlineIsland)) {
                     if (onlinePlayer.getName().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
                         tabArguments.add(onlinePlayer.getName());
-                    if (onlineIsland != null && onlineIsland.getName().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
-                        tabArguments.add(onlineIsland.getName());
+                    if (onlineIsland != null && onlineIsland.getStrippedName().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
+                        tabArguments.add(onlineIsland.getStrippedName());
                 }
             }
         }

@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.collections.IslandPosition2ObjectMap
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
+import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.island.top.metadata.IslandSortMetadata;
@@ -40,6 +41,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
 
     private final Synchronized<IslandPosition2ObjectMap<Island>> islandsByPositions = Synchronized.of(new IslandPosition2ObjectMap<>());
     private final Map<UUID, Island> islandsByUUID = new ConcurrentHashMap<>();
+    private final Map<String, Island> islandsByNames = new ConcurrentHashMap<>();
 
     private final Map<SortingType, Synchronized<List<Island>>> sortedIslands = new ConcurrentHashMap<>();
 
@@ -82,6 +84,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
         });
 
         this.islandsByUUID.put(island.getUniqueId(), island);
+        this.islandsByNames.put(IslandNames.getNameForLookup(island.getStrippedName()), island);
 
         sortedIslands.values().forEach(sortedIslands -> {
             sortedIslands.write(_sortedIslands -> _sortedIslands.add(island));
@@ -113,7 +116,8 @@ public class DefaultIslandsContainer implements IslandsContainer {
             }
         });
 
-        islandsByUUID.remove(island.getUniqueId());
+        this.islandsByUUID.remove(island.getUniqueId());
+        this.islandsByNames.remove(IslandNames.getNameForLookup(island.getStrippedName()));
 
         sortedIslands.values().forEach(sortedIslands -> {
             sortedIslands.write(_sortedIslands -> _sortedIslands.remove(island));
@@ -124,6 +128,18 @@ public class DefaultIslandsContainer implements IslandsContainer {
     @Override
     public Island getIslandByUUID(UUID uuid) {
         return this.islandsByUUID.get(uuid);
+    }
+
+    @Override
+    public Island getIslandByName(String name) {
+        return this.islandsByNames.get(IslandNames.getNameForLookup(name));
+    }
+
+    @Override
+    public void updateIslandName(Island island, String oldName) {
+        Island currentIsland = this.islandsByNames.remove(IslandNames.getNameForLookup(oldName));
+        if (currentIsland == island)
+            this.islandsByNames.put(IslandNames.getNameForLookup(island.getStrippedName()), island);
     }
 
     @Nullable
