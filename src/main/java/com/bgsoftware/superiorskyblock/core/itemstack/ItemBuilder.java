@@ -12,12 +12,16 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -28,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 public class ItemBuilder {
 
@@ -242,8 +247,31 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder withBannerMeta(DyeColor dyeColor, PatternType patternType) {
+        if (itemMeta instanceof BannerMeta) {
+            BannerMeta bannerMeta = (BannerMeta) itemMeta;
+            bannerMeta.addPattern(new Pattern(dyeColor, patternType));
+        }
+        return this;
+    }
+
     public ItemBuilder withCustomModel(int customModel) {
         plugin.getNMSAlgorithms().setCustomModel(itemMeta, customModel);
+        return this;
+    }
+
+    public ItemBuilder withItemModel(String itemModel) {
+        plugin.getNMSAlgorithms().setItemModel(itemMeta, itemModel);
+        return this;
+    }
+
+    public ItemBuilder withRarity(String rarity) {
+        plugin.getNMSAlgorithms().setRarity(itemMeta, rarity.toUpperCase(Locale.ENGLISH));
+        return this;
+    }
+
+    public ItemBuilder withTrim(String trimMaterial, String trimPattern) {
+        plugin.getNMSAlgorithms().setTrim(itemMeta, trimMaterial.toLowerCase(Locale.ENGLISH), trimPattern.toLowerCase(Locale.ENGLISH));
         return this;
     }
 

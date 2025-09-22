@@ -173,7 +173,7 @@ public class WorldsProvider_Default implements WorldsProvider {
         }
 
         World world = WorldCreator.name(worldName)
-                .type(WorldType.NORMAL)
+                .type(WorldType.FLAT)
                 .environment(dimension.getEnvironment())
                 .generator(WorldGenerator.getWorldGenerator(dimension))
                 .createWorld();

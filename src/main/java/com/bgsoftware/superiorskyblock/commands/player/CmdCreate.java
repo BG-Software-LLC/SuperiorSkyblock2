@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.menu.MenuActions;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -97,12 +98,11 @@ public class CmdCreate implements ISuperiorCommand {
 
         if (plugin.getSettings().isSchematicNameArgument() &&
                 args.length == (plugin.getSettings().getIslandNames().isRequiredForCreation() ? 3 : 2)) {
-            String schematicName = args[plugin.getSettings().getIslandNames().isRequiredForCreation() ? 2 : 1];
-            schematic = plugin.getSchematics().getSchematic(schematicName);
-            if (schematic == null || schematicName.endsWith("_nether") || schematicName.endsWith("_the_end")) {
-                Message.INVALID_SCHEMATIC.send(sender, schematicName);
+            schematic = CommandArguments.getSchematic(plugin, sender,
+                    args[plugin.getSettings().getIslandNames().isRequiredForCreation() ? 2 : 1]);
+
+            if (schematic == null)
                 return;
-            }
         }
 
         if (schematic == null) {

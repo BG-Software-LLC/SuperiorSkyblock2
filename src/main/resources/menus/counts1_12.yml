@@ -29,6 +29,8 @@ items:
       - '&6&l* &e&lQuantity &fx{1}'
       - '&6&l* &e&lWorth: &f${2}'
       - '&6&l* &e&lLevel: &f${3}'
+    flags:
+      - HIDE_ATTRIBUTES
   '%':
     type: PAPER
     name: '{0}Previous Page'
@@ -44,9 +46,3 @@ items:
     type: STAINED_GLASS_PANE
     data: 15
     name: '&f'
-
-sounds:
-  '@':
-    type: ENTITY_EXPERIENCE_ORB_PICKUP
-    volume: 0.2
-    pitch: 0.2

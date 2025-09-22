@@ -83,9 +83,9 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     @Nullable
     private static final EntityType AXOLOTL_TYPE = EnumHelper.getEnum(EntityType.class, "AXOLOTL");
     @Nullable
-    private static final EntityType CAMEL_TYPE = EnumHelper.getEnum(EntityType.class, "CAMEL");
-    @Nullable
     private static final EntityType LLAMA_TYPE = EnumHelper.getEnum(EntityType.class, "LLAMA");
+    @Nullable
+    private static final EntityType HAPPY_GHAST_TYPE = EnumHelper.getEnum(EntityType.class, "HAPPY_GHAST");
 
     private static final int MAX_PICKUP_DISTANCE = 1;
     private static EnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
@@ -128,10 +128,14 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(block, "block cannot be null");
 
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return InteractionResult.SUCCESS;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());
-            Island island = plugin.getGrid().getIslandAt(blockLocation);
-            return handleInteractionInternal(superiorPlayer, blockLocation, island, IslandPrivileges.BUILD,
+            return handleInteractionInternal(superiorPlayer, blockLocation, IslandPrivileges.BUILD,
                     0, true, true);
         }
     }
@@ -141,6 +145,11 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(block, "block cannot be null");
 
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return InteractionResult.SUCCESS;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());
             Island island = plugin.getGrid().getIslandAt(blockLocation);
@@ -148,7 +157,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             Material blockType = block.getType();
             IslandPrivilege islandPrivilege = blockType == Materials.SPAWNER.toBukkitType() ? IslandPrivileges.SPAWNER_BREAK : IslandPrivileges.BREAK;
 
-            InteractionResult interactionResult = handleInteractionInternal(superiorPlayer, blockLocation, island, islandPrivilege, 0, true, true);
+            InteractionResult interactionResult = handleInteractionInternal(superiorPlayer, blockLocation, islandPrivilege,
+                    0, true, true, island, false);
 
             if (interactionResult != InteractionResult.SUCCESS)
                 return interactionResult;
@@ -157,7 +167,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 return InteractionResult.SUCCESS;
 
             if (plugin.getSettings().getValuableBlocks().contains(Keys.of(block)))
-                return handleInteractionInternal(superiorPlayer, blockLocation, island, IslandPrivileges.VALUABLE_BREAK, 0, false, false);
+                return handleInteractionInternal(superiorPlayer, blockLocation, IslandPrivileges.VALUABLE_BREAK,
+                        0, false, false, island, false);
         }
 
         return InteractionResult.SUCCESS;
@@ -167,6 +178,11 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     public InteractionResult handleBlockInteract(SuperiorPlayer superiorPlayer, Block block, Action action, @Nullable ItemStack usedItem) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(block, "block cannot be null");
+
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return InteractionResult.SUCCESS;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());
@@ -178,8 +194,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
             if (!isInteractableItem && stackedBlockAmount <= 1 && !INTERACTABLES_CACHE.contains(blockKey))
                 return InteractionResult.SUCCESS;
-
-            Island island = plugin.getGrid().getIslandAt(blockLocation);
 
             BlockState blockState = block.getState();
             EntityType spawnType = usedItem == null ? EntityType.UNKNOWN : BukkitItems.getEntityType(usedItem);
@@ -217,7 +231,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 islandPrivilege = IslandPrivileges.INTERACT;
             }
 
-            return handleInteractionInternal(superiorPlayer, blockLocation, island, islandPrivilege,
+            return handleInteractionInternal(superiorPlayer, blockLocation, islandPrivilege,
                     0, true, true);
         }
     }
@@ -227,11 +241,14 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(block, "block cannot be null");
 
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return InteractionResult.SUCCESS;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());
-            Island island = plugin.getGrid().getIslandAt(blockLocation);
-
-            return handleInteractionInternal(superiorPlayer, blockLocation, island, IslandPrivileges.FERTILIZE,
+            return handleInteractionInternal(superiorPlayer, blockLocation, IslandPrivileges.FERTILIZE,
                     0, true, true);
         }
     }
@@ -241,12 +258,16 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(entity, "entity cannot be null");
 
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(entity.getWorld()))
+            return InteractionResult.SUCCESS;
+
         InteractionResult interactionResult;
         boolean closeInventory = false;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location entityLocation = entity.getLocation(wrapper.getHandle());
-            Island island = plugin.getGrid().getIslandAt(entityLocation);
 
             EntityType entityType = entity.getType();
             Material usedItemType = usedItem == null ? Material.AIR : usedItem.getType();
@@ -259,7 +280,9 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 islandPrivilege = IslandPrivileges.ANIMAL_BREED;
             } else if (usedItemType == Material.NAME_TAG) {
                 islandPrivilege = IslandPrivileges.NAME_ENTITY;
-            } else if (usedItemType == Material.SADDLE || (entityType == LLAMA_TYPE && Materials.isCarpet(usedItemType))) {
+            } else if (usedItemType == Material.SADDLE || (entityType == LLAMA_TYPE && Materials.isCarpet(usedItemType)) ||
+                    (entityType == HAPPY_GHAST_TYPE && Materials.isHarness(usedItemType)) ||
+                    (usedItemType == Material.SHEARS && plugin.getNMSEntities().canShearSaddleFromEntity(entity))) {
                 islandPrivilege = IslandPrivileges.SADDLE_ENTITY;
             } else if (entity instanceof Villager) {
                 islandPrivilege = IslandPrivileges.VILLAGER_TRADING;
@@ -286,7 +309,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 return InteractionResult.SUCCESS;
             }
 
-            interactionResult = handleInteractionInternal(superiorPlayer, entityLocation, island, islandPrivilege, 0, true, true);
+            interactionResult = handleInteractionInternal(superiorPlayer, entityLocation, islandPrivilege,
+                    0, true, true);
         }
 
         if (closeInventory && interactionResult != InteractionResult.SUCCESS) {
@@ -308,6 +332,11 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(damager, "damager cannot be null");
         Preconditions.checkNotNull(entity, "entity cannot be null");
 
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(entity.getWorld()))
+            return InteractionResult.SUCCESS;
+
         Optional<SuperiorPlayer> damagerSource = BukkitEntities.getPlayerSource(damager).map(plugin.getPlayers()::getSuperiorPlayer);
 
         if (!damagerSource.isPresent())
@@ -317,10 +346,10 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location entityLocation = entity.getLocation(wrapper.getHandle());
-            Island island = plugin.getGrid().getIslandAt(entityLocation);
-            IslandPrivilege islandPrivilege = BukkitEntities.getCategory(entity.getType()).getDamagePrivilege();
+            IslandPrivilege islandPrivilege = BukkitEntities.isTameable(entity) ? IslandPrivileges.TAMED_ANIMAL_DAMAGE :
+                    BukkitEntities.getCategory(entity.getType()).getDamagePrivilege();
 
-            interactionResult = handleInteractionInternal(damagerSource.get(), entityLocation, island, islandPrivilege,
+            interactionResult = handleInteractionInternal(damagerSource.get(), entityLocation, islandPrivilege,
                     0, true, false);
         }
 
@@ -335,13 +364,17 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(vehicle, "vehicle cannot be null");
 
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(vehicle.getWorld()))
+            return InteractionResult.SUCCESS;
+
         IslandPrivilege islandPrivilege = BukkitEntities.isHorse(vehicle) ? IslandPrivileges.HORSE_INTERACT :
                 vehicle instanceof Animals ? IslandPrivileges.ENTITY_RIDE : IslandPrivileges.MINECART_ENTER;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location entityLocation = vehicle.getLocation(wrapper.getHandle());
-            Island island = plugin.getGrid().getIslandAt(entityLocation);
-            return handleInteractionInternal(superiorPlayer, entityLocation, island, islandPrivilege,
+            return handleInteractionInternal(superiorPlayer, entityLocation, islandPrivilege,
                     0, true, false);
         }
     }
@@ -351,11 +384,14 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(entity, "entity cannot be null");
 
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(entity.getWorld()))
+            return InteractionResult.SUCCESS;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location entityLocation = entity.getLocation(wrapper.getHandle());
-            Island island = plugin.getGrid().getIslandAt(entityLocation);
-
-            return handleInteractionInternal(superiorPlayer, entityLocation, island, IslandPrivileges.ANIMAL_SHEAR,
+            return handleInteractionInternal(superiorPlayer, entityLocation, IslandPrivileges.ANIMAL_SHEAR,
                     0, true, false);
         }
     }
@@ -365,11 +401,14 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(entity, "entity cannot be null");
 
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(entity.getWorld()))
+            return InteractionResult.SUCCESS;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location entityLocation = entity.getLocation(wrapper.getHandle());
-            Island island = plugin.getGrid().getIslandAt(entityLocation);
-
-            return handleInteractionInternal(superiorPlayer, entityLocation, island, IslandPrivileges.LEASH,
+            return handleInteractionInternal(superiorPlayer, entityLocation, IslandPrivileges.LEASH,
                     0, true, false);
         }
     }
@@ -382,11 +421,14 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         if (plugin.getNMSPlayers().wasThrownByPlayer(item, superiorPlayer))
             return InteractionResult.SUCCESS;
 
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(item.getWorld()))
+            return InteractionResult.SUCCESS;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location itemLocation = item.getLocation(wrapper.getHandle());
-            Island island = plugin.getGrid().getIslandAt(itemLocation);
-
-            return handleInteractionInternal(superiorPlayer, itemLocation, island, IslandPrivileges.PICKUP_DROPS,
+            return handleInteractionInternal(superiorPlayer, itemLocation, IslandPrivileges.PICKUP_DROPS,
                     MAX_PICKUP_DISTANCE, true, false);
         }
     }
@@ -396,11 +438,14 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(item, "item cannot be null");
 
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(item.getWorld()))
+            return InteractionResult.SUCCESS;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location itemLocation = item.getLocation(wrapper.getHandle());
-            Island island = plugin.getGrid().getIslandAt(itemLocation);
-
-            return handleInteractionInternal(superiorPlayer, itemLocation, island, IslandPrivileges.DROP_ITEMS,
+            return handleInteractionInternal(superiorPlayer, itemLocation, IslandPrivileges.DROP_ITEMS,
                     0, true, false);
         }
     }
@@ -411,9 +456,13 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(destination, "destination cannot be null");
         Preconditions.checkArgument(destination.getWorld() != null, "destination's world cannot be null");
 
-        Island island = plugin.getGrid().getIslandAt(destination);
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(destination.getWorld()))
+            return InteractionResult.SUCCESS;
 
-        return handleInteractionInternal(superiorPlayer, destination, island, IslandPrivileges.ENDER_PEARL, 0, true, false);
+        return handleInteractionInternal(superiorPlayer, destination, IslandPrivileges.ENDER_PEARL,
+                0, true, false);
     }
 
     @Override
@@ -427,8 +476,12 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             return InteractionResult.SUCCESS;
         }
 
-        Island island = plugin.getGrid().getIslandAt(location);
-        return handleInteractionInternal(superiorPlayer, location, island, IslandPrivileges.CHORUS_FRUIT,
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(location.getWorld()))
+            return InteractionResult.SUCCESS;
+
+        return handleInteractionInternal(superiorPlayer, location, IslandPrivileges.CHORUS_FRUIT,
                 0, true, true);
     }
 
@@ -443,8 +496,12 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             return InteractionResult.SUCCESS;
         }
 
-        Island island = plugin.getGrid().getIslandAt(location);
-        return handleInteractionInternal(superiorPlayer, location, island, IslandPrivileges.WIND_CHARGE,
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(location.getWorld()))
+            return InteractionResult.SUCCESS;
+
+        return handleInteractionInternal(superiorPlayer, location, IslandPrivileges.WIND_CHARGE,
                 0, true, true);
     }
 
@@ -454,15 +511,32 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(location, "location cannot be null");
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege cannot be null");
 
-        Island island = plugin.getGrid().getIslandAt(location);
-        return handleInteractionInternal(superiorPlayer, location, island, islandPrivilege, 0, true, false);
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(location.getWorld()))
+            return InteractionResult.SUCCESS;
+
+        return handleInteractionInternal(superiorPlayer, location, islandPrivilege,
+                0, true, false);
     }
 
     private InteractionResult handleInteractionInternal(SuperiorPlayer superiorPlayer, Location location,
-                                                        @Nullable Island island, IslandPrivilege islandPrivilege,
-                                                        int extraRadius, boolean checkIslandBoundaries, boolean checkRecalculation) {
+                                                        IslandPrivilege islandPrivilege, int extraRadius,
+                                                        boolean checkIslandBoundaries, boolean checkRecalculation) {
+        return handleInteractionInternal(superiorPlayer, location, islandPrivilege, extraRadius, checkIslandBoundaries,
+                checkRecalculation, null, true);
+    }
+
+    private InteractionResult handleInteractionInternal(SuperiorPlayer superiorPlayer, Location location,
+                                                        IslandPrivilege islandPrivilege, int extraRadius,
+                                                        boolean checkIslandBoundaries, boolean checkRecalculation,
+                                                        @Nullable Island island, boolean callIslandLookup) {
         if (superiorPlayer.hasBypassModeEnabled())
             return InteractionResult.SUCCESS;
+
+        if (callIslandLookup) {
+            island = plugin.getGrid().getIslandAt(location);
+        }
 
         if (checkIslandBoundaries && !WORLD_PERMISSIONS_CACHE.contains(islandPrivilege)) {
             if (island == null && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld()))
@@ -489,6 +563,22 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(from, "from cannot be null");
         Preconditions.checkNotNull(to, "to cannot be null");
 
+        Island fromIsland = null;
+        boolean lookupFromIsland = true;
+
+        //Checking for out of distance from preview location.
+        IslandPreview islandPreview = plugin.getGrid().getIslandPreview(superiorPlayer);
+        if (islandPreview != null) {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location islandPreviewLocation = islandPreview.getLocation(wrapper.getHandle());
+                if (!islandPreviewLocation.getWorld().equals(to.getWorld()) ||
+                        islandPreviewLocation.distance(to) > plugin.getSettings().getIslandPreviews().getMaxDistance()) {
+                    islandPreview.handleEscape();
+                    return MoveResult.ISLAND_PREVIEW_MOVED_TOO_FAR;
+                }
+            }
+        }
+
         if (from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()) {
             // Handle moving while in teleport warmup.
             BukkitTask teleportTask = superiorPlayer.getTeleportTask();
@@ -496,19 +586,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 teleportTask.cancel();
                 superiorPlayer.setTeleportTask(null);
                 Message.TELEPORT_WARMUP_CANCEL.send(superiorPlayer);
-            }
-
-            //Checking for out of distance from preview location.
-            IslandPreview islandPreview = plugin.getGrid().getIslandPreview(superiorPlayer);
-            if (islandPreview != null) {
-                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    Location islandPreviewLocation = islandPreview.getLocation(wrapper.getHandle());
-                    if (!islandPreviewLocation.getWorld().equals(to.getWorld()) ||
-                            islandPreviewLocation.distanceSquared(to) > 10000) {
-                        islandPreview.handleEscape();
-                        return MoveResult.ISLAND_PREVIEW_MOVED_TOO_FAR;
-                    }
-                }
             }
 
             MoveResult moveResult;
@@ -520,7 +597,9 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                     return moveResult;
             }
 
-            Island fromIsland = plugin.getGrid().getIslandAt(from);
+            lookupFromIsland = false;
+
+            fromIsland = plugin.getGrid().getIslandAt(from);
             if (fromIsland != null) {
                 moveResult = handlePlayerLeaveIslandInternal(superiorPlayer, fromIsland, from, to, IslandLeaveEvent.LeaveCause.PLAYER_MOVE);
                 if (moveResult != MoveResult.SUCCESS)
@@ -529,16 +608,19 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         }
 
         if (from.getBlockY() != to.getBlockY() && to.getBlockY() <= plugin.getNMSWorld().getMinHeight(to.getWorld()) - 5) {
-            Island island = plugin.getGrid().getIslandAt(from);
+            if (lookupFromIsland) {
+                fromIsland = plugin.getGrid().getIslandAt(from);
+            }
 
-            if (island == null || (island.isVisitor(superiorPlayer, false) ? !plugin.getSettings().getVoidTeleport().isVisitors() : !plugin.getSettings().getVoidTeleport().isMembers()))
+            if (fromIsland == null || (fromIsland.isVisitor(superiorPlayer, false) ?
+                    !plugin.getSettings().getVoidTeleport().isVisitors() : !plugin.getSettings().getVoidTeleport().isMembers()))
                 return MoveResult.SUCCESS;
 
             Log.debug(Debug.VOID_TELEPORT, superiorPlayer.getName());
 
             superiorPlayer.setPlayerStatus(PlayerStatus.VOID_TELEPORT);
 
-            superiorPlayer.teleport(island, result -> {
+            superiorPlayer.teleport(fromIsland, result -> {
                 if (!result) {
                     Message.TELEPORTED_FAILED.send(superiorPlayer);
                     superiorPlayer.teleport(plugin.getGrid().getSpawnIsland(), result2 -> {

@@ -4,16 +4,21 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
+import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -25,6 +30,13 @@ import java.util.Locale;
 public class CmdAdminResetWorld implements IAdminIslandCommand {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static final LazyReference<DragonBattleService> dragonBattleService = new LazyReference<DragonBattleService>() {
+        @Override
+        protected DragonBattleService create() {
+            return plugin.getServices().getService(DragonBattleService.class);
+        }
+    };
 
     @Override
     public List<String> getAliases() {
@@ -76,11 +88,6 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
         if (dimension == null)
             return;
 
-        if (dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
-            Message.INVALID_ENVIRONMENT.send(sender, args[3]);
-            return;
-        }
-
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
@@ -106,20 +113,55 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
     }
 
     private static void resetChunksInternal(Island island, World world, Dimension dimension) {
-
+        boolean isDefaultDimension = dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension();
 
         // Sending the players that are in that world to the main island.
         // If the world that will be reset is the normal world, they will be teleported to spawn.
         for (SuperiorPlayer superiorPlayer : island.getAllPlayersInside()) {
             assert superiorPlayer.getWorld() != null;
-            if (superiorPlayer.getWorld().equals(world))
-                superiorPlayer.teleport(island);
+            if (superiorPlayer.getWorld().equals(world)) {
+                if (isDefaultDimension) {
+                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                } else {
+                    superiorPlayer.teleport(island);
+                }
+            }
         }
 
         // Resetting the chunks
-        island.resetChunks(dimension, IslandChunkFlags.ONLY_PROTECTED, () -> island.calcIslandWorth(null));
+        island.resetChunks(dimension, IslandChunkFlags.ONLY_PROTECTED,
+                isDefaultDimension ? null : () -> island.calcIslandWorth(null));
+
+        if (isDefaultDimension) {
+            String islandSchematic = island.getSchematicName();
+            Schematic schematic = plugin.getSchematics().getSchematic(islandSchematic);
+            if (schematic != null) {
+                regenerateSchematicInternal(island, dimension, schematic);
+                return;
+            }
+        }
 
         island.setSchematicGenerate(dimension, false);
+    }
+
+    private static void regenerateSchematicInternal(Island island, Dimension dimension, Schematic schematic) {
+        Location centerLocation = island.getCenter(dimension);
+        Location schematicPlacementLocation = centerLocation.getBlock().getRelative(BlockFace.DOWN).getLocation();
+
+        schematic.pasteSchematic(island, schematicPlacementLocation, () -> {
+            island.setSchematicGenerate(dimension);
+
+            Location homeLocation = schematic.adjustRotation(centerLocation);
+            island.setIslandHome(dimension, homeLocation);
+
+            if (dimension.getEnvironment() == World.Environment.THE_END) {
+                dragonBattleService.get().resetEnderDragonBattle(island, dimension);
+            }
+
+            island.setIslandHome(dimension, homeLocation);
+
+            island.calcIslandWorth(null);
+        }, Throwable::printStackTrace);
     }
 
     @Override
@@ -130,9 +172,8 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
         List<String> environments = new ArrayList<>();
 
         for (Dimension dimension : Dimension.values()) {
-            if (dimension != plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
-                if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension))
-                    environments.add(dimension.getName().toLowerCase(Locale.ENGLISH));
+            if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
+                environments.add(dimension.getName().toLowerCase(Locale.ENGLISH));
             }
         }
 

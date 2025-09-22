@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
@@ -105,6 +106,7 @@ public class FeaturesListener extends AbstractGameEventListener {
                 clickedBlock.getType() != Material.OBSIDIAN)
             return;
 
+        // We do not care about spawn island, and therefore only island worlds are relevant.
         if (!plugin.getGrid().isIslandsWorld(clickedBlock.getWorld()))
             return;
 
@@ -144,8 +146,13 @@ public class FeaturesListener extends AbstractGameEventListener {
 
     /* VISITORS BLOCKED COMMANDS */
 
-    private void onPlayerCommand(GameEvent<GameEventArgs.PlayerCommandEvent> e) {
+    private void onPlayerCommandAsVisitor(GameEvent<GameEventArgs.PlayerCommandEvent> e) {
         Player player = e.getArgs().player;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(player.getWorld()))
+            return;
+
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
         if (superiorPlayer.hasBypassModeEnabled())
@@ -169,11 +176,35 @@ public class FeaturesListener extends AbstractGameEventListener {
         }
     }
 
+    /* PREVIEW BLOCKED COMMANDS */
+
+    private void onPlayerCommandWhilePreview(GameEvent<GameEventArgs.PlayerCommandEvent> e) {
+        Player player = e.getArgs().player;
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+
+        if (superiorPlayer.hasBypassModeEnabled())
+            return;
+
+        IslandPreview islandPreview = plugin.getGrid().getIslandPreview(superiorPlayer);
+        if (islandPreview == null)
+            return;
+
+        String[] message = e.getArgs().command.toLowerCase(Locale.ENGLISH).split(" ");
+
+        String commandLabel = message[0].toCharArray()[0] == '/' ? message[0].substring(1) : message[0];
+
+        if (plugin.getSettings().getIslandPreviews().getBlockedCommands().stream().anyMatch(commandLabel::contains)) {
+            e.setCancelled();
+            Message.ISLAND_PREVIEW_BLOCK_COMMAND.send(superiorPlayer);
+        }
+    }
+
     /* BLOCKS TRACKING */
 
     private void onChunkLoad(GameEvent<GameEventArgs.ChunkLoadEvent> e) {
-        List<Island> chunkIslands = plugin.getGrid().getIslandsAt(e.getArgs().chunk);
-        chunkIslands.forEach(island -> handleIslandChunkLoad(island, e.getArgs().chunk));
+        Chunk chunk = e.getArgs().chunk;
+        List<Island> chunkIslands = plugin.getGrid().getIslandsAt(chunk);
+        chunkIslands.forEach(island -> handleIslandChunkLoad(island, chunk));
     }
 
     private void handleIslandChunkLoad(Island island, Chunk chunk) {
@@ -234,8 +265,7 @@ public class FeaturesListener extends AbstractGameEventListener {
         Action action = e.getArgs().action;
         Block clickedBlock = e.getArgs().clickedBlock;
 
-        if (action != Action.PHYSICAL || !plugin.getGrid().isIslandsWorld(clickedBlock.getWorld()) ||
-                clickedBlock.getType() != SCULK_SHRIEKER)
+        if (action != Action.PHYSICAL || clickedBlock.getType() != SCULK_SHRIEKER)
             return;
 
         InteractionResult interactionResult;
@@ -261,7 +291,9 @@ public class FeaturesListener extends AbstractGameEventListener {
         if (plugin.getSettings().isObsidianToLava())
             registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.HIGHEST, this::onObsidianClick);
         if (!plugin.getSettings().getBlockedVisitorsCommands().isEmpty())
-            registerCallback(GameEventType.PLAYER_COMMAND_EVENT, GameEventPriority.HIGHEST, this::onPlayerCommand);
+            registerCallback(GameEventType.PLAYER_COMMAND_EVENT, GameEventPriority.HIGHEST, this::onPlayerCommandAsVisitor);
+        if (!plugin.getSettings().getIslandPreviews().getBlockedCommands().isEmpty())
+            registerCallback(GameEventType.PLAYER_COMMAND_EVENT, GameEventPriority.HIGHEST, this::onPlayerCommandWhilePreview);
 
         registerCallback(GameEventType.CHUNK_LOAD_EVENT, GameEventPriority.MONITOR, this::onChunkLoad);
 

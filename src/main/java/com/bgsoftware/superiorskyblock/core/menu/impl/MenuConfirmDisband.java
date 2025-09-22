@@ -75,7 +75,7 @@ public class MenuConfirmDisband extends AbstractMenu<IslandMenuView, IslandViewA
 
         int charCounter = 0;
 
-        if (cfg.contains("disband-gui.fill-items")) {
+        if (cfg.isConfigurationSection("disband-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("disband-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

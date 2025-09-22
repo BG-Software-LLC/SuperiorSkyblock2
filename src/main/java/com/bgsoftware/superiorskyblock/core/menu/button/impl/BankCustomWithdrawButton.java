@@ -54,8 +54,6 @@ public class BankCustomWithdrawButton extends AbstractMenuViewButton<IslandMenuV
 
             PlayerChat.remove(player);
 
-            menuView.refreshView();
-
             return true;
         });
     }

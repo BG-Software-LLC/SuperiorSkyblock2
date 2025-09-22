@@ -174,7 +174,9 @@ public class NMSWorldImpl implements NMSWorld {
 
             if (blockData != null) {
                 world.getChunkProvider().flagDirty(blockPosition);
-                world.chunkPacketBlockController.onBlockChange(world, blockPosition, blockData, Blocks.AIR.getBlockData(), 530);
+                if (CHUNK_PACKET_BLOCK_CONTROLLER.isValid()) {
+                    world.chunkPacketBlockController.onBlockChange(world, blockPosition, blockData, Blocks.AIR.getBlockData(), 530);
+                }
             }
         }
     }
@@ -324,6 +326,11 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public WorldEditSession createEditSession(org.bukkit.World world) {
         return WorldEditSessionImpl.obtain(((CraftWorld) world).getHandle());
+    }
+
+    @Override
+    public WorldEditSession createPartialEditSession(Dimension dimension) {
+        return WorldEditSessionImpl.obtain(dimension);
     }
 
     @Override

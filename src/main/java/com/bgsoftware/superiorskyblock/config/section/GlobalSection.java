@@ -4,9 +4,9 @@ import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
-import org.bukkit.Location;
 
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -94,7 +94,7 @@ public class GlobalSection extends SettingsContainerHolder {
     }
 
     public int getDisbandCount() {
-        return getContainer().disbandCount;
+        return getContainer().defaultDisbandCount;
     }
 
     public boolean isIslandTopIncludeLeader() {
@@ -133,10 +133,6 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().stackedBlocksProvider;
     }
 
-    public boolean isDisbandInventoryClear() {
-        return getContainer().disbandInventoryClear;
-    }
-
     public boolean isTeleportOnCreate() {
         return getContainer().teleportOnCreate;
     }
@@ -149,8 +145,24 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().teleportOnKick;
     }
 
-    public boolean isClearOnJoin() {
-        return getContainer().clearOnJoin;
+    public boolean isTeleportOnLeave() {
+        return getContainer().teleportOnLeave;
+    }
+
+    public List<ClearAction> getClearActionsOnDisband() {
+        return getContainer().clearActionsOnDisband;
+    }
+
+    public List<ClearAction> getClearActionsOnJoin() {
+        return getContainer().clearActionsOnJoin;
+    }
+
+    public List<ClearAction> getClearActionsOnKick() {
+        return getContainer().clearActionsOnKick;
+    }
+
+    public List<ClearAction> getClearActionsOnLeave() {
+        return getContainer().clearActionsOnLeave;
     }
 
     public boolean isRateOwnIsland() {
@@ -321,10 +333,6 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().valuableBlocks;
     }
 
-    public Map<String, Location> getPreviewIslands() {
-        return getContainer().islandPreviewLocations;
-    }
-
     public boolean isTabCompleteHideVanished() {
         return getContainer().tabCompleteHideVanished;
     }
@@ -395,6 +403,10 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public int getCommandsPerPage() {
         return getContainer().commandsPerPage;
+    }
+
+    public boolean isCacheSchematics() {
+        return getContainer().cacheSchematics;
     }
 
 }

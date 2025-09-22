@@ -61,6 +61,8 @@ permissions:
             description: Ban a player from your island.
           superior.island.bank:
             description: Open the island's bank.
+          superior.island.bans:
+            description: Open the bans menu.
           superior.island.biome:
             description: Change the biome of the island.
           superior.island.border:
@@ -109,6 +111,11 @@ permissions:
             description: Open the island to the public.
           superior.island.panel:
             description: Open island panel.
+            children:
+              superior.island.visitors:
+                description: Open the visitors menu.
+              superior.island.members:
+                description: Open the members menu.
           superior.island.pardon:
             description: Unban a player from your island.
           superior.island.permissions:
@@ -226,6 +233,8 @@ permissions:
             description: Deposit money into another player's island bank.
           superior.admin.disband:
             description: Disband another player's island permanently.
+          superior.admin.fly:
+            description: Toggle island fly for another player.
           superior.admin.givedisbands:
             description: Give disbands to a player.
           superior.admin.ignore:
@@ -260,8 +269,14 @@ permissions:
             description: Reload all configurations and tasks of the plugin.
           superior.admin.removeblocklimit:
             description: Remove a block limit for an island.
+          superior.admin.removeentitylimit:
+            description: Remove an entity limit for an island.
           superior.admin.removeratings:
             description: Remove all ratings given by a player.
+          superior.admin.resetpermissions:
+            description: Reset all island permissions for a specific island.
+          superior.admin.resetsettings:
+            description: Reset all island settings for a specific island.
           superior.admin.resetworld:
             description: Reset a world for an island.
           superior.admin.schematic:
@@ -288,6 +303,8 @@ permissions:
             description: Set entity limit for another player's island.
           superior.admin.setgenerator:
             description: Change percentage of a material for the cobblestone generator.
+          superior.admin.setislandpreview:
+            description: Set the preview location for an island.
           superior.admin.setleader:
             description: Transfer an island to someone else.
           superior.admin.setmobdrops:

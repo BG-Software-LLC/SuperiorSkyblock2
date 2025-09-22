@@ -2,10 +2,12 @@ package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import org.bukkit.command.CommandSender;
@@ -61,6 +63,10 @@ public class CmdTeleport implements ISuperiorCommand {
             return;
 
         SuperiorPlayer superiorPlayer = arguments.getSuperiorPlayer();
+        Dimension dimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
+
+        if (!PluginEventsFactory.callIslandHomeTeleportEvent(island, superiorPlayer, dimension))
+            return;
 
         EntityTeleports.warmupTeleport(superiorPlayer, plugin.getSettings().getHomeWarmup(),
                 unused -> teleportToIsland(superiorPlayer, island));

@@ -142,6 +142,7 @@ public class GridManagerImpl extends Manager implements GridManager {
     public void updateSpawn() {
         try {
             this.spawnIsland = new SpawnIsland();
+            PluginEventsFactory.callSpawnUpdateEvent();
         } catch (ManagerLoadException error) {
             ManagerLoadException.handle(error);
         }
@@ -156,50 +157,50 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     @Override
-    public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus, Biome biome, String islandName) {
+    public void createIsland(SuperiorPlayer superiorPlayer, String schematicName, BigDecimal bonus, Biome biome, String islandName) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
+        Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
         Preconditions.checkNotNull(bonus, "bonus parameter cannot be null.");
         Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
-        createIsland(superiorPlayer, schemName, bonus, biome, islandName, false);
+        createIsland(superiorPlayer, schematicName, bonus, biome, islandName, false);
     }
 
     @Override
-    public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus, Biome biome, String islandName, boolean offset) {
+    public void createIsland(SuperiorPlayer superiorPlayer, String schematicName, BigDecimal bonus, Biome biome, String islandName, boolean offset) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
+        Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
         Preconditions.checkNotNull(bonus, "bonus parameter cannot be null.");
         Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
-        createIsland(superiorPlayer, schemName, bonus, BigDecimal.ZERO, biome, islandName, false);
+        createIsland(superiorPlayer, schematicName, bonus, BigDecimal.ZERO, biome, islandName, false);
     }
 
     @Override
-    public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonusWorth,
+    public void createIsland(SuperiorPlayer superiorPlayer, String schematicName, BigDecimal bonusWorth,
                              BigDecimal bonusLevel, Biome biome, String islandName, boolean offset) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
+        Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
         Preconditions.checkNotNull(bonusWorth, "bonusWorth parameter cannot be null.");
         Preconditions.checkNotNull(bonusLevel, "bonusLevel parameter cannot be null.");
         Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
-        createIsland(superiorPlayer, schemName, bonusWorth, bonusLevel, biome, islandName, offset, null);
+        createIsland(superiorPlayer, schematicName, bonusWorth, bonusLevel, biome, islandName, offset, null);
     }
 
     @Override
-    public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonusWorth,
+    public void createIsland(SuperiorPlayer superiorPlayer, String schematicName, BigDecimal bonusWorth,
                              BigDecimal bonusLevel, Biome biome, String islandName, boolean offset,
                              @Nullable BlockOffset spawnOffset) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
+        Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
         Preconditions.checkNotNull(bonusWorth, "bonusWorth parameter cannot be null.");
         Preconditions.checkNotNull(bonusLevel, "bonusLevel parameter cannot be null.");
         Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
         Island.Builder builder = Island.newBuilder()
                 .setOwner(superiorPlayer)
-                .setSchematicName(schemName)
+                .setSchematicName(schematicName)
                 .setName(islandName);
 
         if (!offset) {
@@ -254,7 +255,7 @@ public class GridManagerImpl extends Manager implements GridManager {
                 builder.islandName, offset, biome, schematic.getName());
 
         // Removing any active previews for the player.
-        boolean updateGamemode = this.islandPreviews.endIslandPreview(builder.owner) != null;
+        boolean updateGameMode = this.islandPreviews.endIslandPreview(builder.owner) != null;
 
         if (!PluginEventsFactory.callPreIslandCreateEvent(builder.owner, builder.islandName))
             return;
@@ -274,7 +275,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
                 try {
                     createIslandInternalOnSuccessCallback(builder, biome, offset, spawnOffset,
-                            schematic, updateGamemode, startTime, islandCreationResult);
+                            schematic, updateGameMode, startTime, islandCreationResult);
                     return;
                 } catch (Throwable runtimeError) {
                     error = runtimeError;
@@ -297,7 +298,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     private void createIslandInternalOnSuccessCallback(IslandBuilderImpl builder, Biome biome, boolean offset,
                                                        @Nullable BlockOffset spawnOffset, Schematic schematic,
-                                                       boolean updateGamemode, long startTime,
+                                                       boolean updateGameMode, long startTime,
                                                        IslandCreationAlgorithm.IslandCreationResult islandCreationResult) {
         switch (islandCreationResult.getStatus()) {
             case NAME_OCCUPIED:
@@ -353,7 +354,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         island.setIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension(), homeLocation);
 
         BukkitExecutor.sync(() -> builder.owner.runIfOnline(player -> {
-            if (updateGamemode)
+            if (updateGameMode)
                 player.setGameMode(GameMode.SURVIVAL);
 
             if (!teleportPlayer) {
@@ -414,9 +415,9 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     @Override
-    public void startIslandPreview(SuperiorPlayer superiorPlayer, String schemName, String islandName) {
-        Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
-        startIslandPreview(superiorPlayer, plugin.getSchematics().getSchematic(schemName), islandName);
+    public void startIslandPreview(SuperiorPlayer superiorPlayer, String schematicName, String islandName) {
+        Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
+        startIslandPreview(superiorPlayer, plugin.getSchematics().getSchematic(schematicName), islandName);
     }
 
     public void startIslandPreview(SuperiorPlayer superiorPlayer, Schematic schematic, String islandName) {
@@ -424,12 +425,12 @@ public class GridManagerImpl extends Manager implements GridManager {
         Preconditions.checkNotNull(schematic, "schematic parameter cannot be null.");
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
 
-        Location previewLocation = plugin.getSettings().getPreviewIslands().get(schematic.getName().toLowerCase(Locale.ENGLISH));
+        Location previewLocation = plugin.getSettings().getIslandPreviews().getLocations().get(schematic.getName().toLowerCase(Locale.ENGLISH));
         if (previewLocation != null && previewLocation.getWorld() != null) {
             superiorPlayer.teleport(previewLocation, result -> {
                 if (result) {
-                    this.islandPreviews.startIslandPreview(new SIslandPreview(superiorPlayer, previewLocation, schematic, islandName));
-                    BukkitExecutor.ensureMain(() -> superiorPlayer.runIfOnline(player -> player.setGameMode(GameMode.SPECTATOR)));
+                    this.islandPreviews.startIslandPreview(new SIslandPreview(superiorPlayer, previewLocation, schematic, islandName, superiorPlayer.asPlayer().getGameMode()));
+                    BukkitExecutor.ensureMain(() -> superiorPlayer.runIfOnline(player -> player.setGameMode(plugin.getSettings().getIslandPreviews().getGameMode())));
                     Message.ISLAND_PREVIEW_START.send(superiorPlayer, schematic.getName());
                 }
             });
@@ -445,7 +446,7 @@ public class GridManagerImpl extends Manager implements GridManager {
             superiorPlayer.runIfOnline(player -> {
                 BukkitExecutor.ensureMain(() -> superiorPlayer.teleport(plugin.getGrid().getSpawnIsland(), teleportResult -> {
                     if (teleportResult && superiorPlayer.isOnline())
-                        player.setGameMode(GameMode.SURVIVAL);
+                        player.setGameMode(islandPreview.getPreviousGameMode());
                 }));
                 PlayerChat.remove(player);
             });
@@ -553,14 +554,18 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     @Override
-    public Island getIslandAt(Location location) {
+    public Island getIslandAt(@Nullable Location location) {
         if (location == null)
+            return null;
+
+        World world = location.getWorld();
+        if (world == null)
             return null;
 
         if (spawnIsland != null && spawnIsland.isInside(location))
             return spawnIsland;
 
-        return this.islandsContainer.getIslandAt(location);
+        return isIslandsWorld(world) ? this.islandsContainer.getIslandAt(location) : null;
     }
 
     @Override

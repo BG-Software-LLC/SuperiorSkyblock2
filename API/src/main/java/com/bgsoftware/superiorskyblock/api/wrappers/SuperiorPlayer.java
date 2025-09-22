@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
+import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -42,6 +43,11 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * Get the last known name of the player.
      */
     String getName();
+
+    /**
+     * Get the player cache.
+     */
+    PlayerCache getCache();
 
     /**
      * Get the last known skin-texture value of the player.
@@ -336,6 +342,28 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * @return Pending invites, in the same order they were sent.
      */
     List<Island> getInvites();
+
+    /**
+     * Mark player as a coop of an island.
+     * !Can cause issues if not used properly!
+     *
+     * @param island The island to mark the player as coop.
+     * @throws IllegalArgumentException if island doesn't contain player as a coop.
+     */
+    void addCoop(Island island);
+
+    /**
+     * Remove mark of the player as a coop of an island.
+     * !Can cause issues if not used properly!
+     *
+     * @param island The island to remove the mark of the player as coop.
+     */
+    void removeCoop(Island island);
+
+    /**
+     * Get all islands that the player is coop of.
+     */
+    List<Island> getCoopIslands();
 
     /**
      * Get the role of the player.

@@ -72,6 +72,8 @@ public interface NMSWorld {
 
     WorldEditSession createEditSession(World world);
 
+    WorldEditSession createPartialEditSession(Dimension dimension);
+
     ChunkReader createChunkReader(Chunk chunk);
 
 }

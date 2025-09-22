@@ -229,6 +229,7 @@ COMMAND_DESCRIPTION_ADMIN_DEL_WARP: Bir ada için bir ışınlanma noktasını s
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Başka bir oyuncunun adasındaki bir üyeyi rütbe düşür.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Başka bir oyuncunun ada bankasına para yatır.
 COMMAND_DESCRIPTION_ADMIN_DISBAND: Başka bir oyuncunun adasını kalıcı olarak dağıt.
+COMMAND_DESCRIPTION_ADMIN_FLY: 'Toggle island fly for a player.'
 COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: Bir oyuncuya ada dağıtma hakkı ver.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: En iyi adalardan bir adayı yoksay.
 COMMAND_DESCRIPTION_ADMIN_JOIN: Davet olmadan bir adaya katıl.
@@ -248,8 +249,11 @@ COMMAND_DESCRIPTION_ADMIN_RECALC: Bir adanın değerini yeniden hesapla.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Eklentinin tüm yapılandırmalarını ve görevlerini
   yeniden yükle.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Bir adadan blok limitini kaldır.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Bir oyuncu tarafından verilen tüm değerlendirmeleri
   kaldır.
+COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
+COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Bir ada için bir dünyayı sıfırla.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Eklenti için şematikler oluştur.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Bir adaya banka limiti belirle.
@@ -268,6 +272,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: Başka bir oyuncunun adasının ada efekt 
   ayarla.
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Başka bir oyuncunun adası için varlık
   limitini ayarla.
+COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: Bir adayı başkasına devret.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: Başka bir oyuncunun adası için mob düşürme
   çarpanını ayarla.
@@ -305,6 +310,7 @@ COMMAND_DESCRIPTION_ADMIN_WITHDRAW: Başka bir oyuncunun ada bankasından para �
 COMMAND_DESCRIPTION_BALANCE: Bir adanın bankasındaki para miktarını kontrol et.
 COMMAND_DESCRIPTION_BAN: Adandan bir oyuncuyu yasakla.
 COMMAND_DESCRIPTION_BANK: Adanın bankasını aç.
+COMMAND_DESCRIPTION_BANS: 'Open the bans menu.'
 COMMAND_DESCRIPTION_BIOME: Adanın biyomunu değiştir.
 COMMAND_DESCRIPTION_BORDER: Adaların sınır rengini değiştir.
 COMMAND_DESCRIPTION_CHEST: Adanın sandığını aç.
@@ -577,14 +583,18 @@ ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |
   &e&lAda | &7{0}lar:
   {1}
-ISLAND_INFO_VISITORS_COUNT: '&e&lAda | &7Ziyaretçi Sayısı: {0}'
+ISLAND_INFO_VISITORS_COUNT: '&e&lAda | &7Ziyaretçi Sayısı: {0} ({1} unique visitors)'
 ISLAND_INFO_WORTH: '&e&lAda | &7Değer: {0}'
+ISLAND_NAME_NONE: None
 ISLAND_OPENED: '&e&lAda | &7Ada başarıyla halka açıldı.'
+ISLAND_OWNER_NONE: None
+ISLAND_PREVIEW_BLOCK_COMMAND: '&c&lError | &7You cannot use that command in preview mode.'
 ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lÖnizleme | &7Çok uzaklaştın ve artık önizleme
   modunda değilsin.'
 ISLAND_PREVIEW_CANCEL: '&e&lÖnizleme | &7Önizleme modunu iptal ettin.'
-ISLAND_PREVIEW_CONFIRM_TEXT: ONAYLA
-ISLAND_PREVIEW_CANCEL_TEXT: İPTAL ET
+ISLAND_PREVIEW_CONFIRM_TEXT: 'ONAYLA'
+ISLAND_PREVIEW_CANCEL_TEXT: 'İPTAL ET'
+ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
 ISLAND_PREVIEW_START: |
   &e&lÖnizleme | &7{0} şematiği için önizleme modunu başlattın.
   &e&lÖnizleme | &7Yeni bir ada oluşturmak için &a&lONAYLA &7yaz, veya önizleme modunu iptal etmek için &c&lİPTAL ET &7yaz.
@@ -672,7 +682,7 @@ NAME_TOO_SHORT: '&c&lHata | &7Ada adları {0} karakterden kısa olamaz.'
 NO_BAN_PERMISSION: '&c&lHata | &7Oyuncuları yasaklayabilmek için en az {0} olmalısın.'
 NO_CLOSE_BYPASS: '&c&lHata | &7Bu ada halka açık değil.'
 NO_CLOSE_PERMISSION: '&c&lHata | &7Adanı halka kapatabilmek için en az {0} olmalısın.'
-NO_COMMAND_PERMISSION: '&fBilinmeyen komut. Yardım için "/help" yaz.'
+NO_COMMAND_PERMISSION: '&c&lError | &7You don''t have permission to use that command. ({0})'
 NO_COOP_PERMISSION: '&c&lHata | &7Oyuncuları co-op üyesi olarak ekleyebilmek için
   en az {0} olmalısın.'
 NO_DELETE_WARP_PERMISSION: '&c&lHata | &7Işınlanmaları silebilmek için en az {0} olmalısın.'
@@ -741,6 +751,9 @@ PERSISTENT_DATA_SHOW_PATH: '&b{0}&f: '
 PERSISTENT_DATA_SHOW_SPACER: '&f, '
 PERSISTENT_DATA_SHOW_VALUE: '&6{0}&c{1}&f'
 PERSISTENT_DATA_REMOVED: '&e&lVeri | &7{0} için {1} yolundan veri başarıyla kaldırıldı.'
+PERMISSIONS_RESET: '&e&lIsland | &7Successfully reset all the permissions of {0}''s island to default values!'
+PERMISSIONS_RESET_ALL: '&e&lIsland | &7Successfully reset all the permissions of all the islands to default values!'
+PERMISSIONS_RESET_NAME: '&e&lIsland | &7Successfully reset all the permissions of the island {0} to default values!'
 PERMISSIONS_RESET_PLAYER: '&e&lAda | &7{0} için tüm izinler varsayılan değerlere başarıyla
   sıfırlandı!'
 PERMISSIONS_RESET_ROLES: '&e&lAda | &7Adanın tüm izinleri varsayılan değerlere başarıyla
@@ -809,6 +822,10 @@ SET_UPGRADE_LEVEL_NAME: '&e&lYükseltmeler | &7{1} adası için {0} seviyesi ba�
   güncellendi.'
 SET_WARP: '&e&lAda | &7{0} konumunda yeni bir ışınlanma noktası başarıyla oluşturuldu.'
 SET_WARP_OUTSIDE: '&c&lHata | &7Adanın dışında ışınlanma noktası ayarlayamazsın.'
+SETTINGS_RESET: '&e&lIsland | &7Successfully reset all the settings of {0}''s island to default values!'
+SETTINGS_RESET_ALL: '&e&lIsland | &7Successfully reset all the settings of all the islands to default values!'
+SETTINGS_RESET_NAME: '&e&lIsland | &7Successfully reset all the settings of the island {0} to default values!'
+SETTINGS_RESET_SELF: '&e&lIsland | &7Successfully reset all the settings of the island to default values!'
 SETTINGS_UPDATED: '&e&lAda | &7{1}''in adası için {0} ayarları başarıyla güncellendi.'
 SETTINGS_UPDATED_NAME: '&e&lAda | &7{1} adası için {0} ayarları başarıyla güncellendi.'
 SETTINGS_UPDATED_ALL: '&e&lAda | &7Tüm adalar için {0} ayarları başarıyla güncellendi.'
@@ -839,6 +856,8 @@ TOGGLED_BYPASS_OFF: '&e&lBypass | &7Bypass modu &cKAPALI&7.'
 TOGGLED_BYPASS_ON: '&e&lBypass | &7Bypass modu &aAÇIK&7.'
 TOGGLED_FLY_OFF: '&e&lUçuş | &7Ada uçuşu &cKAPALI&7.'
 TOGGLED_FLY_ON: '&e&lUçuş | &7Ada uçuşu &aAÇIK&7.'
+TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
+TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
 TOGGLED_SCHEMATIC_OFF: '&e&lŞematikler | &7Şematik modu &cKAPALI&7.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lŞematikler | &7Şematik modu &aAÇIK&7.
@@ -874,6 +893,7 @@ UNSAFE_WARP: '&e&lAda | &7&oBu ışınlanma güvensiz görünüyor. Lütfen baş
 UPDATED_PERMISSION: '&e&lAda | &7{0} için izinler güncellendi.'
 UPDATED_SETTINGS: '&e&lAda | &7Ada ayarları {0} güncellendi.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lHata | &7Sadece {0} içinde tekrar yükseltme yapabilirsin.'
+VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lHata | &7Bu komutu başka adalarda kullanamazsın.'
 WARP_ALREADY_EXIST: '&c&lHata | &7Bu adla bir ışınlanma noktası zaten var.'
 WARP_CATEGORY_ICON_NEW_LORE: |

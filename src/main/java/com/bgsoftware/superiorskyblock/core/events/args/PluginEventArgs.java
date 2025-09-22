@@ -263,6 +263,10 @@ public class PluginEventArgs {
 
     }
 
+    public static class IslandClearFlags extends IslandDoActionArgs {
+
+    }
+
     public static class IslandClearGeneratorRates extends IslandDoActionArgs {
 
         public Dimension dimension;
@@ -367,6 +371,12 @@ public class PluginEventArgs {
 
     }
 
+    public static class IslandHomeTeleport extends IslandDoActionArgs {
+
+        public Dimension dimension;
+
+    }
+
     public static class IslandInvite extends IslandDoActionArgs {
 
         public SuperiorPlayer targetPlayer;
@@ -430,6 +440,12 @@ public class PluginEventArgs {
     public static class IslandRemoveEffect extends IslandDoActionArgs {
 
         public PotionEffectType effectType;
+
+    }
+
+    public static class IslandRemoveEntityLimit extends IslandDoActionArgs {
+
+        public Key entity;
 
     }
 
@@ -532,6 +548,16 @@ public class PluginEventArgs {
         public List<String> commands;
         public IslandUpgradeEvent.Cause upgradeCause;
         public UpgradeCost upgradeCost;
+
+    }
+
+    public static class IslandVisitorHomeTeleport extends IslandDoActionArgs {
+
+        public Dimension dimension;
+
+    }
+
+    public static class IslandWarpTeleport extends IslandWarpDoActionArgs {
 
     }
 

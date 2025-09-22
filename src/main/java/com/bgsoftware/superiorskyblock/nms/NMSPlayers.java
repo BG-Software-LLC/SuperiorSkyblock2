@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.nms.player.OfflinePlayerData;
 import com.mojang.authlib.properties.Property;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Item;
@@ -12,7 +13,7 @@ import java.util.Locale;
 
 public interface NMSPlayers {
 
-    void clearInventory(OfflinePlayer offlinePlayer);
+    OfflinePlayerData createOfflinePlayerData(OfflinePlayer offlinePlayer);
 
     void setSkinTexture(SuperiorPlayer superiorPlayer);
 

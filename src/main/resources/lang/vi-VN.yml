@@ -199,6 +199,7 @@ COMMAND_DESCRIPTION_ADMIN_DEL_WARP: 'Xóa một khu vực cho một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Hạ cấp thành viên ở đảo của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Gửi tiền vào ngân hàng đảo của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_DISBAND: Giải tán vĩnh viễn hòn đảo của người chơi khác.
+COMMAND_DESCRIPTION_ADMIN_FLY: 'Toggle island fly for a player.'
 COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: Giải tán cho người chơi.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: Bỏ qua một hòn đảo từ những hòn đảo hàng đầu.
 COMMAND_DESCRIPTION_ADMIN_JOIN: Tham gia một hòn đảo mà không cần lời mời.
@@ -219,8 +220,11 @@ COMMAND_DESCRIPTION_ADMIN_RANKUP: Cập nhật mức độ nâng cấp cho hòn 
 COMMAND_DESCRIPTION_ADMIN_RECALC: Tính lại giá trị của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Tải lại tất cả các config và tác vụ của plugin.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Xóa giới hạn khối khỏi một hòn đảo.'
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Xóa tất cả các xếp hạng được cung cấp bởi
   một người chơi.
+COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
+COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Tái tạo lại thế giới cho một hòn đảo.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Tạo các schematic cho plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Đặt mức giới hạn ngân hàng cho một hòn đảo.'
@@ -235,6 +239,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Đặt hệ số tăng trưởng cây
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: Đặt số lượng người cho đảo của người chơi.
 COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: 'Đặt hiệu ứng đảo của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Đặt giới hạn vật thể của người chơi khác.
+COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: Chuyển một hòn đảo cho người khác.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: Đặt số lượng vật phẩm quái rớt cho đảo của người chơi
   khác.
@@ -270,6 +275,7 @@ COMMAND_DESCRIPTION_ADMIN_WITHDRAW: Rút tiền từ ngân hàng đảo của ng
 COMMAND_DESCRIPTION_BALANCE: 'Kiểm tra số tiền bên trong ngân hàng của một hòn đảo.'
 COMMAND_DESCRIPTION_BAN: Cấm một người chơi từ đảo của bạn.
 COMMAND_DESCRIPTION_BANK: 'Mở ngân hàng đảo.'
+COMMAND_DESCRIPTION_BANS: 'Open the bans menu.'
 COMMAND_DESCRIPTION_BIOME: Thẩy đổi quần xã của hòn đảo.
 COMMAND_DESCRIPTION_BORDER: Thay đổi màu giới hạn đảo.
 COMMAND_DESCRIPTION_CHEST: 'Mở rương đảo.'
@@ -544,13 +550,17 @@ ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |
   &e&lĐảo | &7{0}s:
   {1}
-ISLAND_INFO_VISITORS_COUNT: '&e&lĐảo | &7Số lượt khách: {0}'
+ISLAND_INFO_VISITORS_COUNT: '&e&lĐảo | &7Số lượt khách: {0} ({1} unique visitors)'
 ISLAND_INFO_WORTH: '&e&lĐảo | &7Đáng giá: {0}'
+ISLAND_NAME_NONE: None
 ISLAND_OPENED: '&e&lĐảo | &7Mở đảo thành công cho công cộng.'
+ISLAND_OWNER_NONE: None
+ISLAND_PREVIEW_BLOCK_COMMAND: '&c&lError | &7You cannot use that command in preview mode.'
 ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lXem Trước | &7Bạn đã đi ra quá xa và thoát chế độ xem trước.'
 ISLAND_PREVIEW_CANCEL: '&e&lXem Trước | &7Bạn đã hủy chế độ xem trước.'
 ISLAND_PREVIEW_CONFIRM_TEXT: 'DONG-Y'
 ISLAND_PREVIEW_CANCEL_TEXT: 'HUY-BO'
+ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
 ISLAND_PREVIEW_START: |
   &e&lXem Trước | &7Bạn đã bắt đầu chế độ xem trước schematic {0}.
   &e&lXem Trước | &7Nhập &a&lDONG-Y &7để tạo đảo mới, hoặc &c&lHUY-BO &7để dừng chế độ xem trước.
@@ -634,7 +644,7 @@ NAME_TOO_SHORT: '&c&lLỗi | &7Tên đảo không thể ngắn hơn {0} ký tự
 NO_BAN_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để cấm người chơi.'
 NO_CLOSE_BYPASS: '&c&lLỗi | &7Hòn đảo này không mở cửa cho công cộng.'
 NO_CLOSE_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để đóng đảo với công cộng.'
-NO_COMMAND_PERMISSION: '&fLệnh không xác định. Nhấn "/help" để được trợ giúp.'
+NO_COMMAND_PERMISSION: '&c&lError | &7You don''t have permission to use that command. ({0})'
 NO_COOP_PERMISSION: '&c&lLỗi | &7Bạn phải là {0} hoặc cao hơn để thêm người chơi
   với tư cách là thành viên co-op.'
 NO_DELETE_WARP_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để xóa khu vực.'
@@ -702,6 +712,9 @@ PERSISTENT_DATA_SHOW_PATH: '&b{0}&f: '
 PERSISTENT_DATA_SHOW_SPACER: '&f, '
 PERSISTENT_DATA_SHOW_VALUE: '&6{0}&c{1}&f'
 PERSISTENT_DATA_REMOVED: '&e&lDữ liệu | &7Đã xóa thành công dữ liệu cho {0} từ đường dẫn {1}.'
+PERMISSIONS_RESET: '&e&lIsland | &7Successfully reset all the permissions of {0}''s island to default values!'
+PERMISSIONS_RESET_ALL: '&e&lIsland | &7Successfully reset all the permissions of all the islands to default values!'
+PERMISSIONS_RESET_NAME: '&e&lIsland | &7Successfully reset all the permissions of the island {0} to default values!'
 PERMISSIONS_RESET_PLAYER: '&e&lĐảo | &7Thành công đặt lại tất cả các quyền cho {0} thành giá trị mặc định!'
 PERMISSIONS_RESET_ROLES: '&e&lĐảo | &7Thành công đặt lại tất cả các quyền của hòn đảo thành giá trị mặc định!'
 PLACEHOLDER_NO: 'No'
@@ -764,6 +777,10 @@ SET_UPGRADE_LEVEL: '&e&lNâng Cấp | &7Nâng cấp thành công cấp độ c�
 SET_UPGRADE_LEVEL_NAME: '&e&lNâng Cấp | &7Thay đổi thành công cấp độ {0} cho đảo {1}.'
 SET_WARP: '&e&lĐảo | &7Tạo thành công một khu vực mới tại {0}.'
 SET_WARP_OUTSIDE: '&c&lLỗi | &7Bạn không thể đặt khu vực bên ngoài hòn đảo của bạn.'
+SETTINGS_RESET: '&e&lIsland | &7Successfully reset all the settings of {0}''s island to default values!'
+SETTINGS_RESET_ALL: '&e&lIsland | &7Successfully reset all the settings of all the islands to default values!'
+SETTINGS_RESET_NAME: '&e&lIsland | &7Successfully reset all the settings of the island {0} to default values!'
+SETTINGS_RESET_SELF: '&e&lIsland | &7Successfully reset all the settings of the island to default values!'
 SETTINGS_UPDATED: '&e&lĐảo | &7Thay đổi thành công điều chỉnh {0} cho đảo của
   {1}.'
 SETTINGS_UPDATED_NAME: '&e&lĐảo | &7Thay đổi thành công điều chỉnh {0} cho
@@ -796,6 +813,8 @@ TOGGLED_BYPASS_OFF: '&e&lBypass | &7Chuyển đổi chế độ bypass: &cTẮT&
 TOGGLED_BYPASS_ON: '&e&lBypass | &7Chuyển đổi chế độ bypass: &aBẬT&7.'
 TOGGLED_FLY_OFF: '&e&lBay | &7Chuyển đổi chế độ bay trong đảo: &cTẮT&7.'
 TOGGLED_FLY_ON: '&e&lBay | &7Chuyển đổi chế độ bay trong đảo: &aBẬT&7.'
+TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
+TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
 TOGGLED_SCHEMATIC_OFF: '&e&lSchematics | &7Chuyển đổi chế độ schematic: &cTẮT&7.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lSchematics | &7Chuyển đổi chế độ schematic: &aBẬT&7.
@@ -834,6 +853,7 @@ UNSAFE_WARP: '&e&lĐảo | &7&oCó vẻ như khu vực này không an toàn. Vui
 UPDATED_PERMISSION: '&e&lĐảo | &7Đã cập nhật quyền cho {0}.'
 UPDATED_SETTINGS: '&e&lĐảo | &7Thay đổi thành công điều chỉnh của đảo {0}.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lLỗi | &77Bạn có thể nâng cấp lại trong {0}.'
+VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lLỗi | &7Bạn không thể sử dụng lệnh này trên đảo khác.'
 WARP_ALREADY_EXIST: '&c&lLỗi | &7Đã có một khu vực đã được đặt với tên này.'
 WARP_CATEGORY_ICON_NEW_LORE: |

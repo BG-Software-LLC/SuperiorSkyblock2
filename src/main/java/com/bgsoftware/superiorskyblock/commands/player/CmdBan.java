@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -29,7 +28,7 @@ public class CmdBan implements IPermissibleCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "ban [" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "]";
+        return "ban <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
@@ -39,7 +38,7 @@ public class CmdBan implements IPermissibleCommand {
 
     @Override
     public int getMinArgs() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -64,12 +63,6 @@ public class CmdBan implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        if (args.length == 1) {
-            plugin.getMenus().openIslandBannedPlayers(superiorPlayer,
-                    MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
-            return;
-        }
-
         SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, superiorPlayer, args[1]);
 
         if (targetPlayer == null)

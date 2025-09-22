@@ -238,6 +238,7 @@ COMMAND_DESCRIPTION_ADMIN_DEMOTE: Ein Mitglied auf der Insel eines anderen Spiel
   degradieren.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Geld auf die Inselbank eines anderen Spielers einzahlen.
 COMMAND_DESCRIPTION_ADMIN_DISBAND: Die Insel eines anderen Spielers dauerhaft auflösen.
+COMMAND_DESCRIPTION_ADMIN_FLY: 'Toggle island fly for a player.'
 COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: Gib einem Spieler Auflösungen.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: Ignoriere eine Insel von den Top-Inseln.
 COMMAND_DESCRIPTION_ADMIN_JOIN: Treten Sie ohne Einladung einer Insel bei.
@@ -259,7 +260,10 @@ COMMAND_DESCRIPTION_ADMIN_RECALC: Berechnet den Wert einer Insel neu.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Alle Konfigurationen und Aufgaben des Plugins neu
   laden.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Entferne ein Blocklimit von einer Insel.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Alle Bewertungen eines Spielers entfernen.
+COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
+COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Setze eine Welt für eine Insel zurück.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Schaltpläne für das Plugin erstellen.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Banklimit für eine Insel festlegen.
@@ -280,6 +284,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: Lege die Inseleffektstufe der Insel eines 
   Spielers fest.
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Entity-Limit für die Insel eines anderen
   Spielers festlegen.
+COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: Übertrage eine Insel an jemand anderen.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: Lege den Mob-Drop-Multiplikator für die Insel
   eines anderen Spielers fest.
@@ -305,6 +310,7 @@ COMMAND_DESCRIPTION_ADMIN_SHOW: Informationen über eine Insel abrufen.
 COMMAND_DESCRIPTION_ADMIN_SPAWN: Teleport zum Spawn-Ort.
 COMMAND_DESCRIPTION_ADMIN_SPY: Chat-Spionagemodus umschalten
 COMMAND_DESCRIPTION_ADMIN_STATS: Statistiken über das Plugin anzeigen.
+COMMAND_DESCRIPTION_ADMIN_SYNC_BONUS: 'Sync the bonus of an island with the generated worlds.'
 COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES: Upgrade-Werte für eine Insel synchronisieren.
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: Teleport zur anderen Inseln.
 COMMAND_DESCRIPTION_ADMIN_TITLE: Sende einem Spieler einen Titel.
@@ -316,6 +322,7 @@ COMMAND_DESCRIPTION_ADMIN_WITHDRAW: Geld von der Inselbank eines anderen Spieler
 COMMAND_DESCRIPTION_BALANCE: Überprüfe den Geldbetrag in der Bank einer Insel.
 COMMAND_DESCRIPTION_BAN: Banne einen Spieler von deiner Insel.
 COMMAND_DESCRIPTION_BANK: Öffne die Bank der Insel.
+COMMAND_DESCRIPTION_BANS: 'Open the bans menu.'
 COMMAND_DESCRIPTION_BIOME: Ändere das Biom der Insel.
 COMMAND_DESCRIPTION_BORDER: Ändere die Randfarbe der Inseln.
 COMMAND_DESCRIPTION_CHEST: Öffne die Truhe der Insel.
@@ -487,6 +494,7 @@ INVALID_LEVEL: '&c&lError | &7Ungültige Ebene {0}.'
 INVALID_LIMIT: '&c&lError | &7Ungültiges Limit {0}.'
 INVALID_MATERIAL: '&c&lError | &7Ungültiges Material {0}.'
 INVALID_MATERIAL_DATA: '&c&lError | &7Ungültige Materialdaten {0}.'
+INVALID_MENU: '&c&lError | &7Invalid menu {0}.'
 INVALID_MISSION: '&c&lError | &7Ungültige Mission {0}.'
 INVALID_MODULE: '&c&lError | &7Ungültiges Modul {0}.'
 INVALID_MULTIPLIER: '&c&lError | &7Ungültiger Multiplikator {0}.'
@@ -604,18 +612,22 @@ ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |-
   &e&lInsel | &7{0}s:
   {1}
-ISLAND_INFO_VISITORS_COUNT: '&e&lInsel | &7Besucheranzahl: {0}'
+ISLAND_INFO_VISITORS_COUNT: '&e&lInsel | &7Besucheranzahl: {0} ({1} unique visitors)'
 ISLAND_INFO_WORTH: '&e&lInsel | &7Wert: {0}'
+ISLAND_NAME_NONE: None
 ISLAND_OPENED: '&e&lIsland | &7Die Insel wurde erfolgreich der Öffentlichkeit zugänglich
   gemacht.'
+ISLAND_OWNER_NONE: None
+ISLAND_PREVIEW_BLOCK_COMMAND: '&c&lError | &7You cannot use that command in preview mode.'
 ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lVorschau | &7Du hast sich zu weit entfernt und
   befindest dich nicht mehr im Vorschaumodus.'
 ISLAND_PREVIEW_CANCEL: '&e&lVorschau | &7Du hast den Vorschaumodus abgebrochen.'
-ISLAND_PREVIEW_CONFIRM_TEXT: BESTÄTIGEN
-ISLAND_PREVIEW_CANCEL_TEXT: ABBRECHEN
+ISLAND_PREVIEW_CONFIRM_TEXT: 'BESTÄTIGEN'
+ISLAND_PREVIEW_CANCEL_TEXT: 'ABBRECHEN'
+ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
 ISLAND_PREVIEW_START: |
   &e&lVorschau | &7Du hast den Vorschaumodus für den Schaltplan {0} gestartet.
-  &e&lVorschau | &7Gebe &a&lCONFIRM &7 ein, um eine neue Insel zu erstellen, oder &c&lCANCEL &7, um den Vorschaumodus abzubrechen.
+  &e&lVorschau | &7Gebe &a&lBESTÄTIGEN &7 ein, um eine neue Insel zu erstellen, oder &c&lABBRECHEN &7, um den Vorschaumodus abzubrechen.
   &e&lVorschau | &7Du kannst das Inselgebiet nicht verlassen, sonst wird der Vorschaumodus automatisch abgebrochen.
 ISLAND_PROTECTED: '&c&lError | &7Diese Insel ist geschützt.'
 ISLAND_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
@@ -707,7 +719,7 @@ NO_BAN_PERMISSION: '&c&lError | &7Du musst mindestens {0} sein, um Spieler zu ba
 NO_CLOSE_BYPASS: '&c&lError | &7Diese Insel ist nicht für die Öffentlichkeit zugänglich.'
 NO_CLOSE_PERMISSION: '&c&lError | &7Du musst mindestens {0} sein, um die Insel für
   die Öffentlichkeit zu schließen.'
-NO_COMMAND_PERMISSION: '&fUnbekannter Befehl. Gebe "/is help" ein, um Hilfe zu erhalten.'
+NO_COMMAND_PERMISSION: '&c&lError | &7You don''t have permission to use that command. ({0})'
 NO_COOP_PERMISSION: '&c&lError | &7Du musst mindestens {0} sein, um Spieler als Koop-Mitglieder
   hinzuzufügen.'
 NO_DELETE_WARP_PERMISSION: '&c&lError | &7Du musst mindestens {0} sein, um Warps zu
@@ -787,6 +799,9 @@ PERSISTENT_DATA_SHOW_PATH: '&b{0}&f: '
 PERSISTENT_DATA_SHOW_SPACER: '&f, '
 PERSISTENT_DATA_SHOW_VALUE: '&6{0}&c{1}&f'
 PERSISTENT_DATA_REMOVED: '&e&lData | &7Successfully removed data for {0} from path {1}.'
+PERMISSIONS_RESET: '&e&lIsland | &7Successfully reset all the permissions of {0}''s island to default values!'
+PERMISSIONS_RESET_ALL: '&e&lIsland | &7Successfully reset all the permissions of all the islands to default values!'
+PERMISSIONS_RESET_NAME: '&e&lIsland | &7Successfully reset all the permissions of the island {0} to default values!'
 PERMISSIONS_RESET_PLAYER: '&e&lInsel | &7Alle Berechtigungen für {0} erfolgreich auf
   Standardwerte zurückgesetzt!'
 PERMISSIONS_RESET_ROLES: '&e&lInsel | &7Alle Berechtigungen der Insel erfolgreich
@@ -861,6 +876,10 @@ SET_UPGRADE_LEVEL_NAME: '&e&lUpgrades | &7Die Ebene von {0} für {1} wurde erfol
   aktualisiert.'
 SET_WARP: '&e&lInsel | &7Erzeugt erfolgreich einen neuen Warp am {0}.'
 SET_WARP_OUTSIDE: '&c&lError | &7Du kannst keine Warps außerhalb Ihrer Insel setzen.'
+SETTINGS_RESET: '&e&lIsland | &7Successfully reset all the settings of {0}''s island to default values!'
+SETTINGS_RESET_ALL: '&e&lIsland | &7Successfully reset all the settings of all the islands to default values!'
+SETTINGS_RESET_NAME: '&e&lIsland | &7Successfully reset all the settings of the island {0} to default values!'
+SETTINGS_RESET_SELF: '&e&lIsland | &7Successfully reset all the settings of the island to default values!'
 SETTINGS_UPDATED: '&e&lInsel | &7Die Einstellungen {0} wurden erfolgreich auf die
   Insel von {1} aktualisiert.'
 SETTINGS_UPDATED_NAME: '&e&lInsel | &7Die Einstellungen {0} wurden erfolgreich auf
@@ -899,6 +918,8 @@ TOGGLED_BYPASS_OFF: '&e&lBypass | &7Umgehungsmodus &cOFF&7 umgeschaltet.'
 TOGGLED_BYPASS_ON: '&e&lBypass | &7Umgehungsmodus &aON&7 umgeschaltet.'
 TOGGLED_FLY_OFF: '&e&lFly | &7Inselflug umgeschaltet &cOFF&7.'
 TOGGLED_FLY_ON: '&e&lFly | &7Inselflug umgeschaltet &aON&7.'
+TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
+TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
 TOGGLED_SCHEMATIC_OFF: '&e&lSchematics | &7Schematicsmodus &cOFF&7 umschalten.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lSchaltpläne | &7Schematicsmodus umschalten &aON&7.
@@ -936,6 +957,7 @@ UNSAFE_WARP: '&e&lInsel | &7&oAnscheinend ist dieser Warp unsicher. Bitte versuc
 UPDATED_PERMISSION: '&e&lInsel | &7Aktualisierte Berechtigungen für {0}.'
 UPDATED_SETTINGS: '&e&lInsel | &7Die Inseleinstellungen {0} aktualisiert.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lError | &7Du kannst erst in {0} erneut ein Upgrade durchführen.'
+VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lError | &7Du kannst diesen Befehl nicht auf anderen Inseln
   verwenden.'
 WARP_ALREADY_EXIST: '&c&lError | &7Es existiert bereits ein Warp mit diesem Namen.'

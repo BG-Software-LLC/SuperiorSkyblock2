@@ -74,7 +74,10 @@ public class Chunk2ObjectMap<V> extends AbstractMap<ChunkPosition, V> {
         Long2ObjectMapView<V> worldBackendData = this.backendMap.computeIfAbsent(worldName, n ->
                 CollectionsFactory.createLong2ObjectLinkedHashMap());
 
-        return worldBackendData.computeIfAbsent(chunkPair, p -> newValue.get());
+        return worldBackendData.computeIfAbsent(chunkPair, p -> {
+            ++Chunk2ObjectMap.this.size;
+            return newValue.get();
+        });
     }
 
     @Nullable

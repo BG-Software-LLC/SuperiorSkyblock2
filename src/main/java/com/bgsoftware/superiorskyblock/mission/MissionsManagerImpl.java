@@ -286,12 +286,22 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                     return;
                 }
 
-                if (checkAutoReward && !isAutoReward(mission)) {
-                    if (canCompleteAgain(superiorPlayer, mission)) {
-                        Message.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
+                if (checkAutoReward) {
+                    boolean shouldAutoReward = isAutoReward(mission);
+                    if (shouldAutoReward && !BuiltinModules.MISSIONS.getConfiguration().isAutoRewardOutsideIslands() &&
+                            !plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld())) {
                         if (result != null)
                             result.accept(false);
                         return;
+                    }
+
+                    if (!shouldAutoReward) {
+                        if (canCompleteAgain(superiorPlayer, mission)) {
+                            Message.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
+                            if (result != null)
+                                result.accept(false);
+                            return;
+                        }
                     }
                 }
             }
@@ -524,8 +534,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                 List<String> requiredMissions = missionSection.getStringList("required-missions");
                 List<String> requiredChecks = missionSection.getStringList("required-checks");
 
-                boolean onlyShowIfRequiredCompleted = missionSection.contains("only-show-if-required-completed") &&
-                        missionSection.getBoolean("only-show-if-required-completed");
+                boolean onlyShowIfRequiredCompleted = missionSection.getBoolean("only-show-if-required-completed", false);
 
                 mission = createInstance(missionClass, missionName, islandMission, requiredMissions, requiredChecks, onlyShowIfRequiredCompleted);
                 mission.load(plugin, missionSection);
@@ -596,7 +605,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
         YamlConfiguration oldData = YamlConfiguration.loadConfiguration(file);
 
         for (Mission<?> mission : getAllMissions()) {
-            if (oldData.contains(mission.getName())) {
+            if (oldData.isConfigurationSection(mission.getName())) {
                 ConfigurationSection dataSection = oldData.getConfigurationSection(mission.getName());
                 YamlConfiguration data = convertSectionToYaml(dataSection, new YamlConfiguration());
 

@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.tag.ListTag;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -65,9 +64,9 @@ public class ItemSkulls {
     public static ItemStack getPlayerHeadNoNMS(ItemStack itemStack, String texture) {
         CompoundTag compoundTag = Serializers.ITEM_STACK_TO_TAG_SERIALIZER.serialize(itemStack);
 
-        CompoundTag tagCompound = compoundTag.getCompound("tag", new CompoundTag());
+        CompoundTag tagCompound = compoundTag.getCompound("tag").orElseGet(CompoundTag::of);
 
-        CompoundTag skullOwner = tagCompound.getCompound("SkullOwner", new CompoundTag());
+        CompoundTag skullOwner = tagCompound.getCompound("SkullOwner").orElseGet(CompoundTag::of);
 
         UUID ownerUUID = new UUID(texture.hashCode(), texture.hashCode());
 
@@ -77,10 +76,10 @@ public class ItemSkulls {
             skullOwner.setString("Id", ownerUUID.toString());
         }
 
-        CompoundTag properties = new CompoundTag();
+        CompoundTag properties = CompoundTag.of();
 
-        ListTag textures = new ListTag(CompoundTag.class, Collections.emptyList());
-        CompoundTag signature = new CompoundTag();
+        ListTag textures = ListTag.of(CompoundTag.class);
+        CompoundTag signature = CompoundTag.of();
         signature.setString("Value", texture);
         textures.addTag(signature);
 

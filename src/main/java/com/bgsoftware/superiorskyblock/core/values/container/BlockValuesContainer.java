@@ -14,7 +14,7 @@ public class BlockValuesContainer {
     private final KeyMap<BlockValue> valuesMap = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
 
     public void setBlockValue(Key key, BlockValue value) {
-        valuesMap.put(getBlockValueKey(key), value);
+        valuesMap.put(key, value);
     }
 
     @Nullable

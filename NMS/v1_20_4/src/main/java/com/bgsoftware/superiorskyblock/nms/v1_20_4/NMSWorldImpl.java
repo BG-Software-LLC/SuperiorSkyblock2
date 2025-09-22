@@ -25,9 +25,9 @@ import com.bgsoftware.superiorskyblock.nms.world.ChunkReader;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.world.SignType;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
+import com.destroystokyo.paper.antixray.ChunkPacketBlockController;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
@@ -73,6 +73,9 @@ public class NMSWorldImpl implements NMSWorld {
     private static final ReflectField<List<TickingBlockEntity>> LEVEL_BLOCK_ENTITY_TICKERS = initializeLevelBlockEntityTickersField();
     private static final ReflectField<VibrationSystem.User> SCULK_SENSOR_BLOCK_ENTITY_VIBRATION_USER = new ReflectField<VibrationSystem.User>(
             SculkSensorBlockEntity.class, VibrationSystem.User.class, Modifier.PRIVATE | Modifier.FINAL, 1).removeFinal();
+    private static final ReflectField<Object> CHUNK_PACKET_BLOCK_CONTROLLER = new ReflectField<>(Level.class,
+            Object.class, "chunkPacketBlockController")
+            .removeFinal();
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -203,7 +206,9 @@ public class NMSWorldImpl implements NMSWorld {
 
             if (blockState != null) {
                 serverLevel.getChunkSource().blockChanged(blockPos);
-                serverLevel.chunkPacketBlockController.onBlockChange(serverLevel, blockPos, blockState, Blocks.AIR.defaultBlockState(), 530, 512);
+                if (CHUNK_PACKET_BLOCK_CONTROLLER.isValid()) {
+                    serverLevel.chunkPacketBlockController.onBlockChange(serverLevel, blockPos, blockState, Blocks.AIR.defaultBlockState(), 530, 512);
+                }
             }
         }
     }
@@ -339,8 +344,12 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public void removeAntiXray(World bukkitWorld) {
-        // Doesn't exist in this version.
+    public void removeAntiXray(org.bukkit.World bukkitWorld) {
+        if (!CHUNK_PACKET_BLOCK_CONTROLLER.isValid())
+            return;
+
+        ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
+        CHUNK_PACKET_BLOCK_CONTROLLER.set(serverLevel, ChunkPacketBlockController.NO_OPERATION_INSTANCE);
     }
 
     @Override
@@ -351,6 +360,11 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public WorldEditSession createEditSession(World world) {
         return WorldEditSessionImpl.obtain(((CraftWorld) world).getHandle());
+    }
+
+    @Override
+    public WorldEditSession createPartialEditSession(Dimension dimension) {
+        return WorldEditSessionImpl.obtain(dimension);
     }
 
     @Override

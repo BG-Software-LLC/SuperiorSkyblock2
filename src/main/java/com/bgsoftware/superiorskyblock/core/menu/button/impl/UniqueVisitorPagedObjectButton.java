@@ -9,10 +9,12 @@ import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandUniqueVisitors;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Date;
+import java.util.Locale;
 
 public class UniqueVisitorPagedObjectButton extends AbstractPagedMenuButton<MenuIslandUniqueVisitors.View, MenuIslandUniqueVisitors.UniqueVisitorInfo> {
 
@@ -38,9 +40,10 @@ public class UniqueVisitorPagedObjectButton extends AbstractPagedMenuButton<Menu
     public ItemStack modifyViewItem(ItemStack buttonItem) {
         SuperiorPlayer visitor = pagedObject.getVisitor();
         Island island = visitor.getIsland();
+        Locale locale = menuView.getInventoryViewer().getUserLocale();
 
-        String islandOwner = island != null ? island.getOwner().getName() : "None";
-        String islandName = island != null ? island.getName().isEmpty() ? islandOwner : island.getName() : "None";
+        String islandOwner = island != null ? island.getOwner().getName() : Message.ISLAND_OWNER_NONE.getMessage(locale);
+        String islandName = island != null ? island.getName().isEmpty() ? islandOwner : island.getName() : Message.ISLAND_NAME_NONE.getMessage(locale);
 
         return new ItemBuilder(buttonItem)
                 .replaceAll("{0}", visitor.getName())

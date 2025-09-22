@@ -5,9 +5,11 @@ import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -141,7 +143,7 @@ public interface SettingsManager {
     VisitorsSign getVisitorsSign();
 
     /**
-     * All settings related to the worlds of the plugin..
+     * All settings related to the worlds of the plugin.
      * Config path: worlds
      */
     Worlds getWorlds();
@@ -187,9 +189,9 @@ public interface SettingsManager {
     boolean isCoopDamage();
 
     /**
-     * The default amount of disbands players receive when they first join the server.
-     * If 0, then the disbands limit is disabled.
-     * Config-path: disband-count
+     * The default number of disbands players receive when they first join the server.
+     * If -1, then the disbands limit is disabled.
+     * Config-path: default-disband-count
      */
     int getDisbandCount();
 
@@ -251,8 +253,12 @@ public interface SettingsManager {
 
     /**
      * Whether inventory of island members should be cleared when their island is disbanded or not.
-     * Config-path: disband-inventory-clear
+     * Return true if clear-on-disband contains both ENDER_CHEST and INVENTORY.
+     * This method will be deleted in the future!
+     *
+     * @deprecated See {@link #getClearActionsOnDisband()}
      */
+    @Deprecated
     boolean isDisbandInventoryClear();
 
     /**
@@ -280,10 +286,44 @@ public interface SettingsManager {
     boolean isTeleportOnKick();
 
     /**
+     * Whether to teleport players to the spawn when they leave an island or not.
+     * Config-path: teleport-on-leave
+     */
+    boolean isTeleportOnLeave();
+
+    /**
      * Whether to clear players' inventories when they join a new island or not.
+     * Return true if clear-on-join contains both ENDER_CHEST and INVENTORY.
+     * This method will be deleted in the future!
+     *
+     * @deprecated See {@link #getClearActionsOnJoin()}
+     */
+    @Deprecated
+    boolean isClearOnJoin();
+
+    /**
+     * Get the list of clear actions to perform on island members when their island is disbanded.
+     * Config-path: clear-on-disband
+     */
+    List<ClearAction> getClearActionsOnDisband();
+
+    /**
+     * Get the list of clear actions to perform on players when they accept an invite.
      * Config-path: clear-on-join
      */
-    boolean isClearOnJoin();
+    List<ClearAction> getClearActionsOnJoin();
+
+    /**
+     * Get the list of clear actions to perform on players when they are kicked from their island.
+     * Config-path: clear-on-kick
+     */
+    List<ClearAction> getClearActionsOnKick();
+
+    /**
+     * Get the list of clear actions to perform on players when they leave an island.
+     * Config-path: clear-on-leave
+     */
+    List<ClearAction> getClearActionsOnLeave();
 
     /**
      * Whether players can rate their own island or not.
@@ -571,8 +611,17 @@ public interface SettingsManager {
      * List of preview-island locations.
      * Represented by a map with keys as schematic names, and values as locations for the preview islands.
      * Config-path: preview-islands
+     *
+     * @deprecated See {@link #getIslandPreviews()}
      */
+    @Deprecated
     Map<String, Location> getPreviewIslands();
+
+    /**
+     * All settings related to the island previews.
+     * Config path: island-previews
+     */
+    IslandPreviews getIslandPreviews();
 
     /**
      * Whether vanished players should be hidden from command tab completes or not.
@@ -683,6 +732,12 @@ public interface SettingsManager {
      * Config-path: commands-per-page
      */
     int getCommandsPerPage();
+
+    /**
+     * Whether the plugin should cache schematics for faster placement of schematics.
+     * Config-path: cache-schematics
+     */
+    boolean isCacheSchematics();
 
     interface Database {
 
@@ -1244,5 +1299,33 @@ public interface SettingsManager {
 
     }
 
+    interface IslandPreviews {
+
+        /**
+         * The game mode that will be set for the player when they enter preview mode.
+         * Config-path: island-previews.game-mode
+         */
+        GameMode getGameMode();
+
+        /**
+         * The maximum distance a player can move before the preview mode is canceled.
+         * Config-path: island-previews.max-distance
+         */
+        int getMaxDistance();
+
+        /**
+         * A list of commands that cannot be executed by players in preview mode.
+         * Config-path: island-previews.blocked-commands
+         */
+        List<String> getBlockedCommands();
+
+        /**
+         * List of island preview locations.
+         * Represented by a map with keys as schematic names, and values as locations for the preview islands.
+         * Config-path: island-previews.locations
+         */
+        Map<String, Location> getLocations();
+
+    }
 
 }

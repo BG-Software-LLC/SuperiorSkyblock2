@@ -11,7 +11,7 @@ mission-file: FarmingMissions
 # Whether the mission should be given when completing all requirements.
 auto-reward: true
 
-# Should block counts of players get reset when completing the mission?
+# Should plant counts of players get reset when completing the mission?
 reset-after-finish: true
 
 # Rewards given when completing the mission.
@@ -21,7 +21,7 @@ rewards:
     - 'is admin rankup %player% crop-growth'
     - 'is admin msg %player% &e&lFarmer | &7Successfully finished the mission Farmer V!'
     - 'is admin msg %player% &e&lFarmer | &7There is nothing you don''t know how to grow.'
-    - 'is admin msg %player% &e&lFarmer | &7&oYou are now a professional Framer, congratz!'
+    - 'is admin msg %player% &e&lFarmer | &7&oYou are now a professional Farmer, congratz!'
 
 # List of required missions that must be completed before completing this one.
 required-missions:
@@ -30,7 +30,7 @@ required-missions:
   - 'farmer_3'
   - 'farmer_4'
 
-# List of all required blocks must be gathered in order to complete the mission.
+# List of all required plants must be gathered in order to complete the mission.
 required-plants:
   '1':
     types:
@@ -46,21 +46,17 @@ required-plants:
     amount: 320
   '4':
     types:
-      - 'BEETROOT'
+      - 'PUMPKIN'
     amount: 320
   '5':
     types:
-      - 'PUMPKIN'
+      - 'MELON'
     amount: 320
   '6':
     types:
-      - 'MELON'
-    amount: 320
-  '7':
-    types:
       - 'SUGAR_CANE'
     amount: 320
-  '8':
+  '7':
     types:
       - 'CACTUS'
     amount: 320
@@ -75,8 +71,8 @@ icons:
       - '&7Plant 5 stacks of each crop.'
       - ''
       - '&6Required Plants:'
-      - '&8 - &7Carrots, Potatoes, Wheat, Beetroots,'
-      - '&8 - &7Pumpkins, Melons, Sugar Canes, Cactus'
+      - '&8 - &7Carrots, Potatoes, Wheat, Pumpkins'
+      - '&8 - &7Melons, Sugar Canes, Cactus'
       - ''
       - '&6Rewards:'
       - '&8 - &7$1,000,000'
@@ -85,13 +81,13 @@ icons:
       - '&6Grown Carrots: &7{value_carrot}/320'
       - '&6Grown Potatoes: &7{value_potato}/320'
       - '&6Grown Wheat: &7{value_wheat}/320'
-      - '&6Grown Beetroots: &7{value_beetroot}/320'
       - '&6Grown Pumpkins: &7{value_pumpkin}/320'
       - '&6Grown Melons: &7{value_melon}/320'
       - '&6Grown Sugar Canes: &7{value_sugar_cane}/320'
       - '&6Grown Cactus: &7{value_cactus}/320'
       - '&6Progress: &7{0}%'
       - '&c&l ✘ &7Not Completed'
+    amount: 5
   can-complete:
     type: PAPER
     name: '&aFarmer V'
@@ -100,8 +96,8 @@ icons:
       - '&7Plant 5 stacks of each crop.'
       - ''
       - '&6Required Plants:'
-      - '&8 - &7Carrots, Potatoes, Wheat, Beetroots,'
-      - '&8 - &7Pumpkins, Melons, Sugar Canes, Cactus'
+      - '&8 - &7Carrots, Potatoes, Wheat, Pumpkins'
+      - '&8 - &7Melons, Sugar Canes, Cactus'
       - ''
       - '&6Rewards:'
       - '&8 - &7$1,000,000'
@@ -110,17 +106,14 @@ icons:
       - '&6Grown Carrots: &7320/320'
       - '&6Grown Potatoes: &7320/320'
       - '&6Grown Wheat: &7320/320'
-      - '&6Grown Beetroots: &7320/320'
       - '&6Grown Pumpkins: &7320/320'
       - '&6Grown Melons: &7320/320'
       - '&6Grown Sugar Canes: &7320/320'
       - '&6Grown Cactus: &7320/320'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Click to redeem your reward.'
-    enchants:
-      DURABILITY: 1
-    flags:
-      - HIDE_ENCHANTS
+    amount: 5
+    glow: true
   completed:
     type: MAP
     name: '&aFarmer V'
@@ -135,10 +128,10 @@ icons:
       - '&6Grown Carrots: &7320/320'
       - '&6Grown Potatoes: &7320/320'
       - '&6Grown Wheat: &7320/320'
-      - '&6Grown Beetroots: &7320/320'
       - '&6Grown Pumpkins: &7320/320'
       - '&6Grown Melons: &7320/320'
       - '&6Grown Sugar Canes: &7320/320'
       - '&6Grown Cactus: &7320/320'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Already Claimed.'
+    amount: 5

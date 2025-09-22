@@ -5,7 +5,7 @@
 ##                                                  ##
 ######################################################
 
-title: '&lIsland Members'
+title: '&lIsland Members ({0}/{1})'
 previous-menu: true
 
 pattern:

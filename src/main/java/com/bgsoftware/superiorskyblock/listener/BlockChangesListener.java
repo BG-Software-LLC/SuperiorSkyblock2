@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
@@ -35,12 +36,14 @@ import org.bukkit.entity.Minecart;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class BlockChangesListener extends AbstractGameEventListener {
+
+    private static final Map<Material, Key> BUCKET_TO_KEY_CACHE = new ArrayMap<>();
 
     @Nullable
     private static final Material CHORUS_FLOWER = EnumHelper.getEnum(Material.class, "CHORUS_FLOWER");
@@ -51,6 +54,14 @@ public class BlockChangesListener extends AbstractGameEventListener {
     private static final int REGULAR_RECORD_FLAGS = WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS;
     @WorldRecordFlags
     private static final int ALL_RECORD_FLAGS = REGULAR_RECORD_FLAGS | WorldRecordFlags.HANDLE_NEARBY_BLOCKS;
+
+    static {
+        for (Material material : Material.values()) {
+            if (material.name().contains("_BUCKET")) {
+                BUCKET_TO_KEY_CACHE.put(material, getBlockKeyFromBucketMaterial(material));
+            }
+        }
+    }
 
     private final Collection<Location> alreadySpongeAbosrbCalled = AutoRemovalCollection.newArrayList(5L * 50, TimeUnit.MILLISECONDS);
 
@@ -70,6 +81,11 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
     private void onBlockPlace(GameEvent<GameEventArgs.BlockPlaceEvent> e) {
         Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
         BlockState replacedState = e.getArgs().replacedState;
 
         boolean shouldAvoidReplacedState = replacedState.equals(block.getState());
@@ -85,7 +101,11 @@ public class BlockChangesListener extends AbstractGameEventListener {
     private void onBucketEmpty(GameEvent<GameEventArgs.PlayerEmptyBucketEvent> e) {
         Material bucket = e.getArgs().bucket;
 
-        Key blockKey = Keys.ofMaterialAndData(bucket.name().replace("_BUCKET", ""));
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().clickedBlock.getWorld()))
+            return;
+
+        Key blockKey = BUCKET_TO_KEY_CACHE.computeIfAbsent(bucket, BlockChangesListener::getBlockKeyFromBucketMaterial);
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Block clickedBlock = e.getArgs().clickedBlock;
             this.worldRecordService.get().recordBlockPlace(blockKey,
@@ -95,6 +115,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
     }
 
     private void onStructureGrow(GameEvent<GameEventArgs.StructureGrowEvent> e) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().location.getWorld()))
+            return;
+
         KeyMap<Integer> placedBlockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         KeyMap<Integer> brokenBlockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         e.getArgs().blocks.forEach(blockState -> {
@@ -114,6 +138,11 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
     private void onBlockGrow(GameEvent<GameEventArgs.BlockGrowEvent> e) {
         Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
         BlockState newState = e.getArgs().newState;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -125,6 +154,11 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
     private void onBlockForm(GameEvent<GameEventArgs.BlockFormEvent> e) {
         Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
         BlockState newState = e.getArgs().newState;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -136,6 +170,11 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
     private void onBlockSpread(GameEvent<GameEventArgs.BlockSpreadEvent> e) {
         Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
         BlockState newState = e.getArgs().newState;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -149,6 +188,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
         Entity vehicle = e.getArgs().entity;
 
         if (!(vehicle instanceof Minecart))
+            return;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(vehicle.getWorld()))
             return;
 
         Key minecartBlockKey = getMinecartBlockKey(vehicle.getType());
@@ -171,6 +214,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
         ItemStack handItem = e.getArgs().usedItem;
 
         if (handItem == null)
+            return;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(clickedBlock.getWorld()))
             return;
 
         Material handItemType = handItem.getType();
@@ -196,8 +243,13 @@ public class BlockChangesListener extends AbstractGameEventListener {
     }
 
     private void onEntityChangeBlock(GameEvent<GameEventArgs.EntityChangeBlockEvent> e) {
-        Key newBlockKey = e.getArgs().newType;
         Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
+        Key newBlockKey = e.getArgs().newType;
         Key oldBlockKey = Keys.of(block);
 
         if (newBlockKey.equals(oldBlockKey))
@@ -222,15 +274,31 @@ public class BlockChangesListener extends AbstractGameEventListener {
     /* BLOCK BREAKS */
 
     private void onBlockBreak(GameEvent<GameEventArgs.BlockBreakEvent> e) {
-        this.worldRecordService.get().recordBlockBreak(e.getArgs().block, ALL_RECORD_FLAGS);
+        Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
+        this.worldRecordService.get().recordBlockBreak(block, ALL_RECORD_FLAGS);
     }
 
     private void onBlockDestroy(GameEvent<GameEventArgs.BlockDestroyEvent> e) {
-        this.worldRecordService.get().recordBlockBreak(e.getArgs().block, WorldRecordFlags.DIRTY_CHUNKS);
+        Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
+        this.worldRecordService.get().recordBlockBreak(block, WorldRecordFlags.DIRTY_CHUNKS);
     }
 
     private void onBucketFill(GameEvent<GameEventArgs.PlayerFillBucketEvent> e) {
         Block clickedBlock = e.getArgs().clickedBlock;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(clickedBlock.getWorld()))
+            return;
 
         boolean isWaterLogged = plugin.getNMSWorld().isWaterLogged(clickedBlock);
         if (isWaterLogged || clickedBlock.isLiquid()) {
@@ -244,26 +312,37 @@ public class BlockChangesListener extends AbstractGameEventListener {
     }
 
     private void onDragonEggDrop(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
-        if (!(e.getArgs().entity instanceof Item))
+        Entity entity = e.getArgs().entity;
+
+        if (!(entity instanceof Item))
             return;
 
-        Item item = (Item) e.getArgs().entity;
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
+            return;
 
-        if (item.getItemStack().getType() == Material.DRAGON_EGG) {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                for (Entity nearby : item.getNearbyEntities(2, 2, 2)) {
-                    if (nearby instanceof FallingBlock) {
-                        Key blockKey = plugin.getNMSAlgorithms().getFallingBlockType((FallingBlock) nearby);
-                        this.worldRecordService.get().recordBlockBreak(blockKey, nearby.getLocation(wrapper.getHandle()),
-                                1, WorldRecordFlags.SAVE_BLOCK_COUNT);
-                        return;
-                    }
+        Item item = (Item) entity;
+
+        if (item.getItemStack().getType() != Material.DRAGON_EGG)
+            return;
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            for (Entity nearby : item.getNearbyEntities(2, 2, 2)) {
+                if (nearby instanceof FallingBlock) {
+                    Key blockKey = plugin.getNMSAlgorithms().getFallingBlockType((FallingBlock) nearby);
+                    this.worldRecordService.get().recordBlockBreak(blockKey, nearby.getLocation(wrapper.getHandle()),
+                            1, WorldRecordFlags.SAVE_BLOCK_COUNT);
+                    return;
                 }
             }
         }
     }
 
     private void onPistonExtend(GameEvent<GameEventArgs.PistonExtendEvent> e) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().block.getWorld()))
+            return;
+
         for (Block block : e.getArgs().blocks) {
             if (plugin.getNMSWorld().getPistonReaction(block) == PistonPushReaction.DESTROY) {
                 this.worldRecordService.get().recordBlockBreak(block, 1, REGULAR_RECORD_FLAGS);
@@ -272,13 +351,25 @@ public class BlockChangesListener extends AbstractGameEventListener {
     }
 
     private void onLeavesDecay(GameEvent<GameEventArgs.LeavesDecayEvent> e) {
-        this.worldRecordService.get().recordBlockBreak(e.getArgs().block, 1, REGULAR_RECORD_FLAGS);
+        Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
+        this.worldRecordService.get().recordBlockBreak(block, 1, REGULAR_RECORD_FLAGS);
     }
 
     private void onBlockFromTo(GameEvent<GameEventArgs.BlockFromToEvent> e) {
+        Block block = e.getArgs().block;
+
         // Ignore dragon eggs, otherwise it will add +1 to the count of dragon eggs
         // when right-clicking them
-        if (e.getArgs().block.getType() == Material.DRAGON_EGG)
+        if (block.getType() == Material.DRAGON_EGG)
+            return;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
             return;
 
         Block toBlock = e.getArgs().toBlock;
@@ -294,8 +385,33 @@ public class BlockChangesListener extends AbstractGameEventListener {
         }
     }
 
+    private void onBlockFade(GameEvent<GameEventArgs.BlockFadeEvent> e) {
+        Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
+        BlockState newState = e.getArgs().newState;
+        if (newState.getType() == Material.AIR) {
+            this.worldRecordService.get().recordBlockBreak(block, REGULAR_RECORD_FLAGS);
+        } else {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                this.worldRecordService.get().recordBlockPlace(Keys.of(newState),
+                        newState.getLocation(wrapper.getHandle()),
+                        1,
+                        block.getState(),
+                        REGULAR_RECORD_FLAGS);
+            }
+        }
+    }
+
     private void onEntityExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
         Entity entity = e.getArgs().entity;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
+            return;
 
         KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         e.getArgs().blocks.forEach(block -> {
@@ -317,21 +433,14 @@ public class BlockChangesListener extends AbstractGameEventListener {
         }
     }
 
-    private void onMinecartBreak(GameEvent<GameEventArgs.EntityDeathEvent> e) {
-        Entity vehicle = e.getArgs().entity;
-
-        if (vehicle instanceof Minecart) {
-            Key blockKey = plugin.getNMSAlgorithms().getMinecartBlock((Minecart) vehicle);
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                this.worldRecordService.get().recordBlockBreak(blockKey, vehicle.getLocation(wrapper.getHandle()),
-                        1, REGULAR_RECORD_FLAGS);
-            }
-            vehicle.setMetadata("SSB-VehicleDestory", new FixedMetadataValue(plugin, true));
-        }
-    }
-
     private void onChorusHit(GameEvent<GameEventArgs.ProjectileHitEvent> e) {
-        BukkitEntities.getPlayerSource(e.getArgs().entity).ifPresent(shooter -> {
+        Entity entity = e.getArgs().entity;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
+            return;
+
+        BukkitEntities.getPlayerSource(entity).ifPresent(shooter -> {
             Block hitBlock = e.getArgs().hitBlock;
             if (hitBlock != null && hitBlock.getType() == CHORUS_FLOWER) {
                 this.worldRecordService.get().recordBlockBreak(hitBlock, 1, REGULAR_RECORD_FLAGS);
@@ -340,8 +449,13 @@ public class BlockChangesListener extends AbstractGameEventListener {
     }
 
     private void onSpongeAbsorb(GameEvent<GameEventArgs.SpongeAbsorbEvent> e) {
+        Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Block block = e.getArgs().block;
             Location location = block.getLocation(wrapper.getHandle());
 
             if (alreadySpongeAbosrbCalled.contains(location))
@@ -373,8 +487,8 @@ public class BlockChangesListener extends AbstractGameEventListener {
         registerCallback(GameEventType.PISTON_EXTEND_EVENT, GameEventPriority.MONITOR, this::onPistonExtend);
         registerCallback(GameEventType.LEAVES_DECAY_EVENT, GameEventPriority.MONITOR, this::onLeavesDecay);
         registerCallback(GameEventType.BLOCK_FROM_TO_EVENT, GameEventPriority.MONITOR, this::onBlockFromTo);
+        registerCallback(GameEventType.BLOCK_FADE_EVENT, GameEventPriority.MONITOR, this::onBlockFade);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.MONITOR, this::onEntityExplode);
-        registerCallback(GameEventType.ENTITY_DEATH_EVENT, GameEventPriority.MONITOR, this::onMinecartBreak);
         registerCallback(GameEventType.PROJECTILE_HIT_EVENT, GameEventPriority.MONITOR, this::onChorusHit);
         registerCallback(GameEventType.SPONGE_ABSORB_EVENT, GameEventPriority.MONITOR, this::onSpongeAbsorb);
     }
@@ -397,6 +511,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
         }
 
         return null;
+    }
+
+    private static Key getBlockKeyFromBucketMaterial(Material material) {
+        return Keys.ofMaterialAndData(material.name().replace("_BUCKET", ""));
     }
 
 }

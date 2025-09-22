@@ -46,23 +46,41 @@ import java.io.IOException;
  */
 public class DoubleTag extends NumberTag<Double> {
 
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagDouble");
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagDouble", double.class);
 
-    /**
-     * Creates the tag.
-     *
-     * @param value The value.
-     */
-    public DoubleTag(double value) {
-        super(value, CLASS, double.class);
+    private static final DoubleTag[] CACHE = new DoubleTag[100];
+
+    private DoubleTag(double value) {
+        super(value);
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeDouble(value);
+    }
+
+    @Override
+    protected NMSTagConverter getNMSConverter() {
+        return TAG_CONVERTER;
+    }
+
+    public static DoubleTag of(double value) {
+        if (value == (int) value && value >= 0 && value < CACHE.length) {
+            DoubleTag tag = CACHE[(int) value];
+            if (tag == null)
+                tag = CACHE[(int) value] = new DoubleTag(value);
+            return tag;
+        } else {
+            return new DoubleTag(value);
+        }
     }
 
     public static DoubleTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to DoubleTag!");
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to DoubleTag!");
 
         try {
             double value = plugin.getNMSTags().getNBTDoubleValue(tag);
-            return new DoubleTag(value);
+            return DoubleTag.of(value);
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while converting tag double from NMS:");
             return null;
@@ -70,12 +88,7 @@ public class DoubleTag extends NumberTag<Double> {
     }
 
     public static DoubleTag fromStream(DataInputStream is) throws IOException {
-        return new DoubleTag(is.readDouble());
-    }
-
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeDouble(value);
+        return DoubleTag.of(is.readDouble());
     }
 
 }

@@ -179,6 +179,7 @@ COMMAND_DESCRIPTION_ADMIN_DATA: 'Interact with persistent data of players or isl
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Dégrader un membre de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Déposer de l'argent sur le compte de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_DISBAND: Supprimer l'île d'un joueur.
+COMMAND_DESCRIPTION_ADMIN_FLY: 'Toggle island fly for a player.'
 COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: Donner des suppressions d'île à un joueur.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: Masquer une île du top des îles.
 COMMAND_DESCRIPTION_ADMIN_JOIN: Rejoindre une île sans invitation.
@@ -194,7 +195,10 @@ COMMAND_DESCRIPTION_ADMIN_PROMOTE: Promouvoir un membre d'une île.
 COMMAND_DESCRIPTION_ADMIN_RECALC: Re-calculer la valeur d'une île.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Recharger toutes les configurations du plugin.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Retirer la limite de bloc d'une île.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Suppimer toutes les notes attribuées par un joueur.
+COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
+COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Réinitialiser l'île d'un monde précis pour l'île spécifiée.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Créer des schematics pour le plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Définir la limite bancaire d'une île.
@@ -207,6 +211,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Définir le multiplicateur de croissa
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: Définir le nombre de suppression d'îles d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: Définir le niveau d'un effet d'île sur l'île du joueur spécifié.
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Définir la limite d'entités pour l'île du joueur spécifié.
+COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: Transférer une île à quelqu'un d'autre.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: Définir le multiplicateur de drops de mobs de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: Définir un rôle nécéssaire à une permission pour toutes les îles.
@@ -233,6 +238,7 @@ COMMAND_DESCRIPTION_ADMIN_WITHDRAW: Retirer de l'argent de la banque d'île d'un
 COMMAND_DESCRIPTION_BALANCE: Vérifier la quantité d'argent dans le coffre de l'île spécifiée.
 COMMAND_DESCRIPTION_BAN: Bannir un joueur de votre île.
 COMMAND_DESCRIPTION_BANK: Ouvrir la banque de l'île.
+COMMAND_DESCRIPTION_BANS: 'Open the bans menu.'
 COMMAND_DESCRIPTION_BIOME: Changer le biome de l'île.
 COMMAND_DESCRIPTION_BORDER: Changer la couleur de la bordure de l'île.
 COMMAND_DESCRIPTION_CHEST: Ouvrir le stockage communautaire de l'île.
@@ -490,13 +496,17 @@ ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |
   &e&lIle | &7{0}s:
   {1}
-ISLAND_INFO_VISITORS_COUNT: '&e&lIle | &7Nombre de visiteurs: {0}'
+ISLAND_INFO_VISITORS_COUNT: '&e&lIle | &7Nombre de visiteurs: {0} ({1} unique visitors)'
 ISLAND_INFO_WORTH: '&e&lIle | &7Valeur: {0}'
+ISLAND_NAME_NONE: None
 ISLAND_OPENED: '&e&lIle | &7L''île est désormais ouverte au public.'
+ISLAND_OWNER_NONE: None
+ISLAND_PREVIEW_BLOCK_COMMAND: '&c&lError | &7You cannot use that command in preview mode.'
 ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lPrévisualisation | &7Vous vous êtes trop éloigné(e). La prévisualisation à donc été désactivée.'
 ISLAND_PREVIEW_CANCEL: '&e&lPrévisualisation | &7Vous avez annulé(e) la prévisualisation.'
 ISLAND_PREVIEW_CONFIRM_TEXT: 'CONFIRMER'
 ISLAND_PREVIEW_CANCEL_TEXT: 'ANNULER'
+ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
 ISLAND_PREVIEW_START: |
   &e&lPrévisualisation | &7Vous avez débuté la prévisualisation de l'île {0}.
   &e&lPrévisualisation | &7Tapez &a&lCONFIRMER &7pour séléctionner cette île, ou &c&lANNULER &7pour annuler la prévisualisation.
@@ -573,7 +583,7 @@ NO_ISLANDS_TO_PURGE: '&c&lErreur | &7Il n''y a aucune îles à purger.'
 NO_BAN_PERMISSION: '&c&lErreur | &7Vous devez être {0} afin de bannir un joueur.'
 NO_CLOSE_BYPASS: '&c&lErreur | &7Cette île n''est pas ouverte au public.'
 NO_CLOSE_PERMISSION: '&c&lErreur | &7Vous devez être {0} afin de fermer cette.'
-NO_COMMAND_PERMISSION: '&8&l» &eCommande inconnue. Fais &c/help &epour afficher l''assistance.'
+NO_COMMAND_PERMISSION: '&c&lError | &7You don''t have permission to use that command. ({0})'
 NO_COOP_PERMISSION: '&c&lErreur | &7Vous devez être {0} afin d''ajouter des coopérateurs à l''île.'
 NO_DELETE_WARP_PERMISSION: '&c&lErreur | &7Vous devez être {0} afin de supprimer des warps.'
 NO_DEMOTE_PERMISSION: '&c&lErreur | &7Vous devez être {0} afin de rétrograder des joueurs.'
@@ -623,6 +633,9 @@ PERSISTENT_DATA_SHOW_PATH: '&b{0}&f: '
 PERSISTENT_DATA_SHOW_SPACER: '&f, '
 PERSISTENT_DATA_SHOW_VALUE: '&6{0}&c{1}&f'
 PERSISTENT_DATA_REMOVED: '&e&lData | &7Successfully removed data for {0} from path {1}.'
+PERMISSIONS_RESET: '&e&lIsland | &7Successfully reset all the permissions of {0}''s island to default values!'
+PERMISSIONS_RESET_ALL: '&e&lIsland | &7Successfully reset all the permissions of all the islands to default values!'
+PERMISSIONS_RESET_NAME: '&e&lIsland | &7Successfully reset all the permissions of the island {0} to default values!'
 PERMISSIONS_RESET_PLAYER: '&e&lIle | &7Réinitialisation de toutes les permissions de {0} !'
 PERMISSIONS_RESET_ROLES: '&e&lIle | &7Réinitialisation de toutes les permissions de l''île !'
 PLACEHOLDER_NO: 'No'
@@ -681,6 +694,10 @@ SET_UPGRADE_LEVEL: '&e&lAméliorations | &7Niveau de {0} augmenté sur l''île d
 SET_UPGRADE_LEVEL_NAME: '&e&lAméliorations | &7Niveau de {0} augmenté sur {1}.'
 SET_WARP: '&e&lIle | &7Nouveau warp crée au coordonnées {0}.'
 SET_WARP_OUTSIDE: '&c&lErreur | &7Vous ne pouvez pas définir de warps hors de votre île.'
+SETTINGS_RESET: '&e&lIsland | &7Successfully reset all the settings of {0}''s island to default values!'
+SETTINGS_RESET_ALL: '&e&lIsland | &7Successfully reset all the settings of all the islands to default values!'
+SETTINGS_RESET_NAME: '&e&lIsland | &7Successfully reset all the settings of the island {0} to default values!'
+SETTINGS_RESET_SELF: '&e&lIsland | &7Successfully reset all the settings of the island to default values!'
 SETTINGS_UPDATED: '&e&lIle | &7Paramètre {0} mit à jour pour l''île de {1}.'
 SETTINGS_UPDATED_NAME: '&e&lIle | &7Paramètre {0} mit à jour pour l''île {1}.'
 SETTINGS_UPDATED_ALL: '&e&lIle | &7Paramètre {0} mit à jour pour toutes les îles.'
@@ -707,6 +724,8 @@ TOGGLED_BYPASS_OFF: '&e&lBypass | &7Mode bypass &cDÉSACTIVÉ&7.'
 TOGGLED_BYPASS_ON: '&e&lBypass | &7Mode bypass &aACTIVÉ&7.'
 TOGGLED_FLY_OFF: '&e&lVol | &7Mode de fly d''île &cDÉSACTIVÉ&7.'
 TOGGLED_FLY_ON: '&e&lVol | &7Mode de fly d''île &aACTIVÉ&7.'
+TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
+TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
 TOGGLED_SCHEMATIC_OFF: '&e&lSchémas | &7Mode de création de schematics &cDÉSACTIVÉ&7.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lSchémas | &7Mode de création de schematics &aACTIVÉ&7.
@@ -738,6 +757,7 @@ UNSAFE_WARP: '&e&lIle | &7&oIl semblerait que ce warp ne soit pas sécurisé. Ve
 UPDATED_PERMISSION: '&e&lIle | &7Permission mise à jour pour {0}.'
 UPDATED_SETTINGS: '&e&lIle | &7Paramètre de l''île mit à jour {0}.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lErreur | &7Vous devez patienter {0} afin d''effectuer une nouvelle amélioration.'
+VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lErreur | &7Vous ne pouvez pas utiliser cette commande sur d''autres îles.'
 WARP_ALREADY_EXIST: '&c&lErreur | &7Un warp portant ce nom éxiste déjà.'
 WARP_CATEGORY_ICON_NEW_LORE: |

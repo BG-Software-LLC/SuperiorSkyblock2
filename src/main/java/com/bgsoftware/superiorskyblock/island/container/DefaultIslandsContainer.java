@@ -9,8 +9,10 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.IslandPosition;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
+import com.bgsoftware.superiorskyblock.core.collections.IslandPosition2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
@@ -24,6 +26,7 @@ import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
+import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -31,10 +34,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class DefaultIslandsContainer implements IslandsContainer {
 
-    private final Map<IslandPosition, Island> islandsByPositions = new ConcurrentHashMap<>();
+    private final Synchronized<IslandPosition2ObjectMap<Island>> islandsByPositions = Synchronized.of(new IslandPosition2ObjectMap<>());
     private final Map<UUID, Island> islandsByUUID = new ConcurrentHashMap<>();
     private final Map<String, Island> islandsByNames = new ConcurrentHashMap<>();
 
@@ -42,11 +47,12 @@ public class DefaultIslandsContainer implements IslandsContainer {
 
     private final EnumerateSet<SortingType> notifiedValues = new EnumerateSet<>(SortingType.values());
 
+    private final IslandsCache islandsCache = new IslandsCache();
+
     private final SuperiorSkyblockPlugin plugin;
 
     public DefaultIslandsContainer(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-
     }
 
     @Override
@@ -57,18 +63,25 @@ public class DefaultIslandsContainer implements IslandsContainer {
 
         Preconditions.checkNotNull(defaultWorld, "Default world information cannot be null!");
 
-        this.islandsByPositions.put(IslandPosition.of(defaultWorld.getName(), center.getX(), center.getZ(), false), island);
+        long packedPos = IslandPosition.calculatePackedPosFromLocation(center.getX(), center.getZ());
 
-        if (plugin.getProviders().hasCustomWorldsSupport()) {
-            // We don't know the logic of the custom worlds support, therefore we add a position
-            // for every possible world, so there won't be issues with detecting islands later.
-            for (Dimension dimension : Dimension.values()) {
-                if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
-                    runWithCustomWorld(defaultWorld, center, island, dimension,
-                            islandPosition -> this.islandsByPositions.put(islandPosition, island));
+        // Insert to cache if we can access it
+        accessIslandsCache(islandsCache -> islandsCache.insert(defaultWorld.getName(), packedPos, island));
+
+        this.islandsByPositions.write(islandsByPositions -> {
+            islandsByPositions.put(defaultWorld.getName(), packedPos, island);
+
+            if (plugin.getProviders().hasCustomWorldsSupport()) {
+                // We don't know the logic of the custom worlds support, therefore we add a position
+                // for every possible world, so there won't be issues with detecting islands later.
+                for (Dimension dimension : Dimension.values()) {
+                    if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
+                        runWithCustomWorld(defaultWorld, center, island, dimension, (worldName, customWorldPackedPos) ->
+                                islandsByPositions.put(worldName, customWorldPackedPos, island));
+                    }
                 }
             }
-        }
+        });
 
         this.islandsByUUID.put(island.getUniqueId(), island);
         this.islandsByNames.put(island.getStrippedName().toLowerCase(Locale.ENGLISH), island);
@@ -86,18 +99,22 @@ public class DefaultIslandsContainer implements IslandsContainer {
 
         Preconditions.checkNotNull(defaultWorld, "Default world information cannot be null!");
 
-        try (IslandPosition islandPosition = IslandPosition.of(defaultWorld.getName(), center.getX(), center.getZ())) {
-            this.islandsByPositions.remove(islandPosition, island);
-        }
+        long packedPos = IslandPosition.calculatePackedPosFromLocation(center.getX(), center.getZ());
 
-        if (plugin.getProviders().hasCustomWorldsSupport()) {
-            for (Dimension dimension : Dimension.values()) {
-                if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
-                    runWithCustomWorld(defaultWorld, center, island, dimension,
-                            islandPosition -> this.islandsByPositions.remove(islandPosition, island));
+        // Remove from cache if we can access it
+        accessIslandsCache(islandsCache -> islandsCache.remove(defaultWorld.getName(), packedPos));
+
+        this.islandsByPositions.write(islandsByPositions -> {
+            islandsByPositions.remove(defaultWorld.getName(), packedPos);
+
+            if (plugin.getProviders().hasCustomWorldsSupport()) {
+                for (Dimension dimension : Dimension.values()) {
+                    if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
+                        runWithCustomWorld(defaultWorld, center, island, dimension, islandsByPositions::remove);
+                    }
                 }
             }
-        }
+        });
 
         this.islandsByUUID.remove(island.getUniqueId());
         this.islandsByNames.remove(island.getStrippedName().toLowerCase(Locale.ENGLISH));
@@ -143,10 +160,11 @@ public class DefaultIslandsContainer implements IslandsContainer {
     @Nullable
     @Override
     public Island getIslandAt(Location location) {
-        Island island;
-        try (IslandPosition islandPosition = IslandPosition.of(location)) {
-            island = this.islandsByPositions.get(islandPosition);
-        }
+        long packedPos = IslandPosition.calculatePackedPosFromLocation(location.getBlockX(), location.getBlockZ());
+        String worldName = LazyWorldLocation.getWorldName(location);
+        Island island = readIslandsCache(islandsCache -> islandsCache.get(worldName, packedPos),
+                () -> this.islandsByPositions.readAndGet(islandsByPositions ->
+                        islandsByPositions.get(worldName, packedPos)));
         return island == null || !island.isInside(location) ? null : island;
     }
 
@@ -251,10 +269,72 @@ public class DefaultIslandsContainer implements IslandsContainer {
     }
 
     private void runWithCustomWorld(WorldInfo defaultWorld, BlockPosition center, Island island,
-                                    Dimension dimension, Consumer<IslandPosition> consumer) {
+                                    Dimension dimension, CustomWorldConsumer consumer) {
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
-        if (worldInfo != null && !worldInfo.equals(defaultWorld))
-            consumer.accept(IslandPosition.of(worldInfo.getName(), center.getX(), center.getZ(), false));
+        if (worldInfo != null && !worldInfo.equals(defaultWorld)) {
+            consumer.apply(worldInfo.getName(), IslandPosition.calculatePackedPosFromLocation(center.getX(), center.getZ()));
+        }
+    }
+
+    private void accessIslandsCache(Consumer<IslandsCache> consumer) {
+        if (Bukkit.isPrimaryThread()) {
+            consumer.accept(islandsCache);
+        }
+    }
+
+    private <R> R readIslandsCache(Function<IslandsCache, R> function, Supplier<R> onInvalidAccess) {
+        if (Bukkit.isPrimaryThread()) {
+            return function.apply(islandsCache);
+        }
+
+        return onInvalidAccess.get();
+    }
+
+    private interface CustomWorldConsumer {
+
+        void apply(String worldName, long packedPos);
+
+    }
+
+    private class IslandsCache {
+
+        // Implemented with CacheHolder so IslandPositions with no islands will not trigger access to global `islandsByPositions`
+        private final IslandPosition2ObjectMap<CacheHolder> islandsByPositionCache = new IslandPosition2ObjectMap<>();
+
+        @Nullable
+        private Island get(String worldName, long packedPos) {
+            CacheHolder holder = islandsByPositionCache.get(worldName, packedPos);
+            if (holder != null)
+                return holder.island.get();
+
+            Island island = islandsByPositions.readAndGet(islandsByPositions ->
+                    islandsByPositions.get(worldName, packedPos));
+
+            insert(worldName, packedPos, island);
+
+            return island;
+        }
+
+        private void insert(String worldName, long packedPos, @Nullable Island island) {
+            islandsByPositionCache.put(worldName, packedPos, island == null ? CacheHolder.NULL : new CacheHolder(island));
+        }
+
+        private void remove(String worldName, long packedPos) {
+            this.islandsByPositionCache.remove(worldName, packedPos);
+        }
+
+    }
+
+    private static class CacheHolder {
+
+        private static final CacheHolder NULL = new CacheHolder(null);
+
+        private final WeakReference<Island> island;
+
+        CacheHolder(Island island) {
+            this.island = new WeakReference<>(island);
+        }
+
     }
 
 }

@@ -77,6 +77,11 @@ public class MenuIslandVisitors extends AbstractPagedMenu<MenuIslandVisitors.Vie
         }
 
         @Override
+        public String replaceTitle(String title) {
+            return title.replace("{0}", String.valueOf(island.getIslandVisitors(false).size()));
+        }
+
+        @Override
         protected List<SuperiorPlayer> requestObjects() {
             return island.getIslandVisitors(false);
         }
@@ -105,7 +110,7 @@ public class MenuIslandVisitors extends AbstractPagedMenu<MenuIslandVisitors.Vie
 
         int charCounter = 0;
 
-        if (cfg.contains("visitors-panel.fill-items")) {
+        if (cfg.isConfigurationSection("visitors-panel.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("visitors-panel.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

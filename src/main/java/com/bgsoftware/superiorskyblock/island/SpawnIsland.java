@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -19,6 +20,7 @@ import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTracker
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
+import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -50,6 +52,7 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandEntitiesTrackerAlgorithm;
+import com.bgsoftware.superiorskyblock.island.cache.IslandCacheImpl;
 import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
@@ -122,6 +125,12 @@ public class SpawnIsland implements Island {
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
     private final DirtyChunksContainer dirtyChunksContainer;
+    private final LazyReference<IslandCache> islandCache = new LazyReference<IslandCache>() {
+        @Override
+        protected IslandCache create() {
+            return new IslandCacheImpl(SpawnIsland.this);
+        }
+    };
 
     private final BlockPosition center;
     private final World spawnWorld;
@@ -192,6 +201,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public IslandCache getCache() {
+        return this.islandCache.get();
+    }
+
+    @Override
     public List<SuperiorPlayer> getIslandMembers(boolean includeOwner) {
         return Collections.emptyList();
     }
@@ -257,7 +271,13 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public void kickMember(SuperiorPlayer superiorPlayer) {
+        // Do nothing.
+    }
+
+    @Override
+    public void removeMember(SuperiorPlayer superiorPlayer, MemberRemoveReason memberRemoveReason) {
         // Do nothing.
     }
 
@@ -1110,7 +1130,17 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void sendMessage(String message) {
+        // Do nothing.
+    }
+
+    @Override
     public void sendMessage(String message, UUID... ignoredMembers) {
+        // Do nothing.
+    }
+
+    @Override
+    public void sendMessage(IMessageComponent messageComponent) {
         // Do nothing.
     }
 
@@ -1120,12 +1150,27 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers) {
+        // Do nothing.
+    }
+
+    @Override
     public void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers, Object... args) {
         // Do nothing.
     }
 
     @Override
+    public void sendTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut) {
+        // Do nothing.
+    }
+
+    @Override
     public void sendTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers) {
+        // Do nothing.
+    }
+
+    @Override
+    public void executeCommand(String command, boolean onlyOnlineMembers) {
         // Do nothing.
     }
 
@@ -1706,6 +1751,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void removeEntityLimit(Key key) {
+        // Do nothing.
+    }
+
+    @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType) {
         return hasReachedEntityLimit(entityType, 1);
     }
@@ -1967,6 +2017,11 @@ public class SpawnIsland implements Island {
 
     @Override
     public void disableSettings(IslandFlag islandFlag) {
+        // Do nothing.
+    }
+
+    @Override
+    public void resetSettings() {
         // Do nothing.
     }
 

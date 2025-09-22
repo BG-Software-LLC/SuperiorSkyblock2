@@ -31,6 +31,7 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminDelWarp());
         registerCommand(new CmdAdminDemote());
         registerCommand(new CmdAdminDisband());
+        registerCommand(new CmdAdminFly());
         registerCommand(new CmdAdminIgnore());
         registerCommand(new CmdAdminJoin());
         registerCommand(new CmdAdminKick());
@@ -45,7 +46,10 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminRecalc());
         registerCommand(new CmdAdminReload());
         registerCommand(new CmdAdminRemoveBlockLimit());
+        registerCommand(new CmdAdminRemoveEntityLimit());
         registerCommand(new CmdAdminRemoveRatings());
+        registerCommand(new CmdAdminResetPermissions());
+        registerCommand(new CmdAdminResetSettings());
         registerCommand(new CmdAdminResetWorld());
         registerCommand(new CmdAdminSchematic());
         registerCommand(new CmdAdminSetBankLimit());
@@ -58,6 +62,7 @@ public class AdminCommandsMap extends CommandsMap {
             registerCommand(new CmdAdminSetCoopLimit());
         registerCommand(new CmdAdminSetDisbands());
         registerCommand(new CmdAdminSetEntityLimit());
+        registerCommand(new CmdAdminSetIslandPreview());
         registerCommand(new CmdAdminSetLeader());
         registerCommand(new CmdAdminSetPermission());
         registerCommand(new CmdAdminSetRate());

@@ -47,7 +47,7 @@ public class PlayersManagerImpl extends Manager implements PlayersManager {
     @Override
     public SuperiorPlayer getSuperiorPlayer(Player player) {
         Preconditions.checkNotNull(player, "player parameter cannot be null.");
-        return player.hasMetadata("NPC") ? new SuperiorNPCPlayer(player) : getSuperiorPlayer(player.getUniqueId());
+        return player.hasMetadata("NPC") ? SuperiorNPCPlayer.obtain(player) : getSuperiorPlayer(player.getUniqueId());
     }
 
     @Override

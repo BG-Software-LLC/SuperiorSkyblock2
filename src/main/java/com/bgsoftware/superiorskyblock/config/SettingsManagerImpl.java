@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.config.section.AFKIntegrationsSection;
 import com.bgsoftware.superiorskyblock.config.section.DatabaseSection;
@@ -15,6 +16,7 @@ import com.bgsoftware.superiorskyblock.config.section.DefaultValuesSection;
 import com.bgsoftware.superiorskyblock.config.section.GlobalSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandChestsSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandNamesSection;
+import com.bgsoftware.superiorskyblock.config.section.IslandPreviewsSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandRolesSection;
 import com.bgsoftware.superiorskyblock.config.section.SpawnSection;
 import com.bgsoftware.superiorskyblock.config.section.StackedBlocksSection;
@@ -25,6 +27,7 @@ import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -32,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +47,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     private static final String[] IGNORED_SECTIONS = new String[]{
             "config.yml", "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases",
-            "preview-islands", "default-values.block-limits", "default-values.entity-limits",
+            "island-previews.locations", "default-values.block-limits", "default-values.entity-limits",
             "default-values.role-limits", "stacked-blocks.limits", "default-values.generator"
     };
 
@@ -60,6 +64,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     private final AFKIntegrationsSection afkIntegrations = new AFKIntegrationsSection();
     private final DefaultContainersSection defaultContainers = new DefaultContainersSection();
     private final IslandChestsSection islandChests = new IslandChestsSection();
+    private final IslandPreviewsSection islandPreviews = new IslandPreviewsSection();
 
     public SettingsManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -274,7 +279,8 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public boolean isDisbandInventoryClear() {
-        return this.global.isDisbandInventoryClear();
+        List<ClearAction> clearActions = this.global.getClearActionsOnDisband();
+        return clearActions.contains(ClearActions.ENDER_CHEST) && clearActions.contains(ClearActions.INVENTORY);
     }
 
     @Override
@@ -298,8 +304,34 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public boolean isTeleportOnLeave() {
+        return this.global.isTeleportOnLeave();
+    }
+
+    @Override
     public boolean isClearOnJoin() {
-        return this.global.isClearOnJoin();
+        List<ClearAction> clearActions = this.global.getClearActionsOnJoin();
+        return clearActions.contains(ClearActions.ENDER_CHEST) && clearActions.contains(ClearActions.INVENTORY);
+    }
+
+    @Override
+    public List<ClearAction> getClearActionsOnDisband() {
+        return this.global.getClearActionsOnDisband();
+    }
+
+    @Override
+    public List<ClearAction> getClearActionsOnJoin() {
+        return this.global.getClearActionsOnJoin();
+    }
+
+    @Override
+    public List<ClearAction> getClearActionsOnKick() {
+        return this.global.getClearActionsOnKick();
+    }
+
+    @Override
+    public List<ClearAction> getClearActionsOnLeave() {
+        return this.global.getClearActionsOnLeave();
     }
 
     @Override
@@ -394,7 +426,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public long getVisitWarmup() {
-        return this.global.getHomeWarmup();
+        return this.global.getVisitWarmup();
     }
 
     @Override
@@ -528,8 +560,14 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    @Deprecated
     public Map<String, Location> getPreviewIslands() {
-        return this.global.getPreviewIslands();
+        return this.islandPreviews.getLocations();
+    }
+
+    @Override
+    public IslandPreviewsSection getIslandPreviews() {
+        return this.islandPreviews;
     }
 
     @Override
@@ -622,6 +660,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         return this.global.getCommandsPerPage();
     }
 
+    @Override
+    public boolean isCacheSchematics() {
+        return this.global.isCacheSchematics();
+    }
+
     public void updateValue(String path, Object value) throws IOException {
         File file = new File(plugin.getDataFolder(), "config.yml");
 
@@ -630,7 +673,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         cfg.syncWithConfig(file, plugin.getResource("config.yml"), "config.yml",
-                "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "preview-islands");
+                "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "island-previews.locations");
 
         cfg.set(path, value);
 
@@ -658,14 +701,38 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         this.afkIntegrations.setContainer(container);
         this.defaultContainers.setContainer(container);
         this.islandChests.setContainer(container);
+        this.islandPreviews.setContainer(container);
     }
 
     private void convertData(YamlConfiguration cfg) {
-        if (cfg.contains("default-hoppers-limit")) {
+        if (cfg.isConfigurationSection("preview-islands")) {
+            cfg.set("island-previews.locations", cfg.getConfigurationSection("preview-islands"));
+            cfg.set("preview-islands", null);
+        }
+        if (cfg.isBoolean("disband-inventory-clear")) {
+            if (cfg.getBoolean("disband-inventory-clear")) {
+                cfg.set("clear-on-disband", Arrays.asList("ENDER_CHEST", "INVENTORY"));
+            } else {
+                cfg.set("clear-on-disband", Collections.emptyList());
+            }
+            cfg.set("disband-inventory-clear", null);
+        }
+        if (cfg.isBoolean("clear-on-join")) {
+            if (cfg.getBoolean("disband-inventory-clear")) {
+                cfg.set("clear-on-join", Arrays.asList("ENDER_CHEST", "INVENTORY"));
+            } else {
+                cfg.set("clear-on-join", Collections.emptyList());
+            }
+        }
+        if (cfg.isInt("disband-count")) {
+            cfg.set("default-disband-count", cfg.getInt("disband-count") == 0 ? -1 : cfg.getInt("disband-count"));
+            cfg.set("disband-count", null);
+        }
+        if (cfg.isInt("default-hoppers-limit")) {
             cfg.set("default-limits", Collections.singletonList("HOPPER:" + cfg.getInt("default-hoppers-limit")));
             cfg.set("default-hoppers-limit", null);
         }
-        if (cfg.contains("default-permissions")) {
+        if (cfg.isConfigurationSection("default-permissions")) {
             cfg.set("island-roles.guest.name", "Guest");
             cfg.set("island-roles.guest.permissions", cfg.getStringList("default-permissions.guest"));
             cfg.set("island-roles.ladder.member.name", "Member");
@@ -681,45 +748,45 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
             cfg.set("island-roles.ladder.leader.weight", 3);
             cfg.set("island-roles.ladder.leader.permissions", cfg.getStringList("default-permissions.leader"));
         }
-        if (cfg.contains("spawn-location"))
+        if (cfg.isString("spawn-location"))
             cfg.set("spawn.location", cfg.getString("spawn-location"));
-        if (cfg.contains("spawn-protection"))
+        if (cfg.isBoolean("spawn-protection"))
             cfg.set("spawn.protection", cfg.getBoolean("spawn-protection"));
         if (cfg.getBoolean("spawn-pvp", false))
             cfg.set("spawn.settings", Collections.singletonList("PVP"));
-        if (cfg.contains("island-world"))
+        if (cfg.isString("island-world"))
             cfg.set("worlds.normal-world", cfg.getString("island-world"));
-        if (cfg.contains("welcome-sign-line"))
+        if (cfg.isString("welcome-sign-line"))
             cfg.set("visitors-sign.line", cfg.getString("welcome-sign-line"));
-        if (cfg.contains("island-roles.ladder")) {
+        if (cfg.isConfigurationSection("island-roles.ladder")) {
             for (String name : cfg.getConfigurationSection("island-roles.ladder").getKeys(false)) {
-                if (!cfg.contains("island-roles.ladder." + name + ".id"))
+                if (!cfg.isInt("island-roles.ladder." + name + ".id"))
                     cfg.set("island-roles.ladder." + name + ".id", cfg.getInt("island-roles.ladder." + name + ".weight"));
             }
         }
-        if (cfg.contains("default-island-size"))
+        if (cfg.isInt("default-island-size"))
             cfg.set("default-values.island-size", cfg.getInt("default-island-size"));
-        if (cfg.contains("default-limits"))
+        if (cfg.isList("default-limits"))
             cfg.set("default-values.block-limits", cfg.getStringList("default-limits"));
-        if (cfg.contains("default-entity-limits"))
+        if (cfg.isList("default-entity-limits"))
             cfg.set("default-values.entity-limits", cfg.getStringList("default-entity-limits"));
-        if (cfg.contains("default-warps-limit"))
+        if (cfg.isInt("default-warps-limit"))
             cfg.set("default-values.warps-limit", cfg.getInt("default-warps-limit"));
-        if (cfg.contains("default-team-limit"))
+        if (cfg.isInt("default-team-limit"))
             cfg.set("default-values.team-limit", cfg.getInt("default-team-limit"));
-        if (cfg.contains("default-crop-growth"))
+        if (cfg.isInt("default-crop-growth"))
             cfg.set("default-values.crop-growth", cfg.getInt("default-crop-growth"));
-        if (cfg.contains("default-spawner-rates"))
+        if (cfg.isInt("default-spawner-rates"))
             cfg.set("default-values.spawner-rates", cfg.getInt("default-spawner-rates"));
-        if (cfg.contains("default-mob-drops"))
+        if (cfg.isInt("default-mob-drops"))
             cfg.set("default-values.mob-drops", cfg.getInt("default-mob-drops"));
-        if (cfg.contains("default-island-height"))
+        if (cfg.isInt("default-island-height"))
             cfg.set("islands-height", cfg.getInt("default-island-height"));
-        if (cfg.contains("starter-chest")) {
+        if (cfg.isConfigurationSection("starter-chest")) {
             cfg.set("default-containers.enabled", cfg.getBoolean("starter-chest.enabled"));
             cfg.set("default-containers.containers.chest", cfg.getConfigurationSection("starter-chest.contents"));
         }
-        if (cfg.contains("default-generator"))
+        if (cfg.isList("default-generator"))
             cfg.set("default-values.generator", cfg.getStringList("default-generator"));
         if (cfg.isBoolean("void-teleport")) {
             boolean voidTeleport = cfg.getBoolean("void-teleport");
@@ -728,27 +795,27 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         }
         if (cfg.isBoolean("sync-worth"))
             cfg.set("sync-worth", cfg.getBoolean("sync-worth") ? "BUY" : "NONE");
-        if (!cfg.contains("worlds.nether")) {
+        if (!cfg.isConfigurationSection("worlds.nether")) {
             cfg.set("worlds.nether.enabled", cfg.getBoolean("worlds.nether-world"));
             cfg.set("worlds.nether.unlock", cfg.getBoolean("worlds.nether-unlock"));
         }
-        if (!cfg.contains("worlds.end")) {
+        if (!cfg.isConfigurationSection("worlds.end")) {
             cfg.set("worlds.end.enabled", cfg.getBoolean("worlds.end-world"));
             cfg.set("worlds.end.unlock", cfg.getBoolean("worlds.end-unlock"));
         }
-        if (cfg.contains("worlds.normal-world")) {
+        if (cfg.isString("worlds.normal-world")) {
             cfg.set("worlds.world-name", cfg.getString("worlds.normal-world"));
             cfg.set("worlds.normal-world", null);
         }
         if (cfg.isBoolean("worlds.end.dragon-fight")) {
             cfg.set("worlds.end.dragon-fight.enabled", cfg.getBoolean("worlds.end.dragon-fight"));
         }
-        if (!cfg.contains("default-values.island-effects"))
+        if (!cfg.isConfigurationSection("default-values.island-effects"))
             cfg.createSection("default-values.island-effects");
     }
 
     private void convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg) {
-        if (!cfg.contains("interactables"))
+        if (!cfg.isList("interactables"))
             return;
 
         File file = new File(plugin.getDataFolder(), "interactables.yml");

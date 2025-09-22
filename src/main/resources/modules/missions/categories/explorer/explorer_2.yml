@@ -11,9 +11,6 @@ mission-file: IslandMissions
 # Whether the mission should be given when completing all requirements.
 auto-reward: true
 
-# Should block counts of players get reset when completing the mission?
-reset-after-finish: true
-
 # Rewards given when completing the mission.
 rewards:
   commands:
@@ -54,10 +51,7 @@ icons:
       - '&8 - &7$150,000'
       - ''
       - '&a&l ✔ &7Click to redeem your reward.'
-    enchants:
-      DURABILITY: 1
-    flags:
-      - HIDE_ENCHANTS
+    glow: true
   completed:
     type: MAP
     name: '&aThe-End Explorer'

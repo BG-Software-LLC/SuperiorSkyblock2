@@ -69,6 +69,7 @@ icons:
       - '&6Iron Ore Mined: &7{value_iron_ore}/16'
       - '&6Progress: &7{0}%'
       - '&c&l ✘ &7Not Completed'
+    amount: 2
   can-complete:
     type: PAPER
     name: '&aMiner II'
@@ -90,10 +91,8 @@ icons:
       - '&6Iron Ore Mined: &716/16'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Click to redeem your reward.'
-    enchants:
-      DURABILITY: 1
-    flags:
-      - HIDE_ENCHANTS
+    amount: 2
+    glow: true
   completed:
     type: MAP
     name: '&aMiner II'
@@ -110,3 +109,4 @@ icons:
       - '&6Iron Ore Mined: &716/16'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Already Claimed.'
+    amount: 2

@@ -73,9 +73,11 @@ public class CmdVisit implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Dimension dimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
 
-        IslandWorlds.accessIslandWorldAsync(targetIsland, dimension, true, islandWorldResult -> {
-            islandWorldResult.ifLeft(world -> teleportPlayerInternal(targetIsland, superiorPlayer));
-        });
+        if (!PluginEventsFactory.callIslandVisitorHomeTeleportEvent(targetIsland, superiorPlayer, dimension))
+            return;
+
+        IslandWorlds.accessIslandWorldAsync(targetIsland, dimension, true, islandWorldResult ->
+                islandWorldResult.ifLeft(world -> teleportPlayerInternal(targetIsland, superiorPlayer)));
     }
 
     @Override
@@ -119,10 +121,9 @@ public class CmdVisit implements ISuperiorCommand {
 
         Location finalVisitLocation = visitLocation;
 
-        EntityTeleports.warmupTeleport(superiorPlayer, plugin.getSettings().getVisitWarmup(), afterWarmup -> {
-            teleportPlayerNoWarmup(superiorPlayer, targetIsland, finalVisitLocation, isVisitorSign,
-                    afterWarmup /*checkIslandLock*/, true);
-        });
+        EntityTeleports.warmupTeleport(superiorPlayer, plugin.getSettings().getVisitWarmup(), afterWarmup ->
+                teleportPlayerNoWarmup(superiorPlayer, targetIsland, finalVisitLocation,
+                        isVisitorSign, afterWarmup /*checkIslandLock*/, true));
     }
 
     private static void teleportPlayerNoWarmup(SuperiorPlayer superiorPlayer, Island island, Location visitLocation,

@@ -23,6 +23,8 @@ import java.util.Map;
 
 public class SuperiorSchematicDeserializer {
 
+    private static final ListTag EMPTY_ITEMS_LIST = ListTag.of(Collections.emptyList());
+
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final EnumMap<BlockFace, Byte> rotationToByte = Maps.newEnumMap(BlockFace.class);
@@ -50,150 +52,99 @@ public class SuperiorSchematicDeserializer {
     }
 
     public static void convertOldTileEntity(CompoundTag compoundTag) {
-        CompoundTag tileEntity = new CompoundTag();
+        CompoundTag tileEntity = CompoundTag.of();
 
-        {
-            String baseColor = compoundTag.getString("baseColor");
-            if (baseColor != null)
-                //noinspection deprecation
-                tileEntity.setInt("Base", DyeColor.valueOf(baseColor).getDyeData());
-        }
+        compoundTag.getString("baseColor").ifPresent(baseColor ->
+                tileEntity.setInt("Base", DyeColor.valueOf(baseColor).getDyeData()));
 
-        {
-            CompoundTag patterns = compoundTag.getCompound("patterns");
-            if (patterns != null) {
-                ListTag patternsList = new ListTag(CompoundTag.class, Collections.emptyList());
+        compoundTag.getCompound("patterns").ifPresent(patterns -> {
+            ListTag patternsList = ListTag.of(CompoundTag.class);
 
-                for (Tag<?> tag : patterns) {
-                    if (tag instanceof CompoundTag) {
-                        CompoundTag oldPatternTag = (CompoundTag) tag;
-                        CompoundTag patternTag = new CompoundTag();
-                        patternTag.setInt("Color", oldPatternTag.getInt("color"));
-                        patternTag.setString("Pattern", oldPatternTag.getString("type"));
-                        patternsList.addTag(patternTag);
+            for (Tag<?> tag : patterns) {
+                if (tag instanceof CompoundTag) {
+                    CompoundTag oldPatternTag = (CompoundTag) tag;
+                    CompoundTag patternTag = CompoundTag.of();
+                    patternTag.setInt("Color", oldPatternTag.getInt("color").orElse(0));
+                    patternTag.setString("Pattern", oldPatternTag.getString("type").orElse(""));
+                    patternsList.addTag(patternTag);
+                }
+            }
+
+            tileEntity.setTag("Patterns", patternsList);
+        });
+
+        compoundTag.getCompound("contents").ifPresent(contents -> {
+            ListTag items = ListTag.of(CompoundTag.class);
+            for (Map.Entry<String, Tag<?>> item : contents.entrySet()) {
+                if (item.getValue() instanceof CompoundTag) {
+                    try {
+                        ItemStack itemStack = Serializers.ITEM_STACK_TO_TAG_SERIALIZER.deserialize((CompoundTag) item.getValue());
+                        CompoundTag itemCompound = plugin.getNMSTags().serializeItem(itemStack);
+                        itemCompound.setByte("Slot", Byte.parseByte(item.getKey()));
+                        items.addTag(itemCompound);
+                    } catch (Exception ignored) {
                     }
                 }
-
-                tileEntity.setTag("Patterns", patternsList);
             }
+
+            tileEntity.setTag("Items", items);
+
+            String inventoryType = compoundTag.getString("inventoryType").orElse("CHEST");
+            tileEntity.setString("inventoryType", inventoryType);
+        });
+
+        compoundTag.getString("flower").ifPresent(flower -> {
+            try {
+                String[] flowerSections = flower.split(":");
+                tileEntity.setString("Item", plugin.getNMSAlgorithms().getMinecraftKey(new ItemStack(Material.valueOf(flowerSections[0]))));
+                tileEntity.setInt("Data", Integer.parseInt(flowerSections[1]));
+            } catch (Exception ignored) {
+            }
+        });
+
+        compoundTag.getString("skullType").ifPresent(skullType ->
+                tileEntity.setByte("SkullType", (byte) (SkullType.valueOf(skullType).ordinal() - 1)));
+
+        compoundTag.getString("rotation").ifPresent(rotation ->
+                tileEntity.setByte("Rot", rotationToByte.getOrDefault(BlockFace.valueOf(rotation), (byte) 0)));
+
+        compoundTag.getString("owner").ifPresent(owner ->
+                tileEntity.setString("Name", owner));
+
+        for (int i = 0; i < 4; ++i) {
+            final String textLineKey = "Text" + (i + 1);
+            compoundTag.getString("signLine" + i).ifPresent(signLine ->
+                    tileEntity.setString(textLineKey, plugin.getNMSAlgorithms().parseSignLine(signLine)));
         }
 
-        {
-            CompoundTag contents = compoundTag.getCompound("contents");
-            if (contents != null) {
-                ListTag items = new ListTag(CompoundTag.class, Collections.emptyList());
-                for (Map.Entry<String, Tag<?>> item : contents.entrySet()) {
-                    if (item.getValue() instanceof CompoundTag) {
-                        try {
-                            ItemStack itemStack = Serializers.ITEM_STACK_TO_TAG_SERIALIZER.deserialize((CompoundTag) item.getValue());
-                            CompoundTag itemCompound = plugin.getNMSTags().serializeItem(itemStack);
-                            itemCompound.setByte("Slot", Byte.parseByte(item.getKey()));
-                            items.addTag(itemCompound);
-                        } catch (Exception ignored) {
-                        }
-                    }
-                }
+        compoundTag.getString("spawnedType").ifPresent(spawnedType ->
+                tileEntity.setString("EntityId", spawnedType));
 
-                tileEntity.setTag("Items", items);
-
-                String inventoryType = compoundTag.getString("inventoryType");
-                tileEntity.setString("inventoryType", inventoryType != null ? inventoryType : "CHEST");
-            }
-        }
-
-        {
-            String flower = compoundTag.getString("flower");
-            if (flower != null) {
-                try {
-                    String[] flowerSections = flower.split(":");
-                    tileEntity.setString("Item", plugin.getNMSAlgorithms().getMinecraftKey(new ItemStack(Material.valueOf(flowerSections[0]))));
-                    tileEntity.setInt("Data", Integer.parseInt(flowerSections[1]));
-                } catch (Exception ignored) {
-                }
-            }
-        }
-
-        {
-            String skullType = compoundTag.getString("skullType");
-            if (skullType != null) {
-                tileEntity.setByte("SkullType", (byte) (SkullType.valueOf(skullType).ordinal() - 1));
-            }
-        }
-
-        {
-            String rotation = compoundTag.getString("rotation");
-            if (rotation != null) {
-                tileEntity.setByte("Rot", rotationToByte.getOrDefault(BlockFace.valueOf(rotation), (byte) 0));
-            }
-        }
-
-        {
-            String owner = compoundTag.getString("owner");
-            if (owner != null) {
-                tileEntity.setString("Name", owner);
-            }
-        }
-
-        {
-            String signLine0 = compoundTag.getString("signLine0");
-            if (signLine0 != null) {
-                tileEntity.setString("Text1", plugin.getNMSAlgorithms().parseSignLine(signLine0));
-            }
-        }
-
-        {
-            String signLine1 = compoundTag.getString("signLine1");
-            if (signLine1 != null) {
-                tileEntity.setString("Text2", plugin.getNMSAlgorithms().parseSignLine(signLine1));
-            }
-        }
-
-        {
-            String signLine2 = compoundTag.getString("signLine2");
-            if (signLine2 != null) {
-                tileEntity.setString("Text3", plugin.getNMSAlgorithms().parseSignLine(signLine2));
-            }
-        }
-
-        {
-            String signLine3 = compoundTag.getString("signLine3");
-            if (signLine3 != null) {
-                tileEntity.setString("Text4", plugin.getNMSAlgorithms().parseSignLine(signLine3));
-            }
-        }
-
-        {
-            String spawnedType = compoundTag.getString("spawnedType");
-            if (spawnedType != null) {
-                tileEntity.setString("EntityId", spawnedType);
-            }
-        }
-
-        if (tileEntity.size() != 0)
+        if (!tileEntity.isEmpty())
             compoundTag.setTag("tileEntity", tileEntity);
     }
 
     @Nullable
     public static SchematicBlockData deserializeSchematicBlock(CompoundTag compoundTag, int dataVersion) {
-        BlockOffset blockOffset = Serializers.OFFSET_SERIALIZER.deserialize(compoundTag.getString("blockPosition"));
+        BlockOffset blockOffset = Serializers.OFFSET_SERIALIZER.deserialize(compoundTag.getString("blockPosition").orElse(null));
         int combinedId;
 
         if (compoundTag.containsKey("combinedId")) {
-            combinedId = compoundTag.getInt("combinedId");
+            combinedId = compoundTag.getInt("combinedId").getAsInt();
         } else if (compoundTag.containsKey("id") && compoundTag.containsKey("data")) {
-            int id = compoundTag.getInt("id");
-            int data = compoundTag.getInt("data");
+            int id = compoundTag.getInt("id").getAsInt();
+            int data = compoundTag.getInt("data").getAsInt();
             combinedId = id + (data << 12);
         } else if (compoundTag.containsKey("type")) {
             Material type;
 
             try {
-                type = Material.valueOf(compoundTag.getString("type"));
+                type = Material.valueOf(compoundTag.getString("type").get());
             } catch (Exception ignored) {
                 return null;
             }
 
-            int data = compoundTag.getInt("data");
+            int data = compoundTag.getInt("data").orElse(0);
 
             combinedId = plugin.getNMSAlgorithms().getCombinedId(type, (byte) data);
         } else {
@@ -223,8 +174,8 @@ public class SuperiorSchematicDeserializer {
         // byte skyLightLevel = compoundTag.getByte("skyLightLevel");
         // byte blockLightLevel = compoundTag.getByte("blockLightLevel");
 
-        CompoundTag statesTag = compoundTag.getCompound("states");
-        CompoundTag tileEntity = compoundTag.getCompound("tileEntity");
+        CompoundTag statesTag = compoundTag.getCompound("states").orElse(null);
+        CompoundTag tileEntity = compoundTag.getCompound("tileEntity").orElse(null);
         tileEntity = SuperiorSchematicDeserializer.upgradeTileEntity(tileEntity, dataVersion);
 
         return statesTag == null && tileEntity == null ? null : new SchematicBlock.Extra(statesTag, tileEntity);
@@ -240,14 +191,14 @@ public class SuperiorSchematicDeserializer {
             return compoundTag;
 
         // Convert chest contents
-        ListTag itemsTag = compoundTag.getList("Items");
-        if (itemsTag != null && itemsTag.size() > 0) {
-            ListTag newItemsTag = new ListTag(CompoundTag.class, Collections.emptyList());
+        ListTag itemsTag = compoundTag.getList("Items").orElse(EMPTY_ITEMS_LIST);
+        if (itemsTag.size() > 0) {
+            ListTag newItemsTag = ListTag.of(CompoundTag.class);
 
             for (Tag<?> tag : itemsTag) {
                 if (tag instanceof CompoundTag) {
                     CompoundTag itemTag = (CompoundTag) tag;
-                    int slot = itemTag.getInt("Slot");
+                    int slot = itemTag.getInt("Slot").orElse(0);
                     itemTag.setInt("DataVersion", dataVersion);
                     ItemStack itemStack = Serializers.ITEM_STACK_TO_TAG_SERIALIZER.deserialize(itemTag);
                     CompoundTag newItemTag = Serializers.ITEM_STACK_TO_TAG_SERIALIZER.serialize(itemStack);

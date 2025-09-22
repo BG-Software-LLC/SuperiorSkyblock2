@@ -42,6 +42,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Biome;
@@ -59,13 +60,20 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemRarity;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ArmorMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.trim.ArmorTrim;
+import org.bukkit.inventory.meta.trim.TrimMaterial;
+import org.bukkit.inventory.meta.trim.TrimPattern;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumMap;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
@@ -217,6 +225,34 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public void setCustomModel(ItemMeta itemMeta, int customModel) {
         itemMeta.setCustomModelData(customModel);
+    }
+
+    @Override
+    public void setItemModel(ItemMeta itemMeta, String itemModel) {
+        itemMeta.setItemModel(NamespacedKey.fromString(itemModel));
+    }
+
+    @Override
+    public void setRarity(ItemMeta itemMeta, String rarity) {
+        itemMeta.setRarity(ItemRarity.valueOf(rarity));
+    }
+
+    @Override
+    public void setTrim(ItemMeta itemMeta, String trimMaterial, String trimPattern) {
+        if (itemMeta instanceof ArmorMeta armorMeta) {
+            TrimMaterial material = Objects.requireNonNull(Bukkit.getRegistry(TrimMaterial.class)).get(NamespacedKey.minecraft(trimMaterial));
+            TrimPattern pattern = Objects.requireNonNull(Bukkit.getRegistry(TrimPattern.class)).get(NamespacedKey.minecraft(trimPattern));
+
+            if (material == null)
+                throw new IllegalArgumentException("Couldn't convert " + trimMaterial.toUpperCase(Locale.ENGLISH) +
+                        " into trim material, skipping...");
+            if (pattern == null)
+                throw new IllegalArgumentException("Couldn't convert " + trimPattern.toUpperCase(Locale.ENGLISH) +
+                        " into trim pattern, skipping...");
+
+            ArmorTrim armorTrim = new ArmorTrim(material, pattern);
+            armorMeta.setTrim(armorTrim);
+        }
     }
 
     @Override

@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.MemberRoleButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
-import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.PlayerViewArgs;
 import com.bgsoftware.superiorskyblock.core.menu.view.impl.PlayerMenuView;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
@@ -111,12 +110,12 @@ public class MenuMemberRole extends AbstractMenu<PlayerMenuView, PlayerViewArgs>
 
         int charCounter = 0;
 
-        if (cfg.contains("roles-panel.fill-items")) {
+        if (cfg.isConfigurationSection("roles-panel.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("roles-panel.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        if (cfg.contains("roles-panel.roles")) {
+        if (cfg.isConfigurationSection("roles-panel.roles")) {
             for (String roleName : cfg.getConfigurationSection("roles-panel.roles").getKeys(false)) {
                 ConfigurationSection section = cfg.getConfigurationSection("roles-panel.roles." + roleName);
                 char itemChar = AbstractMenuLayout.BUTTON_SYMBOLS[charCounter++];

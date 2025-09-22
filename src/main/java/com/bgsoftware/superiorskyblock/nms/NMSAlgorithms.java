@@ -60,6 +60,12 @@ public interface NMSAlgorithms {
 
     void setCustomModel(ItemMeta itemMeta, int customModel);
 
+    void setItemModel(ItemMeta itemMeta, String itemModel);
+
+    void setRarity(ItemMeta itemMeta, String rarity) throws IllegalArgumentException;
+
+    void setTrim(ItemMeta itemMeta, String trimMaterial, String trimPattern) throws IllegalArgumentException;
+
     void addPotion(PotionMeta potionMeta, PotionEffect potionEffect);
 
     String getMinecraftKey(ItemStack itemStack);

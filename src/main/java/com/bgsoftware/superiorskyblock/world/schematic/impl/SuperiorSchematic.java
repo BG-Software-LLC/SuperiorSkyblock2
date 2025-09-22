@@ -60,19 +60,19 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
     public SuperiorSchematic(String name, CompoundTag compoundTag) {
         super(name);
 
-        int xSize = compoundTag.getInt("xSize");
-        int ySize = compoundTag.getInt("ySize");
-        int zSize = compoundTag.getInt("zSize");
+        int xSize = compoundTag.getInt("xSize").orElse(0);
+        int ySize = compoundTag.getInt("ySize").orElse(0);
+        int zSize = compoundTag.getInt("zSize").orElse(0);
 
-        int offsetX = compoundTag.getInt("offsetX", xSize / 2);
-        int offsetY = compoundTag.getInt("offsetY", ySize / 2);
-        int offsetZ = compoundTag.getInt("offsetZ", zSize / 2);
+        int offsetX = compoundTag.getInt("offsetX").orElse(xSize / 2);
+        int offsetY = compoundTag.getInt("offsetY").orElse(ySize / 2);
+        int offsetZ = compoundTag.getInt("offsetZ").orElse(zSize / 2);
 
         BlockOffset schematicOffset = SBlockOffset.fromOffsets(offsetX, offsetY, offsetZ).negate();
-        float yaw = compoundTag.getFloat("yaw");
-        float pitch = compoundTag.getFloat("pitch");
+        float yaw = (float) compoundTag.getFloat("yaw").orElse(0f);
+        float pitch = (float) compoundTag.getFloat("pitch").orElse(0f);
 
-        int dataVersion = compoundTag.getInt("minecraftDataVersion", -1);
+        int dataVersion = compoundTag.getInt("minecraftDataVersion").orElse(-1);
 
         ByteBigArray blockIds;
         BigBitSet bitSet;
@@ -81,7 +81,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         int minY;
         int minZ;
 
-        ListTag blocksList = compoundTag.getList("blocks");
+        ListTag blocksList = compoundTag.getList("blocks").orElse(null);
         if (blocksList == null) {
             blockIds = EMPTY_BLOCK_IDS;
             bitSet = EMPTY_BIT_SET;
@@ -153,7 +153,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         }
 
         List<SchematicEntity> entities;
-        ListTag entitiesList = compoundTag.getList("entities");
+        ListTag entitiesList = compoundTag.getList("entities").orElse(null);
         if (entitiesList == null) {
             entities = Collections.emptyList();
         } else {
@@ -162,9 +162,9 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
             for (Tag<?> tag : entitiesList) {
                 CompoundTag compound = (CompoundTag) tag;
                 try {
-                    EntityType entityType = EntityType.valueOf(compound.getString("entityType"));
-                    CompoundTag entityTag = compound.getCompound("NBT");
-                    Location offset = Serializers.LOCATION_SERIALIZER.deserialize(compound.getString("offset"));
+                    EntityType entityType = EntityType.valueOf(compound.getString("entityType").orElse(null));
+                    CompoundTag entityTag = compound.getCompound("NBT").orElse(null);
+                    Location offset = Serializers.LOCATION_SERIALIZER.deserialize(compound.getString("offset").orElse(null));
                     if (offset != null)
                         entities.add(new SchematicEntity(entityType, entityTag,
                                 SBlockOffset.fromOffsets(offset.getX(), offset.getY(), offset.getZ())));
@@ -181,11 +181,6 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
     private SuperiorSchematic(String name, Data data, KeyMap<Integer> cachedCounts) {
         super(name, cachedCounts);
         this.data = data;
-    }
-
-    @Override
-    public void pasteSchematic(Island island, Location location, Runnable callback) {
-        pasteSchematic(island, location, callback, null);
     }
 
     @Override
@@ -209,13 +204,9 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         }
     }
 
-    private void pasteSchematicAsyncInternal(Island island, Location location, long profiler, Runnable callback, Consumer<Throwable> onFailure) {
-        WorldEditSession worldEditSession = plugin.getNMSWorld().createEditSession(location.getWorld());
+    public void populateSessionWithSchematicBlocks(WorldEditSession worldEditSession, Location location,
+                                                   List<SchematicBlock> prePlaceTasks, List<SchematicBlock> postPlaceTasks) {
         Location min = this.data.offset.applyToLocation(location);
-
-        List<Runnable> finishTasks = new LinkedList<>();
-
-        long placeProfiler = Profiler.start(ProfileType.SCHEMATIC_BLOCKS_PLACE, getName());
 
         VarintArray.Itr blockIdsIterator = new VarintArray(this.data.blockIds).iterator();
 
@@ -226,24 +217,26 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
             BlockOffset blockOffset = SBlockOffset.fromOffsets(x, y, z);
 
-            Location blockLocation = blockOffset.applyToLocation(min.clone());
+            Location blockLocation = blockOffset.applyToLocation(min);
             SchematicBlock schematicBlock = new SchematicBlock(blockLocation,
                     (int) blockIdsIterator.next(), data.extra.get(blockOffset));
 
-            schematicBlock.doPrePlace(island);
+            prePlaceTasks.add(schematicBlock);
 
             worldEditSession.setBlock(blockLocation, schematicBlock.getCombinedId(),
                     schematicBlock.getStatesTag(), schematicBlock.getTileEntityData());
 
             if (schematicBlock.shouldPostPlace())
-                finishTasks.add(() -> schematicBlock.doPostPlace(island));
+                postPlaceTasks.add(schematicBlock);
         }
 
         if (blockIdsIterator.hasNext())
             throw new IllegalStateException("Not all blocks were read from varint iterator");
+    }
 
-        Profiler.end(placeProfiler);
-
+    public void finishPlaceSchematic(WorldEditSession worldEditSession, List<SchematicBlock> postPlaceTasks,
+                                     Island island, Location location, long profiler, Runnable callback,
+                                     Consumer<Throwable> onFailure) {
         List<ChunkPosition> affectedChunks = worldEditSession.getAffectedChunks();
         List<CompletableFuture<Chunk>> chunkFutures = new ArrayList<>(affectedChunks.size());
 
@@ -295,8 +288,11 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                     Log.debugResult(Debug.PASTE_SCHEMATIC, "Placing Schematic", "");
                     worldEditSession.finish(island);
 
-                    if (island.getOwner().isOnline())
-                        finishTasks.forEach(Runnable::run);
+                    if (island.getOwner().isOnline()) {
+                        postPlaceTasks.forEach(schematicBlock -> {
+                            schematicBlock.doPostPlace(island);
+                        });
+                    }
 
                     Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Schematic Placement", "");
 
@@ -308,6 +304,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
                     synchronized (this) {
                         try {
+                            Location min = this.data.offset.applyToLocation(location);
                             prepareCallback(affectedChunks, min);
                             callback.run();
                         } finally {
@@ -322,6 +319,26 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                 }
             });
         });
+    }
+
+    private void pasteSchematicAsyncInternal(Island island, Location location, long profiler, Runnable callback, Consumer<Throwable> onFailure) {
+        List<SchematicBlock> postPlaceTasks = new LinkedList<>();
+        List<SchematicBlock> prePlaceTasks = new LinkedList<>();
+
+        long placeProfiler = Profiler.start(ProfileType.SCHEMATIC_BLOCKS_PLACE, getName());
+
+        WorldEditSession worldEditSession = plugin.getNMSWorld().createEditSession(location.getWorld());
+        populateSessionWithSchematicBlocks(worldEditSession, location, prePlaceTasks, postPlaceTasks);
+
+        prePlaceTasks.forEach(schematicBlock -> {
+            schematicBlock.doPrePlace(island);
+            worldEditSession.setBlock(schematicBlock.getLocation(), schematicBlock.getCombinedId(),
+                    schematicBlock.getStatesTag(), schematicBlock.getTileEntityData());
+        });
+
+        Profiler.end(placeProfiler);
+
+        finishPlaceSchematic(worldEditSession, postPlaceTasks, island, location, profiler, callback, onFailure);
     }
 
     @Override

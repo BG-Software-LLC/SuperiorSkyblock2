@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuActions;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.google.common.base.Preconditions;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -20,12 +21,14 @@ public class SIslandPreview implements IslandPreview {
     private final Location previewLocation;
     private final Schematic schematic;
     private final String islandName;
+    private final GameMode previousGameMode;
 
-    public SIslandPreview(SuperiorPlayer superiorPlayer, Location previewLocation, Schematic schematic, String islandName) {
+    public SIslandPreview(SuperiorPlayer superiorPlayer, Location previewLocation, Schematic schematic, String islandName, GameMode previousGameMode) {
         this.superiorPlayer = superiorPlayer;
         this.previewLocation = previewLocation;
         this.schematic = schematic;
         this.islandName = islandName;
+        this.previousGameMode = previousGameMode;
 
         Player player = superiorPlayer.asPlayer();
         Preconditions.checkNotNull(player, "Cannot start island preview to an offline player.");
@@ -75,6 +78,11 @@ public class SIslandPreview implements IslandPreview {
     @Override
     public String getIslandName() {
         return this.islandName;
+    }
+
+    @Override
+    public GameMode getPreviousGameMode() {
+        return this.previousGameMode;
     }
 
     @Override

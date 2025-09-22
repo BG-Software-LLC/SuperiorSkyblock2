@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
+import com.google.common.base.Preconditions;
 import net.minecraft.server.v1_16_R3.BiomeBase;
 import net.minecraft.server.v1_16_R3.BiomeStorage;
 import net.minecraft.server.v1_16_R3.Block;
@@ -80,19 +81,32 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private final List<Pair<BlockPosition, IBlockData>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPosition, CompoundTag>> blockEntities = new LinkedList<>();
     private final Set<ChunkCoordIntPair> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
-    private WorldServer worldServer;
+
     private Dimension dimension;
+
+    @Nullable
+    private WorldServer worldServer;
 
     public static WorldEditSessionImpl obtain(WorldServer worldServer) {
         return POOL.obtain().initialize(worldServer);
     }
 
+    public static WorldEditSessionImpl obtain(Dimension dimension) {
+        return POOL.obtain().initialize(dimension);
+    }
+
     private WorldEditSessionImpl() {
     }
 
-    public WorldEditSessionImpl initialize(WorldServer worldServer) {
+    private WorldEditSessionImpl initialize(WorldServer worldServer) {
         this.worldServer = worldServer;
         this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(worldServer.getWorld());
+        return this;
+    }
+
+    private WorldEditSessionImpl initialize(Dimension dimension) {
+        this.worldServer = null;
+        this.dimension = dimension;
         return this;
     }
 
@@ -162,6 +176,8 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     @Override
     public List<ChunkPosition> getAffectedChunks() {
+        Preconditions.checkState(this.worldServer != null, "Cannot call WorldEditSession#getAffectedChunks on partial initialized session");
+
         if (chunks.isEmpty())
             return Collections.emptyList();
 
@@ -179,6 +195,8 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     @Override
     public void applyBlocks(org.bukkit.Chunk bukkitChunk) {
+        Preconditions.checkState(this.worldServer != null, "Cannot call WorldEditSession#applyBlocks on partial initialized session");
+
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         ChunkCoordIntPair chunkCoord = chunk.getPos();
 
@@ -221,6 +239,8 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     @Override
     public void finish(Island island) {
+        Preconditions.checkState(this.worldServer != null, "Cannot call WorldEditSession#finish on partial initialized session");
+
         // Update blocks
         blocksToUpdate.forEach(data -> worldServer.setTypeAndData(data.getKey(), data.getValue(), 3));
 
@@ -250,6 +270,30 @@ public class WorldEditSessionImpl implements WorldEditSession {
     }
 
     @Override
+    public Data readData(Location baseLocation) {
+        return new WorldEditSessionDataImpl(baseLocation, this.chunks, this.blocksToUpdate, this.blockEntities, this.lightenChunks);
+    }
+
+    @Override
+    public void applyData(Data data, Location baseLocation) {
+        WorldEditSessionDataImpl dataImpl = (WorldEditSessionDataImpl) data;
+
+        int baseBlockPosXAxis = baseLocation.getBlockX();
+        int baseBlockPosYAxis = baseLocation.getBlockY();
+        int baseBlockPosZAxis = baseLocation.getBlockZ();
+        int baseChunkPosXAxis = baseBlockPosXAxis >> 4;
+        int baseChunkPosZAxis = baseBlockPosZAxis >> 4;
+
+        // We need to transform all data to the new base location values
+
+        dataImpl.readChunks(baseChunkPosXAxis, baseChunkPosZAxis, baseBlockPosXAxis, baseBlockPosYAxis,
+                baseBlockPosZAxis, this, this.chunks);
+        dataImpl.readBlocksToUpdate(baseBlockPosXAxis, baseBlockPosYAxis, baseBlockPosZAxis, this.blocksToUpdate);
+        dataImpl.readBlockEntities(baseBlockPosXAxis, baseBlockPosYAxis, baseBlockPosZAxis, this.blockEntities);
+        dataImpl.readLights(baseChunkPosXAxis, baseChunkPosZAxis, this.lightenChunks);
+    }
+
+    @Override
     public void release() {
         this.chunks.clear();
         this.blocksToUpdate.clear();
@@ -260,19 +304,25 @@ public class WorldEditSessionImpl implements WorldEditSession {
         POOL.release(this);
     }
 
+    public ChunkData createChunkData(ChunkSection[] chunkSections, Map<HeightMap.Type, HeightMap> heightmaps, List<BlockPosition> lights) {
+        return new ChunkData(chunkSections, heightmaps, lights);
+    }
+
     private boolean isValidPosition(BlockPosition blockPosition) {
         return blockPosition.getX() >= -30000000 && blockPosition.getZ() >= -30000000 &&
                 blockPosition.getX() < 30000000 && blockPosition.getZ() < 30000000 &&
-                blockPosition.getY() >= 0 && blockPosition.getY() < worldServer.getHeight();
+                blockPosition.getY() >= 0 && blockPosition.getY() < 256;
     }
 
-    private class ChunkData {
-        private final ChunkSection[] chunkSections = new ChunkSection[16];
-        private final Map<HeightMap.Type, HeightMap> heightmaps = new EnumMap<>(HeightMap.Type.class);
-        private final List<BlockPosition> lights = new LinkedList<>();
+    public class ChunkData {
 
+        private final ChunkSection[] chunkSections;
+        private final Map<HeightMap.Type, HeightMap> heightmaps;
+        private final List<BlockPosition> lights;
 
-        public ChunkData(long chunkKey) {
+        private ChunkData(long chunkKey) {
+            this(new ChunkSection[16], new EnumMap<>(HeightMap.Type.class), new LinkedList<>());
+
             ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(chunkKey);
 
             createChunkSections();
@@ -293,7 +343,26 @@ public class WorldEditSessionImpl implements WorldEditSession {
             }
 
             createHeightmaps(tempChunk);
-            runCustomWorldGenerator(tempChunk);
+            if (worldServer != null)
+                runCustomWorldGenerator(tempChunk);
+        }
+
+        private ChunkData(ChunkSection[] chunkSections, Map<HeightMap.Type, HeightMap> heightmaps, List<BlockPosition> lights) {
+            this.chunkSections = chunkSections;
+            this.heightmaps = heightmaps;
+            this.lights = lights;
+        }
+
+        public ChunkSection[] chunkSections() {
+            return this.chunkSections;
+        }
+
+        public Map<HeightMap.Type, HeightMap> heightmaps() {
+            return this.heightmaps;
+        }
+
+        public List<BlockPosition> lights() {
+            return this.lights;
         }
 
         private void createChunkSections() {

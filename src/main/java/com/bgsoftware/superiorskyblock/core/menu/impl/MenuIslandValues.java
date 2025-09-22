@@ -145,7 +145,7 @@ public class MenuIslandValues extends AbstractMenu<MenuIslandValues.View, Island
 
         int charCounter = 0;
 
-        if (cfg.contains("values-gui.fill-items")) {
+        if (cfg.isConfigurationSection("values-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("values-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
@@ -171,16 +171,16 @@ public class MenuIslandValues extends AbstractMenu<MenuIslandValues.View, Island
         return true;
     }
 
-    private static void copySection(ConfigurationSection source, ConfigurationSection dest, Function<String, String> stringReplacer) {
+    private static void copySection(ConfigurationSection source, ConfigurationSection destination, Function<String, String> stringReplacer) {
         for (String key : source.getKeys(false)) {
             if (source.isConfigurationSection(key)) {
-                copySection(source.getConfigurationSection(key), dest.createSection(key), stringReplacer);
+                copySection(source.getConfigurationSection(key), destination.createSection(key), stringReplacer);
             } else if (source.isList(key)) {
-                dest.set(key, source.getStringList(key).stream().map(stringReplacer).collect(Collectors.toList()));
+                destination.set(key, source.getStringList(key).stream().map(stringReplacer).collect(Collectors.toList()));
             } else if (source.isString(key)) {
-                dest.set(key, stringReplacer.apply(source.getString(key)));
+                destination.set(key, stringReplacer.apply(source.getString(key)));
             } else {
-                dest.set(key, source.getString(key));
+                destination.set(key, source.getString(key));
             }
         }
     }

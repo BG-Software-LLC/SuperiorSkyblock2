@@ -148,7 +148,7 @@ public class ChunkReaderImpl implements ChunkReader {
         if (blockState.getValues().isEmpty())
             return null;
 
-        CompoundTag compoundTag = new CompoundTag();
+        CompoundTag compoundTag = CompoundTag.of();
 
         blockState.getValues().forEach((property, value) -> {
             String name = PropertiesMapper.getPropertyName(property);

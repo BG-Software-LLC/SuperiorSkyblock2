@@ -303,6 +303,12 @@ public class IslandsDatabaseBridge {
                 createFilter("island", island)));
     }
 
+    public static void removeEntityLimit(Island island, Key entity) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_entity_limits",
+                createFilter("island", island, new Pair<>("entity", entity.toString()))
+        ));
+    }
+
     public static void saveTeamLimit(Island island) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands_settings",
                 createFilter("island", island),
@@ -453,6 +459,11 @@ public class IslandsDatabaseBridge {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_flags",
                 createFilter("island", island, new Pair<>("name", islandFlag.getName()))
         ));
+    }
+
+    public static void clearIslandFlags(Island island) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_flags",
+                createFilter("island", island)));
     }
 
     public static void saveGeneratorRate(Island island, Dimension dimension, Key blockKey, int rate) {
@@ -678,6 +689,7 @@ public class IslandsDatabaseBridge {
             databaseBridge.deleteObject("islands", createFilter("uuid", island));
             databaseBridge.deleteObject("islands_banks", islandFilter);
             databaseBridge.deleteObject("islands_settings", islandFilter);
+            databaseBridge.deleteObject("bank_transactions", islandFilter);
 
 
             if (!island.getBannedPlayers().isEmpty())

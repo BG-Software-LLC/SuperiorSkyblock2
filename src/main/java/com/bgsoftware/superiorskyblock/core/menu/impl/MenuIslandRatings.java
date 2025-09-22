@@ -70,6 +70,11 @@ public class MenuIslandRatings extends AbstractPagedMenu<MenuIslandRatings.View,
         }
 
         @Override
+        public String replaceTitle(String title) {
+            return title.replace("{0}", String.valueOf(island.getTotalRating()));
+        }
+
+        @Override
         protected List<RatingInfo> requestObjects() {
             return new SequentialListBuilder<RatingInfo>()
                     .build(island.getRatings().entrySet(), RATING_INFO_MAPPER);
@@ -119,7 +124,7 @@ public class MenuIslandRatings extends AbstractPagedMenu<MenuIslandRatings.View,
 
         int charCounter = 0;
 
-        if (cfg.contains("ratings-gui.fill-items")) {
+        if (cfg.isConfigurationSection("ratings-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("ratings-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

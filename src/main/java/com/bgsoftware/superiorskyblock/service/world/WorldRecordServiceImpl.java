@@ -305,14 +305,9 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
             return recordResult;
 
         if (entity instanceof Minecart) {
-            if (entity.hasMetadata("SSB-VehicleDestory")) {
-                entity.removeMetadata("SSB-VehicleDestory", plugin);
-            } else {
-                // Vehicle was not registered by VehicleDestroyEvent; We want to register its block break
-                Key blockKey = plugin.getNMSAlgorithms().getMinecartBlock((Minecart) entity);
-                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    recordBlockBreak(blockKey, entity.getLocation(wrapper.getHandle()), 1, REGULAR_RECORD_FLAGS);
-                }
+            Key blockKey = plugin.getNMSAlgorithms().getMinecartBlock((Minecart) entity);
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                recordBlockBreak(blockKey, entity.getLocation(wrapper.getHandle()), 1, REGULAR_RECORD_FLAGS);
             }
         }
 
