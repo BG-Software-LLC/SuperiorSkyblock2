@@ -671,7 +671,7 @@ liquid-update: false
 
 # Should lights get updated when pasting schematics?
 # Enabling this can drop performance a bit.
-lights-update: false
+lights-update: true
 
 # A list of worlds that PvP will be enabled between island members.
 pvp-worlds:
@@ -827,7 +827,7 @@ island-previews:
   max-distance: 100
 
   # A list of commands that cannot be executed by players in preview mode.
-  blocked-commands: []
+  blocked-commands: [ ]
 
   # Preview locations for schematics.
   # You can disable this feature by setting the section to 'locations: []'

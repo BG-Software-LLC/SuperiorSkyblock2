@@ -498,7 +498,7 @@ public class SettingsContainer {
         homeWarmup = config.getLong("home-warmup", 0);
         visitWarmup = config.getLong("visit-warmup", 0);
         liquidUpdate = config.getBoolean("liquid-update", false);
-        lightsUpdate = config.getBoolean("lights-update", false);
+        lightsUpdate = config.getBoolean("lights-update", true);
         pvpWorlds = Collections.unmodifiableList(config.getStringList("pvp-worlds"));
         stopLeaving = config.getBoolean("stop-leaving", false);
         valuesMenu = config.getBoolean("values-menu", true);
