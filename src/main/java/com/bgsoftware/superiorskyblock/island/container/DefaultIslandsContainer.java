@@ -27,7 +27,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import java.lang.ref.WeakReference;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +37,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class DefaultIslandsContainer implements IslandsContainer {
-
-    private static final int MAX_ISLANDS_POSITION_CACHE = 250;
 
     private final Synchronized<IslandPosition2ObjectMap<Island>> islandsByPositions = Synchronized.of(new IslandPosition2ObjectMap<>());
     private final Map<UUID, Island> islandsByUUID = new ConcurrentHashMap<>();
@@ -295,6 +292,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
         // Implemented with CacheHolder so IslandPositions with no islands will not trigger access to global `islandsByPositions`
         private final IslandPosition2ObjectMap<CacheHolder> islandsByPositionCache = new IslandPosition2ObjectMap<>();
 
+        @Nullable
         private Island get(String worldName, long packedPos) {
             CacheHolder holder = islandsByPositionCache.get(worldName, packedPos);
             if (holder != null)
@@ -308,16 +306,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
             return island;
         }
 
-        private void insert(String worldName, long packedPos, Island island) {
-            if (islandsByPositionCache.size() > MAX_ISLANDS_POSITION_CACHE) {
-                // Remove one position
-                Iterator<?> iterator = islandsByPositionCache.values().iterator();
-                if (iterator.hasNext()) {
-                    iterator.next();
-                    iterator.remove();
-                }
-            }
-
+        private void insert(String worldName, long packedPos, @Nullable Island island) {
             islandsByPositionCache.put(worldName, packedPos, island == null ? CacheHolder.NULL : new CacheHolder(island));
         }
 
