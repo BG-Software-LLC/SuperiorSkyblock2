@@ -251,13 +251,11 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.getIslandLevel().toString())
                     .put("locked", (island, superiorPlayer) ->
                             Formatters.BOOLEAN_FORMATTER.format(island.isLocked(), superiorPlayer.getUserLocale()))
-                    .put("name", (island, superiorPlayer) ->
-                            plugin.getSettings().getIslandNames().isColorSupport() ?
-                                    Formatters.COLOR_FORMATTER.format(island.getName()) : island.getName())
+                    .put("name", (island, superiorPlayer) -> island.getName())
+                    .put("name_formatted", (island, superiorPlayer) -> island.getFormattedName())
                     .put("name_leader", (island, superiorPlayer) ->
-                            island.getName().isEmpty() ? island.getOwner().getName() :
-                                    plugin.getSettings().getIslandNames().isColorSupport() ?
-                                            Formatters.COLOR_FORMATTER.format(island.getName()) : island.getName())
+                            island.getName().isEmpty() ? island.getOwner().getName() : island.getName())
+                    .put("name_stripped", (island, superiorPlayer) -> island.getStrippedName())
                     .put("nether_unlocked", (island, superiorPlayer) ->
                             Formatters.BOOLEAN_FORMATTER.format(island.isNetherEnabled(), superiorPlayer.getUserLocale()))
                     .put("normal_unlocked", (island, superiorPlayer) ->

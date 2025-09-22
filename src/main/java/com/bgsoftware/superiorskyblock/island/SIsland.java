@@ -268,8 +268,8 @@ public class SIsland implements Island {
     private volatile String paypal;
     private volatile boolean isLocked;
     private volatile boolean isTopIslandsIgnored;
-    private volatile String islandName;
-    private volatile String islandRawName;
+    private volatile String formattedName;
+    private volatile String strippedName;
     private volatile String description;
     private volatile Biome biome = null;
 
@@ -284,8 +284,7 @@ public class SIsland implements Island {
 
         this.center = new SBlockPosition(builder.center);
         this.creationTime = builder.creationTime;
-        this.islandName = builder.islandName;
-        this.islandRawName = Formatters.STRIP_COLOR_FORMATTER.format(this.islandName);
+        setNameInternal(builder.islandName);
         this.schematicName = builder.islandType;
         this.discord = builder.discord;
         this.paypal = builder.paypal;
@@ -1747,27 +1746,43 @@ public class SIsland implements Island {
 
     @Override
     public String getName() {
-        return plugin.getSettings().getIslandNames().isColorSupport() ? islandName : islandRawName;
+        return plugin.getSettings().getIslandNames().isColorSupport() ? getFormattedName() : getStrippedName();
     }
 
     @Override
     public void setName(String islandName) {
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
 
-        Log.debug(Debug.SET_NAME, owner.getName(), islandName);
+        String strippedName = Formatters.STRIP_COLOR_FORMATTER.format(islandName);
 
-        if (Objects.equals(islandName, this.islandName))
+        Log.debug(Debug.SET_NAME, owner.getName(), strippedName);
+
+        if (Objects.equals(strippedName, this.strippedName))
             return;
 
-        this.islandName = islandName;
-        this.islandRawName = Formatters.STRIP_COLOR_FORMATTER.format(this.islandName);
+        setNameInternal(islandName);
 
         IslandsDatabaseBridge.saveName(this);
     }
 
+    private void setNameInternal(String name) {
+        this.formattedName = Formatters.COLOR_FORMATTER.format(name);
+        this.strippedName = Formatters.STRIP_COLOR_FORMATTER.format(name);
+    }
+
     @Override
     public String getRawName() {
-        return islandRawName;
+        return getStrippedName();
+    }
+
+    @Override
+    public String getStrippedName() {
+        return this.strippedName;
+    }
+
+    @Override
+    public String getFormattedName() {
+        return this.formattedName;
     }
 
     @Override
