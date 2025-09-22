@@ -75,11 +75,10 @@ public class CmdAdminName implements IAdminIslandCommand {
         if (!IslandNames.isValidName(sender, island, islandName))
             return;
 
-        String oldName = Formatters.COLOR_FORMATTER.format(island.getName());
+        String oldName = island.getName();
         island.setName(islandName);
 
-        String coloredName = plugin.getSettings().getIslandNames().isColorSupport() ?
-                Formatters.COLOR_FORMATTER.format(islandName) : Formatters.STRIP_COLOR_FORMATTER.format(islandName);
+        String coloredName = island.getName();
 
         if (targetPlayer == null) {
             for (Player player : Bukkit.getOnlinePlayers())

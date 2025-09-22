@@ -26,6 +26,7 @@ import org.bukkit.Location;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,6 +36,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
 
     private final Map<IslandPosition, Island> islandsByPositions = new ConcurrentHashMap<>();
     private final Map<UUID, Island> islandsByUUID = new ConcurrentHashMap<>();
+    private final Map<String, Island> islandsByNames = new ConcurrentHashMap<>();
 
     private final Map<SortingType, Synchronized<List<Island>>> sortedIslands = new ConcurrentHashMap<>();
 
@@ -69,6 +71,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
         }
 
         this.islandsByUUID.put(island.getUniqueId(), island);
+        this.islandsByNames.put(island.getStrippedName().toLowerCase(Locale.ENGLISH), island);
 
         sortedIslands.values().forEach(sortedIslands -> {
             sortedIslands.write(_sortedIslands -> _sortedIslands.add(island));
@@ -96,7 +99,8 @@ public class DefaultIslandsContainer implements IslandsContainer {
             }
         }
 
-        islandsByUUID.remove(island.getUniqueId());
+        this.islandsByUUID.remove(island.getUniqueId());
+        this.islandsByNames.remove(island.getStrippedName().toLowerCase(Locale.ENGLISH));
 
         sortedIslands.values().forEach(sortedIslands -> {
             sortedIslands.write(_sortedIslands -> _sortedIslands.remove(island));
@@ -107,6 +111,11 @@ public class DefaultIslandsContainer implements IslandsContainer {
     @Override
     public Island getIslandByUUID(UUID uuid) {
         return this.islandsByUUID.get(uuid);
+    }
+
+    @Override
+    public Island getIslandByName(String name) {
+        return this.islandsByNames.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     @Nullable

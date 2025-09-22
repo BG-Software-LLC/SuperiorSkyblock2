@@ -549,7 +549,7 @@ public class GridManagerImpl extends Manager implements GridManager {
     public Island getIsland(String islandName) {
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
         String inputName = Formatters.STRIP_COLOR_FORMATTER.format(islandName);
-        return getIslands().stream().filter(island -> island.getRawName().equalsIgnoreCase(inputName)).findFirst().orElse(null);
+        return this.islandsContainer.getIslandByName(inputName);
     }
 
     @Override

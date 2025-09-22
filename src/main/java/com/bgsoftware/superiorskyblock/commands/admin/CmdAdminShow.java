@@ -98,8 +98,7 @@ public class CmdAdminShow implements IAdminIslandCommand {
 
         // Island name
         if (!Message.ISLAND_INFO_NAME.isEmpty(locale) && !island.getName().isEmpty())
-            infoMessage.append(Message.ISLAND_INFO_NAME.getMessage(locale,
-                    Formatters.COLOR_FORMATTER.format(island.getName()))).append("\n");
+            infoMessage.append(Message.ISLAND_INFO_NAME.getMessage(locale, island.getName())).append("\n");
 
         // Island location
         if (!Message.ISLAND_INFO_LOCATION.isEmpty(locale)) {

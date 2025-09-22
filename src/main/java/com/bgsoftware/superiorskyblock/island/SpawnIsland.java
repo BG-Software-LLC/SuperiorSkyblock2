@@ -980,6 +980,16 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public String getStrippedName() {
+        return "";
+    }
+
+    @Override
+    public String getFormattedName() {
+        return "";
+    }
+
+    @Override
     public String getDescription() {
         return "";
     }

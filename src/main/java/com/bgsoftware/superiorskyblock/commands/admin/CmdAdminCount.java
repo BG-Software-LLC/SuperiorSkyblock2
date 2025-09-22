@@ -77,8 +77,8 @@ public class CmdAdminCount implements IAdminIslandCommand {
                 if (playerIsland != null) {
                     if (player.getName().toLowerCase(Locale.ENGLISH).contains(argument))
                         list.add(player.getName());
-                    if (!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase(Locale.ENGLISH).contains(argument))
-                        list.add(playerIsland.getName());
+                    if (!playerIsland.getStrippedName().isEmpty() && playerIsland.getStrippedName().toLowerCase(Locale.ENGLISH).contains(argument))
+                        list.add(playerIsland.getStrippedName());
                 }
             }
         } else if (args.length == 4) {

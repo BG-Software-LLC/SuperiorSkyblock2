@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.Locale;
@@ -22,10 +23,8 @@ public class IslandNames {
     }
 
     public static boolean isValidName(CommandSender sender, Island currentIsland, String islandName) {
-        String coloredName = plugin.getSettings().getIslandNames().isColorSupport() ?
-                Formatters.COLOR_FORMATTER.format(islandName) : islandName;
-        String strippedName = plugin.getSettings().getIslandNames().isColorSupport() ?
-                Formatters.STRIP_COLOR_FORMATTER.format(coloredName) : islandName;
+        String strippedName = Formatters.STRIP_COLOR_FORMATTER.format(islandName);
+
         int maxLength = plugin.getSettings().getIslandNames().getMaxLength();
         int minLength = plugin.getSettings().getIslandNames().getMinLength();
 
@@ -50,17 +49,25 @@ public class IslandNames {
             return false;
         }
 
-        if (currentIsland != null && currentIsland.getName().equalsIgnoreCase(islandName)) {
-            Message.SAME_NAME_CHANGE.send(sender);
-            return false;
-        }
+        if (currentIsland != null) {
+            String formattedName = Formatters.COLOR_FORMATTER.format(islandName);
 
-        if (plugin.getGrid().getIsland(islandName) != null) {
-            Message.ISLAND_ALREADY_EXIST.send(sender);
-            return false;
+            if (currentIsland.getFormattedName().equalsIgnoreCase(formattedName)) {
+                Message.SAME_NAME_CHANGE.send(sender);
+                return false;
+            }
+
+            if (!currentIsland.getStrippedName().equals(strippedName) && plugin.getGrid().getIsland(strippedName) != null) {
+                Message.ISLAND_ALREADY_EXIST.send(sender);
+                return false;
+            }
         }
 
         return true;
+    }
+
+    public static String getNameForDatabase(Island island) {
+        return island.getFormattedName().replace(ChatColor.COLOR_CHAR, '&');
     }
 
 }

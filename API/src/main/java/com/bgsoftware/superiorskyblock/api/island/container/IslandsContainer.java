@@ -35,6 +35,14 @@ public interface IslandsContainer {
     Island getIslandByUUID(UUID uuid);
 
     /**
+     * Get an island by its name.
+     *
+     * @param name The name of the island.
+     */
+    @Nullable
+    Island getIslandByName(String name);
+
+    /**
      * Get an island by its leader's uuid.
      *
      * @param uuid The uuid of the island's leader.

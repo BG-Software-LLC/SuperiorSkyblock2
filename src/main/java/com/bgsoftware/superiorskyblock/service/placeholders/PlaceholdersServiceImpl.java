@@ -151,15 +151,11 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("paypal_all", (island, superiorPlayer) -> island.getPaypal())
                     .put("exists", (island, superiorPlayer) -> Formatters.BOOLEAN_FORMATTER.format(island != null, superiorPlayer.getUserLocale()))
                     .put("locked", (island, superiorPlayer) -> Formatters.BOOLEAN_FORMATTER.format(island.isLocked(), superiorPlayer.getUserLocale()))
-                    .put("name", (island, superiorPlayer) -> {
-                        return plugin.getSettings().getIslandNames().isColorSupport() ?
-                                Formatters.COLOR_FORMATTER.format(island.getName()) : island.getName();
-                    })
-                    .put("name_leader", (island, superiorPlayer) -> {
-                        return island.getName().isEmpty() ? island.getOwner().getName() :
-                                plugin.getSettings().getIslandNames().isColorSupport() ?
-                                        Formatters.COLOR_FORMATTER.format(island.getName()) : island.getName();
-                    })
+                    .put("name", (island, superiorPlayer) -> island.getName())
+                    .put("name_formatted", (island, superiorPlayer) -> island.getFormattedName())
+                    .put("name_leader", (island, superiorPlayer) ->
+                            island.getName().isEmpty() ? island.getOwner().getName() : island.getName())
+                    .put("name_stripped", (island, superiorPlayer) -> island.getStrippedName())
                     .put("is_leader", (island, superiorPlayer) ->
                             Formatters.BOOLEAN_FORMATTER.format(island.getOwner().equals(superiorPlayer), superiorPlayer.getUserLocale()))
                     .put("is_member", (island, superiorPlayer) -> Formatters.BOOLEAN_FORMATTER.format(island.isMember(superiorPlayer), superiorPlayer.getUserLocale()))
