@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
@@ -44,18 +45,21 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
     private final Int2ObjectMapView<ProjectileSource> originalFireballsDamager = CollectionsFactory.createInt2ObjectArrayMap();
 
-    private final World spawnIslandWorld;
+    private World spawnIslandWorld;
 
     public IslandFlagsListener(SuperiorSkyblockPlugin plugin) {
         super(plugin);
+        this.registerListeners();
+    }
 
+    /* INTERNAL EVENTS */
+
+    private void onSpawnUpdate() {
         // We want to optimize island checks only for island worlds
         // However, if the spawn world is not an islands world, we want to check it as well.
         Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter(
                 plugin.getSettings().getWorlds().getDefaultWorldDimension());
         this.spawnIslandWorld = spawnLocation.getWorld();
-
-        this.registerListeners();
     }
 
     /* ENTITY SPAWNING */
@@ -387,6 +391,7 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.LOWEST, this::onEndermanGrief);
         registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.LOWEST, this::onEggLay);
         registerCallback(GameEventType.PROJECTILE_HIT_EVENT, GameEventPriority.LOWEST, this::onPoisonAttack);
+        plugin.getPluginEventsDispatcher().registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, this::onSpawnUpdate);
     }
 
     private boolean shouldIgnoreWorldEvents(@Nullable World world) {

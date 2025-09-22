@@ -142,6 +142,7 @@ public class GridManagerImpl extends Manager implements GridManager {
     public void updateSpawn() {
         try {
             this.spawnIsland = new SpawnIsland();
+            PluginEventsFactory.callSpawnUpdateEvent();
         } catch (ManagerLoadException error) {
             ManagerLoadException.handle(error);
         }

@@ -60,6 +60,10 @@ public class PluginEventsFactory {
         fireEvent(COMMANDS_UPDATE_EVENT, Empty.INSTANCE);
     }
 
+    public static void callSpawnUpdateEvent() {
+        fireEvent(SPAWN_UPDATE_EVENT, Empty.INSTANCE);
+    }
+
     public static boolean callAttemptPlayerSendMessageEvent(SuperiorPlayer receiver, String messageType, Object... args) {
         AttemptPlayerSendMessage attemptPlayerSendMessage = new AttemptPlayerSendMessage();
         attemptPlayerSendMessage.receiver = receiver;
