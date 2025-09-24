@@ -27,15 +27,11 @@ import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class DefaultIslandsContainer implements IslandsContainer {
 
@@ -46,8 +42,6 @@ public class DefaultIslandsContainer implements IslandsContainer {
     private final Map<SortingType, Synchronized<List<Island>>> sortedIslands = new ConcurrentHashMap<>();
 
     private final EnumerateSet<SortingType> notifiedValues = new EnumerateSet<>(SortingType.values());
-
-    private final IslandsCache islandsCache = new IslandsCache();
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -66,7 +60,6 @@ public class DefaultIslandsContainer implements IslandsContainer {
         long packedPos = IslandPosition.calculatePackedPosFromLocation(center.getX(), center.getZ());
 
         // Insert to cache if we can access it
-        accessIslandsCache(islandsCache -> islandsCache.insert(defaultWorld.getName(), packedPos, island));
 
         this.islandsByPositions.write(islandsByPositions -> {
             islandsByPositions.put(defaultWorld.getName(), packedPos, island);
@@ -100,9 +93,6 @@ public class DefaultIslandsContainer implements IslandsContainer {
         Preconditions.checkNotNull(defaultWorld, "Default world information cannot be null!");
 
         long packedPos = IslandPosition.calculatePackedPosFromLocation(center.getX(), center.getZ());
-
-        // Remove from cache if we can access it
-        accessIslandsCache(islandsCache -> islandsCache.remove(defaultWorld.getName(), packedPos));
 
         this.islandsByPositions.write(islandsByPositions -> {
             islandsByPositions.remove(defaultWorld.getName(), packedPos);
@@ -169,9 +159,8 @@ public class DefaultIslandsContainer implements IslandsContainer {
     public Island getIslandAt(Location location) {
         long packedPos = IslandPosition.calculatePackedPosFromLocation(location.getBlockX(), location.getBlockZ());
         String worldName = LazyWorldLocation.getWorldName(location);
-        Island island = readIslandsCache(islandsCache -> islandsCache.get(worldName, packedPos),
-                () -> this.islandsByPositions.readAndGet(islandsByPositions ->
-                        islandsByPositions.get(worldName, packedPos)));
+        Island island = this.islandsByPositions.readAndGet(islandsByPositions ->
+                islandsByPositions.get(worldName, packedPos));
         return island == null || !island.isInside(location) ? null : island;
     }
 
@@ -283,64 +272,9 @@ public class DefaultIslandsContainer implements IslandsContainer {
         }
     }
 
-    private void accessIslandsCache(Consumer<IslandsCache> consumer) {
-        if (Bukkit.isPrimaryThread()) {
-            consumer.accept(islandsCache);
-        }
-    }
-
-    private <R> R readIslandsCache(Function<IslandsCache, R> function, Supplier<R> onInvalidAccess) {
-        if (Bukkit.isPrimaryThread()) {
-            return function.apply(islandsCache);
-        }
-
-        return onInvalidAccess.get();
-    }
-
     private interface CustomWorldConsumer {
 
         void apply(String worldName, long packedPos);
-
-    }
-
-    private class IslandsCache {
-
-        // Implemented with CacheHolder so IslandPositions with no islands will not trigger access to global `islandsByPositions`
-        private final IslandPosition2ObjectMap<CacheHolder> islandsByPositionCache = new IslandPosition2ObjectMap<>();
-
-        @Nullable
-        private Island get(String worldName, long packedPos) {
-            CacheHolder holder = islandsByPositionCache.get(worldName, packedPos);
-            if (holder != null)
-                return holder.island.get();
-
-            Island island = islandsByPositions.readAndGet(islandsByPositions ->
-                    islandsByPositions.get(worldName, packedPos));
-
-            insert(worldName, packedPos, island);
-
-            return island;
-        }
-
-        private void insert(String worldName, long packedPos, @Nullable Island island) {
-            islandsByPositionCache.put(worldName, packedPos, island == null ? CacheHolder.NULL : new CacheHolder(island));
-        }
-
-        private void remove(String worldName, long packedPos) {
-            this.islandsByPositionCache.remove(worldName, packedPos);
-        }
-
-    }
-
-    private static class CacheHolder {
-
-        private static final CacheHolder NULL = new CacheHolder(null);
-
-        private final WeakReference<Island> island;
-
-        CacheHolder(Island island) {
-            this.island = new WeakReference<>(island);
-        }
 
     }
 
