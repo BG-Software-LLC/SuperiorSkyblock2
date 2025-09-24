@@ -13,7 +13,7 @@ public class IslandPosition {
         int radius = plugin.getSettings().getMaxIslandSize() * 3;
         int x = (Math.abs(locX) + (radius / 2)) / radius;
         int z = (Math.abs(locZ) + (radius / 2)) / radius;
-        return calculatePackedPos(x, z);
+        return calculatePackedPos(locX < 0 ? -x : x, locZ < 0 ? -z : z);
     }
 
     public static long calculatePackedPos(int posX, int posZ) {
