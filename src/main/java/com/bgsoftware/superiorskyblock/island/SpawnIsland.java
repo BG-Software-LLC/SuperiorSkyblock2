@@ -135,8 +135,8 @@ public class SpawnIsland implements Island {
     private final BlockPosition center;
     private final World spawnWorld;
     private final WorldInfo spawnWorldInfo;
-    private final IslandArea islandArea;
     private final int islandSize;
+    private final IslandArea islandArea = new IslandArea();
 
     private final float homeYaw;
     private final float homePitch;
@@ -164,7 +164,7 @@ public class SpawnIsland implements Island {
         this.islandSize = plugin.getSettings().getSpawn().getSize();
 
         this.center = new SBlockPosition(worldName, smartCenter.getBlockX(), smartCenter.getBlockY(), smartCenter.getBlockZ());
-        this.islandArea = IslandArea.of(this.center, this.islandSize, false);
+        this.islandArea.update(this.center, this.islandSize);
         this.spawnWorldInfo = new WorldInfoImpl(this.spawnWorld.getName(), Dimensions.fromEnvironment(this.spawnWorld.getEnvironment()));
 
         this.homeYaw = smartCenter.getYaw();
@@ -811,13 +811,7 @@ public class SpawnIsland implements Island {
         if (bukkitWorld == null || !bukkitWorld.equals(this.spawnWorld))
             return false;
 
-        try (IslandArea islandArea = this.islandArea.copy()) {
-            if (extraRadius != 0) {
-                islandArea.expand(extraRadius);
-            }
-
-            return islandArea.intercepts(location.getBlockX(), location.getBlockZ());
-        }
+        return this.islandArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
     }
 
     @Override
@@ -831,10 +825,7 @@ public class SpawnIsland implements Island {
     }
 
     public boolean isChunkInside(int chunkX, int chunkZ) {
-        try (IslandArea islandArea = this.islandArea.copy()) {
-            islandArea.rshift(4);
-            return islandArea.intercepts(chunkX, chunkZ);
-        }
+        return this.islandArea.rshiftAndIntercepts(chunkX, chunkZ, 4);
     }
 
     @Override

@@ -187,7 +187,8 @@ public class SIsland implements Island {
             return new IslandCacheImpl(SIsland.this);
         }
     };
-
+    private final IslandArea entireArea = new IslandArea();
+    private final IslandArea protectedArea = new IslandArea();
     /*
      * Island Identifiers
      */
@@ -393,6 +394,11 @@ public class SIsland implements Island {
         builder.bankTransactions.forEach(this.islandBank::loadTransaction);
         if (builder.persistentData.length > 0)
             getPersistentDataContainer().load(builder.persistentData);
+
+        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
+                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
+        this.entireArea.update(this.center, islandDistance);
+        this.protectedArea.update(this.center, getIslandSize());
 
         this.databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
     }
@@ -1430,13 +1436,7 @@ public class SIsland implements Island {
         if (!isIslandWorld(location.getWorld()))
             return false;
 
-        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
-                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
-
-        try (IslandArea islandArea = IslandArea.of(this.center, islandDistance)) {
-            islandArea.expand(extraRadius);
-            return islandArea.intercepts(location.getBlockX(), location.getBlockZ());
-        }
+        return this.entireArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
     }
 
     @Override
@@ -1452,13 +1452,7 @@ public class SIsland implements Island {
     }
 
     private boolean isChunkInside(int chunkX, int chunkZ) {
-        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
-                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
-
-        try (IslandArea islandArea = IslandArea.of(this.center, islandDistance)) {
-            islandArea.rshift(4);
-            return islandArea.intercepts(chunkX, chunkZ);
-        }
+        return this.entireArea.rshiftAndIntercepts(chunkX, chunkZ, 4);
     }
 
     @Override
@@ -1479,10 +1473,7 @@ public class SIsland implements Island {
         if (!isIslandWorld(location.getWorld()))
             return false;
 
-        try (IslandArea islandArea = IslandArea.of(this.center, getIslandSize())) {
-            islandArea.expand(extraRadius);
-            return islandArea.intercepts(location.getBlockX(), location.getBlockZ());
-        }
+        return this.protectedArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
     }
 
     @Override
@@ -1492,10 +1483,7 @@ public class SIsland implements Island {
         if (!isIslandWorld(chunk.getWorld()))
             return false;
 
-        try (IslandArea islandArea = IslandArea.of(this.center, getIslandSize())) {
-            islandArea.rshift(4);
-            return islandArea.intercepts(chunk.getX(), chunk.getZ());
-        }
+        return this.protectedArea.rshiftAndIntercepts(chunk.getX(), chunk.getZ(), 4);
     }
 
     private static boolean isIslandWorld(@Nullable World world) {
@@ -2002,6 +1990,8 @@ public class SIsland implements Island {
                 newChunks.forEach(chunk -> plugin.getNMSChunks().startTickingChunk(this, chunk, false));
             });
         }
+
+        this.protectedArea.update(this.center, getIslandSize());
 
         updateBorder();
     }
