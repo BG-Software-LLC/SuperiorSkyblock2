@@ -2,8 +2,6 @@ package com.bgsoftware.superiorskyblock.island.container;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.hooks.LazyWorldsProvider;
-import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
@@ -65,7 +63,9 @@ public class DefaultIslandsContainer implements IslandsContainer {
             // for every possible world, so there won't be issues with detecting islands later.
             for (Dimension dimension : Dimension.values()) {
                 if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
-                    islandsGrid.addIsland(dimension, packedPos, island);
+                    WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
+                    if (worldInfo != null)
+                        islandsGrid.addIsland(worldInfo.getName(), packedPos, island);
                 }
             }
         } else {
@@ -88,7 +88,9 @@ public class DefaultIslandsContainer implements IslandsContainer {
         if (plugin.getProviders().hasCustomWorldsSupport()) {
             for (Dimension dimension : Dimension.values()) {
                 if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
-                    islandsGrid.removeIslandAt(dimension, packedPos);
+                    WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
+                    if (worldInfo != null)
+                        islandsGrid.removeIslandAt(worldInfo.getName(), packedPos);
                 }
             }
         } else {
@@ -150,16 +152,8 @@ public class DefaultIslandsContainer implements IslandsContainer {
 
         Island island;
         if (plugin.getProviders().hasCustomWorldsSupport()) {
-            WorldsProvider worldsProvider = plugin.getProviders().getWorldsProvider();
-            Dimension dimension;
-            if (worldsProvider instanceof LazyWorldsProvider) {
-                String worldName = LazyWorldLocation.getWorldName(location);
-                WorldInfo worldInfo = ((LazyWorldsProvider) worldsProvider).getIslandsWorldInfo(worldName);
-                dimension = worldInfo.getDimension();
-            } else {
-                dimension = worldsProvider.getIslandsWorldDimension(location.getWorld());
-            }
-            island = this.islandsGrid.getIslandAt(dimension, packedPos);
+            String worldName = LazyWorldLocation.getWorldName(location);
+            island = this.islandsGrid.getIslandAt(worldName, packedPos);
         } else {
             island = this.islandsGrid.getIslandAt(null, packedPos);
         }

@@ -4840,7 +4840,7 @@ public class SIsland implements Island {
                 if (shouldRetryOnNullWorld && location instanceof LazyWorldLocation &&
                         plugin.getProviders().getWorldsProvider() instanceof LazyWorldsProvider) {
                     LazyWorldsProvider worldsProvider = (LazyWorldsProvider) plugin.getProviders().getWorldsProvider();
-                    WorldInfo worldInfo = worldsProvider.getIslandsWorldInfo(((LazyWorldLocation) location).getWorldName());
+                    WorldInfo worldInfo = worldsProvider.getIslandsWorldInfo(this, ((LazyWorldLocation) location).getWorldName());
                     worldsProvider.prepareWorld(this, worldInfo.getDimension(),
                             () -> warpPlayerWithoutWarmup(superiorPlayer, islandWarp, false));
                     return;

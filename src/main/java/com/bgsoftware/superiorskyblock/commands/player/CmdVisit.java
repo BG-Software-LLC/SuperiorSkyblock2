@@ -132,7 +132,7 @@ public class CmdVisit implements ISuperiorCommand {
             if (shouldRetryOnNullWorld && visitLocation instanceof LazyWorldLocation &&
                     plugin.getProviders().getWorldsProvider() instanceof LazyWorldsProvider) {
                 LazyWorldsProvider worldsProvider = (LazyWorldsProvider) plugin.getProviders().getWorldsProvider();
-                WorldInfo worldInfo = worldsProvider.getIslandsWorldInfo(((LazyWorldLocation) visitLocation).getWorldName());
+                WorldInfo worldInfo = worldsProvider.getIslandsWorldInfo(island, ((LazyWorldLocation) visitLocation).getWorldName());
                 worldsProvider.prepareWorld(island, worldInfo.getDimension(),
                         () -> teleportPlayerNoWarmup(superiorPlayer, island, visitLocation, isVisitorSign, checkIslandLock, false));
                 return;

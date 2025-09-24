@@ -780,7 +780,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         WorldsProvider worldsProvider = plugin.getProviders().getWorldsProvider();
 
         if (worldsProvider instanceof LazyWorldsProvider)
-            return ((LazyWorldsProvider) worldsProvider).getIslandsWorldInfo(worldName);
+            return ((LazyWorldsProvider) worldsProvider).getIslandsWorldInfo(island, worldName);
 
         World world = Bukkit.getWorld(worldName);
         return world == null || !isIslandsWorld(world) ? null : WorldInfo.of(world);

@@ -61,25 +61,8 @@ public interface LazyWorldsProvider extends WorldsProvider {
      * @param island    The island to check.
      * @param worldName The name of the world.
      * @return The world info for the given name, or null if this name is not an islands world.
-     *
-     * @deprecated See {@link #getIslandsWorldInfo(String)}
      */
     @Nullable
-    @Deprecated
-    default WorldInfo getIslandsWorldInfo(Island island, String worldName) {
-        return getIslandsWorldInfo(worldName);
-    }
-
-    /**
-     * Get the {@link WorldInfo} of the world of an island by its name.
-     * The world does not have to be loaded.
-     *
-     * @param worldName The name of the world.
-     * @return The world info for the given name, or null if this name is not an islands world.
-     */
-    @Nullable
-    WorldInfo getIslandsWorldInfo(String worldName);
-
-
+    WorldInfo getIslandsWorldInfo(Island island, String worldName);
 
 }
