@@ -341,7 +341,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
                 playersHandler.savePlayers();
                 gridHandler.saveIslands();
-                stackedBlocksHandler.saveStackedBlocks();
             }
 
             if (loadingStage.isAtLeast(PluginLoadingStage.MODULES_INITIALIZED)) {

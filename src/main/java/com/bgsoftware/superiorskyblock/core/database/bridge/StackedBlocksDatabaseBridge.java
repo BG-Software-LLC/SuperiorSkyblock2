@@ -28,11 +28,6 @@ public class StackedBlocksDatabaseBridge {
         ));
     }
 
-    public static void deleteStackedBlocks(StackedBlocksManager stackedBlocks) {
-        runOperationIfRunning(stackedBlocks.getDatabaseBridge(), databaseBridge ->
-                databaseBridge.deleteObject("stacked_blocks", null));
-    }
-
     private static DatabaseFilter createFilter(Pair<String, Object>... others) {
         return DatabaseFilter.fromFilters(Arrays.asList(others));
     }

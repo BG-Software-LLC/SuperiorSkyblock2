@@ -268,21 +268,6 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
         this.stackedBlocksContainer.forEach(chunkPosition, consumer);
     }
 
-    public void saveStackedBlocks() {
-        StackedBlocksDatabaseBridge.deleteStackedBlocks(this);
-
-        try {
-            databaseBridge.batchOperations(true);
-            this.stackedBlocksContainer.forEach(stackedBlock -> {
-                if (stackedBlock.getAmount() > 1) {
-                    StackedBlocksDatabaseBridge.saveStackedBlock(this, stackedBlock);
-                }
-            });
-        } finally {
-            databaseBridge.batchOperations(false);
-        }
-    }
-
     private void loadStackedBlock(DatabaseResult resultSet) {
         Optional<Location> location = resultSet.getString("location").map(Serializers.LOCATION_SPACED_SERIALIZER::deserialize);
         if (!location.isPresent()) {
