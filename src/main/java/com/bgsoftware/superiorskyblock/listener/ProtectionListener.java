@@ -205,7 +205,7 @@ public class ProtectionListener extends AbstractGameEventListener {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
         InteractionResult interactionResult = this.protectionManager.get().handleEntityInteract(superiorPlayer,
-                e.getArgs().clickedEntity, e.getArgs().player.getItemInHand());
+                e.getArgs().clickedEntity, e.getArgs().usedItem);
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
             return true;
