@@ -254,6 +254,12 @@ public abstract class PluginEventType<Args extends PluginEventArgs> extends Even
             return null;
         }
     };
+    public static final PluginEventType<Empty> WORLD_PROVIDER_UPDATE_EVENT = new PluginEventType<Empty>(null) {
+        @Override
+        public Event createBukkitEvent(Empty args) {
+            return null;
+        }
+    };
 
     public static final PluginEventType<AttemptPlayerSendMessage> ATTEMPT_PLAYER_SEND_MESSAGE_EVENT = new PluginEventType<AttemptPlayerSendMessage>(AttemptPlayerSendMessageEvent.class) {
         @Override

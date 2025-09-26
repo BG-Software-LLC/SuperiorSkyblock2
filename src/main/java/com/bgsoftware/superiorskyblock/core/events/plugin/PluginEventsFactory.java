@@ -64,6 +64,10 @@ public class PluginEventsFactory {
         fireEvent(SPAWN_UPDATE_EVENT, Empty.INSTANCE);
     }
 
+    public static void callWorldsProviderUpdateEvent() {
+        fireEvent(WORLD_PROVIDER_UPDATE_EVENT, Empty.INSTANCE);
+    }
+
     public static boolean callAttemptPlayerSendMessageEvent(SuperiorPlayer receiver, String messageType, Object... args) {
         AttemptPlayerSendMessage attemptPlayerSendMessage = new AttemptPlayerSendMessage();
         attemptPlayerSendMessage.receiver = receiver;

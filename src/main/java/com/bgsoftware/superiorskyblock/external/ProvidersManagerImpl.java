@@ -29,6 +29,7 @@ import com.bgsoftware.superiorskyblock.core.JavaVersion;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -183,6 +184,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     public void setWorldsProvider(WorldsProvider worldsProvider) {
         Preconditions.checkNotNull(worldsProvider, "worldsProvider parameter cannot be null.");
         this.worldsProvider = worldsProvider;
+        PluginEventsFactory.callWorldsProviderUpdateEvent();
     }
 
     @Override

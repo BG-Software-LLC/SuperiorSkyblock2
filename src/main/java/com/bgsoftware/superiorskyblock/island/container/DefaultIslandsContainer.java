@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.IslandPosition;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
@@ -39,7 +40,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
 
     private final Map<UUID, Island> islandsByUUID = new ConcurrentHashMap<>();
     private final Map<String, Island> islandsByNames = new ConcurrentHashMap<>();
-    private final IslandsGrid islandsGrid;
+    private IslandsGrid islandsGrid;
 
     private final Map<SortingType, Synchronized<List<Island>>> sortedIslands = new ConcurrentHashMap<>();
 
@@ -51,10 +52,22 @@ public class DefaultIslandsContainer implements IslandsContainer {
         this.plugin = plugin;
         this.islandsGrid = plugin.getProviders().hasCustomWorldsSupport() ?
                 new MultiWorldIslandsGrid() : new SingleWorldIslandsGrid();
+        plugin.getPluginEventsDispatcher().registerCallback(PluginEventType.WORLD_PROVIDER_UPDATE_EVENT, this::onWorldsProviderUpdate);
     }
 
     @Override
     public void addIsland(Island island) {
+        addIslandToGrid(island);
+
+        this.islandsByUUID.put(island.getUniqueId(), island);
+        this.islandsByNames.put(IslandNames.getNameForLookup(island.getStrippedName()), island);
+
+        sortedIslands.values().forEach(sortedIslands -> {
+            sortedIslands.write(_sortedIslands -> _sortedIslands.add(island));
+        });
+    }
+
+    private void addIslandToGrid(Island island) {
         BlockPosition center = island.getCenterPosition();
         long packedPos = IslandPosition.calculatePackedPosFromLocation(center.getX(), center.getZ());
 
@@ -71,13 +84,6 @@ public class DefaultIslandsContainer implements IslandsContainer {
         } else {
             islandsGrid.addIsland(null, packedPos, island);
         }
-
-        this.islandsByUUID.put(island.getUniqueId(), island);
-        this.islandsByNames.put(IslandNames.getNameForLookup(island.getStrippedName()), island);
-
-        sortedIslands.values().forEach(sortedIslands -> {
-            sortedIslands.write(_sortedIslands -> _sortedIslands.add(island));
-        });
     }
 
     @Override
@@ -259,6 +265,17 @@ public class DefaultIslandsContainer implements IslandsContainer {
         islandMetadatas.forEach(islandMetadata -> existingIslands.add(islandMetadata.getIsland()));
 
         return existingIslands;
+    }
+
+    private void onWorldsProviderUpdate() {
+        if (plugin.getProviders().hasCustomWorldsSupport() && islandsGrid instanceof SingleWorldIslandsGrid) {
+            // We need to upgrade the grid to a MultiWorldIslandsGrid
+            this.islandsGrid = new MultiWorldIslandsGrid();
+            // Re-add all registered islands
+            for (Island island : this.islandsByUUID.values()) {
+                addIslandToGrid(island);
+            }
+        }
     }
 
 }
