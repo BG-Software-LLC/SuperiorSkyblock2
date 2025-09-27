@@ -45,7 +45,6 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.ticks.ProtoChunkTicks;
 import org.bukkit.Chunk;
@@ -326,15 +325,15 @@ public class WorldEditSessionImpl implements WorldEditSession {
     }
 
     private static DimensionType getDimensionTypeFromDimension(Dimension dimension) {
-        ResourceKey<LevelStem> resourceKey;
+        ResourceKey<DimensionType> resourceKey;
         switch (dimension.getEnvironment()) {
-            case NETHER -> resourceKey = LevelStem.NETHER;
-            case THE_END -> resourceKey = LevelStem.END;
-            default -> resourceKey = LevelStem.OVERWORLD;
+            case NETHER -> resourceKey = DimensionType.NETHER_LOCATION;
+            case THE_END -> resourceKey = DimensionType.END_LOCATION;
+            default -> resourceKey = DimensionType.OVERWORLD_LOCATION;
         }
 
-        Registry<LevelStem> registry = MinecraftServer.getServer().registryAccess().registryOrThrow(Registry.LEVEL_STEM_REGISTRY);
-        return registry.getOrThrow(resourceKey).typeHolder().value();
+        Registry<DimensionType> registry = MinecraftServer.getServer().registryAccess().registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
+        return registry.getOrThrow(resourceKey);
     }
 
     public class ChunkData {
