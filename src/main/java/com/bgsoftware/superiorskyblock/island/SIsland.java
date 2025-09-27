@@ -375,6 +375,11 @@ public class SIsland implements Island {
             loadIslandWarp(warpRecord.name, warpRecord.location, warpCategory, warpRecord.isPrivate, warpRecord.icon);
         });
 
+        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
+                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
+        this.entireArea.update(this.center, islandDistance);
+        this.protectedArea.update(this.center, getIslandSize());
+
         // We want to save all the limits to the custom block keys
         plugin.getBlockValues().addCustomBlockKeys(builder.blockLimits.keySet());
 
@@ -394,11 +399,6 @@ public class SIsland implements Island {
         builder.bankTransactions.forEach(this.islandBank::loadTransaction);
         if (builder.persistentData.length > 0)
             getPersistentDataContainer().load(builder.persistentData);
-
-        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
-                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
-        this.entireArea.update(this.center, islandDistance);
-        this.protectedArea.update(this.center, getIslandSize());
 
         this.databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
     }
