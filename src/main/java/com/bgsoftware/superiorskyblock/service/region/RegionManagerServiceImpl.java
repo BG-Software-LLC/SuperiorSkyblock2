@@ -86,6 +86,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     private static final EntityType LLAMA_TYPE = EnumHelper.getEnum(EntityType.class, "LLAMA");
     @Nullable
     private static final EntityType HAPPY_GHAST_TYPE = EnumHelper.getEnum(EntityType.class, "HAPPY_GHAST");
+    @Nullable
+    private static final EntityType PARROT_TYPE = EnumHelper.getEnum(EntityType.class, "PARROT");
 
     private static final int MAX_PICKUP_DISTANCE = 1;
     private static EnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
@@ -305,6 +307,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 islandPrivilege = IslandPrivileges.MINECART_OPEN;
             } else if (entity instanceof Sheep && Materials.isDye(usedItemType)) {
                 islandPrivilege = IslandPrivileges.DYE_SHEEP;
+            } else if (entityType == PARROT_TYPE && usedItemType == Material.COOKIE) {
+                islandPrivilege = BukkitEntities.isTameable(entity) ? IslandPrivileges.TAMED_ANIMAL_DAMAGE : IslandPrivileges.ANIMAL_DAMAGE;
             } else {
                 return InteractionResult.SUCCESS;
             }
