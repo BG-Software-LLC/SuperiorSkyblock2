@@ -5,9 +5,9 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.MaterialKeySource;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.google.common.base.Objects;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -34,7 +34,11 @@ public class SpawnerKey extends MaterialKey {
     }
 
     private SpawnerKey(@Nullable Key spawnerTypeKey) {
-        super(SPAWNER_TYPE, (short) 0, spawnerTypeKey == null, MaterialKeySource.BLOCK);
+        this(spawnerTypeKey, false);
+    }
+
+    private SpawnerKey(@Nullable Key spawnerTypeKey, boolean apiKey) {
+        super(SPAWNER_TYPE, (short) 0, spawnerTypeKey == null, MaterialKeySource.BLOCK, apiKey);
         this.spawnerTypeKey = spawnerTypeKey;
     }
 
@@ -46,6 +50,11 @@ public class SpawnerKey extends MaterialKey {
     @Override
     public String getSubKey() {
         return this.isGlobalType ? "" : getSubKeyInternal();
+    }
+
+    @Override
+    protected MaterialKey createAPIKeyForCacheInternal() {
+        return new SpawnerKey(this.spawnerTypeKey, true);
     }
 
     private String getSubKeyInternal() {
