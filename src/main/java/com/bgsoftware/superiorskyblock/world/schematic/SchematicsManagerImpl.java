@@ -125,7 +125,6 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
                     cachedSchematic = true;
                 } catch (Throwable error) {
                     Log.warn("Cannot cache schematic ", schematic.getName(), ", skipping...");
-                    error.printStackTrace();
                 }
             }
             newSchematics.add(schematic);
