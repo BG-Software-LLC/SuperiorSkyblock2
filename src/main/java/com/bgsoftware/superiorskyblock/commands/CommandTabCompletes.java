@@ -72,6 +72,12 @@ public class CommandTabCompletes {
         return getPlayers(island.getIslandMembers(false), argument);
     }
 
+    public static List<String> getOnlinePlayersWithIsland(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanished,
+                                                          Predicate<SuperiorPlayer> predicate) {
+        return getOnlinePlayers(plugin, argument, hideVanished, (onlinePlayer) ->
+                onlinePlayer != null && onlinePlayer.hasIsland() && predicate.test(onlinePlayer));
+    }
+
     public static List<String> getOnlinePlayers(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanish) {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
         return new SequentialListBuilder<SuperiorPlayer>()
