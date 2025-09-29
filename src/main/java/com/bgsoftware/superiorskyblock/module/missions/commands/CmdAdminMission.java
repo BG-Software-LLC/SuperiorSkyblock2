@@ -104,24 +104,22 @@ public class CmdAdminMission implements IAdminPlayerCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-        switch (args.length) {
-            case 4:
-                return CommandTabCompletes.getCustomComplete(args[3], "complete", "reset");
-            case 5: {
-                List<String> list = new LinkedList<>();
+        if (args.length == 4) {
+            return CommandTabCompletes.getCustomComplete(args[3], "complete", "reset");
+        } else if (args.length == 5) {
+            List<String> list = new LinkedList<>();
 
-                if (args[3].equalsIgnoreCase("complete"))
-                    list.addAll(CommandTabCompletes.getMissions(plugin, args[4], mission ->
-                            plugin.getMissions().canCompleteAgain(targetPlayer, mission)));
-                else if (args[3].equalsIgnoreCase("reset"))
-                    list.addAll(CommandTabCompletes.getMissions(plugin, args[4], mission ->
-                            !plugin.getMissions().canCompleteAgain(targetPlayer, mission)));
+            if (args[3].equalsIgnoreCase("complete"))
+                list.addAll(CommandTabCompletes.getMissions(plugin, args[4], mission ->
+                        plugin.getMissions().canCompleteAgain(targetPlayer, mission)));
+            else if (args[3].equalsIgnoreCase("reset"))
+                list.addAll(CommandTabCompletes.getMissions(plugin, args[4], mission ->
+                        !plugin.getMissions().canCompleteAgain(targetPlayer, mission)));
 
-                if ("*".contains(args[4]) && !list.isEmpty())
-                    list.add("*");
+            if ("*".contains(args[4]) && !list.isEmpty())
+                list.add("*");
 
-                return Collections.unmodifiableList(list);
-            }
+            return Collections.unmodifiableList(list);
         }
 
         return Collections.emptyList();
