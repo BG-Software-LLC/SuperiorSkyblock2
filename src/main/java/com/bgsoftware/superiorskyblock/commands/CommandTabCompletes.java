@@ -55,7 +55,7 @@ public class CommandTabCompletes {
                                                             BiPredicate<SuperiorPlayer, Island> islandPredicate) {
         SuperiorPlayer superiorPlayer = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
         Island island = superiorPlayer == null ? null : superiorPlayer.getIsland();
-        return getOnlinePlayersWithIslands(plugin, argument, hideVanish, (onlinePlayer, onlineIsland) ->
+        return getOnlinePlayersAndIslands(plugin, argument, hideVanish, (onlinePlayer, onlineIsland) ->
                 onlineIsland != null && (superiorPlayer == null || island == null || !island.equals(onlineIsland)) &&
                         islandPredicate.test(onlinePlayer, onlineIsland));
     }
@@ -88,8 +88,8 @@ public class CommandTabCompletes {
                 .map(getOnlineSuperiorPlayers(plugin), SuperiorPlayer::getName);
     }
 
-    public static List<String> getOnlinePlayersWithIslands(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanish,
-                                                           @Nullable BiPredicate<SuperiorPlayer, Island> predicate) {
+    public static List<String> getOnlinePlayersAndIslands(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanish,
+                                                          @Nullable BiPredicate<SuperiorPlayer, Island> predicate) {
         List<String> tabArguments = new LinkedList<>();
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
 

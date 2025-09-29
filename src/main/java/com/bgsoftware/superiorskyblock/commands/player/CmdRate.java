@@ -89,7 +89,7 @@ public class CmdRate implements ISuperiorCommand {
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
-        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
+        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersAndIslands(plugin, args[1],
                 plugin.getSettings().isTabCompleteHideVanished(), (onlinePlayer, onlineIsland) ->
                         canRateIsland(plugin, superiorPlayer, island, onlineIsland) == RateResult.SUCCESS) :
                 Collections.emptyList();

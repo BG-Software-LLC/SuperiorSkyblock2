@@ -109,7 +109,7 @@ public class CmdAccept implements ISuperiorCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
+        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersAndIslands(plugin, args[1],
                 plugin.getSettings().isTabCompleteHideVanished(), (onlinePlayer, onlineIsland) ->
                         onlineIsland.isInvited(superiorPlayer)) : Collections.emptyList();
     }
