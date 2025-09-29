@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -24,7 +25,8 @@ public class CmdAdminSchematic implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin schematic [" + Message.COMMAND_ARGUMENT_SCHEMATIC_NAME.getMessage(locale) + "] [" +
+        return "admin schematic [" +
+                Message.COMMAND_ARGUMENT_SCHEMATIC_NAME.getMessage(locale) + "] [" +
                 Message.COMMAND_ARGUMENT_SCHEMATIC_SAVE_AIR.getMessage(locale) + "[true/false]]";
     }
 
@@ -76,7 +78,8 @@ public class CmdAdminSchematic implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return Collections.emptyList();
+        return args.length == 4 ? CommandTabCompletes.getCustomComplete(args[3], "true", "false") :
+                Collections.emptyList();
     }
 
 }
