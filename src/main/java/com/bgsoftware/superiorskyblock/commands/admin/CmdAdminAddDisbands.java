@@ -25,7 +25,8 @@ public class CmdAdminAddDisbands implements IAdminPlayerCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin adddisbands <" +
-                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_PLAYERS.getMessage(locale) + "> <" +
                 Message.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
     }
 
