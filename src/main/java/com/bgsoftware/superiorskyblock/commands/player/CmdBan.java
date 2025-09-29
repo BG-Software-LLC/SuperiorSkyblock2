@@ -80,9 +80,9 @@ public class CmdBan implements IPermissibleCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        return args.length != 2 ? Collections.emptyList() : CommandTabCompletes.getOnlinePlayers(plugin, args[1], true,
+        return args.length == 2 ? CommandTabCompletes.getOnlinePlayers(plugin, args[1], plugin.getSettings().isTabCompleteHideVanished(),
                 onlinePlayer -> !island.isBanned(onlinePlayer) && (!island.isMember(onlinePlayer) ||
-                        onlinePlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())));
+                        onlinePlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole()))) : Collections.emptyList();
     }
 
 }
