@@ -103,6 +103,7 @@ CHANGED_WARPS_LIMIT: '&e&lAméliorations | &7Vous avez changé la limite de warp
 CHANGED_WARPS_LIMIT_ALL: '&e&lAméliorations | &7Vous avez changé la limite de warps de toutes les îles.'
 CHANGED_WARPS_LIMIT_NAME: '&e&lAméliorations | &7Vous avez changé la limite de warps d''île de {0}.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: quantité
 COMMAND_ARGUMENT_BIOME: biome

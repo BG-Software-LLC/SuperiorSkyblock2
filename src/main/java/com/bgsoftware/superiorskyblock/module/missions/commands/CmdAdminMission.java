@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class CmdAdminMission implements IAdminPlayerCommand {
@@ -30,7 +31,10 @@ public class CmdAdminMission implements IAdminPlayerCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin mission <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <complete/reset> <" + Message.COMMAND_ARGUMENT_MISSION_NAME.getMessage(locale) + ">";
+        return "admin mission <" +
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <complete/reset> <" +
+                Message.COMMAND_ARGUMENT_MISSION_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_MISSIONS.getMessage(locale) + ">";
     }
 
     @Override
@@ -100,10 +104,27 @@ public class CmdAdminMission implements IAdminPlayerCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getCustomComplete(args[3], "complete", "reset") :
-                args.length == 5 && args[3].equalsIgnoreCase("complete") || args[3].equalsIgnoreCase("reset") ?
-                        args[4].equals("*") ? CommandTabCompletes.getAllMissions(plugin) : CommandTabCompletes.getMissions(plugin, args[4]) :
-                        Collections.emptyList();
+        switch (args.length) {
+            case 4:
+                return CommandTabCompletes.getCustomComplete(args[3], "complete", "reset");
+            case 5: {
+                List<String> list = new LinkedList<>();
+
+                if (args[3].equalsIgnoreCase("complete"))
+                    list.addAll(CommandTabCompletes.getMissions(plugin, args[4], mission ->
+                            plugin.getMissions().canCompleteAgain(targetPlayer, mission)));
+                else if (args[3].equalsIgnoreCase("reset"))
+                    list.addAll(CommandTabCompletes.getMissions(plugin, args[4], mission ->
+                            !plugin.getMissions().canCompleteAgain(targetPlayer, mission)));
+
+                if ("*".contains(args[4]) && !list.isEmpty())
+                    list.add("*");
+
+                return Collections.unmodifiableList(list);
+            }
+        }
+
+        return Collections.emptyList();
     }
 
 }

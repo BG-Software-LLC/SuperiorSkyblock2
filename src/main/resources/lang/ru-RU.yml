@@ -103,6 +103,7 @@ CHANGED_WARPS_LIMIT: '&e&lУлучшения | &7Успешно обновлен
 CHANGED_WARPS_LIMIT_ALL: '&e&lУлучшения | &7Успешно обновлен лимит варпов для всех островов.'
 CHANGED_WARPS_LIMIT_NAME: '&e&lУлучшения | &7Успешно обновлен лимит варпов для {0}.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: 'количество'
 COMMAND_ARGUMENT_BIOME: 'биом'

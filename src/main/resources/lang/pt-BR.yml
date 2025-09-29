@@ -103,6 +103,7 @@ CHANGED_WARPS_LIMIT: '&e&lMelhorias | &7O limite de warps da ilha de {0} foi atu
 CHANGED_WARPS_LIMIT_ALL: '&e&lMelhorias | &7O limite de warps de todas as ilhas foi atualizado com sucesso.'
 CHANGED_WARPS_LIMIT_NAME: '&e&lMelhorias | &7O limite de warps de {0} foi atualizado com sucesso.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: 'quantidade'
 COMMAND_ARGUMENT_BIOME: 'bioma'
