@@ -90,8 +90,7 @@ public class CmdRate implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
         return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
-                plugin.getSettings().isTabCompleteHideVanished(),
-                (onlinePlayer, onlineIsland) -> onlineIsland != null &&
+                plugin.getSettings().isTabCompleteHideVanished(), (onlinePlayer, onlineIsland) ->
                         canRateIsland(plugin, superiorPlayer, island, onlineIsland) == RateResult.SUCCESS) :
                 Collections.emptyList();
     }

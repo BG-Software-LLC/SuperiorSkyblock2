@@ -111,7 +111,7 @@ public class CmdAccept implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
                 plugin.getSettings().isTabCompleteHideVanished(), (onlinePlayer, onlineIsland) ->
-                        onlineIsland != null && onlineIsland.isInvited(superiorPlayer)) : Collections.emptyList();
+                        onlineIsland.isInvited(superiorPlayer)) : Collections.emptyList();
     }
 
 }
