@@ -14,6 +14,8 @@ import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.google.common.base.Suppliers;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockBed;
@@ -34,6 +36,7 @@ import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldServer;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 
 import java.util.Collection;
@@ -157,8 +160,10 @@ public class NMSUtils {
                 try {
                     NBTTagCompound chunkCompound = playerChunkMap.read(chunkCoords);
 
-                    if (chunkCompound == null)
+                    if (chunkCompound == null) {
+                        chunkCallback.onChunkNotExist(chunkPosition);
                         return;
+                    }
 
                     NBTTagCompound chunkDataCompound = playerChunkMap.getChunkData(worldServer.getTypeKey(),
                             Suppliers.ofInstance(worldServer.getWorldPersistentData()), chunkCompound, chunkCoords, worldServer);
@@ -290,13 +295,35 @@ public class NMSUtils {
                 blockPosition.getY() >= 0 && blockPosition.getY() < world.getHeight();
     }
 
-    public interface ChunkCallback {
+    public static abstract class ChunkCallback {
 
-        void onLoadedChunk(Chunk chunk);
+        private final ChunkLoadReason chunkLoadReason;
+        private final boolean isWaitForChunkLoad;
 
-        void onUnloadedChunk(ChunkPosition chunkPosition, NBTTagCompound unloadedChunk);
+        public ChunkCallback(ChunkLoadReason chunkLoadReason, boolean isWaitForChunkLoad) {
+            this.chunkLoadReason = chunkLoadReason;
+            this.isWaitForChunkLoad = isWaitForChunkLoad;
+        }
 
-        void onFinish();
+        public abstract void onLoadedChunk(Chunk chunk);
+
+        public abstract void onUnloadedChunk(ChunkPosition chunkPosition, NBTTagCompound unloadedChunk);
+
+        public abstract void onFinish();
+
+        public final void onChunkNotExist(ChunkPosition chunkPosition) {
+            if (!plugin.getProviders().hasCustomWorldsSupport())
+                return;
+
+            CompletableFuture<org.bukkit.Chunk> futureChunk = ChunksProvider.loadChunk(chunkPosition, this.chunkLoadReason, bukkitChunk -> {
+                Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+                onLoadedChunk(chunk);
+            });
+
+            if (this.isWaitForChunkLoad) {
+                futureChunk.join();
+            }
+        }
 
     }
 

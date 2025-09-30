@@ -11,8 +11,8 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_16_R3.crops.CropsTickingMethod;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.crops.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.server.v1_16_R3.BiomeBase;
 import net.minecraft.server.v1_16_R3.BiomeStorage;
@@ -91,7 +92,8 @@ public class NMSChunksImpl implements NMSChunks {
         if (chunkPositions.isEmpty())
             return;
 
-        NMSUtils.runActionOnChunks(chunkPositions, true, new NMSUtils.ChunkCallback() {
+        NMSUtils.runActionOnChunks(chunkPositions, true, new NMSUtils.ChunkCallback(
+                ChunkLoadReason.SET_BIOME, false) {
             @Override
             public void onLoadedChunk(Chunk chunk) {
                 ChunkCoordIntPair chunkCoords = chunk.getPos();
@@ -148,7 +150,8 @@ public class NMSChunksImpl implements NMSChunks {
         chunkPositions.forEach(chunkPosition -> island.markChunkEmpty(chunkPosition.getWorld(),
                 chunkPosition.getX(), chunkPosition.getZ(), false));
 
-        NMSUtils.runActionOnChunks(chunkPositions, true, new NMSUtils.ChunkCallback() {
+        NMSUtils.runActionOnChunks(chunkPositions, true, new NMSUtils.ChunkCallback(
+                ChunkLoadReason.DELETE_CHUNK, false) {
             @Override
             public void onLoadedChunk(Chunk chunk) {
                 Arrays.fill(chunk.getSections(), Chunk.a);
@@ -236,7 +239,8 @@ public class NMSChunksImpl implements NMSChunks {
 
         CompletableFuture<List<CalculatedChunk>> completableFuture = new CompletableFuture<>();
 
-        NMSUtils.runActionOnChunks(chunkPositionsToCalculate, false, new NMSUtils.ChunkCallback() {
+        NMSUtils.runActionOnChunks(chunkPositionsToCalculate, false, new NMSUtils.ChunkCallback(
+                ChunkLoadReason.BLOCKS_RECALCULATE, true) {
             @Override
             public void onLoadedChunk(Chunk chunk) {
                 ChunkPosition chunkPosition = ChunkPosition.of(chunk.getWorld().getWorld(),
@@ -280,7 +284,8 @@ public class NMSChunksImpl implements NMSChunks {
         KeyMap<Counter> chunkEntities = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
         List<Pair<WorldServer, NBTTagList>> unloadedEntityTags = new LinkedList<>();
 
-        NMSUtils.runActionOnChunks(chunkPositions, false, new NMSUtils.ChunkCallback() {
+        NMSUtils.runActionOnChunks(chunkPositions, false, new NMSUtils.ChunkCallback(
+                ChunkLoadReason.ENTITIES_RECALCULATE, true) {
             @Override
             public void onLoadedChunk(Chunk chunk) {
                 for (org.bukkit.entity.Entity bukkitEntity : chunk.getBukkitChunk().getEntities()) {

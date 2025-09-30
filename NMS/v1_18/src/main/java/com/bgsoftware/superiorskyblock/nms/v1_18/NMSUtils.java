@@ -16,6 +16,8 @@ import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.google.common.base.Suppliers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -41,8 +43,10 @@ import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.chunk.storage.EntityStorage;
 import net.minecraft.world.level.chunk.storage.IOWorker;
 import net.minecraft.world.level.levelgen.Heightmap;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_18_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
 
 import java.io.IOException;
@@ -184,8 +188,10 @@ public class NMSUtils {
                 try {
                     net.minecraft.nbt.CompoundTag chunkCompound = chunkMap.read(chunkPos);
 
-                    if (chunkCompound == null)
+                    if (chunkCompound == null) {
+                        chunkCallback.onChunkNotExist(chunkPosition);
                         return;
+                    }
 
                     net.minecraft.nbt.CompoundTag chunkDataCompound = chunkMap.upgradeChunkTag(serverLevel.getTypeKey(),
                             Suppliers.ofInstance(serverLevel.getDataStorage()), chunkCompound,
@@ -237,7 +243,9 @@ public class NMSUtils {
                 if (error != null) {
                     completableFuture.completeExceptionally(error);
                 } else {
-                    if (entityData != null) {
+                    if (entityData == null) {
+                        chunkCallback.onChunkNotExist(chunkPosition);
+                    } else {
                         UnloadedChunkCompound unloadedChunkCompound = new UnloadedChunkCompound(chunkPosition, entityData);
                         chunkCallback.onUnloadedChunk(unloadedChunkCompound);
                     }
@@ -399,13 +407,35 @@ public class NMSUtils {
                 blockPos.getY() >= serverLevel.getMinBuildHeight() && blockPos.getY() < serverLevel.getMaxBuildHeight();
     }
 
-    public interface ChunkCallback {
+    public static abstract class ChunkCallback {
 
-        void onLoadedChunk(LevelChunk levelChunk);
+        private final ChunkLoadReason chunkLoadReason;
+        private final boolean isWaitForChunkLoad;
 
-        void onUnloadedChunk(UnloadedChunkCompound unloadedChunkCompound);
+        public ChunkCallback(ChunkLoadReason chunkLoadReason, boolean isWaitForChunkLoad) {
+            this.chunkLoadReason = chunkLoadReason;
+            this.isWaitForChunkLoad = isWaitForChunkLoad;
+        }
 
-        void onFinish();
+        public abstract void onLoadedChunk(LevelChunk levelChunk);
+
+        public abstract void onUnloadedChunk(UnloadedChunkCompound unloadedChunkCompound);
+
+        public abstract void onFinish();
+
+        public final void onChunkNotExist(ChunkPosition chunkPosition) {
+            if (!plugin.getProviders().hasCustomWorldsSupport())
+                return;
+
+            CompletableFuture<Chunk> futureChunk = ChunksProvider.loadChunk(chunkPosition, this.chunkLoadReason, bukkitChunk -> {
+                LevelChunk levelChunk = ((CraftChunk) bukkitChunk).getHandle();
+                onLoadedChunk(levelChunk);
+            });
+
+            if (this.isWaitForChunkLoad) {
+                futureChunk.join();
+            }
+        }
 
     }
 
