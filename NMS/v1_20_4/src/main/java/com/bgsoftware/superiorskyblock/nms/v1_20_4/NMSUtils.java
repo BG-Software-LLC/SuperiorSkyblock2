@@ -461,7 +461,7 @@ public class NMSUtils {
 
             CompletableFuture<Chunk> futureChunk = ChunksProvider.loadChunk(chunkPosition, this.chunkLoadReason, bukkitChunk -> {
                 LevelChunk levelChunk = getCraftChunkHandle((CraftChunk) bukkitChunk);
-                onLoadedChunk(levelChunk);
+                BukkitExecutor.ensureMain(() -> onLoadedChunk(levelChunk));
             });
 
             if (this.isWaitForChunkLoad) {
