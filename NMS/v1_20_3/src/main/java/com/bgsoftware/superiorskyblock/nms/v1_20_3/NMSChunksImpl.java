@@ -325,6 +325,8 @@ public class NMSChunksImpl implements NMSChunks {
                 ChunkPos chunkPos = levelChunk.getPos();
                 ChunkPosition chunkPosition = ChunkPosition.of(levelChunk.level.getWorld(), chunkPos.x, chunkPos.z, false);
                 allCalculatedChunks.add(calculateChunk(chunkPosition, levelChunk.level, levelChunk.getSections()));
+
+                this.chunkLoadLatch.countDown();
             }
 
             @Override
@@ -387,6 +389,8 @@ public class NMSChunksImpl implements NMSChunks {
                 CalculatedChunk calculatedChunk = calculateChunk(chunkPosition, serverLevel, chunkSections);
                 allCalculatedChunks.add(calculatedChunk);
                 unloadedChunksCache.write(m -> m.put(chunkPosition, calculatedChunk));
+
+                this.chunkLoadLatch.countDown();
             }
 
             @Override
@@ -413,11 +417,15 @@ public class NMSChunksImpl implements NMSChunks {
                     if (!BukkitEntities.canBypassEntityLimit(bukkitEntity))
                         chunkEntities.computeIfAbsent(Keys.of(bukkitEntity), i -> new Counter(0)).inc(1);
                 }
+
+                this.chunkLoadLatch.countDown();
             }
 
             @Override
             public void onUnloadedChunk(NMSUtils.UnloadedChunkCompound unloadedChunkCompound) {
                 unloadedChunkCompounds.add(unloadedChunkCompound);
+
+                this.chunkLoadLatch.countDown();
             }
 
             @Override

@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.ObjectsPool;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.v1_17.world.PropertiesMapper;
@@ -41,7 +40,6 @@ import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.chunk.storage.EntityStorage;
 import net.minecraft.world.level.chunk.storage.IOWorker;
 import net.minecraft.world.level.levelgen.Heightmap;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_17_R1.CraftChunk;
@@ -55,6 +53,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
 public class NMSUtils {
@@ -173,12 +172,20 @@ public class NMSUtils {
         PENDING_CHUNK_ACTIONS.add(pendingTask);
 
         BukkitExecutor.createTask().runAsync(v -> {
+            CountDownLatch countDownLatch;
+            if (chunkCallback.isWaitForChunkLoad) {
+                countDownLatch = chunkCallback.chunkLoadLatch = new CountDownLatch(chunks.size());
+            } else {
+                countDownLatch = null;
+            }
+
             chunks.forEach(chunkPosition -> {
                 ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
                 ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
 
                 ChunkPos chunkPos = new ChunkPos(chunkPosition.getX(), chunkPosition.getZ());
 
+                boolean calledCountdown = false;
                 try {
                     net.minecraft.nbt.CompoundTag chunkCompound = chunkMap.read(chunkPos);
 
@@ -192,13 +199,27 @@ public class NMSUtils {
 
                     if (chunkDataCompound.contains("Level", 10)) {
                         chunkCallback.onUnloadedChunk(chunkPosition, chunkDataCompound.getCompound("Level"));
+                        calledCountdown = true;
                         if (saveChunks)
                             chunkMap.write(chunkPos, chunkDataCompound);
+                    } else {
+                        if (countDownLatch != null)
+                            countDownLatch.countDown();
                     }
                 } catch (Exception error) {
+                    if (!calledCountdown && countDownLatch != null)
+                        countDownLatch.countDown();
                     Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkPosition, ":");
                 }
             });
+
+            if (countDownLatch != null) {
+                try {
+                    countDownLatch.await();
+                } catch (InterruptedException error) {
+                    throw new RuntimeException(error);
+                }
+            }
         }).runSync(v -> {
             chunkCallback.onFinish();
 
@@ -209,37 +230,34 @@ public class NMSUtils {
 
     private static void runActionOnUnloadedEntityChunks(Collection<ChunkPosition> chunks,
                                                         ChunkCallback chunkCallback) {
-        CompletableFutureList<Void> workerChunks = new CompletableFutureList<>(-1);
+        CountDownLatch countDownLatch = chunkCallback.chunkLoadLatch = new CountDownLatch(chunks.size());
 
         chunks.forEach(chunkPosition -> {
             ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
             IOWorker worker = ENTITY_STORAGE_WORKER.get(serverLevel.entityManager.permanentStorage);
 
-            CompletableFuture<Void> completableFuture = new CompletableFuture<>();
-            workerChunks.add(completableFuture);
-
             ChunkPos chunkPos = new ChunkPos(chunkPosition.getX(), chunkPosition.getZ());
 
             WORKER_LOAD_ASYNC.invoke(worker, chunkPos).whenComplete((entityData, error) -> {
                 if (error != null) {
-                    completableFuture.completeExceptionally(error);
+                    countDownLatch.countDown();
+                    throw new RuntimeException(error);
                 } else {
                     if (entityData == null) {
                         chunkCallback.onChunkNotExist(chunkPosition);
                     } else {
                         chunkCallback.onUnloadedChunk(chunkPosition, entityData);
                     }
-                    completableFuture.complete(null);
                 }
             });
         });
 
         BukkitExecutor.createTask().runAsync(v -> {
-            workerChunks.forEachCompleted(pair -> {
-                // Wait for all chunks to load.
-            }, error -> {
-                Log.error(error, "An unexpected error occurred while interacting with an unloaded chunk:");
-            });
+            try {
+                countDownLatch.await();
+            } catch (InterruptedException error) {
+                throw new RuntimeException(error);
+            }
         }).runSync(v -> {
             chunkCallback.onFinish();
         });
@@ -366,6 +384,8 @@ public class NMSUtils {
         private final ChunkLoadReason chunkLoadReason;
         private final boolean isWaitForChunkLoad;
 
+        protected CountDownLatch chunkLoadLatch;
+
         public ChunkCallback(ChunkLoadReason chunkLoadReason, boolean isWaitForChunkLoad) {
             this.chunkLoadReason = chunkLoadReason;
             this.isWaitForChunkLoad = isWaitForChunkLoad;
@@ -381,14 +401,10 @@ public class NMSUtils {
             if (!plugin.getProviders().hasCustomWorldsSupport())
                 return;
 
-            CompletableFuture<Chunk> futureChunk = ChunksProvider.loadChunk(chunkPosition, this.chunkLoadReason, bukkitChunk -> {
+            ChunksProvider.loadChunk(chunkPosition, this.chunkLoadReason, bukkitChunk -> {
                 LevelChunk levelChunk = ((CraftChunk) bukkitChunk).getHandle();
                 BukkitExecutor.ensureMain(() -> onLoadedChunk(levelChunk));
             });
-
-            if (this.isWaitForChunkLoad) {
-                futureChunk.join();
-            }
         }
 
     }

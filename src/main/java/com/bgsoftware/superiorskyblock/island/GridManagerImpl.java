@@ -665,7 +665,7 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     @Override
-    public void sortIslands(SortingType sortingType, Runnable onFinish) {
+    public void sortIslands(SortingType sortingType, @Nullable Runnable onFinish) {
         Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
 
         Log.debug(Debug.SORT_ISLANDS, sortingType.getName());

@@ -76,6 +76,7 @@ import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
 import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
+import com.bgsoftware.superiorskyblock.core.threads.SynchronizedTasks;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
 import com.bgsoftware.superiorskyblock.core.value.IntValue;
 import com.bgsoftware.superiorskyblock.core.value.Value;
@@ -1311,38 +1312,46 @@ public class SIsland implements Island {
     public void resetChunks(@IslandChunkFlags int flags, @Nullable Runnable onFinish) {
         final int realFlags = flags | IslandChunkFlags.NO_EMPTY_CHUNKS;
 
-        for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
-            WorldInfo worldInfo = WorldInfo.of(registeredWorld);
-            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, realFlags);
-            if (!chunkPositions.isEmpty())
-                IslandUtils.deleteChunks(this, chunkPositions, null);
-        }
-
-        MutableObject<Dimension> lastDimension = new MutableObject<>(null);
-        boolean hasDimension = false;
+        List<Dimension> dimensionList = new LinkedList<>();
 
         for (Dimension dimension : Dimension.values()) {
             if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension) && wasSchematicGenerated(dimension)) {
-                hasDimension = true;
-                lastDimension.setValue(dimension);
-                IslandWorlds.accessIslandWorldAsync(this, dimension, true, result -> {
-                    result.ifLeft(world -> {
-                        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
-                        List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, realFlags);
-                        if (!chunkPositions.isEmpty()) {
-                            IslandUtils.deleteChunks(this, chunkPositions,
-                                    dimension == lastDimension.getValue() ? onFinish : null);
-                        }
-                    }).ifRight(err -> {
-                        if (onFinish != null && dimension == lastDimension.getValue())
-                            onFinish.run();
-                    });
-                });
+                dimensionList.add(dimension);
             }
         }
 
-        if (!hasDimension && onFinish != null)
-            onFinish.run();
+        List<World> customWorlds = plugin.getGrid().getRegisteredWorlds();
+
+        SynchronizedTasks synchronizedTasks = new SynchronizedTasks(dimensionList.size() + customWorlds.size(), onFinish);
+
+        customWorlds.forEach(registeredWorld -> {
+            WorldInfo worldInfo = WorldInfo.of(registeredWorld);
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, realFlags);
+            if (!chunkPositions.isEmpty()) {
+                IslandUtils.deleteChunks(this, chunkPositions, synchronizedTasks::notifyTaskComplete);
+            } else {
+                synchronizedTasks.notifyTaskComplete();
+            }
+        });
+
+        dimensionList.forEach(dimension -> {
+            IslandWorlds.accessIslandWorldAsync(this, dimension, true, result -> {
+                result.ifLeft(world -> {
+                    WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
+                    List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, realFlags);
+                    if (!chunkPositions.isEmpty()) {
+                        IslandUtils.deleteChunks(this, chunkPositions, synchronizedTasks::notifyTaskComplete);
+                    } else {
+                        synchronizedTasks.notifyTaskComplete();
+                    }
+                }).ifRight(error -> {
+                    synchronizedTasks.notifyTaskComplete();
+                    throw new RuntimeException(error);
+                });
+            });
+        });
+
+        synchronizedTasks.waitAllAsync();
     }
 
     @Override
@@ -1355,18 +1364,17 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null");
 
         IslandWorlds.accessIslandWorldAsync(this, dimension, true, result -> {
-            if (result.getRight() == null) {
+            result.ifRight(error -> {
+                throw new RuntimeException(error);
+            }).ifLeft(world -> {
                 WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
-                List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this,
-                        worldInfo, flags | IslandChunkFlags.NO_EMPTY_CHUNKS);
+                List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, flags | IslandChunkFlags.NO_EMPTY_CHUNKS);
                 if (!chunkPositions.isEmpty()) {
                     IslandUtils.deleteChunks(this, chunkPositions, onFinish);
-                    return;
+                } else if (onFinish != null) {
+                    onFinish.run();
                 }
-            }
-
-            if (onFinish != null)
-                onFinish.run();
+            });
         });
     }
 

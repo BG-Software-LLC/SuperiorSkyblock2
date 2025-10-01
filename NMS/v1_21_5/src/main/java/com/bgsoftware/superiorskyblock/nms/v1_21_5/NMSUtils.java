@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.ObjectsPool;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.v1_21_5.world.PropertiesMapper;
@@ -50,7 +49,6 @@ import net.minecraft.world.level.chunk.storage.EntityStorage;
 import net.minecraft.world.level.chunk.storage.SimpleRegionStorage;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import net.minecraft.world.level.levelgen.Heightmap;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftChunk;
@@ -67,6 +65,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
 public class NMSUtils {
@@ -186,15 +185,23 @@ public class NMSUtils {
         PENDING_CHUNK_ACTIONS.add(pendingTask);
 
         BukkitExecutor.createTask().runAsync(v -> {
+            CountDownLatch countDownLatch;
+            if (chunkCallback.isWaitForChunkLoad) {
+                countDownLatch = chunkCallback.chunkLoadLatch = new CountDownLatch(chunks.size());
+            } else {
+                countDownLatch = null;
+            }
+
             List<UnloadedChunkCompound> chunkCompounds = new LinkedList<>();
 
             chunks.forEach(chunkPosition -> {
+                ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+                ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
+
+                ChunkPos chunkPos = new ChunkPos(chunkPosition.getX(), chunkPosition.getZ());
+
+                boolean calledCountdown = false;
                 try {
-                    ChunkPos chunkPos = new ChunkPos(chunkPosition.getX(), chunkPosition.getZ());
-
-                    ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
-                    ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
-
                     net.minecraft.nbt.CompoundTag chunkCompound = chunkMap.read(chunkPos).join().orElse(null);
 
                     if (chunkCompound == null) {
@@ -208,18 +215,28 @@ public class NMSUtils {
 
                     UnloadedChunkCompound unloadedChunkCompound = new UnloadedChunkCompound(chunkPosition, chunkDataCompound);
                     chunkCallback.onUnloadedChunk(unloadedChunkCompound);
+                    calledCountdown = true;
 
                     if (saveChunks)
                         chunkCompounds.add(unloadedChunkCompound);
                 } catch (Exception error) {
+                    if (!calledCountdown && countDownLatch != null)
+                        countDownLatch.countDown();
                     Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkPosition, ":");
                 }
             });
 
+            if (countDownLatch != null) {
+                try {
+                    countDownLatch.await();
+                } catch (InterruptedException error) {
+                    throw new RuntimeException(error);
+                }
+            }
+
             return chunkCompounds;
         }).runSync(chunkCompounds -> {
             chunkCompounds.forEach(unloadedChunkCompound -> {
-
                 ServerLevel serverLevel = unloadedChunkCompound.serverLevel();
                 ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
 
@@ -240,9 +257,9 @@ public class NMSUtils {
     }
 
     private static void runActionOnUnloadedEntityChunks(Collection<ChunkPosition> chunks, ChunkCallback chunkCallback) {
-        if (SERVER_LEVEL_ENTITY_MANAGER.isValid()) {
-            CompletableFutureList<Void> readChunksTasksList = new CompletableFutureList<>(-1);
+        CountDownLatch countDownLatch = chunkCallback.chunkLoadLatch = new CountDownLatch(chunks.size());
 
+        if (SERVER_LEVEL_ENTITY_MANAGER.isValid()) {
             chunks.forEach(chunkPosition -> {
                 ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
 
@@ -251,29 +268,28 @@ public class NMSUtils {
 
                 ChunkPos chunkPos = new ChunkPos(chunkPosition.getX(), chunkPosition.getZ());
 
-                CompletableFuture<Void> readTask = new CompletableFuture<>();
-                readChunksTasksList.add(readTask);
-
                 regionStorage.read(chunkPos).whenComplete((entityDataOptional, error) -> {
                     if (error != null) {
-                        readTask.completeExceptionally(error);
+                        countDownLatch.countDown();
+                        throw new RuntimeException(error);
                     } else {
-                        entityDataOptional.ifPresent(entityData -> {
+                        net.minecraft.nbt.CompoundTag entityData = entityDataOptional.orElse(null);
+                        if (entityData == null) {
+                            chunkCallback.onChunkNotExist(chunkPosition);
+                        } else {
                             UnloadedChunkCompound unloadedChunkCompound = new UnloadedChunkCompound(chunkPosition, entityData);
                             chunkCallback.onUnloadedChunk(unloadedChunkCompound);
-                        });
-
-                        readTask.complete(null);
+                        }
                     }
                 });
             });
 
             BukkitExecutor.createTask().runAsync(v -> {
-                readChunksTasksList.forEachCompleted(p -> {
-                    // Wait for all chunks to load.
-                }, error -> {
-                    Log.error(error, "An unexpected error occurred while interacting with unloaded chunk:");
-                });
+                try {
+                    countDownLatch.await();
+                } catch (InterruptedException error) {
+                    throw new RuntimeException(error);
+                }
             }).runSync(v -> {
                 chunkCallback.onFinish();
             });
@@ -296,10 +312,19 @@ public class NMSUtils {
                                 chunkCallback.onUnloadedChunk(unloadedChunkCompound);
                             }
                         }
+
+                        chunkCallback.onChunkNotExist(chunkPosition);
                     } catch (IOException error) {
+                        countDownLatch.countDown();
                         Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkPosition, ":");
                     }
                 });
+
+                try {
+                    countDownLatch.await();
+                } catch (InterruptedException error) {
+                    throw new RuntimeException(error);
+                }
             }).runSync(v -> {
                 chunkCallback.onFinish();
             });
@@ -475,6 +500,8 @@ public class NMSUtils {
         private final ChunkLoadReason chunkLoadReason;
         private final boolean isWaitForChunkLoad;
 
+        protected CountDownLatch chunkLoadLatch;
+
         public ChunkCallback(ChunkLoadReason chunkLoadReason, boolean isWaitForChunkLoad) {
             this.chunkLoadReason = chunkLoadReason;
             this.isWaitForChunkLoad = isWaitForChunkLoad;
@@ -490,14 +517,10 @@ public class NMSUtils {
             if (!plugin.getProviders().hasCustomWorldsSupport())
                 return;
 
-            CompletableFuture<Chunk> futureChunk = ChunksProvider.loadChunk(chunkPosition, this.chunkLoadReason, bukkitChunk -> {
+            ChunksProvider.loadChunk(chunkPosition, this.chunkLoadReason, bukkitChunk -> {
                 LevelChunk levelChunk = getCraftChunkHandle((CraftChunk) bukkitChunk);
                 BukkitExecutor.ensureMain(() -> onLoadedChunk(levelChunk));
             });
-
-            if (this.isWaitForChunkLoad) {
-                futureChunk.join();
-            }
         }
 
     }
