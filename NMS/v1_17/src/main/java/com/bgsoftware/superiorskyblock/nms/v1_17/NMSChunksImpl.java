@@ -253,7 +253,7 @@ public class NMSChunksImpl implements NMSChunks {
                 ChunkPosition chunkPosition = ChunkPosition.of(levelChunk.level.getWorld(), chunkPos.x, chunkPos.z, false);
                 allCalculatedChunks.add(calculateChunk(chunkPosition, levelChunk.getSections()));
 
-                this.chunkLoadLatch.countDown();
+                latchCountDown();
             }
 
             @Override
@@ -276,7 +276,7 @@ public class NMSChunksImpl implements NMSChunks {
                 allCalculatedChunks.add(calculatedChunk);
                 unloadedChunksCache.write(m -> m.put(chunkPosition, calculatedChunk));
 
-                this.chunkLoadLatch.countDown();
+                latchCountDown();
             }
 
             @Override
@@ -304,7 +304,7 @@ public class NMSChunksImpl implements NMSChunks {
                         chunkEntities.computeIfAbsent(Keys.of(bukkitEntity), i -> new Counter(0)).inc(1);
                 }
 
-                this.chunkLoadLatch.countDown();
+                latchCountDown();
             }
 
             @Override
@@ -312,7 +312,7 @@ public class NMSChunksImpl implements NMSChunks {
                 ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
                 unloadedEntityTags.add(new Pair<>(serverLevel, entityData.getList("Entities", 10)));
 
-                this.chunkLoadLatch.countDown();
+                latchCountDown();
             }
 
             @Override

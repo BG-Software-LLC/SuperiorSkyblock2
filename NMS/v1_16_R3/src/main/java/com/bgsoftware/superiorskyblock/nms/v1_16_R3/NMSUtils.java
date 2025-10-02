@@ -323,6 +323,7 @@ public class NMSUtils {
         private final ChunkLoadReason chunkLoadReason;
         private final boolean isWaitForChunkLoad;
 
+        @Nullable
         protected CountDownLatch chunkLoadLatch;
 
         public ChunkCallback(ChunkLoadReason chunkLoadReason, boolean isWaitForChunkLoad) {
@@ -335,6 +336,11 @@ public class NMSUtils {
         public abstract void onUnloadedChunk(ChunkPosition chunkPosition, NBTTagCompound unloadedChunk);
 
         public abstract void onFinish();
+
+        protected final void latchCountDown() {
+            if (this.chunkLoadLatch != null)
+                this.chunkLoadLatch.countDown();
+        }
 
         public final void onChunkNotExist(ChunkPosition chunkPosition) {
             if (!plugin.getProviders().hasCustomWorldsSupport())
