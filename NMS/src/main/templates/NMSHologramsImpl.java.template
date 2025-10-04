@@ -1,0 +1,29 @@
+package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION};
+
+import com.bgsoftware.superiorskyblock.api.service.hologram.Hologram;
+import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.hologram.EntityHologram;
+import com.google.common.base.Preconditions;
+import net.minecraft.server.level.ServerLevel;
+import org.bukkit.Location;
+import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
+import ${CRAFTBUKKIT_PACKAGE}.entity.CraftEntity;
+import org.bukkit.entity.Entity;
+
+public class NMSHologramsImpl implements NMSHolograms {
+
+    @Override
+    public Hologram createHologram(Location location) {
+        Preconditions.checkNotNull(location.getWorld(), "Cannot create hologram in null worlds.");
+        ServerLevel serverLevel = ((CraftWorld) location.getWorld()).getHandle();
+        EntityHologram entityHologram = new EntityHologram(serverLevel, location.getX(), location.getY(), location.getZ());
+        serverLevel.addFreshEntity(entityHologram);
+        return entityHologram;
+    }
+
+    @Override
+    public boolean isHologram(Entity entity) {
+        return ((CraftEntity) entity).getHandle() instanceof Hologram;
+    }
+
+}

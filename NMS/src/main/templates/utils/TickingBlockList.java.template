@@ -1,0 +1,9 @@
+package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils;
+
+public interface TickingBlockList {
+
+    int size();
+
+    int getRaw(int index);
+
+}

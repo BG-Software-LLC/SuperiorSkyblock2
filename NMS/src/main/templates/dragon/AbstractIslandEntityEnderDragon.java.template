@@ -1,0 +1,84 @@
+package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon;
+
+import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.IslandEntityEnderDragon;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.DragonUtils;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.EndWorldEndDragonFightHandler;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.IslandEndDragonFight;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.level.Level;
+import org.bukkit.Location;
+import ${CRAFTBUKKIT_PACKAGE}.entity.CraftEnderDragon;
+
+public class AbstractIslandEntityEnderDragon extends EnderDragon {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    @NotNull
+    public static EnderDragon fromEntityTypes(EntityType<? extends EnderDragon> entityTypes, Level level) {
+        return plugin.getGrid().isIslandsWorld(level.getWorld()) ? new IslandEntityEnderDragon(level) :
+                new EnderDragon(entityTypes, level);
+    }
+
+    protected final ServerLevel serverLevel;
+    protected final Dimension dimension;
+    protected BlockPos islandBlockPos;
+
+    protected AbstractIslandEntityEnderDragon(Level level, BlockPos islandBlockPos) {
+        this(level);
+        this.islandBlockPos = islandBlockPos;
+    }
+
+    protected AbstractIslandEntityEnderDragon(Level level) {
+        super(EntityType.ENDER_DRAGON, level);
+        this.serverLevel = (ServerLevel) level;
+        this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(level.getWorld());
+    }
+
+    @Override
+    public void aiStep() {
+        DragonUtils.runWithPodiumPosition(this.islandBlockPos, super::aiStep);
+    }
+
+    @Override
+    @NotNull
+    public CraftEnderDragon getBukkitEntity() {
+        return (CraftEnderDragon) super.getBukkitEntity();
+    }
+
+    protected void finalizeIslandEnderDragon() {
+        if (!(NMSUtilsVersioned.getEndDragonFight(this.serverLevel) instanceof EndWorldEndDragonFightHandler dragonBattleHandler))
+            return;
+
+        Island island;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            island = plugin.getGrid().getIslandAt(getBukkitEntity().getLocation(wrapper.getHandle()));
+        }
+
+        if (island == null)
+            return;
+
+        Location middleBlock = island.getCenter(dimension);
+
+        SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(dimension);
+        if (dimensionConfig instanceof SettingsManager.Worlds.End) {
+            middleBlock = ((SettingsManager.Worlds.End) dimensionConfig).getPortalOffset().applyToLocation(middleBlock);
+        }
+
+        this.islandBlockPos = new BlockPos(middleBlock.getBlockX(), middleBlock.getBlockY(), middleBlock.getBlockZ());
+
+        IslandEndDragonFight dragonBattle = new IslandEndDragonFight(island, this.serverLevel,
+                this.islandBlockPos, (IslandEntityEnderDragon) this);
+        dragonBattleHandler.addDragonFight(island.getCache(), dragonBattle);
+    }
+
+}
