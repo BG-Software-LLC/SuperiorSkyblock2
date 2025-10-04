@@ -14,6 +14,7 @@ import com.google.common.base.Suppliers;
 import com.google.gson.JsonParseException;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -281,6 +282,10 @@ public class NMSUtilsVersioned {
 
     public static void addEntity(ServerLevel serverLevel, Entity entity, CreatureSpawnEvent.SpawnReason spawnReason) {
         serverLevel.addFreshEntity(entity, spawnReason);
+    }
+
+    public static PropertyMap getProfileProperties(GameProfile gameProfile) {
+        return gameProfile.getProperties();
     }
 
     public static String getPropertyValue(Property property) {

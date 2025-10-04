@@ -54,7 +54,7 @@ import java.util.RandomAccess;
 @SuppressWarnings("rawtypes")
 public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
 
-    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagList");
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = NMSTagConverter.choice("NBTTagList", "ListTag");
 
     private static final byte DYNAMIC_LIST_INDICATOR = (byte) 0xFF;
 

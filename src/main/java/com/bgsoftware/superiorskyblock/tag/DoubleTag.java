@@ -46,7 +46,8 @@ import java.io.IOException;
  */
 public class DoubleTag extends NumberTag<Double> {
 
-    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagDouble", double.class);
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = NMSTagConverter.choice(
+            new String[]{"NBTTagDouble", "DoubleTag"}, double.class);
 
     private static final DoubleTag[] CACHE = new DoubleTag[100];
 

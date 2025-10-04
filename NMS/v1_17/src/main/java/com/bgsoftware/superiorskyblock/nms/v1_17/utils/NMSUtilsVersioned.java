@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_17.world.WorldEditSessionImpl;
 import com.google.common.base.Suppliers;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -251,6 +252,10 @@ public class NMSUtilsVersioned {
 
     public static void addEntity(ServerLevel serverLevel, Entity entity, CreatureSpawnEvent.SpawnReason spawnReason) {
         serverLevel.addEntity(entity, spawnReason);
+    }
+
+    public static PropertyMap getProfileProperties(GameProfile gameProfile) {
+        return gameProfile.getProperties();
     }
 
     public static String getPropertyValue(Property property) {

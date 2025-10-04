@@ -14,6 +14,7 @@ import com.google.common.base.Suppliers;
 import com.google.gson.JsonParseException;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -324,6 +325,10 @@ public class NMSUtilsVersioned {
             SignText.DIRECT_CODEC.encodeStart(NbtOps.INSTANCE, signText).result()
                     .ifPresent(frontTextNBT -> blockEntityCompound.put("front_text", frontTextNBT));
         }
+    }
+
+    public static PropertyMap getProfileProperties(GameProfile gameProfile) {
+        return gameProfile.getProperties();
     }
 
     public static String getPropertyValue(Property property) {

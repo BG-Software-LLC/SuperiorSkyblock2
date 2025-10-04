@@ -46,7 +46,8 @@ import java.io.IOException;
  */
 public class IntTag extends NumberTag<Integer> {
 
-    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagInt", int.class);
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = NMSTagConverter.choice(
+            new String[]{"NBTTagInt", "IntTag"}, int.class);
 
     private static final IntTag[] CACHE = new IntTag[100];
 

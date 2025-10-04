@@ -43,7 +43,7 @@ import java.io.IOException;
  */
 public class EndTag extends Tag<Object> {
 
-    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagEnd");
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = NMSTagConverter.choice("NBTTagEnd", "EndTag");
 
     private static final EndTag INSTANCE = new EndTag();
 

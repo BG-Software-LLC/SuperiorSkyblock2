@@ -41,7 +41,7 @@ public class NMSPlayersImpl implements NMSPlayers {
             return;
 
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-        serverPlayer.getGameProfile().getProperties().get("textures").stream().findFirst()
+        NMSUtilsVersioned.getProfileProperties(serverPlayer.getGameProfile()).get("textures").stream().findFirst()
                 .ifPresent(property -> setSkinTexture(superiorPlayer, property));
     }
 

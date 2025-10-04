@@ -53,7 +53,8 @@ import java.util.UUID;
 @SuppressWarnings("WeakerAccess")
 public class IntArrayTag extends Tag<int[]> {
 
-    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagIntArray", int[].class);
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = NMSTagConverter.choice(
+            new String[]{"NBTTagIntArray", "IntArrayTag"}, int[].class);
 
     private static final IntArrayTag EMPTY = new IntArrayTag(new int[0]);
 

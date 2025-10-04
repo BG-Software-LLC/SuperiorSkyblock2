@@ -47,7 +47,8 @@ import java.nio.charset.StandardCharsets;
  */
 public class StringTag extends Tag<String> {
 
-    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagString", String.class);
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = NMSTagConverter.choice(
+            new String[]{"NBTTagString", "StringTag"}, String.class);
 
     private static final StringTag EMPTY = new StringTag("");
 

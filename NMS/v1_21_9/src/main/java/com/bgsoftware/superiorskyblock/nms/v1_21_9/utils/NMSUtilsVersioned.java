@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.nms.v1_21_3.utils;
+package com.bgsoftware.superiorskyblock.nms.v1_21_9.utils;
 
 import ca.spottedleaf.moonrise.patches.chunk_system.io.MoonriseRegionFileIO;
 import com.bgsoftware.common.annotations.Nullable;
@@ -9,13 +9,14 @@ import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
-import com.bgsoftware.superiorskyblock.nms.v1_21_3.NMSUtils;
-import com.bgsoftware.superiorskyblock.nms.v1_21_3.utils.TickingBlockList;
+import com.bgsoftware.superiorskyblock.nms.v1_21_9.NMSUtils;
+import com.bgsoftware.superiorskyblock.nms.v1_21_9.utils.TickingBlockList;
 import com.google.common.base.Suppliers;
 import com.google.gson.JsonParseException;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
+import com.mojang.logging.LogUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -32,6 +33,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.ChunkPos;
@@ -46,7 +48,9 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.level.chunk.PalettedContainerFactory;
 import net.minecraft.world.level.chunk.ProtoChunk;
+import net.minecraft.world.level.chunk.Strategy;
 import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.chunk.status.ChunkPyramid;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
@@ -57,6 +61,9 @@ import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.dimension.end.EndDragonFight;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.ticks.ProtoChunkTicks;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.CraftWorld;
@@ -66,6 +73,7 @@ import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.generator.ChunkGenerator;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -79,12 +87,17 @@ import java.util.concurrent.CountDownLatch;
 
 public class NMSUtilsVersioned {
 
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     private static final Component[] COMPONENT_ARRAY_TYPE = new Component[0];
 
     private static final ReflectField<PersistentEntitySectionManager<Entity>> SERVER_LEVEL_ENTITY_MANAGER = new ReflectField<>(
             ServerLevel.class, PersistentEntitySectionManager.class, Modifier.PUBLIC | Modifier.FINAL, 1);
     private static final ReflectField<SimpleRegionStorage> ENTITY_STORAGE_REGION_STORAGE = new ReflectField<>(
             EntityStorage.class, SimpleRegionStorage.class, Modifier.PRIVATE | Modifier.FINAL, 1);
+
+    public static final PalettedContainerFactory DEFAULT_PALETTED_CONTAINER_FACTORY = PalettedContainerFactory.create(
+            MinecraftServer.getServer().registryAccess());
 
     public static CompoundTag readChunk(ChunkMap chunkMap, ChunkPos chunkPos) {
         return chunkMap.read(chunkPos).join().orElse(null);
@@ -140,7 +153,7 @@ public class NMSUtilsVersioned {
                         MoonriseRegionFileIO.RegionDataController.ReadData readData =
                                 regionDataController.readData(chunkX, chunkZ);
                         if (readData != null && readData.result() == MoonriseRegionFileIO.RegionDataController.ReadData.ReadResult.SYNC_READ) {
-                            net.minecraft.nbt.CompoundTag entityData = readData.syncRead();
+                            CompoundTag entityData = readData.syncRead();
                             if (entityData != null) {
                                 NMSUtils.UnloadedChunkCompound unloadedChunkCompound = new NMSUtils.UnloadedChunkCompound(chunkPosition, entityData);
                                 chunkCallback.onUnloadedChunk(unloadedChunkCompound);
@@ -162,15 +175,14 @@ public class NMSUtilsVersioned {
         return new ProtoChunk(chunkPos,
                 UpgradeData.EMPTY,
                 serverLevel,
-                serverLevel.registryAccess().lookupOrThrow(Registries.BIOME),
+                DEFAULT_PALETTED_CONTAINER_FACTORY,
                 null);
     }
 
     public static ProtoChunk createProtoChunk(ChunkPos chunkPos, LevelChunkSection[] chunkSections,
                                               LevelHeightAccessor levelHeightAccessor, @Nullable ServerLevel serverLevel) {
-        Registry<Biome> biomesRegistry = MinecraftServer.getServer().registryAccess().lookupOrThrow(Registries.BIOME);
-        return new ProtoChunk(chunkPos, UpgradeData.EMPTY, chunkSections,
-                new ProtoChunkTicks<>(), new ProtoChunkTicks<>(), levelHeightAccessor, biomesRegistry, null);
+        return new ProtoChunk(chunkPos, UpgradeData.EMPTY, chunkSections, new ProtoChunkTicks<>(),
+                new ProtoChunkTicks<>(), levelHeightAccessor, DEFAULT_PALETTED_CONTAINER_FACTORY, null);
     }
 
     public static boolean isBlockStateLiquid(BlockState blockState) {
@@ -182,7 +194,11 @@ public class NMSUtilsVersioned {
     }
 
     public static void loadBlockEntity(BlockEntity blockEntity, CompoundTag compoundTag) {
-        blockEntity.loadWithComponents(compoundTag, MinecraftServer.getServer().registryAccess());
+        try (ProblemReporter.ScopedCollector scopedCollector =
+                     new ProblemReporter.ScopedCollector(() -> "block_entity@" + blockEntity.getBlockPos(), LOGGER)) {
+            ValueInput valueInput = TagValueInput.create(scopedCollector, blockEntity.getLevel().registryAccess(), compoundTag);
+            blockEntity.loadWithComponents(valueInput);
+        }
     }
 
     public static void relightChunks(ThreadedLevelLightEngine lightEngine, Set<ChunkPos> chunks) {
@@ -212,16 +228,11 @@ public class NMSUtilsVersioned {
                                            LevelHeightAccessor levelHeightAccessor,
                                            LevelChunkSection[] chunkSections,
                                            Dimension dimension) {
-        Registry<Biome> biomesRegistry = MinecraftServer.getServer().registryAccess().lookupOrThrow(Registries.BIOME);
-
         Holder<Biome> biome = CraftBiome.bukkitToMinecraftHolder(IslandUtils.getDefaultWorldBiome(dimension));
 
         for (int i = 0; i < chunkSections.length; ++i) {
-            PalettedContainer<Holder<Biome>> biomesContainer = new PalettedContainer<>(biomesRegistry.asHolderIdMap(),
-                    biome, PalettedContainer.Strategy.SECTION_BIOMES);
-            PalettedContainer<BlockState> statesContainer = new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY,
-                    Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES);
-
+            PalettedContainer<Holder<Biome>> biomesContainer = createBiomesContainer(biome);
+            PalettedContainer<BlockState> statesContainer = DEFAULT_PALETTED_CONTAINER_FACTORY.createForBlockStates();
             chunkSections[i] = new LevelChunkSection(statesContainer, biomesContainer);
         }
     }
@@ -245,8 +256,7 @@ public class NMSUtilsVersioned {
     }
 
     public static PalettedContainer<BlockState> createEmptyPlattedContainerStates() {
-        return new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(),
-                PalettedContainer.Strategy.SECTION_STATES);
+        return DEFAULT_PALETTED_CONTAINER_FACTORY.createForBlockStates();
     }
 
     public static PalettedContainer<BlockState> copyPalettedContainer(PalettedContainer<BlockState> original) {
@@ -258,9 +268,12 @@ public class NMSUtilsVersioned {
     }
 
     public static CompoundTag saveEntity(Entity entity) {
-        CompoundTag compoundTag = new CompoundTag();
-        entity.save(compoundTag);
-        return compoundTag;
+        try (ProblemReporter.ScopedCollector scopedCollector =
+                     new ProblemReporter.ScopedCollector(() -> "cached_entity@" + entity.getUUID(), LOGGER)) {
+            TagValueOutput valueOutput = TagValueOutput.createWithContext(scopedCollector, entity.level().registryAccess());
+            entity.save(valueOutput);
+            return valueOutput.buildResult();
+        }
     }
 
     public static Material getMaterialFromBlock(Block block) {
@@ -290,7 +303,7 @@ public class NMSUtilsVersioned {
     }
 
     public static PropertyMap getProfileProperties(GameProfile gameProfile) {
-        return gameProfile.getProperties();
+        return gameProfile.properties();
     }
 
     public static String getPropertyValue(Property property) {
@@ -302,7 +315,7 @@ public class NMSUtilsVersioned {
     }
 
     public static void moveEntity(Entity entity, double x, double y, double z, float yaw, float pitch) {
-        entity.absMoveTo(x, y, z, yaw, pitch);
+        entity.absSnapTo(x, y, z, yaw, pitch);
     }
 
     public static int getMinSection(ServerLevel serverLevel) {
@@ -321,16 +334,29 @@ public class NMSUtilsVersioned {
         levelChunk.markUnsaved();
     }
 
+    public static PalettedContainer<Holder<Biome>> createBiomesContainer(Holder<Biome> biome) {
+        Registry<Biome> biomesRegistry = MinecraftServer.getServer().registryAccess().lookupOrThrow(Registries.BIOME);
+        Strategy<Holder<Biome>> biomesStrategy = Strategy.createForBiomes(biomesRegistry.asHolderIdMap());
+        return new PalettedContainerFactory(
+                null,
+                null,
+                null,
+                biomesStrategy,
+                biome,
+                null,
+                null
+        ).createForBiomes();
+    }
+
     private static void applySignTextLines(CompoundTag blockEntityCompound, String key) {
-        if (blockEntityCompound.contains(key)) {
-            CompoundTag frontText = blockEntityCompound.getCompound(key);
-            ListTag messages = frontText.getList("messages", net.minecraft.nbt.Tag.TAG_STRING);
+        blockEntityCompound.getCompound(key).ifPresent(textCompound -> {
+            ListTag messages = textCompound.getListOrEmpty("messages");
             List<Component> textLines = new ArrayList<>();
             for (net.minecraft.nbt.Tag lineTag : messages) {
                 try {
-                    textLines.add(CraftChatMessage.fromJSON(lineTag.getAsString()));
+                    textLines.add(CraftChatMessage.fromJSON(lineTag.asString().orElseThrow()));
                 } catch (JsonParseException error) {
-                    textLines.add(CraftChatMessage.fromString(lineTag.getAsString())[0]);
+                    textLines.add(CraftChatMessage.fromString(lineTag.asString().orElseThrow())[0]);
                 }
             }
 
@@ -341,8 +367,8 @@ public class NMSUtilsVersioned {
 
             SignText signText = new SignText(textLinesArray, textLinesArray, DyeColor.BLACK, false);
             SignText.DIRECT_CODEC.encodeStart(NbtOps.INSTANCE, signText).result()
-                    .ifPresent(frontTextNBT -> blockEntityCompound.put(key, frontTextNBT));
-        }
+                    .ifPresent(nbt -> blockEntityCompound.put(key, nbt));
+        });
     }
 
     private static void convertLegacySignTextLines(CompoundTag blockEntityCompound) {
@@ -352,13 +378,13 @@ public class NMSUtilsVersioned {
         // We try to convert old text sign lines
         for (int i = 1; i <= 4; ++i) {
             if (blockEntityCompound.contains("SSB.Text" + i)) {
-                String signLine = blockEntityCompound.getString("SSB.Text" + i);
+                String signLine = blockEntityCompound.getString("SSB.Text" + i).orElse(null);
                 if (!Text.isBlank(signLine)) {
                     signLines[i - 1] = CraftChatMessage.fromString(signLine)[0];
                     hasAnySignLines = true;
                 }
             } else {
-                String signLine = blockEntityCompound.getString("Text" + i);
+                String signLine = blockEntityCompound.getString("Text" + i).orElse(null);
                 if (!Text.isBlank(signLine)) {
                     signLines[i - 1] = CraftChatMessage.fromJSON(signLine);
                     hasAnySignLines = true;
