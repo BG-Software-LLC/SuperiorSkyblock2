@@ -4,12 +4,11 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.LocationKey;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
-import com.bgsoftware.superiorskyblock.core.collections.Location2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -36,19 +35,14 @@ import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import java.lang.ref.WeakReference;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class UpgradeTypeEntityLimits implements IUpgradeType {
 
-    private final Map<EntityType, SpawningPlayerData> entityBreederPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
-    private final Map<Location, SpawningPlayerData> vehiclesOwners = AutoRemovalMap.newMap(2, TimeUnit.SECONDS, Location2ObjectMap::new);
-    private final Map<EntityType, SpawningPlayerData> spawnEggPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
+    private final Map<UUID, SpawnOrigin> breedingOrigins = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
+    private final Map<LocationKey, SpawnOrigin> vehiclesOwners = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
+    private final Map<EntityType, SpawnOrigin> spawnEggPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -87,36 +81,36 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onEntitySpawn(CreatureSpawnEvent e) {
             Entity entity = e.getEntity();
-            EntityType entityType = entity.getType();
+            EntityType type = entity.getType();
 
-            if (BukkitEntities.canBypassEntityLimit(entity) || !BukkitEntities.canHaveLimit(entityType))
-                return;
+            if (BukkitEntities.canBypassEntityLimit(entity) || !BukkitEntities.canHaveLimit(type)) return;
 
             Island island = plugin.getGrid().getIslandAt(e.getLocation());
+            if (island == null) return;
 
-            if (island == null)
-                return;
+            SpawnOrigin origin = getSpawnOriginFromSpawnEvent(e);
 
-            SpawningPlayerData spawningPlayerData = getSpawningPlayerFromSpawnEvent(e);
-            Player spawningPlayer = spawningPlayerData == null ? null : spawningPlayerData.player.get();
+            boolean limit = island.hasReachedEntityLimit(Keys.of(entity)).join();
+            if (!limit) return;
 
-            boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
+            e.setCancelled(true);
 
-            if (hasReachedLimit) {
-                e.setCancelled(true);
-                if (spawningPlayer != null && spawningPlayer.isOnline()) {
-                    Message.REACHED_ENTITY_LIMIT.send(spawningPlayer, Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
-                    List<ItemStack> itemsToGiveBack = spawningPlayerData.itemStacks;
-                    try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                        Location location = spawningPlayer.getLocation(wrapper.getHandle());
-                        PlayerInventory inventory = spawningPlayer.getInventory();
-                        for (ItemStack itemStack : itemsToGiveBack) {
-                            BukkitItems.addItem(itemStack, inventory, location);
-                        }
+            if (origin != null && origin.getPlayerId() != null) {
+                Player p = plugin.getServer().getPlayer(origin.getPlayerId());
+                if (p != null && p.isOnline()) {
+                    Message.REACHED_ENTITY_LIMIT.send(p, Formatters.CAPITALIZED_FORMATTER.format(type.toString()));
+                    try (ObjectsPools.Wrapper<Location> w = ObjectsPools.LOCATION.obtain()) {
+                        Location loc = p.getLocation(w.getHandle());
+                        PlayerInventory inv = p.getInventory();
+                        for (ItemStack it : origin.getRefunds())
+                            BukkitItems.addItem(it, inv, loc);
                     }
                 }
             }
         }
+
+
+
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onHangingPlace(HangingPlaceEvent e) {
@@ -144,25 +138,17 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
         @EventHandler
         public void onVehicleSpawn(PlayerInteractEvent e) {
-            if (e.getAction() != Action.RIGHT_CLICK_BLOCK)
-                return;
+            if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
-            PlayerHand playerHand = BukkitItems.getHand(e);
-            if (playerHand != PlayerHand.MAIN_HAND)
-                return;
-
-            ItemStack handItem = BukkitItems.getHandItem(e.getPlayer(), playerHand);
-            if (handItem == null)
-                return;
+            ItemStack handItem = e.getItem();
+            if (handItem == null) return;
 
             Material handType = handItem.getType();
-
-            // Check if minecart or boat
             boolean isMinecart = Materials.isRail(e.getClickedBlock().getType()) && Materials.isMinecart(handType);
             boolean isBoat = Materials.isBoat(handType);
-            if (!isMinecart && !isBoat)
-                return;
+            if (!isMinecart && !isBoat) return;
 
+            LocationKey futureEntitySpawnLocation;
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 Location blockLocation = e.getClickedBlock().getLocation(wrapper.getHandle());
                 Island island = plugin.getGrid().getIslandAt(blockLocation);
@@ -170,58 +156,72 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
                 if (island == null)
                     return;
 
-                Location futureEntitySpawnLocation = isMinecart ? blockLocation :
-                        blockLocation.add(0, 1, 0);
-
-                vehiclesOwners.put(futureEntitySpawnLocation, new SpawningPlayerData(e.getPlayer()));
+                futureEntitySpawnLocation = isMinecart ? LocationKey.of(blockLocation, false) :
+                        LocationKey.of(blockLocation.getWorld().getName(), blockLocation.getX(),
+                                blockLocation.getY() + 1, blockLocation.getZ(), false);
             }
+
+            vehiclesOwners.put(futureEntitySpawnLocation, new SpawnOrigin(e.getPlayer().getUniqueId()));
         }
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onVehicleSpawn(VehicleCreateEvent e) {
             Entity entity = e.getVehicle();
-            EntityType entityType = entity.getType();
+            EntityType type = entity.getType();
 
-            if (BukkitEntities.canBypassEntityLimit(entity) || !BukkitEntities.canHaveLimit(entityType))
-                return;
+            if (BukkitEntities.canBypassEntityLimit(entity) || !BukkitEntities.canHaveLimit(type)) return;
 
             Island island;
-            SpawningPlayerData vehicleOwnerData;
+            SpawnOrigin origin;
 
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                Location entityLocation = entity.getLocation(wrapper.getHandle());
-                island = plugin.getGrid().getIslandAt(entityLocation);
+            try (ObjectsPools.Wrapper<Location> w = ObjectsPools.LOCATION.obtain()) {
+                Location loc = entity.getLocation(w.getHandle());
+                island = plugin.getGrid().getIslandAt(loc);
+                if (island == null) return;
 
-                if (island == null)
-                    return;
+                LocationKey key = LocationKey.of(
+                        loc.getWorld().getName(),
+                        loc.getBlockX(),
+                        loc.getBlockY(),
+                        loc.getBlockZ()
+                );
 
-                vehicleOwnerData = vehiclesOwners.remove(entityLocation);
+                origin = vehiclesOwners.remove(key);
             }
 
-            Player vehicleOwner = vehicleOwnerData == null ? null : vehicleOwnerData.player.get();
+            boolean limit = island.hasReachedEntityLimit(Keys.of(entity)).join();
+            if (!limit) return;
 
-            boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
+            entity.remove();
 
-            if (hasReachedLimit) {
-                entity.remove();
-                if (vehicleOwner != null && vehicleOwner.isOnline()) {
-                    Message.REACHED_ENTITY_LIMIT.send(vehicleOwner, Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
+            if (origin != null && origin.getPlayerId() != null) {
+                Player p = plugin.getServer().getPlayer(origin.getPlayerId());
+                if (p != null && p.isOnline()) {
+                    Message.REACHED_ENTITY_LIMIT.send(p, Formatters.CAPITALIZED_FORMATTER.format(type.toString()));
                 }
             }
         }
 
+
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnEggUse(PlayerInteractEvent e) {
-            if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null)
+            if (e.getAction() != Action.RIGHT_CLICK_BLOCK)
                 return;
 
-            PlayerHand usedHand = BukkitItems.getHand(e);
-            ItemStack usedItem = BukkitItems.getHandItem(e.getPlayer(), usedHand);
-            EntityType spawnEggEntityType = usedItem == null ? EntityType.UNKNOWN :
-                    usedItem.getType() == Material.ARMOR_STAND ? EntityType.ARMOR_STAND :
-                            BukkitItems.getEntityType(usedItem);
+            ItemStack usedItem = e.getItem();
+            if (usedItem == null || usedItem.getType() == Material.AIR)
+                return;
 
-            if (spawnEggEntityType == EntityType.UNKNOWN || !BukkitEntities.canHaveLimit(spawnEggEntityType))
+            Player player = e.getPlayer();
+            EntityType eggType;
+
+            if (usedItem.getType() == Material.ARMOR_STAND) {
+                eggType = EntityType.ARMOR_STAND;
+            } else {
+                eggType = BukkitItems.getEntityType(usedItem);
+            }
+
+            if (eggType == EntityType.UNKNOWN || !BukkitEntities.canHaveLimit(eggType))
                 return;
 
             Island island;
@@ -231,26 +231,25 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            spawnEggPlayers.put(spawnEggEntityType, new SpawningPlayerData(e.getPlayer()));
+            spawnEggPlayers.put(eggType, new SpawnOrigin(player.getUniqueId()));
         }
 
         @Nullable
-        private SpawningPlayerData getSpawningPlayerFromSpawnEvent(CreatureSpawnEvent event) {
-            EntityType entityType = event.getEntityType();
+        private SpawnOrigin getSpawnOriginFromSpawnEvent(CreatureSpawnEvent event) {
+            EntityType type = event.getEntityType();
 
-            if (entityType == EntityType.ARMOR_STAND) {
-                return spawnEggPlayers.remove(entityType);
-            }
+            if (type == EntityType.ARMOR_STAND) return spawnEggPlayers.remove(type);
 
             switch (event.getSpawnReason()) {
                 case SPAWNER_EGG:
-                    return spawnEggPlayers.remove(entityType);
+                    return spawnEggPlayers.remove(type);
                 case BREEDING:
-                    return entityBreederPlayers.remove(entityType);
+                    return breedingOrigins.remove(event.getEntity().getUniqueId());
+                default:
+                    return null;
             }
-
-            return null;
         }
+
 
     }
 
@@ -261,24 +260,33 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onEntityBreed(EntityBreedEvent e) {
             Entity child = e.getEntity();
-            EntityType childEntityType = child.getType();
+            EntityType type = child.getType();
 
-            if (!(e.getBreeder() instanceof Player) || !BukkitEntities.canHaveLimit(childEntityType))
+            if (!BukkitEntities.canHaveLimit(type))
                 return;
 
             Island island;
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                island = plugin.getGrid().getIslandAt(child.getLocation(wrapper.getHandle()));
+            try (ObjectsPools.Wrapper<Location> w = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(child.getLocation(w.getHandle()));
             }
-
             if (island == null)
                 return;
 
-            ItemStack fatherBreedItem = trackedBreedItems.remove(e.getFather().getEntityId());
-            ItemStack motherBreedItem = e.getFather().equals(e.getMother()) ? null :
+            UUID breederId = null;
+            if (e.getBreeder() instanceof Player)
+                breederId = e.getBreeder().getUniqueId();
+
+            ItemStack fatherItem = trackedBreedItems.remove(e.getFather().getEntityId());
+            ItemStack motherItem = e.getFather().equals(e.getMother()) ? null :
                     trackedBreedItems.remove(e.getMother().getEntityId());
 
-            entityBreederPlayers.put(childEntityType, new SpawningPlayerData((Player) e.getBreeder(), fatherBreedItem, motherBreedItem));
+            List<ItemStack> refunds = new LinkedList<>();
+            if (fatherItem != null && fatherItem.getType() != Material.AIR && fatherItem.getAmount() > 0)
+                refunds.add(fatherItem);
+            if (motherItem != null && motherItem.getType() != Material.AIR && motherItem.getAmount() > 0)
+                refunds.add(motherItem);
+
+            breedingOrigins.put(child.getUniqueId(), new SpawnOrigin(breederId, refunds));
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -286,67 +294,66 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (!(e.getRightClicked() instanceof Animals))
                 return;
 
-            PlayerHand usedHand = BukkitItems.getHand(e);
-            ItemStack usedItem = BukkitItems.getHandItem(e.getPlayer(), usedHand);
+            Player player = e.getPlayer();
+            ItemStack usedItem = BukkitItems.getHandItem(player, BukkitItems.getHand(e));
+            if (usedItem == null || usedItem.getType() == Material.AIR)
+                return;
 
-            if (usedItem == null || !plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) e.getRightClicked()))
+            if (!plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) e.getRightClicked()))
                 return;
 
             // We want to calculate the amount of items consumed by breeding this animal.
             // We do that by checking the held item one tick later, and subtracting the
             // amount after 1 tick of the item from the original amount.
-            int mainHandSlot = e.getPlayer().getInventory().getHeldItemSlot();
             int originalAmount = usedItem.getAmount();
             ItemStack breedItem = usedItem.clone();
 
             BukkitExecutor.sync(() -> {
-                ItemStack inventoryItem = usedHand == PlayerHand.MAIN_HAND ?
-                        e.getPlayer().getInventory().getItem(mainHandSlot) :
-                        BukkitItems.getHandItem(e.getPlayer(), PlayerHand.OFF_HAND);
+                ItemStack currentItem = BukkitItems.getHandItem(player, BukkitItems.getHand(e));
 
-                boolean isInventoryItemEmpty = inventoryItem == null || inventoryItem.getType() == Material.AIR;
-
-                if (!isInventoryItemEmpty && !inventoryItem.isSimilar(usedItem))
+                boolean isEmpty = currentItem == null || currentItem.getType() == Material.AIR;
+                if (!isEmpty && !currentItem.isSimilar(usedItem))
                     return;
 
-                int currAmount = isInventoryItemEmpty ? 0 : inventoryItem.getAmount();
-
-                int consumedAmount = originalAmount - currAmount;
-                if (consumedAmount <= 0)
+                int currentAmount = isEmpty ? 0 : currentItem.getAmount();
+                int consumed = originalAmount - currentAmount;
+                if (consumed <= 0)
                     return;
 
-                breedItem.setAmount(consumedAmount);
+                breedItem.setAmount(consumed);
                 trackedBreedItems.put(e.getRightClicked().getEntityId(), breedItem);
             }, 5L);
         }
 
+
     }
 
-    private static class SpawningPlayerData {
+    private static final class SpawnOrigin {
+        private final @Nullable UUID playerId;
+        private final List<ItemStack> refunds;
 
-        private final WeakReference<Player> player;
-        private final List<ItemStack> itemStacks = new LinkedList<>();
-
-        SpawningPlayerData(Player player) {
-            this(player, (ItemStack) null);
+        SpawnOrigin(@Nullable UUID playerId, @Nullable List<ItemStack> refunds) {
+            this.playerId = playerId;
+            if (refunds == null || refunds.isEmpty()) {
+                this.refunds = Collections.emptyList();
+            } else {
+                this.refunds = Collections.unmodifiableList(new ArrayList<>(refunds));
+            }
         }
 
-        SpawningPlayerData(Player player, @Nullable ItemStack itemStack) {
-            this.player = new WeakReference<>(player);
-            addItem(itemStack);
+        SpawnOrigin(@Nullable UUID playerId) {
+            this.playerId = playerId;
+            this.refunds = Collections.emptyList();
         }
 
-        SpawningPlayerData(Player player, ItemStack... itemStacks) {
-            this.player = new WeakReference<>(player);
-            for (ItemStack itemStack : itemStacks)
-                addItem(itemStack);
+        @Nullable
+        UUID getPlayerId() {
+            return playerId;
         }
 
-        private void addItem(@Nullable ItemStack itemStack) {
-            if (itemStack != null && itemStack.getType() != Material.AIR && itemStack.getAmount() > 0)
-                this.itemStacks.add(itemStack);
+        List<ItemStack> getRefunds() {
+            return refunds;
         }
-
     }
 
 }
