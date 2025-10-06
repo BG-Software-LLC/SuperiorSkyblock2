@@ -24,7 +24,6 @@ import io.papermc.paper.chat.ChatRenderer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.item.FallingBlockEntity;
@@ -230,16 +229,6 @@ public abstract class AbstractNMSAlgorithms implements NMSAlgorithms {
     @Override
     public int getMaxWorldSize() {
         return Bukkit.getMaxWorldSize();
-    }
-
-    @Override
-    public double getCurrentTps() {
-        try {
-            return MinecraftServer.getServer().tps1.getAverage();
-        } catch (Throwable error) {
-            //noinspection removal
-            return MinecraftServer.getServer().recentTps[0];
-        }
     }
 
     @Override

@@ -25,4 +25,14 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_20
         itemMeta.setEnchantmentGlintOverride(true);
     }
 
+    @Override
+    public double getCurrentTps() {
+        try {
+            return MinecraftServer.getServer().tps1.getAverage();
+        } catch (Throwable error) {
+            //noinspection removal
+            return MinecraftServer.getServer().recentTps[0];
+        }
+    }
+
 }

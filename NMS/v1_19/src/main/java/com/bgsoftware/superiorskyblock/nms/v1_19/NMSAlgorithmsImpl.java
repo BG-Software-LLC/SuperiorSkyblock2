@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.nms.algorithms.PaperGlowEnchantment;
 import com.bgsoftware.superiorskyblock.nms.algorithms.SpigotGlowEnchantment;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
@@ -55,6 +56,16 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_19
     @Override
     public void makeItemGlow(ItemMeta itemMeta) {
         itemMeta.addEnchant(GLOW_ENCHANT, 1, true);
+    }
+
+    @Override
+    public double getCurrentTps() {
+        try {
+            return MinecraftServer.getServer().tps1.getAverage();
+        } catch (Throwable error) {
+            //noinspection removal
+            return MinecraftServer.getServer().recentTps[0];
+        }
     }
 
     private static Enchantment initializeGlowEnchantment() {
