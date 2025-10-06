@@ -1,22 +1,25 @@
 package com.bgsoftware.superiorskyblock.core.threads;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class BukkitExecutor {
 
+    private static final int DEFAULT_SHUTDOWN_TIMEOUT = 1000 * 20;
+    private static final int SHUTDOWN_INTERVAL_WAIT_TIME = 100;
+
     private static SuperiorSkyblockPlugin plugin;
     private static State state = State.RUNNING;
 
     private static final AtomicLong ACTIVE_TASKS_COUNT = new AtomicLong(0);
-    private static final CountDownLatch WAITABLE = new CountDownLatch(1);
 
     private BukkitExecutor() {
 
@@ -100,9 +103,16 @@ public class BukkitExecutor {
     public static void close(SuperiorSkyblockPlugin plugin) {
         // Waiting for all active tasks to finish
 
-        try {
-            WAITABLE.await();
-        } catch (Throwable ignored) {
+        Log.info("This can take up to " + (DEFAULT_SHUTDOWN_TIMEOUT / 1000) + " seconds to complete");
+
+        long timeoutLeft = DEFAULT_SHUTDOWN_TIMEOUT;
+
+        while (ACTIVE_TASKS_COUNT.get() != 0 && timeoutLeft > 0) {
+            try {
+                Thread.sleep(SHUTDOWN_INTERVAL_WAIT_TIME);
+                timeoutLeft -= SHUTDOWN_INTERVAL_WAIT_TIME;
+            } catch (Throwable ignored) {
+            }
         }
 
         if (ACTIVE_TASKS_COUNT.get() != 0) {
@@ -136,7 +146,7 @@ public class BukkitExecutor {
             if (state == State.PREPARE_SHUTDOWN) {
                 nestedTask.value.complete(function.apply(value.join()));
             } else {
-                nestedTask.onCreate();
+                onCreate();
                 value.whenComplete((value, ex) -> BukkitExecutor.ensureMain(() -> {
                     nestedTask.value.complete(function.apply(value));
                     onComplete();
@@ -153,7 +163,7 @@ public class BukkitExecutor {
                 consumer.accept(value.join());
                 nestedTask.value.complete(null);
             } else {
-                nestedTask.onCreate();
+                onCreate();
                 value.whenComplete((value, ex) -> BukkitExecutor.ensureMain(() -> {
                     consumer.accept(value);
                     nestedTask.value.complete(null);
@@ -170,7 +180,7 @@ public class BukkitExecutor {
             if (state == State.PREPARE_SHUTDOWN) {
                 nestedTask.value.complete(function.apply(value.join()));
             } else {
-                nestedTask.onCreate();
+                onCreate();
                 value.whenComplete((value, ex) -> BukkitExecutor.async(() -> {
                     nestedTask.value.complete(function.apply(value));
                     onComplete();
@@ -187,7 +197,7 @@ public class BukkitExecutor {
                 consumer.accept(value.join());
                 nestedTask.value.complete(null);
             } else {
-                nestedTask.onCreate();
+                onCreate();
                 value.whenComplete((value, ex) -> BukkitExecutor.async(() -> {
                     consumer.accept(value);
                     nestedTask.value.complete(null);
@@ -202,14 +212,17 @@ public class BukkitExecutor {
             return this;
         }
 
-        private void onCreate() {
-            ACTIVE_TASKS_COUNT.incrementAndGet();
+        private static void onCreate() {
+            long curr = ACTIVE_TASKS_COUNT.incrementAndGet();
+            Log.debug(Debug.TRACK_TASK, curr);
         }
 
-        private void onComplete() {
-            long current = ACTIVE_TASKS_COUNT.decrementAndGet();
-            if (current == 0) {
-                WAITABLE.countDown();
+        private static void onComplete() {
+            long curr = ACTIVE_TASKS_COUNT.decrementAndGet();
+            Log.debug(Debug.TRACK_TASK, curr);
+            if (curr < 0) {
+                new RuntimeException("Active tasks count is less than 0").printStackTrace();
+                ACTIVE_TASKS_COUNT.set(0);
             }
         }
 
