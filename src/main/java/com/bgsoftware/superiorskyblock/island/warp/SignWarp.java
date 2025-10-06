@@ -2,8 +2,13 @@ package com.bgsoftware.superiorskyblock.island.warp;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.IslandWorlds;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -24,8 +29,32 @@ public class SignWarp {
     }
 
     public static void trySignWarpBreak(IslandWarp islandWarp, CommandSender commandSender) {
+        try (ObjectsPools.Wrapper<LazyWorldLocation> wrapper = ObjectsPools.LAZY_LOCATION.obtain()) {
+            Location warpLocation = islandWarp.getLocation(wrapper.getHandle());
+
+            if (warpLocation.getWorld() == null) {
+                IslandWorlds.accessIslandWorldAsync(islandWarp.getIsland(), warpLocation, true, islandWorldResult -> {
+                    islandWorldResult.ifRight(Throwable::printStackTrace).ifLeft(unused -> {
+                        trySignWarpBreakWorldLoaded(islandWarp, commandSender);
+                    });
+                });
+                return;
+            }
+        }
+
+        trySignWarpBreakWorldLoaded(islandWarp, commandSender);
+    }
+
+    private static void trySignWarpBreakWorldLoaded(IslandWarp islandWarp, CommandSender commandSender) {
+        ChunksProvider.loadChunk(ChunkPosition.of(islandWarp), ChunkLoadReason.WARP_SIGN_BREAK, chunk -> {
+            trySignWarpBreakChunkLoaded(islandWarp, commandSender);
+        });
+    }
+
+    private static void trySignWarpBreakChunkLoaded(IslandWarp islandWarp, CommandSender commandSender) {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location warpLocation = islandWarp.getLocation(wrapper.getHandle());
+
             Block signBlock = warpLocation.getBlock();
             BlockState blockState = signBlock.getState();
 

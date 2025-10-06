@@ -24,6 +24,33 @@ public class IslandWorlds {
         }
     }
 
+    public static void accessIslandWorldAsync(Island island, Location location, boolean loadWorld, Consumer<Either<World, Throwable>> consumer) {
+        World world = location.getWorld();
+        if (world != null) {
+            consumer.accept(Either.left(world));
+            return;
+        }
+
+        String worldName = LazyWorldLocation.getWorldName(location);
+
+        if (!loadWorld) {
+            consumer.accept(Either.right(new NullPointerException("World " + worldName + " is not loaded when requested")));
+            return;
+        }
+
+        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, worldName);
+
+        Dimension dimension = worldInfo.getDimension();
+
+        WorldsProvider worldsProvider = plugin.getProviders().getWorldsProvider();
+        if (worldsProvider instanceof LazyWorldsProvider) {
+            ((LazyWorldsProvider) worldsProvider).prepareWorld(island, dimension, () ->
+                    loadedWorldCallback(worldInfo, consumer));
+        } else {
+            loadedWorldCallback(worldInfo, consumer);
+        }
+    }
+
     public static void accessIslandWorldAsync(Island island, Dimension dimension, boolean loadWorld, Consumer<Either<World, Throwable>> consumer) {
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
         if (worldInfo == null) {

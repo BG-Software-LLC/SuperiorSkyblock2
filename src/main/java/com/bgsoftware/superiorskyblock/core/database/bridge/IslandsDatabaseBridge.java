@@ -360,7 +360,7 @@ public class IslandsDatabaseBridge {
         WarpCategory category = islandWarp.getCategory();
         ItemStack icon = islandWarp.getRawIcon();
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            try (ObjectsPools.Wrapper<LazyWorldLocation> wrapper = ObjectsPools.LAZY_LOCATION.obtain()) {
                 databaseBridge.insertObject("islands_warps",
                         new Pair<>("island", island.getUniqueId().toString()),
                         new Pair<>("name", islandWarp.getName()),
@@ -382,7 +382,7 @@ public class IslandsDatabaseBridge {
 
     public static void updateWarpLocation(Island island, IslandWarp islandWarp) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            try (ObjectsPools.Wrapper<LazyWorldLocation> wrapper = ObjectsPools.LAZY_LOCATION.obtain()) {
                 databaseBridge.updateObject("islands_warps",
                         createFilter("island", island, new Pair<>("name", islandWarp.getName())),
                         new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(islandWarp.getLocation(wrapper.getHandle())))

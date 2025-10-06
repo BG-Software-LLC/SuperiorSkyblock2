@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
-import com.bgsoftware.superiorskyblock.api.hooks.LazyWorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandBlockFlags;
@@ -3787,7 +3786,7 @@ public class SIsland implements Island {
         }
 
         EntityTeleports.warmupTeleport(superiorPlayer, plugin.getSettings().getWarpsWarmup(),
-                unused -> warpPlayerWithoutWarmup(superiorPlayer, islandWarp, true));
+                unused -> warpPlayerWithoutWarmup(superiorPlayer, islandWarp));
     }
 
     @Override
@@ -3817,7 +3816,7 @@ public class SIsland implements Island {
         WarpCategory warpCategory = islandWarp == null ? null : islandWarp.getCategory();
 
         if (islandWarp != null) {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            try (ObjectsPools.Wrapper<LazyWorldLocation> wrapper = ObjectsPools.LAZY_LOCATION.obtain()) {
                 Location location = islandWarp.getLocation(wrapper.getHandle());
                 this.warpsByLocation.write(warpsByLocation -> warpsByLocation.remove(location));
             }
@@ -4702,7 +4701,7 @@ public class SIsland implements Island {
         if (warpCategory == null)
             warpCategory = warpCategories.values().stream().findFirst().orElseGet(() -> createWarpCategory("Default Category"));
 
-        IslandWarp islandWarp = new SIslandWarp(name, location.clone(true), warpCategory, isPrivate, icon);
+        IslandWarp islandWarp = new SIslandWarp(name, location, warpCategory, isPrivate, icon);
 
         islandWarp.getCategory().getWarps().add(islandWarp);
 
@@ -4824,7 +4823,25 @@ public class SIsland implements Island {
      *  Island top methods
      */
 
-    private void warpPlayerWithoutWarmup(SuperiorPlayer superiorPlayer, IslandWarp islandWarp, boolean shouldRetryOnNullWorld) {
+    private void warpPlayerWithoutWarmup(SuperiorPlayer superiorPlayer, IslandWarp islandWarp) {
+        try (ObjectsPools.Wrapper<LazyWorldLocation> wrapper = ObjectsPools.LAZY_LOCATION.obtain()) {
+            Location location = islandWarp.getLocation(wrapper.getHandle());
+
+            if (location.getWorld() == null) {
+                Location clonedLocation = location.clone();
+                IslandWorlds.accessIslandWorldAsync(this, location, true, islandWorldResult -> {
+                    islandWorldResult.ifRight(Throwable::printStackTrace).ifLeft(world -> {
+                        clonedLocation.setWorld(world);
+                        warpPlayerWithoutWarmupWorldLoaded(superiorPlayer, islandWarp, clonedLocation);
+                    });
+                });
+            } else {
+                warpPlayerWithoutWarmupWorldLoaded(superiorPlayer, islandWarp, location);
+            }
+        }
+    }
+
+    private void warpPlayerWithoutWarmupWorldLoaded(SuperiorPlayer superiorPlayer, IslandWarp islandWarp, Location location) {
         // Warp doesn't exist anymore.
         if (getWarp(islandWarp.getName()) == null) {
             Message.INVALID_WARP.send(superiorPlayer, islandWarp.getName());
@@ -4832,38 +4849,24 @@ public class SIsland implements Island {
             return;
         }
 
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location location = islandWarp.getLocation(wrapper.getHandle());
-            if (location.getWorld() == null) {
-                if (shouldRetryOnNullWorld && location instanceof LazyWorldLocation &&
-                        plugin.getProviders().getWorldsProvider() instanceof LazyWorldsProvider) {
-                    LazyWorldsProvider worldsProvider = (LazyWorldsProvider) plugin.getProviders().getWorldsProvider();
-                    WorldInfo worldInfo = worldsProvider.getIslandsWorldInfo(this, ((LazyWorldLocation) location).getWorldName());
-                    worldsProvider.prepareWorld(this, worldInfo.getDimension(),
-                            () -> warpPlayerWithoutWarmup(superiorPlayer, islandWarp, false));
-                    return;
-                }
-            }
+        superiorPlayer.setTeleportTask(null);
 
-            superiorPlayer.setTeleportTask(null);
-
-            if (!isInsideRange(location) || !WorldBlocks.isSafeBlock(location.getBlock())) {
-                Message.UNSAFE_WARP.send(superiorPlayer);
-                if (plugin.getSettings().getDeleteUnsafeWarps())
-                    deleteWarp(islandWarp.getName());
-                return;
-            }
-
-            superiorPlayer.teleport(location, success -> {
-                if (success) {
-                    Message.TELEPORTED_TO_WARP.send(superiorPlayer);
-                    if (superiorPlayer.isShownAsOnline()) {
-                        IslandUtils.sendMessage(this, Message.TELEPORTED_TO_WARP_ANNOUNCEMENT,
-                                Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName(), islandWarp.getName());
-                    }
-                }
-            });
+        if (!isInsideRange(location) || !WorldBlocks.isSafeBlock(location.getBlock())) {
+            Message.UNSAFE_WARP.send(superiorPlayer);
+            if (plugin.getSettings().getDeleteUnsafeWarps())
+                deleteWarp(islandWarp.getName());
+            return;
         }
+
+        superiorPlayer.teleport(location, success -> {
+            if (success) {
+                Message.TELEPORTED_TO_WARP.send(superiorPlayer);
+                if (superiorPlayer.isShownAsOnline()) {
+                    IslandUtils.sendMessage(this, Message.TELEPORTED_TO_WARP_ANNOUNCEMENT,
+                            Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName(), islandWarp.getName());
+                }
+            }
+        });
     }
 
     /*

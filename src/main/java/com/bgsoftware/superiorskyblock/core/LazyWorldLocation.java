@@ -11,7 +11,8 @@ import org.bukkit.World;
  */
 public class LazyWorldLocation extends Location {
 
-    private final String worldName;
+    private String worldName;
+    private boolean updatedWorld = false;
 
     public static LazyWorldLocation of(Location location) {
         if (location instanceof LazyWorldLocation)
@@ -26,17 +27,42 @@ public class LazyWorldLocation extends Location {
                 0f, 0f);
     }
 
+    public LazyWorldLocation(World world, double x, double y, double z) {
+        super(world, x, y, z);
+        this.worldName = null;
+        this.updatedWorld = false;
+    }
+
     public LazyWorldLocation(String worldName, double x, double y, double z, float yaw, float pitch) {
         super(Bukkit.getWorld(worldName), x, y, z, yaw, pitch);
         this.worldName = worldName;
+        this.updatedWorld = false;
+    }
+
+    public String getWorldName() {
+        return this.worldName;
+    }
+
+    public void setWorldName(String worldName) {
+        this.worldName = worldName;
+        this.updatedWorld = false;
     }
 
     @Override
     public World getWorld() {
-        if (worldName != null)
+        if (!this.updatedWorld) {
             setWorld(Bukkit.getWorld(worldName));
+        }
 
         return super.getWorld();
+    }
+
+    @Override
+    public void setWorld(World world) {
+        super.setWorld(world);
+        if (world != null)
+            this.worldName = world.getName();
+        this.updatedWorld = true;
     }
 
     @Override
@@ -47,10 +73,6 @@ public class LazyWorldLocation extends Location {
     public Location clone(boolean keepLazy) {
         return keepLazy || getWorld() == null ? new LazyWorldLocation(this.worldName, getX(), getY(), getZ(), getYaw(), getPitch()) :
                 super.clone();
-    }
-
-    public String getWorldName() {
-        return worldName;
     }
 
     public static String getWorldName(Location location) {

@@ -8,12 +8,9 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.warp.SignWarp;
-import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
-import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -77,9 +74,7 @@ public class CmdAdminDelWarp implements IAdminIslandCommand {
         island.deleteWarp(islandWarp.getName());
         Message.DELETE_WARP.send(sender, islandWarp.getName());
 
-        ChunksProvider.loadChunk(ChunkPosition.of(islandWarp), ChunkLoadReason.WARP_SIGN_BREAK, chunk -> {
-            SignWarp.trySignWarpBreak(islandWarp, sender);
-        });
+        SignWarp.trySignWarpBreak(islandWarp, sender);
     }
 
     @Override
