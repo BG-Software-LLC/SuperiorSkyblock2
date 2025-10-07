@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.portals.PortalsManagerService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
@@ -95,7 +96,8 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
         if (dimension != plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
             if (!island.wasSchematicGenerated(dimension)) {
                 PortalType portalType = dimension.getEnvironment() == World.Environment.NETHER ? PortalType.NETHER : PortalType.ENDER;
-                Location homeLocation = island.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension());
+                WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
+                Location homeLocation = island.getIslandHomePosition(dimension).toLocation(worldInfo);
                 IslandWorlds.accessIslandWorldAsync(island, homeLocation, true, islandWorldResult -> {
                     islandWorldResult.ifRight(Throwable::printStackTrace).ifLeft(world -> {
                         homeLocation.setWorld(world);
