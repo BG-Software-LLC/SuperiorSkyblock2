@@ -36,7 +36,7 @@ public class WorldPositionSerializer implements ISerializer<WorldPosition, Strin
             return null;
 
         try {
-            String[] sections = element.split(", ");
+            String[] sections = element.split(",");
 
             int startIndex = 0;
             if (sections.length >= 6) {
