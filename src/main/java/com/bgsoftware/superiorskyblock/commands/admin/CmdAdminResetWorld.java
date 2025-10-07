@@ -152,13 +152,11 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
             island.setSchematicGenerate(dimension);
 
             Location homeLocation = schematic.adjustRotation(centerLocation);
-            island.setIslandHome(dimension, homeLocation);
+            island.setIslandHome(homeLocation);
 
             if (dimension.getEnvironment() == World.Environment.THE_END) {
                 dragonBattleService.get().resetEnderDragonBattle(island, dimension);
             }
-
-            island.setIslandHome(dimension, homeLocation);
 
             island.calcIslandWorth(null);
         }, Throwable::printStackTrace);

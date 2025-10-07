@@ -843,7 +843,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Log.debug(Debug.SET_SCHEMATIC_POSITION, getName(), block == null ? "null" : block.getLocation(wrapper.getHandle()));
         }
-        this.schematicPos1 = block == null ? null : new SBlockPosition(block);
+        this.schematicPos1 = block == null ? null : SBlockPosition.of(block);
     }
 
     @Override
@@ -856,7 +856,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Log.debug(Debug.SET_SCHEMATIC_POSITION, getName(), block == null ? "null" : block.getLocation(wrapper.getHandle()));
         }
-        this.schematicPos2 = block == null ? null : new SBlockPosition(block);
+        this.schematicPos2 = block == null ? null : SBlockPosition.of(block);
     }
 
     /*

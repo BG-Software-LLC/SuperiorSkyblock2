@@ -38,6 +38,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
@@ -46,7 +47,7 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LegacyMasks;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.SBlockPosition;
+import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
@@ -133,7 +134,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -233,8 +233,8 @@ public class SIsland implements Island {
     /*
      * General Settings
      */
-    private final Synchronized<EnumerateMap<Dimension, Location>> islandHomes = Synchronized.of(new EnumerateMap<>(Dimension.values()));
-    private final Synchronized<EnumerateMap<Dimension, Location>> visitorHomes = Synchronized.of(new EnumerateMap<>(Dimension.values()));
+    private final Synchronized<EnumerateMap<Dimension, WorldPosition>> islandHomes = Synchronized.of(new EnumerateMap<>(Dimension.values()));
+    private final Synchronized<EnumerateMap<Dimension, WorldPosition>> visitorHomes = Synchronized.of(new EnumerateMap<>(Dimension.values()));
     private final Map<IslandPrivilege, Integer> rolePermissions = new ConcurrentHashMap<>();
     private final Map<IslandFlag, Byte> islandFlags = new ConcurrentHashMap<>();
     private final IslandUpgrades upgrades = new IslandUpgrades();
@@ -283,7 +283,7 @@ public class SIsland implements Island {
             this.owner.setIsland(this);
         }
 
-        this.center = new SBlockPosition(builder.center);
+        this.center = builder.center;
         this.creationTime = builder.creationTime;
         setNameInternal(builder.islandName);
         this.schematicName = builder.islandType;
@@ -406,22 +406,6 @@ public class SIsland implements Island {
     /*
      *  General methods
      */
-
-    private static boolean adjustLocationToCenterOfBlock(Location location) {
-        boolean changed = false;
-
-        if (location.getX() - 0.5 != location.getBlockX()) {
-            location.setX(location.getBlockX() + 0.5);
-            changed = true;
-        }
-
-        if (location.getZ() - 0.5 != location.getBlockZ()) {
-            location.setZ(location.getBlockZ() + 0.5);
-            changed = true;
-        }
-
-        return changed;
-    }
 
     @Override
     public SuperiorPlayer getOwner() {
@@ -870,14 +854,7 @@ public class SIsland implements Island {
 
         Preconditions.checkNotNull(world, "Couldn't find world for dimension " + dimension + ".");
 
-        // noinspection deprecation
-        return center.parse(world).add(0.5, 0, 0.5);
-    }
-
-    @Override
-    @Deprecated
-    public Location getCenter(World.Environment environment) {
-        return getCenter(Dimensions.fromEnvironment(environment));
+        return this.center.toWorldPosition().toLocation(world);
     }
 
     @Override
@@ -886,73 +863,41 @@ public class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public Location getTeleportLocation(World.Environment environment) {
-        return this.getIslandHome(Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
-    @Deprecated
-    public Map<World.Environment, Location> getTeleportLocations() {
-        return this.getIslandHomes();
-    }
-
-    @Override
-    @Deprecated
-    public void setTeleportLocation(Location teleportLocation) {
-        this.setIslandHome(teleportLocation);
-    }
-
-    @Override
-    @Deprecated
-    public void setTeleportLocation(World.Environment environment, @Nullable Location teleportLocation) {
-        this.setIslandHome(Dimensions.fromEnvironment(environment), teleportLocation);
+    public CompletableFuture<World> accessIslandWorld(Dimension dimension) {
+        CompletableFuture<World> completableFuture = new CompletableFuture<>();
+        IslandWorlds.accessIslandWorldAsync(this, dimension, true, islandWorldResult -> {
+            islandWorldResult.ifRight(completableFuture::completeExceptionally).ifLeft(completableFuture::complete);
+        });
+        return completableFuture;
     }
 
     @Override
     public Location getIslandHome(Dimension dimension) {
-        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-
-        Location islandHome = islandHomes.readAndGet(islandHomes -> islandHomes.get(dimension));
-
-        if (islandHome == null)
-            islandHome = getCenter(dimension);
-
-        if (islandHome == null)
-            return null;
-
-        return IslandWorlds.setWorldToLocation(this, dimension, islandHome);
+        WorldPosition islandHome = getIslandHomePosition(dimension);
+        return islandHome == null ? null : IslandWorlds.setWorldToLocation(this, dimension, islandHome);
     }
 
     @Override
-    @Deprecated
-    public Location getIslandHome(World.Environment environment) {
-        return getIslandHome(Dimensions.fromEnvironment(environment));
+    public WorldPosition getIslandHomePosition(Dimension dimension) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        WorldPosition islandHome = islandHomes.readAndGet(islandHomes -> islandHomes.get(dimension));
+
+        return islandHome == null ? this.center.toWorldPosition() : islandHome;
     }
 
     @Override
     public Map<Dimension, Location> getIslandHomesAsDimensions() {
-        return Collections.unmodifiableMap(islandHomes.readAndGet(islandHomes -> islandHomes.collect(Dimension.values())));
+        Map<Dimension, Location> islandHomes = this.islandHomes.readAndGet(map ->
+                map.collect(Dimension.values(), this::worldPositionToLocation));
+        return islandHomes.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(islandHomes);
     }
 
     @Override
-    @Deprecated
-    public Map<World.Environment, Location> getIslandHomes() {
-        EnumMap<World.Environment, Location> islandHomes = new EnumMap<>(World.Environment.class);
-
-        this.islandHomes.read(islandHomesAsDimensions -> {
-            for (Dimension dimension : Dimension.values()) {
-                Location islandHome = islandHomesAsDimensions.get(dimension);
-                if (islandHome != null) {
-                    Object oldValue = islandHomes.put(dimension.getEnvironment(), islandHome);
-                    if (oldValue != null)
-                        throw new IllegalStateException("Called getIslandHomes but there are multiple environments. " +
-                                "Use getIslandHomesAsDimensions instead.");
-                }
-            }
-        });
-
-        return Collections.unmodifiableMap(islandHomes);
+    public Map<Dimension, WorldPosition> getIslandHomes() {
+        Map<Dimension, WorldPosition> islandHomes = this.islandHomes.readAndGet(map ->
+                map.collect(Dimension.values()));
+        return islandHomes.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(islandHomes);
     }
 
     @Override
@@ -962,76 +907,62 @@ public class SIsland implements Island {
         Preconditions.checkArgument(isInside(homeLocation), "homeLocation must be inside island.");
 
         Dimension dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(homeLocation.getWorld());
-
-        setIslandHome(dimension, homeLocation);
+        setIslandHome(dimension, SWorldPosition.of(homeLocation));
     }
 
     @Override
     public void setIslandHome(Dimension dimension, @Nullable Location homeLocation) {
+        setIslandHome(dimension, homeLocation == null ? null : SWorldPosition.of(homeLocation));
+    }
+
+    @Override
+    public void setIslandHome(Dimension dimension, @Nullable WorldPosition homePosition) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
-        Log.debug(Debug.SET_ISLAND_HOME, owner.getName(), dimension, homeLocation);
+        Log.debug(Debug.SET_ISLAND_HOME, owner.getName(), dimension, homePosition);
 
-        Location oldHome = islandHomes.writeAndGet(islandHomes ->
-                islandHomes.put(dimension, homeLocation == null ? null : homeLocation.clone()));
+        WorldPosition newHome = adjustPositionToCenterOfBlock(homePosition);
 
-        if (!Objects.equals(oldHome, homeLocation))
-            IslandsDatabaseBridge.saveIslandHome(this, dimension, homeLocation);
-    }
+        WorldPosition oldHome = islandHomes.writeAndGet(islandHomes ->
+                newHome == null ? islandHomes.remove(dimension) : islandHomes.put(dimension, newHome));
 
-    @Override
-    public void setIslandHome(World.Environment environment, @Nullable Location homeLocation) {
-        setIslandHome(Dimensions.fromEnvironment(environment), homeLocation);
-    }
-
-    @Override
-    public Location getVisitorsLocation() {
-        return getVisitorsLocation((Dimension) null /* unused */);
+        if (!Objects.equals(oldHome, newHome))
+            IslandsDatabaseBridge.saveIslandHome(this, dimension, newHome);
     }
 
     @Nullable
     @Override
     public Location getVisitorsLocation(Dimension unused) {
-        Dimension defaultWorldDimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
-
-        Location visitorsLocation = this.visitorHomes.readAndGet(visitorsLocations ->
-                visitorsLocations.get(defaultWorldDimension));
-
-        if (visitorsLocation == null)
-            return null;
-
-        if (adjustLocationToCenterOfBlock(visitorsLocation))
-            IslandsDatabaseBridge.saveVisitorLocation(this, defaultWorldDimension, visitorsLocation);
-
-        return IslandWorlds.setWorldToLocation(this, defaultWorldDimension, visitorsLocation);
+        WorldPosition visitorsPosition = getVisitorsPosition(null /*unused*/);
+        return visitorsPosition == null ? null : IslandWorlds.setWorldToLocation(
+                this, plugin.getSettings().getWorlds().getDefaultWorldDimension(), visitorsPosition);
     }
 
     @Override
-    @Deprecated
-    public Location getVisitorsLocation(World.Environment unused) {
-        return getVisitorsLocation((Dimension) null /* unused */);
+    public WorldPosition getVisitorsPosition(Dimension unused) {
+        Dimension defaultWorldDimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
+        return this.visitorHomes.readAndGet(visitorHomes ->
+                visitorHomes.get(defaultWorldDimension));
     }
 
     @Override
-    public void setVisitorsLocation(Location visitorsLocation) {
-        Log.debug(Debug.SET_VISITOR_HOME, owner.getName(), visitorsLocation);
+    public void setVisitorsLocation(@Nullable Location visitorsLocation) {
+        setVisitorsLocation(null /*unused*/, visitorsLocation == null ? null : SWorldPosition.of(visitorsLocation));
+    }
+
+    @Override
+    public void setVisitorsLocation(Dimension unused, @Nullable WorldPosition visitorsPosition) {
+        Log.debug(Debug.SET_VISITOR_HOME, owner.getName(), visitorsPosition);
 
         Dimension defaultWorldDimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
 
-        if (visitorsLocation == null) {
-            Location oldVisitorsLocation = this.visitorHomes.writeAndGet(visitorsLocations ->
-                    visitorsLocations.remove(defaultWorldDimension));
-            if (oldVisitorsLocation != null)
-                IslandsDatabaseBridge.removeVisitorLocation(this, defaultWorldDimension);
-        } else {
-            adjustLocationToCenterOfBlock(visitorsLocation);
+        WorldPosition newHome = adjustPositionToCenterOfBlock(visitorsPosition);
 
-            Location oldVisitorsLocation = this.visitorHomes.writeAndGet(visitorsLocations ->
-                    visitorsLocations.put(defaultWorldDimension, visitorsLocation.clone()));
+        WorldPosition oldHome = visitorHomes.writeAndGet(visitorHomes ->
+                newHome == null ? visitorHomes.remove(defaultWorldDimension) : visitorHomes.put(defaultWorldDimension, newHome));
 
-            if (!Objects.equals(oldVisitorsLocation, visitorsLocation))
-                IslandsDatabaseBridge.saveVisitorLocation(this, defaultWorldDimension, visitorsLocation);
-        }
+        if (!Objects.equals(oldHome, newHome))
+            IslandsDatabaseBridge.saveVisitorLocation(this, defaultWorldDimension, newHome);
     }
 
     @Override
@@ -1120,39 +1051,6 @@ public class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public List<Chunk> getAllChunks(World.Environment environment) {
-        return getAllChunks(Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
-    @Deprecated
-    public List<Chunk> getAllChunks(World.Environment environment, @IslandChunkFlags int flags) {
-        return getAllChunks(Dimensions.fromEnvironment(environment), flags);
-    }
-
-    @Override
-    @Deprecated
-    public List<Chunk> getAllChunks(boolean onlyProtected) {
-        return getAllChunks(onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0);
-    }
-
-    @Override
-    @Deprecated
-    public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
-        return getAllChunks(Dimensions.fromEnvironment(environment), onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0);
-    }
-
-    @Override
-    @Deprecated
-    public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
-        int flags = 0;
-        if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
-        if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
-        return getAllChunks(Dimensions.fromEnvironment(environment), flags);
-    }
-
-    @Override
     public List<Chunk> getLoadedChunks() {
         return getLoadedChunks(0);
     }
@@ -1187,35 +1085,6 @@ public class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public List<Chunk> getLoadedChunks(World.Environment environment) {
-        return getLoadedChunks(Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
-    public List<Chunk> getLoadedChunks(World.Environment environment, @IslandChunkFlags int flags) {
-        return getLoadedChunks(Dimensions.fromEnvironment(environment), flags);
-    }
-
-    @Override
-    @Deprecated
-    public List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks) {
-        int flags = 0;
-        if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
-        if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
-        return getLoadedChunks(flags);
-    }
-
-    @Override
-    @Deprecated
-    public List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
-        int flags = 0;
-        if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
-        if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
-        return getLoadedChunks(Dimensions.fromEnvironment(environment), flags);
-    }
-
-    @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension dimension) {
         return getAllChunksAsync(dimension, 0);
     }
@@ -1238,48 +1107,6 @@ public class SIsland implements Island {
 
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
         return IslandUtils.getAllChunksAsync(this, worldInfo, flags, ChunkLoadReason.API_REQUEST, onChunkLoad);
-    }
-
-    @Override
-    @Deprecated
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment) {
-        return getAllChunksAsync(Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
-    @Deprecated
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, @IslandChunkFlags int flags) {
-        return getAllChunksAsync(Dimensions.fromEnvironment(environment), flags);
-    }
-
-    @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment,
-                                                            @Nullable Consumer<Chunk> onChunkLoad) {
-        return getAllChunksAsync(Dimensions.fromEnvironment(environment), onChunkLoad);
-    }
-
-    @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, @IslandChunkFlags int flags,
-                                                            @Nullable Consumer<Chunk> onChunkLoad) {
-        return getAllChunksAsync(Dimensions.fromEnvironment(environment), flags, onChunkLoad);
-    }
-
-    @Override
-    @Deprecated
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected,
-                                                            @Nullable Consumer<Chunk> onChunkLoad) {
-        return getAllChunksAsync(environment, onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0, onChunkLoad);
-    }
-
-    @Override
-    @Deprecated
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment,
-                                                            boolean onlyProtected, boolean noEmptyChunks,
-                                                            @Nullable Consumer<Chunk> onChunkLoad) {
-        int flags = 0;
-        if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
-        if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
-        return getAllChunksAsync(environment, flags, onChunkLoad);
     }
 
     @Override
@@ -1378,54 +1205,6 @@ public class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public void resetChunks(World.Environment environment) {
-        resetChunks(Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
-    @Deprecated
-    public void resetChunks(World.Environment environment, @Nullable Runnable onFinish) {
-        resetChunks(Dimensions.fromEnvironment(environment), onFinish);
-    }
-
-    @Override
-    @Deprecated
-    public void resetChunks(World.Environment environment, @IslandChunkFlags int flags) {
-        resetChunks(Dimensions.fromEnvironment(environment), flags);
-    }
-
-    @Override
-    @Deprecated
-    public void resetChunks(World.Environment environment, @IslandChunkFlags int flags, @Nullable Runnable onFinish) {
-        resetChunks(Dimensions.fromEnvironment(environment), flags, onFinish);
-    }
-
-    @Override
-    @Deprecated
-    public void resetChunks(World.Environment environment, boolean onlyProtected) {
-        resetChunks(Dimensions.fromEnvironment(environment), onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0);
-    }
-
-    @Override
-    @Deprecated
-    public void resetChunks(World.Environment environment, boolean onlyProtected, @Nullable Runnable onFinish) {
-        resetChunks(Dimensions.fromEnvironment(environment), onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0, onFinish);
-    }
-
-    @Override
-    @Deprecated
-    public void resetChunks(boolean onlyProtected) {
-        resetChunks(onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0);
-    }
-
-    @Override
-    @Deprecated
-    public void resetChunks(boolean onlyProtected, @Nullable Runnable onFinish) {
-        resetChunks(onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0, onFinish);
-    }
-
-    @Override
     public boolean isInside(Location location) {
         return isInside(location, 0);
     }
@@ -1439,27 +1218,92 @@ public class SIsland implements Island {
     public boolean isInside(Location location, double extraRadius) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
+        return isIslandWorld(location.getWorld()) && this.entireArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
+    }
 
-        if (!isIslandWorld(location.getWorld()))
-            return false;
+    @Override
+    public boolean isInside(BlockPosition blockPosition) {
+        return isInside(blockPosition, 0D);
+    }
 
-        return this.entireArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
+    @Override
+    public boolean isInside(BlockPosition blockPosition, int extraRadius) {
+        return isInside(blockPosition, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInside(BlockPosition blockPosition, double extraRadius) {
+        Preconditions.checkNotNull(blockPosition, "blockPosition parameter cannot be null.");
+        return this.entireArea.expandAndIntercepts(blockPosition.getX(), blockPosition.getZ(), extraRadius);
+    }
+
+    @Override
+    public boolean isInside(WorldPosition worldPosition) {
+        return isInside(worldPosition, 0D);
+    }
+
+    @Override
+    public boolean isInside(WorldPosition worldPosition, int extraRadius) {
+        return isInside(worldPosition, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInside(WorldPosition worldPosition, double extraRadius) {
+        Preconditions.checkNotNull(worldPosition, "worldPosition parameter cannot be null.");
+        return this.entireArea.expandAndIntercepts(worldPosition.getX(), worldPosition.getZ(), extraRadius);
+    }
+
+    @Override
+    public boolean isInside(Chunk chunk) {
+        Preconditions.checkNotNull(chunk, "chunk parameter cannot be null.");
+        return isInside(chunk.getWorld(), chunk.getX(), chunk.getZ());
     }
 
     @Override
     public boolean isInside(World world, int chunkX, int chunkZ) {
+        return isInside(world, chunkX, chunkZ, 0D);
+    }
+
+    @Override
+    public boolean isInside(World world, int chunkX, int chunkZ, int extraRadius) {
+        return isInside(world, chunkX, chunkZ, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInside(World world, int chunkX, int chunkZ, double extraRadius) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
-        return isIslandWorld(world) && isChunkInside(chunkX, chunkZ);
+        return isIslandWorld(world) && isInside(chunkX, chunkZ, extraRadius);
     }
 
     @Override
     public boolean isInside(WorldInfo worldInfo, int chunkX, int chunkZ) {
-        Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
-        return isIslandWorld(worldInfo) && isChunkInside(chunkX, chunkZ);
+        return isInside(worldInfo, chunkX, chunkZ, 0D);
     }
 
-    private boolean isChunkInside(int chunkX, int chunkZ) {
-        return this.entireArea.rshiftAndIntercepts(chunkX, chunkZ, 4);
+    @Override
+    public boolean isInside(WorldInfo worldInfo, int chunkX, int chunkZ, int extraRadius) {
+        return isInside(worldInfo, chunkX, chunkZ, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInside(WorldInfo worldInfo, int chunkX, int chunkZ, double extraRadius) {
+        Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
+        return isIslandWorld(worldInfo) && isInside(chunkX, chunkZ, extraRadius);
+    }
+
+    @Override
+    public boolean isInside(int chunkX, int chunkZ) {
+        return isInside(chunkX, chunkZ, 0D);
+    }
+
+    @Override
+    public boolean isInside(int chunkX, int chunkZ, int extraRadius) {
+        return isInside(chunkX, chunkZ, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInside(int chunkX, int chunkZ, double extraRadius) {
+        return this.entireArea.expandRshiftAndIntercepts(chunkX, chunkZ, extraRadius, 4);
     }
 
     @Override
@@ -1476,21 +1320,91 @@ public class SIsland implements Island {
     public boolean isInsideRange(Location location, double extraRadius) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
+        return isIslandWorld(location.getWorld()) && this.protectedArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
+    }
 
-        if (!isIslandWorld(location.getWorld()))
-            return false;
+    @Override
+    public boolean isInsideRange(BlockPosition blockPosition) {
+        return isInsideRange(blockPosition, 0D);
+    }
 
-        return this.protectedArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
+    @Override
+    public boolean isInsideRange(BlockPosition blockPosition, int extraRadius) {
+        return isInsideRange(blockPosition, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(BlockPosition blockPosition, double extraRadius) {
+        Preconditions.checkNotNull(blockPosition, "blockPosition parameter cannot be null.");
+        return this.protectedArea.expandAndIntercepts(blockPosition.getX(), blockPosition.getZ(), extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(WorldPosition worldPosition) {
+        return isInsideRange(worldPosition, 0D);
+    }
+
+    @Override
+    public boolean isInsideRange(WorldPosition worldPosition, int extraRadius) {
+        return isInsideRange(worldPosition, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(WorldPosition worldPosition, double extraRadius) {
+        Preconditions.checkNotNull(worldPosition, "worldPosition parameter cannot be null.");
+        return this.protectedArea.expandAndIntercepts(worldPosition.getX(), worldPosition.getZ(), extraRadius);
     }
 
     @Override
     public boolean isInsideRange(Chunk chunk) {
-        Preconditions.checkNotNull(chunk, "chunk parameter cannot be null.");
+        return isInsideRange(chunk.getWorld(), chunk.getX(), chunk.getZ());
+    }
 
-        if (!isIslandWorld(chunk.getWorld()))
-            return false;
+    @Override
+    public boolean isInsideRange(World world, int chunkX, int chunkZ) {
+        return isInsideRange(world, chunkX, chunkZ, 0D);
+    }
 
-        return this.protectedArea.rshiftAndIntercepts(chunk.getX(), chunk.getZ(), 4);
+    @Override
+    public boolean isInsideRange(World world, int chunkX, int chunkZ, int extraRadius) {
+        return isInsideRange(world, chunkX, chunkZ, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(World world, int chunkX, int chunkZ, double extraRadius) {
+        Preconditions.checkNotNull(world, "world parameter cannot be null.");
+        return isIslandWorld(world) && isInsideRange(chunkX, chunkZ, extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(WorldInfo worldInfo, int chunkX, int chunkZ) {
+        return isInsideRange(worldInfo, chunkX, chunkZ, 0D);
+    }
+
+    @Override
+    public boolean isInsideRange(WorldInfo worldInfo, int chunkX, int chunkZ, int extraRadius) {
+        return isInsideRange(worldInfo, chunkX, chunkZ, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(WorldInfo worldInfo, int chunkX, int chunkZ, double extraRadius) {
+        Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
+        return isIslandWorld(worldInfo) && isInsideRange(chunkX, chunkZ, extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(int chunkX, int chunkZ) {
+        return isInsideRange(chunkX, chunkZ, 0D);
+    }
+
+    @Override
+    public boolean isInsideRange(int chunkX, int chunkZ, int extraRadius) {
+        return isInsideRange(chunkX, chunkZ, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(int chunkX, int chunkZ, double extraRadius) {
+        return this.protectedArea.expandRshiftAndIntercepts(chunkX, chunkZ, extraRadius, 4);
     }
 
     private static boolean isIslandWorld(@Nullable World world) {
@@ -2075,7 +1989,7 @@ public class SIsland implements Island {
                     ChunkPosition.of(world, centerBlockPosition.getX() >> 4, centerBlockPosition.getZ() >> 4);
 
             ChunksProvider.loadChunk(centerChunkPosition, ChunkLoadReason.BIOME_REQUEST, null)
-                    .thenApply(chunk -> centerBlockPosition.parse(world).getBlock().getBiome())
+                    .thenApply(chunk -> centerBlockPosition.toLocation(world).getBlock().getBiome())
                     .whenComplete((biome, error) -> {
                         if (error != null)
                             newTask.completeExceptionally(error);
@@ -2848,7 +2762,7 @@ public class SIsland implements Island {
 
     @Override
     public boolean isChunkDirty(WorldInfo worldInfo, int chunkX, int chunkZ) {
-        Preconditions.checkArgument(worldInfo != null && isChunkInside(chunkX, chunkZ),
+        Preconditions.checkArgument(worldInfo != null && isInside(chunkX, chunkZ),
                 "Chunk must be within the island boundaries.");
         try (ChunkPosition chunkPosition = ChunkPosition.of(worldInfo, chunkX, chunkZ)) {
             return this.dirtyChunksContainer.isMarkedDirty(chunkPosition);
@@ -4209,18 +4123,6 @@ public class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public void setGeneratorPercentage(Key key, int percentage, World.Environment environment) {
-        setGeneratorPercentage(key, percentage, Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
-    @Deprecated
-    public boolean setGeneratorPercentage(Key key, int percentage, World.Environment environment, SuperiorPlayer caller, boolean callEvent) {
-        return setGeneratorPercentage(key, percentage, Dimensions.fromEnvironment(environment), caller, callEvent);
-    }
-
-    @Override
     public int getGeneratorPercentage(Key key, Dimension dimension) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
@@ -4230,22 +4132,10 @@ public class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public int getGeneratorPercentage(Key key, World.Environment environment) {
-        return getGeneratorPercentage(key, Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
     public Map<String, Integer> getGeneratorPercentages(Dimension dimension) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
         return getGeneratorAmounts(dimension).keySet().stream().collect(Collectors.toMap(key -> key,
                 key -> getGeneratorAmount(Keys.ofMaterialAndData(key), dimension)));
-    }
-
-    @Override
-    @Deprecated
-    public Map<String, Integer> getGeneratorPercentages(World.Environment environment) {
-        return getGeneratorPercentages(Dimensions.fromEnvironment(environment));
     }
 
     @Override
@@ -4265,11 +4155,6 @@ public class SIsland implements Island {
             return;
 
         IslandsDatabaseBridge.saveGeneratorRate(this, dimension, key, amount);
-    }
-
-    @Override
-    public void setGeneratorAmount(Key key, int amount, World.Environment environment) {
-        setGeneratorAmount(key, amount, Dimensions.fromEnvironment(environment));
     }
 
     @Override
@@ -4301,12 +4186,6 @@ public class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public void removeGeneratorAmount(Key key, World.Environment environment) {
-        removeGeneratorAmount(key, Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
     public int getGeneratorAmount(Key key, Dimension dimension) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
@@ -4322,23 +4201,11 @@ public class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public int getGeneratorAmount(Key key, World.Environment environment) {
-        return getGeneratorAmount(key, Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
     public int getGeneratorTotalAmount(Dimension dimension) {
         int totalAmount = 0;
         for (int amt : getGeneratorAmounts(dimension).values())
             totalAmount += amt;
         return totalAmount;
-    }
-
-    @Override
-    @Deprecated
-    public int getGeneratorTotalAmount(World.Environment environment) {
-        return getGeneratorTotalAmount(Dimensions.fromEnvironment(environment));
     }
 
     @Override
@@ -4362,12 +4229,6 @@ public class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
-        return getGeneratorAmounts(Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
     public Map<Key, Integer> getCustomGeneratorAmounts(Dimension dimension) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
@@ -4383,12 +4244,6 @@ public class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public Map<Key, Integer> getCustomGeneratorAmounts(World.Environment environment) {
-        return getCustomGeneratorAmounts(Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
     public void clearGeneratorAmounts(Dimension dimension) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
@@ -4400,12 +4255,6 @@ public class SIsland implements Island {
             worldGeneratorRates.clear();
             IslandsDatabaseBridge.clearGeneratorRates(this, dimension);
         }
-    }
-
-    @Override
-    @Deprecated
-    public void clearGeneratorAmounts(World.Environment environment) {
-        clearGeneratorAmounts(Dimensions.fromEnvironment(environment));
     }
 
     @Nullable
@@ -4496,21 +4345,9 @@ public class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public Key generateBlock(Location location, World.Environment environment, boolean optimizeDefaultBlock) {
-        return generateBlock(location, Dimensions.fromEnvironment(environment), optimizeDefaultBlock);
-    }
-
-    @Override
     public boolean wasSchematicGenerated(Dimension dimension) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
         return this.generatedSchematics.readAndGet(generatedSchematics -> generatedSchematics.contains(dimension));
-    }
-
-    @Override
-    @Deprecated
-    public boolean wasSchematicGenerated(World.Environment environment) {
-        return wasSchematicGenerated(Dimensions.fromEnvironment(environment));
     }
 
     @Override
@@ -4532,18 +4369,6 @@ public class SIsland implements Island {
             return;
 
         IslandsDatabaseBridge.saveGeneratedSchematics(this);
-    }
-
-    @Override
-    @Deprecated
-    public void setSchematicGenerate(World.Environment environment) {
-        setSchematicGenerate(Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
-    @Deprecated
-    public void setSchematicGenerate(World.Environment environment, boolean generated) {
-        setSchematicGenerate(Dimensions.fromEnvironment(environment), generated);
     }
 
     @Override
@@ -5374,6 +5199,10 @@ public class SIsland implements Island {
         });
     }
 
+    private Location worldPositionToLocation(Dimension dimension, WorldPosition worldPosition) {
+        return IslandWorlds.setWorldToLocation(this, dimension, worldPosition);
+    }
+
     public static void registerListeners(PluginEventsDispatcher dispatcher) {
         dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, SIsland::onSettingsUpdate);
     }
@@ -5386,6 +5215,31 @@ public class SIsland implements Island {
             } catch (Throwable ignored) {
             }
         });
+    }
+
+    private static WorldPosition adjustPositionToCenterOfBlock(@Nullable WorldPosition worldPosition) {
+        if (worldPosition == null)
+            return null;
+
+        boolean changed = false;
+
+        BlockPosition blockPosition = worldPosition.toBlockPosition();
+
+        double x = worldPosition.getX();
+        double z = worldPosition.getZ();
+
+        if (worldPosition.getX() - 0.5 != blockPosition.getX()) {
+            x = blockPosition.getX() + 0.5;
+            changed = true;
+        }
+
+        if (worldPosition.getZ() - 0.5 != blockPosition.getZ()) {
+            z = blockPosition.getZ() + 0.5;
+            changed = true;
+        }
+
+        return !changed ? worldPosition :
+                SWorldPosition.of(x, worldPosition.getY(), z, worldPosition.getYaw(), worldPosition.getPitch());
     }
 
     public static class UniqueVisitor {

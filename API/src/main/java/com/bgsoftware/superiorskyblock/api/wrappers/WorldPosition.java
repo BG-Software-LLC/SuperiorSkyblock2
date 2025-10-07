@@ -7,25 +7,35 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 /**
- * This object represents a position of a block in the world.
+ * This object represents a position of an entity in the world.
  * You can create a new instance of this class by using {@link FactoriesManager}
  */
-public interface BlockPosition {
+public interface WorldPosition {
 
     /**
      * Get the x value of the position.
      */
-    int getX();
+    double getX();
 
     /**
      * Get the y value of the position.
      */
-    int getY();
+    double getY();
 
     /**
      * Get the z value of the position.
      */
-    int getZ();
+    double getZ();
+
+    /**
+     * Get the yaw value of the position.
+     */
+    float getYaw();
+
+    /**
+     * Get the pitch value of the position.
+     */
+    float getPitch();
 
     /**
      * Get a new position by an offset from this position.
@@ -34,26 +44,45 @@ public interface BlockPosition {
      * @param y The y-axis offset.
      * @param z The z-axis offset.
      */
-    BlockPosition offset(int x, int y, int z);
+    WorldPosition offset(double x, double y, double z);
 
     /**
-     * Get the bukkit representation of this block position in the provided world.
+     * Get a new position by rotating this position.
      *
-     * @param world The world for this block position.
+     * @param yaw   The y-axis rotation.
+     * @param pitch The z-axis rotation.
+     */
+    WorldPosition rotate(float yaw, float pitch);
+
+    /**
+     * Get a new position by an offset from this position.
+     *
+     * @param x     The x-axis offset.
+     * @param y     The y-axis offset.
+     * @param z     The z-axis offset.
+     * @param yaw   The y-axis rotation.
+     * @param pitch The z-axis rotation.
+     */
+    WorldPosition offset(double x, double y, double z, float yaw, float pitch);
+
+    /**
+     * Get the bukkit representation of this world position in the provided world.
+     *
+     * @param world The world for this world position.
      */
     Location toLocation(@Nullable World world);
 
     /**
-     * Get the bukkit representation of this block position in the provided world.
+     * Get the bukkit representation of this world position in the provided world.
      *
-     * @param world    The world for this block position.
+     * @param world    The world for this world position.
      * @param location The location to write the output to. If null, null will be returned as well.
      */
     @Nullable
     Location toLocation(@Nullable World world, @Nullable Location location);
 
     /**
-     * Get the bukkit representation of this block position in the provided world.
+     * Get the bukkit representation of this world position in the provided world info.
      * If the world is unloaded, the location's getWorld will return null.
      *
      * @param worldInfo The world information for this world position.
@@ -61,7 +90,7 @@ public interface BlockPosition {
     Location toLocation(WorldInfo worldInfo);
 
     /**
-     * Get the bukkit representation of this block position in the provided world.
+     * Get the bukkit representation of this world position in the provided world info.
      * If the world is unloaded, the location's getWorld will return null.
      *
      * @param worldInfo The world information for this world position.
@@ -71,8 +100,8 @@ public interface BlockPosition {
     Location toLocation(WorldInfo worldInfo, @Nullable Location location);
 
     /**
-     * Get the world position representation of this block position.
+     * Get the block position representation of this world position.
      */
-    WorldPosition toWorldPosition();
+    BlockPosition toBlockPosition();
 
 }

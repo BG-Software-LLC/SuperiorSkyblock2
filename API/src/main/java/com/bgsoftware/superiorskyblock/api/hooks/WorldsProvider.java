@@ -1,8 +1,10 @@
 package com.bgsoftware.superiorskyblock.api.hooks;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -62,8 +64,23 @@ public interface WorldsProvider {
      * @param maxIslandSize    The default maximum island size.
      * @param islandOwner      The owner of the island.
      * @param islandUUID       The UUID of the island.
+     * @deprecated See {@link #getNextLocation(BlockPosition, int, int, UUID, UUID)}
      */
-    Location getNextLocation(Location previousLocation, int islandsHeight, int maxIslandSize, UUID islandOwner, UUID islandUUID);
+    default Location getNextLocation(Location previousLocation, int islandsHeight, int maxIslandSize, UUID islandOwner, UUID islandUUID) {
+        return getNextLocation(SuperiorSkyblockAPI.getFactory().createBlockPosition(previousLocation),
+                islandsHeight, maxIslandSize, islandOwner, islandUUID);
+    }
+
+    /**
+     * Get the location for a new island that is created.
+     *
+     * @param previousPosition The position of the previous island that was created.
+     * @param islandsHeight    The default islands height.
+     * @param maxIslandSize    The default maximum island size.
+     * @param islandOwner      The owner of the island.
+     * @param islandUUID       The UUID of the island.
+     */
+    Location getNextLocation(BlockPosition previousPosition, int islandsHeight, int maxIslandSize, UUID islandOwner, UUID islandUUID);
 
     /**
      * Callback upon finishing of creation of islands.

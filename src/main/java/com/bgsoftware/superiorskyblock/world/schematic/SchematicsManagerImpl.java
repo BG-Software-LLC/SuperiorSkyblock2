@@ -201,7 +201,9 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
                 .setSaveAir(saveAir)
                 .build();
 
-        saveSchematic(pos1.parse(), pos2.parse(), schematicOptions, () -> Message.SCHEMATIC_SAVED.send(superiorPlayer));
+        World world = offset.getWorld();
+        saveSchematic(pos1.toLocation(world), pos2.toLocation(world), schematicOptions,
+                () -> Message.SCHEMATIC_SAVED.send(superiorPlayer));
 
         superiorPlayer.setSchematicPos1(null);
         superiorPlayer.setSchematicPos2(null);

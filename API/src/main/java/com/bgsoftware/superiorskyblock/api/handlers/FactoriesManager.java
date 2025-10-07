@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -122,8 +123,19 @@ public interface FactoriesManager {
      * @param blockX The x-coords of the block.
      * @param blockY The y-coords of the block.
      * @param blockZ The z-coords of the block.
+     * @deprecated See {@link #createBlockPosition(int, int, int)}
      */
+    @Deprecated
     BlockPosition createBlockPosition(String world, int blockX, int blockY, int blockZ);
+
+    /**
+     * Create a {@link BlockPosition} object from given block coords.
+     *
+     * @param blockX The x-coords of the block.
+     * @param blockY The y-coords of the block.
+     * @param blockZ The z-coords of the block.
+     */
+    BlockPosition createBlockPosition(int blockX, int blockY, int blockZ);
 
     /**
      * Create a {@link BlockPosition} object from a location.
@@ -131,6 +143,33 @@ public interface FactoriesManager {
      * @param location The location.
      */
     BlockPosition createBlockPosition(Location location);
+
+    /**
+     * Create a {@link WorldPosition} object from given world coords.
+     *
+     * @param x The x-coords of the position.
+     * @param y The y-coords of the position.
+     * @param z The z-coords of the position.
+     */
+    WorldPosition createWorldPosition(double x, double y, double z);
+
+    /**
+     * Create a {@link WorldPosition} object from given world coords.
+     *
+     * @param x     The x-coords of the position.
+     * @param y     The y-coords of the position.
+     * @param z     The z-coords of the position.
+     * @param yaw   The yaw of the position.
+     * @param pitch The pitch of the position.
+     */
+    WorldPosition createWorldPosition(double x, double y, double z, float yaw, float pitch);
+
+    /**
+     * Create a {@link WorldPosition} object from a location.
+     *
+     * @param location The location.
+     */
+    WorldPosition createWorldPosition(Location location);
 
     /**
      * Create a new bank transaction.

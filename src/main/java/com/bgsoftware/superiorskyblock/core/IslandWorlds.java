@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -78,22 +79,14 @@ public class IslandWorlds {
         }
     }
 
-    public static Location setWorldToLocation(Island island, Dimension dimension, Location location) {
+    public static Location setWorldToLocation(Island island, Dimension dimension, WorldPosition worldPosition) {
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
         World world = Bukkit.getWorld(worldInfo.getName());
+        Location location;
         if (world != null) {
-            location = location.clone();
-            location.setWorld(world);
+            location = worldPosition.toLocation(world);
         } else {
-            WorldsProvider worldsProvider = plugin.getProviders().getWorldsProvider();
-            if (worldsProvider instanceof LazyWorldsProvider) {
-                location = new LazyWorldLocation(worldInfo.getName(), location.getX(), location.getY(),
-                        location.getZ(), location.getYaw(), location.getPitch());
-            } else {
-                location = location.clone();
-                world = plugin.getGrid().getIslandsWorld(island, dimension);
-                location.setWorld(world);
-            }
+            throw new IllegalStateException("You cannot call this method while the world is unloaded. Use Island#accessIslandWorld");
         }
 
         return location;

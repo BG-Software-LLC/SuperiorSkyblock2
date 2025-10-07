@@ -1,7 +1,9 @@
 package com.bgsoftware.superiorskyblock.core;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -11,6 +13,7 @@ import org.bukkit.World;
  */
 public class LazyWorldLocation extends Location {
 
+    @Nullable
     private String worldName;
     private boolean updatedWorld = false;
 
@@ -25,6 +28,11 @@ public class LazyWorldLocation extends Location {
     public static LazyWorldLocation of(WorldInfo worldInfo, BlockPosition blockPosition) {
         return new LazyWorldLocation(worldInfo.getName(), blockPosition.getX(), blockPosition.getY(), blockPosition.getZ(),
                 0f, 0f);
+    }
+
+    public static LazyWorldLocation of(WorldInfo worldInfo, WorldPosition worldPosition) {
+        return new LazyWorldLocation(worldInfo.getName(), worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(),
+                worldPosition.getYaw(), worldPosition.getPitch());
     }
 
     public LazyWorldLocation(World world, double x, double y, double z) {
@@ -51,7 +59,7 @@ public class LazyWorldLocation extends Location {
     @Override
     public World getWorld() {
         if (!this.updatedWorld) {
-            setWorld(Bukkit.getWorld(worldName));
+            setWorld(worldName == null ? null : Bukkit.getWorld(worldName));
         }
 
         return super.getWorld();
@@ -60,8 +68,7 @@ public class LazyWorldLocation extends Location {
     @Override
     public void setWorld(World world) {
         super.setWorld(world);
-        if (world != null)
-            this.worldName = world.getName();
+        this.worldName = world == null ? null : world.getName();
         this.updatedWorld = true;
     }
 
