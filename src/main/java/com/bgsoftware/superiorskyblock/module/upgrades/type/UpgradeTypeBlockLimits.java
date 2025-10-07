@@ -23,6 +23,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -255,6 +256,22 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
                 return;
 
             e.getBlocks().removeIf(blockState -> island.hasReachedBlockLimit(Keys.of(blockState)));
+        }
+
+        @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+        public void onBlockForm(BlockFormEvent e) {
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getBlock().getLocation(wrapper.getHandle()));
+            }
+            if (island == null)
+                return;
+
+            Key blockKey = Keys.of(e.getNewState());
+
+            if (island.hasReachedBlockLimit(blockKey)) {
+                e.setCancelled(true);
+            }
         }
 
 
