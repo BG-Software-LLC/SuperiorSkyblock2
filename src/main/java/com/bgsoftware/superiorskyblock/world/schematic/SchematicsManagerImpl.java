@@ -112,7 +112,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
     }
 
     public void cacheSchematics() {
-        if (!plugin.getSettings().isCacheSchematics() || plugin.getSettings().getMaxIslandSize() % 4 != 0)
+        if (!plugin.getSettings().isCacheSchematics() || plugin.getSettings().getMaxIslandSize() % 4 != 0 || true)
             return;
 
         List<Schematic> newSchematics = new LinkedList<>();
