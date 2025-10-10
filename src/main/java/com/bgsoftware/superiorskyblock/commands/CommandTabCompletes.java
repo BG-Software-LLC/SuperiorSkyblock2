@@ -55,7 +55,7 @@ public class CommandTabCompletes {
                                                             BiPredicate<SuperiorPlayer, Island> islandPredicate) {
         SuperiorPlayer superiorPlayer = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
         Island island = superiorPlayer == null ? null : superiorPlayer.getIsland();
-        return getOnlinePlayersWithIslands(plugin, argument, hideVanish, (onlinePlayer, onlineIsland) ->
+        return getOnlinePlayersAndIslands(plugin, argument, hideVanish, (onlinePlayer, onlineIsland) ->
                 onlineIsland != null && (superiorPlayer == null || island == null || !island.equals(onlineIsland)) &&
                         islandPredicate.test(onlinePlayer, onlineIsland));
     }
@@ -94,9 +94,8 @@ public class CommandTabCompletes {
                 .map(getOnlineSuperiorPlayers(plugin), SuperiorPlayer::getName);
     }
 
-    public static List<String> getOnlinePlayersWithIslands(SuperiorSkyblockPlugin plugin, String argument,
-                                                           boolean hideVanish,
-                                                           @Nullable BiPredicate<SuperiorPlayer, Island> predicate) {
+    public static List<String> getOnlinePlayersAndIslands(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanish,
+                                                          @Nullable BiPredicate<SuperiorPlayer, Island> predicate) {
         List<String> tabArguments = new LinkedList<>();
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
 
@@ -104,10 +103,10 @@ public class CommandTabCompletes {
             SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
             if (!hideVanish || onlinePlayer.isShownAsOnline()) {
                 Island onlineIsland = onlinePlayer.getIsland();
-                if (predicate == null || predicate.test(onlinePlayer, onlineIsland)) {
+                if (onlineIsland != null && (predicate == null || predicate.test(onlinePlayer, onlineIsland))) {
                     if (onlinePlayer.getName().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
                         tabArguments.add(onlinePlayer.getName());
-                    if (onlineIsland != null && onlineIsland.getStrippedName().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
+                    if (onlineIsland.getStrippedName().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
                         tabArguments.add(onlineIsland.getStrippedName());
                 }
             }

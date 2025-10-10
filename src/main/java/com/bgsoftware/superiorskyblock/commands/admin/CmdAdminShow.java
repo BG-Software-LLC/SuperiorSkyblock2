@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -292,12 +291,6 @@ public class CmdAdminShow implements IAdminIslandCommand {
             infoMessage.append(Message.ISLAND_INFO_FOOTER.getMessage(locale));
 
         Message.CUSTOM.send(sender, infoMessage.toString(), false);
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 3 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[2], false, null)
-                : Collections.emptyList();
     }
 
     private static <K, V> Optional<StringBuilder> collectIslandData(Locale locale,
