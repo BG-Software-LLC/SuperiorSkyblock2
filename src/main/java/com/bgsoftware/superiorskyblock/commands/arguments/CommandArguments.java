@@ -183,6 +183,21 @@ public class CommandArguments {
         return colorize ? Formatters.COLOR_FORMATTER.format(stringBuilder.substring(1)) : stringBuilder.substring(1);
     }
 
+    public static PlayerRole getPlayerRole(CommandSender sender, String argument) {
+        PlayerRole playerRole = null;
+
+        try {
+            playerRole = SPlayerRole.of(argument);
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        if (playerRole == null) {
+            Message.INVALID_ROLE.send(sender, argument, SPlayerRole.getAllRoleNames());
+        }
+
+        return playerRole;
+    }
+
     public static PlayerRole getPlayerRoleFromLadder(CommandSender sender, String argument) {
         PlayerRole playerRole = null;
 
@@ -339,9 +354,8 @@ public class CommandArguments {
         } catch (NullPointerException ignored) {
         }
 
-        if (islandPrivilege == null || islandPrivilege.getType() == IslandPrivilege.Type.COMMAND) {
+        if (islandPrivilege == null) {
             Message.INVALID_ISLAND_PERMISSION.send(sender, argument, IslandPrivileges.getPrivilegesNames());
-            islandPrivilege = null;
         }
 
         return islandPrivilege;
