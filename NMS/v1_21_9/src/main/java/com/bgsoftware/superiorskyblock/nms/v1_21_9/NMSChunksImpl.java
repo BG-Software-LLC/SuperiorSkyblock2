@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_21_9;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
@@ -16,11 +17,10 @@ import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
@@ -64,8 +64,10 @@ import static com.bgsoftware.superiorskyblock.nms.v1_21_9.utils.NMSUtilsVersione
 
 public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.AbstractNMSChunks {
 
-    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final ReflectMethod<Codec<PalettedContainer<Holder<Biome>>>> CONTAINER_FACTORY_BIOME_RW_CODEC =
+            new ReflectMethod<>(PalettedContainerFactory.class, "biomeContainerCodecRW");
 
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -93,7 +95,7 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.A
 
                 ClientboundForgetLevelChunkPacket forgetLevelChunkPacket = new ClientboundForgetLevelChunkPacket(chunkPos);
                 ClientboundLevelChunkWithLightPacket mapChunkPacket = new ClientboundLevelChunkWithLightPacket(
-                        levelChunk, levelChunk.level.getLightEngine(), null, null, true);
+                        levelChunk, levelChunk.level.getLightEngine(), null, null);
 
                 playersToUpdate.forEach(player -> {
                     ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
@@ -109,7 +111,7 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.A
                 Holder<Biome> biome = CraftBiome.bukkitToMinecraftHolder(bukkitBiome);
 
                 PalettedContainer<Holder<Biome>> biomesContainer = NMSUtilsVersioned.createBiomesContainer(biome);
-                DataResult<Tag> dataResult = DEFAULT_PALETTED_CONTAINER_FACTORY.biomeContainerRWCodec()
+                DataResult<Tag> dataResult = getBiomeContainerRWCodec()
                         .encodeStart(NbtOps.INSTANCE, biomesContainer);
                 Tag biomesCompound = dataResult.getOrThrow();
 
@@ -264,8 +266,8 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.A
                         PalettedContainer<Holder<Biome>> biomesPalettedContainer;
                         Optional<CompoundTag> biomesCompound = sectionCompound.getCompound("biomes");
                         if (biomesCompound.isPresent()) {
-                            DataResult<PalettedContainer<Holder<Biome>>> dataResult = DEFAULT_PALETTED_CONTAINER_FACTORY
-                                    .biomeContainerRWCodec().parse(NbtOps.INSTANCE, biomesCompound.get())
+                            DataResult<PalettedContainer<Holder<Biome>>> dataResult = getBiomeContainerRWCodec()
+                                    .parse(NbtOps.INSTANCE, biomesCompound.get())
                                     .promotePartial((sx) -> {
                                     });
                             biomesPalettedContainer = dataResult.getOrThrow();
@@ -360,6 +362,14 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.A
             return;
 
         NMSUtilsVersioned.buildSurfaceForChunk(serverLevel, bukkitGenerator, chunk);
+    }
+
+    private static Codec<PalettedContainer<Holder<Biome>>> getBiomeContainerRWCodec() {
+        if (CONTAINER_FACTORY_BIOME_RW_CODEC.isValid()) {
+            return CONTAINER_FACTORY_BIOME_RW_CODEC.invoke(DEFAULT_PALETTED_CONTAINER_FACTORY);
+        } else {
+            return DEFAULT_PALETTED_CONTAINER_FACTORY.biomeContainerRWCodec();
+        }
     }
 
 }

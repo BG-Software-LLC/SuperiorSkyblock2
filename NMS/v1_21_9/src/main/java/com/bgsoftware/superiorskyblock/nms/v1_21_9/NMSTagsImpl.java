@@ -3,10 +3,11 @@ package com.bgsoftware.superiorskyblock.nms.v1_21_9;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
-import com.mojang.datafixers.util.Either;
 import com.mojang.logging.LogUtils;
+import net.minecraft.Util;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.IntArrayTag;
@@ -19,7 +20,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ResolvableProfile;
@@ -28,7 +28,6 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.slf4j.Logger;
 
-import java.util.Optional;
 import java.util.Set;
 
 public class NMSTagsImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.AbstractNMSTags {
@@ -42,10 +41,9 @@ public class NMSTagsImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.Abs
         Multimap<String, Property> properties = HashMultimap.create();
         properties.put("textures", new Property("textures", texture));
 
-        ResolvableProfile.Partial partialProfile = new ResolvableProfile.Partial(
-                Optional.empty(), Optional.empty(), new PropertyMap(properties));
+        GameProfile gameProfile = new GameProfile(Util.NIL_UUID, "", new PropertyMap(properties));
 
-        ResolvableProfile resolvableProfile = new ResolvableProfile.Static(Either.right(partialProfile), PlayerSkin.Patch.EMPTY);
+        ResolvableProfile resolvableProfile = ResolvableProfile.createResolved(gameProfile);
 
         itemStack.set(DataComponents.PROFILE, resolvableProfile);
 

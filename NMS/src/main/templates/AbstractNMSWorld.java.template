@@ -142,7 +142,10 @@ public abstract class AbstractNMSWorld implements NMSWorld {
             Location center = island.getCenter(dimension);
 
             worldBorder = new WorldBorder();
-            worldBorder.world = serverLevel;
+            try {
+                worldBorder.world = serverLevel;
+            } catch (Throwable ignored) {
+            }
             worldBorder.setWarningBlocks(0);
             worldBorder.setCenter(center.getX(), center.getZ());
 

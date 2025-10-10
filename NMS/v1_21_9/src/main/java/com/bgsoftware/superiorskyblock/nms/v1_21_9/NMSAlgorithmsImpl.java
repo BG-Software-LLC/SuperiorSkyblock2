@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_21_9;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -21,10 +22,14 @@ import org.bukkit.inventory.meta.trim.ArmorTrim;
 import org.bukkit.inventory.meta.trim.TrimMaterial;
 import org.bukkit.inventory.meta.trim.TrimPattern;
 
+import java.lang.reflect.Modifier;
 import java.util.Locale;
 import java.util.Objects;
 
 public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.AbstractNMSAlgorithms {
+
+    public static final ReflectField<double[]> SERVER_RECENT_TPS = new ReflectField<>(MinecraftServer.class,
+            double[].class, Modifier.PUBLIC | Modifier.FINAL, 1);
 
     private static final Gson COMPONENT_GSON = new GsonBuilder().disableHtmlEscaping().create();
 
@@ -76,7 +81,7 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_21
 
     @Override
     public double getCurrentTps() {
-        return Bukkit.getTPS()[0];
+        return (SERVER_RECENT_TPS.isValid() ? SERVER_RECENT_TPS.get(MinecraftServer.getServer()) : Bukkit.getTPS())[0];
     }
 
 }
