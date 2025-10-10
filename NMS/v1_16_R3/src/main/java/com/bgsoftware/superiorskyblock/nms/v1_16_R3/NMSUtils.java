@@ -343,12 +343,21 @@ public class NMSUtils {
         }
 
         public final void onChunkNotExist(ChunkPosition chunkPosition) {
-            if (!plugin.getProviders().hasCustomWorldsSupport())
+            if (!plugin.getProviders().hasCustomWorldsSupport()) {
+                latchCountDown();
                 return;
+            }
 
-            ChunksProvider.loadChunk(chunkPosition, this.chunkLoadReason, bukkitChunk -> {
-                Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-                BukkitExecutor.ensureMain(() -> onLoadedChunk(chunk));
+            ChunksProvider.loadChunk(chunkPosition, this.chunkLoadReason, null).whenComplete((bukkitChunk, error) -> {
+                if (error == null) {
+                    BukkitExecutor.ensureMain(() -> {
+                        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+                        onLoadedChunk(chunk);
+                    });
+                } else {
+                    latchCountDown();
+                    throw new RuntimeException(error);
+                }
             });
         }
 

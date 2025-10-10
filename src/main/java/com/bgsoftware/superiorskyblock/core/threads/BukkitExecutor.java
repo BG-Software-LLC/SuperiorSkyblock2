@@ -148,8 +148,11 @@ public class BukkitExecutor {
             } else {
                 onCreate();
                 value.whenComplete((value, ex) -> BukkitExecutor.ensureMain(() -> {
-                    nestedTask.value.complete(function.apply(value));
-                    onComplete();
+                    try {
+                        nestedTask.value.complete(function.apply(value));
+                    } finally {
+                        onComplete();
+                    }
                 }));
             }
             return nestedTask;
@@ -165,9 +168,12 @@ public class BukkitExecutor {
             } else {
                 onCreate();
                 value.whenComplete((value, ex) -> BukkitExecutor.ensureMain(() -> {
-                    consumer.accept(value);
-                    nestedTask.value.complete(null);
-                    onComplete();
+                    try {
+                        consumer.accept(value);
+                        nestedTask.value.complete(null);
+                    } finally {
+                        onComplete();
+                    }
                 }));
             }
             return nestedTask;
@@ -182,8 +188,11 @@ public class BukkitExecutor {
             } else {
                 onCreate();
                 value.whenComplete((value, ex) -> BukkitExecutor.async(() -> {
-                    nestedTask.value.complete(function.apply(value));
-                    onComplete();
+                    try {
+                        nestedTask.value.complete(function.apply(value));
+                    } finally {
+                        onComplete();
+                    }
                 }));
             }
             return nestedTask;
@@ -199,9 +208,12 @@ public class BukkitExecutor {
             } else {
                 onCreate();
                 value.whenComplete((value, ex) -> BukkitExecutor.async(() -> {
-                    consumer.accept(value);
-                    nestedTask.value.complete(null);
-                    onComplete();
+                    try {
+                        consumer.accept(value);
+                        nestedTask.value.complete(null);
+                    } finally {
+                        onComplete();
+                    }
                 }));
             }
             return nestedTask;
