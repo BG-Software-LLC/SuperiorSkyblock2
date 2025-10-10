@@ -478,14 +478,13 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
         this.missionsContainer.addMissionCategory(missionCategory);
     }
 
-    public boolean canDisplayMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean removeCompleted) {
-        if (mission.isOnlyShowIfRequiredCompleted()) {
-            if (!hasAllRequiredMissions(superiorPlayer, mission))
-                return false;
+    public boolean hasAllRequirements(Mission<?> mission, SuperiorPlayer superiorPlayer) {
+        return hasAllRequiredMissions(superiorPlayer, mission) && canPassAllChecks(superiorPlayer, mission);
+    }
 
-            if (!canPassAllChecks(superiorPlayer, mission))
-                return false;
-        }
+    public boolean canDisplayMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean removeCompleted) {
+        if (mission.isOnlyShowIfRequiredCompleted() && !hasAllRequirements(mission, superiorPlayer))
+            return false;
 
         if (removeCompleted) {
             if (mission.getIslandMission() ? superiorPlayer.getIsland() != null &&
