@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.SBlockPosition;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 
 import java.util.function.Consumer;
@@ -18,9 +18,10 @@ public class GridDatabaseBridge {
     private GridDatabaseBridge() {
     }
 
-    public static void saveLastIsland(GridManager gridManager, SBlockPosition lastIsland) {
+    public static void saveLastIsland(GridManager gridManager, BlockPosition lastIsland) {
         runOperationIfRunning(gridManager.getDatabaseBridge(), databaseBridge ->
-                databaseBridge.updateObject("grid", null, new Pair<>("last_island", lastIsland.toString())));
+                databaseBridge.updateObject("grid", null,
+                        new Pair<>("last_island", Serializers.BLOCK_POSITION_SERIALIZER.serialize(lastIsland))));
     }
 
     public static void updateVersion(GridManager gridManager, int version) {
@@ -33,7 +34,7 @@ public class GridDatabaseBridge {
 
     public static void insertGrid(GridManager gridManager) {
         runOperationIfRunning(gridManager.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("grid",
-                new Pair<>("last_island", Serializers.LOCATION_SPACED_SERIALIZER.serialize(gridManager.getLastIslandLocation())),
+                new Pair<>("last_island", Serializers.BLOCK_POSITION_SERIALIZER.serialize(gridManager.getLastIslandPosition())),
                 new Pair<>("max_island_size", plugin.getSettings().getMaxIslandSize()),
                 new Pair<>("world", plugin.getSettings().getWorlds().getDefaultWorldName())
         ));

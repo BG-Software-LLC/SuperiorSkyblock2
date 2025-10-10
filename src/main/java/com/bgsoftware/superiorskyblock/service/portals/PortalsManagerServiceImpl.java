@@ -269,7 +269,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                         }
 
                         Location homeLocation = schematic.adjustRotation(centerLocation);
-                        island.setIslandHome(destination, homeLocation);
+                        island.setIslandHome(homeLocation);
 
                         if (destination.getEnvironment() == World.Environment.THE_END && superiorPlayer != null) {
                             plugin.getNMSDragonFight().awardTheEndAchievement((Player) entity);

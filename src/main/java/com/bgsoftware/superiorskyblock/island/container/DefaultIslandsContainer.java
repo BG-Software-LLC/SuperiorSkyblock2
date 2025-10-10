@@ -173,7 +173,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
     }
 
     @Override
-    public void sortIslands(SortingType sortingType, boolean forceSort, Runnable onFinish) {
+    public void sortIslands(SortingType sortingType, boolean forceSort, @Nullable Runnable onFinish) {
         ensureSortingType(sortingType);
 
         Synchronized<List<Island>> sortedIslands = this.sortedIslands.get(sortingType);
@@ -218,7 +218,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
         Preconditions.checkState(sortedIslands.containsKey(sortingType), "The sorting-type " + sortingType + " doesn't exist in the database. Please contact author!");
     }
 
-    private void sortIslandsInternal(SortingType sortingType, Runnable onFinish) {
+    private void sortIslandsInternal(SortingType sortingType, @Nullable Runnable onFinish) {
         List<Island> existingIslands = new LinkedList<>(islandsByUUID.values());
         existingIslands.removeIf(Island::isIgnored);
 

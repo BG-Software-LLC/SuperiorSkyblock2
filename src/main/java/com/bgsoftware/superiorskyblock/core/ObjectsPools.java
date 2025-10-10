@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 public class ObjectsPools {
 
     public static final ObjectsPool<Wrapper<Location>> LOCATION = createNewPool(() -> new Location(null, 0D, 0D, 0D));
+    public static final ObjectsPool<Wrapper<LazyWorldLocation>> LAZY_LOCATION = createNewPool(() -> new LazyWorldLocation(null, 0D, 0D, 0D));
 
     private ObjectsPools() {
 

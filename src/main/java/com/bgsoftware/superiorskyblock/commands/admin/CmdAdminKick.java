@@ -1,10 +1,11 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -70,6 +71,13 @@ public class CmdAdminKick implements IAdminPlayerCommand {
 
         IslandUtils.handleKickPlayer(sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null,
                 sender.getName(), targetIsland, targetPlayer);
+    }
+
+    @Override
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        return args.length == 3 ? CommandTabCompletes.getOnlinePlayersWithIsland(plugin, args[2], false,
+                superiorPlayer -> !superiorPlayer.getIslandLeader().equals(superiorPlayer)) :
+                Collections.emptyList();
     }
 
 }

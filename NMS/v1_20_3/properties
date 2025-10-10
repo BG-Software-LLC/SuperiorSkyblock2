@@ -1,0 +1,7 @@
+NMS_VERSION=v1_20_3
+CRAFTBUKKIT_PACKAGE=org.bukkit.craftbukkit.v1_20_R3
+COMMON_NMS_PACKAGE=com.bgsoftware.superiorskyblock.nms.v1_20_3
+PAPER_CHUNK_BLOCK_CONTROLLER_CLASS=com.destroystokyo.paper.antixray.ChunkPacketBlockController
+REGISTRY_CLASS=net.minecraft.core.registries.BuiltInRegistries
+CHUNK_STATUS_CLASS=net.minecraft.world.level.chunk.ChunkStatus
+SERVER_LEVEL_RANDOM_TYPE=net.minecraft.util.RandomSource

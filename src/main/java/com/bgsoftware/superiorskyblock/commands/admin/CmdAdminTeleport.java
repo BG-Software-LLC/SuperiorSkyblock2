@@ -5,12 +5,15 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.portals.PortalsManagerService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import org.bukkit.Location;
 import org.bukkit.PortalType;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -93,8 +96,14 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
         if (dimension != plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
             if (!island.wasSchematicGenerated(dimension)) {
                 PortalType portalType = dimension.getEnvironment() == World.Environment.NETHER ? PortalType.NETHER : PortalType.ENDER;
-                portalsManager.get().handlePlayerPortalFromIsland(superiorPlayer, island,
-                        island.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension()), portalType, false);
+                WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
+                Location homeLocation = island.getIslandHomePosition(dimension).toLocation(worldInfo);
+                IslandWorlds.accessIslandWorldAsync(island, homeLocation, true, islandWorldResult -> {
+                    islandWorldResult.ifRight(Throwable::printStackTrace).ifLeft(world -> {
+                        homeLocation.setWorld(world);
+                        portalsManager.get().handlePlayerPortalFromIsland(superiorPlayer, island, homeLocation, portalType, false);
+                    });
+                });
                 return;
             }
         }

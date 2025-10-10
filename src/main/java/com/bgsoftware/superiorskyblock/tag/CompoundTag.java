@@ -57,7 +57,7 @@ import java.util.Set;
  */
 public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Tag<?>> {
 
-    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagCompound");
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = NMSTagConverter.choice("NBTTagCompound", "CompoundTag");
 
     private CompoundTag(Map<String, Tag<?>> value, boolean cloneMap) {
         super(cloneMap ? new HashMap<>(value) : value);

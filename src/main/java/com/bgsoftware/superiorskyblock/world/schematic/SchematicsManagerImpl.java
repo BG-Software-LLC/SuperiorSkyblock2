@@ -112,7 +112,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
     }
 
     public void cacheSchematics() {
-        if (!plugin.getSettings().isCacheSchematics() || plugin.getSettings().getMaxIslandSize() % 4 != 0)
+        if (!plugin.getSettings().isCacheSchematics() || plugin.getSettings().getMaxIslandSize() % 4 != 0 || true)
             return;
 
         List<Schematic> newSchematics = new LinkedList<>();
@@ -125,7 +125,6 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
                     cachedSchematic = true;
                 } catch (Throwable error) {
                     Log.warn("Cannot cache schematic ", schematic.getName(), ", skipping...");
-                    error.printStackTrace();
                 }
             }
             newSchematics.add(schematic);
@@ -202,7 +201,9 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
                 .setSaveAir(saveAir)
                 .build();
 
-        saveSchematic(pos1.parse(), pos2.parse(), schematicOptions, () -> Message.SCHEMATIC_SAVED.send(superiorPlayer));
+        World world = offset.getWorld();
+        saveSchematic(pos1.toLocation(world), pos2.toLocation(world), schematicOptions,
+                () -> Message.SCHEMATIC_SAVED.send(superiorPlayer));
 
         superiorPlayer.setSchematicPos1(null);
         superiorPlayer.setSchematicPos2(null);

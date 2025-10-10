@@ -59,7 +59,7 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
         Preconditions.checkNotNull(builder, "builder parameter cannot be null.");
         Preconditions.checkArgument(builder instanceof IslandBuilderImpl, "Cannot create an island from custom builder.");
         Preconditions.checkNotNull(lastIsland, "lastIsland parameter cannot be null.");
-        
+
         try {
             return createIslandInternal((IslandBuilderImpl) builder, lastIsland);
         } catch (Throwable error) {
@@ -85,9 +85,8 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
 
         long profiler = Profiler.start(ProfileType.CREATE_ISLAND, schematic.getName());
 
-
         Location islandLocation = plugin.getProviders().getWorldsProvider().getNextLocation(
-                lastIsland.parse().clone(),
+                lastIsland,
                 plugin.getSettings().getIslandHeight(),
                 plugin.getSettings().getMaxIslandSize(),
                 builder.owner.getUniqueId(),

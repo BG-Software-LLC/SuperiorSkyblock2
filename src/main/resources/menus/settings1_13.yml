@@ -222,6 +222,10 @@ settings:
       lore:
         - '&7Allow enderman to grief blocks inside your island.'
         - '&7Currently &cDISABLED&7.'
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
 
   fire_spread:
     display-menu: true

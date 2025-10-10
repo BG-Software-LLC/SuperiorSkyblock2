@@ -72,7 +72,7 @@ dependencies {
     implementation 'com.bgsoftware.common.executors:Executors:b3'
     implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:b11:all@jar'
     implementation 'com.bgsoftware.common.dependencies:DependenciesManager:b2'
-    implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b14'
+    implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b16'
     implementation 'com.bgsoftware.common.databasebridge:DatabaseBridge:b1'
 
     implementation 'org.bstats:bstats-bukkit:3.0.0'

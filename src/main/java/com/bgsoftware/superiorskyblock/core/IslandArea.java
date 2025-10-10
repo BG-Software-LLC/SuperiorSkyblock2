@@ -34,13 +34,13 @@ public class IslandArea {
         return x >= minX && x <= maxX && z >= minZ && z <= maxZ;
     }
 
-    public boolean rshiftAndIntercepts(double x, double z, int shiftFactor) {
+    public boolean expandRshiftAndIntercepts(double x, double z, double expandFactor, int shiftFactor) {
         if (shiftFactor == 0)
             return intercepts(x, z);
-        int minX = (int) this.minX >> shiftFactor;
-        int minZ = (int) this.minZ >> shiftFactor;
-        int maxX = (int) this.maxX >> shiftFactor;
-        int maxZ = (int) this.maxZ >> shiftFactor;
+        int minX = (int) (this.minX - expandFactor) >> shiftFactor;
+        int minZ = (int) (this.minZ - expandFactor) >> shiftFactor;
+        int maxX = (int) (this.maxX + expandFactor) >> shiftFactor;
+        int maxZ = (int) (this.maxZ + expandFactor) >> shiftFactor;
         return x >= minX && x <= maxX && z >= minZ && z <= maxZ;
     }
 

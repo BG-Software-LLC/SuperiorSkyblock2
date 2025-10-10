@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LegacyMasks;
@@ -101,8 +102,8 @@ public class IslandsDatabaseBridge {
         ));
     }
 
-    public static void saveIslandHome(Island island, Dimension dimension, Location location) {
-        if (location == null) {
+    public static void saveIslandHome(Island island, Dimension dimension, @Nullable WorldPosition worldPosition) {
+        if (worldPosition == null) {
             runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_homes",
                     createFilter("island", island, new Pair<>("environment", dimension.getName()))
             ));
@@ -110,23 +111,23 @@ public class IslandsDatabaseBridge {
             runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("islands_homes",
                     new Pair<>("island", island.getUniqueId().toString()),
                     new Pair<>("environment", dimension.getName()),
-                    new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(location))
+                    new Pair<>("location", Serializers.WORLD_POSITION_SERIALIZER.serialize(worldPosition))
             ));
         }
     }
 
-    public static void saveVisitorLocation(Island island, Dimension dimension, Location location) {
-        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("islands_visitor_homes",
-                new Pair<>("island", island.getUniqueId().toString()),
-                new Pair<>("environment", dimension.getName()),
-                new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(location))
-        ));
-    }
-
-    public static void removeVisitorLocation(Island island, Dimension dimension) {
-        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_visitor_homes",
-                createFilter("island", island, new Pair<>("environment", dimension.getName()))
-        ));
+    public static void saveVisitorLocation(Island island, Dimension dimension, @Nullable WorldPosition worldPosition) {
+        if (worldPosition == null) {
+            runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_visitor_homes",
+                    createFilter("island", island, new Pair<>("environment", dimension.getName()))
+            ));
+        } else {
+            runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("islands_visitor_homes",
+                    new Pair<>("island", island.getUniqueId().toString()),
+                    new Pair<>("environment", dimension.getName()),
+                    new Pair<>("location", Serializers.WORLD_POSITION_SERIALIZER.serialize(worldPosition))
+            ));
+        }
     }
 
     public static void saveUnlockedWorlds(Island island) {
@@ -360,7 +361,7 @@ public class IslandsDatabaseBridge {
         WarpCategory category = islandWarp.getCategory();
         ItemStack icon = islandWarp.getRawIcon();
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            try (ObjectsPools.Wrapper<LazyWorldLocation> wrapper = ObjectsPools.LAZY_LOCATION.obtain()) {
                 databaseBridge.insertObject("islands_warps",
                         new Pair<>("island", island.getUniqueId().toString()),
                         new Pair<>("name", islandWarp.getName()),
@@ -382,7 +383,7 @@ public class IslandsDatabaseBridge {
 
     public static void updateWarpLocation(Island island, IslandWarp islandWarp) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            try (ObjectsPools.Wrapper<LazyWorldLocation> wrapper = ObjectsPools.LAZY_LOCATION.obtain()) {
                 databaseBridge.updateObject("islands_warps",
                         createFilter("island", island, new Pair<>("name", islandWarp.getName())),
                         new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(islandWarp.getLocation(wrapper.getHandle())))
@@ -712,7 +713,7 @@ public class IslandsDatabaseBridge {
                     break;
                 }
             }
-            if (!island.getIslandHomesAsDimensions().isEmpty())
+            if (!island.getIslandHomes().isEmpty())
                 databaseBridge.deleteObject("islands_homes", islandFilter);
             if (!island.getIslandMembers(false).isEmpty())
                 databaseBridge.deleteObject("islands_members", islandFilter);
@@ -729,7 +730,7 @@ public class IslandsDatabaseBridge {
             if (!island.getUpgrades().isEmpty())
                 databaseBridge.deleteObject("islands_upgrades", islandFilter);
             for (Dimension dimension : Dimension.values()) {
-                if (island.getVisitorsLocation(dimension) != null) {
+                if (island.getVisitorsPosition(dimension) != null) {
                     databaseBridge.deleteObject("islands_visitor_homes", islandFilter);
                     break;
                 }

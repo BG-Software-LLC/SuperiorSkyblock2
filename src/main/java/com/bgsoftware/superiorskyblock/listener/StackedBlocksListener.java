@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.StackedBlocksDepositMenu;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
@@ -24,16 +25,17 @@ import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +44,11 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     @Nullable
     private static final Material COPPER_BLOCK = EnumHelper.getEnum(Material.class, "COPPER_BLOCK");
     private static final Material HONEYCOMB = EnumHelper.getEnum(Material.class, "HONEYCOMB");
+    @Nullable
+    private static final CreatureSpawnEvent.SpawnReason BUILD_COPPERGOLEM = EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "BUILD_COPPERGOLEM");
+    @Nullable
+    private static final Material COPPER_CHEST = EnumHelper.getEnum(Material.class, "COPPER_CHEST");
+
     private final Map<CreatureSpawnEvent.SpawnReason, List<BlockOffset>> ENTITY_TEMPLATE_OFFSETS = buildEntityTemplateOffsetsMap();
 
     private final LazyReference<StackedBlocksInteractionService> stackedBlocksInteractionService = new LazyReference<StackedBlocksInteractionService>() {
@@ -296,10 +303,21 @@ public class StackedBlocksListener extends AbstractGameEventListener {
             for (BlockOffset blockOffset : entityTemplateOffsets) {
                 if (plugin.getStackedBlocks().getStackedBlockAmount(blockOffset.applyToLocation(entityLocation)) > 1) {
                     e.setCancelled();
+                    if (e.getArgs().spawnReason == BUILD_COPPERGOLEM)
+                        onCopperGolemCancel(entityLocation);
                     return;
                 }
             }
         }
+    }
+
+    private void onCopperGolemCancel(Location entityLocation) {
+        Block copperChestBlock = entityLocation.getBlock().getRelative(BlockFace.DOWN);
+        BukkitExecutor.sync(() -> {
+            if (copperChestBlock.getType() == COPPER_CHEST) {
+                copperChestBlock.setType(COPPER_BLOCK);
+            }
+        }, 1L);
     }
 
     private void onSpongeAbsorb(GameEvent<GameEventArgs.SpongeAbsorbEvent> e) {
@@ -349,32 +367,38 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     private static Map<CreatureSpawnEvent.SpawnReason, List<BlockOffset>> buildEntityTemplateOffsetsMap() {
         EnumMap<CreatureSpawnEvent.SpawnReason, List<BlockOffset>> offsetsMap = new EnumMap<>(CreatureSpawnEvent.SpawnReason.class);
 
-        offsetsMap.put(CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM, Arrays.asList(
-                SBlockOffset.fromOffsets(0, 1, 0),
-                SBlockOffset.fromOffsets(1, 1, 0),
-                SBlockOffset.fromOffsets(1, 1, 1),
-                SBlockOffset.fromOffsets(-1, 1, 0),
-                SBlockOffset.fromOffsets(-1, 1, -1),
-                SBlockOffset.fromOffsets(0, 2, 0)
-        ));
+        List<BlockOffset> blockOffsets = new LinkedList<>();
+        blockOffsets.add(SBlockOffset.fromOffsets(0, 1, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(1, 1, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(1, 1, 1));
+        blockOffsets.add(SBlockOffset.fromOffsets(-1, 1, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(-1, 1, -1));
+        blockOffsets.add(SBlockOffset.fromOffsets(0, 2, 0));
+        offsetsMap.put(CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM, blockOffsets);
 
-        offsetsMap.put(CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN, Arrays.asList(
-                SBlockOffset.fromOffsets(0, 1, 0),
-                SBlockOffset.fromOffsets(0, 2, 0)
-        ));
+        blockOffsets = new LinkedList<>();
+        blockOffsets.add(SBlockOffset.fromOffsets(0, 1, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(0, 2, 0));
+        offsetsMap.put(CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN, blockOffsets);
 
-        offsetsMap.put(CreatureSpawnEvent.SpawnReason.BUILD_WITHER, Arrays.asList(
-                SBlockOffset.fromOffsets(0, 1, 0),
-                SBlockOffset.fromOffsets(1, 1, 0),
-                SBlockOffset.fromOffsets(1, 1, 1),
-                SBlockOffset.fromOffsets(-1, 1, 0),
-                SBlockOffset.fromOffsets(-1, 1, -1),
-                SBlockOffset.fromOffsets(0, 2, 0),
-                SBlockOffset.fromOffsets(1, 2, 0),
-                SBlockOffset.fromOffsets(1, 2, 1),
-                SBlockOffset.fromOffsets(-1, 2, 0),
-                SBlockOffset.fromOffsets(-1, 2, -1)
-        ));
+        blockOffsets = new LinkedList<>();
+        blockOffsets.add(SBlockOffset.fromOffsets(0, 1, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(1, 1, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(1, 1, 1));
+        blockOffsets.add(SBlockOffset.fromOffsets(-1, 1, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(-1, 1, -1));
+        blockOffsets.add(SBlockOffset.fromOffsets(0, 2, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(1, 2, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(1, 2, 1));
+        blockOffsets.add(SBlockOffset.fromOffsets(-1, 2, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(-1, 2, -1));
+        offsetsMap.put(CreatureSpawnEvent.SpawnReason.BUILD_WITHER, blockOffsets);
+
+        if (BUILD_COPPERGOLEM != null) {
+            blockOffsets = new LinkedList<>();
+            blockOffsets.add(SBlockOffset.fromOffsets(0, -1, 0));
+            offsetsMap.put(BUILD_COPPERGOLEM, blockOffsets);
+        }
 
         return Collections.unmodifiableMap(offsetsMap);
     }

@@ -46,7 +46,8 @@ import java.io.IOException;
  */
 public class FloatTag extends NumberTag<Float> {
 
-    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagFloat", float.class);
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = NMSTagConverter.choice(
+            new String[]{"NBTTagFloat", "FloatTag"}, float.class);
 
     private static final FloatTag[] CACHE = new FloatTag[100];
 

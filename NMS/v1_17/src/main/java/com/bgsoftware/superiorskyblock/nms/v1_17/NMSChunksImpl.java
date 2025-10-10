@@ -1,28 +1,22 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
-import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
-import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
-import com.bgsoftware.superiorskyblock.nms.NMSChunks;
-import com.bgsoftware.superiorskyblock.nms.v1_17.crops.CropsBlockEntity;
-import com.bgsoftware.superiorskyblock.nms.v1_17.crops.CropsTickingMethod;
+import com.bgsoftware.superiorskyblock.nms.v1_17.NMSUtils;
+import com.bgsoftware.superiorskyblock.nms.v1_17.utils.NMSUtilsVersioned;
 import com.bgsoftware.superiorskyblock.nms.v1_17.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -39,12 +33,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SlabBlock;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.SlabType;
-import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkBiomeContainer;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -52,12 +40,7 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.lighting.LevelLightEngine;
-import net.minecraft.world.phys.AABB;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_17_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.generator.CustomChunkGenerator;
@@ -69,35 +52,23 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class NMSChunksImpl implements NMSChunks {
+public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.AbstractNMSChunks {
 
     private static final ReflectField<Biome[]> BIOME_BASE_ARRAY = new ReflectField<>(
             ChunkBiomeContainer.class, Biome[].class, "f");
     private static final ReflectField<ChunkBiomeContainer> CHUNK_BIOME_CONTAINER = new ReflectField<>(
             LevelChunk.class, ChunkBiomeContainer.class, Modifier.PRIVATE, 1);
 
-    private static final boolean hasStatesIterator = new ReflectMethod<>(PalettedContainer.class,
-            "forEachLocation", PalettedContainer.CountConsumer.class).isValid();
-
-    private final SuperiorSkyblockPlugin plugin;
-
     public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
-        this.plugin = plugin;
-        KeyBlocksCache.cacheAllBlocks();
-        CropsTickingMethod.register();
+        super(plugin);
     }
 
     @Override
-    public void setBiome(List<ChunkPosition> chunkPositions, org.bukkit.block.Biome bukkitBiome, Collection<Player> playersToUpdate) {
-        if (chunkPositions.isEmpty())
-            return;
-
-        NMSUtils.runActionOnChunks(chunkPositions, true, new NMSUtils.ChunkCallback() {
+    protected NMSUtils.ChunkCallback getBiomesChunkCallback(org.bukkit.block.Biome bukkitBiome, Collection<Player> playersToUpdate) {
+        return new NMSUtils.ChunkCallback(ChunkLoadReason.SET_BIOME, false) {
             @Override
             public void onLoadedChunk(LevelChunk levelChunk) {
                 Registry<Biome> biomesRegistry = levelChunk.level.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
@@ -127,8 +98,14 @@ public class NMSChunksImpl implements NMSChunks {
             }
 
             @Override
-            public void onUnloadedChunk(ChunkPosition chunkPosition, CompoundTag unloadedChunk) {
-                ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+            public void onUnloadedChunk(NMSUtils.UnloadedChunkCompound unloadedChunkCompound) {
+                CompoundTag chunkCompound = unloadedChunkCompound.chunkCompound();
+                if (!chunkCompound.contains("Level", 10))
+                    return;
+
+                CompoundTag unloadedChunk = chunkCompound.getCompound("Level");
+
+                ServerLevel serverLevel = unloadedChunkCompound.serverLevel();
                 Registry<Biome> biomesRegistry = serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
                 Biome biome = CraftBlock.biomeToBiomeBase(biomesRegistry, bukkitBiome);
 
@@ -141,18 +118,12 @@ public class NMSChunksImpl implements NMSChunks {
             public void onFinish() {
                 // Do nothing.
             }
-        });
+        };
     }
 
     @Override
-    public void deleteChunks(Island island, List<ChunkPosition> chunkPositions, @Nullable Runnable onFinish) {
-        if (chunkPositions.isEmpty())
-            return;
-
-        chunkPositions.forEach(chunkPosition -> island.markChunkEmpty(chunkPosition.getWorld(),
-                chunkPosition.getX(), chunkPosition.getZ(), false));
-
-        NMSUtils.runActionOnChunks(chunkPositions, true, new NMSUtils.ChunkCallback() {
+    protected NMSUtils.ChunkCallback getDeleteChunkCallback(Runnable onFinish) {
+        return new NMSUtils.ChunkCallback(ChunkLoadReason.DELETE_CHUNK, false) {
             @Override
             public void onLoadedChunk(LevelChunk levelChunk) {
                 Arrays.fill(levelChunk.getSections(), LevelChunk.EMPTY_SECTION);
@@ -163,8 +134,14 @@ public class NMSChunksImpl implements NMSChunks {
             }
 
             @Override
-            public void onUnloadedChunk(ChunkPosition chunkPosition, CompoundTag unloadedChunk) {
-                ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+            public void onUnloadedChunk(NMSUtils.UnloadedChunkCompound unloadedChunkCompound) {
+                CompoundTag chunkCompound = unloadedChunkCompound.chunkCompound();
+                if (!chunkCompound.contains("Level", 10))
+                    return;
+
+                CompoundTag unloadedChunk = chunkCompound.getCompound("Level");
+
+                ServerLevel serverLevel = unloadedChunkCompound.serverLevel();
 
                 ListTag sectionsList = new ListTag();
                 ListTag tileEntities = new ListTag();
@@ -174,18 +151,13 @@ public class NMSChunksImpl implements NMSChunks {
                 unloadedChunk.put("Entities", new ListTag());
 
                 if (!(serverLevel.generator instanceof IslandsGenerator)) {
-                    ChunkPos chunkPos = new ChunkPos(chunkPosition.getX(), chunkPosition.getZ());
+                    ChunkPos chunkPos = unloadedChunkCompound.chunkPos();
 
                     ProtoChunk protoChunk = NMSUtils.createProtoChunk(chunkPos, serverLevel);
 
+
                     try {
-                        CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(serverLevel,
-                                serverLevel.getChunkSource().getGenerator(), serverLevel.generator);
-
-                        WorldGenRegion region = new WorldGenRegion(serverLevel, Collections.singletonList(protoChunk),
-                                ChunkStatus.SURFACE, 0);
-
-                        customChunkGenerator.buildSurface(region, protoChunk);
+                        NMSUtilsVersioned.buildSurfaceForChunk(serverLevel, serverLevel.generator, protoChunk);
                     } catch (Exception ignored) {
                     }
 
@@ -216,42 +188,33 @@ public class NMSChunksImpl implements NMSChunks {
                 if (onFinish != null)
                     onFinish.run();
             }
-        });
+        };
     }
 
     @Override
-    public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
-                                                                    Synchronized<Chunk2ObjectMap<CalculatedChunk>> unloadedChunksCache) {
-        List<CalculatedChunk> allCalculatedChunks = new LinkedList<>();
-        List<ChunkPosition> chunkPositionsToCalculate = new LinkedList<>();
-
-        Iterator<ChunkPosition> chunkPositionsIterator = chunkPositions.iterator();
-        while (chunkPositionsIterator.hasNext()) {
-            ChunkPosition chunkPosition = chunkPositionsIterator.next();
-            CalculatedChunk cachedCalculatedChunk = unloadedChunksCache.readAndGet(m -> m.get(chunkPosition));
-            if (cachedCalculatedChunk != null) {
-                allCalculatedChunks.add(cachedCalculatedChunk);
-                chunkPositionsIterator.remove();
-            } else {
-                chunkPositionsToCalculate.add(chunkPosition);
-            }
-        }
-
-        if (chunkPositions.isEmpty())
-            return CompletableFuture.completedFuture(allCalculatedChunks);
-
-        CompletableFuture<List<CalculatedChunk>> completableFuture = new CompletableFuture<>();
-
-        NMSUtils.runActionOnChunks(chunkPositions, false, new NMSUtils.ChunkCallback() {
+    protected NMSUtils.ChunkCallback getCalculateChunkCallback(CompletableFuture<List<CalculatedChunk>> completableFuture,
+                                                               Synchronized<Chunk2ObjectMap<CalculatedChunk>> unloadedChunksCache,
+                                                               List<CalculatedChunk> allCalculatedChunks) {
+        return new NMSUtils.ChunkCallback(ChunkLoadReason.BLOCKS_RECALCULATE, true) {
             @Override
             public void onLoadedChunk(LevelChunk levelChunk) {
                 ChunkPos chunkPos = levelChunk.getPos();
                 ChunkPosition chunkPosition = ChunkPosition.of(levelChunk.level.getWorld(), chunkPos.x, chunkPos.z, false);
-                allCalculatedChunks.add(calculateChunk(chunkPosition, levelChunk.getSections()));
+                allCalculatedChunks.add(calculateChunk(chunkPosition, levelChunk.level, levelChunk.getSections()));
+
+                latchCountDown();
             }
 
             @Override
-            public void onUnloadedChunk(ChunkPosition chunkPosition, CompoundTag unloadedChunk) {
+            public void onUnloadedChunk(NMSUtils.UnloadedChunkCompound unloadedChunkCompound) {
+                CompoundTag chunkCompound = unloadedChunkCompound.chunkCompound();
+                if (!chunkCompound.contains("Level", 10))
+                    return;
+
+                ServerLevel serverLevel = unloadedChunkCompound.serverLevel();
+
+                CompoundTag unloadedChunk = chunkCompound.getCompound("Level");
+
                 ListTag sectionsList = unloadedChunk.getList("Sections", 10);
                 LevelChunkSection[] levelChunkSections = new LevelChunkSection[sectionsList.size()];
 
@@ -266,52 +229,62 @@ public class NMSChunksImpl implements NMSChunks {
                     }
                 }
 
-                CalculatedChunk calculatedChunk = calculateChunk(chunkPosition, levelChunkSections);
+                ChunkPosition chunkPosition = unloadedChunkCompound.chunkPosition();
+
+                CalculatedChunk calculatedChunk = calculateChunk(chunkPosition, serverLevel, levelChunkSections);
                 allCalculatedChunks.add(calculatedChunk);
                 unloadedChunksCache.write(m -> m.put(chunkPosition, calculatedChunk));
+
+                latchCountDown();
             }
 
             @Override
             public void onFinish() {
                 completableFuture.complete(allCalculatedChunks);
             }
-        });
-
-        return completableFuture;
+        };
     }
 
     @Override
-    public CompletableFuture<KeyMap<Counter>> calculateChunkEntities(Collection<ChunkPosition> chunkPositions) {
-        CompletableFuture<KeyMap<Counter>> completableFuture = new CompletableFuture<>();
-
-        KeyMap<Counter> chunkEntities = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
-        List<Pair<ServerLevel, ListTag>> unloadedEntityTags = new LinkedList<>();
-
-        NMSUtils.runActionOnEntityChunks(chunkPositions, new NMSUtils.ChunkCallback() {
+    protected NMSUtils.ChunkCallback getEntitiesChunkCallback(KeyMap<Counter> chunkEntities,
+                                                              List<NMSUtils.UnloadedChunkCompound> unloadedChunkCompounds,
+                                                              CompletableFuture<KeyMap<Counter>> completableFuture) {
+        return new NMSUtils.ChunkCallback(ChunkLoadReason.ENTITIES_RECALCULATE, true) {
             @Override
             public void onLoadedChunk(LevelChunk levelChunk) {
                 for (org.bukkit.entity.Entity bukkitEntity : new CraftChunk(levelChunk).getEntities()) {
                     if (!BukkitEntities.canBypassEntityLimit(bukkitEntity))
                         chunkEntities.computeIfAbsent(Keys.of(bukkitEntity), i -> new Counter(0)).inc(1);
                 }
+
+                latchCountDown();
             }
 
             @Override
-            public void onUnloadedChunk(ChunkPosition chunkPosition, CompoundTag entityData) {
-                ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
-                unloadedEntityTags.add(new Pair<>(serverLevel, entityData.getList("Entities", 10)));
+            public void onUnloadedChunk(NMSUtils.UnloadedChunkCompound unloadedChunkCompound) {
+                CompoundTag chunkCompound = unloadedChunkCompound.chunkCompound();
+                if (!chunkCompound.contains("Level", 10))
+                    return;
+
+                unloadedChunkCompounds.add(unloadedChunkCompound);
+
+                latchCountDown();
             }
 
             @Override
             public void onFinish() {
                 BukkitExecutor.ensureMain(() -> {
-                    for (Pair<ServerLevel, ListTag> worldUnloadedEntityTagsPair : unloadedEntityTags) {
-                        for (Tag entityTag : worldUnloadedEntityTagsPair.getValue()) {
+                    for (NMSUtils.UnloadedChunkCompound unloadedChunkCompound : unloadedChunkCompounds) {
+                        ListTag entitiesTag = unloadedChunkCompound.chunkCompound().getCompound("Level")
+                                .getList("Entities", 10);
+                        ServerLevel serverLevel = unloadedChunkCompound.serverLevel();
+
+                        for (Tag entityTag : entitiesTag) {
                             EntityType<?> entityType = EntityType.by((CompoundTag) entityTag).orElse(null);
                             if (entityType == null)
                                 continue;
 
-                            Entity fakeEntity = EntityType.create((CompoundTag) entityTag, worldUnloadedEntityTagsPair.getKey()).orElse(null);
+                            Entity fakeEntity = EntityType.create((CompoundTag) entityTag, serverLevel).orElse(null);
                             if (fakeEntity != null) {
                                 fakeEntity.valid = false;
                                 if (BukkitEntities.canBypassEntityLimit(fakeEntity.getBukkitEntity()))
@@ -328,160 +301,7 @@ public class NMSChunksImpl implements NMSChunks {
                     completableFuture.complete(chunkEntities);
                 });
             }
-        });
-
-        return completableFuture;
-    }
-
-    @Override
-    public void injectChunkSections(org.bukkit.Chunk chunk) {
-        // No implementation
-    }
-
-    @Override
-    public boolean isChunkEmpty(org.bukkit.Chunk bukkitChunk) {
-        LevelChunk levelChunk = ((CraftChunk) bukkitChunk).getHandle();
-        return Arrays.stream(levelChunk.getSections()).allMatch(chunkSection ->
-                chunkSection == LevelChunk.EMPTY_SECTION || chunkSection.isEmpty());
-    }
-
-    @Override
-    public org.bukkit.Chunk getChunkIfLoaded(ChunkPosition chunkPosition) {
-        ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
-        ChunkAccess chunkAccess = serverLevel.getChunkSource().getChunk(chunkPosition.getX(), chunkPosition.getZ(), false);
-        return chunkAccess instanceof LevelChunk levelChunk ? levelChunk.getBukkitChunk() : null;
-    }
-
-    @Override
-    public void startTickingChunk(Island island, org.bukkit.Chunk chunk, boolean stop) {
-        if (plugin.getSettings().getCropsInterval() <= 0)
-            return;
-
-
-        if (stop) {
-            CropsBlockEntity cropsBlockEntity = CropsBlockEntity.remove(ChunkPos.asLong(chunk.getX(), chunk.getZ()));
-            if (cropsBlockEntity != null)
-                cropsBlockEntity.remove();
-        } else {
-            LevelChunk levelChunk = ((CraftChunk) chunk).getHandle();
-            CropsBlockEntity.create(island, levelChunk);
-        }
-    }
-
-    @Override
-    public void updateCropsTicker(List<ChunkPosition> chunkPositions, double newCropGrowthMultiplier) {
-        if (chunkPositions.isEmpty()) return;
-        CropsBlockEntity.forEachChunk(chunkPositions, cropsBlockEntity ->
-                cropsBlockEntity.setCropGrowthMultiplier(newCropGrowthMultiplier));
-    }
-
-    @Override
-    public void shutdown() {
-        List<CompletableFuture<Void>> pendingTasks = NMSUtils.getPendingChunkActions();
-
-        if (pendingTasks.isEmpty())
-            return;
-
-        Log.info("Waiting for chunk tasks to complete.");
-
-        CompletableFuture.allOf(pendingTasks.toArray(new CompletableFuture[0])).join();
-    }
-
-    @Override
-    public List<Location> getBlockEntities(Chunk chunk) {
-        LevelChunk levelChunk = ((CraftChunk) chunk).getHandle();
-        List<Location> blockEntities = new LinkedList<>();
-
-        World bukkitWorld = chunk.getWorld();
-
-        levelChunk.getBlockEntities().keySet().forEach(blockPos ->
-                blockEntities.add(new Location(bukkitWorld, blockPos.getX(), blockPos.getY(), blockPos.getZ())));
-
-        return blockEntities;
-    }
-
-    private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, LevelChunkSection[] chunkSections) {
-        KeyMap<Counter> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
-        List<Location> spawnersLocations = new LinkedList<>();
-
-        for (LevelChunkSection levelChunkSection : chunkSections) {
-            if (levelChunkSection != null && !levelChunkSection.isEmpty()) {
-                if (hasStatesIterator) {
-                    levelChunkSection.getStates().forEachLocation((blockState, locationKey) -> {
-                        int x = locationKey & 0xF;
-                        int y = (locationKey >> 8) & 0xF;
-                        int z = (locationKey >> 4) & 0xF;
-                        calculateChunkInternal(blockState, x, y, z, chunkPosition, levelChunkSection, blockCounts, spawnersLocations);
-                    });
-                } else for (BlockPos blockPos : BlockPos.betweenClosed(0, 0, 0, 15, 15, 15)) {
-                    BlockState blockState = levelChunkSection.getBlockState(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-                    calculateChunkInternal(blockState, blockPos.getX(), blockPos.getY(), blockPos.getZ(), chunkPosition,
-                            levelChunkSection, blockCounts, spawnersLocations);
-                }
-            }
-        }
-
-        return new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations);
-    }
-
-    private static void calculateChunkInternal(BlockState blockState, int x, int y, int z, ChunkPosition chunkPosition,
-                                               LevelChunkSection levelChunkSection, KeyMap<Counter> blockCounts,
-                                               List<Location> spawnersLocations) {
-        Block block = blockState.getBlock();
-
-        if (block == Blocks.AIR)
-            return;
-
-        Location location = new Location(chunkPosition.getWorld(),
-                (chunkPosition.getX() << 4) + x,
-                levelChunkSection.bottomBlockY() + y,
-                (chunkPosition.getZ() << 4) + z);
-
-        int blockAmount = 1;
-
-        if (NMSUtils.isDoubleBlock(block, blockState)) {
-            blockAmount = 2;
-            blockState = blockState.setValue(SlabBlock.TYPE, SlabType.BOTTOM);
-        }
-
-        Key blockKey = Keys.of(KeyBlocksCache.getBlockKey(blockState.getBlock()), location);
-        blockCounts.computeIfAbsent(blockKey, b -> new Counter(0)).inc(blockAmount);
-        if (block == Blocks.SPAWNER) {
-            spawnersLocations.add(location);
-        }
-    }
-
-    private static void removeEntities(LevelChunk levelChunk) {
-        ChunkPos chunkPos = levelChunk.getPos();
-        ServerLevel serverLevel = levelChunk.level;
-
-        int chunkWorldCoordX = chunkPos.x << 4;
-        int chunkWorldCoordZ = chunkPos.z << 4;
-
-
-        AABB chunkBounds = new AABB(chunkWorldCoordX, serverLevel.getMinBuildHeight(), chunkWorldCoordZ,
-                chunkWorldCoordX + 15, serverLevel.getMaxBuildHeight(), chunkWorldCoordZ + 15);
-
-        Iterator<Entity> chunkEntities;
-
-        try {
-            chunkEntities = levelChunk.entities.iterator();
-        } catch (Throwable ex) {
-            List<Entity> worldEntities = new LinkedList<>();
-            serverLevel.getEntities().get(chunkBounds, worldEntities::add);
-            chunkEntities = worldEntities.iterator();
-        }
-
-        while (chunkEntities.hasNext()) {
-            Entity entity = chunkEntities.next();
-            if (!(entity instanceof net.minecraft.world.entity.player.Player))
-                entity.setRemoved(Entity.RemovalReason.DISCARDED);
-        }
-    }
-
-    private static void removeBlockEntities(LevelChunk levelChunk) {
-        new LinkedList<>(levelChunk.getBlockEntities().keySet()).forEach(levelChunk.getLevel()::removeBlockEntity);
-        levelChunk.getBlockEntities().clear();
+        };
     }
 
     private static void removeBlocks(LevelChunk levelChunk) {

@@ -1,99 +1,35 @@
 package com.bgsoftware.superiorskyblock.nms.v1_21_7;
 
-import com.bgsoftware.superiorskyblock.core.Materials;
-import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.tag.ListTag;
-import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.Dynamic;
-import net.minecraft.SharedConstants;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NumericTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.datafix.DataFixers;
-import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ResolvableProfile;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.slf4j.Logger;
 
 import java.util.Optional;
 import java.util.Set;
 
-@SuppressWarnings({"unused"})
-public class NMSTagsImpl implements NMSTags {
+public class NMSTagsImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_7.AbstractNMSTags {
 
     private static final Logger LOGGER = LogUtils.getLogger();
-
-    @Override
-    public CompoundTag serializeItem(org.bukkit.inventory.ItemStack bukkitItem) {
-        ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitItem);
-
-        RegistryOps<net.minecraft.nbt.Tag> context =
-                MinecraftServer.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE);
-
-        net.minecraft.nbt.CompoundTag tagCompound = (net.minecraft.nbt.CompoundTag)
-                ItemStack.CODEC.encodeStart(context, itemStack).getOrThrow();
-        tagCompound.putInt("DataVersion", SharedConstants.getCurrentVersion().dataVersion().version());
-
-        return CompoundTag.fromNBT(tagCompound);
-    }
-
-    @Override
-    public org.bukkit.inventory.ItemStack deserializeItem(CompoundTag compoundTag) {
-        if (compoundTag.containsKey("NBT")) {
-            // Old compound version, deserialize it accordingly
-            return deserializeItemOld(compoundTag);
-        }
-
-        net.minecraft.nbt.CompoundTag tagCompound = (net.minecraft.nbt.CompoundTag) compoundTag.toNBT();
-
-        int currentVersion = SharedConstants.getCurrentVersion().dataVersion().version();
-        int itemVersion = tagCompound.getIntOr("DataVersion", 0);
-        if (itemVersion < currentVersion) {
-            tagCompound = (net.minecraft.nbt.CompoundTag) DataFixers.getDataFixer().update(References.ITEM_STACK,
-                    new Dynamic<>(NbtOps.INSTANCE, tagCompound), itemVersion, currentVersion).getValue();
-        }
-
-        RegistryOps<net.minecraft.nbt.Tag> context =
-                MinecraftServer.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE);
-
-        ItemStack itemStack = ItemStack.CODEC.parse(context, tagCompound)
-                .resultOrPartial((itemId) -> LOGGER.error("Tried to load invalid item: '{}'", itemId))
-                .orElseThrow();
-
-        return CraftItemStack.asCraftMirror(itemStack);
-    }
-
-    private static org.bukkit.inventory.ItemStack deserializeItemOld(CompoundTag compoundTag) {
-        String typeName = Materials.patchOldMaterialName(compoundTag.getString("type").orElse(null));
-        Material type = Material.valueOf(typeName);
-        int amount = compoundTag.getInt("amount").orElse(0);
-        short data = (short) compoundTag.getShort("data").orElse(0);
-        CompoundTag nbtData = compoundTag.getCompound("NBT").orElse(null);
-
-        org.bukkit.inventory.ItemStack bukkitItem = new org.bukkit.inventory.ItemStack(type, amount, data);
-        ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitItem);
-        if (nbtData != null)
-            itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of((net.minecraft.nbt.CompoundTag) nbtData.toNBT()));
-
-        return CraftItemStack.asCraftMirror(itemStack);
-    }
 
     @Override
     public org.bukkit.inventory.ItemStack getSkullWithTexture(org.bukkit.inventory.ItemStack bukkitItem, String texture) {
@@ -110,18 +46,38 @@ public class NMSTagsImpl implements NMSTags {
     }
 
     @Override
-    @SuppressWarnings("ConstantConditions")
-    public void spawnEntity(org.bukkit.entity.EntityType entityType, Location location, CompoundTag entityTag) {
-        net.minecraft.nbt.CompoundTag compoundTag = (net.minecraft.nbt.CompoundTag) entityTag.toNBT();
+    protected CompoundTag setTagAndGetCompoundTag(ItemStack itemStack, String key, int value) {
+        RegistryOps<Tag> context = MinecraftServer.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE);
 
-        if (compoundTag == null)
-            compoundTag = new net.minecraft.nbt.CompoundTag();
+        net.minecraft.nbt.CompoundTag tagCompound = (net.minecraft.nbt.CompoundTag)
+                ItemStack.CODEC.encodeStart(context, itemStack).getOrThrow();
+        tagCompound.putInt("DataVersion", CraftMagicNumbers.INSTANCE.getDataVersion());
 
-        if (!compoundTag.contains("id"))
-            //noinspection deprecation
-            compoundTag.putString("id", entityType.getName());
+        return CompoundTag.fromNBT(tagCompound);
+    }
 
-        ServerLevel serverLevel = ((CraftWorld) location.getWorld()).getHandle();
+    @Override
+    protected int getCompoundTagInt(net.minecraft.nbt.CompoundTag compoundTag, String key, int def) {
+        return compoundTag.getIntOr(key, def);
+    }
+
+    @Override
+    protected ItemStack parseItemStack(net.minecraft.nbt.CompoundTag compoundTag) {
+        RegistryOps<net.minecraft.nbt.Tag> context =
+                MinecraftServer.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE);
+
+        return ItemStack.CODEC.parse(context, compoundTag)
+                .resultOrPartial((itemId) -> LOGGER.error("Tried to load invalid item: '{}'", itemId))
+                .orElseThrow();
+    }
+
+    @Override
+    protected void setItemStackCompoundTag(ItemStack itemStack, net.minecraft.nbt.CompoundTag compoundTag) {
+        itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(compoundTag));
+    }
+
+    @Override
+    protected void loadEntity(net.minecraft.nbt.CompoundTag compoundTag, ServerLevel serverLevel, Location location) {
         EntityType.loadEntityRecursive(compoundTag, serverLevel, EntitySpawnReason.NATURAL, entity -> {
             entity.absSnapTo(location.getX(), location.getY(), location.getZ(), entity.getYRot(), entity.getXRot());
             return !serverLevel.addWithUUID(entity) ? null : entity;
@@ -181,31 +137,6 @@ public class NMSTagsImpl implements NMSTags {
     @Override
     public String getNBTStringValue(Object object) {
         return ((StringTag) object).value();
-    }
-
-    @Override
-    public Object parseList(ListTag listTag) {
-        net.minecraft.nbt.ListTag nbtTagList = new net.minecraft.nbt.ListTag();
-
-        for (Tag<?> tag : listTag)
-            nbtTagList.add((net.minecraft.nbt.Tag) tag.toNBT());
-
-        return nbtTagList;
-    }
-
-    @Override
-    public Object getNBTCompoundTag(Object object, String key) {
-        return ((net.minecraft.nbt.CompoundTag) object).get(key);
-    }
-
-    @Override
-    public void setNBTCompoundTagValue(Object object, String key, Object value) {
-        ((net.minecraft.nbt.CompoundTag) object).put(key, (net.minecraft.nbt.Tag) value);
-    }
-
-    @Override
-    public int getNBTTagListSize(Object object) {
-        return ((net.minecraft.nbt.ListTag) object).size();
     }
 
 }

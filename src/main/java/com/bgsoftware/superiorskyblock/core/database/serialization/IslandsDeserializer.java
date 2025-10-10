@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
@@ -516,14 +517,14 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<Location> location = islandHomes.getString("location").map(Serializers.LOCATION_SERIALIZER::deserialize);
+            Optional<WorldPosition> location = islandHomes.getString("location").map(Serializers.WORLD_POSITION_SERIALIZER::deserialize);
             if (!location.isPresent()) {
                 Log.warn("Cannot load island homes with invalid location for ", uuid.get(), ", skipping...");
                 return;
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-            builder.setIslandHome(location.get(), dimension.get());
+            builder.setIslandHome(dimension.get(), location.get());
         });
     }
 
@@ -543,14 +544,14 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<Location> location = islandVisitorHomes.getString("location").map(Serializers.LOCATION_SERIALIZER::deserialize);
+            Optional<WorldPosition> location = islandVisitorHomes.getString("location").map(Serializers.WORLD_POSITION_SERIALIZER::deserialize);
             if (!location.isPresent()) {
                 Log.warn("Cannot load island homes with invalid location for ", uuid.get(), ", skipping...");
                 return;
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-            builder.setVisitorHome(location.get(), dimension.get());
+            builder.setVisitorHome(dimension.get(), location.get());
         });
     }
 

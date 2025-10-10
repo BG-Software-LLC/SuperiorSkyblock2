@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -475,7 +476,11 @@ public interface GridManager extends IDatabaseBridgeHolder {
 
     /**
      * Get the location of the last island that was generated.
+     * The location's getWorld will always return null.
+     *
+     * @deprecated See {@link #getLastIslandPosition()}
      */
+    @Deprecated
     Location getLastIslandLocation();
 
     /**
@@ -483,8 +488,23 @@ public interface GridManager extends IDatabaseBridgeHolder {
      * Warning: Do not use this method unless you know what you're doing
      *
      * @param location The location to set.
+     * @deprecated See {@link #setLastIslandPosition(BlockPosition)}
      */
+    @Deprecated
     void setLastIslandLocation(Location location);
+
+    /**
+     * Get the position of the last island that was generated.
+     */
+    BlockPosition getLastIslandPosition();
+
+    /**
+     * Set the position of the last island.
+     * Warning: Do not use this method unless you know what you're doing
+     *
+     * @param blockPosition The position to set.
+     */
+    void setLastIslandPosition(BlockPosition blockPosition);
 
     /**
      * Get the islands container.

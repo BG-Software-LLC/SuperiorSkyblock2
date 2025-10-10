@@ -93,7 +93,7 @@ public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, Emp
 
         private final Predicate<Island> ISLANDS_FILTER = island -> {
             if (visitorWarps)
-                return island.getVisitorsLocation((Dimension) null /* unused */) != null;
+                return island.getVisitorsPosition(null /* unused */) != null;
             else if (island.equals(getInventoryViewer().getIsland()))
                 return !island.getIslandWarps().isEmpty();
             else

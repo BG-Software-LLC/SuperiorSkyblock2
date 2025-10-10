@@ -1,0 +1,38 @@
+plugins {
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.17"
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
+group 'NMS:v1_21_9'
+
+dependencies {
+    paperweight.paperDevBundle("1.21.10-R0.1-SNAPSHOT")
+    compileOnly project(":NMS:Spigot-1_20_3")
+    compileOnly project(":NMS:Paper-1_20_3")
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+shadowJar {
+    archiveFileName = "${project.name}-exclude.jar"
+}
+
+assemble {
+    dependsOn(reobfJar)
+}
+
+tasks {
+    reobfJar {
+        File outputFile = new File(rootProject.archiveFolder, "reobf/${project.name}.jar")
+        outputJar.set(layout.buildDirectory.file(outputFile.getPath()))
+    }
+}
+
+if (project.hasProperty('nms.compile_v1_21') && !Boolean.valueOf(project.findProperty("nms.compile_v1_21").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

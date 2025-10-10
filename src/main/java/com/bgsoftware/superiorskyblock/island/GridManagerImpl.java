@@ -18,10 +18,10 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
@@ -96,7 +96,7 @@ public class GridManagerImpl extends Manager implements GridManager {
     private IslandCreationAlgorithm islandCreationAlgorithm;
 
     private Island spawnIsland;
-    private SBlockPosition lastIsland;
+    private BlockPosition lastIsland;
     @Nullable
     private UUID serverUUID;
 
@@ -135,7 +135,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         loadServerUuid();
 
-        this.lastIsland = new SBlockPosition(plugin.getSettings().getWorlds().getDefaultWorldName(), 0, 100, 0);
+        this.lastIsland = SBlockPosition.of(0, 100, 0);
         BukkitExecutor.sync(this::updateSpawn);
     }
 
@@ -328,7 +328,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Registering new island");
 
         this.islandsContainer.addIsland(island);
-        setLastIsland(new SBlockPosition(islandLocation));
+        setLastIslandPosition(SBlockPosition.of(islandLocation));
 
         try {
             island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
@@ -351,7 +351,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         if (spawnOffset != null)
             homeLocation = spawnOffset.applyToLocation(homeLocation);
 
-        island.setIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension(), homeLocation);
+        island.setIslandHome(homeLocation);
 
         BukkitExecutor.sync(() -> builder.owner.runIfOnline(player -> {
             if (updateGameMode)
@@ -665,7 +665,7 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     @Override
-    public void sortIslands(SortingType sortingType, Runnable onFinish) {
+    public void sortIslands(SortingType sortingType, @Nullable Runnable onFinish) {
         Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
 
         Log.debug(Debug.SORT_ISLANDS, sortingType.getName());
@@ -963,13 +963,34 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     @Override
+    @Deprecated
     public Location getLastIslandLocation() {
-        return lastIsland.parse();
+        return lastIsland.toLocation((World) null);
     }
 
     @Override
+    @Deprecated
     public void setLastIslandLocation(Location location) {
-        this.setLastIsland(new SBlockPosition(location));
+        Preconditions.checkNotNull(location, "location parameter cannot be null");
+        setLastIslandPosition(SBlockPosition.of(location));
+    }
+
+    @Override
+    public BlockPosition getLastIslandPosition() {
+        return this.lastIsland;
+    }
+
+    @Override
+    public void setLastIslandPosition(BlockPosition lastIsland) {
+        Preconditions.checkNotNull(lastIsland, "lastIsland parameter cannot be null");
+
+        Log.debug(Debug.SET_LAST_ISLAND, lastIsland);
+
+        if (Objects.equals(this.lastIsland, lastIsland))
+            return;
+
+        this.lastIsland = lastIsland;
+        GridDatabaseBridge.saveLastIsland(this, lastIsland);
     }
 
     @Override
@@ -1010,13 +1031,8 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     public void loadGrid(DatabaseResult resultSet) {
-        resultSet.getString("last_island").map(Serializers.LOCATION_SPACED_SERIALIZER::deserialize)
-                .ifPresent(lastIsland -> this.lastIsland = new SBlockPosition((LazyWorldLocation) lastIsland));
-
-        if (!plugin.getSettings().getWorlds().getDefaultWorldName().equals(lastIsland.getWorldName())) {
-            lastIsland = new SBlockPosition(plugin.getSettings().getWorlds().getDefaultWorldName(),
-                    lastIsland.getX(), lastIsland.getY(), lastIsland.getZ());
-        }
+        resultSet.getString("last_island").map(Serializers.BLOCK_POSITION_SERIALIZER::deserialize)
+                .ifPresent(lastIsland -> this.lastIsland = lastIsland);
 
         int maxIslandSize = resultSet.getInt("max_island_size").orElse(plugin.getSettings().getMaxIslandSize());
         String world = resultSet.getString("world").orElse(plugin.getSettings().getWorlds().getDefaultWorldName());
@@ -1055,12 +1071,6 @@ public class GridManagerImpl extends Manager implements GridManager {
             modifiedIslands.forEach(IslandsDatabaseBridge::executeFutureSaves);
 
         getIslands().forEach(Island::removeEffects);
-    }
-
-    private void setLastIsland(SBlockPosition lastIsland) {
-        Log.debug(Debug.SET_LAST_ISLAND, lastIsland);
-        this.lastIsland = lastIsland;
-        GridDatabaseBridge.saveLastIsland(this, lastIsland);
     }
 
     private void initializeDatabaseBridge() {

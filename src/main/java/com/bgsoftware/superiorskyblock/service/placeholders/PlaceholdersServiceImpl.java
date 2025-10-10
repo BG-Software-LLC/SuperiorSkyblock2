@@ -221,14 +221,16 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             Formatters.BOOLEAN_FORMATTER.format(island.isEndEnabled(), superiorPlayer.getUserLocale()))
                     .put("exists", (island, superiorPlayer) ->
                             Formatters.BOOLEAN_FORMATTER.format(island != null, superiorPlayer.getUserLocale()))
-                    .put("home", (island, superiorPlayer) ->
-                            Formatters.LOCATION_FORMATTER.format(island.getIslandHome(getDefaultWorldInfo(island).getDimension())))
+                    .put("home", (island, superiorPlayer) -> {
+                        WorldInfo worldInfo = getDefaultWorldInfo(island);
+                        return Formatters.LOCATION_FORMATTER.format(island.getIslandHomePosition(worldInfo.getDimension()).toLocation(worldInfo));
+                    })
                     .put("home_x", (island, superiorPlayer) ->
-                            island.getIslandHome(getDefaultWorldInfo(island).getDimension()).getBlockX() + "")
+                            island.getIslandHomePosition(getDefaultWorldDimension()).getX() + "")
                     .put("home_y", (island, superiorPlayer) ->
-                            island.getIslandHome(getDefaultWorldInfo(island).getDimension()).getBlockY() + "")
+                            island.getIslandHomePosition(getDefaultWorldDimension()).getY() + "")
                     .put("home_z", (island, superiorPlayer) ->
-                            island.getIslandHome(getDefaultWorldInfo(island).getDimension()).getBlockZ() + "")
+                            island.getIslandHomePosition(getDefaultWorldDimension()).getZ() + "")
                     .put("is_coop", (island, superiorPlayer) ->
                             Formatters.BOOLEAN_FORMATTER.format(island.isCoop(superiorPlayer), superiorPlayer.getUserLocale()))
                     .put("is_leader", (island, superiorPlayer) ->
@@ -383,14 +385,16 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                         }
                         return teamBuilder.substring(2);
                     })
-                    .put("visitors_location", (island, superiorPlayer) ->
-                            Formatters.LOCATION_FORMATTER.format(island.getVisitorsLocation(getDefaultWorldInfo(island).getDimension())))
+                    .put("visitors_location", (island, superiorPlayer) -> {
+                        WorldInfo worldInfo = getDefaultWorldInfo(island);
+                        return Formatters.LOCATION_FORMATTER.format(island.getVisitorsPosition(null /*unused*/).toLocation(worldInfo));
+                    })
                     .put("visitors_location_x", (island, superiorPlayer) ->
-                            island.getVisitorsLocation(getDefaultWorldInfo(island).getDimension()).getBlockX() + "")
+                            island.getVisitorsPosition(getDefaultWorldDimension()).getX() + "")
                     .put("visitors_location_y", (island, superiorPlayer) ->
-                            island.getVisitorsLocation(getDefaultWorldInfo(island).getDimension()).getBlockY() + "")
+                            island.getVisitorsPosition(getDefaultWorldDimension()).getY() + "")
                     .put("visitors_location_z", (island, superiorPlayer) ->
-                            island.getVisitorsLocation(getDefaultWorldInfo(island).getDimension()).getBlockZ() + "")
+                            island.getVisitorsPosition(getDefaultWorldDimension()).getZ() + "")
                     .put("warps", (island, superiorPlayer) ->
                             island.getIslandWarps().size() + "")
                     .put("warps_limit", (island, superiorPlayer) ->
@@ -879,6 +883,10 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
 
     private static WorldInfo getDefaultWorldInfo(Island island) {
         return plugin.getGrid().getIslandsWorldInfo(island, plugin.getSettings().getWorlds().getDefaultWorldDimension());
+    }
+
+    private static Dimension getDefaultWorldDimension() {
+        return plugin.getSettings().getWorlds().getDefaultWorldDimension();
     }
 
 }

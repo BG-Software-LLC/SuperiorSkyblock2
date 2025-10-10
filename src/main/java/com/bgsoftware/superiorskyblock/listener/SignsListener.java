@@ -3,8 +3,6 @@ package com.bgsoftware.superiorskyblock.listener;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
-import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
@@ -193,7 +191,7 @@ public class SignsListener extends AbstractGameEventListener {
     }
 
     private static boolean isValidIsland(Island island) {
-        return island != null && (!island.getIslandWarps().isEmpty() || island.getVisitorsLocation((Dimension) null) != null);
+        return island != null && (!island.getIslandWarps().isEmpty() || island.getVisitorsPosition(null) != null);
     }
 
 }

@@ -48,7 +48,8 @@ import java.util.Locale;
  */
 public class ByteArrayTag extends Tag<byte[]> {
 
-    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagByteArray", byte[].class);
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = NMSTagConverter.choice(
+            new String[]{"NBTTagByteArray", "ByteArrayTag"}, byte[].class);
 
     private static final ByteArrayTag EMPTY = new ByteArrayTag(new byte[0]);
 

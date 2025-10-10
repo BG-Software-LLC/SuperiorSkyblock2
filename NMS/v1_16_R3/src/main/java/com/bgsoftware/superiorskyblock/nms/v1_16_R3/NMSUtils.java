@@ -14,6 +14,8 @@ import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.google.common.base.Suppliers;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockBed;
@@ -34,6 +36,7 @@ import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldServer;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 
 import java.util.Collection;
@@ -43,6 +46,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 
 public class NMSUtils {
 
@@ -148,30 +152,54 @@ public class NMSUtils {
         PENDING_CHUNK_ACTIONS.add(pendingTask);
 
         BukkitExecutor.createTask().runAsync(v -> {
+            CountDownLatch countDownLatch;
+            if (chunkCallback.isWaitForChunkLoad) {
+                countDownLatch = chunkCallback.chunkLoadLatch = new CountDownLatch(chunks.size());
+            } else {
+                countDownLatch = null;
+            }
+
             chunks.forEach(chunkPosition -> {
                 WorldServer worldServer = ((CraftWorld) chunkPosition.getWorld()).getHandle();
                 PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
 
                 ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
 
+                boolean calledCountdown = false;
                 try {
                     NBTTagCompound chunkCompound = playerChunkMap.read(chunkCoords);
 
-                    if (chunkCompound == null)
+                    if (chunkCompound == null) {
+                        chunkCallback.onChunkNotExist(chunkPosition);
                         return;
+                    }
 
                     NBTTagCompound chunkDataCompound = playerChunkMap.getChunkData(worldServer.getTypeKey(),
                             Suppliers.ofInstance(worldServer.getWorldPersistentData()), chunkCompound, chunkCoords, worldServer);
 
                     if (chunkDataCompound.hasKeyOfType("Level", 10)) {
                         chunkCallback.onUnloadedChunk(chunkPosition, chunkDataCompound.getCompound("Level"));
+                        calledCountdown = true;
                         if (saveChunks)
                             playerChunkMap.a(chunkCoords, chunkDataCompound);
+                    } else {
+                        if (countDownLatch != null)
+                            countDownLatch.countDown();
                     }
                 } catch (Exception error) {
+                    if (!calledCountdown && countDownLatch != null)
+                        countDownLatch.countDown();
                     Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkPosition, ":");
                 }
             });
+
+            if (countDownLatch != null) {
+                try {
+                    countDownLatch.await();
+                } catch (InterruptedException error) {
+                    throw new RuntimeException(error);
+                }
+            }
         }).runSync(v -> {
             chunkCallback.onFinish();
 
@@ -290,13 +318,48 @@ public class NMSUtils {
                 blockPosition.getY() >= 0 && blockPosition.getY() < world.getHeight();
     }
 
-    public interface ChunkCallback {
+    public static abstract class ChunkCallback {
 
-        void onLoadedChunk(Chunk chunk);
+        private final ChunkLoadReason chunkLoadReason;
+        private final boolean isWaitForChunkLoad;
 
-        void onUnloadedChunk(ChunkPosition chunkPosition, NBTTagCompound unloadedChunk);
+        @Nullable
+        protected CountDownLatch chunkLoadLatch;
 
-        void onFinish();
+        public ChunkCallback(ChunkLoadReason chunkLoadReason, boolean isWaitForChunkLoad) {
+            this.chunkLoadReason = chunkLoadReason;
+            this.isWaitForChunkLoad = isWaitForChunkLoad;
+        }
+
+        public abstract void onLoadedChunk(Chunk chunk);
+
+        public abstract void onUnloadedChunk(ChunkPosition chunkPosition, NBTTagCompound unloadedChunk);
+
+        public abstract void onFinish();
+
+        protected final void latchCountDown() {
+            if (this.chunkLoadLatch != null)
+                this.chunkLoadLatch.countDown();
+        }
+
+        public final void onChunkNotExist(ChunkPosition chunkPosition) {
+            if (!plugin.getProviders().hasCustomWorldsSupport()) {
+                latchCountDown();
+                return;
+            }
+
+            ChunksProvider.loadChunk(chunkPosition, this.chunkLoadReason, null).whenComplete((bukkitChunk, error) -> {
+                if (error == null) {
+                    BukkitExecutor.ensureMain(() -> {
+                        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+                        onLoadedChunk(chunk);
+                    });
+                } else {
+                    latchCountDown();
+                    throw new RuntimeException(error);
+                }
+            });
+        }
 
     }
 

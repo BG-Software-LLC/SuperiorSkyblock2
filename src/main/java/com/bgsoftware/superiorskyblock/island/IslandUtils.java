@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.SynchronizedTasks;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
@@ -283,11 +284,13 @@ public class IslandUtils {
     }
 
     public static void deleteChunks(Island island, List<ChunkPosition> chunkPositions, Runnable onFinish) {
-        plugin.getNMSChunks().deleteChunks(island, chunkPositions, onFinish);
+        SynchronizedTasks synchronizedTasks = new SynchronizedTasks(1, onFinish);
         chunkPositions.forEach(chunkPosition -> {
             plugin.getStackedBlocks().removeStackedBlocks(chunkPosition);
             PluginEventsFactory.callIslandChunkResetEvent(island, chunkPosition);
         });
+        plugin.getNMSChunks().deleteChunks(island, chunkPositions, synchronizedTasks::notifyTaskComplete);
+        synchronizedTasks.waitAllAsync();
     }
 
     public static boolean isValidRoleForLimit(PlayerRole playerRole) {

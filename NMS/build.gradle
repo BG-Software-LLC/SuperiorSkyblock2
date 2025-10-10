@@ -1,1 +1,52 @@
 group 'NMS'
+
+subprojects {
+    def generatedSrcDir = file("$buildDir/generated/sources/nms")
+
+    task generateNmsSources {
+        doLast {
+            delete generatedSrcDir
+
+            generatedSrcDir.mkdirs()
+
+            def props = new Properties()
+            def propertiesFile = file("$projectDir/properties")
+            if (!propertiesFile.exists()) {
+                return
+            }
+
+            propertiesFile.withInputStream { stream ->
+                props.load(stream)
+            }
+
+            def templatesDir = file("${rootDir}/NMS/src/main/templates/")
+            def templates = fileTree(templatesDir) {
+                include '**/*.template'
+            }
+
+            templates.each { File templateFile ->
+                def relativePath = templatesDir.toPath().relativize(templateFile.toPath()).toString()
+                def outputFile = new File(generatedSrcDir, relativePath.replace('.template', ''))
+                outputFile.parentFile.mkdirs()
+
+                def templateText = templateFile.text
+                props.each { k, v ->
+                    templateText = templateText.replace("\${${k}}", v)
+                }
+                outputFile.text = templateText
+                println "Generated ${outputFile}"
+            }
+
+        }
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java', generatedSrcDir]
+            }
+        }
+    }
+
+    compileJava.dependsOn(generateNmsSources)
+}

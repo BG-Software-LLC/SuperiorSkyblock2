@@ -46,7 +46,8 @@ import java.io.IOException;
  */
 public class ByteTag extends NumberTag<Byte> {
 
-    /*package*/ static final NMSTagConverter TAG_CONVERTER = new NMSTagConverter("NBTTagByte", byte.class);
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = NMSTagConverter.choice(
+            new String[]{"NBTTagByte", "ByteTag"}, byte.class);
 
     private static final ByteTag[] CACHE = new ByteTag[256];
 

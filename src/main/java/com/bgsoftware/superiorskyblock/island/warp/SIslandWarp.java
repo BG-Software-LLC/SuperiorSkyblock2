@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
@@ -20,13 +21,13 @@ public class SIslandWarp implements IslandWarp {
     private final WarpCategory warpCategory;
 
     private String name;
-    private Location location;
+    private LazyWorldLocation location;
     private boolean isPrivate;
     private ItemStack icon;
 
-    public SIslandWarp(String name, Location location, WarpCategory warpCategory, boolean isPrivate, @Nullable ItemStack icon) {
+    public SIslandWarp(String name, LazyWorldLocation location, WarpCategory warpCategory, boolean isPrivate, @Nullable ItemStack icon) {
         this.name = name;
-        this.location = location.clone();
+        this.location = (LazyWorldLocation) location.clone(true);
         this.warpCategory = warpCategory;
         this.isPrivate = isPrivate;
         this.icon = icon;
@@ -62,12 +63,17 @@ public class SIslandWarp implements IslandWarp {
     @Override
     public Location getLocation(Location location) {
         if (location != null) {
-            location.setWorld(this.location.getWorld());
             location.setX(this.location.getX());
             location.setY(this.location.getY());
             location.setZ(this.location.getZ());
             location.setYaw(this.location.getYaw());
             location.setPitch(this.location.getPitch());
+
+            if (location instanceof LazyWorldLocation) {
+                ((LazyWorldLocation) location).setWorldName(this.location.getWorldName());
+            } else {
+                location.setWorld(this.location.getWorld());
+            }
         }
 
         return location;
@@ -79,7 +85,7 @@ public class SIslandWarp implements IslandWarp {
 
         Log.debug(Debug.SET_WARP_LOCATION, getOwnerName(), this.name, location);
 
-        this.location = location.clone();
+        this.location = LazyWorldLocation.of(location);
 
         IslandsDatabaseBridge.updateWarpLocation(getIsland(), this);
     }

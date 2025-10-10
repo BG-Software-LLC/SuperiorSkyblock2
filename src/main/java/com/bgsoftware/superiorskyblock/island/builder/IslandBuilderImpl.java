@@ -15,11 +15,15 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.DirtyChunk;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LegacyMasks;
+import com.bgsoftware.superiorskyblock.core.SBlockPosition;
+import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
@@ -32,7 +36,6 @@ import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -43,7 +46,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -64,7 +66,7 @@ public class IslandBuilderImpl implements Island.Builder {
     @Nullable
     public SuperiorPlayer owner;
     public UUID uuid = null;
-    public Location center = null;
+    public BlockPosition center = null;
     public String islandName = "";
     @Nullable
     public String islandType;
@@ -82,7 +84,7 @@ public class IslandBuilderImpl implements Island.Builder {
     public final Set<DirtyChunk> dirtyChunks = new LinkedHashSet<>();
     public final KeyMap<BigInteger> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
     public final KeyMap<BigInteger> entityCounts = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
-    public final EnumerateMap<Dimension, Location> islandHomes = new EnumerateMap<>(Dimension.values());
+    public final EnumerateMap<Dimension, WorldPosition> islandHomes = new EnumerateMap<>(Dimension.values());
     public final List<SuperiorPlayer> members = new LinkedList<>();
     public final List<SuperiorPlayer> bannedPlayers = new LinkedList<>();
     public final Map<SuperiorPlayer, PlayerPrivilegeNode> playerPermissions = new LinkedHashMap<>();
@@ -98,7 +100,7 @@ public class IslandBuilderImpl implements Island.Builder {
     public final Map<PotionEffectType, IntValue> islandEffects = new LinkedHashMap<>();
     public final List<ItemStack[]> islandChests = new ArrayList<>(plugin.getSettings().getIslandChests().getDefaultPages());
     public final Int2ObjectMapView<IntValue> roleLimits = CollectionsFactory.createInt2ObjectArrayMap();
-    public final EnumerateMap<Dimension, Location> visitorHomes = new EnumerateMap<>(Dimension.values());
+    public final EnumerateMap<Dimension, WorldPosition> visitorHomes = new EnumerateMap<>(Dimension.values());
     public IntValue islandSize = IntValue.syncedFixed(-1);
     public IntValue warpsLimit = IntValue.syncedFixed(-1);
     public IntValue teamLimit = IntValue.syncedFixed(-1);
@@ -148,13 +150,13 @@ public class IslandBuilderImpl implements Island.Builder {
         Preconditions.checkNotNull(center, "center parameter cannot be null.");
         Preconditions.checkState(isValidCenter(center), "The provided center is not centered. center: " + center +
                 ", maxIslandSize: " + plugin.getSettings().getMaxIslandSize());
-        this.center = center;
+        this.center = SBlockPosition.of(center);
         return this;
     }
 
     @Override
     public Location getCenter() {
-        return this.center;
+        return this.center.toLocation((World) null);
     }
 
     @Override
@@ -374,38 +376,29 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public Island.Builder setIslandHome(Location location, Dimension dimension) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
+        return setIslandHome(dimension, SWorldPosition.of(location));
+    }
+
+    @Override
+    public Island.Builder setIslandHome(Dimension dimension, WorldPosition worldPosition) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-        this.islandHomes.put(dimension, location);
+        Preconditions.checkNotNull(worldPosition, "worldPosition parameter cannot be null.");
+        this.islandHomes.put(dimension, worldPosition);
         return this;
     }
 
     @Override
-    @Deprecated
-    public Island.Builder setIslandHome(Location location, World.Environment environment) {
-        return setIslandHome(location, Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
     public Map<Dimension, Location> getIslandHomesAsDimensions() {
-        return Collections.unmodifiableMap(this.islandHomes.collect(Dimension.values()));
-    }
-
-    @Override
-    @Deprecated
-    public Map<World.Environment, Location> getIslandHomes() {
-        EnumMap<World.Environment, Location> islandHomes = new EnumMap<>(World.Environment.class);
+        Map<Dimension, Location> islandHomes = new LinkedHashMap<>();
 
         for (Dimension dimension : Dimension.values()) {
-            Location islandHome = this.islandHomes.get(dimension);
+            WorldPosition islandHome = this.islandHomes.get(dimension);
             if (islandHome != null) {
-                Object oldValue = islandHomes.put(dimension.getEnvironment(), islandHome);
-                if (oldValue != null)
-                    throw new IllegalStateException("Called getIslandHomes but there are multiple environments. " +
-                            "Use getIslandHomesAsDimensions instead.");
+                islandHomes.put(dimension, islandHome.toLocation((World) null));
             }
         }
 
-        return Collections.unmodifiableMap(islandHomes);
+        return islandHomes.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(islandHomes);
     }
 
     @Override
@@ -549,12 +542,6 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
-    @Deprecated
-    public Island.Builder setGeneratorRate(Key block, int rate, World.Environment environment) {
-        return setGeneratorRate(block, rate, Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
     public Map<Dimension, KeyMap<Integer>> getGeneratorRatesAsDimensions() {
         Map<Dimension, KeyMap<Integer>> result = new IdentityHashMap<>();
 
@@ -566,25 +553,6 @@ public class IslandBuilderImpl implements Island.Builder {
                 } else {
                     result.put(dimension, KeyMap.createKeyMap(IntValue.unboxMap(generatorRates)));
                 }
-            }
-        }
-
-        return Collections.unmodifiableMap(result);
-    }
-
-    @Override
-    @Deprecated
-    public Map<World.Environment, KeyMap<Integer>> getGeneratorRates() {
-        EnumMap<World.Environment, KeyMap<Integer>> result = new EnumMap<>(World.Environment.class);
-
-        for (Dimension dimension : Dimension.values()) {
-            KeyMap<IntValue> dimensionGeneratorValues = this.cobbleGeneratorValues.get(dimension);
-            if (dimensionGeneratorValues != null) {
-                KeyMap<Integer> oldValue = result.put(dimension.getEnvironment(),
-                        KeyMap.createKeyMap(IntValue.unboxMap(dimensionGeneratorValues)));
-                if (oldValue != null)
-                    throw new IllegalStateException("Called getGeneratorRates but there are multiple environments. " +
-                            "Use getGeneratorRatesAsDimensions instead.");
             }
         }
 
@@ -677,38 +645,29 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public Island.Builder setVisitorHome(Location location, Dimension dimension) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
+        return setVisitorHome(dimension, SWorldPosition.of(location));
+    }
+
+    @Override
+    public Island.Builder setVisitorHome(Dimension dimension, WorldPosition worldPosition) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-        this.visitorHomes.put(dimension, location);
+        Preconditions.checkNotNull(worldPosition, "worldPosition parameter cannot be null.");
+        this.visitorHomes.put(dimension, worldPosition);
         return this;
     }
 
     @Override
-    @Deprecated
-    public Island.Builder setVisitorHome(Location location, World.Environment environment) {
-        return setVisitorHome(location, Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
     public Map<Dimension, Location> getVisitorHomesAsDimensions() {
-        return Collections.unmodifiableMap(this.visitorHomes.collect(Dimension.values()));
-    }
-
-    @Override
-    @Deprecated
-    public Map<World.Environment, Location> getVisitorHomes() {
-        EnumMap<World.Environment, Location> visitorHomes = new EnumMap<>(World.Environment.class);
+        Map<Dimension, Location> visitorHomes = new LinkedHashMap<>();
 
         for (Dimension dimension : Dimension.values()) {
-            Location visitorHome = this.visitorHomes.get(dimension);
+            WorldPosition visitorHome = this.visitorHomes.get(dimension);
             if (visitorHome != null) {
-                Object oldValue = visitorHomes.put(dimension.getEnvironment(), visitorHome);
-                if (oldValue != null)
-                    throw new IllegalStateException("Called getVisitorHomes but there are multiple environments. " +
-                            "Use getVisitorHomesAsDimensions instead.");
+                visitorHomes.put(dimension, visitorHome.toLocation((World) null));
             }
         }
 
-        return Collections.unmodifiableMap(visitorHomes);
+        return visitorHomes.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(visitorHomes);
     }
 
     @Override

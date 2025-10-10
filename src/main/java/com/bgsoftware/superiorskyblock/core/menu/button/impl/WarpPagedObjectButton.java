@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
@@ -48,7 +49,7 @@ public class WarpPagedObjectButton extends AbstractPagedMenuButton<MenuWarps.Vie
         if (menuView.hasManagePerms() && !Menus.MENU_WARPS.getEditLore().isEmpty())
             itemBuilder.appendLore(Menus.MENU_WARPS.getEditLore());
 
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+        try (ObjectsPools.Wrapper<LazyWorldLocation> wrapper = ObjectsPools.LAZY_LOCATION.obtain()) {
             return itemBuilder.replaceAll("{0}", pagedObject.getName())
                     .replaceAll("{1}", Formatters.LOCATION_FORMATTER.format(pagedObject.getLocation(wrapper.getHandle())))
                     .replaceAll("{2}", pagedObject.hasPrivateFlag() ?
