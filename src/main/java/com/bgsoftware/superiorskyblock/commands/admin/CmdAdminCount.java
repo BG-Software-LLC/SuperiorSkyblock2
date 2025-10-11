@@ -5,15 +5,14 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -42,7 +41,8 @@ public class CmdAdminCount implements IAdminIslandCommand {
         return "admin count <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> [" +
-                Message.COMMAND_ARGUMENT_MATERIAL.getMessage(locale) + "]";
+                Message.COMMAND_ARGUMENT_MATERIAL.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_MATERIALS.getMessage(locale) + "]";
     }
 
     @Override
@@ -63,40 +63,6 @@ public class CmdAdminCount implements IAdminIslandCommand {
     @Override
     public boolean canBeExecutedByConsole() {
         return true;
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> list = new LinkedList<>();
-
-        if (args.length == 3) {
-            String argument = args[2].toLowerCase(Locale.ENGLISH);
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-                Island playerIsland = onlinePlayer.getIsland();
-                if (playerIsland != null) {
-                    if (player.getName().toLowerCase(Locale.ENGLISH).contains(argument))
-                        list.add(player.getName());
-                    if (!playerIsland.getStrippedName().isEmpty() && playerIsland.getStrippedName().toLowerCase(Locale.ENGLISH).contains(argument))
-                        list.add(playerIsland.getStrippedName());
-                }
-            }
-        } else if (args.length == 4) {
-            SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
-            Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
-
-            if (island != null) {
-                String materialArgument = args[3].toLowerCase(Locale.ENGLISH);
-                Materials.getBlocksNonLegacy().stream()
-                        .map(material -> material.name().toLowerCase(Locale.ENGLISH))
-                        .filter(materialName -> materialName.contains(materialArgument))
-                        .forEach(list::add);
-                if ("*".contains(materialArgument))
-                    list.add("*");
-            }
-        }
-
-        return Collections.unmodifiableList(list);
     }
 
     @Override
@@ -152,4 +118,18 @@ public class CmdAdminCount implements IAdminIslandCommand {
                     Formatters.CAPITALIZED_FORMATTER.format(materialName));
         }
     }
+
+    @Override
+    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
+        if (args.length != 4)
+            return Collections.emptyList();
+
+        List<String> list = new LinkedList<>(CommandTabCompletes.getMaterials(args[3]));
+
+        if ("*".contains(args[3]))
+            list.add("*");
+
+        return Collections.unmodifiableList(list);
+    }
+
 }
