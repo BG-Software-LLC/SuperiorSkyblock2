@@ -164,7 +164,8 @@ public class CommandTabCompletes {
     public static List<String> getPlayerRoles(SuperiorSkyblockPlugin plugin, String argument, Predicate<PlayerRole> predicate) {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
         return new SequentialListBuilder<PlayerRole>()
-                .filter(playerRole -> predicate.test(playerRole) && playerRole.toString().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
+                .filter(playerRole -> (predicate == null || predicate.test(playerRole)) &&
+                        playerRole.toString().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
                 .map(plugin.getRoles().getRoles(), PlayerRole::getName);
     }
 

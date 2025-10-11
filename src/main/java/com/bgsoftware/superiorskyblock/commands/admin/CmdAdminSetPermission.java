@@ -98,20 +98,22 @@ public class CmdAdminSetPermission implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        if (args.length == 4) {
-            return CommandTabCompletes.getIslandPrivileges(args[3]);
-        } else if (args.length == 5) {
-            IslandPrivilege islandPrivilege = getIslandPrivilegeSafe(args[3]);
+        switch (args.length) {
+            case 4:
+                return CommandTabCompletes.getIslandPrivileges(args[3]);
+            case 5: {
+                IslandPrivilege islandPrivilege = getIslandPrivilegeSafe(args[3]);
 
-            if (islandPrivilege != null) {
-                if (islandPrivilege.getType() == IslandPrivilege.Type.COMMAND)
+                if (islandPrivilege == null)
+                    return Collections.emptyList();
+                else if (islandPrivilege.getType() == IslandPrivilege.Type.COMMAND)
                     return CommandTabCompletes.getPlayerRoles(plugin, args[4], PlayerRole::isRoleLadder);
                 else
-                    return CommandTabCompletes.getPlayerRoles(plugin, args[4], playerRole -> true);
+                    return CommandTabCompletes.getPlayerRoles(plugin, args[4], null);
             }
+            default:
+                return Collections.emptyList();
         }
-
-        return Collections.emptyList();
     }
 
     @Nullable
