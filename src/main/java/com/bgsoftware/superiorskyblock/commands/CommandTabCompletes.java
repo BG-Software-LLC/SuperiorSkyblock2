@@ -213,13 +213,11 @@ public class CommandTabCompletes {
                 .filter(materialName -> materialName.contains(lowerArgument)));
     }
 
-    public static List<String> getAllMissions(SuperiorSkyblockPlugin plugin) {
-        return new SequentialListBuilder<String>()
-                .build(plugin.getMissions().getAllMissions(), Mission::getName);
-    }
-
-    public static List<String> getMissions(SuperiorSkyblockPlugin plugin, String argument) {
-        return filterByArgument(plugin.getMissions().getAllMissions(), Mission::getName, argument.toLowerCase(Locale.ENGLISH));
+    public static List<String> getMissions(SuperiorSkyblockPlugin plugin, String argument, Predicate<Mission<?>> predicate) {
+        String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
+        return new SequentialListBuilder<String>().build(plugin.getMissions().getAllMissions().stream()
+                .filter(mission -> predicate.test(mission) && mission.getName().contains(lowerArgument))
+                .map(mission -> mission.getName().toLowerCase(Locale.ENGLISH)));
     }
 
     public static List<String> getCustomMenus(SuperiorSkyblockPlugin plugin, String argument) {

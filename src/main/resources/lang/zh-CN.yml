@@ -103,6 +103,7 @@ CHANGED_WARPS_LIMIT: '&e&l升级 | &7成功更新了玩家 {0} 岛屿的传送�
 CHANGED_WARPS_LIMIT_ALL: '&e&l升级 | &7成功更新了所有岛屿的传送点数量限制.'
 CHANGED_WARPS_LIMIT_NAME: '&e&l升级 | &7成功更新了岛屿 {0} 的传送点数量限制.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: '数量'
 COMMAND_ARGUMENT_BIOME: '群系'
