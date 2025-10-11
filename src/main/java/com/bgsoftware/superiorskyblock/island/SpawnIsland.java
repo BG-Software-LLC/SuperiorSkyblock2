@@ -65,6 +65,7 @@ import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.google.common.base.Preconditions;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -154,10 +155,19 @@ public class SpawnIsland implements Island {
         if (centerLocation.getWorld() == null)
             plugin.getProviders().runWorldsListeners(worldName);
 
-        this.spawnWorld = centerLocation.getWorld();
+        World world = centerLocation.getWorld();
 
-        if (this.spawnWorld == null)
-            throw new ManagerLoadException("The spawn location is in invalid world.", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+        if (world == null) {
+            if (!Bukkit.getWorlds().isEmpty()) {
+                world = Bukkit.getWorlds().get(0);
+                centerLocation.setWorld(world);
+                plugin.getLogger().warning("The spawn location is in invalid world, using '" + world.getName() + "' instead.");
+            } else {
+                throw new ManagerLoadException("No worlds are loaded to use for spawn.", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+            }
+        }
+
+        this.spawnWorld = world;
 
         this.islandSize = plugin.getSettings().getSpawn().getSize();
 
@@ -480,7 +490,7 @@ public class SpawnIsland implements Island {
     @Override
     @Deprecated
     public List<Chunk> getAllChunks(Dimension unused) {
-        return getAllChunks((Dimension) null /*unused*/, 0);
+        return getAllChunks(null /*unused*/, 0);
     }
 
     @Override
@@ -522,7 +532,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public List<Chunk> getLoadedChunks(Dimension unused) {
-        return getLoadedChunks((Dimension) null /*unused*/, 0);
+        return getLoadedChunks(null /*unused*/, 0);
     }
 
     @Override
@@ -552,18 +562,18 @@ public class SpawnIsland implements Island {
 
     @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension unused) {
-        return getAllChunksAsync((Dimension) null /*unused*/, 0);
+        return getAllChunksAsync(null /*unused*/, 0);
     }
 
     @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension unused, @IslandChunkFlags int flags) {
-        return getAllChunksAsync((Dimension) null /*unused*/, flags, null);
+        return getAllChunksAsync(null /*unused*/, flags, null);
     }
 
     @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension unused,
                                                             @Nullable Consumer<Chunk> onChunkLoad) {
-        return getAllChunksAsync((Dimension) null /*unused*/, 0, onChunkLoad);
+        return getAllChunksAsync(null /*unused*/, 0, onChunkLoad);
     }
 
     @Override
