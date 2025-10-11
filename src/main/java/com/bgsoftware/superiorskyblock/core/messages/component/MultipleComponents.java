@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.core.messages.component.impl.BossBarCompo
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.SoundComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.TitleComponent;
+import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -18,14 +19,16 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class MultipleComponents implements IMessageComponent {
 
     private final List<IMessageComponent> messageComponents;
 
-    public static IMessageComponent parseSection(ConfigurationSection section) {
+    public static IMessageComponent parseSection(ConfigurationSection section, List<MessagesServiceImpl.CustomComponentParser> customComponentParsers) {
         List<IMessageComponent> messageComponents = new LinkedList<>();
 
+        keysLoop:
         for (String key : section.getKeys(false)) {
             if (key.equals("action-bar")) {
                 messageComponents.add(ActionBarComponent.of(Formatters.COLOR_FORMATTER.format(section.getString(key + ".text"))));
@@ -52,7 +55,17 @@ public class MultipleComponents implements IMessageComponent {
                         Formatters.COLOR_FORMATTER.format(section.getString(key + ".message")),
                         color, section.getInt(key + ".ticks")));
             } else {
-                BaseComponent[] baseComponents = TextComponent.fromLegacyText(Formatters.COLOR_FORMATTER.format(section.getString(key + ".text")));
+                String text = section.getString(key + ".text");
+
+                for (MessagesServiceImpl.CustomComponentParser parser : customComponentParsers) {
+                    Optional<IMessageComponent> res = parser.parse(text);
+                    if (res.isPresent()) {
+                        messageComponents.add(res.get());
+                        continue keysLoop;
+                    }
+                }
+
+                BaseComponent[] baseComponents = TextComponent.fromLegacyText(Formatters.COLOR_FORMATTER.format(text));
 
                 String toolTipMessage = section.getString(key + ".tooltip");
                 if (toolTipMessage != null) {

@@ -44,7 +44,7 @@ public class MessagesServiceImpl implements MessagesService, IService {
     @Override
     public IMessageComponent parseComponent(YamlConfiguration config, String path) {
         if (config.isConfigurationSection(path)) {
-            return MultipleComponents.parseSection(config.getConfigurationSection(path));
+            return MultipleComponents.parseSection(config.getConfigurationSection(path), this.customComponentParsers);
         } else {
             for (CustomComponentParser parser : this.customComponentParsers) {
                 Optional<IMessageComponent> res = parser.parse(config, path);
@@ -74,6 +74,8 @@ public class MessagesServiceImpl implements MessagesService, IService {
     public interface CustomComponentParser {
 
         Optional<IMessageComponent> parse(YamlConfiguration config, String path);
+
+        Optional<IMessageComponent> parse(String raw);
 
     }
 
