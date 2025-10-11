@@ -16,6 +16,7 @@ public class SPlayerRole implements PlayerRole {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    private static String ALL_ROLE_NAMES;
     private static String LIMIT_ROLE_NAMES;
     private static String LADDER_ROLE_NAMES;
 
@@ -65,6 +66,15 @@ public class SPlayerRole implements PlayerRole {
 
     public static PlayerRole of(String name) {
         return plugin.getRoles().getPlayerRole(name);
+    }
+
+    public static String getAllRoleNames() {
+        if (ALL_ROLE_NAMES == null) {
+            ALL_ROLE_NAMES = Formatters.COMMA_FORMATTER.format(plugin.getRoles().getRoles().stream()
+                    .map(playerRole -> playerRole.getName().toLowerCase(Locale.ENGLISH)));
+        }
+
+        return ALL_ROLE_NAMES;
     }
 
     public static String getRoleLimitsNames() {
