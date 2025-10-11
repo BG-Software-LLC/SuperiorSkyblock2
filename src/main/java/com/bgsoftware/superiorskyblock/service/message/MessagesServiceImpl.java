@@ -71,6 +71,10 @@ public class MessagesServiceImpl implements MessagesService, IService {
         this.customComponentParsers.add(parser);
     }
 
+    public List<CustomComponentParser> getCustomComponentParsers() {
+        return customComponentParsers;
+    }
+
     public interface CustomComponentParser {
 
         Optional<IMessageComponent> parse(YamlConfiguration config, String path);

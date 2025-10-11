@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
+import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -38,6 +39,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -863,9 +865,25 @@ public enum Message {
         @Override
         public void send(CommandSender sender, Locale locale, Object... args) {
             String message = args.length == 0 ? null : args[0] == null ? null : args[0].toString();
+
+            if (Text.isBlank(message))
+                return;
+
             boolean translateColors = args.length >= 2 && args[1] instanceof Boolean && (boolean) args[1];
-            if (!Text.isBlank(message))
-                sender.sendMessage(translateColors ? Formatters.COLOR_FORMATTER.format(message) : message);
+
+            if (translateColors) {
+                message = Formatters.COLOR_FORMATTER.format(message);
+            }
+
+            for (MessagesServiceImpl.CustomComponentParser parser : messagesService.get().getCustomComponentParsers()) {
+                Optional<IMessageComponent> component = parser.parse(message);
+                if (component.isPresent()) {
+                    component.get().sendMessage(sender);
+                    return;
+                }
+            }
+
+            sender.sendMessage(message);
         }
 
     };
@@ -873,10 +891,10 @@ public enum Message {
     private static final Object[] EMPTY_ARGS = new Object[0];
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final LazyReference<MessagesService> messagesService = new LazyReference<MessagesService>() {
+    private static final LazyReference<MessagesServiceImpl> messagesService = new LazyReference<MessagesServiceImpl>() {
         @Override
-        protected MessagesService create() {
-            return plugin.getServices().getService(MessagesService.class);
+        protected MessagesServiceImpl create() {
+            return (MessagesServiceImpl) plugin.getServices().getService(MessagesService.class);
         }
     };
 
