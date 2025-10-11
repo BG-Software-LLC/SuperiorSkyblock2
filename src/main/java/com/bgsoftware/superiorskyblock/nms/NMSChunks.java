@@ -24,10 +24,10 @@ public interface NMSChunks {
 
     void deleteChunks(Island island, List<ChunkPosition> chunkPositions, @Nullable Runnable onFinish);
 
-    CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
-                                                             Synchronized<Chunk2ObjectMap<CalculatedChunk>> unloadedChunksCache);
+    CompletableFuture<List<CalculatedChunk.Blocks>> calculateChunks(List<ChunkPosition> chunkPositions,
+                                                             Synchronized<Chunk2ObjectMap<CalculatedChunk.Blocks>> unloadedChunksCache);
 
-    CompletableFuture<KeyMap<Counter>> calculateChunkEntities(Collection<ChunkPosition> chunkPositions);
+    CompletableFuture<List<CalculatedChunk.Entities>> calculateChunkEntities(Collection<ChunkPosition> chunkPositions);
 
     void injectChunkSections(Chunk chunk);
 

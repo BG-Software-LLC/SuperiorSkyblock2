@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
@@ -19,6 +20,7 @@ import com.google.common.base.Preconditions;
 import org.bukkit.World;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -116,14 +118,14 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
         this.beingRecalculated = true;
 
+        Log.debug(Debug.CHUNK_CALCULATION_ENTITIES, island.getOwner().getName());
+
         try {
             this.lastCalculateTime = System.currentTimeMillis();
 
             clearEntityCounts();
 
-            KeyMap<Counter> recalculatedEntityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
-
-            CompletableFutureList<KeyMap<Counter>> chunkEntities = new CompletableFutureList<>(-1);
+            CompletableFutureList<List<CalculatedChunk.Entities>> chunkEntities = new CompletableFutureList<>(-1);
 
             IslandUtils.getChunkCoords(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS)
                     .forEach(((worldInfo, worldChunks) -> {
@@ -135,12 +137,15 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
             BukkitExecutor.async(() -> {
                 try {
-                    chunkEntities.forEachCompleted(entities -> {
-                        entities.forEach((entity, count) -> {
+                    KeyMap<Counter> recalculatedEntityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
+
+                    chunkEntities.forEachCompleted(worldCalculatedChunk -> worldCalculatedChunk.forEach(calculatedChunk -> {
+                        Log.debugResult(Debug.CHUNK_CALCULATION_ENTITIES, "Chunk Finished", calculatedChunk.getPosition());
+                        calculatedChunk.getEntityCounts().forEach((entity, count) -> {
                             if (canTrackEntity(entity))
                                 recalculatedEntityCounts.computeIfAbsent(entity, i -> new Counter(0)).inc(count.get());
                         });
-                    }, error -> {
+                    }), error -> {
                         error.printStackTrace();
                         beingRecalculated = false;
                     });

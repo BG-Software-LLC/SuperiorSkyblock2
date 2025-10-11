@@ -8,25 +8,49 @@ import java.util.List;
 public class CalculatedChunk {
 
     private final ChunkPosition chunkPosition;
-    private final KeyMap<Counter> blockCounts;
-    private final List<Location> spawners;
 
-    public CalculatedChunk(ChunkPosition chunkPosition, KeyMap<Counter> blockCounts, List<Location> spawners) {
+    protected CalculatedChunk(ChunkPosition chunkPosition) {
         this.chunkPosition = chunkPosition;
-        this.blockCounts = blockCounts;
-        this.spawners = spawners;
     }
 
     public ChunkPosition getPosition() {
         return chunkPosition;
     }
 
-    public KeyMap<Counter> getBlockCounts() {
-        return blockCounts;
+    public static class Blocks extends CalculatedChunk {
+
+        private final KeyMap<Counter> blockCounts;
+        private final List<Location> spawners;
+
+        public Blocks(ChunkPosition chunkPosition, KeyMap<Counter> blockCounts, List<Location> spawners) {
+            super(chunkPosition);
+            this.blockCounts = blockCounts;
+            this.spawners = spawners;
+        }
+
+        public KeyMap<Counter> getBlockCounts() {
+            return blockCounts;
+        }
+
+        public List<Location> getSpawners() {
+            return spawners;
+        }
+
     }
 
-    public List<Location> getSpawners() {
-        return spawners;
+    public static class Entities extends CalculatedChunk {
+
+        private final KeyMap<Counter> entityCounts;
+
+        public Entities(ChunkPosition chunkPosition, KeyMap<Counter> entityCounts) {
+            super(chunkPosition);
+            this.entityCounts = entityCounts;
+        }
+
+        public KeyMap<Counter> getEntityCounts() {
+            return entityCounts;
+        }
+
     }
 
 }

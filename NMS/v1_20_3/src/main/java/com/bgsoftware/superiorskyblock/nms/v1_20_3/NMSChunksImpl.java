@@ -7,7 +7,9 @@ import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.nms.v1_20_3.NMSUtils;
@@ -54,6 +56,7 @@ import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_20_3.AbstractNMSChunks {
@@ -240,9 +243,9 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_20_3.A
     }
 
     @Override
-    protected NMSUtils.ChunkCallback getCalculateChunkCallback(CompletableFuture<List<CalculatedChunk>> completableFuture,
-                                                               Synchronized<Chunk2ObjectMap<CalculatedChunk>> unloadedChunksCache,
-                                                               List<CalculatedChunk> allCalculatedChunks) {
+    protected NMSUtils.ChunkCallback getCalculateChunkCallback(CompletableFuture<List<CalculatedChunk.Blocks>> completableFuture,
+                                                               Synchronized<Chunk2ObjectMap<CalculatedChunk.Blocks>> unloadedChunksCache,
+                                                               List<CalculatedChunk.Blocks> allCalculatedChunks) {
         return new NMSUtils.ChunkCallback(ChunkLoadReason.BLOCKS_RECALCULATE, true) {
             @Override
             public void onLoadedChunk(LevelChunk levelChunk) {
@@ -311,7 +314,7 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_20_3.A
 
                 }
 
-                CalculatedChunk calculatedChunk = calculateChunk(chunkPosition, serverLevel, chunkSections);
+                CalculatedChunk.Blocks calculatedChunk = calculateChunk(chunkPosition, serverLevel, chunkSections);
                 allCalculatedChunks.add(calculatedChunk);
                 unloadedChunksCache.write(m -> m.put(chunkPosition, calculatedChunk));
 
@@ -326,16 +329,15 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_20_3.A
     }
 
     @Override
-    protected NMSUtils.ChunkCallback getEntitiesChunkCallback(KeyMap<Counter> chunkEntities,
+    protected NMSUtils.ChunkCallback getEntitiesChunkCallback(List<CalculatedChunk.Entities> allCalculatedChunks,
                                                               List<NMSUtils.UnloadedChunkCompound> unloadedChunkCompounds,
-                                                              CompletableFuture<KeyMap<Counter>> completableFuture) {
+                                                              CompletableFuture<List<CalculatedChunk.Entities>> completableFuture) {
         return new NMSUtils.ChunkCallback(ChunkLoadReason.ENTITIES_RECALCULATE, true) {
             @Override
             public void onLoadedChunk(LevelChunk levelChunk) {
-                for (org.bukkit.entity.Entity bukkitEntity : new CraftChunk(levelChunk).getEntities()) {
-                    if (!BukkitEntities.canBypassEntityLimit(bukkitEntity))
-                        chunkEntities.computeIfAbsent(Keys.of(bukkitEntity), i -> new Counter(0)).inc(1);
-                }
+                ChunkPos chunkPos = levelChunk.getPos();
+                ChunkPosition chunkPosition = ChunkPosition.of(levelChunk.level.getWorld(), chunkPos.x, chunkPos.z, false);
+                allCalculatedChunks.add(calculatedChunk(chunkPosition, levelChunk));
 
                 latchCountDown();
             }
@@ -351,32 +353,20 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_20_3.A
             public void onFinish() {
                 BukkitExecutor.ensureMain(() -> {
                     for (NMSUtils.UnloadedChunkCompound unloadedChunkCompound : unloadedChunkCompounds) {
-                        ServerLevel serverLevel = unloadedChunkCompound.serverLevel();
-                        CompoundTag chunkCompound = unloadedChunkCompound.chunkCompound();
-
-                        for (Tag entityTag : chunkCompound.getList("entities", 10)) {
-                            EntityType<?> entityType = EntityType.by((CompoundTag) entityTag).orElse(null);
-                            if (entityType == null)
-                                continue;
-
-                            Entity fakeEntity = EntityType.create((CompoundTag) entityTag, serverLevel).orElse(null);
-                            if (fakeEntity != null) {
-                                fakeEntity.valid = false;
-                                if (BukkitEntities.canBypassEntityLimit(fakeEntity.getBukkitEntity()))
-                                    continue;
-                            }
-
-                            Key entityKey = Keys.of(org.bukkit.Registry.ENTITY_TYPE.get(
-                                    CraftNamespacedKey.fromMinecraft(EntityType.getKey(entityType))));
-
-                            chunkEntities.computeIfAbsent(entityKey, k -> new Counter(0)).inc(1);
-                        }
+                        ListTag entitiesTag = unloadedChunkCompound.chunkCompound().getList("entities", 10);
+                        allCalculatedChunks.add(calculatedChunk(unloadedChunkCompound.chunkPosition(),
+                                unloadedChunkCompound.serverLevel(), entitiesTag));
                     }
 
-                    completableFuture.complete(chunkEntities);
+                    completableFuture.complete(allCalculatedChunks);
                 });
             }
         };
+    }
+
+    @Override
+    protected Optional<Entity> createEntityFromTag(CompoundTag compoundTag, ServerLevel serverLevel) {
+        return EntityType.create(compoundTag, serverLevel);
     }
 
     private static void removeBlocks(ChunkAccess chunk) {
