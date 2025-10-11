@@ -59,7 +59,7 @@ public class LazyWorldLocation extends Location {
     @Override
     public World getWorld() {
         if (!this.updatedWorld) {
-            setWorld(worldName == null ? null : Bukkit.getWorld(worldName));
+            updateWorldInternal(worldName == null ? null : Bukkit.getWorld(worldName));
         }
 
         return super.getWorld();
@@ -67,8 +67,12 @@ public class LazyWorldLocation extends Location {
 
     @Override
     public void setWorld(World world) {
-        super.setWorld(world);
+        updateWorldInternal(world);
         this.worldName = world == null ? null : world.getName();
+    }
+
+    private void updateWorldInternal(@Nullable World world) {
+        super.setWorld(world);
         this.updatedWorld = true;
     }
 
