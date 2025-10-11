@@ -38,6 +38,23 @@ required-caughts:
 
 # Icons used in the menus.
 icons:
+  locked:
+    type: PAPER
+    name: '&aFisherman III'
+    lore:
+      - '&7It''s possible to catch treasure in the ocean.'
+      - '&7Catch 3 treasure items.'
+      - ''
+      - '&6Required Caughts:'
+      - '&8 - &7x3 Treasure Items'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$50,000'
+      - ''
+      - '&6Treasure Items: &7{1}/3'
+      - '&6Progress: &7{0}%'
+      - '&c&l ✘ &7Locked'
+    amount: 3
   not-completed:
     type: PAPER
     name: '&aFisherman III'

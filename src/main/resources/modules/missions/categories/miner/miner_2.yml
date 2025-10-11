@@ -48,6 +48,28 @@ required-blocks:
 
 # Icons used in the menus.
 icons:
+  locked:
+    type: PAPER
+    name: '&aMiner II'
+    lore:
+      - '&7Continue mining for ores!'
+      - '&7Mine x96 cobblestone, x32 coal ore and x16 iron ore.'
+      - ''
+      - '&6Required Blocks:'
+      - '&8 - &7x96 Cobblestone'
+      - '&8 - &7x32 Coal Ore'
+      - '&8 - &7x16 Iron Ore'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$5,000'
+      - '&8 - &7Generator Upgrade'
+      - ''
+      - '&6Cobblestone Mined: &7{value_cobblestone}/96'
+      - '&6Coal Ore Mined: &7{value_coal_ore}/32'
+      - '&6Iron Ore Mined: &7{value_iron_ore}/16'
+      - '&6Progress: &7{0}%'
+      - '&c&l ✘ &7Locked'
+    amount: 2
   not-completed:
     type: PAPER
     name: '&aMiner II'

@@ -32,6 +32,10 @@ items:
 
 sounds:
   '@':
+    locked:
+      type: BLOCK_ANVIL_PLACE
+      volume: 0.2
+      pitch: 0.2
     completed:
       type: BLOCK_ANVIL_PLACE
       volume: 0.2

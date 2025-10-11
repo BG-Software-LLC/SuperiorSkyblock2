@@ -38,6 +38,23 @@ required-entities:
 
 # Icons used in the menus.
 icons:
+  locked:
+    type: PAPER
+    name: '&aSlayer IV'
+    lore:
+      - '&7Before the end, there is one mission left.'
+      - '&7Kill the wither.'
+      - ''
+      - '&6Required Kills:'
+      - '&8 - &7x1 Wither'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$250,000'
+      - '&8 - &7Unlock The End'
+      - ''
+      - '&6Wither Killed: &c&l✘'
+      - '&c&l ✘ &7Locked'
+    amount: 4
   not-completed:
     type: PAPER
     name: '&aSlayer IV'
@@ -52,7 +69,8 @@ icons:
       - '&8 - &7$250,000'
       - '&8 - &7Unlock The End'
       - ''
-      - '&6Wither Killed: &c&l ✘'
+      - '&6Wither Killed: &c&l✘'
+      - '&c&l ✘ &7Not Completed'
     amount: 4
   can-complete:
     type: PAPER
@@ -68,7 +86,7 @@ icons:
       - '&8 - &7$250,000'
       - '&8 - &7Unlock The End'
       - ''
-      - '&6Wither Killed: &a&l ✔'
+      - '&6Wither Killed: &a&l✔'
       - '&a&l ✔ &7Click to redeem your reward.'
     amount: 4
     glow: true
@@ -83,6 +101,6 @@ icons:
       - '&8 - &7$250,000'
       - '&8 - &7Unlock The End'
       - ''
-      - '&6Wither Killed: &a&l ✔'
-      - '&a&l ✔ &7Click to redeem your reward.'
+      - '&6Wither Killed: &a&l✔'
+      - '&a&l ✔ &7Already Claimed.'
     amount: 4

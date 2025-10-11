@@ -59,6 +59,31 @@ required-plants:
 
 # Icons used in the menus.
 icons:
+  locked:
+    type: PAPER
+    name: '&aFarmer IV'
+    lore:
+      - '&7Now that you are a professional farmer,'
+      - '&7let''s get the hands dirty.'
+      - '&7Plant x64 of each crop.'
+      - ''
+      - '&6Required Plants:'
+      - '&8 - &7Carrots, Potatoes, Wheat, Pumpkins'
+      - '&8 - &7Melons, Sugar Canes, Cactus'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$25,000'
+      - ''
+      - '&6Grown Carrots: &7{value_carrot}/64'
+      - '&6Grown Potatoes: &7{value_potato}/64'
+      - '&6Grown Wheat: &7{value_wheat}/64'
+      - '&6Grown Pumpkins: &7{value_pumpkin}/64'
+      - '&6Grown Melons: &7{value_melon}/64'
+      - '&6Grown Sugar Canes: &7{value_sugar_cane}/64'
+      - '&6Grown Cactus: &7{value_cactus}/64'
+      - '&6Progress: &7{0}%'
+      - '&c&l ✘ &7Locked'
+    amount: 4
   not-completed:
     type: PAPER
     name: '&aFarmer IV'
