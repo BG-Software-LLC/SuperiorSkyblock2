@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
+import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
@@ -17,9 +18,7 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissionsCategory.View, MissionReference> {
@@ -102,21 +101,22 @@ public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissi
         int progressValue = mission.getProgressValue(inventoryViewer);
         int amountCompleted = missionsHolder.getAmountMissionCompleted(mission);
 
-        Map<String, String> placeholders = new HashMap<>();
-        placeholders.put("{0}", percentage + "");
-        placeholders.put("{1}", progressValue + "");
-        placeholders.put("{2}", amountCompleted + "");
-
-        ItemStack itemStack;
+        ItemBuilder itemBuilder;
 
         if (!missionsHolder.canCompleteMissionAgain(mission))
-            itemStack = missionData.getCompleted().replaceAll(placeholders).build(inventoryViewer);
+            itemBuilder = missionData.getCompleted();
         else if (missionData.hasLocked() && !plugin.getMissions().hasAllRequirements(mission, inventoryViewer))
-            itemStack = missionData.getLocked().replaceAll(placeholders).build(inventoryViewer);
+            itemBuilder = missionData.getLocked();
         else if (plugin.getMissions().canComplete(inventoryViewer, mission))
-            itemStack = missionData.getCanComplete().replaceAll(placeholders).build(inventoryViewer);
+            itemBuilder = missionData.getCanComplete();
         else
-            itemStack = missionData.getNotCompleted().replaceAll(placeholders).build(inventoryViewer);
+            itemBuilder = missionData.getNotCompleted();
+
+        ItemStack itemStack = itemBuilder
+                .replaceAll("{0}", percentage + "")
+                .replaceAll("{1}", progressValue + "")
+                .replaceAll("{2}", amountCompleted + "")
+                .build(inventoryViewer);
 
         mission.formatItem(inventoryViewer, itemStack);
 

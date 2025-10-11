@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class ItemBuilder {
 
@@ -189,13 +188,6 @@ public class ItemBuilder {
     public ItemBuilder replaceAll(String regex, String replace) {
         replaceName(regex, replace);
         replaceLore(regex, replace);
-        return this;
-    }
-
-    public ItemBuilder replaceAll(Map<String, String> map) {
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            replaceAll(entry.getKey(), entry.getValue());
-        }
         return this;
     }
 
