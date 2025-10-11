@@ -152,8 +152,12 @@ public class NMSUtilsVersioned {
                         int chunkZ = chunkPosition.getZ();
                         MoonriseRegionFileIO.RegionDataController.ReadData readData =
                                 regionDataController.readData(chunkX, chunkZ);
-                        if (readData != null && readData.result() == MoonriseRegionFileIO.RegionDataController.ReadData.ReadResult.SYNC_READ) {
-                            CompoundTag entityData = readData.syncRead();
+                        if(readData != null) {
+                            CompoundTag entityData = switch (readData.result()) {
+                                case HAS_DATA -> regionDataController.finishRead(chunkX, chunkZ, readData);
+                                case SYNC_READ -> readData.syncRead();
+                                default -> null;
+                            };
                             if (entityData != null) {
                                 NMSUtils.UnloadedChunkCompound unloadedChunkCompound = new NMSUtils.UnloadedChunkCompound(chunkPosition, entityData);
                                 chunkCallback.onUnloadedChunk(unloadedChunkCompound);

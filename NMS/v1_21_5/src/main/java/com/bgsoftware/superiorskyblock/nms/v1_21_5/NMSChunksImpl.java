@@ -161,7 +161,7 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_5.A
 
                 ListTag tileEntities = new ListTag();
 
-                chunkCompound.put("entities", new ListTag());
+                chunkCompound.put("Entities", new ListTag());
                 chunkCompound.put("block_entities", tileEntities);
 
                 if (serverLevel.generator instanceof IslandsGenerator) {
@@ -351,7 +351,7 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_5.A
             public void onFinish() {
                 BukkitExecutor.ensureMain(() -> {
                     for (NMSUtils.UnloadedChunkCompound unloadedChunkCompound : unloadedChunkCompounds) {
-                        ListTag entitiesTag = unloadedChunkCompound.chunkCompound().getListOrEmpty("entities");
+                        ListTag entitiesTag = unloadedChunkCompound.chunkCompound().getListOrEmpty("Entities");
                         allCalculatedChunks.add(calculatedChunk(unloadedChunkCompound.chunkPosition(),
                                 unloadedChunkCompound.serverLevel(), entitiesTag));
                     }
