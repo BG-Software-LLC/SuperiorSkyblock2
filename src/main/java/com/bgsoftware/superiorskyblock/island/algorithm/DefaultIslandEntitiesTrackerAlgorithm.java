@@ -154,8 +154,10 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
                         return;
 
                     if (!recalculatedEntityCounts.isEmpty()) {
-                        recalculatedEntityCounts.forEach((entity, count) ->
-                                this.entityCounts.put(entity, count.get()));
+                        recalculatedEntityCounts.forEach((entity, count) -> {
+                            Log.debug(Debug.ENTITY_SPAWN, island.getOwner().getName(), entity, count.get());
+                            this.entityCounts.put(entity, count.get());
+                        });
                     }
                 } finally {
                     IslandsDatabaseBridge.saveEntityCounts(this.island);
