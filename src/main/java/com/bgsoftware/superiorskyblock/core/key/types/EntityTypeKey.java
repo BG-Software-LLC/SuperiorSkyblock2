@@ -84,4 +84,7 @@ public class EntityTypeKey extends BaseKey<EntityTypeKey> {
         return this.apiKeyCache.get();
     }
 
+    public EntityType getEntityType() {
+        return entityType;
+    }
 }

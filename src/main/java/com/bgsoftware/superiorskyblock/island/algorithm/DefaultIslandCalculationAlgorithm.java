@@ -41,7 +41,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgorithm {
 
-    public static final Synchronized<Chunk2ObjectMap<CalculatedChunk>> CACHED_CALCULATED_CHUNKS =
+    public static final Synchronized<Chunk2ObjectMap<CalculatedChunk.Blocks>> CACHED_CALCULATED_CHUNKS =
             Synchronized.of(new Chunk2ObjectMap<>());
 
     private static final List<Pair<Key, Key>> MINECART_BLOCK_TYPES = createMinecartBlockTypes();
@@ -65,10 +65,10 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
     }
 
     private void calculateIslandInternal(Island island, CompletableFuture<IslandCalculationResult> result) {
-        CompletableFutureList<List<CalculatedChunk>> chunksToLoad = new CompletableFutureList<>(plugin.getSettings().getRecalcTaskTimeout());
+        CompletableFutureList<List<CalculatedChunk.Blocks>> chunksToLoad = new CompletableFutureList<>(plugin.getSettings().getRecalcTaskTimeout());
 
         long profiler = Profiler.start(ProfileType.CALCULATE_ISLAND);
-        Log.debug(Debug.CHUNK_CALCULATION, island.getOwner().getName());
+        Log.debug(Debug.CHUNK_CALCULATION_BLOCKS, island.getOwner().getName());
 
         if (!plugin.getProviders().hasSnapshotsSupport()) {
             IslandUtils.getChunkCoords(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS)
@@ -81,7 +81,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
         } else {
             IslandUtils.getAllChunksAsync(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS,
                     ChunkLoadReason.BLOCKS_RECALCULATE, plugin.getProviders()::takeSnapshots).forEach(completableFuture -> {
-                CompletableFuture<List<CalculatedChunk>> calculateCompletable = new CompletableFuture<>();
+                CompletableFuture<List<CalculatedChunk.Blocks>> calculateCompletable = new CompletableFuture<>();
                 completableFuture.whenComplete((chunk, ex) -> {
                     try (ChunkPosition chunkPosition = ChunkPosition.of(chunk)) {
                         plugin.getNMSChunks().calculateChunks(Collections.singletonList(chunkPosition), CACHED_CALCULATED_CHUNKS)
@@ -98,7 +98,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
 
         BukkitExecutor.createTask().runAsync(v -> {
             chunksToLoad.forEachCompleted(worldCalculatedChunks -> worldCalculatedChunks.forEach(calculatedChunk -> {
-                Log.debugResult(Debug.CHUNK_CALCULATION, "Chunk Finished", calculatedChunk.getPosition());
+                Log.debugResult(Debug.CHUNK_CALCULATION_BLOCKS, "Chunk Finished", calculatedChunk.getPosition());
 
                 // We want to remove spawners from the chunkInfo, as it will be used later
                 calculatedChunk.getBlockCounts().removeIf(key -> key instanceof SpawnerKey);

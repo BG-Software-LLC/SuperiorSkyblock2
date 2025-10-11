@@ -6,24 +6,31 @@ import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.types.EntityTypeKey;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.google.common.base.Preconditions;
 import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 
 import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrackerAlgorithm {
 
+    private static final Set<EntityType> TRACKABLE_ENTITIES = initializeTrackableEntities();
     private static final long CALCULATE_DELAY = TimeUnit.MINUTES.toMillis(5);
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -44,6 +51,11 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
         Log.debug(Debug.ENTITY_SPAWN, island.getOwner().getName(), key, amount);
+
+        if (beingRecalculated) {
+            Log.debugResult(Debug.ENTITY_SPAWN, "Return", "Recalculating");
+            return false;
+        }
 
         if (amount <= 0) {
             Log.debugResult(Debug.ENTITY_SPAWN, "Return", "Negative Amount");
@@ -68,6 +80,11 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
         Log.debug(Debug.ENTITY_DESPAWN, island.getOwner().getName(), key, amount);
+
+        if (beingRecalculated) {
+            Log.debugResult(Debug.ENTITY_DESPAWN, "Return", "Recalculating");
+            return false;
+        }
 
         if (amount <= 0) {
             Log.debugResult(Debug.ENTITY_DESPAWN, "Return", "Negative Amount");
@@ -116,14 +133,12 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
         this.beingRecalculated = true;
 
+        Log.debug(Debug.CHUNK_CALCULATION_ENTITIES, island.getOwner().getName());
+
         try {
             this.lastCalculateTime = System.currentTimeMillis();
 
-            clearEntityCounts();
-
-            KeyMap<Counter> recalculatedEntityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
-
-            CompletableFutureList<KeyMap<Counter>> chunkEntities = new CompletableFutureList<>(-1);
+            CompletableFutureList<List<CalculatedChunk.Entities>> chunkEntities = new CompletableFutureList<>(-1);
 
             IslandUtils.getChunkCoords(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS)
                     .forEach(((worldInfo, worldChunks) -> {
@@ -135,12 +150,15 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
             BukkitExecutor.async(() -> {
                 try {
-                    chunkEntities.forEachCompleted(entities -> {
-                        entities.forEach((entity, count) -> {
+                    KeyMap<Counter> recalculatedEntityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
+
+                    chunkEntities.forEachCompleted(worldCalculatedChunk -> worldCalculatedChunk.forEach(calculatedChunk -> {
+                        Log.debugResult(Debug.CHUNK_CALCULATION_ENTITIES, "Chunk Finished", calculatedChunk.getPosition());
+                        calculatedChunk.getEntityCounts().forEach((entity, count) -> {
                             if (canTrackEntity(entity))
                                 recalculatedEntityCounts.computeIfAbsent(entity, i -> new Counter(0)).inc(count.get());
                         });
-                    }, error -> {
+                    }), error -> {
                         error.printStackTrace();
                         beingRecalculated = false;
                     });
@@ -148,9 +166,13 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
                     if (!beingRecalculated)
                         return;
 
+                    clearEntityCounts();
+
                     if (!recalculatedEntityCounts.isEmpty()) {
-                        recalculatedEntityCounts.forEach((entity, count) ->
-                                this.entityCounts.put(entity, count.get()));
+                        recalculatedEntityCounts.forEach((entity, count) -> {
+                            Log.debug(Debug.ENTITY_SPAWN, island.getOwner().getName(), entity, count.get());
+                            this.entityCounts.put(entity, count.get());
+                        });
                     }
                 } finally {
                     IslandsDatabaseBridge.saveEntityCounts(this.island);
@@ -171,7 +193,26 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
     }
 
     private boolean canTrackEntity(Key key) {
-        return island.getEntityLimit(key) != -1 || key.toString().contains("MINECART");
+        if (island.getEntityLimit(key) != -1)
+            return true;
+
+        if (key instanceof EntityTypeKey) {
+            return TRACKABLE_ENTITIES.contains(((EntityTypeKey) key).getEntityType());
+        } else {
+            return key.toString().contains("MINECART");
+        }
+    }
+
+    private static Set<EntityType> initializeTrackableEntities() {
+        EnumSet<EntityType> trackableEntities = EnumSet.noneOf(EntityType.class);
+
+        for (EntityType entityType : EntityType.values()) {
+            if (entityType.name().contains("MINECART")) {
+                trackableEntities.add(entityType);
+            }
+        }
+
+        return trackableEntities.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(trackableEntities);
     }
 
 }

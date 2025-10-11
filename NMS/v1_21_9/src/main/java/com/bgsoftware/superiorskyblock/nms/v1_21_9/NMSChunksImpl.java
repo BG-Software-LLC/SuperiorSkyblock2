@@ -150,7 +150,7 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.A
 
                 ListTag tileEntities = new ListTag();
 
-                chunkCompound.put("entities", new ListTag());
+                chunkCompound.put("Entities", new ListTag());
                 chunkCompound.put("block_entities", tileEntities);
 
                 if (serverLevel.generator instanceof IslandsGenerator) {
@@ -223,9 +223,9 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.A
     }
 
     @Override
-    protected NMSUtils.ChunkCallback getCalculateChunkCallback(CompletableFuture<List<CalculatedChunk>> completableFuture,
-                                                               Synchronized<Chunk2ObjectMap<CalculatedChunk>> unloadedChunksCache,
-                                                               List<CalculatedChunk> allCalculatedChunks) {
+    protected NMSUtils.ChunkCallback getCalculateChunkCallback(CompletableFuture<List<CalculatedChunk.Blocks>> completableFuture,
+                                                               Synchronized<Chunk2ObjectMap<CalculatedChunk.Blocks>> unloadedChunksCache,
+                                                               List<CalculatedChunk.Blocks> allCalculatedChunks) {
         return new NMSUtils.ChunkCallback(ChunkLoadReason.BLOCKS_RECALCULATE, true) {
             @Override
             public void onLoadedChunk(LevelChunk levelChunk) {
@@ -280,7 +280,7 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.A
 
                 }
 
-                CalculatedChunk calculatedChunk = calculateChunk(chunkPosition, serverLevel, chunkSections);
+                CalculatedChunk.Blocks calculatedChunk = calculateChunk(chunkPosition, serverLevel, chunkSections);
                 allCalculatedChunks.add(calculatedChunk);
                 unloadedChunksCache.write(m -> m.put(chunkPosition, calculatedChunk));
 
@@ -295,16 +295,15 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.A
     }
 
     @Override
-    protected NMSUtils.ChunkCallback getEntitiesChunkCallback(KeyMap<Counter> chunkEntities,
+    protected NMSUtils.ChunkCallback getEntitiesChunkCallback(List<CalculatedChunk.Entities> allCalculatedChunks,
                                                               List<NMSUtils.UnloadedChunkCompound> unloadedChunkCompounds,
-                                                              CompletableFuture<KeyMap<Counter>> completableFuture) {
+                                                              CompletableFuture<List<CalculatedChunk.Entities>> completableFuture) {
         return new NMSUtils.ChunkCallback(ChunkLoadReason.ENTITIES_RECALCULATE, true) {
             @Override
             public void onLoadedChunk(LevelChunk levelChunk) {
-                for (org.bukkit.entity.Entity bukkitEntity : new CraftChunk(levelChunk).getEntities()) {
-                    if (!BukkitEntities.canBypassEntityLimit(bukkitEntity))
-                        chunkEntities.computeIfAbsent(Keys.of(bukkitEntity), i -> new Counter(0)).inc(1);
-                }
+                ChunkPos chunkPos = levelChunk.getPos();
+                ChunkPosition chunkPosition = ChunkPosition.of(levelChunk.level.getWorld(), chunkPos.x, chunkPos.z, false);
+                allCalculatedChunks.add(calculatedChunk(chunkPosition, levelChunk));
 
                 latchCountDown();
             }
@@ -320,38 +319,24 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.A
             public void onFinish() {
                 BukkitExecutor.ensureMain(() -> {
                     for (NMSUtils.UnloadedChunkCompound unloadedChunkCompound : unloadedChunkCompounds) {
-                        ServerLevel serverLevel = unloadedChunkCompound.serverLevel();
-                        CompoundTag chunkCompound = unloadedChunkCompound.chunkCompound();
-
-                        for (Tag entityTag : chunkCompound.getListOrEmpty("entities")) {
-                            Entity fakeEntity;
-                            EntityType<?> entityType;
-                            try (ProblemReporter.ScopedCollector scopedCollector =
-                                         new ProblemReporter.ScopedCollector(entityTag::toString, LOGGER)) {
-                                ValueInput valueInput = TagValueInput.create(scopedCollector, serverLevel.registryAccess(), (CompoundTag) entityTag);
-
-                                entityType = EntityType.by(valueInput).orElse(null);
-                                if (entityType == null)
-                                    continue;
-
-                                fakeEntity = EntityType.create(valueInput, serverLevel, EntitySpawnReason.NATURAL).orElse(null);
-                            }
-
-                            if (fakeEntity != null) {
-                                fakeEntity.valid = false;
-                                if (BukkitEntities.canBypassEntityLimit(fakeEntity.getBukkitEntity()))
-                                    continue;
-                            }
-
-                            Key entityKey = Keys.of(CraftEntityType.minecraftToBukkit(entityType));
-                            chunkEntities.computeIfAbsent(entityKey, k -> new Counter(0)).inc(1);
-                        }
+                        ListTag entitiesTag = unloadedChunkCompound.chunkCompound().getListOrEmpty("Entities");
+                        allCalculatedChunks.add(calculatedChunk(unloadedChunkCompound.chunkPosition(),
+                                unloadedChunkCompound.serverLevel(), entitiesTag));
                     }
 
-                    completableFuture.complete(chunkEntities);
+                    completableFuture.complete(allCalculatedChunks);
                 });
             }
         };
+    }
+
+    @Override
+    protected Optional<Entity> createEntityFromTag(CompoundTag compoundTag, ServerLevel serverLevel) {
+        try (ProblemReporter.ScopedCollector scopedCollector =
+                     new ProblemReporter.ScopedCollector(compoundTag::toString, LOGGER)) {
+            ValueInput valueInput = TagValueInput.create(scopedCollector, serverLevel.registryAccess(), compoundTag);
+            return EntityType.create(valueInput, serverLevel, EntitySpawnReason.NATURAL);
+        }
     }
 
     private static void removeBlocks(ChunkAccess chunk) {

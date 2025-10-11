@@ -71,7 +71,8 @@ public class CmdAdminSetPermission implements IAdminIslandCommand {
         if (islandPrivilege == null)
             return;
 
-        PlayerRole playerRole = CommandArguments.getPlayerRoleFromLadder(sender, args[4]);
+        PlayerRole playerRole = islandPrivilege.getType() == IslandPrivilege.Type.COMMAND ?
+                CommandArguments.getPlayerRoleFromLadder(sender, args[4]) : CommandArguments.getPlayerRole(sender, args[4]);
         if (playerRole == null)
             return;
 
@@ -102,8 +103,13 @@ public class CmdAdminSetPermission implements IAdminIslandCommand {
                 return CommandTabCompletes.getIslandPrivileges(args[3]);
             case 5: {
                 IslandPrivilege islandPrivilege = getIslandPrivilegeSafe(args[3]);
-                return islandPrivilege == null || islandPrivilege.getType() == IslandPrivilege.Type.COMMAND ?
-                        Collections.emptyList() : CommandTabCompletes.getPlayerRoles(plugin, args[4], PlayerRole::isRoleLadder);
+
+                if (islandPrivilege == null)
+                    return Collections.emptyList();
+                else if (islandPrivilege.getType() == IslandPrivilege.Type.COMMAND)
+                    return CommandTabCompletes.getPlayerRoles(plugin, args[4], PlayerRole::isRoleLadder);
+                else
+                    return CommandTabCompletes.getPlayerRoles(plugin, args[4], null);
             }
             default:
                 return Collections.emptyList();

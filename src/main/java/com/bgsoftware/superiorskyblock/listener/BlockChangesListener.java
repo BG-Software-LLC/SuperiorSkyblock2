@@ -194,10 +194,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
         if (!(vehicle instanceof Minecart))
             return;
 
-        // We do not care about spawn island, and therefore only island worlds are relevant.
-        if (!plugin.getGrid().isIslandsWorld(vehicle.getWorld()))
-            return;
-
         Key minecartBlockKey = getMinecartBlockKey(vehicle.getType());
         if (minecartBlockKey != null) {
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -321,10 +317,14 @@ public class BlockChangesListener extends AbstractGameEventListener {
     private void onEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
         Entity entity = e.getArgs().entity;
 
+        if (entity.isDead())
+            return;
+
         // We do not care about spawn island, and therefore only island worlds are relevant.
         if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
             return;
 
+        onMinecartPlace(e);
         onDragonEggDrop(e);
         onGolemStructure(e);
     }
@@ -520,7 +520,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
         registerCallback(GameEventType.BLOCK_GROW_EVENT, GameEventPriority.MONITOR, this::onBlockGrow);
         registerCallback(GameEventType.BLOCK_FORM_EVENT, GameEventPriority.MONITOR, this::onBlockForm);
         registerCallback(GameEventType.BLOCK_SPREAD_EVENT, GameEventPriority.MONITOR, this::onBlockSpread);
-        registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.MONITOR, this::onMinecartPlace);
         registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.MONITOR, this::onSpawnerChange);
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.MONITOR, this::onEntityChangeBlock);
         registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.MONITOR, this::onBlockBreak);

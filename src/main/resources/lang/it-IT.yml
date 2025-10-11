@@ -106,6 +106,7 @@ CHANGED_WARPS_LIMIT: '&e&lAggiornamenti | &7Aggiornato con successo il limite di
 CHANGED_WARPS_LIMIT_ALL: '&e&lAggiornamenti | &7Aggioranto con successo il limite di warps di tutte le isole.'
 CHANGED_WARPS_LIMIT_NAME: '&e&lAggiornamenti | &7Aggiornato con successo il mite di warps dell''isola {0}.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: quantità
 COMMAND_ARGUMENT_BIOME: bioma

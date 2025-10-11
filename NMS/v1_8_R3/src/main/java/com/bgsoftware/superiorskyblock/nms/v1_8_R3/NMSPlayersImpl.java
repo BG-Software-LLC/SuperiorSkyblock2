@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_8_R3.player.OfflinePlayerDataImpl;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.service.bossbar.EmptyBossBar;
 import com.mojang.authlib.properties.Property;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_8_R3.Entity;
 import net.minecraft.server.v1_8_R3.EntityItem;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
@@ -47,7 +48,8 @@ public class NMSPlayersImpl implements NMSPlayers {
 
     @Override
     public void sendActionBar(Player player, String message) {
-        PacketPlayOutChat packetPlayOutChat = new PacketPlayOutChat(CraftChatMessage.fromString(message)[0], (byte) 2);
+        PacketPlayOutChat packetPlayOutChat = new PacketPlayOutChat(null, (byte) 2);
+        packetPlayOutChat.components = TextComponent.fromLegacyText(message);
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutChat);
     }
 

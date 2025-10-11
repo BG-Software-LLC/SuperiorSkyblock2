@@ -51,7 +51,7 @@ public class NMSPlayersImpl implements NMSPlayers {
     @Override
     public void sendActionBar(Player player, String message) {
         //noinspection deprecation
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
     }
 
     @Override

@@ -31,27 +31,35 @@ public class MiniMessageHook {
 
     private static boolean registered = false;
 
+    private static final MessagesServiceImpl.CustomComponentParser PARSER = new MessagesServiceImpl.CustomComponentParser() {
+        @Override
+        public Optional<IMessageComponent> parse(YamlConfiguration config, String path) {
+            if (!config.isString(path))
+                return Optional.empty();
+
+            String content = config.getString(path);
+            if (Text.isBlank(content))
+                return Optional.empty();
+
+            return parse(content);
+        }
+
+        @Override
+        public Optional<IMessageComponent> parse(String content) {
+            try {
+                Component component = MINI_MESSAGE.deserialize(Formatters.COLOR_FORMATTER.format(content));
+                return Optional.of(new MiniMessageComponent(component));
+            } catch (ParsingException error) {
+                return Optional.empty();
+            }
+        }
+    };
+
     public static void register(SuperiorSkyblockPlugin plugin) {
         if (!registered) {
             MessagesServiceImpl messagesService = (MessagesServiceImpl) plugin.getServices().getService(MessagesService.class);
-            messagesService.registerCustomComponentParser(MiniMessageHook::parseMiniMessage);
+            messagesService.registerCustomComponentParser(PARSER);
             registered = true;
-        }
-    }
-
-    private static Optional<IMessageComponent> parseMiniMessage(YamlConfiguration config, String path) {
-        if (!config.isString(path))
-            return Optional.empty();
-
-        String content = config.getString(path);
-        if (Text.isBlank(content))
-            return Optional.empty();
-
-        try {
-            Component component = MINI_MESSAGE.deserialize(Formatters.COLOR_FORMATTER.format(content));
-            return Optional.of(new MiniMessageComponent(component));
-        } catch (ParsingException error) {
-            return Optional.empty();
         }
     }
 

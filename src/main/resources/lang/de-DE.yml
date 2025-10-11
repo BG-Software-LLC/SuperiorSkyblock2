@@ -155,6 +155,7 @@ CHANGED_WARPS_LIMIT_ALL: '&e&lUpgrades | &7Das Warps-Limit aller Inseln wurde er
 CHANGED_WARPS_LIMIT_NAME: '&e&lUpgrades | &7Das Warps-Limit von {0} wurde erfolgreich
   aktualisiert.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: Betrag
 COMMAND_ARGUMENT_BIOME: biom
