@@ -906,6 +906,7 @@ WARP_CATEGORY_ICON_NEW_TYPE: '&e&lIşınlanmalar | &7Yeni bir materyal türü gi
   etmek için "-cancel" yaz):'
 WARP_CATEGORY_ICON_UPDATED: '&e&lIşınlanmalar | &7Kategorinin simgesi başarıyla güncellendi.'
 WARP_CATEGORY_ILLEGAL_NAME: '&c&lHata | &7Işınlanma kategorisi adları boş olamaz.'
+WARP_CATEGORY_NAME_CONTAIN_SPACE: '&c&lError | &7Warp category names cannot contain spaces.'
 WARP_CATEGORY_NAME_TOO_LONG: '&c&lHata | Işınlanma kategorisi adları 255 karakterden
   uzun olamaz.'
 WARP_CATEGORY_SLOT: '&e&lIşınlanmalar | &7Yeni bir yuva gir (İptal etmek için "-cancel"
@@ -930,7 +931,8 @@ WARP_ICON_UPDATED: '&e&lIşınlanmalar | &7Işınlanmanın simgesi başarıyla g
 WARP_ILLEGAL_NAME: '&c&lHata | &7Işınlanma adları boş olamaz.'
 WARP_LOCATION_UPDATE: '&e&lIşınlanmalar | &7Işınlanmanın konumu senin konumuna başarıyla
   güncellendi.'
-WARP_NAME_TOO_LONG: '&c&lHata | Işınlanma adları 255 karakterden uzun olamaz.'
+WARP_NAME_CONTAIN_SPACE: '&c&lError | &7Warp names cannot contain spaces.'
+WARP_NAME_TOO_LONG: '&c&lHata | &7Işınlanma adları 255 karakterden uzun olamaz.'
 WARP_PUBLIC_UPDATE: '&e&lIşınlanmalar | &7Işınlanma başarıyla halka açıldı.'
 WARP_PRIVATE_UPDATE: '&e&lIşınlanmalar | &7Işınlanma başarıyla halka kapatıldı.'
 WARP_RENAME: '&e&lIşınlanmalar | &7Yeni bir ad gir (İptal etmek için "-cancel" yaz):'

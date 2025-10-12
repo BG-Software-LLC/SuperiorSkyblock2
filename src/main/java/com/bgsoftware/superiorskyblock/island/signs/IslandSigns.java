@@ -110,6 +110,10 @@ public class IslandSigns {
             if (sendMessage)
                 Message.WARP_NAME_TOO_LONG.send(superiorPlayer);
             result = Reason.NAME_TOO_LONG;
+        } else if (warpName.contains(" ")) {
+            if (sendMessage)
+                Message.WARP_NAME_CONTAIN_SPACE.send(superiorPlayer);
+            result = Reason.NAME_CONTAINS_SPACE;
         }
 
         if (!PluginEventsFactory.callIslandCreateWarpEvent(island, superiorPlayer, warpName, warpLocation, !privateFlag, null))
@@ -198,6 +202,7 @@ public class IslandSigns {
         ILLEGAL_NAME,
         ALREADY_EXIST,
         NAME_TOO_LONG,
+        NAME_CONTAINS_SPACE,
         LIMIT_REACHED,
         EVENT_CANCELLED,
         SUCCESS

@@ -38,13 +38,15 @@ public class WarpCategoryPagedObjectButton extends AbstractPagedMenuButton<MenuW
         if (accessAmount == 0)
             return null;
 
-        if (!menuView.hasManagePerms() || Menus.MENU_WARP_CATEGORIES.getEditLore().isEmpty()) {
-            return pagedObject.getIcon(island.getOwner());
-        } else {
-            return new ItemBuilder(pagedObject.getIcon(null))
-                    .appendLore(Menus.MENU_WARP_CATEGORIES.getEditLore())
-                    .build(island.getOwner());
+        ItemStack icon = pagedObject.getIcon(inventoryViewer);
+        ItemBuilder itemBuilder = new ItemBuilder(icon == null ? buttonItem : icon);
+
+        if (menuView.hasManagePerms() && !Menus.MENU_WARP_CATEGORIES.getEditLore().isEmpty()) {
+            itemBuilder.appendLore(Menus.MENU_WARP_CATEGORIES.getEditLore());
         }
+
+        return itemBuilder.replaceAll("{0}", pagedObject.getName())
+                .replaceAll("{1}", pagedObject.getWarps().size() + "").build(inventoryViewer);
     }
 
     @Override

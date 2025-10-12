@@ -34,7 +34,7 @@ public class SWarpCategory implements WarpCategory {
         this.islandUUID = islandUUID;
         this.name = name;
         this.slot = slot;
-        this.icon = icon == null ? WarpIcons.DEFAULT_WARP_CATEGORY_ICON.build() : icon;
+        this.icon = icon;
     }
 
     @Override
@@ -83,21 +83,29 @@ public class SWarpCategory implements WarpCategory {
 
     @Override
     public ItemStack getRawIcon() {
-        return icon.clone();
+        return icon == null ? null : icon.clone();
     }
 
     @Override
     public ItemStack getIcon(@Nullable SuperiorPlayer superiorPlayer) {
-        ItemBuilder itemBuilder = new ItemBuilder(icon)
-                .replaceAll("{0}", name);
-        return superiorPlayer == null ? itemBuilder.build() : itemBuilder.build(superiorPlayer);
+        if (icon == null)
+            return null;
+
+        try {
+            ItemBuilder itemBuilder = new ItemBuilder(icon)
+                    .replaceAll("{0}", name);
+            return superiorPlayer == null ? itemBuilder.build() : itemBuilder.build(superiorPlayer);
+        } catch (Exception error) {
+            setIcon(null);
+            return null;
+        }
     }
 
     @Override
     public void setIcon(@Nullable ItemStack icon) {
         Log.debug(Debug.SET_WARP_CATEGORY_ICON, getOwnerName(), this.name, icon);
 
-        this.icon = icon == null ? WarpIcons.DEFAULT_WARP_CATEGORY_ICON.build() : icon.clone();
+        this.icon = icon == null ? null : icon.clone();
 
         IslandsDatabaseBridge.updateWarpCategoryIcon(getIsland(), this);
     }

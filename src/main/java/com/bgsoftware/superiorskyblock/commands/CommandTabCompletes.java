@@ -119,6 +119,10 @@ public class CommandTabCompletes {
         return filterByArgument(island.getIslandWarps().keySet(), argument.toLowerCase(Locale.ENGLISH));
     }
 
+    public static List<String> getWarpCategories(Island island, String argument) {
+        return filterByArgument(island.getWarpCategories().keySet(), argument.toLowerCase(Locale.ENGLISH));
+    }
+
     public static List<String> getIslandVisitors(Island island, String argument, boolean hideVanish) {
         return getPlayers(island.getIslandVisitors(!hideVanish), argument);
     }

@@ -4524,7 +4524,8 @@ public class SIsland implements Island {
     public IslandWarp loadIslandWarp(String name, LazyWorldLocation location, @Nullable WarpCategory warpCategory,
                                      boolean isPrivate, @Nullable ItemStack icon) {
         if (warpCategory == null)
-            warpCategory = warpCategories.values().stream().findFirst().orElseGet(() -> createWarpCategory("Default Category"));
+            warpCategory = warpCategories.values().stream().findFirst().orElseGet(() ->
+                    createWarpCategory(plugin.getSettings().getDefaultWarpCategoryName()));
 
         IslandWarp islandWarp = new SIslandWarp(name, location, warpCategory, isPrivate, icon);
 

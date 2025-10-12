@@ -45,6 +45,11 @@ public class WarpManageRenameButton extends AbstractMenuViewButton<MenuWarpManag
                     return true;
                 }
 
+                if (newName.contains(" ")) {
+                    Message.WARP_NAME_CONTAIN_SPACE.send(player);
+                    return true;
+                }
+
                 PluginEvent<PluginEventArgs.IslandRenameWarp> event = PluginEventsFactory.callIslandRenameWarpEvent(
                         islandWarp.getIsland(), player, islandWarp, newName);
 
