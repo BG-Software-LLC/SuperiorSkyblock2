@@ -149,6 +149,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeoutException;
@@ -874,7 +875,7 @@ public class SIsland implements Island {
     @Override
     public Location getIslandHome(Dimension dimension) {
         WorldPosition islandHome = getIslandHomePosition(dimension);
-        return islandHome == null ? null : IslandWorlds.setWorldToLocation(this, dimension, islandHome);
+        return toLoadedLocation(dimension, islandHome);
     }
 
     @Override
@@ -934,8 +935,7 @@ public class SIsland implements Island {
     @Override
     public Location getVisitorsLocation(Dimension unused) {
         WorldPosition visitorsPosition = getVisitorsPosition(null /*unused*/);
-        return visitorsPosition == null ? null : IslandWorlds.setWorldToLocation(
-                this, plugin.getSettings().getWorlds().getDefaultWorldDimension(), visitorsPosition);
+        return toLoadedLocation(plugin.getSettings().getWorlds().getDefaultWorldDimension(), visitorsPosition);
     }
 
     @Override
@@ -5200,7 +5200,26 @@ public class SIsland implements Island {
     }
 
     private Location worldPositionToLocation(Dimension dimension, WorldPosition worldPosition) {
-        return IslandWorlds.setWorldToLocation(this, dimension, worldPosition);
+        return toLoadedLocation(dimension, worldPosition);
+    }
+
+    @Nullable
+    private Location toLoadedLocation(Dimension dimension, @Nullable WorldPosition worldPosition) {
+        if (worldPosition == null)
+            return null;
+
+        World world = plugin.getGrid().getIslandsWorld(this, dimension);
+        if (world == null) {
+            try {
+                world = accessIslandWorld(dimension).join();
+            } catch (CompletionException exception) {
+                Throwable cause = exception.getCause() != null ? exception.getCause() : exception;
+                throw new IllegalStateException("Unable to load island world for dimension " +
+                        (dimension == null ? "unknown" : dimension.getName()), cause);
+            }
+        }
+
+        return worldPosition.toLocation(world);
     }
 
     public static void registerListeners(PluginEventsDispatcher dispatcher) {
