@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
@@ -787,7 +788,17 @@ public class IslandBuilderImpl implements Island.Builder {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
         Preconditions.checkNotNull(category, "category parameter cannot be null.");
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        this.warps.add(new WarpRecord(name, category, LazyWorldLocation.of(location), isPrivate, icon));
+        this.warps.add(new WarpRecord(name, category, SWorldPosition.of(location), LazyWorldLocation.getWorldName(location), isPrivate, icon));
+        return this;
+    }
+
+    @Override
+    public Island.Builder addWarp(String name, String category, WorldInfo worldInfo, WorldPosition worldPosition, boolean isPrivate, @Nullable ItemStack icon) {
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
+        Preconditions.checkNotNull(category, "category parameter cannot be null.");
+        Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
+        Preconditions.checkNotNull(worldPosition, "worldPosition parameter cannot be null.");
+        this.warps.add(new WarpRecord(name, category, worldPosition, worldInfo.getName(), isPrivate, icon));
         return this;
     }
 
@@ -807,8 +818,26 @@ public class IslandBuilderImpl implements Island.Builder {
     public boolean hasWarp(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null");
 
+        WorldPosition worldPosition = SWorldPosition.of(location);
+        String worldName = LazyWorldLocation.getWorldName(location);
+
         for (WarpRecord warpRecord : this.warps) {
-            if (warpRecord.location.equals(location))
+            if (warpRecord.worldName.equals(worldName) && warpRecord.worldPosition.equals(worldPosition))
+                return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean hasWarp(WorldInfo worldInfo, WorldPosition worldPosition) {
+        Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null");
+        Preconditions.checkNotNull(worldPosition, "worldPosition parameter cannot be null");
+
+        String worldName = worldInfo.getName();
+
+        for (WarpRecord warpRecord : this.warps) {
+            if (warpRecord.worldName.equals(worldName) && warpRecord.worldPosition.equals(worldPosition))
                 return true;
         }
 

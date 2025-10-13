@@ -1869,6 +1869,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public IslandWarp createWarp(String s, WorldInfo worldInfo, WorldPosition worldPosition, WarpCategory warpCategory) {
+        return null;
+    }
+
+    @Override
     public void renameWarp(IslandWarp islandWarp, String newName) {
         // Do nothing.
     }

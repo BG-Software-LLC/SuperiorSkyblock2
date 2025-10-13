@@ -372,7 +372,9 @@ public class SIsland implements Island {
             if (!warpRecord.category.isEmpty())
                 warpCategory = getWarpCategory(warpRecord.category);
 
-            loadIslandWarp(warpRecord.name, warpRecord.location, warpCategory, warpRecord.isPrivate, warpRecord.icon);
+            WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, warpRecord.worldName);
+
+            loadIslandWarp(warpRecord.name, worldInfo, warpRecord.worldPosition, warpCategory, warpRecord.isPrivate, warpRecord.icon);
         });
 
         int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
@@ -3623,15 +3625,31 @@ public class SIsland implements Island {
 
     @Override
     public IslandWarp createWarp(String name, Location location, @Nullable WarpCategory warpCategory) {
-        Preconditions.checkNotNull(name, "name parameter cannot be null.");
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         if (!(location instanceof LazyWorldLocation))
             Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
+
+        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, LazyWorldLocation.getWorldName(location));
+        WorldPosition worldPosition = SWorldPosition.of(location);
+        
+        return createIslandInternal(name, worldInfo, worldPosition, warpCategory);
+    }
+
+    @Override
+    public IslandWarp createWarp(String name, WorldInfo worldInfo, WorldPosition position, @Nullable WarpCategory warpCategory) {
+        Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
+        Preconditions.checkNotNull(position, "position parameter cannot be null.");
+
+        return createIslandInternal(name, worldInfo, position, warpCategory);
+    }
+
+    private IslandWarp createIslandInternal(String name, WorldInfo worldInfo, WorldPosition worldPosition, @Nullable WarpCategory warpCategory) {
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
         Preconditions.checkState(getWarp(name) == null, "Warp already exists: " + name);
 
-        Log.debug(Debug.CREATE_WARP, owner.getName(), name, location, warpCategory);
+        Log.debug(Debug.CREATE_WARP, owner.getName(), name, worldInfo, worldPosition, warpCategory);
 
-        IslandWarp islandWarp = loadIslandWarp(name, LazyWorldLocation.of(location), warpCategory,
+        IslandWarp islandWarp = loadIslandWarp(name, worldInfo, worldPosition, warpCategory,
                 !plugin.getSettings().isPublicWarps(), null);
 
         IslandsDatabaseBridge.saveWarp(this, islandWarp);
@@ -4521,12 +4539,12 @@ public class SIsland implements Island {
         return warpCategory;
     }
 
-    public IslandWarp loadIslandWarp(String name, LazyWorldLocation location, @Nullable WarpCategory warpCategory,
+    public IslandWarp loadIslandWarp(String name, WorldInfo worldInfo, WorldPosition worldPosition, @Nullable WarpCategory warpCategory,
                                      boolean isPrivate, @Nullable ItemStack icon) {
         if (warpCategory == null)
             warpCategory = warpCategories.values().stream().findFirst().orElseGet(() -> createWarpCategory("Default Category"));
 
-        IslandWarp islandWarp = new SIslandWarp(name, location, warpCategory, isPrivate, icon);
+        IslandWarp islandWarp = new SIslandWarp(name, worldInfo, worldPosition, warpCategory, isPrivate, icon);
 
         islandWarp.getCategory().getWarps().add(islandWarp);
 
@@ -4538,7 +4556,7 @@ public class SIsland implements Island {
         warpsByName.put(warpName, islandWarp);
 
         this.warpsByLocation.write(warpsByLocation ->
-                warpsByLocation.put(location, islandWarp));
+                warpsByLocation.put(LazyWorldLocation.of(worldInfo, worldPosition), islandWarp));
 
         return islandWarp;
     }

@@ -1722,6 +1722,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public IslandWarp createWarp(String name, WorldInfo worldInfo, WorldPosition position, WarpCategory warpCategory) {
+        return this.handle.createWarp(name, worldInfo, position, warpCategory);
+    }
+
+    @Override
     public void renameWarp(IslandWarp islandWarp, String newName) {
         this.handle.renameWarp(islandWarp, newName);
     }
