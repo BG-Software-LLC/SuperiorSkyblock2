@@ -28,6 +28,7 @@ public class SWarpCategory implements WarpCategory {
 
     private String name;
     private int slot;
+    @Nullable
     private ItemStack icon;
 
     public SWarpCategory(UUID islandUUID, String name, int slot, @Nullable ItemStack icon) {
@@ -82,11 +83,13 @@ public class SWarpCategory implements WarpCategory {
     }
 
     @Override
+    @Nullable
     public ItemStack getRawIcon() {
         return icon == null ? null : icon.clone();
     }
 
     @Override
+    @Nullable
     public ItemStack getIcon(@Nullable SuperiorPlayer superiorPlayer) {
         if (icon == null)
             return null;
