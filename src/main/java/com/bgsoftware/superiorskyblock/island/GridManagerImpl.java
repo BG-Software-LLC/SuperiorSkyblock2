@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
+import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
@@ -330,11 +331,13 @@ public class GridManagerImpl extends Manager implements GridManager {
         this.islandsContainer.addIsland(island);
         setLastIslandPosition(SBlockPosition.of(islandLocation));
 
+        Dimension defaultDimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
+
         try {
             island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
 
             island.setBiome(biome, false);
-            island.setSchematicGenerate(plugin.getSettings().getWorlds().getDefaultWorldDimension());
+            island.setSchematicGenerate(defaultDimension);
             island.setCurrentlyActive(true);
 
             if (offset) {
@@ -351,7 +354,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         if (spawnOffset != null)
             homeLocation = spawnOffset.applyToLocation(homeLocation);
 
-        island.setIslandHome(homeLocation);
+        island.setIslandHome(defaultDimension, SWorldPosition.of(homeLocation));
 
         BukkitExecutor.sync(() -> builder.owner.runIfOnline(player -> {
             if (updateGameMode)
@@ -379,8 +382,6 @@ public class GridManagerImpl extends Manager implements GridManager {
                                 island.setBiome(biome, true);
                             }, 10L);
                         }
-
-                        Dimension defaultDimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
 
                         if (defaultDimension.getEnvironment() == World.Environment.THE_END) {
                             plugin.getNMSDragonFight().awardTheEndAchievement(player);
