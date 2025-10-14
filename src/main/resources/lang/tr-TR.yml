@@ -147,6 +147,7 @@ CHANGED_WARPS_LIMIT_ALL: '&e&lYükseltmeler | &7Tüm adaların ışınlanma limi
 CHANGED_WARPS_LIMIT_NAME: '&e&lYükseltmeler | &7{0} adasının ışınlanma limiti başarıyla
   güncellendi.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_ALL_MATERIALS: '*'
 COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: miktar

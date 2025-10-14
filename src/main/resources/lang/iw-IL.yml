@@ -111,6 +111,7 @@ CHANGED_WARPS_LIMIT: '&e&lםיגורדש | &7החלצהב הנכדוע {0} לש 
 CHANGED_WARPS_LIMIT_ALL: '&e&lםיגורדש | &7החלצהב הנכדוע םייאה לכ לש םימוקימה תלבגמ.'
 CHANGED_WARPS_LIMIT_NAME: '&e&lםיגורדש | &7החלצהב הנכדוע {0} יאה לש םימוקימה תלבגמ.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_ALL_MATERIALS: '*'
 COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: תומכ

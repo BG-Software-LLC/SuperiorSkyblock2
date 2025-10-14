@@ -41,7 +41,6 @@ public class GameEventType<Args extends IEventArgs> extends EventType<Args, Game
     public static final GameEventType<WorldUnloadEvent> WORLD_UNLOAD_EVENT = register(WorldUnloadEvent.class);
 
     // Entity Events
-    public static final GameEventType<AttemptEntitySpawnEvent> ATTEMPT_ENTITY_SPAWN_EVENT = register(AttemptEntitySpawnEvent.class);
     public static final GameEventType<EntityBlockFormEvent> ENTITY_BLOCK_FORM_EVENT = register(EntityBlockFormEvent.class);
     public static final GameEventType<EntityChangeBlockEvent> ENTITY_CHANGE_BLOCK_EVENT = register(EntityChangeBlockEvent.class);
     public static final GameEventType<EntityCollisionEvent> ENTITY_COLLISION_EVENT = register(EntityCollisionEvent.class);

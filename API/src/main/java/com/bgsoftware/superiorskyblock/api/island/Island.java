@@ -2422,6 +2422,17 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     IslandWarp createWarp(String name, Location location, @Nullable WarpCategory warpCategory);
 
     /**
+     * Create a warp for the island.
+     *
+     * @param name         The name of the warp.
+     * @param worldInfo    The world of the warp.
+     * @param position     The position of the warp.
+     * @param warpCategory The category to add the island.
+     * @return The new island warp object.
+     */
+    IslandWarp createWarp(String name, WorldInfo worldInfo, WorldPosition position, @Nullable WarpCategory warpCategory);
+
+    /**
      * Rename a warp.
      *
      * @param islandWarp The warp to rename.
@@ -2984,9 +2995,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
         Builder addWarp(String name, String category, Location location, boolean isPrivate, @Nullable ItemStack icon);
 
+        Builder addWarp(String name, String category, WorldInfo worldInfo, WorldPosition worldPosition, boolean isPrivate, @Nullable ItemStack icon);
+
         boolean hasWarp(String name);
 
         boolean hasWarp(Location location);
+
+        boolean hasWarp(WorldInfo worldInfo, WorldPosition worldPosition);
 
         Builder addWarpCategory(String name, int slot, @Nullable ItemStack icon);
 

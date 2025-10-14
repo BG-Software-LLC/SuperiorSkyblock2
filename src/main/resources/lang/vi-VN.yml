@@ -128,6 +128,7 @@ CHANGED_WARPS_LIMIT_ALL: '&e&lNâng Cấp | &7Cập nhật thành công giới h
 CHANGED_WARPS_LIMIT_NAME: '&e&lNâng Cấp | &7Cập nhật thành công giới hạn khu vực
   của đảo {0}.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_ALL_MATERIALS: '*'
 COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: so-luong

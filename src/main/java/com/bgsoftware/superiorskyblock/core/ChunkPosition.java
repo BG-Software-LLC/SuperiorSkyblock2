@@ -3,6 +3,8 @@ package com.bgsoftware.superiorskyblock.core;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -28,6 +30,11 @@ public class ChunkPosition implements ObjectsPool.Releasable, AutoCloseable {
     public static ChunkPosition of(Location location) {
         World world = location.getWorld();
         return of(WorldInfo.of(world), location.getBlockX() >> 4, location.getBlockZ() >> 4).withBukkitWorld(world);
+    }
+
+    public static ChunkPosition of(WorldInfo worldInfo, WorldPosition worldPosition) {
+        BlockPosition blockPosition = worldPosition.toBlockPosition();
+        return of(worldInfo, blockPosition.getX() >> 4, blockPosition.getZ() >> 4);
     }
 
     public static ChunkPosition of(Chunk chunk) {

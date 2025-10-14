@@ -103,6 +103,7 @@ CHANGED_WARPS_LIMIT: '&e&lUpgrades | &7Successfully updated the warps limit of {
 CHANGED_WARPS_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the warps limit of all the islands.'
 CHANGED_WARPS_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the warps limit of {0}.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_ALL_MATERIALS: '*'
 COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: 'amount'

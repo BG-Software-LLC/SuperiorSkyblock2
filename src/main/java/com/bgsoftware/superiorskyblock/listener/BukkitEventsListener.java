@@ -114,8 +114,6 @@ public class BukkitEventsListener implements Listener {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    private boolean shouldFireAttemptEntitySpawnEvent = false;
-
     public BukkitEventsListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
 
@@ -212,13 +210,6 @@ public class BukkitEventsListener implements Listener {
             createEventListener(GameEventType.ENTITY_DEATH_EVENT, com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent.class, new EntityRemoveFromWorldEventFunction());
         } catch (ClassNotFoundException ignored) {
             createEventListener(GameEventType.ENTITY_DEATH_EVENT, EntityDeathEvent.class, this::createGameEvent);
-        }
-
-        try {
-            Class.forName("com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent");
-            createEventListener(GameEventType.ATTEMPT_ENTITY_SPAWN_EVENT, com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent.class, new AttemptEntitySpawnEventFunction());
-        } catch (ClassNotFoundException ignored) {
-            shouldFireAttemptEntitySpawnEvent = true;
         }
 
         boolean registeredChatListener = false;
@@ -542,20 +533,6 @@ public class BukkitEventsListener implements Listener {
     }
 
     private GameEvent<GameEventArgs.EntitySpawnEvent> createGameEvent(GameEventType<GameEventArgs.EntitySpawnEvent> eventType, GameEventPriority priority, CreatureSpawnEvent e) {
-        if (this.shouldFireAttemptEntitySpawnEvent) {
-            GameEventArgs.AttemptEntitySpawnEvent attemptEntitySpawnEvent = new GameEventArgs.AttemptEntitySpawnEvent();
-            attemptEntitySpawnEvent.entityType = e.getEntityType();
-            attemptEntitySpawnEvent.spawnLocation = e.getLocation();
-            attemptEntitySpawnEvent.spawnReason = e.getSpawnReason();
-            GameEvent<GameEventArgs.AttemptEntitySpawnEvent> gameEvent = GameEventType.ATTEMPT_ENTITY_SPAWN_EVENT
-                    .createEvent(attemptEntitySpawnEvent);
-            plugin.getGameEventsDispatcher().onGameEvent(gameEvent, priority);
-            if (gameEvent.isCancelled()) {
-                e.getEntity().remove();
-                return null;
-            }
-        }
-
         GameEventArgs.EntitySpawnEvent entitySpawnEvent = new GameEventArgs.EntitySpawnEvent();
         entitySpawnEvent.entity = e.getEntity();
         entitySpawnEvent.spawnReason = e.getSpawnReason();
@@ -953,19 +930,6 @@ public class BukkitEventsListener implements Listener {
 
             return null;
         }
-    }
-
-    private static class AttemptEntitySpawnEventFunction implements GameEventCreator<GameEventArgs.AttemptEntitySpawnEvent, com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent> {
-
-        @Override
-        public GameEvent<GameEventArgs.AttemptEntitySpawnEvent> execute(GameEventType<GameEventArgs.AttemptEntitySpawnEvent> eventType, GameEventPriority priority, com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent e) {
-            GameEventArgs.AttemptEntitySpawnEvent attemptEntitySpawnEvent = new GameEventArgs.AttemptEntitySpawnEvent();
-            attemptEntitySpawnEvent.entityType = e.getType();
-            attemptEntitySpawnEvent.spawnLocation = e.getSpawnLocation();
-            attemptEntitySpawnEvent.spawnReason = e.getReason();
-            return eventType.createEvent(attemptEntitySpawnEvent);
-        }
-
     }
 
     private class AsyncChatEventFunctions implements

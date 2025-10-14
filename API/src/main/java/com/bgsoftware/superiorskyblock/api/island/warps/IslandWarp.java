@@ -2,7 +2,9 @@ package com.bgsoftware.superiorskyblock.api.island.warps;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
@@ -45,6 +47,24 @@ public interface IslandWarp {
      * @param location The new location to set.
      */
     void setLocation(Location location);
+
+    /**
+     * Get the position of the warp.
+     */
+    WorldPosition getPosition();
+
+    /**
+     * Get the dimension of the position of the warp.
+     */
+    Dimension getPositionDimension();
+
+    /**
+     * Set the position of the warp.
+     *
+     * @param dimension     The dimension of the new position to set.
+     * @param worldPosition The new position to set.
+     */
+    void setPosition(Dimension dimension, WorldPosition worldPosition);
 
     /**
      * Check if the warp is private or public to visitors.
