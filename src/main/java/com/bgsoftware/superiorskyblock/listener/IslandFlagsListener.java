@@ -67,8 +67,21 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
     /* ENTITY SPAWNING */
 
-    private void onAttemptEntitySpawn(GameEvent<GameEventArgs.AttemptEntitySpawnEvent> e) {
-        EntityType entityType = e.getArgs().entityType;
+    private void onEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(e.getArgs().entity.getWorld()))
+            return;
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location location = e.getArgs().entity.getLocation(wrapper.getHandle());
+
+            if (checkPreventEntitySpawn(e, location) || checkPreventEggLay(e, location))
+                e.setCancelled();
+        }
+    }
+
+    private boolean checkPreventEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e, Location entityLocation) {
+        EntityType entityType = e.getArgs().entity.getType();
         CreatureSpawnEvent.SpawnReason spawnReason = e.getArgs().spawnReason;
 
         IslandFlag actionFlag;
@@ -83,7 +96,7 @@ public class IslandFlagsListener extends AbstractGameEventListener {
                     actionFlag = IslandFlags.SPAWNER_MONSTER_SPAWN;
                     break;
                 default:
-                    return;
+                    return false;
             }
         } else if (NATURAL_SPAWN_REASONS.contains(spawnReason)) {
             switch (BukkitEntities.getCategory(entityType)) {
@@ -94,50 +107,33 @@ public class IslandFlagsListener extends AbstractGameEventListener {
                     actionFlag = IslandFlags.NATURAL_MONSTER_SPAWN;
                     break;
                 default:
-                    return;
+                    return false;
             }
         } else {
-            return;
+            return false;
         }
 
-        Location location = e.getArgs().spawnLocation;
-
-        // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(location.getWorld()))
-            return;
-
-        if (!preventAction(location, actionFlag))
-            return;
-
-        e.setCancelled();
+        return preventAction(entityLocation, actionFlag);
     }
 
-    // Patch for https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/2521
-    private void onEntitySpawnFromVillageSiege(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
-        if (e.getArgs().spawnReason != VILLAGE_INVASION)
-            return;
+    private boolean checkPreventEggLay(GameEvent<GameEventArgs.EntitySpawnEvent> e, Location entityLocation) {
+        if (!(e.getArgs().entity instanceof Item))
+            return false;
 
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location entityLocation = e.getArgs().entity.getLocation(wrapper.getHandle());
+        Item item = (Item) e.getArgs().entity;
 
-            // We only check island flags in relevant worlds
-            if (shouldIgnoreWorldEvents(entityLocation.getWorld()))
-                return;
+        if (item.getItemStack().getType() != Material.EGG)
+            return false;
 
-            if (!preventAction(entityLocation, IslandFlags.NATURAL_MONSTER_SPAWN))
-                return;
+        if (preventAction(entityLocation, IslandFlags.EGG_LAY)) {
+            for (Entity entity : item.getNearbyEntities(1, 1, 1)) {
+                if (entity instanceof Chicken) {
+                    return true;
+                }
+            }
         }
 
-        Entity entity = e.getArgs().entity;
-
-        // We should prevent the spawn of the entity
-        e.setCancelled();
-
-        BukkitExecutor.sync(() -> {
-            // The entity was not removed, let's remove it now
-            if (entity.isValid() || !entity.isDead())
-                entity.remove();
-        }, 1L);
+        return false;
     }
 
     /* ENTITY EXPLOSIONS */
@@ -342,32 +338,6 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         }
     }
 
-    private void onEggLay(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
-        if (!(e.getArgs().entity instanceof Item))
-            return;
-
-        Item item = (Item) e.getArgs().entity;
-
-        if (item.getItemStack().getType() != Material.EGG)
-            return;
-
-        // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(item.getWorld())) {
-            return;
-        }
-
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(item.getLocation(wrapper.getHandle()), IslandFlags.EGG_LAY)) {
-                for (Entity entity : item.getNearbyEntities(1, 1, 1)) {
-                    if (entity instanceof Chicken) {
-                        e.setCancelled();
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
     private void onPoisonAttack(GameEvent<GameEventArgs.ProjectileHitEvent> e) {
         Entity entity = e.getArgs().entity;
         EntityType entityType = entity.getType();
@@ -409,11 +379,9 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     }
 
     private void registerListeners() {
-        registerCallback(GameEventType.ATTEMPT_ENTITY_SPAWN_EVENT, GameEventPriority.LOWEST, this::onAttemptEntitySpawn);
-        if (VILLAGE_INVASION != null)
-            registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.LOWEST, this::onEntitySpawnFromVillageSiege);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.LOWEST, this::onEntityExplode);
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.LOWEST, this::onEntityChangeBlock);
+        registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.LOWEST, this::onEntitySpawn);
         registerCallback(GameEventType.HANGING_BREAK_EVENT, GameEventPriority.LOWEST, this::onHangingBreakByEntity);
         registerCallback(GameEventType.ENTITY_DAMAGE_EVENT, GameEventPriority.MONITOR, this::onFireballDamage);
         registerCallback(GameEventType.BLOCK_FROM_TO_EVENT, GameEventPriority.LOWEST, this::onBlockFlow);
@@ -422,7 +390,6 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         registerCallback(GameEventType.BLOCK_BURN_EVENT, GameEventPriority.LOWEST, this::onFireSpread);
         registerCallback(GameEventType.BLOCK_IGNITE_EVENT, GameEventPriority.LOWEST, this::onBlockIgnite);
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.LOWEST, this::onEndermanGrief);
-        registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.LOWEST, this::onEggLay);
         registerCallback(GameEventType.PROJECTILE_HIT_EVENT, GameEventPriority.LOWEST, this::onPoisonAttack);
         plugin.getPluginEventsDispatcher().registerCallback(PluginEventType.SPAWN_UPDATE_EVENT, this::onSpawnUpdate);
     }
