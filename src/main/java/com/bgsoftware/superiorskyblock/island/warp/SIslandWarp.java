@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
+import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
@@ -16,6 +17,7 @@ import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
@@ -67,24 +69,25 @@ public class SIslandWarp implements IslandWarp {
 
     @Override
     public Location getLocation() {
-        return LazyWorldLocation.of(worldInfo, worldPosition);
+        return IslandWorlds.setWorldToLocation(this.worldInfo, this.worldPosition);
     }
 
     @Override
     public Location getLocation(Location location) {
         if (location != null) {
+            if (location instanceof LazyWorldLocation) {
+                ((LazyWorldLocation) location).setWorldName(this.worldInfo.getName());
+            } else {
+                IslandWorlds.ensureWorldLoaded(this.worldInfo);
+                World world = Bukkit.getWorld(this.worldInfo.getName());
+                location.setWorld(world);
+            }
+
             location.setX(this.worldPosition.getX());
             location.setY(this.worldPosition.getY());
             location.setZ(this.worldPosition.getZ());
             location.setYaw(this.worldPosition.getYaw());
             location.setPitch(this.worldPosition.getPitch());
-
-            if (location instanceof LazyWorldLocation) {
-                ((LazyWorldLocation) location).setWorldName(this.worldInfo.getName());
-            } else {
-                World world = plugin.getGrid().getIslandsWorld(getIsland(), this.worldInfo.getDimension());
-                location.setWorld(world);
-            }
         }
 
         return location;

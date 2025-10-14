@@ -81,6 +81,10 @@ public class IslandWorlds {
 
     public static Location setWorldToLocation(Island island, Dimension dimension, WorldPosition worldPosition) {
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
+        return setWorldToLocation(worldInfo, worldPosition);
+    }
+
+    public static Location setWorldToLocation(WorldInfo worldInfo, WorldPosition worldPosition) {
         World world = Bukkit.getWorld(worldInfo.getName());
         Location location;
         if (world != null) {
@@ -90,6 +94,17 @@ public class IslandWorlds {
         }
 
         return location;
+    }
+
+    public static void ensureWorldLoaded(Island island, Dimension dimension) {
+        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
+        ensureWorldLoaded(worldInfo);
+    }
+
+    public static void ensureWorldLoaded(WorldInfo worldInfo) {
+        World world = Bukkit.getWorld(worldInfo.getName());
+        if (world == null)
+            throw new IllegalStateException("You cannot call this method while the world is unloaded. Use Island#accessIslandWorld");
     }
 
     private static void loadedWorldCallback(WorldInfo worldInfo, Consumer<Either<World, Throwable>> consumer) {
