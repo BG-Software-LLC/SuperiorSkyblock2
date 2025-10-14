@@ -43,6 +43,9 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
     private static final EnumSet<CreatureSpawnEvent.SpawnReason> NATURAL_SPAWN_REASONS = initializeNaturalSpawnReasons();
 
+    @Nullable
+    private static final CreatureSpawnEvent.SpawnReason VILLAGE_INVASION = EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "VILLAGE_INVASION");
+
     private final Int2ObjectMapView<ProjectileSource> originalFireballsDamager = CollectionsFactory.createInt2ObjectArrayMap();
 
     private World spawnIslandWorld;
@@ -107,6 +110,34 @@ public class IslandFlagsListener extends AbstractGameEventListener {
             return;
 
         e.setCancelled();
+    }
+
+    // Patch for https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/2521
+    private void onEntitySpawnFromVillageSiege(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
+        if (e.getArgs().spawnReason != VILLAGE_INVASION)
+            return;
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location entityLocation = e.getArgs().entity.getLocation(wrapper.getHandle());
+
+            // We only check island flags in relevant worlds
+            if (shouldIgnoreWorldEvents(entityLocation.getWorld()))
+                return;
+
+            if (!preventAction(entityLocation, IslandFlags.NATURAL_MONSTER_SPAWN))
+                return;
+        }
+
+        Entity entity = e.getArgs().entity;
+
+        // We should prevent the spawn of the entity
+        e.setCancelled();
+
+        BukkitExecutor.sync(() -> {
+            // The entity was not removed, let's remove it now
+            if (entity.isValid() || !entity.isDead())
+                entity.remove();
+        }, 1L);
     }
 
     /* ENTITY EXPLOSIONS */
@@ -379,6 +410,8 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
     private void registerListeners() {
         registerCallback(GameEventType.ATTEMPT_ENTITY_SPAWN_EVENT, GameEventPriority.LOWEST, this::onAttemptEntitySpawn);
+        if (VILLAGE_INVASION != null)
+            registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.LOWEST, this::onEntitySpawnFromVillageSiege);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.LOWEST, this::onEntityExplode);
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.LOWEST, this::onEntityChangeBlock);
         registerCallback(GameEventType.HANGING_BREAK_EVENT, GameEventPriority.LOWEST, this::onHangingBreakByEntity);
