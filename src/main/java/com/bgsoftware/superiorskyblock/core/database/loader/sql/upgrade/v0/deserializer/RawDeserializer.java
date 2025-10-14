@@ -20,7 +20,7 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.World;
@@ -207,11 +207,11 @@ public class RawDeserializer implements IDeserializer {
                 if (name.isEmpty())
                     continue;
 
-                if (!IslandUtils.isWarpNameLengthValid(name))
-                    name = name.substring(0, IslandUtils.getMaxWarpNameLength());
+                if (!IslandNames.isWarpNameLengthValid(name))
+                    name = name.substring(0, IslandNames.getMaxWarpNameLength());
 
-                if (!IslandUtils.isWarpNameLengthValid(category))
-                    category = category.substring(0, IslandUtils.getMaxWarpNameLength());
+                if (!IslandNames.isWarpNameLengthValid(category))
+                    category = category.substring(0, IslandNames.getMaxWarpNameLength());
 
                 warpAttributes.add(new IslandWarpAttributes()
                         .setValue(IslandWarpAttributes.Field.NAME, name)

@@ -3650,7 +3650,7 @@ public class SIsland implements Island {
     public void renameWarp(IslandWarp islandWarp, String newName) {
         Preconditions.checkNotNull(islandWarp, "islandWarp parameter cannot be null.");
         Preconditions.checkNotNull(newName, "newName parameter cannot be null.");
-        Preconditions.checkArgument(IslandUtils.isWarpNameLengthValid(newName), "Warp names must cannot be longer than 255 chars.");
+        Preconditions.checkArgument(IslandNames.isWarpNameLengthValid(newName), "Warp names must cannot be longer than 255 chars.");
         Preconditions.checkState(getWarp(newName) == null, "Cannot rename warps to an already existing warps.");
 
         warpsByName.remove(islandWarp.getName().toLowerCase(Locale.ENGLISH));

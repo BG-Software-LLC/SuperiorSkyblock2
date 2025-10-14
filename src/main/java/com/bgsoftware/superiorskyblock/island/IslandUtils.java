@@ -297,14 +297,6 @@ public class IslandUtils {
         return playerRole.isRoleLadder() && !playerRole.isFirstRole() && !playerRole.isLastRole();
     }
 
-    public static boolean isWarpNameLengthValid(String warpName) {
-        return warpName.length() <= getMaxWarpNameLength();
-    }
-
-    public static int getMaxWarpNameLength() {
-        return 255;
-    }
-
     public static boolean handleBorderColorUpdate(SuperiorPlayer superiorPlayer, BorderColor borderColor) {
         if (!superiorPlayer.hasWorldBorderEnabled()) {
             if (!PluginEventsFactory.callPlayerToggleBorderEvent(superiorPlayer))
