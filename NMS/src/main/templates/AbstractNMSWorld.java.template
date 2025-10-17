@@ -231,15 +231,23 @@ public abstract class AbstractNMSWorld implements NMSWorld {
 
     @Override
     public int getDefaultAmount(org.bukkit.block.Block bukkitBlock) {
-        return getDefaultAmount(((CraftBlock) bukkitBlock).getNMS());
+        ServerLevel serverLevel = ((CraftWorld) bukkitBlock.getWorld()).getHandle();
+        BlockState blockState;
+        try (ObjectsPools.Wrapper<BlockPos.MutableBlockPos> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPos.MutableBlockPos blockPos = wrapper.getHandle();
+            blockPos.set(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
+
+            blockState = serverLevel.getBlockState(blockPos);
+        }
+        return getDefaultAmountInternal(blockState);
     }
 
     @Override
     public int getDefaultAmount(org.bukkit.block.BlockState bukkitBlockState) {
-        return getDefaultAmount(((CraftBlockState) bukkitBlockState).getHandle());
+        return getDefaultAmountInternal(((CraftBlockState) bukkitBlockState).getHandle());
     }
 
-    private int getDefaultAmount(BlockState blockState) {
+    private int getDefaultAmountInternal(BlockState blockState) {
         Block block = blockState.getBlock();
         return NMSUtils.isDoubleBlock(block, blockState) ? 2 : 1;
     }
