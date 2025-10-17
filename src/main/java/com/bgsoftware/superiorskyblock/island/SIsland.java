@@ -357,7 +357,10 @@ public class SIsland implements Island {
         });
         if (!builder.blockCounts.isEmpty()) {
             plugin.getProviders().addPricesLoadCallback(() -> {
-                builder.blockCounts.forEach((block, count) -> handleBlockPlaceInternal(block, count, 0));
+                accessBlocksTracker(true, unused -> {
+                    builder.blockCounts.forEach((block, count) -> handleBlockPlaceInternal(block, count, 0));
+                    return null;
+                });
                 this.lastSavedBlockCounts = this.currentTotalBlockCounts.get();
             });
         }
@@ -2427,7 +2430,10 @@ public class SIsland implements Island {
     }
 
     private BlockChangeResult handleBlockPlaceInternal(Key key, @Size BigInteger amount, @IslandBlockFlags int flags) {
-        boolean trackedBlock = this.blocksTracker.trackBlock(key, amount);
+        boolean rawBlocks = (flags & IslandBlockFlags.RAW_BLOCKS) != 0;
+
+        boolean trackedBlock = accessBlocksTracker(rawBlocks,
+                blocksTracker -> blocksTracker.trackBlock(key, amount));
 
         if (!trackedBlock)
             return BlockChangeResult.MISSING_BLOCK_VALUE;
@@ -2543,12 +2549,16 @@ public class SIsland implements Island {
         BigDecimal oldWorth = getWorth();
         BigDecimal oldLevel = getIslandLevel();
 
-        KeyMap<BlockChangeResult> result = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
+        boolean rawBlocks = (flags & IslandBlockFlags.RAW_BLOCKS) != 0;
 
-        blocks.forEach((blockKey, amount) -> {
-            BlockChangeResult blockResult = handleBlockPlaceWithResult(blockKey, amount, 0);
-            if (blockResult != BlockChangeResult.SUCCESS)
-                result.put(blockKey, blockResult);
+        KeyMap<BlockChangeResult> result = accessBlocksTracker(rawBlocks, blocksTracker -> {
+            KeyMap<BlockChangeResult> resultMap = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
+            blocks.forEach((blockKey, amount) -> {
+                BlockChangeResult blockResult = handleBlockPlaceWithResult(blockKey, amount, 0);
+                if (blockResult != BlockChangeResult.SUCCESS)
+                    resultMap.put(blockKey, blockResult);
+            });
+            return resultMap.isEmpty() ? KeyMaps.createEmptyMap() : KeyMaps.unmodifiableKeyMap(resultMap);
         });
 
         boolean saveBlockCounts = (flags & IslandBlockFlags.SAVE_BLOCK_COUNTS) != 0;
@@ -2560,7 +2570,7 @@ public class SIsland implements Island {
         if (updateLastTimeStatus)
             updateLastTime();
 
-        return result.isEmpty() ? KeyMaps.createEmptyMap() : KeyMaps.unmodifiableKeyMap(result);
+        return result;
     }
 
     @Override
@@ -2631,7 +2641,10 @@ public class SIsland implements Island {
 
         BigInteger amountBig = BigInteger.valueOf(amount);
 
-        boolean untrackedBlocks = this.blocksTracker.untrackBlock(key, amountBig);
+        boolean rawBlocks = (flags & IslandBlockFlags.RAW_BLOCKS) != 0;
+
+        boolean untrackedBlocks = accessBlocksTracker(rawBlocks,
+                blocksTracker -> blocksTracker.untrackBlock(key, amountBig));
 
         if (!untrackedBlocks)
             return BlockChangeResult.MISSING_BLOCK_VALUE;
@@ -2729,12 +2742,16 @@ public class SIsland implements Island {
         BigDecimal oldWorth = getWorth();
         BigDecimal oldLevel = getIslandLevel();
 
-        KeyMap<BlockChangeResult> result = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
+        boolean rawBlocks = (flags & IslandBlockFlags.RAW_BLOCKS) != 0;
 
-        blocks.forEach((blockKey, amount) -> {
-            BlockChangeResult blockResult = handleBlockBreakWithResult(blockKey, amount, 0);
-            if (blockResult != BlockChangeResult.SUCCESS)
-                result.put(blockKey, blockResult);
+        KeyMap<BlockChangeResult> result = accessBlocksTracker(rawBlocks, blocksTracker -> {
+            KeyMap<BlockChangeResult> resultMap = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
+            blocks.forEach((blockKey, amount) -> {
+                BlockChangeResult blockResult = handleBlockBreakWithResult(blockKey, amount, 0);
+                if (blockResult != BlockChangeResult.SUCCESS)
+                    resultMap.put(blockKey, blockResult);
+            });
+            return resultMap.isEmpty() ? KeyMaps.createEmptyMap() : KeyMaps.unmodifiableKeyMap(resultMap);
         });
 
         boolean saveBlockCounts = (flags & IslandBlockFlags.SAVE_BLOCK_COUNTS) != 0;
@@ -2746,7 +2763,7 @@ public class SIsland implements Island {
         if (updateLastTimeStatus)
             updateLastTime();
 
-        return result.isEmpty() ? KeyMaps.createEmptyMap() : KeyMaps.unmodifiableKeyMap(result);
+        return result;
     }
 
     @Override
@@ -3631,7 +3648,7 @@ public class SIsland implements Island {
 
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, LazyWorldLocation.getWorldName(location));
         WorldPosition worldPosition = SWorldPosition.of(location);
-        
+
         return createIslandInternal(name, worldInfo, worldPosition, warpCategory);
     }
 
@@ -5219,6 +5236,18 @@ public class SIsland implements Island {
 
     private Location worldPositionToLocation(Dimension dimension, WorldPosition worldPosition) {
         return IslandWorlds.setWorldToLocation(this, dimension, worldPosition);
+    }
+
+    private <R> R accessBlocksTracker(boolean rawBlocks, Function<IslandBlocksTrackerAlgorithm, R> function) {
+        if (!rawBlocks)
+            return function.apply(this.blocksTracker);
+
+        try {
+            this.blocksTracker.setLoadingDataMode(true);
+            return function.apply(this.blocksTracker);
+        } finally {
+            this.blocksTracker.setLoadingDataMode(false);
+        }
     }
 
     public static void registerListeners(PluginEventsDispatcher dispatcher) {
