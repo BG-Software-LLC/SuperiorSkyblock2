@@ -86,19 +86,13 @@ public class IslandNames {
 
     public static boolean isValidWarpName(SuperiorPlayer superiorPlayer, Island island,
                                           String warpName, boolean sendMessage) {
-        if (warpName.isEmpty()) {
-            if (sendMessage)
-                Message.WARP_ILLEGAL_NAME.send(superiorPlayer);
-            return false;
-        }
-
-        if (warpName.contains(" ")) {
+        if (warpName.isEmpty() || warpName.contains(" ")) {
             if (sendMessage)
                 Message.WARP_INVALID_NAME.send(superiorPlayer);
             return false;
         }
 
-        if (isWarpNameLengthValid(warpName)) {
+        if (!isWarpNameLengthValid(warpName)) {
             if (sendMessage)
                 Message.WARP_NAME_TOO_LONG.send(superiorPlayer);
             return false;
@@ -114,30 +108,13 @@ public class IslandNames {
     }
 
     public static boolean isValidWarpCategoryName(SuperiorPlayer superiorPlayer, String categoryName) {
-        if (categoryName.isEmpty()) {
-            Message.WARP_CATEGORY_ILLEGAL_NAME.send(superiorPlayer);
-            return false;
-        }
-
-        if (categoryName.contains(" ")) {
+        if (categoryName.isEmpty() || categoryName.contains(" ")) {
             Message.WARP_CATEGORY_INVALID_NAME.send(superiorPlayer);
             return false;
         }
 
-        if (categoryName.length() > 255) {
+        if (!isWarpNameLengthValid(categoryName)) {
             Message.WARP_CATEGORY_NAME_TOO_LONG.send(superiorPlayer);
-            return false;
-        }
-
-        return true;
-    }
-
-    public static boolean isValidWarpCategoryNameForRename(SuperiorPlayer superiorPlayer, Island island, String categoryName) {
-        if (!isValidWarpCategoryName(superiorPlayer, categoryName))
-            return false;
-
-        if (island.getWarpCategory(categoryName) != null) {
-            Message.WARP_CATEGORY_ALREADY_EXIST.send(superiorPlayer);
             return false;
         }
 

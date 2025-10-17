@@ -40,8 +40,13 @@ public class WarpCategoryManageRenameButton extends AbstractMenuViewButton<MenuW
 
             if (warpCategory.getIsland().getWarpCategory(warpCategory.getName()) != null &&
                     !newName.equalsIgnoreCase("-cancel")) {
-                if (!IslandNames.isValidWarpCategoryNameForRename(superiorPlayer, island, newName))
+                if (!IslandNames.isValidWarpCategoryName(superiorPlayer, newName))
                     return true;
+
+                if (island.getWarpCategory(newName) != null) {
+                    Message.WARP_CATEGORY_ALREADY_EXIST.send(superiorPlayer);
+                    return true;
+                }
 
                 PluginEvent<PluginEventArgs.IslandRenameWarpCategory> event = PluginEventsFactory.callIslandRenameWarpCategoryEvent(
                         warpCategory.getIsland(), plugin.getPlayers().getSuperiorPlayer(player), warpCategory, newName);

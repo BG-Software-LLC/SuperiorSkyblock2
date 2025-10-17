@@ -760,20 +760,19 @@ UPGRADE_COOLDOWN_FORMAT: '&c&l错误 | &7你只能在 {0} 之后才可继续进�
 VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&l错误 | &7你不能对其他岛屿使用该命令.'
 WARP_ALREADY_EXIST: '&c&l错误 | &7已存在同名传送点.'
+WARP_CATEGORY_ALREADY_EXIST: '&c&lError | &7There is already a warp category with this name.'
 WARP_CATEGORY_ICON_NEW_LORE: |
   &e&l传送 | &7输入一行新的描述 (输入 "-cancel" 取消本次操作):
   &e&l传送 | &7可使用符号 "\n" 进行换行.
 WARP_CATEGORY_ICON_NEW_NAME: '&e&l传送 | &7输入新的分类图标名称 (输入 "-cancel" 取消本次操作):'
 WARP_CATEGORY_ICON_NEW_TYPE: '&e&l传送 | &7输入新的材料名称 (输入 "-cancel" 取消本次操作):'
 WARP_CATEGORY_ICON_UPDATED: '&e&l传送 | &7成功更新了分类图标的样式.'
-WARP_CATEGORY_ILLEGAL_NAME: '&c&l错误 | &7传送点分类名称不能为空.'
-WARP_CATEGORY_NAME_CONTAIN_SPACE: '&c&lError | &7Warp category names cannot contain spaces.'
+WARP_CATEGORY_INVALID_NAME: '&c&lError | &7Warp category names cannot be empty and must be one word.'
 WARP_CATEGORY_NAME_TOO_LONG: '&c&l错误 | &7传送点分类名称长度不能大于 255 个字符.'
 WARP_CATEGORY_SLOT: '&e&l传送 | &7输入一个新的格子位置 (输入 "-cancel" 取消本次操作):'
 WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&l错误 | &7该槽位已有其他分类图标占用.'
 WARP_CATEGORY_SLOT_SUCCESS: '&e&l传送 | &7成功将该分类的位置转移至 {0}.'
 WARP_CATEGORY_RENAME: '&e&l传送 | &7输入新的名称 (输入 "-cancel" 取消本次操作):'
-WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&l错误 | &7已存在名称相同的分类名称.'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&l传送 | &7成功将分类重命名为 {0}.'
 WARP_ICON_NEW_LORE: |
   &e&l传送 | &7输入一行新的描述 (输入 "-cancel" 取消本次操作):
@@ -781,14 +780,12 @@ WARP_ICON_NEW_LORE: |
 WARP_ICON_NEW_NAME: '&e&l传送 | &7输入新的名称 (输入 "-cancel" 取消本次操作):'
 WARP_ICON_NEW_TYPE: '&e&l传送 | &7输入新的材料名称 (输入 "-cancel" 取消本次操作):'
 WARP_ICON_UPDATED: '&e&l传送 | &7成功更新了传送点的图标样式.'
-WARP_ILLEGAL_NAME: '&c&l错误 | &7传送点名称不能为空.'
+WARP_INVALID_NAME: '&c&lError | &7Warp names cannot be empty and must be one word.'
 WARP_LOCATION_UPDATE: '&e&l传送 | &7成功将传送点的位置转移至你当前的位置.'
-WARP_NAME_CONTAIN_SPACE: '&c&lError | &7Warp names cannot contain spaces.'
 WARP_NAME_TOO_LONG: '&c&l错误 | &7W传送蒂娜名称长度不能大于 255 个字符.'
 WARP_PUBLIC_UPDATE: '&e&l传送 | &7成功将传送点设置为对公众开放.'
 WARP_PRIVATE_UPDATE: '&e&l传送 | &7成功将传送点设置为不对公众开放.'
 WARP_RENAME: '&e&l传送 | &7输入传送点的新名称 (输入 "-cancel" 取消本次操作):'
-WARP_RENAME_ALREADY_EXIST: '&c&l错误 | &7已存在名称相同的其他传送点.'
 WARP_RENAME_SUCCESS: '&e&l传送 | &7成功将传送点重命名为 {0}.'
 WITHDRAW_ALL_MONEY: |-
   &e&l银行 | &7岛屿银行余额为 ${0}.

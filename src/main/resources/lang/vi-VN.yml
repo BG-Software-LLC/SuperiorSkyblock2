@@ -858,20 +858,19 @@ UPGRADE_COOLDOWN_FORMAT: '&c&lLỗi | &77Bạn có thể nâng cấp lại trong
 VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lLỗi | &7Bạn không thể sử dụng lệnh này trên đảo khác.'
 WARP_ALREADY_EXIST: '&c&lLỗi | &7Đã có một khu vực đã được đặt với tên này.'
+WARP_CATEGORY_ALREADY_EXIST: '&c&lError | &7There is already a warp category with this name.'
 WARP_CATEGORY_ICON_NEW_LORE: |
   &e&lKhu Vực | &7Hãy nhập mô tả mới (Nhập "-cancel" để hủy):
   &e&lKhu Vực | &7Bạn có thể xuống dòng bằng cách thêm chữ "\n".
 WARP_CATEGORY_ICON_NEW_NAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'
 WARP_CATEGORY_ICON_NEW_TYPE: '&e&lKhu Vực | &7Vui lòng nhập một nguyên liệu mới (Nhập "-cancel" để hủy):'
 WARP_CATEGORY_ICON_UPDATED: '&e&lKhu Vực | &7Cập nhật thành công biểu tượng danh mục.'
-WARP_CATEGORY_ILLEGAL_NAME: '&c&lLỗi | &7Bạn chỉ có thể sử dụng các chữ cái theo thứ tự bảng chữ cái, số và ''_'' cho tên danh mục khu vực.'
-WARP_CATEGORY_NAME_CONTAIN_SPACE: '&c&lError | &7Warp category names cannot contain spaces.'
+WARP_CATEGORY_INVALID_NAME: '&c&lError | &7Warp category names cannot be empty and must be one word.'
 WARP_CATEGORY_NAME_TOO_LONG: '&c&lLỗi | &7Tên danh mục khu vực không thể dài hơn 255 kí tự.'
 WARP_CATEGORY_SLOT: '&e&lKhu Vực | &7Vui lòng nhập vị trí mới (Nhập "-cancel" để hủy):'
 WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lLỗi | &7Vị trí đã được dùng bởi một danh mục khu vực khác.'
 WARP_CATEGORY_SLOT_SUCCESS: '&e&lKhu Vực | &7Thành công thay đổi danh mục tới vị trí {0}.'
 WARP_CATEGORY_RENAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'
-WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lLỗi | &7Tên này đã được dùng bởi một danh mục khu vực khác.'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lKhu Vực | &7Thành công đổi tên danh mục thành {0}.'
 WARP_ICON_NEW_LORE: |
   &e&lKhu Vực | &7Hãy nhập mô tả mới (Nhập "-cancel" để hủy):
@@ -879,14 +878,12 @@ WARP_ICON_NEW_LORE: |
 WARP_ICON_NEW_NAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'
 WARP_ICON_NEW_TYPE: '&e&lKhu Vực | &7Vui lòng nhập một nguyên liệu mới (Nhập "-cancel" để hủy):'
 WARP_ICON_UPDATED: '&e&lKhu Vực | &7Cập nhật thành công biểu tượng danh mục.'
-WARP_ILLEGAL_NAME: '&c&lLỗi | &7Bạn chỉ có thể sử dụng các chữ cái theo thứ tự bảng chữ cái, số và ''_'' cho tên danh mục khu vực.'
+WARP_INVALID_NAME: '&c&lError | &7Warp names cannot be empty and must be one word.'
 WARP_LOCATION_UPDATE: '&e&lKhu Vực | &7Đã cập nhật thành công vị trí của khu vực vào vị trí của bạn.'
-WARP_NAME_CONTAIN_SPACE: '&c&lError | &7Warp names cannot contain spaces.'
 WARP_NAME_TOO_LONG: '&c&lLỗi | &7Tên khu vực không thể dài hơn 255 kí tự.'
 WARP_PUBLIC_UPDATE: '&e&lKhu Vực | &7Thành công mở khu vực cho công chúng.'
 WARP_PRIVATE_UPDATE: '&e&lKhu Vực | &7Thành công đóng khu vực đối với công chúng.'
 WARP_RENAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'
-WARP_RENAME_ALREADY_EXIST: '&c&lLỗi | &7Tên này đã được dùng bởi một danh mục khu vực khác.'
 WARP_RENAME_SUCCESS: '&e&lKhu Vực | &7Thành công đổi tên danh mục thành {0}.'
 WITHDRAW_ALL_MONEY: |-
   &e&lNgân Hàng | &7Đảo ngân hàng chỉ có {0}$ bên trong.
