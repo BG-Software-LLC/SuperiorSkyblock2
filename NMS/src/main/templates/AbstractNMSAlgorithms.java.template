@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION};
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -75,6 +76,9 @@ public abstract class AbstractNMSAlgorithms implements NMSAlgorithms {
             return enumValue.name();
         }
     };
+
+    static final int DATA_VERSION = ((CraftMagicNumbers) new ReflectField<>(
+            CraftMagicNumbers.class, Object.class, "INSTANCE").get(null)).getDataVersion();
 
     private static final EnumMap<InventoryType, MenuCreator> MENUS_HOLDER_CREATORS = new EnumMap<>(InventoryType.class);
 
@@ -233,7 +237,7 @@ public abstract class AbstractNMSAlgorithms implements NMSAlgorithms {
 
     @Override
     public int getDataVersion() {
-        return CraftMagicNumbers.INSTANCE.getDataVersion();
+        return DATA_VERSION;
     }
 
     @Override
