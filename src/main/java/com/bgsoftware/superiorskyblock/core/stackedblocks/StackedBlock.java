@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.service.hologram.Hologram;
 import com.bgsoftware.superiorskyblock.api.service.hologram.HologramsService;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -82,8 +83,12 @@ public class StackedBlock {
             return;
         }
 
-        if (hologram == null)
-            hologram = hologramsService.get().createHologram(location.add(0.5, 1, 0.5));
+        if (hologram == null) {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location location = copyLocation(wrapper.getHandle()).add(0.5, 1, 0.5);
+                hologram = hologramsService.get().createHologram(location);
+            }
+        }
 
         hologram.setHologramName(plugin.getSettings().getStackedBlocks().getCustomName()
                 .replace("{0}", String.valueOf(amount))
@@ -97,6 +102,16 @@ public class StackedBlock {
             hologram.removeHologram();
             hologram = null;
         }
+    }
+
+    private Location copyLocation(Location location) {
+        location.setX(this.location.getX());
+        location.setY(this.location.getY());
+        location.setZ(this.location.getZ());
+        location.setYaw(this.location.getYaw());
+        location.setPitch(this.location.getPitch());
+        location.setWorld(this.location.getWorld());
+        return location;
     }
 
 }
