@@ -44,7 +44,6 @@ BLOCK_LEVEL: '&e&lLevel | &7Die Ebene des Blocks {0} ist {1}.'
 BLOCK_LEVEL_WORTHLESS: '&e&lLevel | &7Der Block {0} ist wertlos.'
 BLOCK_VALUE: '&e&lWert | &7Der Block {0} im Wert von {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lWert | &7Der Block {0} ist wertlos.'
-BONUS_SET_SUCCESS: '&e&lInsel | &7Der Inselbonus wurde erfolgreich auf {0} aktualisiert.'
 BONUS_SYNC_ALL: '&e&lIsland | &7Successfully synced the island bonus to all the islands'
 BONUS_SYNC_NAME: '&e&lIsland | &7Successfully synced the island bonus to {0}.'
 BONUS_SYNC: '&e&lIsland | &7Successfully synced the island bonus to {0}''s island.'
@@ -77,6 +76,12 @@ CHANGED_BLOCK_LIMIT_ALL: '&e&lUpgrades | &7Das {0} Blocklimit aller Inseln wurde
   aktualisiert.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lUpgrades | &7Das {0} Blocklimit von {1} wurde erfolgreich
   aktualisiert.'
+CHANGED_BONUS_LEVEL: '&e&lIsland | &7Successfully updated the level bonus of {0}''s island.'
+CHANGED_BONUS_LEVEL_ALL: '&e&lIsland | &7Successfully updated the level bonus of all the islands.'
+CHANGED_BONUS_LEVEL_NAME: '&e&lIsland | &7Successfully updated the level bonus of {0}.'
+CHANGED_BONUS_WORTH: '&e&lIsland | &7Successfully updated the worth bonus of {0}''s island.'
+CHANGED_BONUS_WORTH_ALL: '&e&lIsland | &7Successfully updated the worth bonus of all the islands.'
+CHANGED_BONUS_WORTH_NAME: '&e&lIsland | &7Successfully updated the worth bonus of {0}.'
 CHANGED_CHEST_SIZE: '&e&lChest | &7Die Zeilen von Seite #{0} wurden erfolgreich auf
   {1} für die Insel von {2} aktualisiert.'
 CHANGED_CHEST_SIZE_ALL: '&e&lChest | &7Die Zeilen der Seite #{0} wurden für alle Inseln

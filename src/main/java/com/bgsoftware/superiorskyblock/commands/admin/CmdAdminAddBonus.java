@@ -13,11 +13,13 @@ import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class CmdAdminAddBonus implements IAdminIslandCommand {
 
@@ -67,7 +69,17 @@ public class CmdAdminAddBonus implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        boolean isWorthBonus = !args[3].equalsIgnoreCase("level");
+        boolean isWorthBonus;
+
+        if (args[3].equalsIgnoreCase("worth")) {
+            isWorthBonus = true;
+        } else if (args[3].equalsIgnoreCase("level")) {
+            isWorthBonus = false;
+        } else {
+            Locale locale = PlayerLocales.getLocale(sender);
+            Message.COMMAND_USAGE.send(sender, locale, plugin.getCommands().getLabel() + " " + getUsage(locale));
+            return;
+        }
 
         BigDecimal bonus = CommandArguments.getBigDecimalAmount(sender, args[4]);
 
@@ -97,7 +109,21 @@ public class CmdAdminAddBonus implements IAdminIslandCommand {
         if (islandsChangedCount <= 0)
             return;
 
-        Message.BONUS_SET_SUCCESS.send(sender, bonus.toString());
+        if (isWorthBonus) {
+            if (islandsChangedCount > 1)
+                Message.CHANGED_BONUS_WORTH_ALL.send(sender);
+            else if (targetPlayer == null)
+                Message.CHANGED_BONUS_WORTH_NAME.send(sender, islands.get(0).getName());
+            else
+                Message.CHANGED_BONUS_WORTH.send(sender, targetPlayer.getName());
+        } else {
+            if (islandsChangedCount > 1)
+                Message.CHANGED_BONUS_LEVEL_ALL.send(sender);
+            else if (targetPlayer == null)
+                Message.CHANGED_BONUS_LEVEL_NAME.send(sender, islands.get(0).getName());
+            else
+                Message.CHANGED_BONUS_LEVEL.send(sender, targetPlayer.getName());
+        }
     }
 
     @Override
