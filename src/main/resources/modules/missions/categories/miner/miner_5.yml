@@ -41,6 +41,22 @@ required-blocks:
 
 # Icons used in the menus.
 icons:
+  locked:
+    type: PAPER
+    name: '&aMiner V'
+    lore:
+      - '&7It''s time to buy the best goodies.'
+      - '&7Mine x32 diamond ores.'
+      - ''
+      - '&6Required Blocks:'
+      - '&8 - &7x32 Diamond Ore'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$250,000'
+      - ''
+      - '&6Diamond Ore Mined: &7{1}/32'
+      - '&c&l ✘ &7Locked'
+    amount: 5
   not-completed:
     type: PAPER
     name: '&aMiner V'

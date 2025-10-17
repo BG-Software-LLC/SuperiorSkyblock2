@@ -63,6 +63,30 @@ required-plants:
 
 # Icons used in the menus.
 icons:
+  locked:
+    type: PAPER
+    name: '&aFarmer V'
+    lore:
+      - '&7Let''s go one step further,'
+      - '&7Plant 5 stacks of each crop.'
+      - ''
+      - '&6Required Plants:'
+      - '&8 - &7Carrots, Potatoes, Wheat, Pumpkins'
+      - '&8 - &7Melons, Sugar Canes, Cactus'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$1,000,000'
+      - '&8 - &7Crops Upgrade'
+      - ''
+      - '&6Grown Carrots: &7{value_carrot}/320'
+      - '&6Grown Potatoes: &7{value_potato}/320'
+      - '&6Grown Wheat: &7{value_wheat}/320'
+      - '&6Grown Pumpkins: &7{value_pumpkin}/320'
+      - '&6Grown Melons: &7{value_melon}/320'
+      - '&6Grown Sugar Canes: &7{value_sugar_cane}/320'
+      - '&6Grown Cactus: &7{value_cactus}/320'
+      - '&c&l ✘ &7Locked'
+    amount: 5
   not-completed:
     type: PAPER
     name: '&aFarmer V'

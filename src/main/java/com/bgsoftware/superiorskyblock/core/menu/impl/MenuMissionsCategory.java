@@ -74,11 +74,13 @@ public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory
                 GameSound completedSound = MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("completed"));
                 GameSound notCompletedSound = MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("not-completed"));
                 GameSound canCompleteSound = MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("can-complete"));
+                GameSound lockedSound = MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("locked"));
 
                 patternBuilder.setPagedObjectSlots(menuPatternSlots.getSlots(slotChar), new MissionsPagedObjectButton.Builder()
                         .setCompletedSound(completedSound)
                         .setNotCompletedSound(notCompletedSound)
-                        .setCanCompleteSound(canCompleteSound));
+                        .setCanCompleteSound(canCompleteSound)
+                        .setLockedSound(lockedSound));
             }
         }
 

@@ -31,6 +31,16 @@ required-missions:
 
 # Icons used in the menus.
 icons:
+  locked:
+    type: PAPER
+    name: '&aThe-End Explorer'
+    lore:
+      - '&7Go to The-End.'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$150,000'
+      - ''
+      - '&c&l ✘ &7Locked'
   not-completed:
     type: PAPER
     name: '&aThe-End Explorer'

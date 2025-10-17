@@ -48,6 +48,27 @@ required-plants:
 
 # Icons used in the menus.
 icons:
+  locked:
+    type: PAPER
+    name: '&aFarmer II'
+    lore:
+      - '&7Expand your farm with beetroots, pumpkins and melons.'
+      - ''
+      - '&6Required Plants:'
+      - '&8 - &7x10 Beetroots'
+      - '&8 - &7x10 Pumpkins'
+      - '&8 - &7x10 Melons'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7x1 Sugar Cane'
+      - '&8 - &7x1 Cactus'
+      - '&8 - &7$5,000'
+      - ''
+      - '&6Grown Beetroots: &7{value_beetroot}/10'
+      - '&6Grown Pumpkins: &7{value_pumpkin}/10'
+      - '&6Grown Melons: &7{value_melon}/10'
+      - '&c&l ✘ &7Locked'
+    amount: 2
   not-completed:
     type: PAPER
     name: '&aFarmer II'

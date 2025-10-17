@@ -33,6 +33,10 @@ items:
 
 sounds:
   '@':
+    locked:
+      type: ANVIL_LAND
+      volume: 0.2
+      pitch: 0.2
     completed:
       type: ANVIL_LAND
       volume: 0.2

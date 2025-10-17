@@ -29,6 +29,8 @@ public class MissionData {
     @Nullable
     private final TemplateItem canComplete;
     @Nullable
+    private final TemplateItem locked;
+    @Nullable
     private final TemplateItem completed;
     private final int resetAmount;
 
@@ -58,6 +60,7 @@ public class MissionData {
 
         this.notCompleted = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.not-completed"));
         this.canComplete = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.can-complete"));
+        this.locked = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.locked"));
         this.completed = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.completed"));
     }
 
@@ -97,8 +100,16 @@ public class MissionData {
         return resetAmount;
     }
 
+    public boolean hasLocked() {
+        return locked != null;
+    }
+
     public ItemBuilder getCompleted() {
         return (completed == null ? TemplateItem.AIR : completed).getBuilder();
+    }
+
+    public ItemBuilder getLocked() {
+        return (locked == null ? TemplateItem.AIR : locked).getBuilder();
     }
 
     public ItemBuilder getCanComplete() {
