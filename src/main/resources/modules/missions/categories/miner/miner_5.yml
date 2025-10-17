@@ -55,7 +55,6 @@ icons:
       - '&8 - &7$250,000'
       - ''
       - '&6Diamond Ore Mined: &7{1}/32'
-      - '&6Progress: &7{0}%'
       - '&c&l ✘ &7Locked'
     amount: 5
   not-completed:

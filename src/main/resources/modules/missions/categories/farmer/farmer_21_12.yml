@@ -67,7 +67,6 @@ icons:
       - '&6Grown Beetroots: &7{value_beetroot}/10'
       - '&6Grown Pumpkins: &7{value_pumpkin}/10'
       - '&6Grown Melons: &7{value_melon}/10'
-      - '&6Progress: &7{0}%'
       - '&c&l ✘ &7Locked'
     amount: 2
   not-completed:

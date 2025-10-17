@@ -62,7 +62,6 @@ icons:
       - '&6Blazes Killed: &7{value_blaze}/12'
       - '&6Wither Skeletons Killed: &7{value_wither_skeleton}/12'
       - '&6Endermans Killed: &7{value_enderman}/24'
-      - '&6Progress: &7{0}%'
       - '&c&l ✘ &7Locked'
     amount: 3
   not-completed:

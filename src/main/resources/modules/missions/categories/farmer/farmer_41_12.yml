@@ -86,7 +86,6 @@ icons:
       - '&6Grown Melons: &7{value_melon}/64'
       - '&6Grown Sugar Canes: &7{value_sugar_cane}/64'
       - '&6Grown Cactus: &7{value_cactus}/64'
-      - '&6Progress: &7{0}%'
       - '&c&l ✘ &7Locked'
     amount: 4
   not-completed:

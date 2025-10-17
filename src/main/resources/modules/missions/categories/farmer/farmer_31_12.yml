@@ -53,7 +53,6 @@ icons:
       - ''
       - '&6Grown Sugar Canes: &7{value_sugar_cane}/10'
       - '&6Grown Cactus: &7{value_cactus}/10'
-      - '&6Progress: &7{0}%'
       - '&c&l ✘ &7Locked'
     amount: 3
   not-completed:

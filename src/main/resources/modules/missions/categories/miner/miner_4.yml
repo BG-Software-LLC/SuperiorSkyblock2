@@ -60,7 +60,6 @@ icons:
       - ''
       - '&6Coal Ore Mined: &7{value_coal_ore}/192'
       - '&6Iron Ore Mined: &7{value_iron_ore}/320'
-      - '&6Progress: &7{0}%'
       - '&c&l ✘ &7Locked'
     amount: 4
   not-completed:

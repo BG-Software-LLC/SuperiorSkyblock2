@@ -69,7 +69,6 @@ icons:
       - '&6Zombies Killed: &7{value_zombie}/32'
       - '&6Spiders Killed: &7{value_spider}/32'
       - '&6Creepers Killed: &7{value_creeper}/24'
-      - '&6Progress: &7{0}%'
       - '&c&l ✘ &7Locked'
     amount: 2
   not-completed:
