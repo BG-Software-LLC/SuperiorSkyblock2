@@ -2211,6 +2211,7 @@ public class SIsland implements Island {
 
     @Override
     public void setCurrentlyActive(boolean active) {
+        Log.debug(Debug.ISLAND_ACTIVE, getOwner().getName(), active);
         this.currentlyActive = active;
     }
 
