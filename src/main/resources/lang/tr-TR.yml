@@ -41,7 +41,6 @@ BLOCK_LEVEL: '&e&lSeviye | &7{0} bloğunun seviyesi {1}.'
 BLOCK_LEVEL_WORTHLESS: '&e&lSeviye | &7{0} bloğu değersiz.'
 BLOCK_VALUE: '&e&lDeğer | &7{0} bloğunun değeri {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lDeğer | &7{0} bloğu değersiz.'
-BONUS_SET_SUCCESS: '&e&lAda | &7Ada bonusu başarıyla {0} olarak güncellendi.'
 BONUS_SYNC_ALL: '&e&lAda | &7Ada bonusu tüm adalarla başarıyla senkronize edildi.'
 BONUS_SYNC_NAME: '&e&lAda | &7Ada bonusu {0} ile başarıyla senkronize edildi.'
 BONUS_SYNC: '&e&lAda | &7Ada bonusu {0}''ın adasıyla başarıyla senkronize edildi.'
@@ -73,6 +72,12 @@ CHANGED_BLOCK_LIMIT_ALL: '&e&lYükseltmeler | &7{0} Bloğunun tüm adalar için 
   başarıyla güncellendi.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lYükseltmeler | &7{0} Bloğunun {1} adası için limiti
   başarıyla güncellendi.'
+CHANGED_BONUS_LEVEL: '&e&lIsland | &7Successfully updated the level bonus of {0}''s island.'
+CHANGED_BONUS_LEVEL_ALL: '&e&lIsland | &7Successfully updated the level bonus of all the islands.'
+CHANGED_BONUS_LEVEL_NAME: '&e&lIsland | &7Successfully updated the level bonus of {0}.'
+CHANGED_BONUS_WORTH: '&e&lIsland | &7Successfully updated the worth bonus of {0}''s island.'
+CHANGED_BONUS_WORTH_ALL: '&e&lIsland | &7Successfully updated the worth bonus of all the islands.'
+CHANGED_BONUS_WORTH_NAME: '&e&lIsland | &7Successfully updated the worth bonus of {0}.'
 CHANGED_CHEST_SIZE: '&e&lSandık | &7{2}''in adası için #{0} sayfasının satırları başarıyla
   {1} olarak güncellendi.'
 CHANGED_CHEST_SIZE_ALL: '&e&lSandık | &7Tüm adalar için #{0} sayfasının satırları
