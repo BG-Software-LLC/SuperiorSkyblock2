@@ -247,7 +247,8 @@ public class IslandsDeserializer {
             }
 
             Optional<String> name = islandWarp.getString("name").map(_name -> {
-                return IslandNames.isWarpNameLengthValid(_name) ? _name : _name.substring(0, IslandNames.getMaxWarpNameLength());
+                String splitName = _name.split(" ")[0];
+                return IslandNames.isWarpNameLengthValid(splitName) ? splitName : splitName.substring(0, IslandNames.getMaxWarpNameLength());
             });
             if (!name.isPresent() || name.get().isEmpty()) {
                 Log.warn("Cannot load warps with invalid names for ", uuid.get(), ", skipping...");
@@ -261,7 +262,12 @@ public class IslandsDeserializer {
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-            builder.addWarp(name.get(), islandWarp.getString("category").orElse(""),
+            if (builder.hasWarp(name.get())) {
+                Log.warn("Cannot load warps with same name for ", uuid.get(), ", skipping...");
+                return;
+            }
+
+            builder.addWarp(name.get(), islandWarp.getString("category").orElse("").split(" ")[0],
                     location.get(), islandWarp.getBoolean("private").orElse(!plugin.getSettings().isPublicWarps()),
                     islandWarp.getString("icon").map(Serializers.ITEM_STACK_SERIALIZER::deserialize).orElse(null));
         });
@@ -665,13 +671,21 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<String> name = warpCategory.getString("name").map(Formatters.STRIP_COLOR_FORMATTER::format);
+            Optional<String> name = warpCategory.getString("name").map(_name -> {
+                String splitName = _name.split(" ")[0];
+                return Formatters.STRIP_COLOR_FORMATTER.format(splitName);
+            });
             if (!name.isPresent() || name.get().isEmpty()) {
                 Log.warn("Cannot load warp categories with invalid name for ", uuid.get(), ", skipping...");
                 return;
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            if (builder.hasWarpCategory(name.get())) {
+                Log.warn("Cannot load warp categories with same name for ", uuid.get(), ", skipping...");
+                return;
+            }
+
             builder.addWarpCategory(name.get(), warpCategory.getInt("slot").orElse(-1),
                     warpCategory.getString("icon").map(Serializers.ITEM_STACK_SERIALIZER::deserialize).orElse(null));
         });
