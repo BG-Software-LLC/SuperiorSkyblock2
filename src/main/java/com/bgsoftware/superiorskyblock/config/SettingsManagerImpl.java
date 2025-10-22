@@ -586,6 +586,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public Map<String, Long> getMessageDelays() {
+        return this.global.getMessageDelays();
+    }
+
+    @Override
     public boolean isWarpCategories() {
         return this.global.isWarpCategories();
     }

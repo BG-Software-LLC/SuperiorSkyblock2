@@ -642,6 +642,13 @@ public interface SettingsManager {
     long getProtectedMessageDelay();
 
     /**
+     * A list of messages that should have a delay, in milliseconds.
+     * Represented by a map with string as the message name, and values as the delays.
+     * Config-path: message-delays
+     */
+    Map<String, Long> getMessageDelays();
+
+    /**
      * Whether the warp categories system is enabled or not.
      * Config-path: warp-categories
      */

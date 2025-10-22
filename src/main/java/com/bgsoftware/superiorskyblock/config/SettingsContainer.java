@@ -167,6 +167,7 @@ public class SettingsContainer {
     public final boolean disableRedstoneAFK;
     public final boolean disableSpawningAFK;
     public final Map<String, Pair<Integer, String>> commandsCooldown;
+    public final Map<String, Long> messageDelays;
     public final long upgradeCooldown;
     public final String numberFormat;
     public final String dateFormat;
@@ -562,6 +563,13 @@ public class SettingsContainer {
         tabCompleteHideVanished = config.getBoolean("tab-complete-hide-vanished", true);
         dropsUpgradePlayersMultiply = config.getBoolean("drops-upgrade-players-multiply", false);
         protectedMessageDelay = config.getLong("protected-message-delay", 60L);
+        Map<String, Long> messageDelays = new HashMap<>();
+        if (config.isConfigurationSection("message-delays")) {
+            for (String message : config.getConfigurationSection("message-delays").getKeys(false)) {
+                messageDelays.put(message, config.getLong("message-delays." + message));
+            }
+        }
+        this.messageDelays = messageDelays;
         warpCategories = config.getBoolean("warp-categories", true);
         physicsListener = config.getBoolean("physics-listener", true);
         chargeOnWarp = config.getDouble("charge-on-warp", 0D);

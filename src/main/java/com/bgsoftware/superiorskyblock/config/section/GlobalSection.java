@@ -345,6 +345,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().protectedMessageDelay;
     }
 
+    public Map<String, Long> getMessageDelays() {
+        return getContainer().messageDelays;
+    }
+
     public boolean isWarpCategories() {
         return getContainer().warpCategories;
     }

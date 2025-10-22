@@ -36,11 +36,7 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public enum Message {
@@ -907,6 +903,8 @@ public enum Message {
 
     @Nullable
     private static Collection<UUID> noInteractMessages;
+    @Nullable
+    private static Map<Message, Collection<UUID>> delays;
 
     private final String defaultMessage;
     private final boolean isCustom;
@@ -1064,6 +1062,9 @@ public enum Message {
             UUID playerUUID = ((Player) sender).getUniqueId();
             if (delayedMessages != null && !delayedMessages.add(playerUUID))
                 return;
+            if (addDelay(playerUUID)) {
+                return;
+            }
         }
 
         PluginEvent<PluginEventArgs.SendMessage> event = PluginEventsFactory.callSendMessageEvent(sender, name(), messageComponent, args);
@@ -1077,6 +1078,27 @@ public enum Message {
 
     private void setMessage(Locale locale, IMessageComponent messageComponent) {
         messages.put(locale, messageComponent);
+    }
+
+    private long getDelay() {
+        Long delay = plugin.getSettings().getMessageDelays().get(this.name());
+        return delay == null ? 0L : delay;
+    }
+
+    private boolean addDelay(UUID playerUUID) {
+        if (getDelay() > 0L) {
+            if (delays == null) {
+                delays = new HashMap<>();
+            }
+
+            Collection<UUID> collection = delays.computeIfAbsent(this, message ->
+                    AutoRemovalCollection.newHashSet(getDelay(), TimeUnit.MILLISECONDS)
+            );
+
+            return !collection.add(playerUUID);
+        }
+
+        return false;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -1095,6 +1117,7 @@ public enum Message {
 
     private static void onSettingsUpdate() {
         noInteractMessages = null;
+        delays = null;
     }
 
 }
