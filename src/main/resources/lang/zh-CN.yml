@@ -687,6 +687,7 @@ RESET_WORLD_SUCCEED_ALL: '&e&l岛屿 | &7成功为所有岛屿重置了世界 {0
 RESET_WORLD_SUCCEED_NAME: '&e&l岛屿 | &7成功为岛屿 {1} 重置了世界 {0}.'
 SAME_NAME_CHANGE: '&c&l错误 | &7你必须输入一个不与当前岛屿名称重复的名称.'
 SCHEMATIC_LEFT_SELECT: '&e&l结构 | &7已选中 #2 位点 ({0})'
+SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
 SCHEMATIC_NOT_READY: '&c&l错误 | &7你尚未选中两点.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&l结构 | &7正在处理你的请求...'
 SCHEMATIC_READY_TO_CREATE: |

@@ -687,6 +687,7 @@ RESET_WORLD_SUCCEED_ALL: '&e&lWyspa | &7Pomyslnie zresetuj swiat {0} dla wszystk
 RESET_WORLD_SUCCEED_NAME: '&e&lWyspa | &7Pomyslnie zresetuj swiat {0} dla {1}.'
 SAME_NAME_CHANGE: '&c&lBlad | &7Musisz wprowadzic inna nazwe niz obecna nazwa wyspy.'
 SCHEMATIC_LEFT_SELECT: '&e&lSchematy | &7Wybrana pozycja #2 ({0})'
+SCHEMATIC_NOT_ADDED: '&c&lBlad | &7Serwer nie dodal schematu {0}. Skontaktuj sie z administratorem, aby rozwiazac problem. Format dla schematu {0} to "{1}".'
 SCHEMATIC_NOT_READY: '&c&lBlad | &7Nie wybrales dwóch pozycji.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lSchematy | &7Przetwarzanie zadania...'
 SCHEMATIC_READY_TO_CREATE: |

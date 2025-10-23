@@ -869,6 +869,7 @@ RESET_WORLD_SUCCEED_NAME: '&e&lInsel | &7Die Welt {0} für {1} erfolgreich zurü
 SAME_NAME_CHANGE: '&c&lError | &7Du musst einen anderen Namen als dein aktuellen Inselnamen
   eingeben.'
 SCHEMATIC_LEFT_SELECT: '&e&lSchematics | &7Ausgewählte Position #2 ({0})'
+SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
 SCHEMATIC_NOT_READY: '&c&lError | &7Du hast keine zwei Stellen ausgewählt.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lSchematics | &7Deine Anfrage wird bearbeitet...'
 SCHEMATIC_READY_TO_CREATE: |

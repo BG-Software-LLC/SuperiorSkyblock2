@@ -709,6 +709,7 @@ RESET_WORLD_SUCCEED_ALL: '&e&lIsland | &7Successfully reset the world {0} for al
 RESET_WORLD_SUCCEED_NAME: '&e&lIsland | &7Successfully reset the world {0} for {1}.'
 SAME_NAME_CHANGE: '&c&lהאיגש | &7ךלש יאה לש יוושכעה םשהמ רחא םש סינכהל ךירצ התא.'
 SCHEMATIC_LEFT_SELECT: '&e&lםינבמ רצוי | &7היינש הדוקנ תנמיס ({0})'
+SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
 SCHEMATIC_NOT_READY: '&c&lהאיגש | &7תודוקנ ינש תרחב אל.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lםינבמ רצוי | &7ךתשקב תא דבעמ...'
 SCHEMATIC_READY_TO_CREATE: |

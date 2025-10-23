@@ -3,14 +3,10 @@ package com.bgsoftware.superiorskyblock.core.messages;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
-import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
@@ -30,18 +26,17 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public enum Message {
@@ -79,7 +74,7 @@ public enum Message {
     BORDER_PLAYER_COLOR_NAME_GREEN,
     BORDER_PLAYER_COLOR_NAME_RED,
     BORDER_PLAYER_COLOR_UPDATED,
-    BUILD_OUTSIDE_ISLAND(3, TimeUnit.SECONDS),
+    BUILD_OUTSIDE_ISLAND,
     CANNOT_SET_ROLE,
     CHANGED_BANK_LIMIT,
     CHANGED_BANK_LIMIT_ALL,
@@ -480,7 +475,7 @@ public enum Message {
     ISLAND_BANK_SHOW,
     ISLAND_BANK_SHOW_OTHER,
     ISLAND_BANK_SHOW_OTHER_NAME,
-    ISLAND_BEING_CALCULATED(3, TimeUnit.SECONDS),
+    ISLAND_BEING_CALCULATED,
     ISLAND_CLOSED,
     ISLAND_CREATE_PROCCESS_REQUEST,
     ISLAND_CREATE_PROCESS_FAIL,
@@ -709,6 +704,7 @@ public enum Message {
     REVOKE_INVITE_ANNOUNCEMENT,
     SAME_NAME_CHANGE,
     SCHEMATIC_LEFT_SELECT,
+    SCHEMATIC_NOT_ADDED,
     SCHEMATIC_NOT_READY,
     SCHEMATIC_PROCCESS_REQUEST,
     SCHEMATIC_READY_TO_CREATE,
@@ -815,60 +811,6 @@ public enum Message {
     WORLD_NOT_ENABLED,
     WORLD_NOT_UNLOCKED,
 
-    SCHEMATICS(true) {
-
-        private final Collection<UUID> noSchematicMessages = AutoRemovalCollection.newHashSet(3, TimeUnit.SECONDS);
-
-        @Override
-        public void send(CommandSender sender, Locale locale, Object... objects) {
-            if (!(sender instanceof Player) || objects.length != 1 || !(objects[0] instanceof String))
-                return;
-
-            UUID playerUUID = ((Player) sender).getUniqueId();
-            String message = (String) objects[0];
-
-            if (noSchematicMessages.add(playerUUID)) {
-                Message.CUSTOM.send(sender, locale, message, false);
-            }
-        }
-    },
-
-    PROTECTION(true) {
-        @Override
-        public void send(CommandSender sender, Locale locale, Object... args) {
-            if (!(sender instanceof Player))
-                return;
-
-            if (plugin.getSettings().getProtectedMessageDelay() > 0) {
-                if (noInteractMessages == null)
-                    noInteractMessages = AutoRemovalCollection.newHashSet(plugin.getSettings().getProtectedMessageDelay() * 50, TimeUnit.MILLISECONDS);
-
-                UUID playerUUID = ((Player) sender).getUniqueId();
-
-                if (!noInteractMessages.add(playerUUID))
-                    return;
-            }
-
-            boolean isSpawnIsland;
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                Island island = plugin.getGrid().getIslandAt(((Player) sender).getLocation(wrapper.getHandle()));
-                isSpawnIsland = island != null && island.isSpawn();
-            }
-
-            if (!isSpawnIsland)
-                Message.ISLAND_PROTECTED.send(sender, locale, args);
-            else
-                Message.SPAWN_PROTECTED.send(sender, locale, args);
-
-            SuperiorCommand bypassCommand = plugin.getCommands().getAdminCommand("bypass");
-            if (CommandsHelper.hasCommandAccess(bypassCommand, sender))
-                if (!isSpawnIsland)
-                    Message.ISLAND_PROTECTED_OPPED.send(sender, locale, args);
-                else
-                    Message.SPAWN_PROTECTED_OPPED.send(sender, locale, args);
-        }
-    },
-
     CUSTOM(true) {
         @Override
         public void send(CommandSender sender, Locale locale, Object... args) {
@@ -907,8 +849,6 @@ public enum Message {
     };
 
     @Nullable
-    private static Collection<UUID> noInteractMessages;
-    @Nullable
     private static Map<Message, Collection<UUID>> delays;
 
     private final String defaultMessage;
@@ -927,10 +867,6 @@ public enum Message {
 
     Message(String defaultMessage) {
         this(defaultMessage, false, 0L, null);
-    }
-
-    Message(long delay, TimeUnit delayUnit) {
-        this(null, false, delay, delayUnit);
     }
 
     Message(String defaultMessage, boolean isCustom, long delay, @Nullable TimeUnit delayUnit) {
@@ -1091,13 +1027,14 @@ public enum Message {
     }
 
     private boolean addDelay(UUID playerUUID) {
-        if (getDelay() > 0L) {
+        long delay = getDelay();
+        if (delay > 0L) {
             if (delays == null) {
-                delays = new HashMap<>();
+                delays = new ConcurrentHashMap<>();
             }
 
             Collection<UUID> collection = delays.computeIfAbsent(this, message ->
-                    AutoRemovalCollection.newHashSet(getDelay(), TimeUnit.MILLISECONDS)
+                    AutoRemovalCollection.newHashSet(delay, TimeUnit.MILLISECONDS)
             );
 
             return !collection.add(playerUUID);
@@ -1121,7 +1058,6 @@ public enum Message {
     }
 
     private static void onSettingsUpdate() {
-        noInteractMessages = null;
         delays = null;
     }
 

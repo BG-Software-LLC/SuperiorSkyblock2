@@ -341,10 +341,6 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().dropsUpgradePlayersMultiply;
     }
 
-    public long getProtectedMessageDelay() {
-        return getContainer().protectedMessageDelay;
-    }
-
     public Map<String, Long> getMessageDelays() {
         return getContainer().messageDelays;
     }

@@ -815,6 +815,7 @@ RESET_WORLD_SUCCEED_ALL: '&e&lAda | &7Tüm adalar için {0} dünyası başarıyl
 RESET_WORLD_SUCCEED_NAME: '&e&lAda | &7{1} adası için {0} dünyası başarıyla sıfırlandı.'
 SAME_NAME_CHANGE: '&c&lHata | &7Mevcut ada adından farklı bir ad girmelisin.'
 SCHEMATIC_LEFT_SELECT: '&e&lŞematikler | &7Konum #2 ({0}) seçildi.'
+SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
 SCHEMATIC_NOT_READY: '&c&lHata | &7İki konum seçmedin.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lŞematikler | &7İsteğiniz işleniyor...'
 SCHEMATIC_READY_TO_CREATE: |

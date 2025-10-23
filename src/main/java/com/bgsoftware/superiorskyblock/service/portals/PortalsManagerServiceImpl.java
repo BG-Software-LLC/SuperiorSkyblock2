@@ -130,14 +130,13 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         EntityPortalResult portalResult = simulateEntityPortalFromIsland(superiorPlayer.asPlayer(), island,
                 portalLocation, portalType);
 
-        if (portalResult == EntityPortalResult.WORLD_NOT_UNLOCKED && !Message.WORLD_NOT_UNLOCKED.isEmpty(superiorPlayer.getUserLocale())) {
+        if (portalResult == EntityPortalResult.WORLD_NOT_UNLOCKED) {
             Dimension originalDestination = getTargetWorld(portalLocation, portalType);
-            Message.SCHEMATICS.send(superiorPlayer, Message.WORLD_NOT_UNLOCKED.getMessage(
-                    superiorPlayer.getUserLocale(), Formatters.CAPITALIZED_FORMATTER.format(originalDestination.getName())));
+            Message.WORLD_NOT_UNLOCKED.send(superiorPlayer, Formatters.CAPITALIZED_FORMATTER.format(originalDestination.getName()));
         }
 
-        if (portalResult == EntityPortalResult.DESTINATION_WORLD_DISABLED && !Message.WORLD_NOT_ENABLED.isEmpty(superiorPlayer.getUserLocale())) {
-            Message.SCHEMATICS.send(superiorPlayer, Message.WORLD_NOT_ENABLED.getMessage(superiorPlayer.getUserLocale()));
+        if (portalResult == EntityPortalResult.DESTINATION_WORLD_DISABLED) {
+            Message.WORLD_NOT_ENABLED.send(superiorPlayer);
         }
 
         return portalResult;
@@ -210,10 +209,8 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
 
             if (schematic == null && !ignoreInvalidSchematic) {
                 if (superiorPlayer != null) {
-                    Message.SCHEMATICS.send(superiorPlayer, ChatColor.RED + "The server hasn't added a " +
-                            destinationEnvironmentName + " schematic. Please contact administrator to solve the problem. " +
-                            "The format for " + destinationEnvironmentName + " schematic is \"" +
-                            islandSchematic + "_" + destinationEnvironmentName + "\".");
+                    String schematicName = islandSchematic + "_" + destinationEnvironmentName;
+                    Message.SCHEMATIC_NOT_ADDED.send(superiorPlayer, destinationEnvironmentName, schematicName);
                 }
                 return EntityPortalResult.INVALID_SCHEMATIC;
             }

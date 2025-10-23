@@ -843,11 +843,17 @@ tab-complete-hide-vanished: true
 # When enabled, the drops multiplier will only multiply drops of entities that were killed by players.
 drops-upgrade-players-multiply: false
 
-# The delay between protected messages (in ticks)
-protected-message-delay: 60
-
 # List of messages that should have a delay. (in milliseconds)
-message-delays: [ ]
+message-delays:
+  BUILD_OUTSIDE_ISLAND: 3000
+  ISLAND_BEING_CALCULATED: 3000
+  ISLAND_PROTECTED: 3000
+  ISLAND_PROTECTED_OPPED: 3000
+  SCHEMATIC_NOT_ADDED: 3000
+  SPAWN_PROTECTED: 3000
+  SPAWN_PROTECTED_OPPED: 3000
+  WORLD_NOT_ENABLED: 3000
+  WORLD_NOT_UNLOCKED: 3000
 
 # Should players be able to create warp categories?
 warp-categories: true

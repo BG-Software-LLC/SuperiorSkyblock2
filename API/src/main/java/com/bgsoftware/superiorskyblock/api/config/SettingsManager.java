@@ -636,9 +636,11 @@ public interface SettingsManager {
     boolean isDropsUpgradePlayersMultiply();
 
     /**
-     * The delay between protect messages, in ticks.
-     * Config-path: protected-message-delay
+     * The delay set for the ISLAND_PROTECTED message.
+     *
+     * @deprecated See {@link #getMessageDelays()}
      */
+    @Deprecated
     long getProtectedMessageDelay();
 
     /**
