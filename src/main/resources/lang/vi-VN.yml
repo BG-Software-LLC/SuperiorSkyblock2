@@ -899,5 +899,5 @@ WITHDRAW_ANNOUNCEMENT: '&e&lNgân Hàng | &7{0} rút {1}$ từ ngân hàng của
 WITHDRAW_ERROR: '&c&lLỗi | &7{0}.'
 WITHDRAWN_MONEY: '&e&lNgân Hàng | &7Bạn đã rút ${0} từ đảo của {1}!'
 WITHDRAWN_MONEY_NAME: '&e&lNgân Hàng | &7Bạn đã rút ${0} từ đảo {1}!'
-WORLD_NOT_ENABLED: '&e&lThế giới | &7Thế giới này không được bật trên máy chủ.'
+WORLD_NOT_ENABLED: '&e&lWorlds | &7The {0} world is not enabled on the server.'
 WORLD_NOT_UNLOCKED: '&e&lThế Giới | &7Thế giới {0} hiện chưa được mở khóa!'

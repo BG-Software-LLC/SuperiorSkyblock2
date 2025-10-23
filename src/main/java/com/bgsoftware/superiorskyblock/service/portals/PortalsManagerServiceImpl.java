@@ -26,7 +26,6 @@ import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import com.google.common.base.Preconditions;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.PortalType;
 import org.bukkit.World;
@@ -136,7 +135,8 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         }
 
         if (portalResult == EntityPortalResult.DESTINATION_WORLD_DISABLED) {
-            Message.WORLD_NOT_ENABLED.send(superiorPlayer);
+            Dimension originalDestination = getTargetWorld(portalLocation, portalType);
+            Message.WORLD_NOT_ENABLED.send(superiorPlayer, Formatters.CAPITALIZED_FORMATTER.format(originalDestination.getName()));
         }
 
         return portalResult;

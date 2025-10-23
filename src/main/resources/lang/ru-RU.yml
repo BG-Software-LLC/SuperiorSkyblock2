@@ -801,5 +801,5 @@ WITHDRAW_ANNOUNCEMENT: '&e&lБанк | &7{0} снял ${1} из банка ос�
 WITHDRAW_ERROR: '&c&lОшибка | &7{0}.'
 WITHDRAWN_MONEY: '&e&lБанк | &7Вы сняли ${0} из банка острова {1}!'
 WITHDRAWN_MONEY_NAME: '&e&lБанк | &7Вы сняли ${0} из банка острова {1}!'
-WORLD_NOT_ENABLED: '&e&lМиры | &7Этот мир не включен на сервере.'
+WORLD_NOT_ENABLED: '&e&lWorlds | &7The {0} world is not enabled on the server.'
 WORLD_NOT_UNLOCKED: '&e&lМиры | &7Мир {0} еще не разблокирован!'

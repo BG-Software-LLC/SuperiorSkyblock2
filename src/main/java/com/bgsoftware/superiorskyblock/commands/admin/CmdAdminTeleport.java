@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Location;
 import org.bukkit.PortalType;
@@ -89,7 +90,7 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
         }
 
         if (plugin.getGrid().getIslandsWorldInfo(island, dimension) == null) {
-            Message.WORLD_NOT_ENABLED.send(sender);
+            Message.WORLD_NOT_ENABLED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(dimension.getName()));
             return;
         }
 

@@ -801,5 +801,5 @@ WITHDRAW_ANNOUNCEMENT: '&e&l银行 | &7玩家 {0} 从岛屿银行中取出了 ${
 WITHDRAW_ERROR: '&c&l错误 | &7{0}.'
 WITHDRAWN_MONEY: '&e&l银行 | &7你从玩家 {1} 的岛屿银行中取出 ${0}!'
 WITHDRAWN_MONEY_NAME: '&e&l银行 | &7你从岛屿 {1} 的银行中取出 ${0} {1}!'
-WORLD_NOT_ENABLED: '&e&l世界 | &7该服务器尚未启用该世界.'
+WORLD_NOT_ENABLED: '&e&lWorlds | &7The {0} world is not enabled on the server.'
 WORLD_NOT_UNLOCKED: '&e&l世界 | &7世界 {0} 尚未解锁!'

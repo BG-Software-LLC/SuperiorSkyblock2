@@ -809,5 +809,5 @@ WITHDRAW_ANNOUNCEMENT: '&e&lBanca | &7{0} ha prelevato ${1} dalla banca dell''is
 WITHDRAW_ERROR: '&c&lErrore | &7{0}.'
 WITHDRAWN_MONEY: '&e&lBanca | &7Hai ritirato ${0} dalla banca dell''isola di {1}!'
 WITHDRAWN_MONEY_NAME: '&e&lBanca | &7Hai ritirato ${0} dalla riva dell''isola {1}!'
-WORLD_NOT_ENABLED: '&e&lWorlds | &7This world is not enabled on the server.'
+WORLD_NOT_ENABLED: '&e&lWorlds | &7The {0} world is not enabled on the server.'
 WORLD_NOT_UNLOCKED: '&e&lMondi | &7Il mondo {0} non è ancora stato sbloccato!'
