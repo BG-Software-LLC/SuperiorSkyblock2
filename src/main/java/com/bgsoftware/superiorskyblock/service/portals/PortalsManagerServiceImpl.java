@@ -132,9 +132,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         if (portalResult == EntityPortalResult.WORLD_NOT_UNLOCKED) {
             Dimension originalDestination = getTargetWorld(portalLocation, portalType);
             Message.WORLD_NOT_UNLOCKED.send(superiorPlayer, Formatters.CAPITALIZED_FORMATTER.format(originalDestination.getName()));
-        }
-
-        if (portalResult == EntityPortalResult.DESTINATION_WORLD_DISABLED) {
+        } else if (portalResult == EntityPortalResult.DESTINATION_WORLD_DISABLED) {
             Dimension originalDestination = getTargetWorld(portalLocation, portalType);
             Message.WORLD_NOT_ENABLED.send(superiorPlayer, Formatters.CAPITALIZED_FORMATTER.format(originalDestination.getName()));
         }
