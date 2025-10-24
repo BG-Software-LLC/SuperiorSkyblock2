@@ -996,17 +996,9 @@ public enum Message {
             return;
 
         if (sender instanceof Player) {
-            long delay = getDelay();
-
-            if (delay > 0L) {
-                if (delayedMessages == null)
-                    delayedMessages = AutoRemovalCollection.newHashSet(delay, TimeUnit.MILLISECONDS);
-
-                UUID uuid = ((Player) sender).getUniqueId();
-
-                if (!delayedMessages.add(uuid))
-                    return;
-            }
+            UUID playerUUID = ((Player) sender).getUniqueId();
+            if (delayedMessages != null && !delayedMessages.add(playerUUID))
+                return;
         }
 
         PluginEvent<PluginEventArgs.SendMessage> event = PluginEventsFactory.callSendMessageEvent(sender, name(), messageComponent, args);
@@ -1016,11 +1008,6 @@ public enum Message {
                 Thread.dumpStack();
             }
         }
-    }
-
-    private long getDelay() {
-        Long delay = plugin.getSettings().getMessageDelays().get(this.name());
-        return delay == null ? 0L : delay;
     }
 
     private void setMessage(Locale locale, IMessageComponent messageComponent) {
@@ -1043,9 +1030,18 @@ public enum Message {
 
     private static void onSettingsUpdate() {
         for (Message message : values()) {
-            message.delayedMessages = plugin.getSettings().getMessageDelays().containsKey(message.name()) ?
-                    AutoRemovalCollection.newHashSet(message.getDelay(), TimeUnit.MILLISECONDS) : null;
+            long delay = message.getDelay();
+
+            if (delay > 0L && plugin.getSettings().getMessageDelays().containsKey(message.name()))
+                message.delayedMessages = AutoRemovalCollection.newHashSet(delay, TimeUnit.MILLISECONDS);
+            else
+                message.delayedMessages = null;
         }
+    }
+
+    private long getDelay() {
+        Long delay = plugin.getSettings().getMessageDelays().get(this.name());
+        return delay == null ? 0L : delay;
     }
 
 }
