@@ -1032,7 +1032,7 @@ public enum Message {
         for (Message message : values()) {
             long delay = message.getDelay();
 
-            if (delay > 0L && plugin.getSettings().getMessageDelays().containsKey(message.name()))
+            if (delay > 0L)
                 message.delayedMessages = AutoRemovalCollection.newHashSet(delay, TimeUnit.MILLISECONDS);
             else
                 message.delayedMessages = null;
