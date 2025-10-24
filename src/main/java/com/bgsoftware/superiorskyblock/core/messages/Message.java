@@ -36,7 +36,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public enum Message {
@@ -848,9 +847,6 @@ public enum Message {
         }
     };
 
-    @Nullable
-    private static Map<Message, Collection<UUID>> delays;
-
     private final String defaultMessage;
     private final boolean isCustom;
     private final Map<Locale, IMessageComponent> messages = new ArrayMap<>();
@@ -1000,11 +996,16 @@ public enum Message {
             return;
 
         if (sender instanceof Player) {
-            UUID playerUUID = ((Player) sender).getUniqueId();
-            if (delayedMessages != null && !delayedMessages.add(playerUUID))
-                return;
-            if (addDelay(playerUUID)) {
-                return;
+            long delay = getDelay();
+
+            if (delay > 0L) {
+                if (delayedMessages == null)
+                    delayedMessages = AutoRemovalCollection.newHashSet(delay, TimeUnit.MILLISECONDS);
+
+                UUID uuid = ((Player) sender).getUniqueId();
+
+                if (!delayedMessages.add(uuid))
+                    return;
             }
         }
 
@@ -1017,30 +1018,13 @@ public enum Message {
         }
     }
 
-    private void setMessage(Locale locale, IMessageComponent messageComponent) {
-        messages.put(locale, messageComponent);
-    }
-
     private long getDelay() {
         Long delay = plugin.getSettings().getMessageDelays().get(this.name());
         return delay == null ? 0L : delay;
     }
 
-    private boolean addDelay(UUID playerUUID) {
-        long delay = getDelay();
-        if (delay > 0L) {
-            if (delays == null) {
-                delays = new ConcurrentHashMap<>();
-            }
-
-            Collection<UUID> collection = delays.computeIfAbsent(this, message ->
-                    AutoRemovalCollection.newHashSet(delay, TimeUnit.MILLISECONDS)
-            );
-
-            return !collection.add(playerUUID);
-        }
-
-        return false;
+    private void setMessage(Locale locale, IMessageComponent messageComponent) {
+        messages.put(locale, messageComponent);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -1058,7 +1042,10 @@ public enum Message {
     }
 
     private static void onSettingsUpdate() {
-        delays = null;
+        for (Message message : values()) {
+            message.delayedMessages = plugin.getSettings().getMessageDelays().containsKey(message.name()) ?
+                    AutoRemovalCollection.newHashSet(message.getDelay(), TimeUnit.MILLISECONDS) : null;
+        }
     }
 
 }
