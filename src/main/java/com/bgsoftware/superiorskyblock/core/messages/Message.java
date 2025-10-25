@@ -1030,18 +1030,13 @@ public enum Message {
 
     private static void onSettingsUpdate() {
         for (Message message : values()) {
-            long delay = message.getDelay();
+            long delay = plugin.getSettings().getMessageDelays().getOrDefault(message.name(), 0L);
 
             if (delay > 0L)
                 message.delayedMessages = AutoRemovalCollection.newHashSet(delay, TimeUnit.MILLISECONDS);
             else
                 message.delayedMessages = null;
         }
-    }
-
-    private long getDelay() {
-        Long delay = plugin.getSettings().getMessageDelays().get(this.name());
-        return delay == null ? 0L : delay;
     }
 
 }
