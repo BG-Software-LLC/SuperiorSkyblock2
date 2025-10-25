@@ -583,8 +583,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     @Override
     @Deprecated
     public long getProtectedMessageDelay() {
-        Long delay = this.global.getMessageDelays().get("ISLAND_PROTECTED");
-        return delay == null ? 0L : delay;
+        return this.global.getMessageDelays().getOrDefault("ISLAND_PROTECTED", 0L);
     }
 
     @Override
