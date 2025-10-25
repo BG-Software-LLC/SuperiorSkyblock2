@@ -564,7 +564,7 @@ public class SettingsContainer {
         Map<String, Long> messageDelays = new HashMap<>();
         if (config.isConfigurationSection("message-delays")) {
             for (String message : config.getConfigurationSection("message-delays").getKeys(false)) {
-                messageDelays.put(message, config.getLong("message-delays." + message));
+                messageDelays.put(message.toUpperCase(Locale.ENGLISH), config.getLong("message-delays." + message));
             }
         }
         this.messageDelays = Collections.unmodifiableMap(messageDelays);
