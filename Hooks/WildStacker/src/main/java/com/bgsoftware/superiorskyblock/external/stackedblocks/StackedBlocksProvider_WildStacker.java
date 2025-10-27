@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.external.WildStackerSnapshotsContainer;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceInventoryEvent;
@@ -153,7 +154,7 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
             if (!island.hasPermission(player, IslandPrivileges.BREAK)) {
                 e.setCancelled(true);
-                Message.PROTECTION.send(player);
+                ProtectionHelper.sendProtectionMessage(player);
             }
         }
 

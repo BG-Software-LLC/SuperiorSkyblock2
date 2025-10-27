@@ -687,6 +687,7 @@ RESET_WORLD_SUCCEED_ALL: '&e&lIsland | &7Successfully reset the world {0} for al
 RESET_WORLD_SUCCEED_NAME: '&e&lIsland | &7Successfully reset the world {0} for {1}.'
 SAME_NAME_CHANGE: '&c&lError | &7Debes ingresar un nombre diferente al nombre de tu isla actual.'
 SCHEMATIC_LEFT_SELECT: '&e&lSchematics | &7Posición seleccionada #2 ({0})'
+SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
 SCHEMATIC_NOT_READY: '&c&lError | &7No ha seleccionado dos posiciones.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lSchematics | &7Procesando su solicitud...'
 SCHEMATIC_READY_TO_CREATE: |
@@ -800,5 +801,5 @@ WITHDRAW_ANNOUNCEMENT: '&e&lBanco | &7{0} esta retirado ${1} del banco de la isl
 WITHDRAW_ERROR: '&c&lError | &7{0}.'
 WITHDRAWN_MONEY: '&e&lBanco | &7¡Retiraste ${0} del banco de la isla de {1}!'
 WITHDRAWN_MONEY_NAME: '&e&lBanco | &7¡Retiraste ${0} del banco de la isla de {1}!'
-WORLD_NOT_ENABLED: '&e&lWorlds | &7This world is not enabled on the server.'
+WORLD_NOT_ENABLED: '&e&lWorlds | &7The {0} world is not enabled on the server.'
 WORLD_NOT_UNLOCKED: '&e&lMundos | &7¡El mundo {0} aún no está desbloqueado!'

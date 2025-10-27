@@ -636,10 +636,19 @@ public interface SettingsManager {
     boolean isDropsUpgradePlayersMultiply();
 
     /**
-     * The delay between protect messages, in ticks.
-     * Config-path: protected-message-delay
+     * The delay set for the ISLAND_PROTECTED message.
+     *
+     * @deprecated See {@link #getMessageDelays()}
      */
+    @Deprecated
     long getProtectedMessageDelay();
+
+    /**
+     * A list of messages that should have a delay, in milliseconds.
+     * Represented by a map with string as the message name, and values as the delays.
+     * Config-path: message-delays
+     */
+    Map<String, Long> getMessageDelays();
 
     /**
      * Whether the warp categories system is enabled or not.

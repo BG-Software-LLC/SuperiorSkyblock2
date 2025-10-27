@@ -216,7 +216,7 @@ public class SettingsContainer {
     public final Map<String, Location> islandPreviewsLocations;
     public final boolean tabCompleteHideVanished;
     public final boolean dropsUpgradePlayersMultiply;
-    public final long protectedMessageDelay;
+    public final Map<String, Long> messageDelays;
     public final boolean warpCategories;
     public final boolean physicsListener;
     public final double chargeOnWarp;
@@ -561,7 +561,13 @@ public class SettingsContainer {
         this.islandPreviewsLocations = Collections.unmodifiableMap(islandPreviewsLocations);
         tabCompleteHideVanished = config.getBoolean("tab-complete-hide-vanished", true);
         dropsUpgradePlayersMultiply = config.getBoolean("drops-upgrade-players-multiply", false);
-        protectedMessageDelay = config.getLong("protected-message-delay", 60L);
+        Map<String, Long> messageDelays = new HashMap<>();
+        if (config.isConfigurationSection("message-delays")) {
+            for (String message : config.getConfigurationSection("message-delays").getKeys(false)) {
+                messageDelays.put(message.toUpperCase(Locale.ENGLISH), config.getLong("message-delays." + message));
+            }
+        }
+        this.messageDelays = Collections.unmodifiableMap(messageDelays);
         warpCategories = config.getBoolean("warp-categories", true);
         physicsListener = config.getBoolean("physics-listener", true);
         chargeOnWarp = config.getDouble("charge-on-warp", 0D);

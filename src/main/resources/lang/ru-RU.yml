@@ -687,6 +687,7 @@ RESET_WORLD_SUCCEED_ALL: '&e&lОстров | &7Успешно сброшен м�
 RESET_WORLD_SUCCEED_NAME: '&e&lОстров | &7Успешно сброшен мир {0} для {1}.'
 SAME_NAME_CHANGE: '&c&lОшибка | &7Вы должны ввести другое имя, отличное от текущего имени острова.'
 SCHEMATIC_LEFT_SELECT: '&e&lСхемы | &7Выбрана позиция #2 ({0})'
+SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
 SCHEMATIC_NOT_READY: '&c&lОшибка | &7Вы не выбрали две позиции.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lСхемы | &7Обработка вашего запроса...'
 SCHEMATIC_READY_TO_CREATE: |
@@ -800,5 +801,5 @@ WITHDRAW_ANNOUNCEMENT: '&e&lБанк | &7{0} снял ${1} из банка ос�
 WITHDRAW_ERROR: '&c&lОшибка | &7{0}.'
 WITHDRAWN_MONEY: '&e&lБанк | &7Вы сняли ${0} из банка острова {1}!'
 WITHDRAWN_MONEY_NAME: '&e&lБанк | &7Вы сняли ${0} из банка острова {1}!'
-WORLD_NOT_ENABLED: '&e&lМиры | &7Этот мир не включен на сервере.'
+WORLD_NOT_ENABLED: '&e&lWorlds | &7The {0} world is not enabled on the server.'
 WORLD_NOT_UNLOCKED: '&e&lМиры | &7Мир {0} еще не разблокирован!'

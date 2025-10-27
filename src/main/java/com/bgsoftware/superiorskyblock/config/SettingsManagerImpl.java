@@ -48,7 +48,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     private static final String[] IGNORED_SECTIONS = new String[]{
             "config.yml", "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases",
             "island-previews.locations", "default-values.block-limits", "default-values.entity-limits",
-            "default-values.role-limits", "stacked-blocks.limits", "default-values.generator"
+            "default-values.role-limits", "stacked-blocks.limits", "default-values.generator", "message-delays"
     };
 
     private final GlobalSection global = new GlobalSection();
@@ -581,8 +581,14 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    @Deprecated
     public long getProtectedMessageDelay() {
-        return this.global.getProtectedMessageDelay();
+        return this.global.getMessageDelays().getOrDefault("ISLAND_PROTECTED", 0L);
+    }
+
+    @Override
+    public Map<String, Long> getMessageDelays() {
+        return this.global.getMessageDelays();
     }
 
     @Override
@@ -705,6 +711,14 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     private void convertData(YamlConfiguration cfg) {
+        if (cfg.get("protected-message-delay") instanceof Number) {
+            long delay = cfg.getLong("protected-message-delay") * 50;
+            cfg.set("message-delays.ISLAND_PROTECTED", delay);
+            cfg.set("message-delays.ISLAND_PROTECTED_OPPED", delay);
+            cfg.set("message-delays.SPAWN_PROTECTED", delay);
+            cfg.set("message-delays.SPAWN_PROTECTED_OPPED", delay);
+            cfg.set("protected-message-delay", null);
+        }
         if (cfg.isConfigurationSection("preview-islands")) {
             cfg.set("island-previews.locations", cfg.getConfigurationSection("preview-islands"));
             cfg.set("preview-islands", null);

@@ -771,6 +771,7 @@ RESET_WORLD_SUCCEED_NAME: '&e&lĐảo | &7Thành công đặt lại thế giới
 SAME_NAME_CHANGE: '&c&lLỗi | &7Bạn phải nhập một tên khác với tên đảo hiện tại của
   bạn.'
 SCHEMATIC_LEFT_SELECT: '&e&lSchematics | &7Đã chọn vị trí #2 ({0})'
+SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
 SCHEMATIC_NOT_READY: '&c&lLỗi | &7Bạn chưa chọn hai vị trí.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lSchematics | &7Đang xử lý yêu cầu của bạn...'
 SCHEMATIC_READY_TO_CREATE: |
@@ -898,5 +899,5 @@ WITHDRAW_ANNOUNCEMENT: '&e&lNgân Hàng | &7{0} rút {1}$ từ ngân hàng của
 WITHDRAW_ERROR: '&c&lLỗi | &7{0}.'
 WITHDRAWN_MONEY: '&e&lNgân Hàng | &7Bạn đã rút ${0} từ đảo của {1}!'
 WITHDRAWN_MONEY_NAME: '&e&lNgân Hàng | &7Bạn đã rút ${0} từ đảo {1}!'
-WORLD_NOT_ENABLED: '&e&lThế giới | &7Thế giới này không được bật trên máy chủ.'
+WORLD_NOT_ENABLED: '&e&lWorlds | &7The {0} world is not enabled on the server.'
 WORLD_NOT_UNLOCKED: '&e&lThế Giới | &7Thế giới {0} hiện chưa được mở khóa!'
