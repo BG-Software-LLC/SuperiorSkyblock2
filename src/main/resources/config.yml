@@ -13,7 +13,7 @@ calc-interval: 0
 # All settings related to the database of the plugin.
 database:
   # For local database, use "SQLite".
-  # For remote database, use "MySQL" or "MariaDB" (Depends on your setup).
+  # For remote database, use "MySQL", "MariaDB" or "Postgres" (Depends on your setup).
   type: SQLite
   # Whether the datastore folder should be back-up on startup.
   backup: true
@@ -26,6 +26,7 @@ database:
   prefix: ''
   useSSL: false
   allowPublicKeyRetrieval: true
+  sslMode: 'disable' # Only used for PostgreSQL
   waitTimeout: 600000
   maxLifetime: 1800000
 

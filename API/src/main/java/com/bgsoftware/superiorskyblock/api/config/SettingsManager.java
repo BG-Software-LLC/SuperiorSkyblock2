@@ -819,6 +819,13 @@ public interface SettingsManager {
         boolean hasPublicKeyRetrieval();
 
         /**
+         * Whether the database uses SSL or not.
+         * Used for PostgreSQL only.
+         * Config-path: database.sslMode
+         */
+        String sslMode();
+
+        /**
          * The wait-timeout of the database, in milliseconds.
          * Used for MySQL only.
          * Config-path: database.waitTimeout

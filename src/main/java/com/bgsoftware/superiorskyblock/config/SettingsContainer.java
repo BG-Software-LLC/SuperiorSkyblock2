@@ -75,6 +75,7 @@ public class SettingsContainer {
     public final String databaseMySQLPrefix;
     public final boolean databaseMySQLSSL;
     public final boolean databaseMySQLPublicKeyRetrieval;
+    public final String databasePostgreSQLSSLMode;
     public final long databaseMySQLWaitTimeout;
     public final long databaseMySQLMaxLifetime;
     public final int maxIslandSize;
@@ -245,6 +246,7 @@ public class SettingsContainer {
         databaseMySQLPrefix = config.getString("database.prefix");
         databaseMySQLSSL = config.getBoolean("database.useSSL");
         databaseMySQLPublicKeyRetrieval = config.getBoolean("database.allowPublicKeyRetrieval");
+        databasePostgreSQLSSLMode = config.getString("database.sslMode");
         databaseMySQLWaitTimeout = config.getLong("database.waitTimeout");
         databaseMySQLMaxLifetime = config.getLong("database.maxLifetime");
 

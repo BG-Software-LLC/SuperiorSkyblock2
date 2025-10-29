@@ -56,6 +56,11 @@ public class DatabaseSection extends SettingsContainerHolder implements Settings
     }
 
     @Override
+    public String sslMode() {
+        return getContainer().databasePostgreSQLSSLMode;
+    }
+
+    @Override
     public long getWaitTimeout() {
         return getContainer().databaseMySQLWaitTimeout;
     }

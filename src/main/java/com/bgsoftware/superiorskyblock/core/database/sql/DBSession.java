@@ -5,10 +5,7 @@ import com.bgsoftware.common.databasebridge.logger.ILogger;
 import com.bgsoftware.common.databasebridge.session.IDatabaseSession;
 import com.bgsoftware.common.databasebridge.sql.query.Column;
 import com.bgsoftware.common.databasebridge.sql.query.QueryResult;
-import com.bgsoftware.common.databasebridge.sql.session.MariaDBDatabaseSession;
-import com.bgsoftware.common.databasebridge.sql.session.MySQLDatabaseSession;
-import com.bgsoftware.common.databasebridge.sql.session.SQLDatabaseSession;
-import com.bgsoftware.common.databasebridge.sql.session.SQLiteDatabaseSession;
+import com.bgsoftware.common.databasebridge.sql.session.*;
 import com.bgsoftware.common.databasebridge.transaction.DatabaseTransactionsExecutor;
 import com.bgsoftware.common.databasebridge.transaction.IDatabaseTransaction;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -162,6 +159,11 @@ public class DBSession {
                 args = new MariaDBDatabaseSession.Args(database.getAddress(), database.getPort(), database.getDBName(),
                         database.getUsername(), database.getPassword(), database.getPrefix(), database.hasSSL(),
                         database.hasPublicKeyRetrieval(), database.getWaitTimeout(), database.getMaxLifetime(),
+                        "SuperiorSkyblock Database Thread", LOGGER);
+                break;
+            case "POSTGRESQL":
+                args = new PostgreSQLDatabaseSession.Args(database.getAddress(), database.getPort(), database.getDBName(),
+                        database.getUsername(), database.getPassword(), database.getPrefix(), database.sslMode(), database.getWaitTimeout(), database.getMaxLifetime(),
                         "SuperiorSkyblock Database Thread", LOGGER);
                 break;
             default:
