@@ -4852,7 +4852,7 @@ public class SIsland implements Island {
         if (other == null)
             return -1;
 
-        SortingType sortingType = SortingType.getByName(plugin.getSettings().getIslandTopOrder());
+        SortingType sortingType = SortingTypes.getIslandTopSorting();
         Comparator<Island> comparator = sortingType.getComparator();
 
         int result = comparator.compare(this, other);

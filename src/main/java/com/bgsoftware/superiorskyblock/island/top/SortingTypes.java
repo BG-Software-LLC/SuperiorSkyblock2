@@ -13,6 +13,11 @@ public class SortingTypes {
     public static final SortingType BY_RATING = register("RATING", SortingComparators.RATING_COMPARATOR, false);
     public static final SortingType BY_PLAYERS = register("PLAYERS", SortingComparators.PLAYERS_COMPARATOR, false);
 
+    private static final SortingType ISLAND_TOP_SORTING =
+            SortingType.getByName(SuperiorSkyblockPlugin.getPlugin().getSettings().getIslandTopOrder());
+    private static final SortingType GLOBAL_WARPS_SORTING =
+            SortingType.getByName(SuperiorSkyblockPlugin.getPlugin().getSettings().getGlobalWarpsOrder());
+
     private SortingTypes() {
 
     }
@@ -26,8 +31,12 @@ public class SortingTypes {
         return SortingType.getByName(name);
     }
 
-    public static SortingType getDefaultSorting() {
-        return SortingType.getByName(SuperiorSkyblockPlugin.getPlugin().getSettings().getIslandTopOrder());
+    public static SortingType getIslandTopSorting() {
+        return ISLAND_TOP_SORTING;
+    }
+
+    public static SortingType getGlobalWarpsSorting() {
+        return GLOBAL_WARPS_SORTING;
     }
 
 }

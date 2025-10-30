@@ -87,7 +87,7 @@ public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, Emp
         @Override
         protected List<Island> requestObjects() {
             return new SequentialListBuilder<Island>()
-                    .sorted(SortingType.getByName(plugin.getSettings().getGlobalWarpsOrder()).getComparator())
+                    .sorted(SortingTypes.getGlobalWarpsSorting().getComparator())
                     .filter(ISLANDS_FILTER)
                     .build(plugin.getGrid().getIslands());
         }
