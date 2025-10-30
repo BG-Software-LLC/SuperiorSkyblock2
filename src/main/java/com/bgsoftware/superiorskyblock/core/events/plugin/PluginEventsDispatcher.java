@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
+import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.service.region.RegionManagerServiceImpl;
 import org.bukkit.Bukkit;
@@ -41,6 +42,7 @@ public class PluginEventsDispatcher extends EventsDispatcher<
         CmdAdmin.registerCallbacks(this);
         Message.registerListeners(this);
         SSuperiorPlayer.registerListeners(this);
+        SortingTypes.registerListeners(this);
     }
 
     public void registerCallback(PluginEventType<?> type, Runnable callback) {

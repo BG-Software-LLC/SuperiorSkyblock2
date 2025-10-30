@@ -3,8 +3,11 @@ package com.bgsoftware.superiorskyblock.island.top;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 public class SortingTypes {
 
@@ -13,13 +16,12 @@ public class SortingTypes {
     public static final SortingType BY_RATING = register("RATING", SortingComparators.RATING_COMPARATOR, false);
     public static final SortingType BY_PLAYERS = register("PLAYERS", SortingComparators.PLAYERS_COMPARATOR, false);
 
-    private static final SortingType ISLAND_TOP_SORTING =
-            SortingType.getByName(SuperiorSkyblockPlugin.getPlugin().getSettings().getIslandTopOrder());
-    private static final SortingType GLOBAL_WARPS_SORTING =
-            SortingType.getByName(SuperiorSkyblockPlugin.getPlugin().getSettings().getGlobalWarpsOrder());
+    private static volatile SortingType ISLAND_TOP_SORTING = resolveByName(
+            SuperiorSkyblockPlugin.getPlugin().getSettings().getIslandTopOrder());
+    private static volatile SortingType GLOBAL_WARPS_SORTING = resolveByName(
+            SuperiorSkyblockPlugin.getPlugin().getSettings().getGlobalWarpsOrder());
 
     private SortingTypes() {
-
     }
 
     public static void registerSortingTypes() {
@@ -28,7 +30,7 @@ public class SortingTypes {
 
     private static SortingType register(String name, Comparator<Island> comparator, boolean handleEqualsIslands) {
         SortingType.register(name, comparator, handleEqualsIslands);
-        return SortingType.getByName(name);
+        return Objects.requireNonNull(SortingType.getByName(name), "SortingType non enregistré: " + name);
     }
 
     public static SortingType getIslandTopSorting() {
@@ -39,4 +41,20 @@ public class SortingTypes {
         return GLOBAL_WARPS_SORTING;
     }
 
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, SortingTypes::onSettingsUpdate);
+    }
+
+    private static void onSettingsUpdate() {
+        String topOrder = SuperiorSkyblockPlugin.getPlugin().getSettings().getIslandTopOrder();
+        String warpsOrder = SuperiorSkyblockPlugin.getPlugin().getSettings().getGlobalWarpsOrder();
+
+        ISLAND_TOP_SORTING = resolveByName(topOrder);
+        GLOBAL_WARPS_SORTING = resolveByName(warpsOrder);
+    }
+
+    private static SortingType resolveByName(String name) {
+        return SortingType.getByName(name);
+    }
 }
+
