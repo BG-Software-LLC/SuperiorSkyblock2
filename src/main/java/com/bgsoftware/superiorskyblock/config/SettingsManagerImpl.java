@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
@@ -671,6 +672,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         return this.global.isCacheSchematics();
     }
 
+    @Override
+    public Map<String, KeySet> getEntityCategories() {
+        return this.global.getEntityCategories();
+    }
+
     public void updateValue(String path, Object value) throws IOException {
         File file = new File(plugin.getDataFolder(), "config.yml");
 
@@ -711,6 +717,9 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     private void convertData(YamlConfiguration cfg) {
+        if (!cfg.isConfigurationSection("entity-categories")) {
+            cfg.createSection("entity-categories");
+        }
         if (cfg.get("protected-message-delay") instanceof Number) {
             long delay = cfg.getLong("protected-message-delay") * 50;
             cfg.set("message-delays.ISLAND_PROTECTED", delay);

@@ -233,6 +233,7 @@ public class SettingsContainer {
     public final boolean chatSigningSupport;
     public final int commandsPerPage;
     public final boolean cacheSchematics;
+    public final Map<String, KeySet> entityCategories;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws ManagerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
@@ -594,6 +595,7 @@ public class SettingsContainer {
         chatSigningSupport = config.getBoolean("chat-signing-support", true);
         commandsPerPage = config.getInt("commands-per-page", 7);
         cacheSchematics = config.getBoolean("cache-schematics", true);
+        entityCategories = parseEntityCategories(config.getConfigurationSection("entity-categories"));
     }
 
     private List<ClearAction> loadClearActions(List<String> clearActionsNames) {
@@ -668,6 +670,21 @@ public class SettingsContainer {
             defaultGenerator.put(blockKey, percentage);
         });
         this.defaultGenerator.put(dimension, KeyMaps.unmodifiableKeyMap(defaultGenerator));
+    }
+
+    private static Map<String, KeySet> parseEntityCategories(ConfigurationSection section) {
+        Map<String, KeySet> entityCategories = new HashMap<>();
+
+        for (String categoryName : section.getKeys(false)) {
+            KeySet entityTypes = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE);
+            for (String entityType : section.getStringList(categoryName)) {
+                entityTypes.add(Keys.ofEntityType(entityType));
+            }
+            if (!entityTypes.isEmpty())
+                entityCategories.put(categoryName, KeySets.unmodifiableKeySet(entityTypes));
+        }
+
+        return entityCategories.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(entityCategories);
     }
 
     private static void loadListOrSection(YamlConfiguration config, String path, String parseName, BiConsumer<String, Integer> consumer) {
