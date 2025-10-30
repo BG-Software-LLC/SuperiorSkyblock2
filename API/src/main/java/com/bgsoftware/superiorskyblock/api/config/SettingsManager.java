@@ -105,7 +105,7 @@ public interface SettingsManager {
      * The default island-top sorting type.
      * Config path: island-top-order
      */
-    SortingType getIslandTopOrder();
+    String getIslandTopOrder();
 
     /**
      * The default global-warps sorting type.

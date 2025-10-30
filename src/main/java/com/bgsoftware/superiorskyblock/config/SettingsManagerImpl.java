@@ -155,8 +155,8 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
-    public SortingType getIslandTopOrder() {
-        return this.global.getIslandTopOrder();
+    public String getIslandTopOrder() {
+        return this.global.getIslandTopOrder().getName();
     }
 
     @Override

@@ -315,7 +315,7 @@ public class SettingsContainer {
         String rawTop = config.getString("island-top-order", "WORTH");
         SortingType parsedTop = SortingType.getByName(rawTop.toUpperCase(Locale.ENGLISH));
         if (parsedTop == null) {
-            parsedTop = SortingType.getByName("worth");
+            parsedTop = SortingType.getByName("WORTH");
             Log.warnFromFile("config.yml", "Invalid island-top-order '" + rawTop + "', using 'WORTH'.");
         }
         this.islandTopOrder = parsedTop;
@@ -323,7 +323,7 @@ public class SettingsContainer {
         String rawGlobalWarps = config.getString("global-warps-order", "WORTH").toUpperCase(Locale.ENGLISH);
         SortingType foundGlobalWarpsOrder = SortingType.getByName(rawGlobalWarps);
         if (foundGlobalWarpsOrder == null) {
-            foundGlobalWarpsOrder = SortingType.getByName("worth");
+            foundGlobalWarpsOrder = SortingType.getByName("WORTH");
             Log.warnFromFile("config.yml", "Invalid global-warps-order '" + rawGlobalWarps + "', using 'WORTH'.");
         }
         this.globalWarpsOrder = foundGlobalWarpsOrder;

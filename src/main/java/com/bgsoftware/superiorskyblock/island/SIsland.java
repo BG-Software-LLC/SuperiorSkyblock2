@@ -4852,16 +4852,14 @@ public class SIsland implements Island {
         if (other == null)
             return -1;
 
-        SortingType sortingType = plugin.getSettings().getIslandTopOrder();
+        SortingType sortingType = SortingType.getByName(plugin.getSettings().getIslandTopOrder());
         Comparator<Island> comparator = sortingType.getComparator();
 
         int result = comparator.compare(this, other);
         if (result != 0)
             return result;
 
-        String thisOwner = getOwner() == null ? "null" : getOwner().getName();
-        String otherOwner = other.getOwner() == null ? "null" : other.getOwner().getName();
-        return thisOwner.compareTo(otherOwner);
+        return getOwner().getName().compareTo(other.getOwner().getName());
     }
 
     private IslandChest[] createDefaultIslandChests() {
