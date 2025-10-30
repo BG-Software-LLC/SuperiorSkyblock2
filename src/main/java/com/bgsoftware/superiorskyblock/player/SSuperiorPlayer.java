@@ -1047,8 +1047,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
             return false;
 
         Optional<MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
-        return missionDataOptional.isPresent() && getAmountMissionCompleted(mission) <
-                missionDataOptional.get().getResetAmount();
+
+        if (missionDataOptional.isPresent()) {
+            int resetAmount = missionDataOptional.get().getResetAmount();
+            return resetAmount <= 0 || getAmountMissionCompleted(mission) < resetAmount;
+        }
+
+        return false;
     }
 
     @Override
