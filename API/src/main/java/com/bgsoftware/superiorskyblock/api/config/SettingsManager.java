@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.config;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
@@ -104,7 +105,13 @@ public interface SettingsManager {
      * The default island-top sorting type.
      * Config path: island-top-order
      */
-    String getIslandTopOrder();
+    SortingType getIslandTopOrder();
+
+    /**
+     * The default global-warps sorting type.
+     * Config path: global-warps-order
+     */
+    SortingType getGlobalWarpsOrder();
 
     /**
      * Whether coop members are enabled.

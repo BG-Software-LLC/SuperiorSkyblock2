@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
@@ -27,6 +28,7 @@ import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -153,8 +155,13 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
-    public String getIslandTopOrder() {
+    public SortingType getIslandTopOrder() {
         return this.global.getIslandTopOrder();
+    }
+
+    @Override
+    public SortingType getGlobalWarpsOrder() {
+        return this.global.getGlobalWarpsOrder();
     }
 
     @Override

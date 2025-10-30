@@ -27,7 +27,7 @@ public class SortingTypes {
     }
 
     public static SortingType getDefaultSorting() {
-        return SortingType.getByName(SuperiorSkyblockPlugin.getPlugin().getSettings().getIslandTopOrder());
+        return SuperiorSkyblockPlugin.getPlugin().getSettings().getIslandTopOrder();
     }
 
 }

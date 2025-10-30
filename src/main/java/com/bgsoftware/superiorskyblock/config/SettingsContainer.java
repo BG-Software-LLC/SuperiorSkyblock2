@@ -4,6 +4,7 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
@@ -106,7 +107,8 @@ public class SettingsContainer {
     public final boolean roundedIslandLevel;
     public final RoundingMode islandLevelRoundingMode;
     public final boolean autoBlocksTracking;
-    public final String islandTopOrder;
+    public final SortingType islandTopOrder;
+    public final SortingType globalWarpsOrder;
     public boolean coopMembers;
     public boolean editPlayerPermissions;
     public final ConfigurationSection islandRolesSection;
@@ -309,7 +311,22 @@ public class SettingsContainer {
                         config.getString("island-level-rounding-mode").toUpperCase(Locale.ENGLISH)))
                 .orElse(RoundingMode.HALF_UP);
         autoBlocksTracking = config.getBoolean("auto-blocks-tracking", true);
-        islandTopOrder = config.getString("island-top-order", "WORTH").toUpperCase(Locale.ENGLISH);
+
+        String rawTop = config.getString("island-top-order", "WORTH");
+        SortingType parsedTop = SortingType.getByName(rawTop.toUpperCase(Locale.ENGLISH));
+        if (parsedTop == null) {
+            parsedTop = SortingType.getByName("worth");
+            Log.warnFromFile("config.yml", "Invalid island-top-order '" + rawTop + "', using 'WORTH'.");
+        }
+        this.islandTopOrder = parsedTop;
+
+        String rawGlobalWarps = config.getString("global-warps-order", "WORTH").toUpperCase(Locale.ENGLISH);
+        SortingType foundGlobalWarpsOrder = SortingType.getByName(rawGlobalWarps);
+        if (foundGlobalWarpsOrder == null) {
+            foundGlobalWarpsOrder = SortingType.getByName("worth");
+            Log.warnFromFile("config.yml", "Invalid global-warps-order '" + rawGlobalWarps + "', using 'WORTH'.");
+        }
+        this.globalWarpsOrder = foundGlobalWarpsOrder;
         coopMembers = config.getBoolean("coop-members", true);
         editPlayerPermissions = config.getBoolean("edit-player-permissions", true);
         islandRolesSection = config.getConfigurationSection("island-roles");
