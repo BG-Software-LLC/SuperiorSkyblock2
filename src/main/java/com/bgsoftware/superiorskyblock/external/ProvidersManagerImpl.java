@@ -48,6 +48,7 @@ import com.bgsoftware.superiorskyblock.external.spawners.SpawnersProvider_AutoDe
 import com.bgsoftware.superiorskyblock.external.spawners.SpawnersProvider_Default;
 import com.bgsoftware.superiorskyblock.external.stackedblocks.StackedBlocksProvider_AutoDetect;
 import com.bgsoftware.superiorskyblock.external.stackedblocks.StackedBlocksProvider_Default;
+import com.bgsoftware.superiorskyblock.external.vanish.VanishProvider_Default;
 import com.bgsoftware.superiorskyblock.external.worlds.WorldsProvider_Default;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import com.google.common.base.Preconditions;
@@ -83,7 +84,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private EconomyProvider bankEconomyProvider = new EconomyProvider_Default();
     private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
     private PricesProvider pricesProvider = new PricesProvider_Default();
-    private VanishProvider vanishProvider = player -> false;
+    private VanishProvider vanishProvider = new VanishProvider_Default();
     private AsyncProvider asyncProvider = new AsyncProvider_Default();
     private WorldsProvider worldsProvider;
     private ChunksProvider chunksProvider = new ChunksProvider_Default();
