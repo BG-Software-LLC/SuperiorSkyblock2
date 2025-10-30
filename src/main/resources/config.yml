@@ -932,7 +932,16 @@ chat-signing-support: true
 # Setting this to 0 or below will result all commands to be shown in a single page.
 commands-per-page: 7
 
-# Whether the plugin should cache schematics for faster placement of schematics.
-# This may consume more RAM usage, but will place schematics much faster.
-# This will only work if max-island-size is divisible by 4 with no remainder.
-cache-schematics: true
+# Configure custom entity categories.
+# By default, there are two entity categories - ANIMALS and MONSTER
+# You can add your own custom categories in here, and configure which entities are part of the category.
+# Entities in the custom categories will have custom privileges and flags for damaging and spawning them.
+# You can add the custom privileges and island flags manually to the menus.
+# For example:
+#   entity-categories:
+#     VILLAGERS:
+#     - VILLAGER
+# The `VILLAGERS` category will have VILLAGER entities in it.
+# The privileges `VILLAGERS_SPAWN` and `VILLAGERS_DAMAGE` will be required by players, and the island flags
+# `SPAWNER_VILLAGERS_SPAWN` and `NATURAL_VILLAGERS_SPAWN` will be required to be enabled for the island.
+entity-categories: { }

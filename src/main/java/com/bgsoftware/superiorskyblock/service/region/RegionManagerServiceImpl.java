@@ -35,6 +35,7 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
+import com.bgsoftware.superiorskyblock.world.entity.EntityCategory;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -204,7 +205,12 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             IslandPrivilege islandPrivilege;
 
             if (spawnType != EntityType.UNKNOWN) {
-                islandPrivilege = BukkitEntities.getCategory(spawnType).getSpawnPrivilege();
+                EntityCategory entityCategory = EntityCategory.getEntityCategory(Keys.of(spawnType));
+                if (entityCategory == null)
+                    return InteractionResult.SUCCESS;
+                islandPrivilege = entityCategory.getSpawnPrivilege();
+                if (islandPrivilege == null)
+                    return InteractionResult.SUCCESS;
             } else if (usedItem != null && Materials.isMinecart(usedItem.getType()) ? Materials.isRail(blockType) : Materials.isBoat(blockType)) {
                 islandPrivilege = IslandPrivileges.MINECART_PLACE;
             } else if (Materials.isChest(blockType)) {
@@ -350,8 +356,19 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location entityLocation = entity.getLocation(wrapper.getHandle());
-            IslandPrivilege islandPrivilege = BukkitEntities.isTameable(entity) ? IslandPrivileges.TAMED_ANIMAL_DAMAGE :
-                    BukkitEntities.getCategory(entity.getType()).getDamagePrivilege();
+
+            IslandPrivilege islandPrivilege;
+            if (BukkitEntities.isTameable(entity)) {
+                islandPrivilege = IslandPrivileges.TAMED_ANIMAL_DAMAGE;
+            } else {
+                EntityCategory entityCategory = EntityCategory.getEntityCategory(Keys.of(entity));
+                if (entityCategory == null)
+                    return InteractionResult.SUCCESS;
+                islandPrivilege = entityCategory.getDamagePrivilege();
+            }
+
+            if (islandPrivilege == null)
+                return InteractionResult.SUCCESS;
 
             interactionResult = handleInteractionInternal(damagerSource.get(), entityLocation, islandPrivilege,
                     0, true, false);

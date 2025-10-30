@@ -2,11 +2,13 @@ package com.bgsoftware.superiorskyblock.external.vanish;
 
 import com.bgsoftware.superiorskyblock.api.hooks.VanishProvider;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.MetadataValue;
 
 public class VanishProvider_Default implements VanishProvider {
 
     @Override
     public boolean isVanished(Player player) {
-        return player.hasMetadata("vanished");
+        return player.getMetadata("vanished").stream()
+                .anyMatch(MetadataValue::asBoolean);
     }
 }

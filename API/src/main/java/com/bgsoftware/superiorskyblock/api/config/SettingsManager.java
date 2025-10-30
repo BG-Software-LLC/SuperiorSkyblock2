@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
@@ -754,6 +755,12 @@ public interface SettingsManager {
      * Config-path: cache-schematics
      */
     boolean isCacheSchematics();
+
+    /**
+     * Custom entity categories to be used by the plugin.
+     * Config-path: entity-categories
+     */
+    Map<String, KeySet> getEntityCategories();
 
     interface Database {
 
