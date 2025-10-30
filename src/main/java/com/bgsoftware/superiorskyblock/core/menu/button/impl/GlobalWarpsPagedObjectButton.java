@@ -19,6 +19,8 @@ import java.util.Map;
 
 public class GlobalWarpsPagedObjectButton extends AbstractPagedMenuButton<MenuGlobalWarps.View, Island> {
 
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
+
     private GlobalWarpsPagedObjectButton(MenuTemplateButton<MenuGlobalWarps.View> templateButton, MenuGlobalWarps.View menuView) {
         super(templateButton, menuView);
     }
@@ -57,7 +59,7 @@ public class GlobalWarpsPagedObjectButton extends AbstractPagedMenuButton<MenuGl
         String ratingAvgFancy = Formatters.RATING_FORMATTER.format(pagedObject.getTotalRating(), userLocale);
 
         String[] descLines = (pagedObject.getDescription() == null || pagedObject.getDescription().isEmpty())
-                ? new String[0]
+                ? EMPTY_STRING_ARRAY
                 : pagedObject.getDescription().split("\n");
 
         return new ItemBuilder(buttonItem)
