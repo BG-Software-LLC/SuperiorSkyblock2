@@ -41,7 +41,7 @@ public class GlobalWarpsPagedObjectButton extends AbstractPagedMenuButton<MenuGl
     public ItemStack modifyViewItem(ItemStack buttonItem) {
         final SuperiorPlayer viewer = menuView.getInventoryViewer();
         final SuperiorPlayer owner = pagedObject.getOwner();
-        final String ownerName = owner != null ? owner.getName() : "Unknown";
+        final String ownerName = owner.getName();
         String islandName = pagedObject.getName();
         if (islandName == null || islandName.isEmpty()) islandName = ownerName;
 
