@@ -82,6 +82,7 @@ import com.bgsoftware.superiorskyblock.service.ServicesHandler;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.WorldGenerator;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
+import com.bgsoftware.superiorskyblock.world.entity.EntityCategories;
 import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
 import org.bstats.bukkit.Metrics;

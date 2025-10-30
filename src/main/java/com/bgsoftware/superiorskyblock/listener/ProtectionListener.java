@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
@@ -21,6 +22,7 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
+import com.bgsoftware.superiorskyblock.world.entity.EntityCategory;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -499,8 +501,12 @@ public class ProtectionListener extends AbstractGameEventListener {
                     if (hitEntity == null)
                         return;
 
+                    EntityCategory entityCategory = EntityCategory.getEntityCategory(Keys.of(entity));
+                    if (entityCategory == null)
+                        return;
+
                     location = hitEntity.getLocation(wrapper.getHandle());
-                    islandPrivilege = BukkitEntities.getCategory(entity.getType()).getDamagePrivilege();
+                    islandPrivilege = entityCategory.getDamagePrivilege();
                     hitBlock = null;
                 } else {
                     hitBlock = e.getArgs().hitBlock;
@@ -510,6 +516,9 @@ public class ProtectionListener extends AbstractGameEventListener {
                     location = hitBlock.getLocation(wrapper.getHandle());
                     islandPrivilege = IslandPrivileges.BREAK;
                 }
+
+                if (islandPrivilege == null)
+                    return;
 
                 interactionResult = this.protectionManager.get().handleCustomInteraction(shooterPlayer, location, islandPrivilege);
             }
