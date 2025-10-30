@@ -927,8 +927,3 @@ chat-signing-support: true
 # Amount of commands to be listed in the `/is help` and `/is admin` commands.
 # Setting this to 0 or below will result all commands to be shown in a single page.
 commands-per-page: 7
-
-# Whether the plugin should cache schematics for faster placement of schematics.
-# This may consume more RAM usage, but will place schematics much faster.
-# This will only work if max-island-size is divisible by 4 with no remainder.
-cache-schematics: true
