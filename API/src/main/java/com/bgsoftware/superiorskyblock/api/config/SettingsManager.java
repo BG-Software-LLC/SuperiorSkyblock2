@@ -111,7 +111,7 @@ public interface SettingsManager {
      * The default global-warps sorting type.
      * Config path: global-warps-order
      */
-    SortingType getGlobalWarpsOrder();
+    String getGlobalWarpsOrder();
 
     /**
      * Whether coop members are enabled.

@@ -160,8 +160,8 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
-    public SortingType getGlobalWarpsOrder() {
-        return this.global.getGlobalWarpsOrder();
+    public String getGlobalWarpsOrder() {
+        return this.global.getGlobalWarpsOrder().getName();
     }
 
     @Override
