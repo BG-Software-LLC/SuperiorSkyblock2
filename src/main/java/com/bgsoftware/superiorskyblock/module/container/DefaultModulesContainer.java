@@ -2,11 +2,14 @@ package com.bgsoftware.superiorskyblock.module.container;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.modules.ModuleInitializeData;
+import com.bgsoftware.superiorskyblock.api.modules.ModuleLogger;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.module.ModuleData;
+import com.bgsoftware.superiorskyblock.module.logging.ModuleLoggerFileHandler;
 import com.google.common.base.Preconditions;
 import org.bukkit.event.HandlerList;
 
@@ -23,9 +26,11 @@ public class DefaultModulesContainer implements ModulesContainer {
     private final Map<PluginModule, ModuleData> modulesData = new ArrayMap<>();
 
     private final SuperiorSkyblockPlugin plugin;
+    private final File globalLogsFolder;
 
     public DefaultModulesContainer(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+        this.globalLogsFolder = new File(plugin.getDataFolder(), "logs" + File.separator + "modules");
     }
 
     @Override
@@ -36,9 +41,14 @@ public class DefaultModulesContainer implements ModulesContainer {
 
         File dataFolder = new File(modulesDataFolder, pluginModule.getName());
         File moduleFolder = new File(modulesFolder, pluginModule.getName());
+        File logsFolder = new File(this.globalLogsFolder, pluginModule.getName());
+
+        ModuleLogger moduleLogger = new ModuleLogger(pluginModule);
+        ModuleLoggerFileHandler.addToLogger(new File(logsFolder, "latest.log"), moduleLogger);
 
         try {
-            pluginModule.initModule(plugin, moduleFolder, dataFolder);
+            ModuleInitializeDataImpl context = new ModuleInitializeDataImpl(dataFolder, moduleFolder, moduleLogger);
+            pluginModule.initModule(plugin, context);
         } catch (Throwable error) {
             Log.error("An unexpected error occurred while initializing the module ", pluginModule.getName(), ".");
             Log.error(error, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");
@@ -88,6 +98,34 @@ public class DefaultModulesContainer implements ModulesContainer {
     @Nullable
     public ModuleData getModuleData(PluginModule module) {
         return this.modulesData.get(module);
+    }
+
+    private static class ModuleInitializeDataImpl implements ModuleInitializeData {
+
+        private final File dataFolder;
+        private final File moduleFolder;
+        private final ModuleLogger logger;
+
+        public ModuleInitializeDataImpl(File dataFolder, File moduleFolder, ModuleLogger logger) {
+            this.dataFolder = dataFolder;
+            this.moduleFolder = moduleFolder;
+            this.logger = logger;
+        }
+
+        @Override
+        public File getDataFolder() {
+            return this.dataFolder;
+        }
+
+        @Override
+        public File getModuleFolder() {
+            return this.moduleFolder;
+        }
+
+        @Override
+        public ModuleLogger getLogger() {
+            return this.logger;
+        }
     }
 
 }

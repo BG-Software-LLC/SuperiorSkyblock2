@@ -25,7 +25,7 @@ public abstract class PluginModule {
     private File moduleFile;
     private File moduleFolder;
     private ClassLoader classLoader;
-    private Logger logger;
+    private ModuleLogger logger;
     private ModuleResources moduleResources;
 
     private boolean initialized = false;
@@ -251,21 +251,49 @@ public abstract class PluginModule {
      * @param dataFolder   The database folder of the module.
      * @param moduleFolder The folder of the module.
      */
+    @Deprecated
     public final void initModule(SuperiorSkyblock plugin, File moduleFolder, File dataFolder) {
-        if (initialized)
-            throw new RuntimeException("The module " + moduleName + " was already initialized.");
+        ModuleLogger moduleLogger = new ModuleLogger(this);
+        this.initModule(plugin, new ModuleInitializeData() {
+            @Override
+            public File getDataFolder() {
+                return dataFolder;
+            }
 
-        initialized = true;
+            @Override
+            public File getModuleFolder() {
+                return moduleFolder;
+            }
 
-        this.dataFolder = dataFolder;
-        this.moduleFolder = moduleFolder;
+            @Override
+            public ModuleLogger getLogger() {
+                return moduleLogger;
+            }
+        });
+    }
 
+    /**
+     * Initialize the module.
+     * This method cannot be called twice - do not call it unless you know what you are doing.
+     *
+     * @param plugin       An instance to the plugin.
+     * @param context      The initialize context.
+     */
+    public final void initModule(SuperiorSkyblock plugin, ModuleInitializeData context) {
+        if (this.initialized)
+            throw new RuntimeException("The module " + this.moduleName + " was already initialized.");
+
+        this.initialized = true;
+
+        File moduleFolder = context.getModuleFolder();
         if (!moduleFolder.exists() && !moduleFolder.mkdirs())
-            throw new RuntimeException("Cannot create module folder for " + moduleName + ".");
+            throw new RuntimeException("Cannot create module folder for " + this.moduleName + ".");
 
-        this.logger = new ModuleLogger(this);
+        this.dataFolder = context.getDataFolder();
+        this.moduleFolder = moduleFolder;
+        this.logger = context.getLogger();
 
-        if (moduleFile != null && classLoader != null)
+        if (this.moduleFile != null && this.classLoader != null)
             this.moduleResources = new ModuleResources(this.moduleFile, this.moduleFolder, this.classLoader);
 
         onPluginInit(plugin);
