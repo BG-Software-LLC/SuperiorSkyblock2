@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
@@ -43,7 +44,7 @@ public class GlobalWarpsPagedObjectButton extends AbstractPagedMenuButton<MenuGl
         final SuperiorPlayer owner = pagedObject.getOwner();
         final String ownerName = owner.getName();
         String islandName = pagedObject.getName();
-        if (islandName == null || islandName.isEmpty()) islandName = ownerName;
+        if (Text.isBlank(islandName)) islandName = ownerName;
 
         final int warpsCount = pagedObject.getIslandWarps().size();
 
@@ -58,7 +59,7 @@ public class GlobalWarpsPagedObjectButton extends AbstractPagedMenuButton<MenuGl
         String ratingAvgNum = Formatters.NUMBER_FORMATTER.format(pagedObject.getTotalRating());
         String ratingAvgFancy = Formatters.RATING_FORMATTER.format(pagedObject.getTotalRating(), userLocale);
 
-        String[] descLines = (pagedObject.getDescription() == null || pagedObject.getDescription().isEmpty())
+        String[] descLines = Text.isBlank(pagedObject.getDescription())
                 ? EMPTY_STRING_ARRAY
                 : pagedObject.getDescription().split("\n");
 
