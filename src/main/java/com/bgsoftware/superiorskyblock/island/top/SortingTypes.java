@@ -30,7 +30,7 @@ public class SortingTypes {
 
     private static SortingType register(String name, Comparator<Island> comparator, boolean handleEqualsIslands) {
         SortingType.register(name, comparator, handleEqualsIslands);
-        return Objects.requireNonNull(SortingType.getByName(name), "SortingType non enregistré: " + name);
+        return SortingType.getByName(name);
     }
 
     public static SortingType getIslandTopSorting() {
