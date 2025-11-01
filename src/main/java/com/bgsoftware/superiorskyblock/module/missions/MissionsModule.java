@@ -10,12 +10,12 @@ import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
 import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
 import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookupFactory;
-import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandMembers;
 import com.bgsoftware.superiorskyblock.mission.SMissionCategory;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
+import com.bgsoftware.superiorskyblock.module.IModuleConfiguration;
 import com.bgsoftware.superiorskyblock.module.missions.commands.CmdAdminMission;
 import com.bgsoftware.superiorskyblock.module.missions.commands.CmdMission;
 import com.bgsoftware.superiorskyblock.module.missions.commands.CmdMissions;
@@ -32,82 +32,38 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class MissionsModule extends BuiltinModule {
+public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static final String[] IGNORED_SECTIONS = new String[]{"categories"};
     private static final int MAX_MISSIONS_NAME_LENGTH = 255;
-
-    private final List<Mission<?>> missionsToLoad = new LinkedList<>();
-
-    private boolean enabled = true;
 
     public MissionsModule() {
         super("missions");
     }
 
-    private void generateDefaultFiles() {
-        Resources.copyResource("modules/missions/BlocksMissions");
-        Resources.copyResource("modules/missions/BrewingMissions");
-        Resources.copyResource("modules/missions/CraftingMissions");
-        Resources.copyResource("modules/missions/EnchantingMissions");
-        Resources.copyResource("modules/missions/FarmingMissions");
-        Resources.copyResource("modules/missions/FishingMissions");
-        Resources.copyResource("modules/missions/IslandMissions");
-        Resources.copyResource("modules/missions/ItemsMissions");
-        Resources.copyResource("modules/missions/KillsMissions");
-        Resources.copyResource("modules/missions/StatisticsMissions");
+    @Override
+    protected boolean onConfigCreate(SuperiorSkyblockPlugin plugin, CommentedConfiguration config, boolean firstTime) {
+        boolean updatedConfig = false;
 
-        File categoriesFolder = new File(getModuleFolder(), "categories");
+        if (convertOldMissions(plugin, config))
+            updatedConfig = true;
+        if (convertNonCategorizedMissions(plugin, config))
+            updatedConfig = true;
 
-        if ((!categoriesFolder.exists() || !categoriesFolder.isDirectory()) && categoriesFolder.mkdirs()) {
-            Resources.saveResource("modules/missions/categories/farmer/farmer_1.yml");
-            Resources.saveResource("modules/missions/categories/farmer/farmer_2.yml");
-            Resources.saveResource("modules/missions/categories/farmer/farmer_3.yml");
-            Resources.saveResource("modules/missions/categories/farmer/farmer_4.yml");
-            Resources.saveResource("modules/missions/categories/farmer/farmer_5.yml");
-            Resources.saveResource("modules/missions/categories/miner/miner_1.yml");
-            Resources.saveResource("modules/missions/categories/miner/miner_2.yml");
-            Resources.saveResource("modules/missions/categories/miner/miner_3.yml");
-            Resources.saveResource("modules/missions/categories/miner/miner_4.yml");
-            Resources.saveResource("modules/missions/categories/miner/miner_5.yml");
-            Resources.saveResource("modules/missions/categories/slayer/slayer_1.yml");
-            Resources.saveResource("modules/missions/categories/slayer/slayer_2.yml");
-            Resources.saveResource("modules/missions/categories/slayer/slayer_3.yml");
-            Resources.saveResource("modules/missions/categories/slayer/slayer_4.yml");
-            Resources.saveResource("modules/missions/categories/fisherman/fisherman_1.yml");
-            Resources.saveResource("modules/missions/categories/fisherman/fisherman_2.yml");
-            Resources.saveResource("modules/missions/categories/fisherman/fisherman_3.yml");
-            Resources.saveResource("modules/missions/categories/explorer/explorer_1.yml");
-            Resources.saveResource("modules/missions/categories/explorer/explorer_2.yml");
+        generateDefaultMissionJars();
+
+        if (firstTime) {
+            generateDefaultFiles();
         }
+
+        return updatedConfig;
     }
 
     @Override
-    protected void onPluginInit(SuperiorSkyblockPlugin plugin) {
-        File file = new File(getModuleFolder(), "config.yml");
-
-        if (!file.exists())
-            Resources.saveResource("modules/missions/config.yml");
-
-        config = CommentedConfiguration.loadConfiguration(file);
-
-        convertOldMissions(plugin, file, config);
-        convertNonCategorizedMissions(plugin, file, config);
-        generateDefaultFiles();
-
-        try {
-            config.syncWithConfig(file, Resources.getResource("modules/missions/config.yml"), getIgnoredSections());
-        } catch (Exception error) {
-            Log.entering("MissionsModule", "onPluginInit", "ENTER");
-            Log.error(error, "An error occurred while saving config file:");
-        }
-
-        updateConfig(plugin);
-    }
-
-    @Override
-    public void onEnable(SuperiorSkyblockPlugin plugin) {
-        if (enabled)
-            loadMissionCategories(plugin);
+    protected void onEnable(SuperiorSkyblockPlugin plugin) {
+        // Do nothing
     }
 
     @Override
@@ -122,12 +78,13 @@ public class MissionsModule extends BuiltinModule {
 
     @Override
     public void onDisable(SuperiorSkyblockPlugin plugin) {
-        if (enabled)
+        if (isEnabled())
             plugin.getMissions().saveMissionsData();
     }
 
     @Override
     public void loadData(SuperiorSkyblockPlugin plugin) {
+        List<Mission<?>> missionsToLoad = this.configuration.missionsToLoad;
         if (!missionsToLoad.isEmpty()) {
             plugin.getMissions().loadMissionsData(missionsToLoad);
             missionsToLoad.clear();
@@ -141,125 +98,145 @@ public class MissionsModule extends BuiltinModule {
 
     @Override
     public SuperiorCommand[] getSuperiorCommands(SuperiorSkyblockPlugin plugin) {
-        return !enabled ? null : new SuperiorCommand[]{new CmdMission(), new CmdMissions()};
+        return new SuperiorCommand[]{new CmdMission(), new CmdMissions()};
     }
 
     @Override
     public SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin) {
-        return !enabled ? null : new SuperiorCommand[]{new CmdAdminMission()};
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled && isInitialized();
-    }
-
-    @Override
-    protected void updateConfig(SuperiorSkyblockPlugin plugin) {
-        enabled = config.getBoolean("enabled");
+        return new SuperiorCommand[]{new CmdAdminMission()};
     }
 
     @Override
     protected String[] getIgnoredSections() {
-        return new String[]{"categories"};
+        return IGNORED_SECTIONS;
     }
 
-    private void loadMissionCategories(SuperiorSkyblockPlugin plugin) {
-        ConfigurationSection categoriesSection = config.getConfigurationSection("categories");
+    @Override
+    protected Configuration createConfigFile(CommentedConfiguration config) {
+        return new Configuration(config);
+    }
 
-        if (categoriesSection != null) {
-            for (String categoryName : categoriesSection.getKeys(false)) {
-                ConfigurationSection categorySection = categoriesSection.getConfigurationSection(categoryName);
+    public class Configuration implements IModuleConfiguration {
 
-                if (categorySection == null)
-                    continue;
+        private final boolean enabled;
+        private final boolean autoRewardOutsideIslands;
+        private final List<Mission<?>> missionsToLoad = new LinkedList<>();
 
-                List<Mission<?>> categoryMissions = new LinkedList<>();
-
-                if (!canLoadCategory(plugin, categoryName, categoryMissions))
-                    continue;
-
-                int slot = categorySection.getInt("slot");
-
-                String formattedCategoryName = categorySection.getString("name", categoryName);
-
-                plugin.getMissions().loadMissionCategory(new SMissionCategory(formattedCategoryName, slot, categoryMissions));
-
-                missionsToLoad.addAll(categoryMissions);
+        Configuration(CommentedConfiguration config) {
+            this.enabled = config.getBoolean("enabled");
+            this.autoRewardOutsideIslands = config.getBoolean("auto-reward-outside-islands");
+            if (this.enabled) {
+                loadMissionCategories(config);
             }
         }
-    }
 
-    private boolean canLoadCategory(SuperiorSkyblockPlugin plugin, String categoryName, List<Mission<?>> categoryMissions) {
-        File categoryFolder = new File(getModuleFolder(), "categories/" + categoryName);
-
-        if (!categoryFolder.exists()) {
-            Log.warn("The directory of the mission category ", categoryName, " doesn't exist, skipping...");
-            return false;
+        @Override
+        public boolean isEnabled() {
+            return this.enabled;
         }
 
-        if (!categoryFolder.isDirectory()) {
-            Log.warn("The directory of the mission category ", categoryName, " is not valid, skipping...");
-            return false;
+        public boolean isAutoRewardOutsideIslands() {
+            return this.autoRewardOutsideIslands;
         }
 
-        File[] missionFiles = categoryFolder.listFiles(file ->
-                file.isFile() && file.getName().endsWith(".yml"));
+        private void loadMissionCategories(CommentedConfiguration config) {
+            ConfigurationSection categoriesSection = config.getConfigurationSection("categories");
 
-        if (missionFiles == null || missionFiles.length == 0) {
-            Log.warn("The mission category ", categoryName, " doesn't have missions, skipping...");
-            return false;
-        }
+            if (categoriesSection != null) {
+                for (String categoryName : categoriesSection.getKeys(false)) {
+                    ConfigurationSection categorySection = categoriesSection.getConfigurationSection(categoryName);
 
-        Map<Mission<?>, Integer> missionWeights = new ArrayMap<>();
+                    if (categorySection == null)
+                        continue;
 
-        try (FilesLookup filesLookup = FilesLookupFactory.getInstance().lookupFolder(getModuleFolder())) {
-            for (File missionFile : missionFiles) {
-                String missionName = missionFile.getName().replace(".yml", "");
+                    List<Mission<?>> categoryMissions = new LinkedList<>();
 
-                if (missionName.length() > MAX_MISSIONS_NAME_LENGTH)
-                    missionName = missionName.substring(0, MAX_MISSIONS_NAME_LENGTH);
+                    if (!canLoadCategory(categoryName, categoryMissions))
+                        continue;
 
-                YamlConfiguration missionConfigFile = new YamlConfiguration();
+                    int slot = categorySection.getInt("slot");
 
-                try {
-                    missionConfigFile.load(missionFile);
-                } catch (InvalidConfigurationException error) {
-                    Log.error(error, "A format-error occurred while parsing the mission file ", missionFile.getName() + ":");
-                    continue;
-                } catch (IOException error) {
-                    Log.error(error, "An unexpected error occurred while parsing the mission file ", missionFile.getName() + ":");
-                    continue;
-                }
+                    String formattedCategoryName = categorySection.getString("name", categoryName);
 
-                ConfigurationSection missionSection = missionConfigFile.getConfigurationSection("");
+                    plugin.getMissions().loadMissionCategory(new SMissionCategory(formattedCategoryName, slot, categoryMissions));
 
-                Mission<?> mission = plugin.getMissions().loadMission(missionName, categoryName, filesLookup, missionSection);
-
-                if (mission != null) {
-                    categoryMissions.add(mission);
-                    missionWeights.put(mission, missionSection.getInt("weight", 0));
+                    missionsToLoad.addAll(categoryMissions);
                 }
             }
         }
 
-        if (categoryMissions.isEmpty()) {
-            Log.warn("The mission category ", categoryName, " doesn't have missions, skipping...");
-            return false;
+        private boolean canLoadCategory(String categoryName, List<Mission<?>> categoryMissions) {
+            File categoryFolder = new File(getModuleFolder(), "categories/" + categoryName);
+
+            if (!categoryFolder.exists()) {
+                getLogger().w("The directory of the mission category " + categoryName + " doesn't exist, skipping...");
+                return false;
+            }
+
+            if (!categoryFolder.isDirectory()) {
+                getLogger().w("The directory of the mission category " + categoryName + " is not valid, skipping...");
+                return false;
+            }
+
+            File[] missionFiles = categoryFolder.listFiles(file ->
+                    file.isFile() && file.getName().endsWith(".yml"));
+
+            if (missionFiles == null || missionFiles.length == 0) {
+                getLogger().w("The mission category " + categoryName + " doesn't have missions, skipping...");
+                return false;
+            }
+
+            Map<Mission<?>, Integer> missionWeights = new ArrayMap<>();
+
+            try (FilesLookup filesLookup = FilesLookupFactory.getInstance().lookupFolder(getModuleFolder())) {
+                for (File missionFile : missionFiles) {
+                    String missionName = missionFile.getName().replace(".yml", "");
+
+                    if (missionName.length() > MAX_MISSIONS_NAME_LENGTH)
+                        missionName = missionName.substring(0, MAX_MISSIONS_NAME_LENGTH);
+
+                    YamlConfiguration missionConfigFile = new YamlConfiguration();
+
+                    try {
+                        missionConfigFile.load(missionFile);
+                    } catch (InvalidConfigurationException error) {
+                        getLogger().e("A format-error occurred while parsing the mission file " + missionFile.getName() + ":", error);
+                        continue;
+                    } catch (IOException error) {
+                        getLogger().e("An unexpected error occurred while parsing the mission file " + missionFile.getName() + ":", error);
+                        continue;
+                    }
+
+                    ConfigurationSection missionSection = missionConfigFile.getConfigurationSection("");
+
+                    Mission<?> mission = plugin.getMissions().loadMission(missionName, categoryName, filesLookup, missionSection);
+
+                    if (mission != null) {
+                        categoryMissions.add(mission);
+                        missionWeights.put(mission, missionSection.getInt("weight", 0));
+                    }
+                }
+            }
+
+            if (categoryMissions.isEmpty()) {
+                getLogger().w("The mission category " + categoryName + " doesn't have missions, skipping...");
+                return false;
+            }
+
+            // Sort missions by their names and weights.
+            categoryMissions.sort(new MissionsComparator(missionWeights));
+
+            return true;
         }
 
-        // Sort missions by their names and weights.
-        categoryMissions.sort(new MissionsComparator(missionWeights));
-
-        return true;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void convertNonCategorizedMissions(SuperiorSkyblockPlugin plugin, File file, YamlConfiguration config) {
+    private boolean convertNonCategorizedMissions(SuperiorSkyblockPlugin plugin, YamlConfiguration config) {
         ConfigurationSection missionsSection = config.getConfigurationSection("missions");
 
         if (missionsSection == null)
-            return;
+            return false;
 
         ConfigurationSection categoriesSection = config.createSection("categories");
 
@@ -267,7 +244,7 @@ public class MissionsModule extends BuiltinModule {
                 null);
 
         if (menuLoadResult == null)
-            return;
+            return false;
 
         MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
         YamlConfiguration missionsMenuConfig = menuLoadResult.getConfig();
@@ -303,7 +280,7 @@ public class MissionsModule extends BuiltinModule {
             try {
                 missionFile.createNewFile();
             } catch (IOException error) {
-                Log.error(error, "An unexpected error occurred while converting non-categorized mission ", missionName, ":");
+                getLogger().e("An unexpected error occurred while converting non-categorized mission " + missionName + ":", error);
                 continue;
             }
 
@@ -313,23 +290,21 @@ public class MissionsModule extends BuiltinModule {
             try {
                 missionConfigFile.save(missionFile);
             } catch (Exception error) {
-                Log.error(error, "An unexpected error occurred while saving non-categorized mission ", missionName, ":");
+                getLogger().e("An unexpected error occurred while saving non-categorized mission " + missionName + ":", error);
             }
         }
 
         config.set("missions", "");
 
-        try {
-            config.save(file);
-        } catch (Exception error) {
-            Log.error(error, "An unexpected error occurred while saving missions file:");
-        }
-
         copyOldMissionsMenuFile(plugin);
+
+        return true;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void convertOldMissions(SuperiorSkyblockPlugin plugin, File file, YamlConfiguration config) {
+    private boolean convertOldMissions(SuperiorSkyblockPlugin plugin, YamlConfiguration config) {
+        boolean updatedConfig = false;
+
         File oldMissionsFolder = new File(plugin.getDataFolder(), "missions");
         if (oldMissionsFolder.exists()) {
             File oldMissionsFile = new File(oldMissionsFolder, "missions.yml");
@@ -338,11 +313,7 @@ public class MissionsModule extends BuiltinModule {
                 YamlConfiguration oldConfig = YamlConfiguration.loadConfiguration(oldMissionsFile);
                 config.set("missions", oldConfig.getConfigurationSection(""));
 
-                try {
-                    config.save(file);
-                } catch (Exception error) {
-                    Log.error(error, "An unexpected error occurred while saving old missions file ", file.getName(), ":");
-                }
+                updatedConfig = true;
 
                 oldMissionsFile.delete();
             }
@@ -357,6 +328,8 @@ public class MissionsModule extends BuiltinModule {
 
             Files.deleteDirectory(oldMissionsFolder);
         }
+
+        return updatedConfig;
     }
 
     private void copyOldMissionsMenuFile(SuperiorSkyblockPlugin plugin) {
@@ -366,7 +339,7 @@ public class MissionsModule extends BuiltinModule {
         try {
             java.nio.file.Files.copy(Paths.get(oldMissionsMenuFile.toURI()), Paths.get(newMissionsCategoryMenuFile.toURI()));
         } catch (IOException error) {
-            Log.error(error, "An unexpected error occurred while copying old missions-menu to the new format:");
+            getLogger().e("An unexpected error occurred while copying old missions-menu to the new format:", error);
             return;
         }
 
@@ -377,6 +350,45 @@ public class MissionsModule extends BuiltinModule {
             newMissionsCategoryMenuConfig.save(newMissionsCategoryMenuFile);
         } catch (IOException ignored) {
         }
+    }
+
+    private void generateDefaultFiles() {
+        File categoriesFolder = new File(getModuleFolder(), "categories");
+
+        if ((!categoriesFolder.exists() || !categoriesFolder.isDirectory()) && categoriesFolder.mkdirs()) {
+            Resources.saveResource("modules/missions/categories/farmer/farmer_1.yml");
+            Resources.saveResource("modules/missions/categories/farmer/farmer_2.yml");
+            Resources.saveResource("modules/missions/categories/farmer/farmer_3.yml");
+            Resources.saveResource("modules/missions/categories/farmer/farmer_4.yml");
+            Resources.saveResource("modules/missions/categories/farmer/farmer_5.yml");
+            Resources.saveResource("modules/missions/categories/miner/miner_1.yml");
+            Resources.saveResource("modules/missions/categories/miner/miner_2.yml");
+            Resources.saveResource("modules/missions/categories/miner/miner_3.yml");
+            Resources.saveResource("modules/missions/categories/miner/miner_4.yml");
+            Resources.saveResource("modules/missions/categories/miner/miner_5.yml");
+            Resources.saveResource("modules/missions/categories/slayer/slayer_1.yml");
+            Resources.saveResource("modules/missions/categories/slayer/slayer_2.yml");
+            Resources.saveResource("modules/missions/categories/slayer/slayer_3.yml");
+            Resources.saveResource("modules/missions/categories/slayer/slayer_4.yml");
+            Resources.saveResource("modules/missions/categories/fisherman/fisherman_1.yml");
+            Resources.saveResource("modules/missions/categories/fisherman/fisherman_2.yml");
+            Resources.saveResource("modules/missions/categories/fisherman/fisherman_3.yml");
+            Resources.saveResource("modules/missions/categories/explorer/explorer_1.yml");
+            Resources.saveResource("modules/missions/categories/explorer/explorer_2.yml");
+        }
+    }
+
+    private void generateDefaultMissionJars() {
+        Resources.copyResource("modules/missions/BlocksMissions");
+        Resources.copyResource("modules/missions/BrewingMissions");
+        Resources.copyResource("modules/missions/CraftingMissions");
+        Resources.copyResource("modules/missions/EnchantingMissions");
+        Resources.copyResource("modules/missions/FarmingMissions");
+        Resources.copyResource("modules/missions/FishingMissions");
+        Resources.copyResource("modules/missions/IslandMissions");
+        Resources.copyResource("modules/missions/ItemsMissions");
+        Resources.copyResource("modules/missions/KillsMissions");
+        Resources.copyResource("modules/missions/StatisticsMissions");
     }
 
     private static class MissionsComparator implements Comparator<Mission<?>> {

@@ -2,13 +2,16 @@ package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
-import org.bukkit.Location;
 
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -44,12 +47,28 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().roundedIslandLevel;
     }
 
-    public String getIslandTopOrder() {
+    public RoundingMode getIslandLevelRoundingMode() {
+        return getContainer().islandLevelRoundingMode;
+    }
+
+    public boolean isAutoBlocksTracking() {
+        return getContainer().autoBlocksTracking;
+    }
+
+    public SortingType getIslandTopOrder() {
         return getContainer().islandTopOrder;
+    }
+
+    public SortingType getGlobalWarpsOrder() {
+        return getContainer().globalWarpsOrder;
     }
 
     public boolean isCoopMembers() {
         return getContainer().coopMembers;
+    }
+
+    public boolean isEditPlayerPermissions() {
+        return getContainer().editPlayerPermissions;
     }
 
     public String getSignWarpLine() {
@@ -81,7 +100,7 @@ public class GlobalSection extends SettingsContainerHolder {
     }
 
     public int getDisbandCount() {
-        return getContainer().disbandCount;
+        return getContainer().defaultDisbandCount;
     }
 
     public boolean isIslandTopIncludeLeader() {
@@ -108,6 +127,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().leaveConfirm;
     }
 
+    public boolean isTransferConfirm() {
+        return getContainer().transferConfirm;
+    }
+
     public String getSpawnersProvider() {
         return getContainer().spawnersProvider;
     }
@@ -116,8 +139,8 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().stackedBlocksProvider;
     }
 
-    public boolean isDisbandInventoryClear() {
-        return getContainer().disbandInventoryClear;
+    public boolean isTeleportOnCreate() {
+        return getContainer().teleportOnCreate;
     }
 
     public boolean isTeleportOnJoin() {
@@ -128,12 +151,32 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().teleportOnKick;
     }
 
-    public boolean isClearOnJoin() {
-        return getContainer().clearOnJoin;
+    public boolean isTeleportOnLeave() {
+        return getContainer().teleportOnLeave;
+    }
+
+    public List<ClearAction> getClearActionsOnDisband() {
+        return getContainer().clearActionsOnDisband;
+    }
+
+    public List<ClearAction> getClearActionsOnJoin() {
+        return getContainer().clearActionsOnJoin;
+    }
+
+    public List<ClearAction> getClearActionsOnKick() {
+        return getContainer().clearActionsOnKick;
+    }
+
+    public List<ClearAction> getClearActionsOnLeave() {
+        return getContainer().clearActionsOnLeave;
     }
 
     public boolean isRateOwnIsland() {
         return getContainer().rateOwnIsland;
+    }
+
+    public boolean isChangeIslandRating() {
+        return getContainer().changeIslandRating;
     }
 
     public List<String> getDefaultSettings() {
@@ -296,10 +339,6 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().valuableBlocks;
     }
 
-    public Map<String, Location> getPreviewIslands() {
-        return getContainer().islandPreviewLocations;
-    }
-
     public boolean isTabCompleteHideVanished() {
         return getContainer().tabCompleteHideVanished;
     }
@@ -308,8 +347,8 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().dropsUpgradePlayersMultiply;
     }
 
-    public long getProtectedMessageDelay() {
-        return getContainer().protectedMessageDelay;
+    public Map<String, Long> getMessageDelays() {
+        return getContainer().messageDelays;
     }
 
     public boolean isWarpCategories() {
@@ -326,6 +365,10 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public boolean isPublicWarps() {
         return getContainer().publicWarps;
+    }
+
+    public boolean isLockedIslands() {
+        return getContainer().lockedIslands;
     }
 
     public long getRecalcTaskTimeout() {
@@ -366,6 +409,14 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public int getCommandsPerPage() {
         return getContainer().commandsPerPage;
+    }
+
+    public boolean isCacheSchematics() {
+        return getContainer().cacheSchematics;
+    }
+
+    public Map<String, KeySet> getEntityCategories() {
+        return getContainer().entityCategories;
     }
 
 }

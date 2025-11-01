@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.external;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
@@ -30,25 +31,35 @@ public class MiniMessageHook {
 
     private static boolean registered = false;
 
+    private static final MessagesServiceImpl.CustomComponentParser PARSER = new MessagesServiceImpl.CustomComponentParser() {
+        @Override
+        public Optional<IMessageComponent> parse(YamlConfiguration config, String path) {
+            if (!config.isString(path))
+                return Optional.empty();
+
+            String content = config.getString(path);
+            if (Text.isBlank(content))
+                return Optional.empty();
+
+            return parse(content);
+        }
+
+        @Override
+        public Optional<IMessageComponent> parse(String content) {
+            try {
+                Component component = MINI_MESSAGE.deserialize(Formatters.COLOR_FORMATTER.format(content));
+                return Optional.of(new MiniMessageComponent(component));
+            } catch (ParsingException error) {
+                return Optional.empty();
+            }
+        }
+    };
+
     public static void register(SuperiorSkyblockPlugin plugin) {
         if (!registered) {
             MessagesServiceImpl messagesService = (MessagesServiceImpl) plugin.getServices().getService(MessagesService.class);
-            messagesService.registerCustomComponentParser(MiniMessageHook::parseMiniMessage);
+            messagesService.registerCustomComponentParser(PARSER);
             registered = true;
-        }
-    }
-
-    private static Optional<IMessageComponent> parseMiniMessage(YamlConfiguration config, String path) {
-        if (!config.isString(path))
-            return Optional.empty();
-
-        String content = config.getString(path);
-
-        try {
-            Component component = MINI_MESSAGE.deserialize(Formatters.COLOR_FORMATTER.format(content));
-            return Optional.of(new MiniMessageComponent(component));
-        } catch (ParsingException error) {
-            return Optional.empty();
         }
     }
 
@@ -69,12 +80,12 @@ public class MiniMessageHook {
 
         @Override
         public String getMessage() {
-            return this.content.getContent().orElse("");
+            return this.content.getContent(null).orElse("");
         }
 
         @Override
         public String getMessage(Object... args) {
-            return this.content.getContent(args).orElse("");
+            return this.content.getContent(null, args).orElse("");
         }
 
         @Override

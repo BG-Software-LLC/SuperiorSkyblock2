@@ -87,6 +87,9 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
             Key valueKey = plugin.getBlockValues().getBlockKey(key);
             removeCounts(valueKey, amount);
 
+            if (loadingDataMode)
+                return true;
+
             Key limitKey = island.getBlockLimitKey(valueKey);
             Key globalKey = ((BaseKey<?>) valueKey).toGlobalKey();
             boolean limitCount = false;

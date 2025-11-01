@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v1;
 
-import com.bgsoftware.superiorskyblock.core.database.sql.SQLHelper;
+import com.bgsoftware.superiorskyblock.core.database.sql.DBSession;
 
 public class DatabaseUpgrade_V1 implements Runnable {
 
@@ -12,7 +12,7 @@ public class DatabaseUpgrade_V1 implements Runnable {
 
     @Override
     public void run() {
-        SQLHelper.addColumn("islands", "entity_counts", "LONGTEXT");
+        DBSession.addColumn("islands", "entity_counts", "LONGTEXT");
     }
 
 }

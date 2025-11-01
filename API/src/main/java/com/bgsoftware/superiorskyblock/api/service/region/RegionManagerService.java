@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
@@ -132,6 +133,15 @@ public interface RegionManagerService {
      * @return The result of the interaction.
      */
     InteractionResult handleEntityDamage(Entity damager, Entity entity);
+
+    /**
+     * Handle a player riding an entity.
+     *
+     * @param superiorPlayer The player that rides the entity.
+     * @param vehicle        The entity that is ridden.
+     * @return The result of the interaction.
+     */
+    InteractionResult handleEntityRide(SuperiorPlayer superiorPlayer, Entity vehicle);
 
     /**
      * Handle a custom interaction of a player.

@@ -63,29 +63,19 @@ public class CmdTransfer implements ISuperiorCommand {
             return;
 
         SuperiorPlayer superiorPlayer = arguments.getSuperiorPlayer();
-
-        if (!superiorPlayer.getPlayerRole().isLastRole()) {
-            Message.NO_TRANSFER_PERMISSION.send(superiorPlayer);
-            return;
-        }
-
         SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, superiorPlayer, args[1]);
 
         if (targetPlayer == null)
             return;
 
-        if (!island.isMember(targetPlayer)) {
-            Message.PLAYER_NOT_INSIDE_ISLAND.send(sender);
+        if (!IslandUtils.checkTransferRestrictions(superiorPlayer, island, targetPlayer))
             return;
-        }
 
-        if (island.getOwner().getUniqueId().equals(targetPlayer.getUniqueId())) {
-            Message.TRANSFER_ALREADY_LEADER.send(superiorPlayer);
-            return;
+        if (plugin.getSettings().isTransferConfirm()) {
+            plugin.getMenus().openConfirmTransfer(superiorPlayer, null, island, targetPlayer);
+        } else {
+            IslandUtils.handleTransferIsland(superiorPlayer, island, targetPlayer);
         }
-
-        if (island.transferIsland(targetPlayer))
-            IslandUtils.sendMessage(island, Message.TRANSFER_BROADCAST, Collections.emptyList(), targetPlayer.getName());
     }
 
     @Override

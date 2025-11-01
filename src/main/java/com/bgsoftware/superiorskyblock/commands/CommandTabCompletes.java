@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
+import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -39,6 +40,8 @@ import java.util.stream.Stream;
 
 public class CommandTabCompletes {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private CommandTabCompletes() {
 
     }
@@ -52,7 +55,7 @@ public class CommandTabCompletes {
                                                             BiPredicate<SuperiorPlayer, Island> islandPredicate) {
         SuperiorPlayer superiorPlayer = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
         Island island = superiorPlayer == null ? null : superiorPlayer.getIsland();
-        return getOnlinePlayersWithIslands(plugin, argument, hideVanish, (onlinePlayer, onlineIsland) ->
+        return getOnlinePlayersAndIslands(plugin, argument, hideVanish, (onlinePlayer, onlineIsland) ->
                 onlineIsland != null && (superiorPlayer == null || island == null || !island.equals(onlineIsland)) &&
                         islandPredicate.test(onlinePlayer, onlineIsland));
     }
@@ -67,6 +70,12 @@ public class CommandTabCompletes {
 
     public static List<String> getIslandMembers(Island island, String argument) {
         return getPlayers(island.getIslandMembers(false), argument);
+    }
+
+    public static List<String> getOnlinePlayersWithIsland(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanished,
+                                                          Predicate<SuperiorPlayer> predicate) {
+        return getOnlinePlayers(plugin, argument, hideVanished, (onlinePlayer) ->
+                onlinePlayer != null && onlinePlayer.hasIsland() && predicate.test(onlinePlayer));
     }
 
     public static List<String> getOnlinePlayers(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanish) {
@@ -85,9 +94,8 @@ public class CommandTabCompletes {
                 .map(getOnlineSuperiorPlayers(plugin), SuperiorPlayer::getName);
     }
 
-    public static List<String> getOnlinePlayersWithIslands(SuperiorSkyblockPlugin plugin, String argument,
-                                                           boolean hideVanish,
-                                                           @Nullable BiPredicate<SuperiorPlayer, Island> predicate) {
+    public static List<String> getOnlinePlayersAndIslands(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanish,
+                                                          @Nullable BiPredicate<SuperiorPlayer, Island> predicate) {
         List<String> tabArguments = new LinkedList<>();
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
 
@@ -95,11 +103,11 @@ public class CommandTabCompletes {
             SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
             if (!hideVanish || onlinePlayer.isShownAsOnline()) {
                 Island onlineIsland = onlinePlayer.getIsland();
-                if (predicate == null || predicate.test(onlinePlayer, onlineIsland)) {
+                if (onlineIsland != null && (predicate == null || predicate.test(onlinePlayer, onlineIsland))) {
                     if (onlinePlayer.getName().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
                         tabArguments.add(onlinePlayer.getName());
-                    if (onlineIsland != null && onlineIsland.getName().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
-                        tabArguments.add(onlineIsland.getName());
+                    if (onlineIsland.getStrippedName().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
+                        tabArguments.add(onlineIsland.getStrippedName());
                 }
             }
         }
@@ -116,7 +124,11 @@ public class CommandTabCompletes {
     }
 
     public static List<String> getCustomComplete(String argument, String... tabVariables) {
-        return filterByArgument(Arrays.asList(tabVariables), argument.toLowerCase(Locale.ENGLISH));
+        return getCustomComplete(argument, Arrays.asList(tabVariables));
+    }
+
+    public static List<String> getCustomComplete(String argument, Collection<String> tabVariables) {
+        return filterByArgument(tabVariables, argument.toLowerCase(Locale.ENGLISH));
     }
 
     public static List<String> getCustomComplete(String argument, Predicate<String> predicate, String... tabVariables) {
@@ -136,8 +148,8 @@ public class CommandTabCompletes {
     public static List<String> getSchematics(SuperiorSkyblockPlugin plugin, String argument) {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
         return new SequentialListBuilder<String>()
-                .filter(schematic -> !schematic.endsWith("_nether") && !schematic.endsWith("_the_end") &&
-                        schematic.toLowerCase(Locale.ENGLISH).contains(lowerArgument))
+                .filter(schematic -> !schematic.endsWith("_nether") && !schematic.endsWith("_normal") &&
+                        !schematic.endsWith("_the_end") && schematic.toLowerCase(Locale.ENGLISH).contains(lowerArgument))
                 .build(plugin.getSchematics().getSchematics());
     }
 
@@ -149,14 +161,11 @@ public class CommandTabCompletes {
         return filterByArgument(plugin.getUpgrades().getUpgrades(), Upgrade::getName, argument.toLowerCase(Locale.ENGLISH));
     }
 
-    public static List<String> getPlayerRoles(SuperiorSkyblockPlugin plugin, String argument) {
-        return filterByArgument(plugin.getRoles().getRoles(), PlayerRole::getName, argument.toLowerCase(Locale.ENGLISH));
-    }
-
     public static List<String> getPlayerRoles(SuperiorSkyblockPlugin plugin, String argument, Predicate<PlayerRole> predicate) {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
         return new SequentialListBuilder<PlayerRole>()
-                .filter(playerRole -> predicate.test(playerRole) && playerRole.toString().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
+                .filter(playerRole -> (predicate == null || predicate.test(playerRole)) &&
+                        playerRole.toString().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
                 .map(plugin.getRoles().getRoles(), PlayerRole::getName);
     }
 
@@ -178,7 +187,15 @@ public class CommandTabCompletes {
                         return false;
                     }
                 })
-                .map(Arrays.asList(PotionEffectType.values()), PotionEffectType::getName);
+                .map(PotionEffectType.values(), potionEffectType -> {
+                    String name = potionEffectType.getName();
+                    if (name.startsWith("minecraft:")) {
+                        name = name.substring("minecraft:".length()).toLowerCase(Locale.ENGLISH);
+                    } else {
+                        name = name.toLowerCase(Locale.ENGLISH);
+                    }
+                    return name;
+                });
     }
 
     public static List<String> getEntitiesForLimit(String argument) {
@@ -196,13 +213,11 @@ public class CommandTabCompletes {
                 .filter(materialName -> materialName.contains(lowerArgument)));
     }
 
-    public static List<String> getAllMissions(SuperiorSkyblockPlugin plugin) {
-        return new SequentialListBuilder<String>()
-                .build(plugin.getMissions().getAllMissions(), Mission::getName);
-    }
-
-    public static List<String> getMissions(SuperiorSkyblockPlugin plugin, String argument) {
-        return filterByArgument(plugin.getMissions().getAllMissions(), Mission::getName, argument.toLowerCase(Locale.ENGLISH));
+    public static List<String> getMissions(SuperiorSkyblockPlugin plugin, String argument, Predicate<Mission<?>> predicate) {
+        String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
+        return new SequentialListBuilder<String>().build(plugin.getMissions().getAllMissions().stream()
+                .filter(mission -> predicate.test(mission) && mission.getName().contains(lowerArgument))
+                .map(mission -> mission.getName().toLowerCase(Locale.ENGLISH)));
     }
 
     public static List<String> getCustomMenus(SuperiorSkyblockPlugin plugin, String argument) {
@@ -212,7 +227,8 @@ public class CommandTabCompletes {
     }
 
     public static List<String> getBiomes(String argument) {
-        return getFromEnum(Arrays.asList(Biome.values()), argument.toLowerCase(Locale.ENGLISH));
+        NMSAlgorithms.EnumBridge<Biome> biomeEnumBridge = plugin.getNMSAlgorithms().getBiomeBridge();
+        return filterByArgument(biomeEnumBridge.getValues(), biomeEnumBridge::getName, argument.toLowerCase(Locale.ENGLISH));
     }
 
     public static List<String> getWorlds(String argument) {
@@ -281,6 +297,12 @@ public class CommandTabCompletes {
     }
 
     private static <E> List<String> filterByArgument(Collection<E> collection, Function<E, String> mapper, String argument) {
+        return new SequentialListBuilder<String>()
+                .filter(name -> name.toLowerCase(Locale.ENGLISH).contains(argument))
+                .build(collection, mapper);
+    }
+
+    private static <E> List<String> filterByArgument(E[] collection, Function<E, String> mapper, String argument) {
         return new SequentialListBuilder<String>()
                 .filter(name -> name.toLowerCase(Locale.ENGLISH).contains(argument))
                 .build(collection, mapper);

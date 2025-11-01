@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpPagedObjectButt
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.warp.WarpIcons;
@@ -91,7 +92,7 @@ public class MenuWarps extends AbstractPagedMenu<MenuWarps.View, MenuWarps.Args,
 
     }
 
-    public static class View extends AbstractPagedMenuView<View, Args, IslandWarp> {
+    public static class View extends AbstractPagedMenuView<View, Args, IslandWarp> implements IIslandMenuView {
 
         private final Island island;
         private final WarpCategory warpCategory;
@@ -106,15 +107,16 @@ public class MenuWarps extends AbstractPagedMenu<MenuWarps.View, MenuWarps.Args,
         }
 
         @Override
+        public Island getIsland() {
+            return island;
+        }
+
+        @Override
         protected List<IslandWarp> requestObjects() {
             boolean isMember = warpCategory.getIsland().isMember(getInventoryViewer());
             return new SequentialListBuilder<IslandWarp>()
                     .filter(islandWarp -> isMember || !islandWarp.hasPrivateFlag())
                     .build(warpCategory.getWarps());
-        }
-
-        public Island getIsland() {
-            return island;
         }
 
         public WarpCategory getWarpCategory() {
@@ -149,7 +151,7 @@ public class MenuWarps extends AbstractPagedMenu<MenuWarps.View, MenuWarps.Args,
 
         int charCounter = 0;
 
-        if (cfg.contains("warps-gui.fill-items")) {
+        if (cfg.isConfigurationSection("warps-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("warps-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

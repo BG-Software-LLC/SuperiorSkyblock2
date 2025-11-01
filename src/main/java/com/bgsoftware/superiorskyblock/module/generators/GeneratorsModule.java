@@ -3,47 +3,36 @@ package com.bgsoftware.superiorskyblock.module.generators;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
-import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.module.BuiltinModule;
+import com.bgsoftware.superiorskyblock.module.IModuleConfiguration;
 import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminAddGenerator;
 import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminClearGenerator;
 import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminSetGenerator;
-import com.bgsoftware.superiorskyblock.module.BuiltinModule;
 import com.bgsoftware.superiorskyblock.module.generators.listeners.GeneratorsListener;
 import org.bukkit.event.Listener;
 
 import java.io.File;
 
-public class GeneratorsModule extends BuiltinModule {
-
-    private boolean enabled = true;
-    private boolean matchGeneratorWorld = true;
+public class GeneratorsModule extends BuiltinModule<GeneratorsModule.Configuration> {
 
     public GeneratorsModule() {
         super("generators");
     }
 
     @Override
-    protected void onPluginInit(SuperiorSkyblockPlugin plugin) {
-        super.onPluginInit(plugin);
+    protected boolean onConfigCreate(SuperiorSkyblockPlugin plugin, CommentedConfiguration config, boolean firstTime) {
+        File oldConfigFile = new File(plugin.getDataFolder(), "config.yml");
+        if (!oldConfigFile.exists())
+            return false;
 
-        File configFile = new File(plugin.getDataFolder(), "config.yml");
-        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(configFile);
+        CommentedConfiguration oldConfig = CommentedConfiguration.loadConfiguration(oldConfigFile);
+        boolean updatedConfig = false;
 
-        if (config.contains("generators")) {
-            super.config.set("enabled", config.getBoolean("generators"));
-            config.set("generators", null);
-
-            File moduleConfigFile = new File(getModuleFolder(), "config.yml");
-
-            try {
-                super.config.save(moduleConfigFile);
-                config.save(configFile);
-            } catch (Exception error) {
-                Log.entering("GeneratorsModule", "onPluginInit", "ENTER");
-                Log.error(error, "An error occurred while saving config file:");
-            }
+        if (oldConfig.contains("generators")) {
+            config.set("enabled", oldConfig.getBoolean("generators"));
         }
 
+        return updatedConfig;
     }
 
     @Override
@@ -63,7 +52,7 @@ public class GeneratorsModule extends BuiltinModule {
 
     @Override
     public Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin) {
-        return !enabled ? null : new Listener[]{new GeneratorsListener(plugin, this)};
+        return new Listener[]{new GeneratorsListener(plugin)};
     }
 
     @Override
@@ -73,22 +62,33 @@ public class GeneratorsModule extends BuiltinModule {
 
     @Override
     public SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin) {
-        return !enabled ? null : new SuperiorCommand[]{new CmdAdminAddGenerator(), new CmdAdminClearGenerator(), new CmdAdminSetGenerator()};
+        return new SuperiorCommand[]{new CmdAdminAddGenerator(), new CmdAdminClearGenerator(), new CmdAdminSetGenerator()};
     }
 
     @Override
-    public boolean isEnabled() {
-        return enabled && isInitialized();
+    protected Configuration createConfigFile(CommentedConfiguration config) {
+        return new Configuration(config);
     }
 
-    @Override
-    protected void updateConfig(SuperiorSkyblockPlugin plugin) {
-        enabled = config.getBoolean("enabled");
-        matchGeneratorWorld = config.getBoolean("match-generator-world");
-    }
+    public static class Configuration implements IModuleConfiguration {
 
-    public boolean isMatchGeneratorWorld() {
-        return matchGeneratorWorld;
+        private final boolean enabled;
+        private final boolean matchGeneratorWorld;
+
+        Configuration(CommentedConfiguration config) {
+            this.enabled = config.getBoolean("enabled");
+            this.matchGeneratorWorld = config.getBoolean("match-generator-world");
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return this.enabled;
+        }
+
+        public boolean isMatchGeneratorWorld() {
+            return this.matchGeneratorWorld;
+        }
+
     }
 
 }

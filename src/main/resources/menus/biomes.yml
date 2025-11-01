@@ -142,64 +142,64 @@ items:
 sounds:
   '!':
     access:
-      type: ENTITY_ENDERMAN_TELEPORT
+      type: ENDERMAN_TELEPORT
       volume: 0.8
       pitch: 0.2
     no-access:
-      type: BLOCK_ANVIL_PLACE
+      type: ANVIL_LAND
       volume: 0.2
       pitch: 0.2
   '@':
     access:
-      type: ENTITY_ENDERMAN_TELEPORT
+      type: ENDERMAN_TELEPORT
       volume: 0.8
       pitch: 0.2
     no-access:
-      type: BLOCK_ANVIL_PLACE
+      type: ANVIL_LAND
       volume: 0.2
       pitch: 0.2
   '%':
     access:
-      type: ENTITY_ENDERMAN_TELEPORT
+      type: ENDERMAN_TELEPORT
       volume: 0.8
       pitch: 0.2
     no-access:
-      type: BLOCK_ANVIL_PLACE
+      type: ANVIL_LAND
       volume: 0.2
       pitch: 0.2
   '^':
     access:
-      type: ENTITY_ENDERMAN_TELEPORT
+      type: ENDERMAN_TELEPORT
       volume: 0.8
       pitch: 0.2
     no-access:
-      type: BLOCK_ANVIL_PLACE
+      type: ANVIL_LAND
       volume: 0.2
       pitch: 0.2
   '&':
     access:
-      type: ENTITY_ENDERMAN_TELEPORT
+      type: ENDERMAN_TELEPORT
       volume: 0.8
       pitch: 0.2
     no-access:
-      type: BLOCK_ANVIL_PLACE
+      type: ANVIL_LAND
       volume: 0.2
       pitch: 0.2
   '*':
     access:
-      type: ENTITY_ENDERMAN_TELEPORT
+      type: ENDERMAN_TELEPORT
       volume: 0.8
       pitch: 0.2
     no-access:
-      type: BLOCK_ANVIL_PLACE
+      type: ANVIL_LAND
       volume: 0.2
       pitch: 0.2
   '~':
     access:
-      type: ENTITY_ENDERMAN_TELEPORT
+      type: ENDERMAN_TELEPORT
       volume: 0.8
       pitch: 0.2
     no-access:
-      type: BLOCK_ANVIL_PLACE
+      type: ANVIL_LAND
       volume: 0.2
       pitch: 0.2

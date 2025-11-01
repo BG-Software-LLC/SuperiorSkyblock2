@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -70,17 +71,9 @@ public class CmdLeave implements ISuperiorCommand {
 
         if (plugin.getSettings().isLeaveConfirm()) {
             plugin.getMenus().openConfirmLeave(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()));
-            return;
+        } else {
+            IslandUtils.handleLeaveIsland(superiorPlayer, island);
         }
-
-        if (!PluginEventsFactory.callIslandQuitEvent(island, superiorPlayer))
-            return;
-
-        island.kickMember(superiorPlayer);
-
-        IslandUtils.sendMessage(island, Message.LEAVE_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
-
-        Message.LEFT_ISLAND.send(superiorPlayer);
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.core.value;
 
 import java.util.function.Supplier;
 
-public class ValueSuppliedSynced<V extends Number> implements Value<V> {
+public class ValueSuppliedSynced<V> implements Value<V> {
 
     private final Supplier<V> supplier;
 

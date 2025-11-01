@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.VisitorPagedObjectB
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -60,7 +61,7 @@ public class MenuIslandVisitors extends AbstractPagedMenu<MenuIslandVisitors.Vie
         return new MenuIslandVisitors(menuParseResult);
     }
 
-    public static class View extends AbstractPagedMenuView<View, IslandViewArgs, SuperiorPlayer> {
+    public static class View extends AbstractPagedMenuView<View, IslandViewArgs, SuperiorPlayer> implements IIslandMenuView {
 
         private final Island island;
 
@@ -70,8 +71,14 @@ public class MenuIslandVisitors extends AbstractPagedMenu<MenuIslandVisitors.Vie
             this.island = args.getIsland();
         }
 
+        @Override
         public Island getIsland() {
             return island;
+        }
+
+        @Override
+        public String replaceTitle(String title) {
+            return title.replace("{0}", String.valueOf(island.getIslandVisitors(false).size()));
         }
 
         @Override
@@ -103,7 +110,7 @@ public class MenuIslandVisitors extends AbstractPagedMenu<MenuIslandVisitors.Vie
 
         int charCounter = 0;
 
-        if (cfg.contains("visitors-panel.fill-items")) {
+        if (cfg.isConfigurationSection("visitors-panel.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("visitors-panel.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

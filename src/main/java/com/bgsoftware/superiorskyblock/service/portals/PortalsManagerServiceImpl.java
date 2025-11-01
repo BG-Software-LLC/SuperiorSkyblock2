@@ -26,10 +26,10 @@ import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import com.google.common.base.Preconditions;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.PortalType;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -129,10 +129,12 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         EntityPortalResult portalResult = simulateEntityPortalFromIsland(superiorPlayer.asPlayer(), island,
                 portalLocation, portalType);
 
-        if (portalResult == EntityPortalResult.WORLD_NOT_UNLOCKED && !Message.WORLD_NOT_UNLOCKED.isEmpty(superiorPlayer.getUserLocale())) {
+        if (portalResult == EntityPortalResult.WORLD_NOT_UNLOCKED) {
             Dimension originalDestination = getTargetWorld(portalLocation, portalType);
-            Message.SCHEMATICS.send(superiorPlayer, Message.WORLD_NOT_UNLOCKED.getMessage(
-                    superiorPlayer.getUserLocale(), Formatters.CAPITALIZED_FORMATTER.format(originalDestination.getName())));
+            Message.WORLD_NOT_UNLOCKED.send(superiorPlayer, Formatters.CAPITALIZED_FORMATTER.format(originalDestination.getName()));
+        } else if (portalResult == EntityPortalResult.DESTINATION_WORLD_DISABLED) {
+            Dimension originalDestination = getTargetWorld(portalLocation, portalType);
+            Message.WORLD_NOT_ENABLED.send(superiorPlayer, Formatters.CAPITALIZED_FORMATTER.format(originalDestination.getName()));
         }
 
         return portalResult;
@@ -205,10 +207,8 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
 
             if (schematic == null && !ignoreInvalidSchematic) {
                 if (superiorPlayer != null) {
-                    Message.SCHEMATICS.send(superiorPlayer, ChatColor.RED + "The server hasn't added a " +
-                            destinationEnvironmentName + " schematic. Please contact administrator to solve the problem. " +
-                            "The format for " + destinationEnvironmentName + " schematic is \"" +
-                            islandSchematic + "_" + destinationEnvironmentName + "\".");
+                    String schematicName = islandSchematic + "_" + destinationEnvironmentName;
+                    Message.SCHEMATIC_NOT_ADDED.send(superiorPlayer, destinationEnvironmentName, schematicName);
                 }
                 return EntityPortalResult.INVALID_SCHEMATIC;
             }
@@ -233,10 +233,10 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                 return EntityPortalResult.SUCCEED;
             }
 
-            IslandWorlds.accessIslandWorldAsync(island, destination, islandWorldResult -> {
+            IslandWorlds.accessIslandWorldAsync(island, destination, true, islandWorldResult -> {
                 islandWorldResult.ifRight(Throwable::printStackTrace).ifLeft(world -> {
-                    Location schematicPlacementLocation = island.getCenter(destination).subtract(0, 1, 0);
-                    schematicPlacementLocation.setY(plugin.getSettings().getIslandHeight());
+                    Location centerLocation = island.getCenter(destination);
+                    Location schematicPlacementLocation = centerLocation.getBlock().getRelative(BlockFace.DOWN).getLocation();
 
                     BigDecimal originalWorth = island.getRawWorth();
                     BigDecimal originalLevel = island.getRawLevel();
@@ -263,7 +263,8 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                             }
                         }
 
-                        Location destinationLocation = island.getIslandHome(destination);
+                        Location homeLocation = schematic.adjustRotation(centerLocation);
+                        island.setIslandHome(homeLocation);
 
                         if (destination.getEnvironment() == World.Environment.THE_END && superiorPlayer != null) {
                             plugin.getNMSDragonFight().awardTheEndAchievement((Player) entity);
@@ -271,9 +272,9 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                         }
 
                         if (superiorPlayer != null) {
-                            superiorPlayer.teleport(schematic.adjustRotation(destinationLocation));
+                            superiorPlayer.teleport(homeLocation);
                         } else {
-                            EntityTeleports.teleport(entity, schematic.adjustRotation(destinationLocation));
+                            EntityTeleports.teleport(entity, homeLocation);
                         }
                     }, error -> {
                         generatingSchematicsIslands.remove(island.getUniqueId());

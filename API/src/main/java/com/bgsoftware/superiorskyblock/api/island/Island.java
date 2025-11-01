@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
+import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.enums.SyncStatus;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeGeneratorRateEvent;
@@ -12,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAl
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
+import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -27,6 +29,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -77,6 +80,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Re-sync the island with a new dates formatter.
      */
     void updateDatesFormatter();
+
+    /**
+     * Get the island cache.
+     */
+    IslandCache getCache();
 
     /*
      *  Player related methods
@@ -164,8 +172,18 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Kick a member from the island.
      *
      * @param superiorPlayer The player to kick.
+     * @deprecated See {@link #removeMember(SuperiorPlayer, MemberRemoveReason)}
      */
+    @Deprecated
     void kickMember(SuperiorPlayer superiorPlayer);
+
+    /**
+     * Remove a member from the island.
+     *
+     * @param superiorPlayer     The player to remove.
+     * @param memberRemoveReason The reason for removal.
+     */
+    void removeMember(SuperiorPlayer superiorPlayer, MemberRemoveReason memberRemoveReason);
 
     /**
      * Check whether a player is a member of the island.
@@ -275,56 +293,17 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     Location getCenter(Dimension dimension);
 
     /**
-     * Get the center location of the island, depends on the world environment.
-     *
-     * @param environment The environment.
-     * @deprecated See {@link #getCenter(Dimension)}
-     */
-    @Deprecated
-    Location getCenter(World.Environment environment);
-
-    /**
      * Get the center position of the island.
      */
     BlockPosition getCenterPosition();
 
     /**
-     * Get the members' teleport location of the island, depends on the world environment.
-     * Similar to {@link #getIslandHome(Dimension)}
+     * Access the island's world.
+     * This method will load the world safely if it is not loaded.
      *
-     * @param environment The environment.
-     * @deprecated See {@link #getIslandHome(Dimension)}
+     * @param dimension The dimension of the island world.
      */
-    @Deprecated
-    @Nullable
-    Location getTeleportLocation(World.Environment environment);
-
-    /**
-     * Get all the teleport locations of the island.
-     *
-     * @deprecated See {@link #getIslandHomesAsDimensions()}
-     */
-    @Deprecated
-    Map<World.Environment, Location> getTeleportLocations();
-
-    /**
-     * Set the members' teleport location of the island.
-     *
-     * @param teleportLocation The new teleport location.
-     * @deprecated See {@link #setIslandHome(Location)}
-     */
-    @Deprecated
-    void setTeleportLocation(Location teleportLocation);
-
-    /**
-     * Set the members' teleport location of the island.
-     *
-     * @param environment      The environment to change teleport location for.
-     * @param teleportLocation The new teleport location.
-     * @deprecated See {@link #setIslandHome(Dimension, Location)}
-     */
-    @Deprecated
-    void setTeleportLocation(World.Environment environment, @Nullable Location teleportLocation);
+    CompletableFuture<World> accessIslandWorld(Dimension dimension);
 
     /**
      * Get the members' home location of the island, depends on the world dimension.
@@ -335,55 +314,54 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     Location getIslandHome(Dimension dimension);
 
     /**
-     * Get the members' home location of the island, depends on the world environment.
+     * Get the members' home location of the island, depends on the world dimension.
      *
-     * @param environment The environment.
-     * @deprecated See {@link #getIslandHome(Dimension)}
+     * @param dimension The dimension.
      */
-    @Deprecated
     @Nullable
-    Location getIslandHome(World.Environment environment);
+    WorldPosition getIslandHomePosition(Dimension dimension);
 
     /**
      * Get all the home locations of the island.
+     * If the world is not loaded, the location's getWorld will return null.
      */
     Map<Dimension, Location> getIslandHomesAsDimensions();
 
     /**
-     * Get all the home locations of the island.
-     *
-     * @deprecated See {@link #getIslandHomesAsDimensions()}
+     * Get all the home positions of the island.
      */
-    @Deprecated
-    Map<World.Environment, Location> getIslandHomes();
+    Map<Dimension, WorldPosition> getIslandHomes();
 
     /**
-     * Set the members' teleport location of the island.
+     * Set the home location of the island.
+     * The location will be set for the world provided in {@param homeLocation}
      *
      * @param homeLocation The new home location.
      */
     void setIslandHome(Location homeLocation);
 
     /**
-     * Set the members' teleport location of the island.
+     * Set the home position of the island.
+     * The world of {@param homeLocation} is ignored.
      *
-     * @param dimension    The dimension to change teleport location for.
+     * @param dimension    The dimension to change home position for.
      * @param homeLocation The new home location.
+     * @deprecated See {@link #setIslandHome(Dimension, WorldPosition)}
      */
+    @Deprecated
     void setIslandHome(Dimension dimension, @Nullable Location homeLocation);
 
     /**
-     * Set the members' teleport location of the island.
+     * Set the home position of the island.
      *
-     * @param environment  The environment to change teleport location for.
-     * @param homeLocation The new home location.
-     * @deprecated See {@link #setIslandHome(Dimension, Location)}
+     * @param dimension    The dimension to change home position for.
+     * @param homePosition The new home position.
      */
-    @Deprecated
-    void setIslandHome(World.Environment environment, @Nullable Location homeLocation);
+    void setIslandHome(Dimension dimension, @Nullable WorldPosition homePosition);
 
     /**
      * Get the visitors' teleport location of the island.
+     * If the world is unloaded, the location's getWorld method will return null.
      *
      * @param dimension The dimension to get the visitors-location from.
      *                  Currently unused, it has no effect.
@@ -392,24 +370,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     Location getVisitorsLocation(Dimension dimension);
 
     /**
-     * Get the visitors' teleport location of the island.
+     * Get the visitors' teleport position of the island.
      *
-     * @deprecated See {@link #getVisitorsLocation(Dimension)}
+     * @param dimension The dimension to get the visitors-position from.
+     *                  Currently unused, it has no effect.
      */
     @Nullable
-    @Deprecated
-    Location getVisitorsLocation();
-
-    /**
-     * Get the visitors' teleport location of the island.
-     *
-     * @param environment The environment to get the visitors-location from.
-     *                    Currently unused, it has no effect.
-     * @deprecated See {@link #getVisitorsLocation(Dimension)}
-     */
-    @Nullable
-    @Deprecated
-    Location getVisitorsLocation(World.Environment environment);
+    WorldPosition getVisitorsPosition(Dimension dimension);
 
     /**
      * Set the visitors' teleport location of the island.
@@ -419,7 +386,17 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setVisitorsLocation(@Nullable Location visitorsLocation);
 
     /**
+     * Set the visitors' teleport position of the island.
+     *
+     * @param dimension        The dimension to change the visitors-position.
+     *                         Currently unused, it has no effect.
+     * @param visitorsPosition The new visitors position.
+     */
+    void setVisitorsLocation(Dimension dimension, @Nullable WorldPosition visitorsPosition);
+
+    /**
      * Get the minimum location of the island.
+     * If the world is unloaded, the location's getWorld will return null.
      */
     Location getMinimum();
 
@@ -430,6 +407,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the minimum protected location of the island.
+     * If the world is unloaded, the location's getWorld will return null.
      */
     Location getMinimumProtected();
 
@@ -440,6 +418,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the maximum location of the island.
+     * If the world is unloaded, the location's getWorld will return null.
      */
     Location getMaximum();
 
@@ -450,6 +429,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the minimum protected location of the island.
+     * If the world is unloaded, the location's getWorld will return null.
      */
     Location getMaximumProtected();
 
@@ -488,55 +468,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     List<Chunk> getAllChunks(Dimension dimension, @IslandChunkFlags int flags);
 
     /**
-     * Get all the chunks of the island.
-     *
-     * @param environment The environment to get the chunks from.
-     * @deprecated See {@link #getAllChunks(Dimension)}
-     */
-    @Deprecated
-    List<Chunk> getAllChunks(World.Environment environment);
-
-    /**
-     * Get all the chunks of the island.
-     *
-     * @param environment The environment to get the chunks from.
-     * @param flags       See {@link IslandChunkFlags}
-     * @deprecated See {@link #getAllChunks(Dimension, int)}
-     */
-    @Deprecated
-    List<Chunk> getAllChunks(World.Environment environment, @IslandChunkFlags int flags);
-
-    /**
-     * Get all the chunks of the island from all the environments.
-     *
-     * @param onlyProtected Whether only chunks inside the protected area should be returned.
-     * @deprecated See {@link #getAllChunks(int)}
-     */
-    @Deprecated
-    List<Chunk> getAllChunks(boolean onlyProtected);
-
-    /**
-     * Get all the chunks of the island, including empty ones.
-     *
-     * @param environment   The environment to get the chunks from.
-     * @param onlyProtected Whether only chunks inside the protected area should be returned.
-     * @deprecated See {@link #getAllChunks(Dimension, int)}
-     */
-    @Deprecated
-    List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected);
-
-    /**
-     * Get all the chunks of the island.
-     *
-     * @param environment   The environment to get the chunks from.
-     * @param onlyProtected Whether only chunks inside the protected area should be returned.
-     * @param noEmptyChunks Should empty chunks be loaded or not?
-     * @deprecated See {@link #getAllChunks(Dimension, int)}
-     */
-    @Deprecated
-    List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks);
-
-    /**
      * Get all the loaded chunks of the island.
      * Similar to {@link #getLoadedChunks(int)} with 0 as flags parameter.
      */
@@ -564,46 +495,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param flags     See {@link IslandChunkFlags}
      */
     List<Chunk> getLoadedChunks(Dimension dimension, @IslandChunkFlags int flags);
-
-    /**
-     * Get all the loaded chunks of the island.
-     *
-     * @param environment The environment to get the chunks from.
-     * @deprecated See {@link #getLoadedChunks(Dimension)}
-     */
-    @Deprecated
-    List<Chunk> getLoadedChunks(World.Environment environment);
-
-    /**
-     * Get all the loaded chunks of the island.
-     *
-     * @param environment The environment to get the chunks from.
-     * @param flags       See {@link IslandChunkFlags}
-     * @deprecated See {@link #getLoadedChunks(Dimension, int)}
-     */
-    @Deprecated
-    List<Chunk> getLoadedChunks(World.Environment environment, @IslandChunkFlags int flags);
-
-    /**
-     * Get all the loaded chunks of the island.
-     *
-     * @param onlyProtected Whether only chunks inside the protected area should be returned.
-     * @param noEmptyChunks Should empty chunks be loaded or not?
-     * @deprecated See {@link #getLoadedChunks(int)}
-     */
-    @Deprecated
-    List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks);
-
-    /**
-     * Get all the loaded chunks of the island.
-     *
-     * @param environment   The environment to get the chunks from.
-     * @param onlyProtected Whether only chunks inside the protected area should be returned.
-     * @param noEmptyChunks Should empty chunks be loaded or not?
-     * @deprecated See {@link #getLoadedChunks(Dimension, int)}
-     */
-    @Deprecated
-    List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks);
 
     /**
      * Get all the chunks of the island asynchronized, including empty chunks.
@@ -639,72 +530,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      */
     List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension dimension, @IslandChunkFlags int flags,
                                                      @Nullable Consumer<Chunk> onChunkLoad);
-
-    /**
-     * Get all the chunks of the island asynchronized, including empty chunks.
-     *
-     * @param environment The environment to get the chunks from.
-     * @deprecated See {@link #getAllChunksAsync(Dimension)}
-     */
-    @Deprecated
-    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment);
-
-    /**
-     * Get all the chunks of the island asynchronized, including empty chunks.
-     *
-     * @param environment The environment to get the chunks from.
-     * @param flags       See {@link IslandChunkFlags}
-     * @deprecated See {@link #getAllChunks(Dimension, int)}
-     */
-    @Deprecated
-    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, @IslandChunkFlags int flags);
-
-    /**
-     * Get all the chunks of the island asynchronized, including empty chunks.
-     *
-     * @param environment The environment to get the chunks from.
-     * @param onChunkLoad A consumer that will be ran when the chunk is loaded. Can be null.
-     * @deprecated See {@link #getAllChunksAsync(Dimension, Consumer)}
-     */
-    @Deprecated
-    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, @Nullable Consumer<Chunk> onChunkLoad);
-
-    /**
-     * Get all the chunks of the island asynchronized, including empty chunks.
-     *
-     * @param environment The environment to get the chunks from.
-     * @param flags       See {@link IslandChunkFlags}
-     * @param onChunkLoad A consumer that will be ran when the chunk is loaded. Can be null.
-     * @deprecated See {@link #getAllChunksAsync(Dimension, int, Consumer)}
-     */
-    @Deprecated
-    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, @IslandChunkFlags int flags,
-                                                     @Nullable Consumer<Chunk> onChunkLoad);
-
-    /**
-     * Get all the chunks of the island asynchronized, including empty chunks.
-     *
-     * @param environment   The environment to get the chunks from.
-     * @param onlyProtected Whether only chunks inside the protected area should be returned.
-     * @param onChunkLoad   A consumer that will be ran when the chunk is loaded. Can be null.
-     * @deprecated See {@link #getAllChunksAsync(Dimension, int, Consumer)}
-     */
-    @Deprecated
-    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected,
-                                                     @Nullable Consumer<Chunk> onChunkLoad);
-
-    /**
-     * Get all the chunks of the island asynchronized.
-     *
-     * @param environment   The environment to get the chunks from.
-     * @param onlyProtected Whether only chunks inside the protected area should be returned.
-     * @param noEmptyChunks Should empty chunks be loaded or not?
-     * @param onChunkLoad   A consumer that will be ran when the chunk is loaded. Can be null.
-     * @deprecated See {@link #getAllChunksAsync(Dimension, int, Consumer)}
-     */
-    @Deprecated
-    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected,
-                                                     boolean noEmptyChunks, @Nullable Consumer<Chunk> onChunkLoad);
 
     /**
      * Reset all the chunks of the island from all the worlds (will make all chunks empty).
@@ -769,87 +594,8 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void resetChunks(Dimension dimension, @IslandChunkFlags int flags, @Nullable Runnable onFinish);
 
     /**
-     * Reset all the chunks of the island (will make all chunks empty).
-     *
-     * @param environment The environment to reset chunks in.
-     * @deprecated See {@link #resetChunks(Dimension)}
-     */
-    @Deprecated
-    void resetChunks(World.Environment environment);
-
-    /**
-     * Reset all the chunks of the island (will make all chunks empty).
-     *
-     * @param environment The environment to reset chunks in.
-     * @param onFinish    Callback runnable.
-     * @deprecated {@link #resetChunks(Dimension, Runnable)}
-     */
-    @Deprecated
-    void resetChunks(World.Environment environment, @Nullable Runnable onFinish);
-
-    /**
-     * Reset all the chunks of the island (will make all chunks empty).
-     *
-     * @param environment The environment to reset chunks in.
-     * @param flags       See {@link IslandChunkFlags}
-     * @deprecated See {@link #resetChunks(Dimension, int)}
-     */
-    @Deprecated
-    void resetChunks(World.Environment environment, @IslandChunkFlags int flags);
-
-    /**
-     * Reset all the chunks of the island (will make all chunks empty).
-     *
-     * @param environment The environment to reset chunks in.
-     * @param flags       See {@link IslandChunkFlags}
-     * @param onFinish    Callback runnable.
-     * @deprecated See {@link #resetChunks(Dimension, int, Runnable)}
-     */
-    @Deprecated
-    void resetChunks(World.Environment environment, @IslandChunkFlags int flags, @Nullable Runnable onFinish);
-
-    /**
-     * Reset all the chunks of the island (will make all chunks empty).
-     *
-     * @param environment   The environment to reset chunks in.
-     * @param onlyProtected Whether only chunks inside the protected area should be reset.
-     * @deprecated See {@link #resetChunks(Dimension, int)}
-     */
-    @Deprecated
-    void resetChunks(World.Environment environment, boolean onlyProtected);
-
-    /**
-     * Reset all the chunks of the island (will make all chunks empty).
-     *
-     * @param environment   The environment to reset chunks in.
-     * @param onlyProtected Whether only chunks inside the protected area should be reset.
-     * @param onFinish      Callback runnable.
-     * @deprecated See {@link #resetChunks(Dimension, int, Runnable)}
-     */
-    @Deprecated
-    void resetChunks(World.Environment environment, boolean onlyProtected, @Nullable Runnable onFinish);
-
-    /**
-     * Reset all the chunks of the island from all the worlds (will make all chunks empty).
-     *
-     * @param onlyProtected Whether only chunks inside the protected area should be reset.
-     * @deprecated See {@link #resetChunks(int)}
-     */
-    @Deprecated
-    void resetChunks(boolean onlyProtected);
-
-    /**
-     * Reset all the chunks of the island from all the worlds (will make all chunks empty).
-     *
-     * @param onlyProtected Whether only chunks inside the protected area should be reset.
-     * @param onFinish      Callback runnable.
-     * @deprecated See {@link #resetChunks(int, Runnable)}
-     */
-    @Deprecated
-    void resetChunks(boolean onlyProtected, @Nullable Runnable onFinish);
-
-    /**
      * Check if the location is inside the island's area.
+     * Similar to {@link #isInside(Location, int)} or {@link #isInside(Location, double)} with extraRadius set to 0.
      *
      * @param location The location to check.
      */
@@ -858,19 +604,82 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     /**
      * Check if the location is inside the island's area.
      *
-     * @param location The location to check.
+     * @param location    The location to check.
+     * @param extraRadius Add extra radius to the range.
      */
     boolean isInside(Location location, int extraRadius);
 
     /**
      * Check if the location is inside the island's area.
      *
-     * @param location The location to check.
+     * @param location    The location to check.
+     * @param extraRadius Add extra radius to the range.
      */
     boolean isInside(Location location, double extraRadius);
 
     /**
+     * Check if the location is inside the island's area.
+     * The world is ignored in this case.
+     * Similar to {@link #isInside(BlockPosition, int)} or {@link #isInside(BlockPosition, double)} with extraRadius set to 0.
+     *
+     * @param blockPosition The position to check.
+     */
+    boolean isInside(BlockPosition blockPosition);
+
+    /**
+     * Check if the position is inside the island's area.
+     * The world is ignored in this case.
+     *
+     * @param blockPosition The position to check.
+     * @param extraRadius   Add extra radius to the range.
+     */
+    boolean isInside(BlockPosition blockPosition, int extraRadius);
+
+    /**
+     * Check if the position is inside the island's area.
+     *
+     * @param blockPosition The position to check.
+     * @param extraRadius   Add extra radius to the range.
+     */
+    boolean isInside(BlockPosition blockPosition, double extraRadius);
+
+    /**
+     * Check if the location is inside the island's area.
+     * The world is ignored in this case.
+     * Similar to {@link #isInside(WorldPosition, int)} or {@link #isInside(WorldPosition, double)} with extraRadius set to 0.
+     *
+     * @param worldPosition The position to check.
+     */
+    boolean isInside(WorldPosition worldPosition);
+
+    /**
+     * Check if the position is inside the island's area.
+     * The world is ignored in this case.
+     *
+     * @param worldPosition The position to check.
+     * @param extraRadius   Add extra radius to the range.
+     */
+    boolean isInside(WorldPosition worldPosition, int extraRadius);
+
+    /**
+     * Check if the position is inside the island's area.
+     *
+     * @param worldPosition The position to check.
+     * @param extraRadius   Add extra radius to the range.
+     */
+    boolean isInside(WorldPosition worldPosition, double extraRadius);
+
+    /**
+     * Check if a chunk is inside the island's area.
+     * Similar to {@link #isInside(World, int, int)}
+     *
+     * @param chunk The chunk to check.
+     */
+    boolean isInside(Chunk chunk);
+
+    /**
      * Check if a chunk location is inside the island's area.
+     * Similar to {@link #isInside(World, int, int, int)} or {@link #isInside(World, int, int, double)} with extraRadius set to 0.
      *
      * @param world  The world of the chunk.
      * @param chunkX The x-coords of the chunk.
@@ -881,11 +690,82 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     /**
      * Check if a chunk location is inside the island's area.
      *
+     * @param world       The world of the chunk.
+     * @param chunkX      The x-coords of the chunk.
+     * @param chunkZ      The z-coords of the chunk.
+     * @param extraRadius Add extra radius to the range.
+     */
+    boolean isInside(World world, int chunkX, int chunkZ, int extraRadius);
+
+    /**
+     * Check if a chunk location is inside the island's area.
+     *
+     * @param world       The world of the chunk.
+     * @param chunkX      The x-coords of the chunk.
+     * @param chunkZ      The z-coords of the chunk.
+     * @param extraRadius Add extra radius to the range.
+     */
+    boolean isInside(World world, int chunkX, int chunkZ, double extraRadius);
+
+    /**
+     * Check if a chunk location is inside the island's area.
+     * Similar to {@link #isInside(WorldInfo, int, int, int)} or {@link #isInside(WorldInfo, int, int, double)} with extraRadius set to 0.
+     *
      * @param worldInfo The world of the chunk.
      * @param chunkX    The x-coords of the chunk.
      * @param chunkZ    The z-coords of the chunk.
      */
     boolean isInside(WorldInfo worldInfo, int chunkX, int chunkZ);
+
+    /**
+     * Check if a chunk location is inside the island's area.
+     *
+     * @param worldInfo   The world of the chunk.
+     * @param chunkX      The x-coords of the chunk.
+     * @param chunkZ      The z-coords of the chunk.
+     * @param extraRadius Add extra radius to the range.
+     */
+    boolean isInside(WorldInfo worldInfo, int chunkX, int chunkZ, int extraRadius);
+
+    /**
+     * Check if a chunk location is inside the island's area.
+     *
+     * @param worldInfo   The world of the chunk.
+     * @param chunkX      The x-coords of the chunk.
+     * @param chunkZ      The z-coords of the chunk.
+     * @param extraRadius Add extra radius to the range.
+     */
+    boolean isInside(WorldInfo worldInfo, int chunkX, int chunkZ, double extraRadius);
+
+    /**
+     * Check if a chunk position is inside the island's area.
+     * The world in this case is ignored.
+     * Similar to {@link #isInside(int, int, int)} or {@link #isInside(int, int, double)} with extraRadius set to 0.
+     *
+     * @param chunkX The x-coords of the chunk.
+     * @param chunkZ The z-coords of the chunk.
+     */
+    boolean isInside(int chunkX, int chunkZ);
+
+    /**
+     * Check if a chunk position is inside the island's area.
+     * The world in this case is ignored.
+     *
+     * @param chunkX      The x-coords of the chunk.
+     * @param chunkZ      The z-coords of the chunk.
+     * @param extraRadius Add extra radius to the range.
+     */
+    boolean isInside(int chunkX, int chunkZ, int extraRadius);
+
+    /**
+     * Check if a chunk position is inside the island's area.
+     * The world in this case is ignored.
+     *
+     * @param chunkX      The x-coords of the chunk.
+     * @param chunkZ      The z-coords of the chunk.
+     * @param extraRadius Add extra radius to the range.
+     */
+    boolean isInside(int chunkX, int chunkZ, double extraRadius);
 
     /**
      * Check if the location is inside the island's protected area.
@@ -911,11 +791,153 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     boolean isInsideRange(Location location, double extraRadius);
 
     /**
+     * Check if the position is inside the island's protected area.
+     * The world in this case is ignored.
+     *
+     * @param blockPosition The position to check.
+     */
+    boolean isInsideRange(BlockPosition blockPosition);
+
+    /**
+     * Check if the position is inside the island's protected area.
+     * The world in this case is ignored.
+     *
+     * @param blockPosition The position to check.
+     * @param extraRadius   Add extra radius to the protected range.
+     */
+    boolean isInsideRange(BlockPosition blockPosition, int extraRadius);
+
+    /**
+     * Check if the position is inside the island's protected area.
+     * The world in this case is ignored.
+     *
+     * @param blockPosition The position to check.
+     * @param extraRadius   Add extra radius to the protected range.
+     */
+    boolean isInsideRange(BlockPosition blockPosition, double extraRadius);
+
+    /**
+     * Check if the position is inside the island's protected area.
+     * The world in this case is ignored.
+     *
+     * @param worldPosition The position to check.
+     */
+    boolean isInsideRange(WorldPosition worldPosition);
+
+    /**
+     * Check if the position is inside the island's protected area.
+     * The world in this case is ignored.
+     *
+     * @param worldPosition The position to check.
+     * @param extraRadius   Add extra radius to the protected range.
+     */
+    boolean isInsideRange(WorldPosition worldPosition, int extraRadius);
+
+    /**
+     * Check if the position is inside the island's protected area.
+     * The world in this case is ignored.
+     *
+     * @param worldPosition The position to check.
+     * @param extraRadius   Add extra radius to the protected range.
+     */
+    boolean isInsideRange(WorldPosition worldPosition, double extraRadius);
+
+    /**
      * Check if the chunk is inside the island's protected area.
      *
      * @param chunk The chunk to check.
      */
     boolean isInsideRange(Chunk chunk);
+
+    /**
+     * Check if a chunk location is inside the island's protected area.
+     * Similar to {@link #isInside(World, int, int, int)} or {@link #isInside(World, int, int, double)} with extraRadius set to 0.
+     *
+     * @param world  The world of the chunk.
+     * @param chunkX The x-coords of the chunk.
+     * @param chunkZ The z-coords of the chunk.
+     */
+    boolean isInsideRange(World world, int chunkX, int chunkZ);
+
+    /**
+     * Check if a chunk location is inside the island's protected area.
+     *
+     * @param world       The world of the chunk.
+     * @param chunkX      The x-coords of the chunk.
+     * @param chunkZ      The z-coords of the chunk.
+     * @param extraRadius Add extra radius to the protected range.
+     */
+    boolean isInsideRange(World world, int chunkX, int chunkZ, int extraRadius);
+
+    /**
+     * Check if a chunk location is inside the island's protected area.
+     *
+     * @param world       The world of the chunk.
+     * @param chunkX      The x-coords of the chunk.
+     * @param chunkZ      The z-coords of the chunk.
+     * @param extraRadius Add extra radius to the protected range.
+     */
+    boolean isInsideRange(World world, int chunkX, int chunkZ, double extraRadius);
+
+    /**
+     * Check if a chunk location is inside the island's protected area.
+     * Similar to {@link #isInside(WorldInfo, int, int, int)} or {@link #isInside(WorldInfo, int, int, double)} with extraRadius set to 0.
+     *
+     * @param worldInfo The world of the chunk.
+     * @param chunkX    The x-coords of the chunk.
+     * @param chunkZ    The z-coords of the chunk.
+     */
+    boolean isInsideRange(WorldInfo worldInfo, int chunkX, int chunkZ);
+
+    /**
+     * Check if a chunk location is inside the island's protected area.
+     *
+     * @param worldInfo   The world of the chunk.
+     * @param chunkX      The x-coords of the chunk.
+     * @param chunkZ      The z-coords of the chunk.
+     * @param extraRadius Add extra radius to the protected range.
+     */
+    boolean isInsideRange(WorldInfo worldInfo, int chunkX, int chunkZ, int extraRadius);
+
+    /**
+     * Check if a chunk location is inside the island's protected area.
+     *
+     * @param worldInfo   The world of the chunk.
+     * @param chunkX      The x-coords of the chunk.
+     * @param chunkZ      The z-coords of the chunk.
+     * @param extraRadius Add extra radius to the protected range.
+     */
+    boolean isInsideRange(WorldInfo worldInfo, int chunkX, int chunkZ, double extraRadius);
+
+    /**
+     * Check if a chunk position is inside the island's protected area.
+     * The world in this case is ignored.
+     * Similar to {@link #isInside(int, int, int)} or {@link #isInside(int, int, double)} with extraRadius set to 0.
+     *
+     * @param chunkX The x-coords of the chunk.
+     * @param chunkZ The z-coords of the chunk.
+     */
+    boolean isInsideRange(int chunkX, int chunkZ);
+
+    /**
+     * Check if a chunk position is inside the island's protected area.
+     * The world in this case is ignored.
+     *
+     * @param chunkX      The x-coords of the chunk.
+     * @param chunkZ      The z-coords of the chunk.
+     * @param extraRadius Add extra radius to the protected range.
+     */
+    boolean isInsideRange(int chunkX, int chunkZ, int extraRadius);
+
+    /**
+     * Check if a chunk position is inside the island's protected area.
+     * The world in this case is ignored.
+     *
+     * @param chunkX      The x-coords of the chunk.
+     * @param chunkZ      The z-coords of the chunk.
+     * @param extraRadius Add extra radius to the protected range.
+     */
+    boolean isInsideRange(int chunkX, int chunkZ, double extraRadius);
 
     /**
      * Is the normal world enabled for the island?
@@ -1075,11 +1097,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     boolean isSpawn();
 
     /**
-     * Get the name of the island.
-     */
-    String getName();
-
-    /**
      * Set the name of the island.
      *
      * @param islandName The name to set.
@@ -1087,9 +1104,30 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setName(String islandName);
 
     /**
-     * Get the name of the island, unformatted.
+     * Get the name of the island in respect to color-support.
+     * This method will call {@link #getFormattedName()} or {@link #getStrippedName()}, depends on color-support.
      */
+    String getName();
+
+    /**
+     * Get the name of the island in its stripped form.
+     *
+     * @deprecated See {@link #getStrippedName()}
+     */
+    @Deprecated
     String getRawName();
+
+    /**
+     * Get the name of the island in its stripped form.
+     * Unlike {@link #getName()}, this method will always return the stripped form of the name.
+     */
+    String getStrippedName();
+
+    /**
+     * Get the name of the island in its color-formatted form.
+     * Unlike {@link #getName()}, this method will always return the color-formatted form of the name.
+     */
+    String getFormattedName();
 
     /**
      * Get the description of the island.
@@ -1237,10 +1275,24 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     /**
      * Send a plain message to all the members of the island.
      *
+     * @param message The message to send
+     */
+    void sendMessage(String message);
+
+    /**
+     * Send a plain message to all the members of the island.
+     *
      * @param message        The message to send
      * @param ignoredMembers An array of ignored members.
      */
     void sendMessage(String message, UUID... ignoredMembers);
+
+    /**
+     * Send a message to all the members of the island.
+     *
+     * @param messageComponent The message to send
+     */
+    void sendMessage(IMessageComponent messageComponent);
 
     /**
      * Send a message to all the members of the island.
@@ -1255,9 +1307,28 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      *
      * @param messageComponent The message to send
      * @param ignoredMembers   An array of ignored members.
+     */
+    void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers);
+
+    /**
+     * Send a message to all the members of the island.
+     *
+     * @param messageComponent The message to send
+     * @param ignoredMembers   An array of ignored members.
      * @param args             Arguments for the component.
      */
     void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers, Object... args);
+
+    /**
+     * Send a plain message to all the members of the island.
+     *
+     * @param title    The main title to send.
+     * @param subtitle The sub title to send.
+     * @param fadeIn   The fade-in duration in ticks.
+     * @param duration The title duration in ticks.
+     * @param fadeOut  The fade-out duration in ticks.
+     */
+    void sendTitle(@Nullable String title, @Nullable String subtitle, int fadeIn, int duration, int fadeOut);
 
     /**
      * Send a plain message to all the members of the island.
@@ -1270,6 +1341,15 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param ignoredMembers An array of ignored members.
      */
     void sendTitle(@Nullable String title, @Nullable String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers);
+
+    /**
+     * Execute a command on all the members of the island.
+     * You can use {player-name} as a placeholder for the member's name.
+     *
+     * @param command           The command to execute.
+     * @param onlyOnlineMembers Whether the command should be executed only for online members.
+     */
+    void executeCommand(String command, boolean onlyOnlineMembers);
 
     /**
      * Execute a command on all the members of the island.
@@ -2102,6 +2182,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setEntityLimit(Key key, int limit);
 
     /**
+     * Remove the limit of an entity.
+     *
+     * @param key The entity's key to remove it's limit.
+     */
+    void removeEntityLimit(Key key);
+
+    /**
      * A method to check if a specific entity has reached the limit.
      *
      * @param entityType The entity's type to check.
@@ -2198,6 +2285,12 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get a list of all active island effects with their levels.
      */
     Map<PotionEffectType, Integer> getPotionEffects();
+
+    /**
+     * Get a list of all custom active island effects with their levels.
+     */
+    Map<PotionEffectType, Integer> getCustomPotionEffects();
+
 
     /**
      * Give all the island effects to a player.
@@ -2329,6 +2422,17 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     IslandWarp createWarp(String name, Location location, @Nullable WarpCategory warpCategory);
 
     /**
+     * Create a warp for the island.
+     *
+     * @param name         The name of the warp.
+     * @param worldInfo    The world of the warp.
+     * @param position     The position of the warp.
+     * @param warpCategory The category to add the island.
+     * @return The new island warp object.
+     */
+    IslandWarp createWarp(String name, WorldInfo worldInfo, WorldPosition position, @Nullable WarpCategory warpCategory);
+
+    /**
      * Rename a warp.
      *
      * @param islandWarp The warp to rename.
@@ -2356,9 +2460,18 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Teleport a player to a warp.
      *
      * @param superiorPlayer The player to teleport.
-     * @param warp           The warp's name to teleport the player to.
+     * @param warpName       The warp's name to teleport the player to.
      */
-    void warpPlayer(SuperiorPlayer superiorPlayer, String warp);
+    void warpPlayer(SuperiorPlayer superiorPlayer, String warpName);
+
+    /**
+     * Teleport a player to a warp.
+     *
+     * @param superiorPlayer The player to teleport.
+     * @param warpName       The warp's name to teleport the player to.
+     * @param force          Force teleportation of the player
+     */
+    void warpPlayer(SuperiorPlayer superiorPlayer, String warpName, boolean force);
 
     /**
      * Delete a warp from the island.
@@ -2457,6 +2570,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      */
     void disableSettings(IslandFlag islandFlag);
 
+    /**
+     * Reset the island settings to default values.
+     */
+    void resetSettings();
+
     /*
      *  Generator related methods
      */
@@ -2505,34 +2623,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
                                    @Nullable SuperiorPlayer caller, boolean callEvent);
 
     /**
-     * Set a percentage for a specific key in a specific world.
-     *
-     * @param key         The block to change the generator rate of.
-     * @param percentage  The percentage to set the new rate.
-     * @param environment The world to change the rates in.
-     * @deprecated See {@link #setGeneratorPercentage(Key, int, Dimension)}
-     */
-    @Deprecated
-    void setGeneratorPercentage(Key key, int percentage, World.Environment environment);
-
-    /**
-     * Set a percentage for a specific key in a specific world.
-     *
-     * @param key         The block to change the generator rate of.
-     * @param percentage  The percentage to set the new rate.
-     * @param environment The world to change the rates in.
-     * @param caller      The player that changes the percentages (used for the event).
-     *                    If null, it means the console did the operation.
-     * @param callEvent   Whether to call the {@link IslandChangeGeneratorRateEvent}
-     * @return Whether the operation succeed.
-     * The operation may fail if callEvent is true and the event was cancelled.
-     * @deprecated See {@link #setGeneratorPercentage(Key, int, Dimension, SuperiorPlayer, boolean)}
-     */
-    @Deprecated
-    boolean setGeneratorPercentage(Key key, int percentage, World.Environment environment,
-                                   @Nullable SuperiorPlayer caller, boolean callEvent);
-
-    /**
      * Get the percentage for a specific key in a specific world.
      * The formula is (amount * 100) / total_amount.
      *
@@ -2542,28 +2632,9 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     int getGeneratorPercentage(Key key, Dimension dimension);
 
     /**
-     * Get the percentage for a specific key in a specific world.
-     * The formula is (amount * 100) / total_amount.
-     *
-     * @param key         The material key
-     * @param environment The world environment.
-     * @deprecated See {@link #getGeneratorPercentage(Key, Dimension)}
-     */
-    @Deprecated
-    int getGeneratorPercentage(Key key, World.Environment environment);
-
-    /**
      * Get the percentages of the materials for the cobblestone generator in the island for a specific world.
      */
     Map<String, Integer> getGeneratorPercentages(Dimension dimension);
-
-    /**
-     * Get the percentages of the materials for the cobblestone generator in the island for a specific world.
-     *
-     * @deprecated See {@link #getGeneratorPercentages(Dimension)}
-     */
-    @Deprecated
-    Map<String, Integer> getGeneratorPercentages(World.Environment environment);
 
     /**
      * Set an amount for a specific key in a specific world.
@@ -2571,25 +2642,9 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setGeneratorAmount(Key key, @Size int amount, Dimension dimension);
 
     /**
-     * Set an amount for a specific key in a specific world.
-     *
-     * @deprecated See {@link #setGeneratorAmount(Key, int, Dimension)}
-     */
-    @Deprecated
-    void setGeneratorAmount(Key key, @Size int amount, World.Environment environment);
-
-    /**
      * Remove a rate for a specific key in a specific world.
      */
     void removeGeneratorAmount(Key key, Dimension dimension);
-
-    /**
-     * Remove a rate for a specific key in a specific world.
-     *
-     * @deprecated See {@link #removeGeneratorAmount(Key, Dimension)}
-     */
-    @Deprecated
-    void removeGeneratorAmount(Key key, World.Environment environment);
 
     /**
      * Get the amount of a specific key in a specific world.
@@ -2597,25 +2652,9 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     int getGeneratorAmount(Key key, Dimension dimension);
 
     /**
-     * Get the amount of a specific key in a specific world.
-     *
-     * @deprecated See {@link #getGeneratorAmount(Key, Dimension)}
-     */
-    @Deprecated
-    int getGeneratorAmount(Key key, World.Environment environment);
-
-    /**
      * Get the total amount of all the generator keys together.
      */
     int getGeneratorTotalAmount(Dimension dimension);
-
-    /**
-     * Get the total amount of all the generator keys together.
-     *
-     * @deprecated See {@link #getGeneratorTotalAmount(Dimension)}
-     */
-    @Deprecated
-    int getGeneratorTotalAmount(World.Environment environment);
 
     /**
      * Get the amounts of the materials for the cobblestone generator in the island.
@@ -2623,38 +2662,14 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     Map<String, Integer> getGeneratorAmounts(Dimension dimension);
 
     /**
-     * Get the amounts of the materials for the cobblestone generator in the island.
-     *
-     * @deprecated See {@link #getGeneratorAmounts(Dimension)}
-     */
-    @Deprecated
-    Map<String, Integer> getGeneratorAmounts(World.Environment environment);
-
-    /**
      * Get the custom amounts of the materials for the cobblestone generator in the island.
      */
     Map<Key, Integer> getCustomGeneratorAmounts(Dimension dimension);
 
     /**
-     * Get the custom amounts of the materials for the cobblestone generator in the island.
-     *
-     * @deprecated See {@link #getCustomGeneratorAmounts(Dimension)}
-     */
-    @Deprecated
-    Map<Key, Integer> getCustomGeneratorAmounts(World.Environment environment);
-
-    /**
      * Clear all the custom generator amounts for this island.
      */
     void clearGeneratorAmounts(Dimension dimension);
-
-    /**
-     * Clear all the custom generator amounts for this island.
-     *
-     * @deprecated See {@link #clearGeneratorAmounts(Dimension)}
-     */
-    @Deprecated
-    void clearGeneratorAmounts(World.Environment environment);
 
     /**
      * Generate a block at a specified location.
@@ -2689,22 +2704,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     @Nullable
     Key generateBlock(Location location, Dimension dimension, boolean optimizeDefaultBlock);
 
-    /**
-     * Generate a block at a specified location.
-     *
-     * @param location             The location to generate block at.
-     * @param environment          The world to get generator rates from.
-     * @param optimizeDefaultBlock When set to true and the default block needs to be generated, the plugin will
-     *                             not play any effect, count the block towards the block counts or set the block.
-     *                             This is useful when calling the method from BlockFromToEvent, and instead of letting
-     *                             the plugin do the logic of vanilla, the plugin lets the game do it.
-     * @return The block type that was generated, null if failed.
-     * @deprecated See {@link #generateBlock(Location, Dimension, boolean)}
-     */
-    @Deprecated
-    @Nullable
-    Key generateBlock(Location location, World.Environment environment, boolean optimizeDefaultBlock);
-
     /*
      *  Schematic methods
      */
@@ -2715,15 +2714,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param dimension The dimension to check.
      */
     boolean wasSchematicGenerated(Dimension dimension);
-
-    /**
-     * Checks if a schematic was generated already.
-     *
-     * @param environment The environment to check.
-     * @deprecated See {@link #wasSchematicGenerated(Dimension)}
-     */
-    @Deprecated
-    boolean wasSchematicGenerated(World.Environment environment);
 
     /**
      * Set schematic generated flag to true.
@@ -2739,25 +2729,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param generated The flag to set.
      */
     void setSchematicGenerate(Dimension dimension, boolean generated);
-
-    /**
-     * Set schematic generated flag to true.
-     *
-     * @param environment The environment to set.
-     * @deprecated See {@link #setSchematicGenerate(Dimension)}
-     */
-    @Deprecated
-    void setSchematicGenerate(World.Environment environment);
-
-    /**
-     * Set schematic generated flag.
-     *
-     * @param environment The environment to set.
-     * @param generated   The flag to set.
-     * @deprecated See {@link #setSchematicGenerate(Dimension, boolean)}
-     */
-    @Deprecated
-    void setSchematicGenerate(World.Environment environment, boolean generated);
 
     /**
      * Get the generated schematics.
@@ -2912,13 +2883,9 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
         Builder setIslandHome(Location location, Dimension dimension);
 
-        @Deprecated
-        Builder setIslandHome(Location location, World.Environment environment);
+        Builder setIslandHome(Dimension dimension, WorldPosition worldPosition);
 
         Map<Dimension, Location> getIslandHomesAsDimensions();
-
-        @Deprecated
-        Map<World.Environment, Location> getIslandHomes();
 
         Builder addIslandMember(SuperiorPlayer superiorPlayer);
 
@@ -2958,13 +2925,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
         Builder setGeneratorRate(Key block, int rate, Dimension dimension);
 
-        @Deprecated
-        Builder setGeneratorRate(Key block, int rate, World.Environment environment);
-
         Map<Dimension, KeyMap<Integer>> getGeneratorRatesAsDimensions();
-
-        @Deprecated
-        Map<World.Environment, KeyMap<Integer>> getGeneratorRates();
 
         Builder addUniqueVisitor(SuperiorPlayer superiorPlayer, long visitTime);
 
@@ -2988,13 +2949,9 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
         Builder setVisitorHome(Location location, Dimension dimension);
 
-        @Deprecated
-        Builder setVisitorHome(Location location, World.Environment environment);
+        Builder setVisitorHome(Dimension dimension, WorldPosition worldPosition);
 
         Map<Dimension, Location> getVisitorHomesAsDimensions();
-
-        @Deprecated
-        Map<World.Environment, Location> getVisitorHomes();
 
         Builder setIslandSize(int islandSize);
 
@@ -3038,9 +2995,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
         Builder addWarp(String name, String category, Location location, boolean isPrivate, @Nullable ItemStack icon);
 
+        Builder addWarp(String name, String category, WorldInfo worldInfo, WorldPosition worldPosition, boolean isPrivate, @Nullable ItemStack icon);
+
         boolean hasWarp(String name);
 
         boolean hasWarp(Location location);
+
+        boolean hasWarp(WorldInfo worldInfo, WorldPosition worldPosition);
 
         Builder addWarpCategory(String name, int slot, @Nullable ItemStack icon);
 

@@ -24,6 +24,8 @@ items:
   '$':
     type: MOB_SPAWNER
     name: '&e&lSPAWNERS ->'
+    flags:
+      - HIDE_ATTRIBUTES
   '*':
     type: BOOK_AND_QUILL
     name: '&e&lITEMS ->'

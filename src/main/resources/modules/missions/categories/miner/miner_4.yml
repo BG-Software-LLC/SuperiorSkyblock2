@@ -44,6 +44,24 @@ required-blocks:
 
 # Icons used in the menus.
 icons:
+  locked:
+    type: PAPER
+    name: '&aMiner IV'
+    lore:
+      - '&7I have more customers, I need more materials!'
+      - '&7Mine x192 coal ore and x320 iron ore.'
+      - ''
+      - '&6Required Blocks:'
+      - '&8 - &7x192 Coal Ore'
+      - '&8 - &7x320 Iron Ore'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$125,000'
+      - ''
+      - '&6Coal Ore Mined: &7{value_coal_ore}/192'
+      - '&6Iron Ore Mined: &7{value_iron_ore}/320'
+      - '&c&l ✘ &7Locked'
+    amount: 4
   not-completed:
     type: PAPER
     name: '&aMiner IV'
@@ -62,6 +80,7 @@ icons:
       - '&6Iron Ore Mined: &7{value_iron_ore}/320'
       - '&6Progress: &7{0}%'
       - '&c&l ✘ &7Not Completed'
+    amount: 4
   can-complete:
     type: PAPER
     name: '&aMiner IV'
@@ -80,10 +99,8 @@ icons:
       - '&6Iron Ore Mined: &7320/320'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Click to redeem your reward.'
-    enchants:
-      DURABILITY: 1
-    flags:
-      - HIDE_ENCHANTS
+    amount: 4
+    glow: true
   completed:
     type: MAP
     name: '&aMiner IV'
@@ -98,3 +115,4 @@ icons:
       - '&6Iron Ore Mined: &7320/320'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Already Claimed.'
+    amount: 4

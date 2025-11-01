@@ -43,6 +43,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,6 +57,7 @@ public class NMSChunksImpl implements NMSChunks {
     public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         KeyBlocksCache.cacheAllBlocks();
+        CropsTickingTileEntity.register();
     }
 
     @Override
@@ -106,15 +108,15 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     @Override
-    public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
-                                                                    Synchronized<Chunk2ObjectMap<CalculatedChunk>> unloadedChunksCache) {
-        List<CalculatedChunk> allCalculatedChunks = new LinkedList<>();
+    public CompletableFuture<List<CalculatedChunk.Blocks>> calculateChunks(List<ChunkPosition> chunkPositions,
+                                                                    Synchronized<Chunk2ObjectMap<CalculatedChunk.Blocks>> unloadedChunksCache) {
+        List<CalculatedChunk.Blocks> allCalculatedChunks = new LinkedList<>();
         List<ChunkPosition> chunkPositionsToCalculate = new LinkedList<>();
 
         Iterator<ChunkPosition> chunkPositionsIterator = chunkPositions.iterator();
         while (chunkPositionsIterator.hasNext()) {
             ChunkPosition chunkPosition = chunkPositionsIterator.next();
-            CalculatedChunk cachedCalculatedChunk = unloadedChunksCache.readAndGet(m -> m.get(chunkPosition));
+            CalculatedChunk.Blocks cachedCalculatedChunk = unloadedChunksCache.readAndGet(m -> m.get(chunkPosition));
             if (cachedCalculatedChunk != null) {
                 allCalculatedChunks.add(cachedCalculatedChunk);
                 chunkPositionsIterator.remove();
@@ -126,7 +128,7 @@ public class NMSChunksImpl implements NMSChunks {
         if (chunkPositions.isEmpty())
             return CompletableFuture.completedFuture(allCalculatedChunks);
 
-        CompletableFuture<List<CalculatedChunk>> completableFuture = new CompletableFuture<>();
+        CompletableFuture<List<CalculatedChunk.Blocks>> completableFuture = new CompletableFuture<>();
 
         NMSUtils.runActionOnChunks(chunkPositions, false, new NMSUtils.ChunkCallback() {
             @Override
@@ -168,7 +170,7 @@ public class NMSChunksImpl implements NMSChunks {
                     }
                 }
 
-                CalculatedChunk calculatedChunk = new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations);
+                CalculatedChunk.Blocks calculatedChunk = new CalculatedChunk.Blocks(chunkPosition, blockCounts, spawnersLocations);
                 allCalculatedChunks.add(calculatedChunk);
 
                 if (!isLoaded)
@@ -185,27 +187,33 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     @Override
-    public CompletableFuture<KeyMap<Counter>> calculateChunkEntities(Collection<ChunkPosition> chunkPositions) {
+    public CompletableFuture<List<CalculatedChunk.Entities>> calculateChunkEntities(Collection<ChunkPosition> chunkPositions) {
         if (chunkPositions.isEmpty())
-            return CompletableFuture.completedFuture(KeyMaps.createEmptyMap());
+            return CompletableFuture.completedFuture(Collections.emptyList());
 
-        CompletableFuture<KeyMap<Counter>> completableFuture = new CompletableFuture<>();
+        CompletableFuture<List<CalculatedChunk.Entities>> completableFuture = new CompletableFuture<>();
 
-        KeyMap<Counter> chunkEntities = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
+        List<CalculatedChunk.Entities> allCalculatedChunks = new LinkedList<>();
 
         NMSUtils.runActionOnChunks(chunkPositions, false, new NMSUtils.ChunkCallback() {
 
             @Override
             public void onChunk(Chunk chunk, boolean isLoaded) {
+                KeyMap<Counter> chunkEntities = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
+
                 for (org.bukkit.entity.Entity bukkitEntity : chunk.bukkitChunk.getEntities()) {
                     if (!BukkitEntities.canBypassEntityLimit(bukkitEntity))
                         chunkEntities.computeIfAbsent(Keys.of(bukkitEntity), i -> new Counter(0)).inc(1);
                 }
+
+                ChunkPosition chunkPosition = ChunkPosition.of(chunk.getWorld().getWorld(), chunk.locX, chunk.locZ, false);
+                CalculatedChunk.Entities calculatedChunk = new CalculatedChunk.Entities(chunkPosition, chunkEntities);
+                allCalculatedChunks.add(calculatedChunk);
             }
 
             @Override
             public void onFinish() {
-                completableFuture.complete(chunkEntities);
+                completableFuture.complete(allCalculatedChunks);
             }
         });
 

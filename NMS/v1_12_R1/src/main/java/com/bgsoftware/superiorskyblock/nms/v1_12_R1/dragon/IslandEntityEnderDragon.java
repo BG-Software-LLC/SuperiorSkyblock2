@@ -92,7 +92,7 @@ public class IslandEntityEnderDragon extends EntityEnderDragon {
         this.islandBlockPosition = new BlockPosition(middleBlock.getX(), middleBlock.getY(), middleBlock.getZ());
 
         IslandEnderDragonBattle dragonBattle = new IslandEnderDragonBattle(island, (WorldServer) world, this.islandBlockPosition, this);
-        dragonBattleHandler.addDragonBattle(island.getUniqueId(), dragonBattle);
+        dragonBattleHandler.addDragonBattle(island.getCache(), dragonBattle);
     }
 
 }

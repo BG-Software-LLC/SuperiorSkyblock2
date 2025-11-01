@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.signs;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
@@ -30,6 +31,9 @@ public class IslandSigns {
 
     public static Result handleSignPlace(SuperiorPlayer superiorPlayer, Location warpLocation, String[] warpLines,
                                          boolean sendMessage) {
+        // Adjust to the middle of the block
+        warpLocation.add(0.5, 0, 0.5);
+
         Island island = plugin.getGrid().getIslandAt(warpLocation);
         if (island == null)
             return new Result(Reason.NOT_IN_ISLAND, false);
@@ -50,13 +54,15 @@ public class IslandSigns {
         return new Result(Reason.SUCCESS, false);
     }
 
-    public static Result handleSignBreak(SuperiorPlayer superiorPlayer, Sign sign) {
+    public static Result handleSignBreak(@Nullable Island island, @Nullable SuperiorPlayer superiorPlayer, Sign sign) {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location signLocation = sign.getLocation(wrapper.getHandle());
-            Island island = plugin.getGrid().getIslandAt(signLocation);
 
-            if (island == null)
-                return new Result(Reason.NOT_IN_ISLAND, false);
+            if (island == null) {
+                island = plugin.getGrid().getIslandAt(signLocation);
+                if (island == null)
+                    return new Result(Reason.NOT_IN_ISLAND, false);
+            }
 
             IslandWarp islandWarp = island.getWarp(signLocation);
 

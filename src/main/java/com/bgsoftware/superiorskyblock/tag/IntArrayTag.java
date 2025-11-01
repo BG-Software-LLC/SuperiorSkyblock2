@@ -53,51 +53,18 @@ import java.util.UUID;
 @SuppressWarnings("WeakerAccess")
 public class IntArrayTag extends Tag<int[]> {
 
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagIntArray");
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = NMSTagConverter.choice(
+            new String[]{"NBTTagIntArray", "IntArrayTag"}, int[].class);
+
+    private static final IntArrayTag EMPTY = new IntArrayTag(new int[0]);
 
     /**
      * Creates the tag.
      *
      * @param value The value.
      */
-    public IntArrayTag(int[] value) {
-        super(value, CLASS, int[].class);
-    }
-
-    public static IntArrayTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to IntArrayTag!");
-
-        try {
-            int[] value = plugin.getNMSTags().getNBTIntArrayValue(tag);
-            return new IntArrayTag(value);
-        } catch (Exception error) {
-            Log.error(error, "An unexpected error occurred while converting tag int-array from NMS:");
-            return null;
-        }
-    }
-
-    public static IntArrayTag fromUUID(UUID uuid) {
-        long MSB = uuid.getMostSignificantBits();
-        long LSB = uuid.getLeastSignificantBits();
-        return new IntArrayTag(new int[]{(int) (MSB >> 32), (int) MSB, (int) (LSB >> 32), (int) LSB});
-    }
-
-    public static IntArrayTag fromStream(DataInputStream is) throws IOException {
-        int length = is.readInt();
-        int[] data = new int[length];
-        for (int i = 0; i < length; i++) {
-            data[i] = is.readInt();
-        }
-        return new IntArrayTag(data);
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder integers = new StringBuilder();
-        for (int b : value) {
-            integers.append(b).append(" ");
-        }
-        return "TAG_Int_Array: " + integers.toString();
+    private IntArrayTag(int[] value) {
+        super(value);
     }
 
     @Override
@@ -107,10 +74,20 @@ public class IntArrayTag extends Tag<int[]> {
             os.writeInt(i);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
+    @Override
+    protected NMSTagConverter getNMSConverter() {
+        return TAG_CONVERTER;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder integers = new StringBuilder();
+        for (int b : value) {
+            integers.append(b).append(" ");
+        }
+        return "TAG_Int_Array: " + integers;
+    }
+
     @Override
     public int hashCode() {
         int prime = 31;
@@ -119,13 +96,40 @@ public class IntArrayTag extends Tag<int[]> {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(final Object obj) {
         return this == obj || (obj instanceof IntArrayTag && Arrays.equals(value, ((IntArrayTag) obj).value));
+    }
+
+    public static IntArrayTag of(int[] value) {
+        return value.length == 0 ? EMPTY : new IntArrayTag(value);
+    }
+
+    public static IntArrayTag fromNBT(Object tag) {
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to IntArrayTag!");
+
+        try {
+            int[] value = plugin.getNMSTags().getNBTIntArrayValue(tag);
+            return IntArrayTag.of(value);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while converting tag int-array from NMS:");
+            return null;
+        }
+    }
+
+    public static IntArrayTag fromUUID(UUID uuid) {
+        long MSB = uuid.getMostSignificantBits();
+        long LSB = uuid.getLeastSignificantBits();
+        return IntArrayTag.of(new int[]{(int) (MSB >> 32), (int) MSB, (int) (LSB >> 32), (int) LSB});
+    }
+
+    public static IntArrayTag fromStream(DataInputStream is) throws IOException {
+        int length = is.readInt();
+        int[] data = new int[length];
+        for (int i = 0; i < length; i++) {
+            data[i] = is.readInt();
+        }
+        return IntArrayTag.of(data);
     }
 
 }

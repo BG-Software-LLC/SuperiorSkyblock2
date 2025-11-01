@@ -57,7 +57,7 @@ public class CmdToggle implements ISuperiorCommand {
 
         if (args[1].equalsIgnoreCase("border")) {
             if (!superiorPlayer.hasPermission("superior.island.toggle.border")) {
-                Message.NO_COMMAND_PERMISSION.send(sender);
+                Message.NO_COMMAND_PERMISSION.send(sender, "superior.island.toggle.border");
                 return;
             }
 
@@ -76,7 +76,7 @@ public class CmdToggle implements ISuperiorCommand {
             }
         } else if (args[1].equalsIgnoreCase("blocks")) {
             if (!superiorPlayer.hasPermission("superior.island.toggle.blocks")) {
-                Message.NO_COMMAND_PERMISSION.send(sender);
+                Message.NO_COMMAND_PERMISSION.send(sender, "superior.island.toggle.blocks");
                 return;
             }
 

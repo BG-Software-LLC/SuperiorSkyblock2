@@ -86,7 +86,13 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
     @Override
     public void registerCommand(SuperiorCommand superiorCommand) {
         Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
-        registerCommand(superiorCommand, true);
+
+        if (pendingCommands != null) {
+            pendingCommands.add(() -> registerCommand(superiorCommand));
+            return;
+        }
+
+        playerCommandsMap.registerCommand(superiorCommand);
     }
 
     @Override
@@ -102,7 +108,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
         }
 
         Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
-        adminCommandsMap.registerCommand(superiorCommand, true);
+        adminCommandsMap.registerCommand(superiorCommand);
     }
 
     @Override
@@ -168,15 +174,6 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
     public String getLabel() {
         return label;
-    }
-
-    public void registerCommand(SuperiorCommand superiorCommand, boolean sort) {
-        if (pendingCommands != null) {
-            pendingCommands.add(() -> registerCommand(superiorCommand, sort));
-            return;
-        }
-
-        playerCommandsMap.registerCommand(superiorCommand, sort);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -266,7 +263,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
                     if (!CommandsHelper.hasCommandAccess(command, sender)) {
                         Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", command.getPermission());
-                        Message.NO_COMMAND_PERMISSION.send(sender, locale);
+                        Message.NO_COMMAND_PERMISSION.send(sender, locale, command.getPermission());
                         return false;
                     }
 
@@ -336,7 +333,10 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                 }
             }
 
-            Message.NO_COMMAND_PERMISSION.send(sender, locale);
+            // We don't want to end up in an infinite loop
+            if (!"help".equalsIgnoreCase(executedSubCommand)) {
+                dispatchSubCommand(sender, "help");
+            }
 
             return false;
         }

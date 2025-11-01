@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.io.ClassProcessor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -20,6 +21,18 @@ import org.bukkit.potion.PotionEffect;
 import java.util.Optional;
 
 public interface NMSAlgorithms {
+
+    EnumBridge<Biome> BIOME_ENUM_BRIDGE = new EnumBridge<Biome>() {
+        @Override
+        public Biome[] getValues() {
+            return Biome.values();
+        }
+
+        @Override
+        public String getName(Biome enumValue) {
+            return enumValue.name();
+        }
+    };
 
     void registerCommand(BukkitCommand command);
 
@@ -47,6 +60,12 @@ public interface NMSAlgorithms {
 
     void setCustomModel(ItemMeta itemMeta, int customModel);
 
+    void setItemModel(ItemMeta itemMeta, String itemModel);
+
+    void setRarity(ItemMeta itemMeta, String rarity) throws IllegalArgumentException;
+
+    void setTrim(ItemMeta itemMeta, String trimMaterial, String trimPattern) throws IllegalArgumentException;
+
     void addPotion(PotionMeta potionMeta, PotionEffect potionEffect);
 
     String getMinecraftKey(ItemStack itemStack);
@@ -73,4 +92,17 @@ public interface NMSAlgorithms {
     default void hideAttributes(ItemMeta itemMeta) {
 
     }
+
+    default EnumBridge<Biome> getBiomeBridge() {
+        return BIOME_ENUM_BRIDGE;
+    }
+
+    interface EnumBridge<T> {
+
+        T[] getValues();
+
+        String getName(T enumValue);
+
+    }
+
 }

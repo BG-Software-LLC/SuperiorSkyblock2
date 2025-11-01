@@ -23,6 +23,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -73,8 +74,8 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
         }
 
         @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-        public void onCartPlace(PlayerInteractEvent e) {
-            if (e.getAction() != Action.RIGHT_CLICK_BLOCK || !Materials.isRail(e.getClickedBlock().getType()))
+        public void onPlayerRightClickBlock(PlayerInteractEvent e) {
+            if (e.getAction() != Action.RIGHT_CLICK_BLOCK)
                 return;
 
             PlayerHand playerHand = BukkitItems.getHand(e);
@@ -85,20 +86,60 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
             if (handItem == null)
                 return;
 
+            Material clickedBlockType = e.getClickedBlock().getType();
+
+            if (onCartPlaceInternal(e, clickedBlockType, handItem) ||
+                    onSpawnerChangeInternal(e, clickedBlockType, handItem))
+                e.setCancelled(true);
+        }
+
+        private boolean onCartPlaceInternal(PlayerInteractEvent e, Material clickedBlockType, ItemStack handItem) {
+            if (!Materials.isRail(clickedBlockType))
+                return false;
+
             Material handItemType = handItem.getType();
 
             if (!Materials.isMinecart(handItemType))
-                return;
+                return false;
 
             MutableObject<Key> minecraftKey = new MutableObject<>(null);
 
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 if (preventMinecartPlace(handItemType, e.getClickedBlock().getLocation(wrapper.getHandle()), minecraftKey)) {
-                    e.setCancelled(true);
                     Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(
                             minecraftKey.getValue().getGlobalKey()));
+                    return true;
                 }
             }
+
+            return false;
+        }
+
+        private boolean onSpawnerChangeInternal(PlayerInteractEvent e, Material clickedBlockType, ItemStack handItem) {
+            if (clickedBlockType != Materials.SPAWNER.toBukkitType())
+                return false;
+
+            Material handItemType = handItem.getType();
+            if (!Materials.isSpawnEgg(handItemType))
+                return false;
+
+            Key oldSpawnerKey = Keys.of(e.getClickedBlock());
+            Key newSpawnerKey = Keys.ofSpawner(BukkitItems.getEntityType(e.getItem()));
+
+            if (oldSpawnerKey.equals(newSpawnerKey))
+                return false;
+
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation(wrapper.getHandle()));
+            }
+
+            if (island != null && island.hasReachedBlockLimit(newSpawnerKey)) {
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(newSpawnerKey.toString()));
+                return true;
+            }
+
+            return false;
         }
 
         @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -216,6 +257,23 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
             e.getBlocks().removeIf(blockState -> island.hasReachedBlockLimit(Keys.of(blockState)));
         }
+
+        @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+        public void onBlockForm(BlockFormEvent e) {
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(e.getBlock().getLocation(wrapper.getHandle()));
+            }
+            if (island == null)
+                return;
+
+            Key blockKey = Keys.of(e.getNewState());
+
+            if (island.hasReachedBlockLimit(blockKey)) {
+                e.setCancelled(true);
+            }
+        }
+
 
     }
 

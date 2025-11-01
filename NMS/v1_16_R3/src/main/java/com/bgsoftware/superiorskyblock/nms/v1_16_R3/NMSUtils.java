@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
@@ -15,6 +14,8 @@ import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.google.common.base.Suppliers;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockBed;
@@ -29,14 +30,13 @@ import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.IBlockState;
 import net.minecraft.server.v1_16_R3.IChunkAccess;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
-import net.minecraft.server.v1_16_R3.Packet;
-import net.minecraft.server.v1_16_R3.PlayerChunk;
 import net.minecraft.server.v1_16_R3.PlayerChunkMap;
 import net.minecraft.server.v1_16_R3.ProtoChunk;
 import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldServer;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 
 import java.util.Collection;
@@ -46,15 +46,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 
 public class NMSUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(
-            PlayerChunkMap.class, Map.class, "visibleChunks");
-    private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(
-            PlayerChunk.class, "a", Packet.class, boolean.class);
     private static final ReflectMethod<Chunk> CHUNK_PROVIDER_SERVER_GET_CHUNK_IF_CACHED = new ReflectMethod<>(
             ChunkProviderServer.class, "getChunkAtIfCachedImmediately", int.class, int.class);
 
@@ -78,7 +75,7 @@ public class NMSUtils {
 
         try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
             BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
-            blockPosition.setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            blockPosition.d(location.getBlockX(), location.getBlockY(), location.getBlockZ());
             TileEntity tileEntity = worldServer.getTileEntity(blockPosition);
             return !type.isInstance(tileEntity) ? null : type.cast(tileEntity);
         }
@@ -155,30 +152,54 @@ public class NMSUtils {
         PENDING_CHUNK_ACTIONS.add(pendingTask);
 
         BukkitExecutor.createTask().runAsync(v -> {
+            CountDownLatch countDownLatch;
+            if (chunkCallback.isWaitForChunkLoad) {
+                countDownLatch = chunkCallback.chunkLoadLatch = new CountDownLatch(chunks.size());
+            } else {
+                countDownLatch = null;
+            }
+
             chunks.forEach(chunkPosition -> {
                 WorldServer worldServer = ((CraftWorld) chunkPosition.getWorld()).getHandle();
                 PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
 
                 ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
 
+                boolean calledCountdown = false;
                 try {
                     NBTTagCompound chunkCompound = playerChunkMap.read(chunkCoords);
 
-                    if (chunkCompound == null)
+                    if (chunkCompound == null) {
+                        chunkCallback.onChunkNotExist(chunkPosition);
                         return;
+                    }
 
                     NBTTagCompound chunkDataCompound = playerChunkMap.getChunkData(worldServer.getTypeKey(),
                             Suppliers.ofInstance(worldServer.getWorldPersistentData()), chunkCompound, chunkCoords, worldServer);
 
                     if (chunkDataCompound.hasKeyOfType("Level", 10)) {
                         chunkCallback.onUnloadedChunk(chunkPosition, chunkDataCompound.getCompound("Level"));
+                        calledCountdown = true;
                         if (saveChunks)
                             playerChunkMap.a(chunkCoords, chunkDataCompound);
+                    } else {
+                        if (countDownLatch != null)
+                            countDownLatch.countDown();
                     }
                 } catch (Exception error) {
+                    if (!calledCountdown && countDownLatch != null)
+                        countDownLatch.countDown();
                     Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkPosition, ":");
                 }
             });
+
+            if (countDownLatch != null) {
+                try {
+                    countDownLatch.await();
+                } catch (InterruptedException error) {
+                    throw new RuntimeException(error);
+                }
+            }
         }).runSync(v -> {
             chunkCallback.onFinish();
 
@@ -202,30 +223,10 @@ public class NMSUtils {
         }
     }
 
-    public static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
-        PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
-        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-        PlayerChunk playerChunk;
-
-        try {
-            playerChunk = playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair());
-        } catch (Throwable ex) {
-            playerChunk = VISIBLE_CHUNKS.get(playerChunkMap).get(chunkCoordIntPair.pair());
-        }
-
-        if (playerChunk != null) {
-            try {
-                playerChunk.sendPacketToTrackedPlayers(packet, false);
-            } catch (Throwable ex) {
-                SEND_PACKETS_TO_RELEVANT_PLAYERS.invoke(playerChunk, packet, false);
-            }
-        }
-    }
-
-    public static void setBlock(Chunk chunk, BlockPosition blockPosition, int combinedId, CompoundTag statesTag,
-                                CompoundTag tileEntity) {
+    public static IBlockData setBlock(Chunk chunk, BlockPosition blockPosition, int combinedId, CompoundTag statesTag,
+                                      CompoundTag tileEntity) {
         if (!isValidPosition(chunk.getWorld(), blockPosition))
-            return;
+            return null;
 
         IBlockData blockData = Block.getByCombinedId(combinedId);
 
@@ -255,7 +256,7 @@ public class NMSUtils {
 
         if ((blockData.getMaterial().isLiquid() && plugin.getSettings().isLiquidUpdate()) || blockData.getBlock() instanceof BlockBed) {
             chunk.world.setTypeAndData(blockPosition, blockData, 3);
-            return;
+            return blockData;
         }
 
         int indexY = blockPosition.getY() >> 4;
@@ -307,6 +308,8 @@ public class NMSUtils {
                     worldTileEntity.load(blockData, tileEntityCompound);
             }
         }
+
+        return blockData;
     }
 
     private static boolean isValidPosition(World world, BlockPosition blockPosition) {
@@ -315,13 +318,48 @@ public class NMSUtils {
                 blockPosition.getY() >= 0 && blockPosition.getY() < world.getHeight();
     }
 
-    public interface ChunkCallback {
+    public static abstract class ChunkCallback {
 
-        void onLoadedChunk(Chunk chunk);
+        private final ChunkLoadReason chunkLoadReason;
+        private final boolean isWaitForChunkLoad;
 
-        void onUnloadedChunk(ChunkPosition chunkPosition, NBTTagCompound unloadedChunk);
+        @Nullable
+        protected CountDownLatch chunkLoadLatch;
 
-        void onFinish();
+        public ChunkCallback(ChunkLoadReason chunkLoadReason, boolean isWaitForChunkLoad) {
+            this.chunkLoadReason = chunkLoadReason;
+            this.isWaitForChunkLoad = isWaitForChunkLoad;
+        }
+
+        public abstract void onLoadedChunk(Chunk chunk);
+
+        public abstract void onUnloadedChunk(ChunkPosition chunkPosition, NBTTagCompound unloadedChunk);
+
+        public abstract void onFinish();
+
+        protected final void latchCountDown() {
+            if (this.chunkLoadLatch != null)
+                this.chunkLoadLatch.countDown();
+        }
+
+        public final void onChunkNotExist(ChunkPosition chunkPosition) {
+            if (!plugin.getProviders().hasCustomWorldsSupport()) {
+                latchCountDown();
+                return;
+            }
+
+            ChunksProvider.loadChunk(chunkPosition, this.chunkLoadReason, null).whenComplete((bukkitChunk, error) -> {
+                if (error == null) {
+                    BukkitExecutor.ensureMain(() -> {
+                        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+                        onLoadedChunk(chunk);
+                    });
+                } else {
+                    latchCountDown();
+                    throw new RuntimeException(error);
+                }
+            });
+        }
 
     }
 

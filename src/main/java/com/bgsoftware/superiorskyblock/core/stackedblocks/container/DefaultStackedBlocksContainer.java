@@ -53,4 +53,8 @@ public class DefaultStackedBlocksContainer implements StackedBlocksContainer {
         });
     }
 
+    @Override
+    public int size() {
+        return this.stackedBlocks.size();
+    }
 }

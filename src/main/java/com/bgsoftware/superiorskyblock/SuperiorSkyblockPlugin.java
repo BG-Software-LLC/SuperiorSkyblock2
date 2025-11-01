@@ -22,7 +22,6 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PluginLoadingStage;
 import com.bgsoftware.superiorskyblock.core.PluginReloadReason;
 import com.bgsoftware.superiorskyblock.core.database.DataManager;
-import com.bgsoftware.superiorskyblock.core.database.transaction.DatabaseTransactionsExecutor;
 import com.bgsoftware.superiorskyblock.core.engine.EnginesFactory;
 import com.bgsoftware.superiorskyblock.core.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
@@ -46,6 +45,7 @@ import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
 import com.bgsoftware.superiorskyblock.core.values.container.BlockValuesContainer;
 import com.bgsoftware.superiorskyblock.external.ProvidersManagerImpl;
 import com.bgsoftware.superiorskyblock.island.GridManagerImpl;
+import com.bgsoftware.superiorskyblock.island.cache.IslandCacheKeys;
 import com.bgsoftware.superiorskyblock.island.container.DefaultIslandsContainer;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.preview.DefaultIslandPreviews;
@@ -76,11 +76,13 @@ import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventsDispatcher;
 import com.bgsoftware.superiorskyblock.player.PlayersManagerImpl;
 import com.bgsoftware.superiorskyblock.player.container.DefaultPlayersContainer;
+import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
 import com.bgsoftware.superiorskyblock.service.ServicesHandler;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.WorldGenerator;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
+import com.bgsoftware.superiorskyblock.world.entity.EntityCategories;
 import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
 import org.bstats.bukkit.Metrics;
@@ -177,10 +179,12 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         Runtime.getRuntime().addShutdownHook(new ShutdownTask(this));
 
         IslandPrivileges.registerPrivileges();
-        SortingTypes.registerSortingTypes();
+        SortingTypes.registerSortingTypes(this);
         IslandFlags.registerFlags();
+        ClearActions.registerActions();
         RespawnActions.registerActions();
         Dimensions.registerDimensions();
+        IslandCacheKeys.registerCacheKeys();
 
         try {
             SortingComparators.initializeTopIslandMembersSorting();
@@ -196,8 +200,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         client.start();
 
         loadingStage = PluginLoadingStage.LOADED;
-
-        DatabaseTransactionsExecutor.init();
     }
 
     @Override
@@ -259,22 +261,12 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             try {
                 reloadPlugin(PluginReloadReason.STARTUP);
             } catch (ManagerLoadException error) {
+                Log.error(error, "An unexpected error occurred while starting up the plugin:");
                 ManagerLoadException.handle(error);
                 return;
             }
 
             loadingStage = PluginLoadingStage.MANAGERS_INITIALIZED;
-
-            try {
-                bukkitListeners.registerListeners();
-            } catch (RuntimeException ex) {
-                ManagerLoadException handlerError = new ManagerLoadException("Cannot load plugin due to a missing event: " + ex.getMessage() + " - contact @Ome_R!", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
-                Log.error(handlerError, "An error occurred while registering listeners:");
-                Bukkit.shutdown();
-                return;
-            }
-
-            loadingStage = PluginLoadingStage.EVENTS_INITIALIZED;
 
             ChunksProvider.start();
 
@@ -336,7 +328,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     public void onDisable() {
         try {
             if (loadingStage.isAtLeast(PluginLoadingStage.START_ENABLE))
-                BukkitExecutor.prepareDisable();
+                BukkitExecutor.prepareShutdown();
 
             if (loadingStage.isAtLeast(PluginLoadingStage.CHUNKS_PROVIDER_INITIALIZED))
                 ChunksProvider.stop();
@@ -350,7 +342,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
                 playersHandler.savePlayers();
                 gridHandler.saveIslands();
-                stackedBlocksHandler.saveStackedBlocks();
             }
 
             if (loadingStage.isAtLeast(PluginLoadingStage.MODULES_INITIALIZED)) {
@@ -386,9 +377,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             if (loadingStage.isAtLeast(PluginLoadingStage.START_ENABLE)) {
                 Log.info("Shutting down executor");
-                BukkitExecutor.close();
-                Log.info("Shutting down database executor");
-                DatabaseTransactionsExecutor.stop();
+                BukkitExecutor.close(plugin);
             }
 
             if (loadingStage.isAtLeast(PluginLoadingStage.MANAGERS_INITIALIZED)) {
@@ -447,6 +436,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     }
 
     public void reloadPlugin(PluginReloadReason reloadReason) throws ManagerLoadException {
+        if (reloadReason == PluginReloadReason.COMMAND) {
+            bukkitListeners.unregisterListeners();
+        }
+
         providersHandler.loadData();
 
         ItemSkulls.readTextures(this);
@@ -477,12 +470,13 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         if (reloadReason == PluginReloadReason.STARTUP) {
             playersHandler.loadData();
             gridHandler.loadData();
+            schematicsHandler.loadData();
         } else {
             BukkitExecutor.sync(gridHandler::updateSpawn, 1L);
             gridHandler.syncUpgrades();
+            schematicsHandler.loadSchematics();
         }
 
-        schematicsHandler.loadData();
         menusHandler.loadData();
         missionsHandler.loadData();
 
@@ -490,6 +484,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             dataHandler.loadData();
             stackedBlocksHandler.loadData();
         }
+
+        BukkitExecutor.sync(schematicsHandler::cacheSchematics);
 
         modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_MODULE_DATA_LOAD, reloadReason == PluginReloadReason.COMMAND);
 
@@ -510,6 +506,12 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
         if (reloadReason == PluginReloadReason.STARTUP) {
             modulesHandler.loadModulesData(this);
+        }
+
+        try {
+            bukkitListeners.registerListeners();
+        } catch (RuntimeException ex) {
+            throw new ManagerLoadException("Cannot load plugin due to a missing event: " + ex.getMessage() + " - contact @Ome_R!", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
     }
 

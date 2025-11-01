@@ -32,16 +32,13 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.tag;
 
-import com.bgsoftware.common.reflection.ReflectConstructor;
-import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.logging.Log;
-import org.bukkit.Bukkit;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Represents a single NBT tag.
@@ -52,40 +49,36 @@ public abstract class Tag<E> {
 
     protected static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    protected final ReflectMethod<Object> A;
-    protected final ReflectConstructor<Object> CONSTRUCTOR;
     protected final E value;
 
-    protected Tag(E value, Class<?> clazz, Class<?>... parameterTypes) {
+    protected Tag(E value) {
         this.value = value;
-        this.A = new ReflectMethod<>(clazz, clazz, "a", parameterTypes);
-        this.CONSTRUCTOR = new ReflectConstructor<>(clazz, parameterTypes);
     }
 
     public static Tag<?> fromNBT(Object tag) {
-        if (tag.getClass().equals(ByteArrayTag.CLASS))
+        if (tag.getClass().equals(ByteArrayTag.TAG_CONVERTER.getNBTClass()))
             return ByteArrayTag.fromNBT(tag);
-        else if (tag.getClass().equals(ByteTag.CLASS))
+        else if (tag.getClass().equals(ByteTag.TAG_CONVERTER.getNBTClass()))
             return ByteTag.fromNBT(tag);
-        else if (tag.getClass().equals(CompoundTag.CLASS))
+        else if (tag.getClass().equals(CompoundTag.TAG_CONVERTER.getNBTClass()))
             return CompoundTag.fromNBT(tag);
-        else if (tag.getClass().equals(DoubleTag.CLASS))
+        else if (tag.getClass().equals(DoubleTag.TAG_CONVERTER.getNBTClass()))
             return DoubleTag.fromNBT(tag);
-        else if (tag.getClass().equals(EndTag.CLASS))
-            return new EndTag();
-        else if (tag.getClass().equals(FloatTag.CLASS))
+        else if (tag.getClass().equals(EndTag.TAG_CONVERTER.getNBTClass()))
+            return EndTag.of();
+        else if (tag.getClass().equals(FloatTag.TAG_CONVERTER.getNBTClass()))
             return FloatTag.fromNBT(tag);
-        else if (tag.getClass().equals(IntArrayTag.CLASS))
+        else if (tag.getClass().equals(IntArrayTag.TAG_CONVERTER.getNBTClass()))
             return IntArrayTag.fromNBT(tag);
-        else if (tag.getClass().equals(IntTag.CLASS))
+        else if (tag.getClass().equals(IntTag.TAG_CONVERTER.getNBTClass()))
             return IntTag.fromNBT(tag);
-        else if (tag.getClass().equals(ListTag.CLASS))
+        else if (tag.getClass().equals(ListTag.TAG_CONVERTER.getNBTClass()))
             return ListTag.fromNBT(tag);
-        else if (tag.getClass().equals(LongTag.CLASS))
+        else if (tag.getClass().equals(LongTag.TAG_CONVERTER.getNBTClass()))
             return LongTag.fromNBT(tag);
-        else if (tag.getClass().equals(ShortTag.CLASS))
+        else if (tag.getClass().equals(ShortTag.TAG_CONVERTER.getNBTClass()))
             return ShortTag.fromNBT(tag);
-        else if (tag.getClass().equals(StringTag.CLASS))
+        else if (tag.getClass().equals(StringTag.TAG_CONVERTER.getNBTClass()))
             return StringTag.fromNBT(tag);
 
         throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to Tag!");
@@ -133,20 +126,6 @@ public abstract class Tag<E> {
         throw new IllegalArgumentException("Invalid tag: " + type);
     }
 
-    protected static Class<?> getNNTClass(String nbtType) {
-        try {
-            if (ServerVersion.isAtLeast(ServerVersion.v1_17)) {
-                return Class.forName("net.minecraft.nbt." + nbtType);
-            } else {
-                String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-                return Class.forName("net.minecraft.server." + version + "." + nbtType);
-            }
-        } catch (Exception error) {
-            Log.error(error, "An unexpected error while loading nbt class ", nbtType, ":");
-            return null;
-        }
-    }
-
     public E getValue() {
         return value;
     }
@@ -170,12 +149,16 @@ public abstract class Tag<E> {
 
     protected abstract void writeData(DataOutputStream outputStream) throws IOException;
 
+    @Nullable
+    protected NMSTagConverter getNMSConverter() {
+        return null;
+    }
+
     public Object toNBT() {
-        if (A.isValid()) {
-            return A.invoke(null, value);
-        } else {
-            return CONSTRUCTOR.newInstance(value);
-        }
+        NMSTagConverter converter = getNMSConverter();
+        if (converter == null)
+            throw new UnsupportedOperationException();
+        return Objects.requireNonNull(converter.toNBT(this.value));
     }
 
 }

@@ -24,4 +24,6 @@ public interface UpgradesContainer {
 
     void addUpgrade(Upgrade upgrade);
 
+    void clearUpgrades();
+
 }

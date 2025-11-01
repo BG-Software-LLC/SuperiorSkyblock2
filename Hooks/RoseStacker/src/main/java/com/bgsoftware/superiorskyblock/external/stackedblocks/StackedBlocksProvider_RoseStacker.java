@@ -10,7 +10,10 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.google.common.base.Preconditions;
 import dev.rosewood.rosestacker.api.RoseStackerAPI;
@@ -83,9 +86,21 @@ public class StackedBlocksProvider_RoseStacker implements StackedBlocksProvider_
         public void onBlockStack(BlockStackEvent e) {
             Location location = e.getStack().getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
-            if (island != null) {
-                int placedBlocksAmount = e.isNew() ? Math.max(1, e.getIncreaseAmount() - 1) : e.getIncreaseAmount();
-                island.handleBlockPlace(e.getStack().getBlock(), placedBlocksAmount);
+
+            if (island == null)
+                return;
+
+            Key blockKey = Keys.of(e.getStack().getBlock());
+
+            int increaseAmount = e.getStack().getStackSize() + e.getIncreaseAmount() > e.getStack().getStackSettings().getMaxStackSize() ?
+                    e.getStack().getStackSettings().getMaxStackSize() - e.getStack().getStackSize() : e.getIncreaseAmount();
+            int newBlocksCount = e.isNew() ? Math.max(1, increaseAmount - 1) : increaseAmount;
+
+            if (island.hasReachedBlockLimit(blockKey, newBlocksCount)) {
+                e.setCancelled(true);
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
+            } else {
+                island.handleBlockPlace(blockKey, newBlocksCount);
             }
         }
 

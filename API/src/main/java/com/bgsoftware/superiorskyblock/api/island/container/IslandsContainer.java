@@ -35,6 +35,22 @@ public interface IslandsContainer {
     Island getIslandByUUID(UUID uuid);
 
     /**
+     * Get an island by its name.
+     *
+     * @param name The name of the island.
+     */
+    @Nullable
+    Island getIslandByName(String name);
+
+    /**
+     * Update an island with a new name.
+     *
+     * @param island  The island to update.
+     * @param oldName The old name of the island.
+     */
+    void updateIslandName(Island island, String oldName);
+
+    /**
      * Get an island by its leader's uuid.
      *
      * @param uuid The uuid of the island's leader.

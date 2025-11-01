@@ -11,9 +11,11 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
+import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.ObjectsPool;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.persistence.EmptyPersistentDataContainer;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
@@ -21,7 +23,6 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -32,12 +33,29 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class SuperiorNPCPlayer implements SuperiorPlayer {
+public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable {
 
-    private final Entity npc;
+    private static final ObjectsPool<SuperiorNPCPlayer> POOL = new ObjectsPool<>(SuperiorNPCPlayer::new);
 
-    public SuperiorNPCPlayer(Entity npc) {
+    public static SuperiorNPCPlayer obtain(Player npc) {
+        return POOL.obtain().initialize(npc);
+    }
+
+    private Player npc;
+
+    private SuperiorNPCPlayer() {
+
+    }
+
+    private SuperiorNPCPlayer initialize(Player npc) {
         this.npc = npc;
+        return this;
+    }
+
+    @Override
+    public void release() {
+        this.npc = null;
+
     }
 
     @Override
@@ -48,6 +66,11 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
     @Override
     public String getName() {
         return "NPC-Citizens";
+    }
+
+    @Override
+    public PlayerCache getCache() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -255,6 +278,21 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
     @Override
     public List<Island> getInvites() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public void addCoop(Island island) {
+        throw new UnsupportedOperationException("Cannot mark NPCs as coop players");
+    }
+
+    @Override
+    public void removeCoop(Island island) {
+        throw new UnsupportedOperationException("Cannot mark NPCs as coop players");
+    }
+
+    @Override
+    public List<Island> getCoopIslands() {
+        throw new UnsupportedOperationException("Cannot mark NPCs as coop players");
     }
 
     @Override

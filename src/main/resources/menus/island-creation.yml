@@ -88,28 +88,28 @@ items:
 sounds:
   '@':
     access:
-      type: BLOCK_PORTAL_AMBIENT
+      type: PORTAL_TRIGGER
       volume: 1
       pitch: 0.2
     no-access:
-      type: BLOCK_ANVIL_PLACE
+      type: ANVIL_LAND
       volume: 0.2
       pitch: 0.2
   '^':
     access:
-      type: BLOCK_PORTAL_AMBIENT
+      type: PORTAL_TRIGGER
       volume: 1
       pitch: 0.2
     no-access:
-      type: BLOCK_ANVIL_PLACE
+      type: ANVIL_LAND
       volume: 0.2
       pitch: 0.2
   '$':
     access:
-      type: BLOCK_PORTAL_AMBIENT
+      type: PORTAL_TRIGGER
       volume: 1
       pitch: 0.2
     no-access:
-      type: BLOCK_ANVIL_PLACE
+      type: ANVIL_LAND
       volume: 0.2
       pitch: 0.2

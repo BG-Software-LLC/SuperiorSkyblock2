@@ -42,7 +42,6 @@ BLOCK_LEVEL: '&e&lLivello | &7Il blocco {0} vale {1}.'
 BLOCK_LEVEL_WORTHLESS: '&e&lLivello | &7Il blocco {0} non ha valore.'
 BLOCK_VALUE: '&e&lWorth | &7Il blocco {0} vale {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lWorth | &7Il blocco {0} non ha valore.'
-BONUS_SET_SUCCESS: '&e&lIsola | &7Aggiornato con successo il bonus isola a {0}.'
 BONUS_SYNC_ALL: '&e&lIsola | &7SAggiornato con successo il bonus a tutte le isole.'
 BONUS_SYNC_NAME: '&e&lIsola | &7Aggiornato con successo il bonus per l''isola di {0}.'
 BONUS_SYNC: '&e&lIsola | &7Aggiornato con successo il bonus per l''isola di {0}.'
@@ -64,6 +63,12 @@ CHANGED_BLOCK_AMOUNT: '&e&lBlocchi | &7Aggiornato con successo il numero di bloc
 CHANGED_BLOCK_LIMIT: '&e&lAggiornamenti | &7Aggiornato il limite del blocco {0} dell''isola {1}.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lAggiornamenti | &7Aggiornato il limite del blocco {0} in tutte le isole.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lAggiornamenti | &7Aggiornato il limite del blocco {0} nell''isola di {1}.'
+CHANGED_BONUS_LEVEL: '&e&lIsland | &7Successfully updated the level bonus of {0}''s island.'
+CHANGED_BONUS_LEVEL_ALL: '&e&lIsland | &7Successfully updated the level bonus of all the islands.'
+CHANGED_BONUS_LEVEL_NAME: '&e&lIsland | &7Successfully updated the level bonus of {0}.'
+CHANGED_BONUS_WORTH: '&e&lIsland | &7Successfully updated the worth bonus of {0}''s island.'
+CHANGED_BONUS_WORTH_ALL: '&e&lIsland | &7Successfully updated the worth bonus of all the islands.'
+CHANGED_BONUS_WORTH_NAME: '&e&lIsland | &7Successfully updated the worth bonus of {0}.'
 CHANGED_CHEST_SIZE: '&e&lBaule | &7Aggiornate con successo le righe della pagina #{0} a {1} per l''isola di {2}.'
 CHANGED_CHEST_SIZE_ALL: '&e&lBaule | &7Aggiornate con successo le righe della pagina #{0} a {1} per tutte le isole.'
 CHANGED_CHEST_SIZE_NAME: '&e&lBaule | &7Aggiornate con successo le righe della pagina #{0} a {1} per {2}.'
@@ -88,9 +93,9 @@ CHANGED_LANGUAGE: '&e&lLanguage | &7Lingua cambiata in Italiano.'
 CHANGED_MOB_DROPS: '&e&lAggiornamenti | &7Aggiornata con successo il moltiplicatore dei drops dei mob nell''isola di {0}.'
 CHANGED_MOB_DROPS_ALL: '&e&lAggiornamenti | &7Aggiornata con successo il moltiplicatore dei drops dei mob in tutte le isole.'
 CHANGED_MOB_DROPS_NAME: '&e&lAggiornamenti | &7Aggiornata con successo il moltiplicatore dei drops dei mob di {0}.'
-CHANGED_NAME: '&e&lIsola | &7Hai cambiato il nome della tua isola in {0}.'
-CHANGED_NAME_OTHER: '&e&lIsola | &7Hai cambiato il nome della tua isola da {0} a {1}.'
-CHANGED_NAME_OTHER_NAME: '&e&lIsola | &7Hai cambiato il nome dell''isola di {0} a {1}.'
+CHANGED_NAME: '&e&lIsola | &7Hai cambiato il nome della tua isola in {0}&7.'
+CHANGED_NAME_OTHER: '&e&lIsola | &7Hai cambiato il nome della tua isola da {0} a {1}&7.'
+CHANGED_NAME_OTHER_NAME: '&e&lIsola | &7Hai cambiato il nome dell''isola di {0}&7 a {1}&7.'
 CHANGED_PAYPAL: '&e&lIsola | &7Paypal dell''isola cambiato con successo in {0}.'
 CHANGED_ROLE_LIMIT: '&e&lAggiornamenti | &7Aggiornata con successo il limite per il ruolo {0} per l''isola di {1}.'
 CHANGED_ROLE_LIMIT_ALL: '&e&lAggiornamenti | &7Aggiornata con successo il limite per il ruolo {0} di tutte le isole.'
@@ -106,6 +111,8 @@ CHANGED_WARPS_LIMIT: '&e&lAggiornamenti | &7Aggiornato con successo il limite di
 CHANGED_WARPS_LIMIT_ALL: '&e&lAggiornamenti | &7Aggioranto con successo il limite di warps di tutte le isole.'
 CHANGED_WARPS_LIMIT_NAME: '&e&lAggiornamenti | &7Aggiornato con successo il mite di warps dell''isola {0}.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_ALL_MATERIALS: '*'
+COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: quantità
 COMMAND_ARGUMENT_BIOME: bioma
@@ -177,6 +184,7 @@ COMMAND_DESCRIPTION_ADMIN_DEL_WARP: Elimina un warp per un'isola.
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Diminuisci il ruolo di un membro dell'isola di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Depositare denaro nella banca dell'isola di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_DISBAND: Sciogli definitivamente l'isola di un  giocatore.
+COMMAND_DESCRIPTION_ADMIN_FLY: 'Toggle island fly for a player.'
 COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: Aumenta la quantità di reset disponibili di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: Rimuovi un giocatore dal menu delle migliori isole.
 COMMAND_DESCRIPTION_ADMIN_JOIN: Unisciti a un'isola senza un invito.
@@ -194,7 +202,10 @@ COMMAND_DESCRIPTION_ADMIN_RANKUP: Potenzia un aggiornamento per un isola.
 COMMAND_DESCRIPTION_ADMIN_RECALC: Ricalcola il valore di un'isola.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Ricarica tutte le configurazioni e le attività del plugin.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Rimuovi il limite di un blocco da un'isola.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
+COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Rimuovi tutte le valutazioni fornite da un giocatore.
+COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Ripristina il mondo su un''isole.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Crea una schematica per il plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Imposta un limite di banca per un'isola.
@@ -207,6 +218,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Imposta il moltiplicatore della cresc
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: Imposta la quantità di reset dell'isola di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: Imposta il livello dell'effetto dell'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Imposta il limite di entità per l'isola di un altro giocatore.
+COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: Trasferisci un'isola a qualcun altro.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: Imposta il moltiplicatore di drops dei mob per l'isola di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: Imposta un ruolo richiesto per avere un'autorizzazione, in tutte le isole.
@@ -236,6 +248,7 @@ COMMAND_DESCRIPTION_ADMIN_WITHDRAW: Prelevare denaro dalla banca dell'isola di u
 COMMAND_DESCRIPTION_BALANCE: Controlla la quantità di denaro all'interno della banca di un'isola.
 COMMAND_DESCRIPTION_BAN: Bandisci un giocatore dalla tua isola.
 COMMAND_DESCRIPTION_BANK: Apri la banca dell'isola.
+COMMAND_DESCRIPTION_BANS: 'Open the bans menu.'
 COMMAND_DESCRIPTION_BIOME: Cambia il bioma dell'isola.
 COMMAND_DESCRIPTION_BORDER: Cambia il colore del bordo delle isole.
 COMMAND_DESCRIPTION_CHEST: Apri il baule dell'isola.
@@ -382,6 +395,7 @@ INVALID_LEVEL: '&c&lErrore | &7Livello non valido {0}.'
 INVALID_LIMIT: '&c&lErrore | &7Limite non valido {0}.'
 INVALID_MATERIAL: '&c&lErrore | &7Materiale non valido {0}.'
 INVALID_MATERIAL_DATA: '&c&lErrore | &7Il material-data non è corretto {0}.'
+INVALID_MENU: '&c&lError | &7Invalid menu {0}.'
 INVALID_MISSION: '&c&lErrore | &7La missione {0} non è corretta.'
 INVALID_MODULE: '&c&lError | &7Modulo non valido: {0}'
 INVALID_MULTIPLIER: '&c&lErrore | &7Il moltiplicatore {0} non è corretto.'
@@ -495,16 +509,20 @@ ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |
   &e&lIsola | &7{0}:
   {1}
-ISLAND_INFO_VISITORS_COUNT: '&e&lIsola | &7Numero di visitatori: {0}'
+ISLAND_INFO_VISITORS_COUNT: '&e&lIsola | &7Numero di visitatori: {0} ({1} unique visitors)'
 ISLAND_INFO_WORTH: '&e&lIsola | &7Valore: {0}'
+ISLAND_NAME_NONE: None
 ISLAND_OPENED: '&e&lIsola | &7Aperta con successo l''isola al pubblico.'
+ISLAND_OWNER_NONE: None
+ISLAND_PREVIEW_BLOCK_COMMAND: '&c&lError | &7You cannot use that command in preview mode.'
 ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lAnteprima | &7Sei andato troppo lontano, non sei più in modalità anteprima.'
 ISLAND_PREVIEW_CANCEL: '&e&lAnteprima | &7Hai annullato la modalità di anteprima.'
 ISLAND_PREVIEW_CONFIRM_TEXT: 'CONFERMA'
 ISLAND_PREVIEW_CANCEL_TEXT: 'ANNULLA'
+ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
 ISLAND_PREVIEW_START: |
   &e&lAnteprima | &7Hai avviato la modalità di anteprima per la schematica {0}.
-  &e&lAnteprima | &7Scrivi &a&lCONFIRM &7per creare una nuova isola, oppure &c&lCANCEL &7per annullare la modalità di anteprima.
+  &e&lAnteprima | &7Scrivi &a&lCONFERMA &7per creare una nuova isola, oppure &c&lANNULLA &7per annullare la modalità di anteprima.
   &e&lAnteprima | &7Non è possibile lasciare l'area dell'isola, altrimenti la modalità anteprima verrà annullata automaticamente.
 ISLAND_PROTECTED: '&c&lErrore | &7Quest''isola è protetta.'
 ISLAND_PROTECTED_OPPED: '&7&oPuoi aggirare questa restrizione utilizzando "/is admin bypass".'
@@ -542,6 +560,9 @@ LEAVE_ISLAND_AS_LEADER: |
 LEFT_ISLAND: '&e&lIsola | &7Hai lasciato la tua isola.'
 LEFT_ISLAND_COOP: '&e&lIsola | &7Non sei più un membro coop dell''isola di {0}.'
 LEFT_ISLAND_COOP_NAME: '&e&lIsola | &7Non sei più un membro coop dell''isola {0}.'
+LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now locked for all islands!'
+LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now locked for the island {1}!'
+LOCK_WORLD_ANNOUNCEMENT: '&e&lWorlds | &7The world {0} is now locked for {1}''s island!'
 MATERIAL_NOT_SOLID: '&c&lErrore | &7È necessario fornire un materiale solido.'
 MAXIMUM_LEVEL: '&c&lErrore | &7Il livello massimo per questo aggiornamento è {0}.'
 MESSAGE_SENT: '&e&lIsola | &7{0} inviato correttamente il messaggio!'
@@ -563,16 +584,18 @@ MODULE_UNLOADED_SUCCESS: '&e&lModule | &7Modulo disabilitato con successo.'
 MODULES_LIST: '&fModuli ({0}): {1}'
 MODULES_LIST_MODULE_NAME: '&a{0}'
 MODULES_LIST_SEPARATOR: '&f, '
-NAME_ANNOUNCEMENT: '&e&lIsola | &7{0} ha cambiato il nome della sua isola in {1}.'
+NAME_ANNOUNCEMENT: '&e&lIsola | &7{0} ha cambiato il nome della sua isola in {1}&7.'
+NAME_ANNOUNCEMENT_OTHER: '&e&lIsland | &7{0} changed the {1} island''s name to {2}&7.'
+NAME_ANNOUNCEMENT_OTHER_NAME: '&e&lIsland | &7{0} changed the name of {1}&7 to {2}&7.'
 NAME_BLACKLISTED: '&c&lErrore | &7Non puoi usare quel nome.'
 NAME_CHAT_FORMAT: '&8[&e{0}&8] &r'
 NAME_SAME_AS_PLAYER: '&c&lErrore | &7Non puoi usare i nomi dei giocatori come nome dell''isola.'
-NAME_TOO_LONG: '&c&lErrore | &7I nomi delle isole non possono avere una lunghezza superiore a 16 caratteri.'
-NAME_TOO_SHORT: '&c&lErrore | &7I nomi delle isole non possono avere una lunghezza inferiore a 3 caratteri.'
+NAME_TOO_LONG: '&c&lErrore | &7I nomi delle isole non possono avere una lunghezza superiore a {0} caratteri.'
+NAME_TOO_SHORT: '&c&lErrore | &7I nomi delle isole non possono avere una lunghezza inferiore a {0} caratteri.'
 NO_BAN_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per poter vietare i giocatori.'
 NO_CLOSE_BYPASS: '&c&lErrore | &7Quest''isola non è aperta al pubblico.'
 NO_CLOSE_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per chiudere l''isola al pubblico.'
-NO_COMMAND_PERMISSION: '&fComando sconosciuto. Digita "/help" se ti serve aiuto.'
+NO_COMMAND_PERMISSION: '&c&lError | &7You don''t have permission to use that command. ({0})'
 NO_COOP_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per aggiungere giocatori come membri coop.'
 NO_DELETE_WARP_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per eliminare le warp.'
 NO_DEMOTE_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per degradare i giocatori.'
@@ -623,6 +646,9 @@ PERSISTENT_DATA_SHOW_PATH: '&b{0}&f: '
 PERSISTENT_DATA_SHOW_SPACER: '&f, '
 PERSISTENT_DATA_SHOW_VALUE: '&6{0}&c{1}&f'
 PERSISTENT_DATA_REMOVED: '&e&lData | &7Successfully removed data for {0} from path {1}.'
+PERMISSIONS_RESET: '&e&lIsland | &7Successfully reset all the permissions of {0}''s island to default values!'
+PERMISSIONS_RESET_ALL: '&e&lIsland | &7Successfully reset all the permissions of all the islands to default values!'
+PERMISSIONS_RESET_NAME: '&e&lIsland | &7Successfully reset all the permissions of the island {0} to default values!'
 PERMISSIONS_RESET_PLAYER: '&e&lIsola | &7Successfully reset all the permissions for {0} to default values!'
 PERMISSIONS_RESET_ROLES: '&e&lIsola | &7Successfully reset all the permissions of the island to default values!'
 PLACEHOLDER_NO: 'No'
@@ -647,6 +673,7 @@ PURGED_ISLANDS: |
 RANKUP_SUCCESS: '&e&lIsola | &7Aggiornato con successo il livello del upgrade {0} per l''isola di {1}.'
 RANKUP_SUCCESS_ALL: '&e&lIsola | &7Aggiornato con successo il livello del upgrade {0} per tutte le isole.'
 RANKUP_SUCCESS_NAME: '&e&lIsola | &7Aggiornato con successo il livello del upgrade {0} per l''isola {1}.'
+RATE_ALREADY_GIVEN: '&c&lError | &7You already rated this island.'
 RATE_ANNOUNCEMENT: '&e&lIsola | &7{0} ha valutato la tua isola {1} stelle su 5!'
 RATE_CHANGE_OTHER: '&e&lIsola | &7Hai cambiato la valutazione di {0} a {1}.'
 RATE_OWN_ISLAND: '&c&lErrore | &7Non puoi valutare la tua isola.'
@@ -668,6 +695,7 @@ RESET_WORLD_SUCCEED_ALL: '&e&lIsola | &7Ripristinato il mondo {0} con successo p
 RESET_WORLD_SUCCEED_NAME: '&e&lIsola | &7Ripristinato il mondo {0} con successo per {1}.'
 SAME_NAME_CHANGE: '&c&lErrore | &7Devi inserire un nome diverso dal tuo attuale nome dell''isola.'
 SCHEMATIC_LEFT_SELECT: '&e&lSchematics | &7Posizione selezionata #2 ({0})'
+SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
 SCHEMATIC_NOT_READY: '&c&lErrore | &7Non hai selezionato due posizioni.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lSchematics | &7Elaborazione della richiesta...'
 SCHEMATIC_READY_TO_CREATE: |
@@ -680,10 +708,16 @@ SET_UPGRADE_LEVEL: '&e&lAggiornamenti | &7Aggiornato con successo il livello di 
 SET_UPGRADE_LEVEL_NAME: '&e&lAggiornamenti | &7Aggiornato con successo il livello di {0} per {1}.'
 SET_WARP: '&e&lIsola | &7Creato con successo un nuovo warp a {0}.'
 SET_WARP_OUTSIDE: '&c&lErrore | &7Non puoi impostare warp fuori dalla tua isola.'
+SETTINGS_RESET: '&e&lIsland | &7Successfully reset all the settings of {0}''s island to default values!'
+SETTINGS_RESET_ALL: '&e&lIsland | &7Successfully reset all the settings of all the islands to default values!'
+SETTINGS_RESET_NAME: '&e&lIsland | &7Successfully reset all the settings of the island {0} to default values!'
+SETTINGS_RESET_SELF: '&e&lIsland | &7Successfully reset all the settings of the island to default values!'
 SETTINGS_UPDATED: '&e&lIsola | &7Aggiornate correttamente le impostazioni {0} dell''isola di {1}.'
 SETTINGS_UPDATED_NAME: '&e&lIsola | &7Aggiornate correttamente le impostazioni {0} di {1}.'
 SETTINGS_UPDATED_ALL: '&e&lIsola | &7Aggiornate correttamente le impostazioni {0} a tutte le isole.'
 SIZE_BIGGER_MAX: '&c&lErrore | &7Non è possibile impostare una dimensione maggiore della dimensione massima dell''isola.'
+SPAWN_PROTECTED: '&c&lError | &7Spawn is protected.'
+SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Hai teletrasportato {0} con successo allo spawn.'
 SPAWN_SET_SUCCESS: '&e&lSpawn | &7La posizione di spawn è stata aggiornata correttamente alle coordinate: {0}'
 SPY_TEAM_CHAT_FORMAT: '&7[Spy] &e[{0}] {1}&f: &7{2}'
@@ -704,6 +738,8 @@ TOGGLED_BYPASS_OFF: '&e&lBypass | &7Modalità bypass &cOFF&7.'
 TOGGLED_BYPASS_ON: '&e&lBypass | &7Modalità bypass &aON&7.'
 TOGGLED_FLY_OFF: '&e&lFly | &7Modalità volo &cOFF&7.'
 TOGGLED_FLY_ON: '&e&lFly | &7Modalità volo &aON&7.'
+TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
+TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
 TOGGLED_SCHEMATIC_OFF: '&e&lSchematics | &7Modalità schematica &cOFF&7.'
 TOGGLED_SCHEMATIC_ON: |
   &e&lSchematics | &7Schematic mode &aON&7.
@@ -728,11 +764,14 @@ UNCOOP_AUTO_ANNOUNCEMENT: '&e&lIsola | &7Non ci sono membri dell''isola online e
 UNCOOP_LEFT_ANNOUNCEMENT: '&e&lIsola | &7{0} è uscito dal server, non è più un membro coop.'
 UNIGNORED_ISLAND: '&e&lIsola | &7L''isola di {0} ora NON È PIÙ IGNORATA dalle isole migliori(/is top).'
 UNIGNORED_ISLAND_NAME: '&e&lIsola | &7L''isola {0} ora NON È PIÙ IGNORATA dalle isole migliori(/is top).'
-UNLOCK_WORLD_ANNOUNCEMENT: '&e&lMondi | &7Il tuo {0} mondo è stato sbloccato!'
+UNLOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now unlocked for all islands!'
+UNLOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now unlocked for the island {1}!'
+UNLOCK_WORLD_ANNOUNCEMENT: '&e&lWorlds | &7The world {0} is now unlocked for {1}''s island!'
 UNSAFE_WARP: '&e&lIsola | &7&oSembra che questa warp non sia sicura. Per favore, prova un altra warp.'
 UPDATED_PERMISSION: '&e&lIsola | &7Autorizzazioni aggiornate per {0}.'
 UPDATED_SETTINGS: '&e&lIsola | &7Aggiornate le impostazioni dell''isola {0}.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lError | &7Puoi eseguire nuovamente l''aggiornamento solo tra {0}.'
+VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lErrore | &7Non puoi usare questo comando quando ti trovi sopra ad altre isole.'
 WARP_ALREADY_EXIST: '&c&lErrore | &7C''è già una warp con questo nome.'
 WARP_CATEGORY_ICON_NEW_LORE: |
@@ -770,5 +809,5 @@ WITHDRAW_ANNOUNCEMENT: '&e&lBanca | &7{0} ha prelevato ${1} dalla banca dell''is
 WITHDRAW_ERROR: '&c&lErrore | &7{0}.'
 WITHDRAWN_MONEY: '&e&lBanca | &7Hai ritirato ${0} dalla banca dell''isola di {1}!'
 WITHDRAWN_MONEY_NAME: '&e&lBanca | &7Hai ritirato ${0} dalla riva dell''isola {1}!'
-WORLD_NOT_ENABLED: '&e&lWorlds | &7This world is not enabled on the server.'
+WORLD_NOT_ENABLED: '&e&lWorlds | &7The {0} world is not enabled on the server.'
 WORLD_NOT_UNLOCKED: '&e&lMondi | &7Il mondo {0} non è ancora stato sbloccato!'

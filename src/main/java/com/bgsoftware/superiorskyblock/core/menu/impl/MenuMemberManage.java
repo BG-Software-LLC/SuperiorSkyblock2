@@ -13,24 +13,24 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.MemberManageButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
-import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.PlayerViewArgs;
+import com.bgsoftware.superiorskyblock.core.menu.view.impl.PlayerMenuView;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.util.Arrays;
 
-public class MenuMemberManage extends AbstractMenu<MenuMemberManage.View, PlayerViewArgs> {
+public class MenuMemberManage extends AbstractMenu<PlayerMenuView, PlayerViewArgs> {
 
-    private MenuMemberManage(MenuParseResult<MenuMemberManage.View> parseResult) {
+    private MenuMemberManage(MenuParseResult<PlayerMenuView> parseResult) {
         super(MenuIdentifiers.MENU_MEMBER_MANAGE, parseResult);
     }
 
     @Override
-    protected MenuMemberManage.View createViewInternal(SuperiorPlayer superiorPlayer, PlayerViewArgs args,
-                                                       @Nullable MenuView<?, ?> previousMenuView) {
-        return new MenuMemberManage.View(superiorPlayer, previousMenuView, this, args);
+    protected PlayerMenuView createViewInternal(SuperiorPlayer superiorPlayer, PlayerViewArgs args,
+                                                @Nullable MenuView<?, ?> previousMenuView) {
+        return new PlayerMenuView(superiorPlayer, previousMenuView, this, args);
     }
 
     public void closeViews(SuperiorPlayer islandMember) {
@@ -39,7 +39,7 @@ public class MenuMemberManage extends AbstractMenu<MenuMemberManage.View, Player
 
     @Nullable
     public static MenuMemberManage createInstance() {
-        MenuParseResult<MenuMemberManage.View> menuParseResult = MenuParserImpl.getInstance().loadMenu("member-manage.yml",
+        MenuParseResult<PlayerMenuView> menuParseResult = MenuParserImpl.getInstance().loadMenu("member-manage.yml",
                 MenuMemberManage::convertOldGUI);
 
         if (menuParseResult == null) {
@@ -48,7 +48,7 @@ public class MenuMemberManage extends AbstractMenu<MenuMemberManage.View, Player
 
         MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
-        MenuLayout.Builder<MenuMemberManage.View> patternBuilder = menuParseResult.getLayoutBuilder();
+        MenuLayout.Builder<PlayerMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
 
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "roles", menuPatternSlots),
                 new MemberManageButton.Builder().setManageAction(MemberManageButton.ManageAction.SET_ROLE));
@@ -58,27 +58,6 @@ public class MenuMemberManage extends AbstractMenu<MenuMemberManage.View, Player
                 new MemberManageButton.Builder().setManageAction(MemberManageButton.ManageAction.KICK_MEMBER));
 
         return new MenuMemberManage(menuParseResult);
-    }
-
-    public static class View extends AbstractMenuView<View, PlayerViewArgs> {
-
-        private final SuperiorPlayer superiorPlayer;
-
-        View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView,
-             MenuMemberManage menu, PlayerViewArgs args) {
-            super(inventoryViewer, previousMenuView, menu);
-            this.superiorPlayer = args.getSuperiorPlayer();
-        }
-
-        public SuperiorPlayer getSuperiorPlayer() {
-            return this.superiorPlayer;
-        }
-
-        @Override
-        public String replaceTitle(String title) {
-            return title.replace("{}", getSuperiorPlayer().getName());
-        }
-
     }
 
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
@@ -103,7 +82,7 @@ public class MenuMemberManage extends AbstractMenu<MenuMemberManage.View, Player
 
         int charCounter = 0;
 
-        if (cfg.contains("players-panel.fill-items")) {
+        if (cfg.isConfigurationSection("players-panel.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("players-panel.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

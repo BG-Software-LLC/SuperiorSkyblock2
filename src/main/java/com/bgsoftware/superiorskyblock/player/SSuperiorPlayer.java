@@ -14,23 +14,28 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
+import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Counter;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.config.PvPWorldsCache;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
+import com.bgsoftware.superiorskyblock.player.cache.PlayerCacheImpl;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -44,6 +49,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
@@ -61,20 +67,30 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    private static PvPWorldsCache pvpWorldsCache = null;
+
     private final DatabaseBridge databaseBridge;
     private final PlayerTeleportAlgorithm playerTeleportAlgorithm;
     @Nullable
     private PersistentDataContainer persistentDataContainer; // Lazy loading
+    private LazyReference<PlayerCache> playerCache = new LazyReference<PlayerCache>() {
+        @Override
+        protected PlayerCache create() {
+            return new PlayerCacheImpl(SSuperiorPlayer.this);
+        }
+    };
 
     private final Map<MissionReference, Counter> completedMissions = new ConcurrentHashMap<>();
     private final List<UUID> pendingInvites = new LinkedList<>();
+    private final List<Island> coopIslands = new LinkedList<>();
 
     private final UUID uuid;
 
     private Island playerIsland = null;
     private String name;
     private String textureValue;
-    private PlayerRole playerRole;
+    private WeakReference<PlayerRole> playerRole;
+    private int playerRoleId;
     private java.util.Locale userLocale;
 
     private boolean worldBorderEnabled;
@@ -98,7 +114,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public SSuperiorPlayer(SuperiorPlayerBuilderImpl builder) {
         this.uuid = builder.uuid;
         this.name = builder.name;
-        this.playerRole = builder.playerRole;
+        setPlayerRoleInternal(builder.playerRole);
         this.disbands = builder.disbands;
         this.userLocale = builder.locale;
         this.textureValue = builder.textureValue;
@@ -129,6 +145,11 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         // Checks for pvp warm-up
         if (player.hasPlayerStatus(PlayerStatus.PVP_IMMUNED))
             return target ? HitActionResult.TARGET_PVP_WARMUP : HitActionResult.PVP_WARMUP;
+
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(player.getWorld()))
+            return HitActionResult.SUCCESS;
 
         Island standingIsland;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -163,6 +184,11 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public PlayerCache getCache() {
+        return this.playerCache.get();
+    }
+
+    @Override
     public String getTextureValue() {
         return textureValue;
     }
@@ -173,11 +199,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         Log.debug(Debug.SET_TEXTURE_VALUE, getName(), textureValue);
 
+        String oldTextureValue = this.textureValue;
+
         // We first update the texture value, even if they are equal.
         this.textureValue = textureValue;
 
         // We now compare them but remove the timestamp when comparing.
-        if (Objects.equals(removeTextureValueTimeStamp(this.textureValue), removeTextureValueTimeStamp(textureValue)))
+        if (Objects.equals(removeTextureValueTimeStamp(oldTextureValue), removeTextureValueTimeStamp(textureValue)))
             return;
 
         // We only save the value if it's actually different.
@@ -359,8 +387,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         World world = getWorld();
 
         // Checks for island teammates pvp
-        if (getIslandLeader().equals(otherPlayer.getIslandLeader()) &&
-                (world == null || !plugin.getSettings().getPvPWorlds().contains(world.getName())))
+        if (getIsland() == otherPlayer.getIsland() && (world == null || !isPvPWorldInternal(world.getName())))
             return HitActionResult.ISLAND_TEAM_PVP;
 
         // Checks if this player can bypass all pvp restrictions
@@ -503,7 +530,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         this.playerIsland = island;
 
         if (this.playerIsland == null) {
-            this.playerRole = SPlayerRole.guestRole();
+            setPlayerRoleInternal(null);
         }
 
     }
@@ -530,9 +557,37 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void addCoop(Island island) {
+        Preconditions.checkNotNull(island, "island parameter cannot be null");
+        Preconditions.checkArgument(island.isCoop(this), "player is not coop of given island");
+        this.coopIslands.add(island);
+    }
+
+    @Override
+    public void removeCoop(Island island) {
+        Preconditions.checkNotNull(island, "island parameter cannot be null");
+        this.coopIslands.remove(island);
+    }
+
+    @Override
+    public List<Island> getCoopIslands() {
+        return new SequentialListBuilder<Island>().build(this.coopIslands);
+    }
+
+    @Override
     public PlayerRole getPlayerRole() {
-        if (playerRole == null || (this.playerIsland == null && this.playerRole != SPlayerRole.guestRole()))
-            setPlayerRole(SPlayerRole.guestRole());
+        PlayerRole playerRole = this.playerRole.get();
+
+        if (playerRole == null) {
+            // Reference doesn't exist anymore, let's get it from roles manager again
+            playerRole = plugin.getRoles().getPlayerRoleFromId(this.playerRoleId);
+            this.playerRole = new WeakReference<>(playerRole);
+        }
+
+        if (this.playerIsland == null && playerRole != SPlayerRole.guestRole()) {
+            setPlayerRoleInternal(null);
+            playerRole = this.playerRole.get();
+        }
 
         return playerRole;
     }
@@ -543,7 +598,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         Log.debug(Debug.SET_PLAYER_ROLE, getName(), playerRole.getName());
 
-        this.playerRole = playerRole;
+        setPlayerRoleInternal(playerRole);
 
         Island island = getIsland();
         if (island != null && island.getOwner() != this)
@@ -557,8 +612,6 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setDisbands(int disbands) {
-        disbands = Math.max(disbands, 0);
-
         Log.debug(Debug.SET_DISBANDS, getName(), disbands);
 
         if (this.disbands == disbands)
@@ -790,7 +843,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Log.debug(Debug.SET_SCHEMATIC_POSITION, getName(), block == null ? "null" : block.getLocation(wrapper.getHandle()));
         }
-        this.schematicPos1 = block == null ? null : new SBlockPosition(block);
+        this.schematicPos1 = block == null ? null : SBlockPosition.of(block);
     }
 
     @Override
@@ -803,7 +856,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Log.debug(Debug.SET_SCHEMATIC_POSITION, getName(), block == null ? "null" : block.getLocation(wrapper.getHandle()));
         }
-        this.schematicPos2 = block == null ? null : new SBlockPosition(block);
+        this.schematicPos2 = block == null ? null : SBlockPosition.of(block);
     }
 
     /*
@@ -916,7 +969,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         this.name = otherPlayer.getName();
         this.playerIsland = otherPlayer.getIsland();
-        this.playerRole = otherPlayer.getPlayerRole();
+        setPlayerRoleInternal(otherPlayer.getPlayerRole());
         this.userLocale = otherPlayer.getUserLocale();
         this.worldBorderEnabled |= otherPlayer.hasWorldBorderEnabled();
         this.blocksStackerEnabled |= otherPlayer.hasBlocksStackerEnabled();
@@ -994,8 +1047,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
             return false;
 
         Optional<MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
-        return missionDataOptional.isPresent() && getAmountMissionCompleted(mission) <
-                missionDataOptional.get().getResetAmount();
+
+        if (missionDataOptional.isPresent()) {
+            int resetAmount = missionDataOptional.get().getResetAmount();
+            return resetAmount <= 0 || getAmountMissionCompleted(mission) < resetAmount;
+        }
+
+        return false;
     }
 
     @Override
@@ -1082,11 +1140,32 @@ public class SSuperiorPlayer implements SuperiorPlayer {
                 "}";
     }
 
+    private void setPlayerRoleInternal(@Nullable PlayerRole playerRole) {
+        PlayerRole newRole = playerRole == null ? SPlayerRole.guestRole() : playerRole;
+        this.playerRole = new WeakReference<>(newRole);
+        this.playerRoleId = newRole.getId();
+    }
+
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, SSuperiorPlayer::onSettingsUpdate);
+    }
+
     private static String removeTextureValueTimeStamp(@Nullable String textureValue) {
         // The texture value string is a json containing a timestamp value.
         // However, when we compare texture values, we want to emit the timestamp value.
         // This value is found at index 35->41 (6 chars in length).
         return textureValue == null || textureValue.length() <= 42 ? null : textureValue.substring(0, 35) + textureValue.substring(42);
+    }
+
+    private static boolean isPvPWorldInternal(String worldName) {
+        if (pvpWorldsCache == null)
+            pvpWorldsCache = new PvPWorldsCache(plugin.getSettings().getPvPWorlds());
+
+        return pvpWorldsCache.isPvPWorld(worldName);
+    }
+
+    private static void onSettingsUpdate() {
+        pvpWorldsCache = null;
     }
 
 }

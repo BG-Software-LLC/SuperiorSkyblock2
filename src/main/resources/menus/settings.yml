@@ -39,6 +39,7 @@ items:
 
 settings:
   always_day:
+    display-menu: true
     settings-enabled:
       type: STAINED_CLAY
       data: 4
@@ -54,11 +55,12 @@ settings:
         - '&7Set a day time on your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   always_middle_day:
+    display-menu: true
     settings-enabled:
       type: STAINED_CLAY
       data: 1
@@ -74,11 +76,12 @@ settings:
         - '&7Set a middle day time on your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   always_night:
+    display-menu: true
     settings-enabled:
       type: STAINED_CLAY
       data: 3
@@ -94,11 +97,12 @@ settings:
         - '&7Set a night time on your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   always_middle_night:
+    display-menu: true
     settings-enabled:
       type: STAINED_CLAY
       data: 11
@@ -114,11 +118,12 @@ settings:
         - '&7Set a middle night day time on your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   always_rain:
+    display-menu: true
     settings-enabled:
       type: WATER_LILY
       name: '&6Always Rain'
@@ -132,11 +137,12 @@ settings:
         - '&7Set a rainy weather on your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   always_shiny:
+    display-menu: true
     settings-enabled:
       type: DEAD_BUSH
       name: '&6Always Shiny'
@@ -150,11 +156,12 @@ settings:
         - '&7Set a shiny weather on your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   creeper_explosion:
+    display-menu: true
     settings-enabled:
       type: SKULL_ITEM
       data: 4
@@ -170,11 +177,12 @@ settings:
         - '&7Allow creepers to explode blocks inside your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   crops_growth:
+    display-menu: true
     settings-enabled:
       type: SEEDS
       name: '&6Crops Growth'
@@ -188,11 +196,12 @@ settings:
         - '&7Allow growth of crops inside your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   egg_lay:
+    display-menu: true
     settings-enabled:
       type: EGG
       name: '&6Egg Lay'
@@ -206,11 +215,12 @@ settings:
         - '&7Allow chickens to lay eggs inside your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   enderman_grief:
+    display-menu: true
     settings-enabled:
       type: ENDER_PEARL
       name: '&6Enderman Grief'
@@ -224,11 +234,12 @@ settings:
         - '&7Allow enderman to grief blocks inside your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   fire_spread:
+    display-menu: true
     settings-enabled:
       type: FLINT_AND_STEEL
       name: '&6Fire Spread'
@@ -242,11 +253,12 @@ settings:
         - '&7Allow fire to spread inside your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   ghast_fireball:
+    display-menu: true
     settings-enabled:
       type: FIREBALL
       name: '&6Ghast Fireball'
@@ -260,11 +272,12 @@ settings:
         - '&7Allow fireballs to break blocks inside your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   lava_flow:
+    display-menu: true
     settings-enabled:
       type: LAVA_BUCKET
       name: '&6Lava Flow'
@@ -278,11 +291,12 @@ settings:
         - '&7Allow lava to flow inside your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   natural_animals_spawn:
+    display-menu: true
     settings-enabled:
       type: MONSTER_EGG
       data: 90
@@ -298,11 +312,12 @@ settings:
         - '&7Allow natural spawning of animals inside the island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   natural_monster_spawn:
+    display-menu: true
     settings-enabled:
       type: MONSTER_EGG
       data: 54
@@ -318,29 +333,35 @@ settings:
         - '&7Allow natural spawning of monsters inside the island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   pvp:
+    display-menu: true
     settings-enabled:
       type: DIAMOND_SWORD
       name: '&6PvP'
       lore:
         - '&7Allow players to pvp inside the island.'
         - '&7Currently &aENABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     settings-disabled:
       type: DIAMOND_SWORD
       name: '&6PvP'
       lore:
         - '&7Allow players to pvp inside the island.'
         - '&7Currently &cDISABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   spawner_animals_spawn:
+    display-menu: true
     settings-enabled:
       type: MOB_SPAWNER
       name: '&6Spawner Animals Spawn'
@@ -354,11 +375,12 @@ settings:
         - '&7Allow spawner spawning of animals inside the island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   spawner_monster_spawn:
+    display-menu: true
     settings-enabled:
       type: MOB_SPAWNER
       name: '&6Spawner Monster Spawn'
@@ -372,11 +394,12 @@ settings:
         - '&7Allow spawner spawning of monsters inside the island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   tnt_explosion:
+    display-menu: true
     settings-enabled:
       type: TNT
       name: '&6TNT Explosion'
@@ -390,11 +413,12 @@ settings:
         - '&7Allow TNT to explode blocks inside your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   tree_growth:
+    display-menu: true
     settings-enabled:
       type: SAPLING
       name: '&6Tree Growth'
@@ -408,11 +432,12 @@ settings:
         - '&7Allow growth of trees inside your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   water_flow:
+    display-menu: true
     settings-enabled:
       type: WATER_BUCKET
       name: '&6Water Flow'
@@ -426,11 +451,12 @@ settings:
         - '&7Allow water to flow inside your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
 
   wither_explosion:
+    display-menu: true
     settings-enabled:
       type: SKULL_ITEM
       data: 1
@@ -446,6 +472,6 @@ settings:
         - '&7Allow withers to explode blocks inside your island.'
         - '&7Currently &cDISABLED&7.'
     sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2

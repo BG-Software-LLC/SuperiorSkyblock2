@@ -19,6 +19,7 @@ items:
   '$':
     type: STAINED_GLASS_PANE
     data: 15
+    name: '&f'
   '#':
     type: DIAMOND_PICKAXE
     name: '&eMiner Missions'
@@ -50,22 +51,22 @@ items:
 
 sounds:
   '#':
-    type: BLOCK_CHEST_OPEN
+    type: CHEST_OPEN
     volume: 0.8
     pitch: 1
   '@':
-    type: BLOCK_CHEST_OPEN
+    type: CHEST_OPEN
     volume: 0.8
     pitch: 1
   '%':
-    type: BLOCK_CHEST_OPEN
+    type: CHEST_OPEN
     volume: 0.8
     pitch: 1
   '^':
-    type: BLOCK_CHEST_OPEN
+    type: CHEST_OPEN
     volume: 0.8
     pitch: 1
   '&':
-    type: BLOCK_CHEST_OPEN
+    type: CHEST_OPEN
     volume: 0.8
     pitch: 1

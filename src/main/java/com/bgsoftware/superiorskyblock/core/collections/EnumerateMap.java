@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class EnumerateMap<K extends Enumerable, V> {
@@ -116,6 +117,18 @@ public class EnumerateMap<K extends Enumerable, V> {
             V value = get(key);
             if (value != null)
                 map.put(key, valuesMapper.apply(value));
+        }
+
+        return map;
+    }
+
+    public <T> Map<K, T> collect(Collection<K> enumerables, BiFunction<K, V, T> valuesMapper) {
+        Map<K, T> map = new IdentityHashMap<>();
+
+        for (K key : enumerables) {
+            V value = get(key);
+            if (value != null)
+                map.put(key, valuesMapper.apply(key, value));
         }
 
         return map;

@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.IslandFlagPagedObje
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -66,7 +67,9 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
         Optional.ofNullable(cfg.getConfigurationSection("settings")).ifPresent(settingsSection -> {
             for (String islandFlagName : settingsSection.getKeys(false)) {
                 Optional.ofNullable(settingsSection.getConfigurationSection(islandFlagName)).ifPresent(islandFlagSection -> {
-                    islandFlags.add(loadIslandFlagInfo(islandFlagSection, islandFlagName, islandFlags.size()));
+                    if (islandFlagSection.getBoolean("display-menu", true)) {
+                        islandFlags.add(loadIslandFlagInfo(islandFlagSection, islandFlagName, islandFlags.size()));
+                    }
                 });
             }
         });
@@ -91,7 +94,7 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
                 disabledIslandFlagItem, clickSound, position);
     }
 
-    public class View extends AbstractPagedMenuView<MenuIslandFlags.View, IslandViewArgs, IslandFlagInfo> {
+    public class View extends AbstractPagedMenuView<MenuIslandFlags.View, IslandViewArgs, IslandFlagInfo> implements IIslandMenuView {
 
         private final Island island;
 
@@ -101,6 +104,7 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
             this.island = args.getIsland();
         }
 
+        @Override
         public Island getIsland() {
             return island;
         }
@@ -187,7 +191,7 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
 
         int charCounter = 0;
 
-        if (cfg.contains("settings-gui.fill-items")) {
+        if (cfg.isConfigurationSection("settings-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("settings-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

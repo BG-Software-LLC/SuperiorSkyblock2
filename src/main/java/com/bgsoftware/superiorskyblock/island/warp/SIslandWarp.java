@@ -1,32 +1,45 @@
 package com.bgsoftware.superiorskyblock.island.warp;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
+import com.bgsoftware.superiorskyblock.core.IslandWorlds;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
 
 public class SIslandWarp implements IslandWarp {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private final WarpCategory warpCategory;
 
     private String name;
-    private Location location;
+    private WorldPosition worldPosition;
+    private WorldInfo worldInfo;
     private boolean isPrivate;
     private ItemStack icon;
 
-    public SIslandWarp(String name, Location location, WarpCategory warpCategory, boolean isPrivate, @Nullable ItemStack icon) {
+    public SIslandWarp(String name, WorldInfo worldInfo, WorldPosition worldPosition, WarpCategory warpCategory, boolean isPrivate, @Nullable ItemStack icon) {
         this.name = name;
-        this.location = location.clone().add(0.5, 0, 0.5);
+        this.worldPosition = worldPosition;
+        this.worldInfo = worldInfo;
         this.warpCategory = warpCategory;
         this.isPrivate = isPrivate;
         this.icon = icon;
@@ -56,18 +69,25 @@ public class SIslandWarp implements IslandWarp {
 
     @Override
     public Location getLocation() {
-        return location.clone();
+        return IslandWorlds.setWorldToLocation(this.worldInfo, this.worldPosition);
     }
 
     @Override
     public Location getLocation(Location location) {
         if (location != null) {
-            location.setWorld(this.location.getWorld());
-            location.setX(this.location.getX());
-            location.setY(this.location.getY());
-            location.setZ(this.location.getZ());
-            location.setYaw(this.location.getYaw());
-            location.setPitch(this.location.getPitch());
+            if (location instanceof LazyWorldLocation) {
+                ((LazyWorldLocation) location).setWorldName(this.worldInfo.getName());
+            } else {
+                IslandWorlds.ensureWorldLoaded(this.worldInfo);
+                World world = Bukkit.getWorld(this.worldInfo.getName());
+                location.setWorld(world);
+            }
+
+            location.setX(this.worldPosition.getX());
+            location.setY(this.worldPosition.getY());
+            location.setZ(this.worldPosition.getZ());
+            location.setYaw(this.worldPosition.getYaw());
+            location.setPitch(this.worldPosition.getPitch());
         }
 
         return location;
@@ -79,7 +99,31 @@ public class SIslandWarp implements IslandWarp {
 
         Log.debug(Debug.SET_WARP_LOCATION, getOwnerName(), this.name, location);
 
-        this.location = location.clone();
+        this.worldInfo = plugin.getGrid().getIslandsWorldInfo(getIsland(), LazyWorldLocation.getWorldName(location));
+        this.worldPosition = SWorldPosition.of(location);
+
+        IslandsDatabaseBridge.updateWarpLocation(getIsland(), this);
+    }
+
+    @Override
+    public WorldPosition getPosition() {
+        return this.worldPosition;
+    }
+
+    @Override
+    public Dimension getPositionDimension() {
+        return this.worldInfo.getDimension();
+    }
+
+    @Override
+    public void setPosition(Dimension dimension, WorldPosition worldPosition) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+        Preconditions.checkNotNull(worldPosition, "worldPosition parameter cannot be null.");
+
+        Log.debug(Debug.SET_WARP_LOCATION, getOwnerName(), this.name, dimension, worldPosition);
+
+        this.worldInfo = plugin.getGrid().getIslandsWorldInfo(getIsland(), dimension);
+        this.worldPosition = worldPosition;
 
         IslandsDatabaseBridge.updateWarpLocation(getIsland(), this);
     }

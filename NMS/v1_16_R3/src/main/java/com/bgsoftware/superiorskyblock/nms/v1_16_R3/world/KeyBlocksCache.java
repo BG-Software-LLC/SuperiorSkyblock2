@@ -21,7 +21,7 @@ public class KeyBlocksCache {
     public static Key getBlockKey(Block block) {
         return BLOCK_TO_KEY.computeIfAbsent(block, unused -> {
             Material blockType = CraftMagicNumbers.getMaterial(block);
-            return Keys.of(blockType, (short) 0);
+            return blockType == null ? null : blockType.isItem() ? Keys.of(blockType, (short) 0) : Keys.of(blockType);
         });
     }
 

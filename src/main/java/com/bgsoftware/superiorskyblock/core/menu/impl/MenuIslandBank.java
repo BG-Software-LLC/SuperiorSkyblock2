@@ -11,12 +11,13 @@ import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankBalanceButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankCustomDepositButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankCustomWithdrawButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankDepositButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankWithdrawButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.OpenBankLogsButton;
-import com.bgsoftware.superiorskyblock.core.menu.view.IslandMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.impl.IslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -53,7 +54,7 @@ public class MenuIslandBank extends AbstractMenu<IslandMenuView, IslandViewArgs>
 
         if (cfg.isConfigurationSection("items")) {
             for (String itemChar : cfg.getConfigurationSection("items").getKeys(false)) {
-                if (cfg.contains("items." + itemChar + ".bank-action")) {
+                if (cfg.isConfigurationSection("items." + itemChar + ".bank-action")) {
                     List<Integer> slots = menuPatternSlots.getSlots(itemChar);
 
                     if (slots.isEmpty()) {
@@ -76,7 +77,7 @@ public class MenuIslandBank extends AbstractMenu<IslandMenuView, IslandViewArgs>
                         List<String> withdrawCommands = cfg.getStringList("items." + itemChar + ".bank-action.withdraw");
                         patternBuilder.mapButtons(slots, new BankWithdrawButton.Builder(withdrawCommands)
                                 .setFailSound(failSound).setSuccessSound(successSound));
-                    } else if (cfg.contains("items." + itemChar + ".bank-action.deposit")) {
+                    } else if (cfg.isDouble("items." + itemChar + ".bank-action.deposit")) {
                         double depositPercentage = cfg.getDouble("items." + itemChar + ".bank-action.deposit");
                         if (depositPercentage <= 0) {
                             patternBuilder.mapButtons(slots, new BankCustomDepositButton.Builder()
@@ -89,6 +90,9 @@ public class MenuIslandBank extends AbstractMenu<IslandMenuView, IslandViewArgs>
                 }
             }
         }
+
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "balance", menuPatternSlots),
+                new BankBalanceButton.Builder());
 
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "logs", menuPatternSlots),
                 new OpenBankLogsButton.Builder());

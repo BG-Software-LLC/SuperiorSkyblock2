@@ -4,15 +4,18 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
@@ -23,9 +26,9 @@ import com.bgsoftware.superiorskyblock.core.formatting.impl.NumberFormatter;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
@@ -33,19 +36,20 @@ import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
-import com.google.common.base.Preconditions;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -79,7 +83,7 @@ public class SettingsContainer {
     public final int defaultIslandSize;
     public final KeyMap<Integer> defaultBlockLimits;
     public final KeyMap<Integer> defaultEntityLimits;
-    public final KeyMap<Integer>[] defaultGenerator;
+    public final EnumerateMap<Dimension, Map<Key, Integer>> defaultGenerator;
     public final int defaultWarpsLimit;
     public final int defaultTeamLimit;
     public final int defaultCoopLimit;
@@ -88,6 +92,7 @@ public class SettingsContainer {
     public final double defaultMobDrops;
     public final BigDecimal defaultBankLimit;
     public final Int2IntMapView defaultRoleLimits;
+    public final Map<PotionEffectType, Integer> defaultIslandEffects;
     public final int islandsHeight;
     public final boolean worldBordersEnabled;
     public final boolean stackedBlocksEnabled;
@@ -100,8 +105,12 @@ public class SettingsContainer {
     public final String stackedBlocksMenuTitle;
     public final String islandLevelFormula;
     public final boolean roundedIslandLevel;
-    public final String islandTopOrder;
+    public final RoundingMode islandLevelRoundingMode;
+    public final boolean autoBlocksTracking;
+    public final SortingType islandTopOrder;
+    public final SortingType globalWarpsOrder;
     public boolean coopMembers;
+    public boolean editPlayerPermissions;
     public final ConfigurationSection islandRolesSection;
     public final long calcInterval;
     public final String signWarpLine;
@@ -129,16 +138,15 @@ public class SettingsContainer {
     public final KeySet safeBlocks;
     public final boolean visitorsDamage;
     public final boolean coopDamage;
-    public final int disbandCount;
     public final boolean islandTopIncludeLeader;
     public final Map<String, String> defaultPlaceholders;
     public final boolean banConfirm;
     public final boolean disbandConfirm;
     public final boolean kickConfirm;
     public final boolean leaveConfirm;
+    public final boolean transferConfirm;
     public final String spawnersProvider;
     public final String stackedBlocksProvider;
-    public final boolean disbandInventoryClear;
     public final boolean islandNamesRequiredForCreation;
     public final int islandNamesMaxLength;
     public final int islandNamesMinLength;
@@ -146,10 +154,16 @@ public class SettingsContainer {
     public final boolean islandNamesColorSupport;
     public final boolean islandNamesIslandTop;
     public final boolean islandNamesPreventPlayerNames;
+    public final boolean teleportOnCreate;
     public final boolean teleportOnJoin;
     public final boolean teleportOnKick;
-    public final boolean clearOnJoin;
+    public final boolean teleportOnLeave;
+    public final List<ClearAction> clearActionsOnDisband;
+    public final List<ClearAction> clearActionsOnJoin;
+    public final List<ClearAction> clearActionsOnKick;
+    public final List<ClearAction> clearActionsOnLeave;
     public final boolean rateOwnIsland;
+    public final boolean changeIslandRating;
     public final List<String> defaultSettings;
     public final boolean disableRedstoneOffline;
     public final boolean disableRedstoneAFK;
@@ -178,6 +192,7 @@ public class SettingsContainer {
     public final int cropsInterval;
     public final boolean onlyBackButton;
     public final boolean buildOutsideIsland;
+    public final int defaultDisbandCount;
     public final String defaultLanguage;
     public final boolean defaultWorldBorder;
     public final boolean defaultBlocksStacker;
@@ -197,14 +212,18 @@ public class SettingsContainer {
     public final int islandChestsDefaultSize;
     public final Map<String, List<String>> commandAliases;
     public final KeySet valuableBlocks;
-    public final Map<String, Location> islandPreviewLocations;
+    public final GameMode islandPreviewsGameMode;
+    public final int islandPreviewsMaxDistance;
+    public final List<String> islandPreviewsBlockedCommands;
+    public final Map<String, Location> islandPreviewsLocations;
     public final boolean tabCompleteHideVanished;
     public final boolean dropsUpgradePlayersMultiply;
-    public final long protectedMessageDelay;
+    public final Map<String, Long> messageDelays;
     public final boolean warpCategories;
     public final boolean physicsListener;
     public final double chargeOnWarp;
     public final boolean publicWarps;
+    public final boolean lockedIslands;
     public final long recalcTaskTimeout;
     public final boolean autoLanguageDetection;
     public final boolean autoUncoopWhenAlone;
@@ -215,6 +234,8 @@ public class SettingsContainer {
     public final BigInteger blockCountsSaveThreshold;
     public final boolean chatSigningSupport;
     public final int commandsPerPage;
+    public final boolean cacheSchematics;
+    public final Map<String, KeySet> entityCategories;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws ManagerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
@@ -245,6 +266,16 @@ public class SettingsContainer {
         loadListOrSection(config, "default-values.entity-limits", "entity limit", (entityType, limit) ->
                 defaultEntityLimits.put(Keys.ofEntityType(entityType), limit));
         this.defaultEntityLimits = KeyMaps.unmodifiableKeyMap(defaultEntityLimits);
+        Map<PotionEffectType, Integer> defaultIslandEffects = new ArrayMap<>();
+        loadListOrSection(config, "default-values.island-effects", "island effect", (effectName, effectLevel) -> {
+            PotionEffectType potionEffectType = PotionEffectType.getByName(effectName);
+            if (potionEffectType == null) {
+                Log.errorFromFile("config.yml", "Invalid potion effect " + effectName + ", skipping...");
+            } else {
+                defaultIslandEffects.put(potionEffectType, effectLevel - 1);
+            }
+        });
+        this.defaultIslandEffects = Collections.unmodifiableMap(defaultIslandEffects);
         defaultTeamLimit = config.getInt("default-values.team-limit", 4);
         defaultWarpsLimit = config.getInt("default-values.warps-limit", 3);
         defaultCoopLimit = config.getInt("default-values.coop-limit", 8);
@@ -277,8 +308,28 @@ public class SettingsContainer {
         stackedBlocksMenuTitle = Formatters.COLOR_FORMATTER.format(config.getString("stacked-blocks.deposit-menu.title", "&lDeposit Blocks"));
         islandLevelFormula = config.getString("island-level-formula", "{} / 2");
         roundedIslandLevel = config.getBoolean("rounded-island-level", false);
-        islandTopOrder = config.getString("island-top-order", "WORTH").toUpperCase(Locale.ENGLISH);
+        islandLevelRoundingMode = Optional.ofNullable(EnumHelper.getEnum(RoundingMode.class,
+                        config.getString("island-level-rounding-mode").toUpperCase(Locale.ENGLISH)))
+                .orElse(RoundingMode.HALF_UP);
+        autoBlocksTracking = config.getBoolean("auto-blocks-tracking", true);
+
+        String rawTop = config.getString("island-top-order", "WORTH");
+        SortingType parsedTop = SortingType.getByName(rawTop.toUpperCase(Locale.ENGLISH));
+        if (parsedTop == null) {
+            parsedTop = SortingType.getByName("WORTH");
+            Log.warnFromFile("config.yml", "Invalid island-top-order '" + rawTop + "', using 'WORTH'.");
+        }
+        this.islandTopOrder = parsedTop;
+
+        String rawGlobalWarps = config.getString("global-warps-order", "WORTH").toUpperCase(Locale.ENGLISH);
+        SortingType foundGlobalWarpsOrder = SortingType.getByName(rawGlobalWarps);
+        if (foundGlobalWarpsOrder == null) {
+            foundGlobalWarpsOrder = SortingType.getByName("WORTH");
+            Log.warnFromFile("config.yml", "Invalid global-warps-order '" + rawGlobalWarps + "', using 'WORTH'.");
+        }
+        this.globalWarpsOrder = foundGlobalWarpsOrder;
         coopMembers = config.getBoolean("coop-members", true);
+        editPlayerPermissions = config.getBoolean("edit-player-permissions", true);
         islandRolesSection = config.getConfigurationSection("island-roles");
         signWarpLine = config.getString("sign-warp-line", "[IslandWarp]");
         List<String> signWarp = Formatters.formatList(config.getStringList("sign-warp"), Formatters.COLOR_FORMATTER);
@@ -351,7 +402,6 @@ public class SettingsContainer {
         safeBlocks = loadSafeBlocks(plugin);
         visitorsDamage = config.getBoolean("visitors-damage", false);
         coopDamage = config.getBoolean("coop-damage", true);
-        disbandCount = config.getInt("disband-count", 5);
         islandTopIncludeLeader = config.getBoolean("island-top-include-leader", true);
         defaultPlaceholders = Collections.unmodifiableMap(config.getStringList("default-placeholders").stream().collect(Collectors.toMap(
                 line -> line.split(":")[0].replace("superior_", "").toLowerCase(Locale.ENGLISH),
@@ -361,9 +411,9 @@ public class SettingsContainer {
         disbandConfirm = config.getBoolean("disband-confirm");
         kickConfirm = config.getBoolean("kick-confirm");
         leaveConfirm = config.getBoolean("leave-confirm");
+        transferConfirm = config.getBoolean("transfer-confirm");
         spawnersProvider = config.getString("spawners-provider", "AUTO");
         stackedBlocksProvider = config.getString("stacked-blocks-provider", "AUTO");
-        disbandInventoryClear = config.getBoolean("disband-inventory-clear", true);
         islandNamesRequiredForCreation = config.getBoolean("island-names.required-for-creation", true);
         islandNamesMaxLength = config.getInt("island-names.max-length", 16);
         islandNamesMinLength = config.getInt("island-names.min-length", 3);
@@ -373,24 +423,30 @@ public class SettingsContainer {
         islandNamesColorSupport = config.getBoolean("island-names.color-support", true);
         islandNamesIslandTop = config.getBoolean("island-names.island-top", true);
         islandNamesPreventPlayerNames = config.getBoolean("island-names.prevent-player-names", true);
+        teleportOnCreate = config.getBoolean("teleport-on-create", true);
         teleportOnJoin = config.getBoolean("teleport-on-join", false);
-        teleportOnKick = config.getBoolean("teleport-on-kick", false);
-        clearOnJoin = config.getBoolean("clear-on-join", false);
+        teleportOnKick = config.getBoolean("teleport-on-kick", true);
+        teleportOnLeave = config.getBoolean("teleport-on-leave", false);
+        clearActionsOnDisband = loadClearActions(config.getStringList("clear-on-disband"));
+        clearActionsOnJoin = loadClearActions(config.getStringList("clear-on-join"));
+        clearActionsOnKick = loadClearActions(config.getStringList("clear-on-kick"));
+        clearActionsOnLeave = loadClearActions(config.getStringList("clear-on-leave"));
         rateOwnIsland = config.getBoolean("rate-own-island", false);
+        changeIslandRating = config.getBoolean("change-island-rating", true);
         defaultSettings = Collections.unmodifiableList(config.getStringList("default-settings")
                 .stream().map(str -> str.toUpperCase(Locale.ENGLISH)).collect(Collectors.toList()));
-        defaultGenerator = new KeyMap[Dimension.values().size()];
+        defaultGenerator = new EnumerateMap<>(Dimension.values());
         if (config.isConfigurationSection("default-values.generator")) {
             for (String env : config.getConfigurationSection("default-values.generator").getKeys(false)) {
                 try {
-                    World.Environment environment = World.Environment.valueOf(env.toUpperCase(Locale.ENGLISH));
-                    loadGenerator(config, "default-values.generator." + env, environment.ordinal());
+                    Dimension dimension = Dimension.getByName(env.toUpperCase(Locale.ENGLISH));
+                    loadGenerator(config, "default-values.generator." + env, dimension);
                 } catch (Exception error) {
                     Log.errorFromFile(error, "config.yml", "An unexpected error occurred while loading default generator values for ", env + ":");
                 }
             }
         } else {
-            loadGenerator(config, "default-values.generator", 0);
+            loadGenerator(config, "default-values.generator", this.defaultWorldDimension);
         }
         disableRedstoneOffline = config.getBoolean("disable-redstone-offline", true);
         disableRedstoneAFK = config.getBoolean("afk-integrations.disable-redstone", false);
@@ -413,11 +469,11 @@ public class SettingsContainer {
         blockedVisitorsCommands = Collections.unmodifiableList(config.getStringList("blocked-visitors-commands"));
         defaultContainersEnabled = config.getBoolean("default-containers.enabled", false);
         Map<InventoryType, ListTag> defaultContainersContents = new EnumMap<>(InventoryType.class);
-        if (config.contains("default-containers.containers")) {
+        if (config.isConfigurationSection("default-containers.containers")) {
             for (String container : config.getConfigurationSection("default-containers.containers").getKeys(false)) {
                 try {
                     InventoryType containerType = InventoryType.valueOf(container.toUpperCase(Locale.ENGLISH));
-                    ListTag items = new ListTag(CompoundTag.class, Collections.emptyList());
+                    ListTag items = ListTag.of(CompoundTag.class);
                     defaultContainersContents.put(containerType, items);
 
                     ConfigurationSection containerSection = config.getConfigurationSection("default-containers.containers." + container);
@@ -450,7 +506,7 @@ public class SettingsContainer {
         defaultSignLines = Collections.unmodifiableList(
                 Formatters.formatList(config.getStringList("default-signs"), Formatters.COLOR_FORMATTER));
         Map<String, List<String>> eventCommands = new HashMap<>();
-        if (config.contains("event-commands")) {
+        if (config.isConfigurationSection("event-commands")) {
             for (String eventName : config.getConfigurationSection("event-commands").getKeys(false)) {
                 eventCommands.put(eventName.toLowerCase(Locale.ENGLISH), config.getStringList("event-commands." + eventName));
             }
@@ -460,7 +516,7 @@ public class SettingsContainer {
         homeWarmup = config.getLong("home-warmup", 0);
         visitWarmup = config.getLong("visit-warmup", 0);
         liquidUpdate = config.getBoolean("liquid-update", false);
-        lightsUpdate = config.getBoolean("lights-update", false);
+        lightsUpdate = config.getBoolean("lights-update", true);
         pvpWorlds = Collections.unmodifiableList(config.getStringList("pvp-worlds"));
         stopLeaving = config.getBoolean("stop-leaving", false);
         valuesMenu = config.getBoolean("values-menu", true);
@@ -468,6 +524,7 @@ public class SettingsContainer {
         cropsInterval = config.getInt("crops-interval", 5);
         onlyBackButton = config.getBoolean("only-back-button", false);
         buildOutsideIsland = config.getBoolean("build-outside-island", false);
+        defaultDisbandCount = config.getInt("default-disband-count", 5);
         defaultLanguage = config.getString("default-language", "en-US");
         defaultWorldBorder = config.getBoolean("default-world-border", true);
         defaultBlocksStacker = config.getBoolean("default-blocks-stacker", true);
@@ -497,25 +554,43 @@ public class SettingsContainer {
         this.commandAliases = Collections.unmodifiableMap(commandAliases);
         valuableBlocks = KeySets.unmodifiableKeySet(
                 KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("valuable-blocks")));
-        Map<String, Location> islandPreviewLocations = new HashMap<>();
-        if (config.isConfigurationSection("preview-islands")) {
-            for (String schematic : config.getConfigurationSection("preview-islands").getKeys(false)) {
+        GameMode islandPreviewsGameMode;
+        String islandPreviewsGameModeName = config.getString("island-previews.game-mode", "SPECTATOR").toUpperCase(Locale.ENGLISH);
+        try {
+            islandPreviewsGameMode = GameMode.valueOf(islandPreviewsGameModeName);
+        } catch (IllegalArgumentException error) {
+            islandPreviewsGameMode = GameMode.SPECTATOR;
+            Log.warnFromFile("config.yml", "Invalid game mode ", islandPreviewsGameModeName + ", using SPECTATOR instead.");
+        }
+        this.islandPreviewsGameMode = islandPreviewsGameMode;
+        islandPreviewsMaxDistance = config.getInt("island-previews.max-distance", 100);
+        islandPreviewsBlockedCommands = Collections.unmodifiableList(config.getStringList("island-previews.blocked-commands"));
+        Map<String, Location> islandPreviewsLocations = new HashMap<>();
+        if (config.isConfigurationSection("island-previews.locations")) {
+            for (String schematic : config.getConfigurationSection("island-previews.locations").getKeys(false)) {
                 try {
-                    islandPreviewLocations.put(schematic.toLowerCase(Locale.ENGLISH), Serializers.LOCATION_SERIALIZER
-                            .deserialize(config.getString("preview-islands." + schematic)));
+                    islandPreviewsLocations.put(schematic.toLowerCase(Locale.ENGLISH), Serializers.LOCATION_SERIALIZER
+                            .deserialize(config.getString("island-previews.locations." + schematic)));
                 } catch (Exception error) {
                     Log.warnFromFile("config.yml", "Cannot deserialize island preview for ", schematic, ", skipping...");
                 }
             }
         }
-        this.islandPreviewLocations = Collections.unmodifiableMap(islandPreviewLocations);
+        this.islandPreviewsLocations = Collections.unmodifiableMap(islandPreviewsLocations);
         tabCompleteHideVanished = config.getBoolean("tab-complete-hide-vanished", true);
         dropsUpgradePlayersMultiply = config.getBoolean("drops-upgrade-players-multiply", false);
-        protectedMessageDelay = config.getLong("protected-message-delay", 60L);
+        Map<String, Long> messageDelays = new HashMap<>();
+        if (config.isConfigurationSection("message-delays")) {
+            for (String message : config.getConfigurationSection("message-delays").getKeys(false)) {
+                messageDelays.put(message.toUpperCase(Locale.ENGLISH), config.getLong("message-delays." + message));
+            }
+        }
+        this.messageDelays = Collections.unmodifiableMap(messageDelays);
         warpCategories = config.getBoolean("warp-categories", true);
         physicsListener = config.getBoolean("physics-listener", true);
         chargeOnWarp = config.getDouble("charge-on-warp", 0D);
         publicWarps = config.getBoolean("public-warps");
+        lockedIslands = config.getBoolean("locked-islands", false);
         recalcTaskTimeout = config.getLong("recalc-task-timeout");
         autoLanguageDetection = config.getBoolean("auto-language-detection", true);
         autoUncoopWhenAlone = config.getBoolean("auto-uncoop-when-alone", false);
@@ -536,6 +611,20 @@ public class SettingsContainer {
         blockCountsSaveThreshold = BigInteger.valueOf(config.getInt("block-counts-save-threshold", 100));
         chatSigningSupport = config.getBoolean("chat-signing-support", true);
         commandsPerPage = config.getInt("commands-per-page", 7);
+        cacheSchematics = config.getBoolean("cache-schematics", true);
+        entityCategories = parseEntityCategories(config.getConfigurationSection("entity-categories"));
+    }
+
+    private List<ClearAction> loadClearActions(List<String> clearActionsNames) {
+        List<ClearAction> clearActions = new LinkedList<>();
+        clearActionsNames.forEach(clearAction -> {
+            try {
+                clearActions.add(ClearAction.getByName(clearAction));
+            } catch (NullPointerException error) {
+                Log.warnFromFile("config.yml", "Invalid clear action ", clearAction + ", skipping...");
+            }
+        });
+        return Collections.unmodifiableList(clearActions);
     }
 
     private List<String> loadInteractables(SuperiorSkyblockPlugin plugin) {
@@ -591,17 +680,34 @@ public class SettingsContainer {
         return KeySets.unmodifiableKeySet(KeySets.createHashSet(KeyIndicator.MATERIAL, safeBlocks));
     }
 
-    private void loadGenerator(YamlConfiguration config, String path, int index) {
+    private void loadGenerator(YamlConfiguration config, String path, Dimension dimension) {
         KeyMap<Integer> defaultGenerator = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         loadListOrSection(config, path, "generator-rates", (key, percentage) -> {
             Key blockKey = Keys.ofMaterialAndData(key);
             defaultGenerator.put(blockKey, percentage);
         });
-        this.defaultGenerator[index] = KeyMaps.unmodifiableKeyMap(defaultGenerator);
+        this.defaultGenerator.put(dimension, KeyMaps.unmodifiableKeyMap(defaultGenerator));
+    }
+
+    private static Map<String, KeySet> parseEntityCategories(ConfigurationSection section) {
+        Map<String, KeySet> entityCategories = new HashMap<>();
+
+        for (String categoryName : section.getKeys(false)) {
+            KeySet entityTypes = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE);
+            for (String entityType : section.getStringList(categoryName)) {
+                entityTypes.add(Keys.ofEntityType(entityType));
+            }
+            if (!entityTypes.isEmpty())
+                entityCategories.put(categoryName, KeySets.unmodifiableKeySet(entityTypes));
+        }
+
+        return entityCategories.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(entityCategories);
     }
 
     private static void loadListOrSection(YamlConfiguration config, String path, String parseName, BiConsumer<String, Integer> consumer) {
-        Object value = Preconditions.checkNotNull(config.get(path), "Path '" + path + "' does not exist.");
+        Object value = config.get(path);
+        if (value == null)
+            return;
 
         if (value instanceof List) {
             ((List<String>) value).forEach(line -> {

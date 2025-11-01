@@ -44,6 +44,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.Set;
 
 /**
@@ -53,103 +57,85 @@ import java.util.Set;
  */
 public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Tag<?>> {
 
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagCompound");
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = NMSTagConverter.choice("NBTTagCompound", "CompoundTag");
 
-    public CompoundTag() {
-        this(new HashMap<>());
+    private CompoundTag(Map<String, Tag<?>> value, boolean cloneMap) {
+        super(cloneMap ? new HashMap<>(value) : value);
     }
 
-    public CompoundTag(CompoundTag other) {
-        super(new HashMap<>(other.value), CLASS);
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        for (Map.Entry<String, Tag<?>> entry : value.entrySet()) {
+            entry.getValue().write(os);
+
+            byte[] keyBytes = entry.getKey().getBytes(StandardCharsets.UTF_8);
+            os.writeShort(keyBytes.length);
+            os.write(keyBytes);
+        }
+
+        os.writeByte((byte) 0);
     }
 
-
-    /**
-     * Creates the tag.
-     *
-     * @param value The value.
-     */
-    public CompoundTag(Map<String, Tag<?>> value) {
-        super(value, CLASS);
+    public CompoundTag copy() {
+        return of(this.value);
     }
 
-    public Tag<?> getTag(String key) {
-        return getTag(key, null);
+    public Optional<Tag<?>> getTag(String key) {
+        return Optional.ofNullable(getTagInternal(key));
     }
 
-    public Tag<?> getTag(String key, Tag<?> def) {
-        return this.value.getOrDefault(key, def);
+    public Optional<byte[]> getByteArray(String key) {
+        return getTagInternal(key, ByteArrayTag.class).map(tag -> tag.value);
     }
 
-    public byte[] getByteArray(String key) {
-        Tag<?> tag = getTag(key);
-        return tag instanceof ByteArrayTag ? (byte[]) tag.value : null;
+    public OptionalInt getByte(String key) {
+        NumberTag<?> tag = getTagInternal(key, NumberTag.class).orElse(null);
+        return tag == null ? OptionalInt.empty() : OptionalInt.of(tag.value.byteValue());
     }
 
-    public byte getByte(String key) {
-        Number number = getNumber(key);
-        return number == null ? 0 : number.byteValue();
+    public Optional<CompoundTag> getCompound(String key) {
+        return getTagInternal(key, CompoundTag.class);
     }
 
-    public CompoundTag getCompound(String key) {
-        return getCompound(key, null);
+    public OptionalDouble getDouble(String key) {
+        NumberTag<?> tag = getTagInternal(key, NumberTag.class).orElse(null);
+        return tag == null ? OptionalDouble.empty() : OptionalDouble.of(tag.value.doubleValue());
     }
 
-    public CompoundTag getCompound(String key, CompoundTag def) {
-        Tag<?> tag = getTag(key);
-        return tag instanceof CompoundTag ? (CompoundTag) tag : def;
+    public OptionalDouble getFloat(String key) {
+        NumberTag<?> tag = getTagInternal(key, NumberTag.class).orElse(null);
+        return tag == null ? OptionalDouble.empty() : OptionalDouble.of(tag.value.floatValue());
     }
 
-    public double getDouble(String key) {
-        Number number = getNumber(key);
-        return number == null ? 0D : number.doubleValue();
+    public Optional<int[]> getIntArray(String key) {
+        return getTagInternal(key, IntArrayTag.class).map(tag -> tag.value);
     }
 
-    public float getFloat(String key) {
-        Number number = getNumber(key);
-        return number == null ? 0F : number.floatValue();
+    public OptionalInt getInt(String key) {
+        NumberTag<?> tag = getTagInternal(key, NumberTag.class).orElse(null);
+        return tag == null ? OptionalInt.empty() : OptionalInt.of(tag.value.intValue());
     }
 
-    public int[] getIntArray(String key) {
-        Tag<?> tag = getTag(key);
-        return tag instanceof IntArrayTag ? (int[]) tag.value : null;
+    public Optional<ListTag> getList(String key) {
+        return getTagInternal(key, ListTag.class);
     }
 
-    public int getInt(String key) {
-        return getInt(key, 0);
+    public OptionalLong getLong(String key) {
+        NumberTag<?> tag = getTagInternal(key, NumberTag.class).orElse(null);
+        return tag == null ? OptionalLong.empty() : OptionalLong.of(tag.value.longValue());
     }
 
-    public int getInt(String key, int def) {
-        return getNumber(key, def).intValue();
+    public Optional<Number> getNumber(String key) {
+        return getTagInternal(key, NumberTag.class).map(tag -> (Number) tag.value);
     }
 
-    public ListTag getList(String key) {
-        Tag<?> tag = getTag(key);
-        return tag instanceof ListTag ? (ListTag) tag : null;
+    public OptionalInt getShort(String key) {
+        NumberTag<?> tag = getTagInternal(key, NumberTag.class).orElse(null);
+        return tag == null ? OptionalInt.empty() : OptionalInt.of(tag.value.shortValue());
     }
 
-    public long getLong(String key) {
-        Number number = getNumber(key);
-        return number == null ? 0L : number.longValue();
-    }
-
-    public Number getNumber(String key) {
-        return getNumber(key, null);
-    }
-
-    public Number getNumber(String key, Number def) {
-        Tag<?> tag = getTag(key);
-        return tag instanceof NumberTag ? (Number) tag.value : def;
-    }
-
-    public short getShort(String key) {
-        Number number = getNumber(key);
-        return number == null ? 0 : number.shortValue();
-    }
-
-    public String getString(String key) {
-        Tag<?> tag = getTag(key);
-        return tag instanceof StringTag ? (String) tag.value : null;
+    public Optional<String> getString(String key) {
+        return getTagInternal(key, StringTag.class).map(tag -> tag.value);
     }
 
     @Nullable
@@ -158,39 +144,39 @@ public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Ta
     }
 
     public void setByteArray(String key, byte[] value) {
-        setTag(key, new ByteArrayTag(value));
+        setTag(key, ByteArrayTag.of(value));
     }
 
     public void setByte(String key, byte value) {
-        setTag(key, new ByteTag(value));
+        setTag(key, ByteTag.of(value));
     }
 
     public void setDouble(String key, double value) {
-        setTag(key, new DoubleTag(value));
+        setTag(key, DoubleTag.of(value));
     }
 
     public void setFloat(String key, float value) {
-        setTag(key, new FloatTag(value));
+        setTag(key, FloatTag.of(value));
     }
 
     public void setIntArray(String key, int[] value) {
-        setTag(key, new IntArrayTag(value));
+        setTag(key, IntArrayTag.of(value));
     }
 
     public void setInt(String key, int value) {
-        setTag(key, new IntTag(value));
+        setTag(key, IntTag.of(value));
     }
 
     public void setLong(String key, long value) {
-        setTag(key, new LongTag(value));
+        setTag(key, LongTag.of(value));
     }
 
     public void setShort(String key, short value) {
-        setTag(key, new ShortTag(value));
+        setTag(key, ShortTag.of(value));
     }
 
     public void setString(String key, String value) {
-        setTag(key, new StringTag(value));
+        setTag(key, StringTag.of(value));
     }
 
     public void putAll(CompoundTag other) {
@@ -235,22 +221,9 @@ public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Ta
     }
 
     @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        for (Map.Entry<String, Tag<?>> entry : value.entrySet()) {
-            entry.getValue().write(os);
-
-            byte[] keyBytes = entry.getKey().getBytes(StandardCharsets.UTF_8);
-            os.writeShort(keyBytes.length);
-            os.write(keyBytes);
-        }
-
-        os.writeByte((byte) 0);
-    }
-
-    @Override
     public Object toNBT() {
         try {
-            Object nbtTagCompound = CONSTRUCTOR.newInstance();
+            Object nbtTagCompound = TAG_CONVERTER.toNBT();
 
             for (Map.Entry<String, Tag<?>> entry : value.entrySet()) {
                 plugin.getNMSTags().setNBTCompoundTagValue(nbtTagCompound, entry.getKey(), entry.getValue().toNBT());
@@ -263,8 +236,27 @@ public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Ta
         }
     }
 
+    @Nullable
+    private Tag<?> getTagInternal(String key) {
+        return this.value.get(key);
+    }
+
+    @Nullable
+    private <T extends Tag<?>> Optional<T> getTagInternal(String key, Class<T> valueType) {
+        Tag<?> tag = this.value.get(key);
+        return tag != null && valueType.isAssignableFrom(tag.getClass()) ? Optional.of(valueType.cast(tag)) : Optional.empty();
+    }
+
+    public static CompoundTag of() {
+        return new CompoundTag(new HashMap<>(), false);
+    }
+
+    public static CompoundTag of(Map<String, Tag<?>> value) {
+        return new CompoundTag(value, true);
+    }
+
     public static CompoundTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to CompoundTag!");
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to CompoundTag!");
 
         Map<String, Tag<?>> map = new HashMap<>();
 
@@ -275,7 +267,7 @@ public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Ta
                 map.put(key, Tag.fromNBT(plugin.getNMSTags().getNBTCompoundTag(tag, key)));
             }
 
-            return new CompoundTag(map);
+            return new CompoundTag(map, false);
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while converting tag compound from NMS:");
             return null;
@@ -294,7 +286,7 @@ public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Ta
             tagMap.put(key, tag);
         }
 
-        return new CompoundTag(tagMap);
+        return new CompoundTag(tagMap, false);
     }
 
 }

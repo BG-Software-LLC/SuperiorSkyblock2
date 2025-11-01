@@ -21,7 +21,7 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
     private final E holder;
     private final Consumer<E> saveFunction;
 
-    private final CompoundTag innerTag = new CompoundTag();
+    private final CompoundTag innerTag = CompoundTag.of();
 
     public PersistentDataContainerImpl(E holder, Consumer<E> saveFunction) {
         this.holder = holder;
@@ -37,7 +37,7 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
     public <T> boolean hasKeyOfType(String key, PersistentDataType<T> type) {
         Preconditions.checkNotNull(key, "key parameter cannot be null");
         Preconditions.checkNotNull(type, "type parameter cannot be null");
-        Tag<?> tag = innerTag.getTag(key);
+        Tag<?> tag = innerTag.getTag(key).orElse(null);
         return tag != null && PersistenceDataTypeSerializer.isTagOfType(tag, type);
     }
 
@@ -160,7 +160,7 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
 
     @Nullable
     private <T> T _getOfType(String key, PersistentDataType<T> type, @Nullable T def) {
-        Tag<?> tag = innerTag.getTag(key);
+        Tag<?> tag = innerTag.getTag(key).orElse(null);
 
         if (tag == null) {
             return def;
@@ -176,7 +176,7 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
 
     @Nullable
     private Object _get(String key, @Nullable Object def) {
-        Tag<?> tag = innerTag.getTag(key);
+        Tag<?> tag = innerTag.getTag(key).orElse(null);
         return tag == null ? def : tag.getValue();
     }
 

@@ -11,7 +11,7 @@ mission-file: FarmingMissions
 # Whether the mission should be given when completing all requirements.
 auto-reward: true
 
-# Should block counts of players get reset when completing the mission?
+# Should plant counts of players get reset when completing the mission?
 reset-after-finish: true
 
 # Rewards given when completing the mission.
@@ -26,7 +26,7 @@ required-missions:
   - 'farmer_2'
   - 'farmer_3'
 
-# List of all required blocks must be gathered in order to complete the mission.
+# List of all required plants must be gathered in order to complete the mission.
 required-plants:
   '1':
     types:
@@ -42,27 +42,47 @@ required-plants:
     amount: 64
   '4':
     types:
-      - 'BEETROOT'
+      - 'PUMPKIN'
     amount: 64
   '5':
     types:
-      - 'PUMPKIN'
+      - 'MELON'
     amount: 64
   '6':
     types:
-      - 'MELON'
-    amount: 64
-  '7':
-    types:
       - 'SUGAR_CANE'
     amount: 64
-  '8':
+  '7':
     types:
       - 'CACTUS'
     amount: 64
 
 # Icons used in the menus.
 icons:
+  locked:
+    type: PAPER
+    name: '&aFarmer IV'
+    lore:
+      - '&7Now that you are a professional farmer,'
+      - '&7let''s get the hands dirty.'
+      - '&7Plant x64 of each crop.'
+      - ''
+      - '&6Required Plants:'
+      - '&8 - &7Carrots, Potatoes, Wheat, Pumpkins'
+      - '&8 - &7Melons, Sugar Canes, Cactus'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$25,000'
+      - ''
+      - '&6Grown Carrots: &7{value_carrot}/64'
+      - '&6Grown Potatoes: &7{value_potato}/64'
+      - '&6Grown Wheat: &7{value_wheat}/64'
+      - '&6Grown Pumpkins: &7{value_pumpkin}/64'
+      - '&6Grown Melons: &7{value_melon}/64'
+      - '&6Grown Sugar Canes: &7{value_sugar_cane}/64'
+      - '&6Grown Cactus: &7{value_cactus}/64'
+      - '&c&l ✘ &7Locked'
+    amount: 4
   not-completed:
     type: PAPER
     name: '&aFarmer IV'
@@ -72,8 +92,8 @@ icons:
       - '&7Plant x64 of each crop.'
       - ''
       - '&6Required Plants:'
-      - '&8 - &7Carrots, Potatoes, Wheat, Beetroots,'
-      - '&8 - &7Pumpkins, Melons, Sugar Canes, Cactus'
+      - '&8 - &7Carrots, Potatoes, Wheat, Pumpkins'
+      - '&8 - &7Melons, Sugar Canes, Cactus'
       - ''
       - '&6Rewards:'
       - '&8 - &7$25,000'
@@ -81,13 +101,13 @@ icons:
       - '&6Grown Carrots: &7{value_carrot}/64'
       - '&6Grown Potatoes: &7{value_potato}/64'
       - '&6Grown Wheat: &7{value_wheat}/64'
-      - '&6Grown Beetroots: &7{value_beetroot}/64'
       - '&6Grown Pumpkins: &7{value_pumpkin}/64'
       - '&6Grown Melons: &7{value_melon}/64'
       - '&6Grown Sugar Canes: &7{value_sugar_cane}/64'
       - '&6Grown Cactus: &7{value_cactus}/64'
       - '&6Progress: &7{0}%'
       - '&c&l ✘ &7Not Completed'
+    amount: 4
   can-complete:
     type: PAPER
     name: '&aFarmer IV'
@@ -97,8 +117,8 @@ icons:
       - '&7Plant x64 of each crop.'
       - ''
       - '&6Required Plants:'
-      - '&8 - &7Carrots, Potatoes, Wheat, Beetroots,'
-      - '&8 - &7Pumpkins, Melons, Sugar Canes, Cactus'
+      - '&8 - &7Carrots, Potatoes, Wheat, Pumpkins'
+      - '&8 - &7Melons, Sugar Canes, Cactus'
       - ''
       - '&6Rewards:'
       - '&8 - &7$25,000'
@@ -106,17 +126,14 @@ icons:
       - '&6Grown Carrots: &764/64'
       - '&6Grown Potatoes: &764/64'
       - '&6Grown Wheat: &764/64'
-      - '&6Grown Beetroots: &764/64'
       - '&6Grown Pumpkins: &764/64'
       - '&6Grown Melons: &764/64'
       - '&6Grown Sugar Canes: &764/64'
       - '&6Grown Cactus: &764/64'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Click to redeem your reward.'
-    enchants:
-      DURABILITY: 1
-    flags:
-      - HIDE_ENCHANTS
+    amount: 4
+    glow: true
   completed:
     type: MAP
     name: '&aFarmer IV'
@@ -131,10 +148,10 @@ icons:
       - '&6Grown Carrots: &764/64'
       - '&6Grown Potatoes: &764/64'
       - '&6Grown Wheat: &764/64'
-      - '&6Grown Beetroots: &764/64'
       - '&6Grown Pumpkins: &764/64'
       - '&6Grown Melons: &764/64'
       - '&6Grown Sugar Canes: &764/64'
       - '&6Grown Cactus: &764/64'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Already Claimed.'
+    amount: 4

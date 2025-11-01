@@ -67,12 +67,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -100,12 +100,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -117,12 +117,16 @@ permissions:
       lore:
         - '&7Access to damage animals inside the island.'
         - '&7Currently &aENABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     permission-disabled:
       type: DIAMOND_SWORD
       name: '&6Animal Damage'
       lore:
         - '&7Access to damage animals inside the island.'
         - '&7Currently &cDISABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     role-permission:
       type: DIAMOND_SWORD
       name: '&6Animal Damage'
@@ -131,14 +135,16 @@ permissions:
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'
+      flags:
+        - HIDE_ATTRIBUTES
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -166,12 +172,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -202,12 +208,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -235,12 +241,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -252,12 +258,16 @@ permissions:
       lore:
         - '&7Access to break blocks inside the island.'
         - '&7Currently &aENABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     permission-disabled:
       type: DIAMOND_PICKAXE
       name: '&6Break'
       lore:
         - '&7Access to break blocks inside the island.'
         - '&7Currently &cDISABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     role-permission:
       type: DIAMOND_PICKAXE
       name: '&6Break'
@@ -266,14 +276,16 @@ permissions:
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'
+      flags:
+        - HIDE_ATTRIBUTES
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -301,12 +313,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -334,12 +346,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -367,12 +379,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -400,12 +412,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -433,12 +445,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -466,12 +478,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -499,12 +511,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -532,12 +544,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -565,12 +577,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -598,12 +610,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -634,12 +646,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -667,12 +679,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -703,12 +715,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -736,12 +748,45 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
+        volume: 0.2
+        pitch: 0.2
+
+  entity_ride:
+    display-menu: true
+    permission-enabled:
+      type: SADDLE
+      name: '&6Entity Ride'
+      lore:
+        - '&7Access to ride entities inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: SADDLE
+      name: '&6Entity Ride'
+      lore:
+        - '&7Access to ride entities inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: SADDLE
+      name: '&6Entity Ride'
+      lore:
+        - '&7Access to ride entities inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -769,12 +814,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -802,12 +847,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -835,12 +880,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -871,12 +916,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -904,12 +949,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -937,12 +982,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -973,12 +1018,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1009,12 +1054,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1042,12 +1087,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1078,12 +1123,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1111,12 +1156,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1144,12 +1189,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1177,12 +1222,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1210,12 +1255,111 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
+        volume: 0.2
+        pitch: 0.2
+
+  minecart_damage:
+    display-menu: true
+    permission-enabled:
+      type: EXPLOSIVE_MINECART
+      name: '&6Minecart Damage'
+      lore:
+        - '&7Access to damage minecarts inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: EXPLOSIVE_MINECART
+      name: '&6Minecart Damage'
+      lore:
+        - '&7Access to damage minecarts inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: EXPLOSIVE_MINECART
+      name: '&6Minecart Damage'
+      lore:
+        - '&7Access to damage minecarts inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: ANVIL_LAND
+        volume: 0.2
+        pitch: 0.2
+
+  minecart_enter:
+    display-menu: true
+    permission-enabled:
+      type: HOPPER_MINECART
+      name: '&6Minecart Enter'
+      lore:
+        - '&7Access to enter minecarts inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: HOPPER_MINECART
+      name: '&6Minecart Enter'
+      lore:
+        - '&7Access to enter minecarts inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: HOPPER_MINECART
+      name: '&6Minecart Enter'
+      lore:
+        - '&7Access to enter minecarts inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: ANVIL_LAND
+        volume: 0.2
+        pitch: 0.2
+
+  minecart_open:
+    display-menu: true
+    permission-enabled:
+      type: STORAGE_MINECART
+      name: '&6Minecart Open'
+      lore:
+        - '&7Access to open minecarts inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: STORAGE_MINECART
+      name: '&6Minecart Open'
+      lore:
+        - '&7Access to open minecarts inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: STORAGE_MINECART
+      name: '&6Minecart Open'
+      lore:
+        - '&7Access to open minecarts inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1246,111 +1390,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
-        volume: 0.2
-        pitch: 0.2
-
-  minecart_damage:
-    display-menu: true
-    permission-enabled:
-      type: EXPLOSIVE_MINECART
-      name: '&6Minecart Damage'
-      lore:
-        - '&7Access to damage minecarts inside the island.'
-        - '&7Currently &aENABLED&7.'
-    permission-disabled:
-      type: EXPLOSIVE_MINECART
-      name: '&6Minecart Damage'
-      lore:
-        - '&7Access to damage minecarts inside the island.'
-        - '&7Currently &cDISABLED&7.'
-    role-permission:
-      type: EXPLOSIVE_MINECART
-      name: '&6Minecart Damage'
-      lore:
-        - '&7Access to damage minecarts inside the island.'
-        - '&7Role: &e{}&7.'
-        - ''
-        - '{0}'
-    has-access:
-      sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
-        volume: 0.2
-        pitch: 0.2
-    no-access:
-      sound:
-        type: BLOCK_ANVIL_PLACE
-        volume: 0.2
-        pitch: 0.2
-
-  minecart_enter:
-    display-menu: true
-    permission-enabled:
-      type: HOPPER_MINECART
-      name: '&6Minecart Enter'
-      lore:
-        - '&7Access to enter minecarts inside the island.'
-        - '&7Currently &aENABLED&7.'
-    permission-disabled:
-      type: HOPPER_MINECART
-      name: '&6Minecart Enter'
-      lore:
-        - '&7Access to enter minecarts inside the island.'
-        - '&7Currently &cDISABLED&7.'
-    role-permission:
-      type: HOPPER_MINECART
-      name: '&6Minecart Enter'
-      lore:
-        - '&7Access to enter minecarts inside the island.'
-        - '&7Role: &e{}&7.'
-        - ''
-        - '{0}'
-    has-access:
-      sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
-        volume: 0.2
-        pitch: 0.2
-    no-access:
-      sound:
-        type: BLOCK_ANVIL_PLACE
-        volume: 0.2
-        pitch: 0.2
-
-  minecart_open:
-    display-menu: true
-    permission-enabled:
-      type: STORAGE_MINECART
-      name: '&6Minecart Open'
-      lore:
-        - '&7Access to open minecarts inside the island.'
-        - '&7Currently &aENABLED&7.'
-    permission-disabled:
-      type: STORAGE_MINECART
-      name: '&6Minecart Open'
-      lore:
-        - '&7Access to open minecarts inside the island.'
-        - '&7Currently &cDISABLED&7.'
-    role-permission:
-      type: STORAGE_MINECART
-      name: '&6Minecart Open'
-      lore:
-        - '&7Access to open minecarts inside the island.'
-        - '&7Role: &e{}&7.'
-        - ''
-        - '{0}'
-    has-access:
-      sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
-        volume: 0.2
-        pitch: 0.2
-    no-access:
-      sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1381,12 +1426,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1414,12 +1459,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1447,12 +1492,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1480,12 +1525,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1516,12 +1561,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1549,12 +1594,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1582,12 +1627,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1615,12 +1660,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1648,12 +1693,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1681,12 +1726,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1714,12 +1759,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1750,12 +1795,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1783,12 +1828,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1819,12 +1864,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1852,12 +1897,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1869,12 +1914,16 @@ permissions:
       lore:
         - '&7Access to change roles for island members.'
         - '&7Currently &aENABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     permission-disabled:
       type: DIAMOND_CHESTPLATE
       name: '&6Set Role'
       lore:
         - '&7Access to change roles for island members.'
         - '&7Currently &cDISABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     role-permission:
       type: DIAMOND_CHESTPLATE
       name: '&6Set Role'
@@ -1883,14 +1932,16 @@ permissions:
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'
+      flags:
+        - HIDE_ATTRIBUTES
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1918,12 +1969,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -1951,45 +2002,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
-        volume: 0.2
-        pitch: 0.2
-
-  uncoop_member:
-    display-menu: true
-    permission-enabled:
-      type: GOLDEN_APPLE
-      name: '&6Uncoop Member'
-      lore:
-        - '&7Access to remove co-op members from the island.'
-        - '&7Currently &aENABLED&7.'
-    permission-disabled:
-      type: GOLDEN_APPLE
-      name: '&6Uncoop Member'
-      lore:
-        - '&7Access to remove co-op members from the island.'
-        - '&7Currently &cDISABLED&7.'
-    role-permission:
-      type: GOLDEN_APPLE
-      name: '&6Uncoop Member'
-      lore:
-        - '&7Access to remove co-op members from the island.'
-        - '&7Role: &e{}&7.'
-        - ''
-        - '{0}'
-    has-access:
-      sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
-        volume: 0.2
-        pitch: 0.2
-    no-access:
-      sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -2017,12 +2035,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -2050,12 +2068,78 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
+        volume: 0.2
+        pitch: 0.2
+
+  tamed_animal_damage:
+    display-menu: true
+    permission-enabled:
+      type: BONE
+      name: '&6Tamed Animal Damage'
+      lore:
+        - '&7Access to damage tamed animals inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: BONE
+      name: '&6Tamed Animal Damage'
+      lore:
+        - '&7Access to damage tamed animals inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: BONE
+      name: '&6Tamed Animal Damage'
+      lore:
+        - '&7Access to damage tamed animals inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: ANVIL_LAND
+        volume: 0.2
+        pitch: 0.2
+
+  uncoop_member:
+    display-menu: true
+    permission-enabled:
+      type: GOLDEN_APPLE
+      name: '&6Uncoop Member'
+      lore:
+        - '&7Access to remove co-op members from the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: GOLDEN_APPLE
+      name: '&6Uncoop Member'
+      lore:
+        - '&7Access to remove co-op members from the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: GOLDEN_APPLE
+      name: '&6Uncoop Member'
+      lore:
+        - '&7Access to remove co-op members from the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -2083,12 +2167,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -2116,12 +2200,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -2155,12 +2239,12 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2
 
@@ -2188,11 +2272,11 @@ permissions:
         - '{0}'
     has-access:
       sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        type: ORB_PICKUP
         volume: 0.2
         pitch: 0.2
     no-access:
       sound:
-        type: BLOCK_ANVIL_PLACE
+        type: ANVIL_LAND
         volume: 0.2
         pitch: 0.2

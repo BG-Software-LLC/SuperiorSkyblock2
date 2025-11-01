@@ -85,7 +85,7 @@ public class CmdAdmin implements ISuperiorCommand {
 
                 if (!CommandsHelper.hasCommandAccess(command, sender)) {
                     Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", command.getPermission());
-                    Message.NO_COMMAND_PERMISSION.send(sender, locale);
+                    Message.NO_COMMAND_PERMISSION.send(sender, locale, command.getPermission());
                     return;
                 }
 
@@ -121,7 +121,7 @@ public class CmdAdmin implements ISuperiorCommand {
                 .build(plugin.getCommands().getAdminSubCommands());
 
         if (subCommands.isEmpty()) {
-            Message.NO_COMMAND_PERMISSION.send(sender, locale);
+            Message.NO_COMMAND_PERMISSION.send(sender, locale, getPermission());
             return;
         }
 

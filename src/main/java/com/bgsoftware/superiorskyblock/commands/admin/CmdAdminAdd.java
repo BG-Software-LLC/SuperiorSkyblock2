@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -91,13 +92,13 @@ public class CmdAdminAdd implements IAdminIslandCommand {
 
         if (plugin.getSettings().isTeleportOnJoin() && targetPlayer.isOnline())
             targetPlayer.teleport(island);
-        if (plugin.getSettings().isClearOnJoin())
-            plugin.getNMSPlayers().clearInventory(targetPlayer.asOfflinePlayer());
+
+        ClearActions.runClearActions(targetPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnJoin());
     }
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getOnlinePlayers(plugin, args[2], false,
+        return args.length == 4 ? CommandTabCompletes.getOnlinePlayers(plugin, args[3], false,
                 superiorPlayer -> superiorPlayer.getIsland() == null) : Collections.emptyList();
     }
 

@@ -25,10 +25,11 @@ import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
-import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
+import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.WorldInfoImpl;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
@@ -156,16 +157,36 @@ public class FactoriesManagerImpl implements FactoriesManager {
     }
 
     @Override
+    @Deprecated
     public BlockPosition createBlockPosition(String world, int blockX, int blockY, int blockZ) {
-        Preconditions.checkNotNull(world, "world cannot be null.");
-        return new SBlockPosition(world, blockX, blockY, blockZ);
+        return createBlockPosition(blockX, blockY, blockZ);
+    }
+
+    @Override
+    public BlockPosition createBlockPosition(int blockX, int blockY, int blockZ) {
+        return SBlockPosition.of(blockX, blockY, blockZ);
     }
 
     @Override
     public BlockPosition createBlockPosition(Location location) {
-        if (!(location instanceof LazyWorldLocation))
-            Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
-        return new SBlockPosition(location);
+        Preconditions.checkNotNull(location, "location cannot be null.");
+        return SBlockPosition.of(location);
+    }
+
+    @Override
+    public WorldPosition createWorldPosition(double x, double y, double z) {
+        return SWorldPosition.of(x, y, z);
+    }
+
+    @Override
+    public WorldPosition createWorldPosition(double x, double y, double z, float yaw, float pitch) {
+        return SWorldPosition.of(x, y, z, yaw, pitch);
+    }
+
+    @Override
+    public WorldPosition createWorldPosition(Location location) {
+        Preconditions.checkNotNull(location, "location cannot be null.");
+        return SWorldPosition.of(location);
     }
 
     @Override

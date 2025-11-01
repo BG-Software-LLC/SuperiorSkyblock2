@@ -153,8 +153,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public Object getBlockData(org.bukkit.block.Block block) {
-        // Doesn't exist
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -163,7 +162,7 @@ public class NMSWorldImpl implements NMSWorld {
 
         try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
             BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
-            blockPosition.setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            blockPosition.c(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 
             NMSUtils.setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, combinedId, null);
             NMSUtils.sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
@@ -180,6 +179,13 @@ public class NMSWorldImpl implements NMSWorld {
     public boolean isWaterLogged(org.bukkit.block.Block block) {
         Material blockType = block.getType();
         return blockType == Material.WATER || blockType == Material.STATIONARY_WATER;
+    }
+
+    @Override
+    public SignType getSignType(org.bukkit.block.Block block) {
+        Material blockType = block.getType();
+        return blockType == Material.SIGN_POST ? SignType.STANDING_SIGN :
+                blockType == Material.WALL_SIGN ? SignType.WALL_SIGN : SignType.UNKNOWN;
     }
 
     @Override
@@ -219,6 +225,16 @@ public class NMSWorldImpl implements NMSWorld {
         }
 
         return 1;
+    }
+
+    @Override
+    public boolean canPlayerSuffocate(org.bukkit.block.Block bukkitBlock) {
+        WorldServer worldServer = ((CraftWorld) bukkitBlock.getWorld()).getHandle();
+        try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
+            blockPosition.c(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
+            return worldServer.getType(blockPosition).r();
+        }
     }
 
     @Override
@@ -273,7 +289,7 @@ public class NMSWorldImpl implements NMSWorld {
         WorldServer worldServer = ((CraftWorld) block.getWorld()).getHandle();
         try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
             BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
-            blockPosition.setValues(block.getX(), block.getY(), block.getZ());
+            blockPosition.c(block.getX(), block.getY(), block.getZ());
             worldServer.a(null, 2001, blockPosition, Block.getCombinedId(worldServer.getType(blockPosition)));
         }
     }
@@ -284,7 +300,7 @@ public class NMSWorldImpl implements NMSWorld {
 
         try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
             BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
-            blockPosition.setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            blockPosition.c(location.getBlockX(), location.getBlockY(), location.getBlockZ());
             SoundEffectType soundEffectType = worldServer.getType(blockPosition).getBlock().getStepSound();
 
             worldServer.a(null, blockPosition, soundEffectType.e(), SoundCategory.BLOCKS,
@@ -310,6 +326,11 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public WorldEditSession createEditSession(World world) {
         return WorldEditSessionImpl.obtain(((CraftWorld) world).getHandle());
+    }
+
+    @Override
+    public WorldEditSession createPartialEditSession(Dimension dimension) {
+        return WorldEditSessionImpl.obtain(dimension);
     }
 
     @Override

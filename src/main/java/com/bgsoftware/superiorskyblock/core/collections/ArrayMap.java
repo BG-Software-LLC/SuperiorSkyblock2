@@ -64,6 +64,7 @@ public class ArrayMap<K, V> implements Map<K, V> {
         this.values = EMPTY_ARRAY;
         this.keys = EMPTY_ARRAY;
         this.size = 0;
+        this.capacity = 0;
     }
 
     @Override

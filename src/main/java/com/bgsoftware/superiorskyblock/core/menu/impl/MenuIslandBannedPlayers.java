@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BannedPlayersPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public class MenuIslandBannedPlayers extends AbstractPagedMenu<MenuIslandBannedP
         return menuParseResult == null ? null : new MenuIslandBannedPlayers(menuParseResult);
     }
 
-    public static class View extends AbstractPagedMenuView<MenuIslandBannedPlayers.View, IslandViewArgs, SuperiorPlayer> {
+    public static class View extends AbstractPagedMenuView<MenuIslandBannedPlayers.View, IslandViewArgs, SuperiorPlayer> implements IIslandMenuView {
 
         private final Island island;
 
@@ -46,6 +47,16 @@ public class MenuIslandBannedPlayers extends AbstractPagedMenu<MenuIslandBannedP
              Menu<View, IslandViewArgs> menu, IslandViewArgs args) {
             super(inventoryViewer, previousMenuView, menu);
             this.island = args.getIsland();
+        }
+
+        @Override
+        public Island getIsland() {
+            return this.island;
+        }
+
+        @Override
+        public String replaceTitle(String title) {
+            return title.replace("{0}", String.valueOf(island.getBannedPlayers().size()));
         }
 
         @Override

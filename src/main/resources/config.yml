@@ -45,60 +45,73 @@ max-island-size: 200
 # the upgrade, and not from here.
 default-values:
   # The default island size of all islands.
-  # This island size can be expanded by using the /is admin setsize command.
   island-size: 20
 
-  # Set the default block limits of islands.
-  # This limit can be expanded by using the /is admin setblocklimit command.
+  # Set the default block limits of all islands.
+  # The following example will set a limit of 8 hoppers in islands:
+  #   block-limits:
+  #     HOPPER: 8
   # You can find a list of materials here: https://bg-software.com/materials/
   block-limits:
     HOPPER: 8
 
-  # Set the default entity limits of islands.
-  # This limit can be expanded by using the /is admin setentitylimit command.
+  # Set the default entity limits of all islands.
+  # The following example will set a limit of 4 Minecarts in islands:
+  #   entity-limits:
+  #     MINECART: 4
   # You can find a list of entities here: https://bg-software.com/entities/
   entity-limits:
     MINECART: 4
 
-  # The amount of warps an island can have
-  # This limit can be expanded by using the /is admin setwarpslimit command.
+  # Set the default warps limit of all islands.
   warps-limit: 3
 
-  # Set the default team limit of islands.
-  # This limit can be expanded by using the /is admin setteamlimit command.
+  # Set the default team limit of all islands.
   team-limit: 4
 
-  # Set the default coop limit of islands.
-  # This limit can be expanded by using the /is admin setcooplimit command.
+  # Set the default coop limit of all islands.
   coop-limit: 8
 
-  # Set the default crop-growth multiplier of islands.
-  # This multiplier can be expanded by using the /is admin setcropgrowth command.
+  # Set the default crop-growth multiplier of all islands.
   crop-growth: 1
 
-  # Set the default spawner-rates multiplier of islands.
-  # This multiplier can be expanded by using the /is admin setspawnerrates command.
+  # Set the default spawner-rates multiplier of all islands.
   spawner-rates: 1
 
-  # Set the default mob-drops multiplier of islands.
-  # This multiplier can be expanded by using the /is admin setmobdrops command.
+  # Set the default mob-drops multiplier of all islands.
   mob-drops: 1
 
-  # Set the default bank limit of islands.
-  # Set it to -1 for no bank limits.
+  # Set the default bank limit of all islands.
   bank-limit: -1
 
-  # A list of default generator percentages for new islands.
-  # Example: 'DIAMOND_BLOCK:50' will set 50% chance for diamond block.
+  # Set the default generator percentages of all islands.
+  # The following example will set 0.5% chance for diamond block in the normal world, and 50% for gold block in nether:
+  #   generator:
+  #     normal:
+  #       DIAMOND_BLOCK: 1
+  #       STONE: 199
+  #     nether:
+  #       GOLD_BLOCK: 1
+  #       NETHERRACK: 1
   # You can find a list of materials here: https://bg-software.com/materials/
   generator:
     normal:
       COBBLESTONE: 95
       COAL_ORE: 5
 
-  # A list of default role limits for new islands.
-  # Example: '1:5' will set the limit of the role with the id 1 (Moderator by default) to 5.
-  role-limits: [ ]
+  # Set the default role limits of all islands.
+  # The following example will set the limit of the role with the id 1 (Moderator by default) to 5:
+  #   role-limits:
+  #     '1': 5
+  role-limits: { }
+
+  # Set the of default island effects for all islands.
+  # The following example will set the effect level of Speed to 3:
+  #   island-effects:
+  #     SPEED: 4
+  # You can find the list of valid potion effects here:
+  # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html
+  island-effects: { }
 
 # Set the islands height generation for islands.
 islands-height: 100
@@ -147,12 +160,31 @@ island-level-formula: '{} / 2'
 # Should the island levels be a rounded integer?
 rounded-island-level: false
 
+# How should the island level be rounded when rounded-island-level feature is enabled?
+# Use UP, DOWN, CEILING, FLOOR, HALF_UP, HALF_DOWN or HALF_EVEN
+# You can see more information about it here:
+# https://docs.oracle.com/javase/8/docs/api/java/math/RoundingMode.html
+island-level-rounding-mode: 'HALF_UP'
+
+# Whether to automatic track block counts when players place and break blocks.
+# If set to true, block counts, worth and levels will automatically be updated upon
+# placement and breaking of blocks.
+auto-blocks-tracking: true
+
 # How should the island top be ordered by default?
 # Use WORTH, LEVEL, RATING or PLAYERS.
 island-top-order: 'WORTH'
 
+# How should the global warps be ordered by default?
+# Use WORTH, LEVEL, RATING or PLAYERS.
+global-warps-order: 'WORTH'
+
 # Whether coop members should be enabled or not.
 coop-members: true
+
+# Should players be able to edit island privileges for other players?
+# When set to false, island privileges could be edited only to island roles.
+edit-player-permissions: true
 
 # All settings related to island roles.
 # You can find a list of permissions here: https://wiki.bg-software.com/superiorskyblock/island-permissions
@@ -180,6 +212,7 @@ island-roles:
       - DROP_ITEMS
       - DYE_SHEEP
       - ENDER_PEARL
+      - ENTITY_RIDE
       - EXPEL_BYPASS
       - FARM_TRAMPING
       - FERTILIZE
@@ -228,6 +261,7 @@ island-roles:
         - MONSTER_SPAWN
         - RANKUP
         - SPAWNER_BREAK
+        - TAMED_ANIMAL_DAMAGE
     mod:
       id: 1
       name: 'Moderator'
@@ -357,8 +391,8 @@ spawn:
   location: SuperiorWorld, 0, 100, 0, 0, 0
 
   # Should the spawn be protected?
-  # When disabled, it's your responsibility to protect the spawn!
-  # Therefore, settings will be still applied to the area if false.
+  # When set to false, settings and permissions will not be applied to the spawn region.
+  # In that case, it is your own responsibility to protect the spawn region.
   protection: true
 
   # A list of settings that will be enabled for the spawn.
@@ -400,10 +434,6 @@ visitors-damage: false
 # When disabled, coop won't get damaged in islands they are coop with.
 coop-damage: true
 
-# The amount of times a player can disband an island.
-# If you want to disable this feature, set it to 0.
-disband-count: 5
-
 # Should the list of members in island top also include the island leader?
 island-top-include-leader: true
 
@@ -427,6 +457,9 @@ kick-confirm: true
 # Should a confirm gui be displayed when /is leave is executed.
 leave-confirm: true
 
+# Should a confirm gui be displayed when /is transfer is executed.
+transfer-confirm: true
+
 # If you want a specific spawners provider to use, specify it here.
 # Providers: Auto, WildStacker, EpicSpawners, MergedSpawner, PvpingSpawners, SilkSpawners, RoseStacker
 spawners-provider: 'AUTO'
@@ -434,9 +467,6 @@ spawners-provider: 'AUTO'
 # If you want a specific stacked-blocks provider to use, specify it here.
 # Providers: Auto, WildStacker, RoseStacker
 stacked-blocks-provider: 'AUTO'
-
-# Should inventories of island members get cleared after disbanding their island?
-disband-inventory-clear: true
 
 # All settings related to island names.
 island-names:
@@ -464,17 +494,45 @@ island-names:
   # Should the plugin prevent players from using player names as island names?
   prevent-player-names: false
 
-# Should players get teleported to the island after they accept an invite?
+# Should players get teleported to the island when they create it?
+teleport-on-create: true
+
+# Should players get teleported to the island when they accept an invite?
 teleport-on-join: false
 
 # Should players get teleported to spawn when they are kicked from their island?
 teleport-on-kick: true
 
-# Should the inventory of the players get cleared after they accept an invite?
-clear-on-join: false
+# Should players get teleported to spawn when they leave an island?
+teleport-on-leave: false
+
+# List of clear actions to perform on island members when their island is disbanded.
+# Available actions: EFFECTS, ENDER_CHEST, EXPERIENCE, HEALTH, HUNGER, INVENTORY
+# You can disable this feature by setting the section to 'clear-on-disband: []'
+clear-on-disband:
+  - ENDER_CHEST
+  - INVENTORY
+
+# List of clear actions to perform on players when they accept an invite.
+# Available actions: EFFECTS, ENDER_CHEST, EXPERIENCE, HEALTH, HUNGER, INVENTORY
+# You can disable this feature by setting the section to 'clear-on-join: []'
+clear-on-join: [ ]
+
+# List of clear actions to perform on players when they are kicked from their island.
+# Available actions: EFFECTS, ENDER_CHEST, EXPERIENCE, HEALTH, HUNGER, INVENTORY
+# You can disable this feature by setting the section to 'clear-on-kick: []'
+clear-on-kick: [ ]
+
+# List of clear actions to perform on players when they leave an island.
+# Available actions: EFFECTS, ENDER_CHEST, EXPERIENCE, HEALTH, HUNGER, INVENTORY
+# You can disable this feature by setting the section to 'clear-on-leave: []'
+clear-on-leave: [ ]
 
 # Should players be able to rate their own islands?
 rate-own-island: false
+
+# Should players be able to change island rating?
+change-island-rating: true
 
 # A list of default settings for new islands.
 # You can find a list of settings here: https://wiki.bg-software.com/superiorskyblock/island-settings
@@ -530,7 +588,7 @@ number-format: "en-US"
 date-format: "dd/MM/yyyy HH:mm:ss"
 
 # Should players skip menus with only one items inside them?
-# When enabled, creation, island-warps and island-chest menus will be skipped if only one item is inside them.
+# When enabled, creation, island-warps, island-chest and missions menus will be skipped if only one item is inside them.
 skip-one-item-menus: false
 
 # Should visitors get teleported to spawn when pvp is enabled in an island?
@@ -617,7 +675,7 @@ liquid-update: false
 
 # Should lights get updated when pasting schematics?
 # Enabling this can drop performance a bit.
-lights-update: false
+lights-update: true
 
 # A list of worlds that PvP will be enabled between island members.
 pvp-worlds:
@@ -632,31 +690,46 @@ values-menu: true
 # A list of crops that will be affected by the crop growth multiplier.
 # You can find a list of materials here: https://bg-software.com/materials/
 crops-to-grow:
-  - 'CACTUS'
+  - 'SAPLING'
+  - 'OAK_SAPLING'
+  - 'SPRUCE_SAPLING'
+  - 'BIRCH_SAPLING'
+  - 'JUNGLE_SAPLING'
+  - 'ACACIA_SAPLING'
+  - 'DARK_OAK_SAPLING'
+  - 'MANGROVE_PROPAGULE'
+  - 'CHERRY_SAPLING'
+  - 'PALE_OAK_SAPLING'
+  - 'BROWN_MUSHROOM'
+  - 'RED_MUSHROOM'
+  - 'BAMBOO'
+  - 'BAMBOO_SAPLING'
   - 'SUGAR_CANE_BLOCK'
   - 'SUGAR_CANE'
-  - 'MELON_STEM'
-  - 'ATTACHED_MELON_STEM'
-  - 'RED_MUSHROOM'
-  - 'BROWN_MUSHROOM'
+  - 'CACTUS'
+  - 'WEEPING_VINES'
+  - 'TWISTING_VINES'
+  - 'VINE'
+  - 'CHORUS_FLOWER'
+  - 'WHEAT'
+  - 'COCOA'
   - 'PUMPKIN_STEM'
   - 'ATTACHED_PUMPKIN_STEM'
-  - 'VINE'
-  - 'COCOA'
-  - 'SAPLING'
-  - 'DARK_OAK_SAPLING'
-  - 'JUNGLE_SAPLING'
-  - 'OAK_SAPLING'
-  - 'ACACIA_SAPLING'
-  - 'BIRCH_SAPLING'
-  - 'SPRUCE_SAPLING'
-  - 'CROPS'
-  - 'WHEAT'
+  - 'MELON_STEM'
+  - 'ATTACHED_MELON_STEM'
+  - 'BEETROOTS'
+  - 'TORCHFLOWER_CROP'
+  - 'PITCHER_CROP'
+  - 'CAVE_VINES'
+  - 'SWEET_BERRY_BUSH'
+  - 'NETHER_WART'
+  - 'NETHER_WARTS'
+  - 'KELP'
   - 'CARROT'
   - 'CARROTS'
   - 'POTATO'
   - 'POTATOES'
-  - 'BEETROOTS'
+  - 'CROPS'
 
 # How frequency should the crops task run? (in ticks)
 # You can disable this feature by setting it to 0.
@@ -671,6 +744,10 @@ only-back-button: false
 # It's recommended to have a low max island size when this feature is enabled!
 build-outside-island: false
 
+# The default number of times new players can disband their island.
+# If you want to disable this feature, set it to -1.
+default-disband-count: 5
+
 # The default language to be used.
 # This should be the same as your language file's name.
 default-language: 'en-US'
@@ -678,7 +755,8 @@ default-language: 'en-US'
 # Should world borders be enabled by default for new players?
 default-world-border: true
 
-# Should blocks stacking be enabled by default for new players?
+# Should blocks stacking be enabled by default for players?
+# The blocks stacking will reset every restart for all players to this value.
 default-blocks-stacker: true
 
 # Should panels be toggled by default for new players?
@@ -743,13 +821,25 @@ command-aliases:
 # These blocks require the "VALUABLE_BREAK" permission in order to break them.
 valuable-blocks: [ ]
 
-# Set preview locations for schematics.
-# You can disable this feature by setting the section to 'preview-islands: {}'
-# Make sure you follow the location format: '<world>, <x>, <y>, <z>'
-preview-islands:
-  normal: world, 0, 100, 0
-  mycel: world, 0, 100, 0
-  desert: world, 0, 100, 0
+# Settings related to the island previews.
+island-previews:
+  # The game mode that will be set for the player when they enter preview mode.
+  # Use ADVENTURE, CREATIVE, SPECTATOR or SURVIVAL.
+  game-mode: SPECTATOR
+
+  # The maximum distance a player can move before the preview mode is canceled.
+  max-distance: 100
+
+  # A list of commands that cannot be executed by players in preview mode.
+  blocked-commands: [ ]
+
+  # Preview locations for schematics.
+  # You can disable this feature by setting the section to 'locations: []'
+  # Make sure you follow the location format: '<world>, <x>, <y>, <z>, <pitch>, <yaw>'
+  locations:
+    normal: world, 0, 100, 0
+    mycel: world, 0, 100, 0
+    desert: world, 0, 100, 0
 
 # Should vanished players be hidden in tab completes?
 tab-complete-hide-vanished: true
@@ -757,8 +847,17 @@ tab-complete-hide-vanished: true
 # When enabled, the drops multiplier will only multiply drops of entities that were killed by players.
 drops-upgrade-players-multiply: false
 
-# The delay between protected messages (in ticks)
-protected-message-delay: 60
+# List of messages that should have a delay. (in milliseconds)
+message-delays:
+  BUILD_OUTSIDE_ISLAND: 3000
+  ISLAND_BEING_CALCULATED: 3000
+  ISLAND_PROTECTED: 3000
+  ISLAND_PROTECTED_OPPED: 3000
+  SCHEMATIC_NOT_ADDED: 3000
+  SPAWN_PROTECTED: 3000
+  SPAWN_PROTECTED_OPPED: 3000
+  WORLD_NOT_ENABLED: 3000
+  WORLD_NOT_UNLOCKED: 3000
 
 # Should players be able to create warp categories?
 warp-categories: true
@@ -774,6 +873,9 @@ charge-on-warp: 0
 
 # Should island warps be public by default?
 public-warps: false
+
+# Should islands be locked by default?
+locked-islands: false
 
 # Timeout for the recalculate task, in seconds.
 # If you want to disable the timeout, set this to 0 or below.
@@ -829,3 +931,17 @@ chat-signing-support: true
 # Amount of commands to be listed in the `/is help` and `/is admin` commands.
 # Setting this to 0 or below will result all commands to be shown in a single page.
 commands-per-page: 7
+
+# Configure custom entity categories.
+# By default, there are two entity categories - ANIMALS and MONSTER
+# You can add your own custom categories in here, and configure which entities are part of the category.
+# Entities in the custom categories will have custom privileges and flags for damaging and spawning them.
+# You can add the custom privileges and island flags manually to the menus.
+# For example:
+#   entity-categories:
+#     VILLAGERS:
+#     - VILLAGER
+# The `VILLAGERS` category will have VILLAGER entities in it.
+# The privileges `VILLAGERS_SPAWN` and `VILLAGERS_DAMAGE` will be required by players, and the island flags
+# `SPAWNER_VILLAGERS_SPAWN` and `NATURAL_VILLAGERS_SPAWN` will be required to be enabled for the island.
+entity-categories: { }

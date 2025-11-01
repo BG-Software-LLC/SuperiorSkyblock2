@@ -20,4 +20,12 @@ public interface WorldEditSession extends ObjectsPool.Releasable {
 
     void finish(Island island);
 
+    Data readData(Location baseLocation);
+
+    void applyData(Data data, Location baseLocation);
+
+    interface Data {
+
+    }
+
 }

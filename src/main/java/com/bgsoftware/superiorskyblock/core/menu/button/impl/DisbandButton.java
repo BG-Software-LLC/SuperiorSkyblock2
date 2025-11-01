@@ -11,7 +11,7 @@ import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
-import com.bgsoftware.superiorskyblock.core.menu.view.IslandMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.impl.IslandMenuView;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
@@ -43,12 +43,15 @@ public class DisbandButton extends AbstractMenuViewButton<IslandMenuView> {
 
             Message.DISBANDED_ISLAND.send(inventoryViewer);
 
-            if (BuiltinModules.BANK.disbandRefund > 0) {
+            if (BuiltinModules.BANK.getConfiguration().hasDisbandRefund()) {
+                BigDecimal disbandRefund = BuiltinModules.BANK.getConfiguration().getDisbandRefund();
                 Message.DISBAND_ISLAND_BALANCE_REFUND.send(targetIsland.getOwner(), Formatters.NUMBER_FORMATTER.format(
-                        targetIsland.getIslandBank().getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
+                        targetIsland.getIslandBank().getBalance().multiply(disbandRefund)));
             }
 
-            inventoryViewer.setDisbands(inventoryViewer.getDisbands() - 1);
+            if (plugin.getSettings().getDisbandCount() >= 0) {
+                inventoryViewer.setDisbands(inventoryViewer.getDisbands() - 1);
+            }
 
             targetIsland.disbandIsland();
         }

@@ -11,7 +11,7 @@ mission-file: KillsMissions
 # Whether the mission should be given when completing all requirements.
 auto-reward: true
 
-# Should block counts of players get reset when completing the mission?
+# Should entity counts of players get reset when completing the mission?
 reset-after-finish: true
 
 # Rewards given when completing the mission.
@@ -29,7 +29,7 @@ required-missions:
   - 'slayer_2'
   - 'slayer_3'
 
-# List of all required blocks must be gathered in order to complete the mission.
+# List of all required entities must be gathered in order to complete the mission.
 required-entities:
   '1':
     types:
@@ -38,6 +38,23 @@ required-entities:
 
 # Icons used in the menus.
 icons:
+  locked:
+    type: PAPER
+    name: '&aSlayer IV'
+    lore:
+      - '&7Before the end, there is one mission left.'
+      - '&7Kill the wither.'
+      - ''
+      - '&6Required Kills:'
+      - '&8 - &7x1 Wither'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$250,000'
+      - '&8 - &7Unlock The End'
+      - ''
+      - '&6Wither Killed: &c&l✘'
+      - '&c&l ✘ &7Locked'
+    amount: 4
   not-completed:
     type: PAPER
     name: '&aSlayer IV'
@@ -52,7 +69,9 @@ icons:
       - '&8 - &7$250,000'
       - '&8 - &7Unlock The End'
       - ''
-      - '&6Wither Killed: &c&l ✘'
+      - '&6Wither Killed: &c&l✘'
+      - '&c&l ✘ &7Not Completed'
+    amount: 4
   can-complete:
     type: PAPER
     name: '&aSlayer IV'
@@ -67,12 +86,10 @@ icons:
       - '&8 - &7$250,000'
       - '&8 - &7Unlock The End'
       - ''
-      - '&6Wither Killed: &a&l ✔'
+      - '&6Wither Killed: &a&l✔'
       - '&a&l ✔ &7Click to redeem your reward.'
-    enchants:
-      DURABILITY: 1
-    flags:
-      - HIDE_ENCHANTS
+    amount: 4
+    glow: true
   completed:
     type: MAP
     name: '&aSlayer IV'
@@ -84,5 +101,6 @@ icons:
       - '&8 - &7$250,000'
       - '&8 - &7Unlock The End'
       - ''
-      - '&6Wither Killed: &a&l ✔'
-      - '&a&l ✔ &7Click to redeem your reward.'
+      - '&6Wither Killed: &a&l✔'
+      - '&a&l ✔ &7Already Claimed.'
+    amount: 4

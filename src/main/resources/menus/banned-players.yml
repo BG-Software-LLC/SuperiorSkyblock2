@@ -5,7 +5,7 @@
 ##                                                  ##
 ######################################################
 
-title: '&lIsland Banned Players'
+title: '&lIsland Banned Players ({0})'
 previous-menu: true
 
 pattern:
@@ -46,6 +46,6 @@ items:
 
 sounds:
   '@':
-    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    type: ORB_PICKUP
     volume: 0.2
     pitch: 0.2

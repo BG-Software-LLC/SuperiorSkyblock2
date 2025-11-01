@@ -11,7 +11,7 @@ import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
-import com.bgsoftware.superiorskyblock.core.menu.view.IslandMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.impl.IslandMenuView;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import org.bukkit.entity.Player;
@@ -53,8 +53,6 @@ public class BankCustomWithdrawButton extends AbstractMenuViewButton<IslandMenuV
             }
 
             PlayerChat.remove(player);
-
-            menuView.refreshView();
 
             return true;
         });

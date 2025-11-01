@@ -8,14 +8,14 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.world.EntityTeleports;
+import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 
@@ -70,27 +70,36 @@ public class CmdVisit implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Dimension dimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
 
-        IslandWorlds.accessIslandWorldAsync(targetIsland, dimension, islandWorldResult -> {
-            islandWorldResult.ifLeft(world -> teleportPlayerInternal(targetIsland, superiorPlayer));
-        });
+        if (!PluginEventsFactory.callIslandVisitorHomeTeleportEvent(targetIsland, superiorPlayer, dimension))
+            return;
+
+        IslandWorlds.accessIslandWorldAsync(targetIsland, dimension, true, islandWorldResult ->
+                islandWorldResult.ifLeft(world -> teleportPlayerInternal(targetIsland, superiorPlayer)));
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
+        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersAndIslands(plugin, args[1],
                 plugin.getSettings().isTabCompleteHideVanished(),
                 (onlinePlayer, onlineIsland) -> onlineIsland != null && (
                         (!plugin.getSettings().getVisitorsSign().isRequiredForVisit() ||
-                                onlineIsland.getVisitorsLocation((Dimension) null /* unused */) != null) ||
+                                onlineIsland.getVisitorsPosition(null /* unused */) != null) ||
                                 superiorPlayer.hasBypassModeEnabled()) && (!onlineIsland.isLocked() ||
                         onlineIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS))) : Collections.emptyList();
     }
 
     private static void teleportPlayerInternal(Island targetIsland, SuperiorPlayer superiorPlayer) {
-        Location visitLocation = plugin.getSettings().getVisitorsSign().isRequiredForVisit() ?
-                targetIsland.getVisitorsLocation((Dimension) null /* unused */) :
-                targetIsland.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension());
+        Location visitLocation;
+        boolean isVisitorSign;
+
+        if (plugin.getSettings().getVisitorsSign().isRequiredForVisit()) {
+            isVisitorSign = true;
+            visitLocation = targetIsland.getVisitorsLocation(null /* unused */);
+        } else {
+            isVisitorSign = false;
+            visitLocation = targetIsland.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension());
+        }
 
         if (visitLocation == null) {
             Message.INVALID_VISIT_LOCATION.send(superiorPlayer);
@@ -107,27 +116,45 @@ public class CmdVisit implements ISuperiorCommand {
             return;
         }
 
-        if (plugin.getSettings().getVisitWarmup() > 0 && !superiorPlayer.hasBypassModeEnabled()) {
-            Message.TELEPORT_WARMUP.send(superiorPlayer, Formatters.TIME_FORMATTER.format(
-                    Duration.ofMillis(plugin.getSettings().getVisitWarmup()), superiorPlayer.getUserLocale()));
+        Location finalVisitLocation = visitLocation;
 
-            Location finalVisitLocation = visitLocation;
+        EntityTeleports.warmupTeleport(superiorPlayer, plugin.getSettings().getVisitWarmup(), afterWarmup ->
+                teleportPlayerNoWarmup(superiorPlayer, targetIsland, finalVisitLocation, isVisitorSign, afterWarmup /*checkIslandLock*/));
+    }
 
-            superiorPlayer.setTeleportTask(BukkitExecutor.sync(() ->
-                            teleportPlayerNoWarmup(superiorPlayer, targetIsland, finalVisitLocation, true),
-                    plugin.getSettings().getHomeWarmup() / 50));
+    private static void teleportPlayerNoWarmup(SuperiorPlayer superiorPlayer, Island island, Location visitLocation,
+                                               boolean isVisitorSign, boolean checkIslandLock) {
+        if (visitLocation.getWorld() == null) {
+            IslandWorlds.accessIslandWorldAsync(island, visitLocation, true, islandWorldResult -> {
+                islandWorldResult.ifRight(Throwable::printStackTrace).ifLeft(world -> {
+                    visitLocation.setWorld(world);
+                    teleportPlayerNoWarmupWorldLoaded(superiorPlayer, island, visitLocation, isVisitorSign, checkIslandLock);
+                });
+            });
         } else {
-            teleportPlayerNoWarmup(superiorPlayer, targetIsland, visitLocation, false);
+            teleportPlayerNoWarmupWorldLoaded(superiorPlayer, island, visitLocation, isVisitorSign, checkIslandLock);
         }
     }
 
-    private static void teleportPlayerNoWarmup(SuperiorPlayer superiorPlayer, Island island,
-                                               Location visitLocation, boolean checkIslandLock) {
+    private static void teleportPlayerNoWarmupWorldLoaded(SuperiorPlayer superiorPlayer, Island island, Location visitLocation,
+                                                          boolean isVisitorSign, boolean checkIslandLock) {
         superiorPlayer.setTeleportTask(null);
 
         if (checkIslandLock && island.isLocked() && !island.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)) {
             Message.NO_CLOSE_BYPASS.send(superiorPlayer);
             return;
+        }
+
+        if (isVisitorSign && !WorldBlocks.isSafeBlock(visitLocation.getBlock())) {
+            Message.INVALID_VISIT_LOCATION.send(superiorPlayer);
+
+            if (!superiorPlayer.hasBypassModeEnabled()) {
+                if (PluginEventsFactory.callIslandRemoveVisitorHomeEvent(island, superiorPlayer))
+                    island.setVisitorsLocation(null);
+                return;
+            }
+
+            Message.INVALID_VISIT_LOCATION_BYPASS.send(superiorPlayer);
         }
 
         superiorPlayer.teleport(visitLocation);

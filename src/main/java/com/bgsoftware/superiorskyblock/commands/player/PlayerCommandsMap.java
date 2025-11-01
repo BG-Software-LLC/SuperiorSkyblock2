@@ -11,60 +11,63 @@ public class PlayerCommandsMap extends CommandsMap {
 
     @Override
     public void loadDefaultCommands() {
-        registerCommand(new CmdAccept(), false);
-        registerCommand(new CmdAdmin(), false);
-        registerCommand(new CmdBan(), false);
-        registerCommand(new CmdBiome(), false);
-        registerCommand(new CmdBorder(), false);
-        registerCommand(new CmdChest(), false);
-        registerCommand(new CmdClose(), false);
+        clearCommands();
+
+        registerCommand(new CmdAccept());
+        registerCommand(new CmdAdmin());
+        registerCommand(new CmdBan());
+        registerCommand(new CmdBans());
+        registerCommand(new CmdBiome());
+        registerCommand(new CmdBorder());
+        registerCommand(new CmdChest());
+        registerCommand(new CmdClose());
         if (plugin.getSettings().isCoopMembers()) {
-            registerCommand(new CmdCoop(), false);
-            registerCommand(new CmdCoops(), false);
+            registerCommand(new CmdCoop());
+            registerCommand(new CmdCoops());
         }
-        registerCommand(new CmdCounts(), false);
-        registerCommand(new CmdCreate(), false);
-        registerCommand(new CmdDelWarp(), false);
-        registerCommand(new CmdDemote(), false);
-        registerCommand(new CmdDisband(), false);
-        registerCommand(new CmdExpel(), false);
-        registerCommand(new CmdFly(), false);
-        registerCommand(new CmdHelp(), false);
-        registerCommand(new CmdInvite(), false);
-        registerCommand(new CmdKick(), false);
-        registerCommand(new CmdLang(), false);
-        registerCommand(new CmdLeave(), false);
-        registerCommand(new CmdMembers(), false);
-        registerCommand(new CmdName(), false);
-        registerCommand(new CmdOpen(), false);
-        registerCommand(new CmdPanel(), false);
-        registerCommand(new CmdPardon(), false);
-        registerCommand(new CmdPermissions(), false);
-        registerCommand(new CmdPromote(), false);
-        registerCommand(new CmdRate(), false);
-        registerCommand(new CmdRatings(), false);
-        registerCommand(new CmdRecalc(), false);
-        registerCommand(new CmdSetDiscord(), false);
-        registerCommand(new CmdSetPaypal(), false);
-        registerCommand(new CmdSetRole(), false);
-        registerCommand(new CmdSetTeleport(), false);
-        registerCommand(new CmdSettings(), false);
-        registerCommand(new CmdSetWarp(), false);
-        registerCommand(new CmdShow(), false);
-        registerCommand(new CmdTeam(), false);
-        registerCommand(new CmdTeamChat(), false);
-        registerCommand(new CmdTeleport(), false);
-        registerCommand(new CmdToggle(), false);
-        registerCommand(new CmdTop(), false);
-        registerCommand(new CmdTransfer(), false);
+        registerCommand(new CmdCounts());
+        registerCommand(new CmdCreate());
+        registerCommand(new CmdDelWarp());
+        registerCommand(new CmdDemote());
+        registerCommand(new CmdDisband());
+        registerCommand(new CmdExpel());
+        registerCommand(new CmdFly());
+        registerCommand(new CmdHelp());
+        registerCommand(new CmdInvite());
+        registerCommand(new CmdKick());
+        registerCommand(new CmdLang());
+        registerCommand(new CmdLeave());
+        registerCommand(new CmdMembers());
+        registerCommand(new CmdName());
+        registerCommand(new CmdOpen());
+        registerCommand(new CmdPanel());
+        registerCommand(new CmdPardon());
+        registerCommand(new CmdPermissions());
+        registerCommand(new CmdPromote());
+        registerCommand(new CmdRate());
+        registerCommand(new CmdRatings());
+        registerCommand(new CmdRecalc());
+        registerCommand(new CmdSetDiscord());
+        registerCommand(new CmdSetPaypal());
+        registerCommand(new CmdSetRole());
+        registerCommand(new CmdSetTeleport());
+        registerCommand(new CmdSettings());
+        registerCommand(new CmdSetWarp());
+        registerCommand(new CmdShow());
+        registerCommand(new CmdTeam());
+        registerCommand(new CmdTeamChat());
+        registerCommand(new CmdTeleport());
+        registerCommand(new CmdToggle());
+        registerCommand(new CmdTop());
+        registerCommand(new CmdTransfer());
         if (plugin.getSettings().isCoopMembers())
-            registerCommand(new CmdUncoop(), false);
-        registerCommand(new CmdValue(), false);
-        registerCommand(new CmdValues(), false);
-        registerCommand(new CmdVisit(), false);
-        registerCommand(new CmdVisitors(), false);
-        registerCommand(new CmdWarp(), false);
-        registerCommand(new CmdWarps(), false);
+            registerCommand(new CmdUncoop());
+        registerCommand(new CmdValue());
+        registerCommand(new CmdValues());
+        registerCommand(new CmdVisit());
+        registerCommand(new CmdVisitors());
+        registerCommand(new CmdWarp());
+        registerCommand(new CmdWarps());
     }
 
 }

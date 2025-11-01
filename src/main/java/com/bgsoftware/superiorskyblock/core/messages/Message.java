@@ -3,17 +3,17 @@ package com.bgsoftware.superiorskyblock.core.messages;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.Files;
@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
+import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -30,7 +31,6 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
@@ -66,7 +66,6 @@ public enum Message {
     BLOCK_LEVEL_WORTHLESS,
     BLOCK_VALUE,
     BLOCK_VALUE_WORTHLESS,
-    BONUS_SET_SUCCESS,
     BONUS_SYNC_ALL,
     BONUS_SYNC_NAME,
     BONUS_SYNC,
@@ -74,7 +73,7 @@ public enum Message {
     BORDER_PLAYER_COLOR_NAME_GREEN,
     BORDER_PLAYER_COLOR_NAME_RED,
     BORDER_PLAYER_COLOR_UPDATED,
-    BUILD_OUTSIDE_ISLAND(3, TimeUnit.SECONDS),
+    BUILD_OUTSIDE_ISLAND,
     CANNOT_SET_ROLE,
     CHANGED_BANK_LIMIT,
     CHANGED_BANK_LIMIT_ALL,
@@ -87,6 +86,12 @@ public enum Message {
     CHANGED_BLOCK_LIMIT,
     CHANGED_BLOCK_LIMIT_ALL,
     CHANGED_BLOCK_LIMIT_NAME,
+    CHANGED_BONUS_LEVEL,
+    CHANGED_BONUS_LEVEL_ALL,
+    CHANGED_BONUS_LEVEL_NAME,
+    CHANGED_BONUS_WORTH,
+    CHANGED_BONUS_WORTH_ALL,
+    CHANGED_BONUS_WORTH_NAME,
     CHANGED_CHEST_SIZE,
     CHANGED_CHEST_SIZE_ALL,
     CHANGED_CHEST_SIZE_NAME,
@@ -130,6 +135,8 @@ public enum Message {
     CHANGED_WARPS_LIMIT_NAME,
     CHANGE_PERMISSION_FOR_HIGHER_ROLE,
     COMMAND_ARGUMENT_ALL_ISLANDS("*"),
+    COMMAND_ARGUMENT_ALL_MATERIALS("*"),
+    COMMAND_ARGUMENT_ALL_MISSIONS("*"),
     COMMAND_ARGUMENT_ALL_PLAYERS("*"),
     COMMAND_ARGUMENT_AMOUNT("amount"),
     COMMAND_ARGUMENT_BIOME("biome"),
@@ -200,6 +207,7 @@ public enum Message {
     COMMAND_DESCRIPTION_ADMIN_DEMOTE,
     COMMAND_DESCRIPTION_ADMIN_DEPOSIT,
     COMMAND_DESCRIPTION_ADMIN_DISBAND,
+    COMMAND_DESCRIPTION_ADMIN_FLY,
     COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS,
     COMMAND_DESCRIPTION_ADMIN_IGNORE,
     COMMAND_DESCRIPTION_ADMIN_JOIN,
@@ -217,7 +225,10 @@ public enum Message {
     COMMAND_DESCRIPTION_ADMIN_RECALC,
     COMMAND_DESCRIPTION_ADMIN_RELOAD,
     COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT,
+    COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT,
     COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS,
+    COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS,
+    COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS,
     COMMAND_DESCRIPTION_ADMIN_RESET_WORLD,
     COMMAND_DESCRIPTION_ADMIN_SCHEMATIC,
     COMMAND_DESCRIPTION_ADMIN_SETTINGS,
@@ -232,6 +243,7 @@ public enum Message {
     COMMAND_DESCRIPTION_ADMIN_SET_EFFECT,
     COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT,
     COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR,
+    COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW,
     COMMAND_DESCRIPTION_ADMIN_SET_LEADER,
     COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS,
     COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION,
@@ -259,6 +271,7 @@ public enum Message {
     COMMAND_DESCRIPTION_BALANCE,
     COMMAND_DESCRIPTION_BAN,
     COMMAND_DESCRIPTION_BANK,
+    COMMAND_DESCRIPTION_BANS,
     COMMAND_DESCRIPTION_BIOME,
     COMMAND_DESCRIPTION_BORDER,
     COMMAND_DESCRIPTION_CHEST,
@@ -430,6 +443,7 @@ public enum Message {
     INVALID_LIMIT,
     INVALID_MATERIAL,
     INVALID_MATERIAL_DATA,
+    INVALID_MENU,
     INVALID_MISSION,
     INVALID_MODULE,
     INVALID_MULTIPLIER,
@@ -460,7 +474,7 @@ public enum Message {
     ISLAND_BANK_SHOW,
     ISLAND_BANK_SHOW_OTHER,
     ISLAND_BANK_SHOW_OTHER_NAME,
-    ISLAND_BEING_CALCULATED(3, TimeUnit.SECONDS),
+    ISLAND_BEING_CALCULATED,
     ISLAND_CLOSED,
     ISLAND_CREATE_PROCCESS_REQUEST,
     ISLAND_CREATE_PROCESS_FAIL,
@@ -519,11 +533,15 @@ public enum Message {
     ISLAND_INFO_ROLES,
     ISLAND_INFO_VISITORS_COUNT,
     ISLAND_INFO_WORTH,
+    ISLAND_NAME_NONE,
     ISLAND_OPENED,
+    ISLAND_OWNER_NONE,
+    ISLAND_PREVIEW_BLOCK_COMMAND,
     ISLAND_PREVIEW_CANCEL,
     ISLAND_PREVIEW_CANCEL_DISTANCE,
     ISLAND_PREVIEW_CANCEL_TEXT,
     ISLAND_PREVIEW_CONFIRM_TEXT,
+    ISLAND_PREVIEW_SET,
     ISLAND_PREVIEW_START,
     ISLAND_PROTECTED,
     ISLAND_PROTECTED_OPPED,
@@ -559,6 +577,9 @@ public enum Message {
     LEFT_ISLAND,
     LEFT_ISLAND_COOP,
     LEFT_ISLAND_COOP_NAME,
+    LOCK_WORLD_ANNOUNCEMENT_ALL,
+    LOCK_WORLD_ANNOUNCEMENT_NAME,
+    LOCK_WORLD_ANNOUNCEMENT,
     MATERIAL_NOT_SOLID,
     MAXIMUM_LEVEL,
     MESSAGE_SENT,
@@ -578,6 +599,8 @@ public enum Message {
     MODULE_LOADED_SUCCESS,
     MODULE_UNLOADED_SUCCESS,
     NAME_ANNOUNCEMENT,
+    NAME_ANNOUNCEMENT_OTHER,
+    NAME_ANNOUNCEMENT_OTHER_NAME,
     NAME_BLACKLISTED,
     NAME_CHAT_FORMAT,
     NAME_SAME_AS_PLAYER,
@@ -623,6 +646,9 @@ public enum Message {
     OPEN_MENU_WHILE_SLEEPING,
     PANEL_TOGGLE_OFF,
     PANEL_TOGGLE_ON,
+    PERMISSIONS_RESET,
+    PERMISSIONS_RESET_ALL,
+    PERMISSIONS_RESET_NAME,
     PERMISSIONS_RESET_PLAYER,
     PERMISSIONS_RESET_ROLES,
     PERMISSION_CHANGED,
@@ -656,6 +682,7 @@ public enum Message {
     RANKUP_SUCCESS_ALL,
     RANKUP_SUCCESS_NAME,
     RATE_ANNOUNCEMENT,
+    RATE_ALREADY_GIVEN,
     RATE_CHANGE_OTHER,
     RATE_OWN_ISLAND,
     RATE_REMOVE_ALL,
@@ -676,12 +703,17 @@ public enum Message {
     REVOKE_INVITE_ANNOUNCEMENT,
     SAME_NAME_CHANGE,
     SCHEMATIC_LEFT_SELECT,
+    SCHEMATIC_NOT_ADDED,
     SCHEMATIC_NOT_READY,
     SCHEMATIC_PROCCESS_REQUEST,
     SCHEMATIC_READY_TO_CREATE,
     SCHEMATIC_RIGHT_SELECT,
     SCHEMATIC_SAVED,
     SELF_ROLE_CHANGE,
+    SETTINGS_RESET,
+    SETTINGS_RESET_ALL,
+    SETTINGS_RESET_NAME,
+    SETTINGS_RESET_SELF,
     SETTINGS_UPDATED,
     SETTINGS_UPDATED_ALL,
     SETTINGS_UPDATED_NAME,
@@ -690,6 +722,8 @@ public enum Message {
     SET_WARP,
     SET_WARP_OUTSIDE,
     SIZE_BIGGER_MAX,
+    SPAWN_PROTECTED,
+    SPAWN_PROTECTED_OPPED,
     SPAWN_SET_SUCCESS,
     SPAWN_TELEPORT_SUCCESS,
     SPY_TEAM_CHAT_FORMAT,
@@ -710,6 +744,8 @@ public enum Message {
     TOGGLED_BYPASS_ON,
     TOGGLED_FLY_OFF,
     TOGGLED_FLY_ON,
+    TOGGLED_FLY_OFF_OTHER,
+    TOGGLED_FLY_ON_OTHER,
     TOGGLED_SCHEMATIC_OFF,
     TOGGLED_SCHEMATIC_ON,
     TOGGLED_SPY_OFF,
@@ -732,11 +768,14 @@ public enum Message {
     UNCOOP_LEFT_ANNOUNCEMENT,
     UNIGNORED_ISLAND,
     UNIGNORED_ISLAND_NAME,
+    UNLOCK_WORLD_ANNOUNCEMENT_ALL,
+    UNLOCK_WORLD_ANNOUNCEMENT_NAME,
     UNLOCK_WORLD_ANNOUNCEMENT,
     UNSAFE_WARP,
     UPDATED_PERMISSION,
     UPDATED_SETTINGS,
     UPGRADE_COOLDOWN_FORMAT,
+    VAULT_NOT_INSTALLED,
     VISITOR_BLOCK_COMMAND,
     WARP_ALREADY_EXIST,
     WARP_CATEGORY_ICON_NEW_LORE,
@@ -771,68 +810,40 @@ public enum Message {
     WORLD_NOT_ENABLED,
     WORLD_NOT_UNLOCKED,
 
-    SCHEMATICS(true) {
-
-        private final Collection<UUID> noSchematicMessages = AutoRemovalCollection.newHashSet(3, TimeUnit.SECONDS);
-
-        @Override
-        public void send(CommandSender sender, Locale locale, Object... objects) {
-            if (!(sender instanceof Player) || objects.length != 1 || !(objects[0] instanceof String))
-                return;
-
-            UUID playerUUID = ((Player) sender).getUniqueId();
-            String message = (String) objects[0];
-
-            if (noSchematicMessages.add(playerUUID)) {
-                Message.CUSTOM.send(sender, locale, message, false);
-            }
-        }
-    },
-
-    PROTECTION(true) {
-
-        @Nullable
-        private Collection<UUID> noInteractMessages;
-
-        @Override
-        public void send(CommandSender sender, Locale locale, Object... args) {
-            if (!(sender instanceof Player))
-                return;
-
-            if (plugin.getSettings().getProtectedMessageDelay() > 0) {
-                if (noInteractMessages == null)
-                    noInteractMessages = AutoRemovalCollection.newHashSet(plugin.getSettings().getProtectedMessageDelay() * 50, TimeUnit.MILLISECONDS);
-
-                UUID playerUUID = ((Player) sender).getUniqueId();
-
-                if (!noInteractMessages.add(playerUUID))
-                    return;
-            }
-
-            Message.ISLAND_PROTECTED.send(sender, locale, args);
-
-            SuperiorCommand bypassCommand = plugin.getCommands().getAdminCommand("bypass");
-            if (CommandsHelper.hasCommandAccess(bypassCommand, sender))
-                Message.ISLAND_PROTECTED_OPPED.send(sender, locale, args);
-        }
-    },
-
     CUSTOM(true) {
         @Override
         public void send(CommandSender sender, Locale locale, Object... args) {
             String message = args.length == 0 ? null : args[0] == null ? null : args[0].toString();
+
+            if (Text.isBlank(message))
+                return;
+
             boolean translateColors = args.length >= 2 && args[1] instanceof Boolean && (boolean) args[1];
-            if (!Text.isBlank(message))
-                sender.sendMessage(translateColors ? Formatters.COLOR_FORMATTER.format(message) : message);
+
+            if (translateColors) {
+                message = Formatters.COLOR_FORMATTER.format(message);
+            }
+
+            for (MessagesServiceImpl.CustomComponentParser parser : messagesService.get().getCustomComponentParsers()) {
+                Optional<IMessageComponent> component = parser.parse(message);
+                if (component.isPresent()) {
+                    component.get().sendMessage(sender);
+                    return;
+                }
+            }
+
+            sender.sendMessage(message);
         }
 
     };
 
+    private static final Object[] EMPTY_ARGS = new Object[0];
+
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final LazyReference<MessagesService> messagesService = new LazyReference<MessagesService>() {
+    private static final LazyReference<MessagesServiceImpl> messagesService = new LazyReference<MessagesServiceImpl>() {
         @Override
-        protected MessagesService create() {
-            return plugin.getServices().getService(MessagesService.class);
+        protected MessagesServiceImpl create() {
+            return (MessagesServiceImpl) plugin.getServices().getService(MessagesService.class);
         }
     };
 
@@ -852,10 +863,6 @@ public enum Message {
 
     Message(String defaultMessage) {
         this(defaultMessage, false, 0L, null);
-    }
-
-    Message(long delay, TimeUnit delayUnit) {
-        this(null, false, delay, delayUnit);
     }
 
     Message(String defaultMessage, boolean isCustom, long delay, @Nullable TimeUnit delayUnit) {
@@ -884,6 +891,7 @@ public enum Message {
             plugin.saveResource("lang/pl-PL.yml", false);
             plugin.saveResource("lang/pt-BR.yml", false);
             plugin.saveResource("lang/ru-RU.yml", false);
+            plugin.saveResource("lang/tr-TR.yml", false);
             plugin.saveResource("lang/vi-VN.yml", false);
             plugin.saveResource("lang/zh-CN.yml", false);
         }
@@ -946,13 +954,26 @@ public enum Message {
     }
 
     @Nullable
+    public String getMessage(Locale locale) {
+        return getMessage(locale, EMPTY_ARGS);
+    }
+
+    @Nullable
     public String getMessage(Locale locale, Object... args) {
         return isEmpty(locale) ? defaultMessage : messages.get(locale).getMessage(args);
+    }
+
+    public final void send(SuperiorPlayer superiorPlayer) {
+        send(superiorPlayer, EMPTY_ARGS);
     }
 
     public final void send(SuperiorPlayer superiorPlayer, Object... args) {
         if (PluginEventsFactory.callAttemptPlayerSendMessageEvent(superiorPlayer, name(), args))
             superiorPlayer.runIfOnline(player -> send(player, superiorPlayer.getUserLocale(), args));
+    }
+
+    public final void send(CommandSender sender) {
+        send(sender, EMPTY_ARGS);
     }
 
     public final void send(CommandSender sender, Object... args) {
@@ -965,7 +986,11 @@ public enum Message {
         send(sender, PlayerLocales.getLocale(sender), args);
     }
 
-    public void send(CommandSender sender, Locale locale, Object... objects) {
+    public void send(CommandSender sender, Locale locale) {
+        send(sender, locale, EMPTY_ARGS);
+    }
+
+    public void send(CommandSender sender, Locale locale, Object... args) {
         IMessageComponent messageComponent = getComponent(locale);
         if (messageComponent == null)
             return;
@@ -976,9 +1001,9 @@ public enum Message {
                 return;
         }
 
-        PluginEvent<PluginEventArgs.SendMessage> event = PluginEventsFactory.callSendMessageEvent(sender, name(), messageComponent, objects);
+        PluginEvent<PluginEventArgs.SendMessage> event = PluginEventsFactory.callSendMessageEvent(sender, name(), messageComponent, args);
         if (!event.isCancelled()) {
-            event.getArgs().messageComponent.sendMessage(sender, objects);
+            event.getArgs().messageComponent.sendMessage(sender, args);
             if (!(sender instanceof Player) && Log.isDebugged(Debug.SHOW_STACKTRACE)) {
                 Thread.dumpStack();
             }
@@ -996,6 +1021,21 @@ public enum Message {
             File dest = new File(plugin.getDataFolder(), "lang/en-US.yml");
             dest.getParentFile().mkdirs();
             file.renameTo(dest);
+        }
+    }
+
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, Message::onSettingsUpdate);
+    }
+
+    private static void onSettingsUpdate() {
+        for (Message message : values()) {
+            long delay = plugin.getSettings().getMessageDelays().getOrDefault(message.name(), 0L);
+
+            if (delay > 0L)
+                message.delayedMessages = AutoRemovalCollection.newHashSet(delay, TimeUnit.MILLISECONDS);
+            else
+                message.delayedMessages = null;
         }
     }
 

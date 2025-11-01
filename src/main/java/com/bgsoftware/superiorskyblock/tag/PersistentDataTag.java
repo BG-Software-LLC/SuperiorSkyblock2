@@ -9,8 +9,8 @@ public class PersistentDataTag<E> extends Tag<E> {
 
     private final PersistentDataTypeContext<E> serializer;
 
-    public PersistentDataTag(E value, PersistentDataTypeContext<E> serializer) {
-        super(value, null);
+    private PersistentDataTag(E value, PersistentDataTypeContext<E> serializer) {
+        super(value);
         this.serializer = serializer;
     }
 
@@ -19,6 +19,10 @@ public class PersistentDataTag<E> extends Tag<E> {
         byte[] data = serializer.serialize(value);
         os.writeInt(data.length);
         os.write(data);
+    }
+
+    public static <E> PersistentDataTag<E> of(E value, PersistentDataTypeContext<E> serializer) {
+        return new PersistentDataTag<>(value, serializer);
     }
 
 }

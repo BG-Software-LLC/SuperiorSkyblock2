@@ -36,8 +36,9 @@ public class MenuConfig {
         public IslandCreation(Schematic schematic, IslandCreationButton.Template template) {
             this.schematic = schematic;
             this.template = template;
-            this.biome = template == null ? EnumHelper.getEnum(Biome.class, plugin.getSettings().getWorlds().getDimensionConfig(
-                    plugin.getSettings().getWorlds().getDefaultWorldDimension()).getBiome()) : template.getBiome();
+            Biome biome = template == null ? null : template.getBiome();
+            this.biome = biome == null ? EnumHelper.getEnum(Biome.class, plugin.getSettings().getWorlds().getDimensionConfig(
+                    plugin.getSettings().getWorlds().getDefaultWorldDimension()).getBiome()) : biome;
         }
 
         @Override

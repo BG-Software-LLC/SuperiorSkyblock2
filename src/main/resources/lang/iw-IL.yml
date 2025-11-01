@@ -40,7 +40,6 @@ BLOCK_LEVEL: '&e&lתודוקנ | &7{1} אוה {0} קולבה לש תודוקנה
 BLOCK_LEVEL_WORTHLESS: '&e&lתודוקנ | &7םולכ הווש אל {0} קולבה.'
 BLOCK_VALUE: '&e&lיווש | &7{1} אוה {0} קולבה לש יוושה.'
 BLOCK_VALUE_WORTHLESS: '&e&lיווש | &7םולכ הווש אל {0} קולבה.'
-BONUS_SET_SUCCESS: '&e&lיא | &7{0} ל החלצהב ןכדוע יאה לש סונובה.'
 BONUS_SYNC_ALL: '&e&lIsland | &7Successfully synced the island bonus to all the islands'
 BONUS_SYNC_NAME: '&e&lIsland | &7Successfully synced the island bonus to {0}.'
 BONUS_SYNC: '&e&lIsland | &7Successfully synced the island bonus to {0}''s island.'
@@ -64,6 +63,12 @@ CHANGED_BLOCK_AMOUNT: '&e&lBlocks | &7Successfully changed the block amount at {
 CHANGED_BLOCK_LIMIT: '&e&lםיגורדש | &7{1} לש יאל החלצהב הנכדוע {0} קולבה תלבגה.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lםיגורדש | &7םייאה לכל החלצהב הנכדוע {0} קולבה תלבגה.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lםיגורדש | &7{1} יאל החלצהב הנכדוע {0} קולבה תלבגה.'
+CHANGED_BONUS_LEVEL: '&e&lIsland | &7Successfully updated the level bonus of {0}''s island.'
+CHANGED_BONUS_LEVEL_ALL: '&e&lIsland | &7Successfully updated the level bonus of all the islands.'
+CHANGED_BONUS_LEVEL_NAME: '&e&lIsland | &7Successfully updated the level bonus of {0}.'
+CHANGED_BONUS_WORTH: '&e&lIsland | &7Successfully updated the worth bonus of {0}''s island.'
+CHANGED_BONUS_WORTH_ALL: '&e&lIsland | &7Successfully updated the worth bonus of all the islands.'
+CHANGED_BONUS_WORTH_NAME: '&e&lIsland | &7Successfully updated the worth bonus of {0}.'
 CHANGED_CHEST_SIZE: '&e&lChest | &7Successfully updated the rows of page #{0} to {1} for {2}''s island.'
 CHANGED_CHEST_SIZE_ALL: '&e&lChest | &7Successfully updated the rows of page #{0} to {1} for all the islands.'
 CHANGED_CHEST_SIZE_NAME: '&e&lChest | &7Successfully updated the rows of page #{0} to {1} for {2}.'
@@ -90,9 +95,9 @@ CHANGED_MOB_DROPS_ALL: '&e&lםיגורדש | &7החלצהב ןכדוע םייא�
   סונוב.'
 CHANGED_MOB_DROPS_NAME: '&e&lםיגורדש | &7החלצהב ןכדוע {0} יאה לש םיבומ לש םיטירפה
   סונוב.'
-CHANGED_NAME: '&e&lיא | &7{0} ל ךלש יאה לש םשה תא תיניש.'
-CHANGED_NAME_OTHER: '&e&lיא | &7{1} ל {0} לש יאה לש םשה תא תיניש.'
-CHANGED_NAME_OTHER_NAME: '&e&lיא | &7{1} ל {0} יאה לש םשה תא תיניש.'
+CHANGED_NAME: '&e&lIsland | &7You changed your island''s name to {0}&7.'
+CHANGED_NAME_OTHER: '&e&lIsland | &7You changed the {0} island''s name to {1}&7.'
+CHANGED_NAME_OTHER_NAME: '&e&lIsland | &7You changed the name of {0}&7 to {1}&7.'
 CHANGED_PAYPAL: '&e&lיא | &7{0} ל החלצהב ןכדוע יאה לש לאפייפה.'
 CHANGED_ROLE_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for {1}''s island.'
 CHANGED_ROLE_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for all the islands.'
@@ -111,6 +116,8 @@ CHANGED_WARPS_LIMIT: '&e&lםיגורדש | &7החלצהב הנכדוע {0} לש 
 CHANGED_WARPS_LIMIT_ALL: '&e&lםיגורדש | &7החלצהב הנכדוע םייאה לכ לש םימוקימה תלבגמ.'
 CHANGED_WARPS_LIMIT_NAME: '&e&lםיגורדש | &7החלצהב הנכדוע {0} יאה לש םימוקימה תלבגמ.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_ALL_MATERIALS: '*'
+COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: תומכ
 COMMAND_ARGUMENT_BIOME: 'biome'
@@ -182,6 +189,7 @@ COMMAND_DESCRIPTION_ADMIN_DEL_WARP: 'Delete a warp for an island.'
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: רחא יאב ןקחש הגרדב דירוהל.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: רחא יא לש קנב לא ףסכ ריבעהל.
 COMMAND_DESCRIPTION_ADMIN_DISBAND: רחא ןקחש לש יא קוחמל.
+COMMAND_DESCRIPTION_ADMIN_FLY: 'Toggle island fly for a player.'
 COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: ןקחשל םייא תוקיחמ תתל.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: רתויב םיבוטה םייאה תמישרמ יא דירוהל.
 COMMAND_DESCRIPTION_ADMIN_JOIN: הנמזה אלל יאל סנכיהל.
@@ -199,7 +207,10 @@ COMMAND_DESCRIPTION_ADMIN_RANKUP: 'Rankup an upgrade for an island.'
 COMMAND_DESCRIPTION_ADMIN_RECALC: יא לש יווש שדחמ בשחל.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: ןיגאלפה לש םיצבקה לכ תא שדחמ ןועטל.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Remove a block limit from an island.'
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: ןקחש ידי לע ונתנש םיגורידה לכ תא קוחמל.
+COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
+COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Reset a world for an island.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: ןיגאלפל שדח הנבמ רוציל.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set a bank limit to an island.'
@@ -212,6 +223,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: רחא ןקחש לש יא של הלי
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: ןקחש לש תורתומה תוקיחמה תומכ תא תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: 'Set the island effect level of another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Set entity limit for another player''s island.
+COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: רחא ןקחשל יא לע תוגיהנמה תא ריבעהל.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: רחא ןקחש לש יא לש םיבומ לש םיטירפה סונוב
   תא תונשל.
@@ -244,6 +256,7 @@ COMMAND_DESCRIPTION_ADMIN_WITHDRAW: רחא ןקחש לש יאמ ףסכ איצו�
 COMMAND_DESCRIPTION_BALANCE: 'Check the amount of money inside an island''s bank.'
 COMMAND_DESCRIPTION_BAN: ךלש יאהמ ןקחש קיחרהל.
 COMMAND_DESCRIPTION_BANK: 'Open the island''s bank.'
+COMMAND_DESCRIPTION_BANS: 'Open the bans menu.'
 COMMAND_DESCRIPTION_BIOME: יאה לש םויבה תא ףילחהל.
 COMMAND_DESCRIPTION_BORDER: םייאה לש לובגה עבצ תא ףילחהל.
 COMMAND_DESCRIPTION_CHEST: 'Open the island''s chest.'
@@ -394,6 +407,7 @@ INVALID_LEVEL: '&c&lהאיגש | &7{0} תיקוח אל המר.'
 INVALID_LIMIT: '&c&lהאיגש | &7{0} תיקוח אל הלבגמ.'
 INVALID_MATERIAL: '&c&lהאיגש | &7{0} תיקוח אל רמוח.'
 INVALID_MATERIAL_DATA: '&c&lError | &7Invalid material-data {0}.'
+INVALID_MENU: '&c&lError | &7Invalid menu {0}.'
 INVALID_MISSION: '&c&lהאיגש | &7{0} תיקוח אל המישמ.'
 INVALID_MODULE: '&c&lError | &7Invalid module {0}.'
 INVALID_MULTIPLIER: '&c&lהאיגש | &7{0} יקוח אל סונוב.'
@@ -505,13 +519,17 @@ ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |
   &e&lיא | &7{0}s:
   {1}
-ISLAND_INFO_VISITORS_COUNT: '&e&lיא | &7םירקבמ רפסמ: {0}'
+ISLAND_INFO_VISITORS_COUNT: '&e&lIsland | &7Visitors Count: {0} ({1} unique visitors)'
 ISLAND_INFO_WORTH: '&e&lיא | &7יווש: {0}'
+ISLAND_NAME_NONE: None
 ISLAND_OPENED: '&e&lיא | &7החלצהב רוביצל חתפנ יאה.'
+ISLAND_OWNER_NONE: None
+ISLAND_PREVIEW_BLOCK_COMMAND: '&c&lError | &7You cannot use that command in preview mode.'
 ISLAND_PREVIEW_CANCEL_DISTANCE: '&e&lPreview | &7You went too far away, and you are no longer in preview mode.'
 ISLAND_PREVIEW_CANCEL: '&e&lPreview | &7You cancelled the preview mode.'
 ISLAND_PREVIEW_CONFIRM_TEXT: 'CONFIRM'
 ISLAND_PREVIEW_CANCEL_TEXT: 'CANCEL'
+ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
 ISLAND_PREVIEW_START: |
   &e&lPreview | &7You started the preview mode for the schematic {0}.
   &e&lPreview | &7Type &a&lCONFIRM &7to create a new island, or &c&lCANCEL &7to cancel the preview mode.
@@ -554,6 +572,9 @@ LEAVE_ISLAND_AS_LEADER: |-
 LEFT_ISLAND: '&e&lיא | &7ךלש יאה תא תבזע.'
 LEFT_ISLAND_COOP: '&e&lיא | &7{0} לש יאה לש הלועפ ףתשמ אל התא.'
 LEFT_ISLAND_COOP_NAME: '&e&lיא | &7רמוע יאה לש הלועפ ףתשמ אל התא.'
+LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now locked for all islands!'
+LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now locked for the island {1}!'
+LOCK_WORLD_ANNOUNCEMENT: '&e&lWorlds | &7The world {0} is now locked for {1}''s island!'
 MATERIAL_NOT_SOLID: '&c&lהאיגש | &7חישק רמוח סינכהל ביוחמ התא.'
 MAXIMUM_LEVEL: '&c&lהאיגש | &7{0} איה גורדשה לש תילמיסקמה המרה.'
 MESSAGE_SENT: '&e&lיא | &7החלצהב {0} לא החלשנ העדוהה!'
@@ -577,16 +598,18 @@ MODULE_UNLOADED_SUCCESS: '&e&lModule | &7Successfully unloaded the module.'
 MODULES_LIST: '&fModules ({0}): {1}'
 MODULES_LIST_MODULE_NAME: '&a{0}'
 MODULES_LIST_SEPARATOR: '&f, '
-NAME_ANNOUNCEMENT: '&e&lיא | &7{1} ל ולש יאה םש תא הניש {0}.'
+NAME_ANNOUNCEMENT: '&e&lIsland | &7{0} changed his island name to {1}&7.'
+NAME_ANNOUNCEMENT_OTHER: '&e&lIsland | &7{0} changed the {1} island''s name to {2}&7.'
+NAME_ANNOUNCEMENT_OTHER_NAME: '&e&lIsland | &7{0} changed the name of {1}&7 to {2}&7.'
 NAME_BLACKLISTED: '&c&lהאיגש | &7הזה םשב שמתשהל לוכי אל התא.'
 NAME_CHAT_FORMAT: '&8[&e{0}&8] &r'
 NAME_SAME_AS_PLAYER: '&c&lError | &7You cannot use player names as island names.'
-NAME_TOO_LONG: '&c&lהאיגש | &7םיוות 16 מ לעמ תויהל םילוכי אל םייא לש תומש.'
-NAME_TOO_SHORT: '&c&lהאיגש | &7םיוות 3 מ תוחפ תויהל םילוכי אל םייא לש תומש.'
+NAME_TOO_LONG: '&c&lהאיגש | &7םיוות {0} מ לעמ תויהל םילוכי אל םייא לש תומש.'
+NAME_TOO_SHORT: '&c&lהאיגש | &7םיוות {0} מ תוחפ תויהל םילוכי אל םייא לש תומש.'
 NO_BAN_PERMISSION: '&c&lהאיגש | &7םינקחש קיחרהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
 NO_CLOSE_BYPASS: '&c&lהאיגש | &7רוביצל חותפ אל הזה יאה.'
 NO_CLOSE_PERMISSION: '&c&lהאיגש | &7רוביצל יאה תא רוגסל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
-NO_COMMAND_PERMISSION: '&fUnknown command. Type "/help" for help.'
+NO_COMMAND_PERMISSION: '&c&lError | &7You don''t have permission to use that command. ({0})'
 NO_COOP_PERMISSION: '&c&lהאיגש | &7הלועפ יפתשמכ םינקחש ףיסוהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
 NO_DELETE_WARP_PERMISSION: '&c&lהאיגש | &7םימוקימ קוחמל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
 NO_DEMOTE_PERMISSION: '&c&lהאיגש | &7המרב םינקחש דירוהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
@@ -637,6 +660,9 @@ PERSISTENT_DATA_SHOW_PATH: '&b{0}&f: '
 PERSISTENT_DATA_SHOW_SPACER: '&f, '
 PERSISTENT_DATA_SHOW_VALUE: '&6{0}&c{1}&f'
 PERSISTENT_DATA_REMOVED: '&e&lData | &7Successfully removed data for {0} from path {1}.'
+PERMISSIONS_RESET: '&e&lIsland | &7Successfully reset all the permissions of {0}''s island to default values!'
+PERMISSIONS_RESET_ALL: '&e&lIsland | &7Successfully reset all the permissions of all the islands to default values!'
+PERMISSIONS_RESET_NAME: '&e&lIsland | &7Successfully reset all the permissions of the island {0} to default values!'
 PERMISSIONS_RESET_PLAYER: '&e&lIsland | &7Successfully reset all the permissions for {0} to default values!'
 PERMISSIONS_RESET_ROLES: '&e&lIsland | &7Successfully reset all the permissions of the island to default values!'
 PLACEHOLDER_NO: 'No'
@@ -661,6 +687,7 @@ PURGED_ISLANDS: |-
 RANKUP_SUCCESS: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for {1}''s island.'
 RANKUP_SUCCESS_ALL: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for all the islands.'
 RANKUP_SUCCESS_NAME: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for {1}.'
+RATE_ALREADY_GIVEN: '&c&lError | &7You already rated this island.'
 RATE_ANNOUNCEMENT: '&e&lיא | &75 ךותמ {1} ךלש יאה תא גריד {0}!'
 RATE_CHANGE_OTHER: '&e&lיא | &7{1} ל {0} לש גורידה תא תיניש.'
 RATE_OWN_ISLAND: '&c&lהאיגש | &7ךלש יאה תא גרדל לוכי אל התא.'
@@ -682,6 +709,7 @@ RESET_WORLD_SUCCEED_ALL: '&e&lIsland | &7Successfully reset the world {0} for al
 RESET_WORLD_SUCCEED_NAME: '&e&lIsland | &7Successfully reset the world {0} for {1}.'
 SAME_NAME_CHANGE: '&c&lהאיגש | &7ךלש יאה לש יוושכעה םשהמ רחא םש סינכהל ךירצ התא.'
 SCHEMATIC_LEFT_SELECT: '&e&lםינבמ רצוי | &7היינש הדוקנ תנמיס ({0})'
+SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
 SCHEMATIC_NOT_READY: '&c&lהאיגש | &7תודוקנ ינש תרחב אל.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lםינבמ רצוי | &7ךתשקב תא דבעמ...'
 SCHEMATIC_READY_TO_CREATE: |
@@ -694,10 +722,16 @@ SET_UPGRADE_LEVEL: '&e&lםיגורדש | &7החלצהב התנוש {1} לש יא
 SET_UPGRADE_LEVEL_NAME: '&e&lםיגורדש | &7החלצהב התנוש {1} יאב {0} גורדשה לש המרה.'
 SET_WARP: '&e&lיא | &7{0} ב החלצהב שדח םוקימ תרצי.'
 SET_WARP_OUTSIDE: '&c&lהאיגש | &7ךלש יאל ץוחמ םימוקימ רוציל לוכי אל התא.'
+SETTINGS_RESET: '&e&lIsland | &7Successfully reset all the settings of {0}''s island to default values!'
+SETTINGS_RESET_ALL: '&e&lIsland | &7Successfully reset all the settings of all the islands to default values!'
+SETTINGS_RESET_NAME: '&e&lIsland | &7Successfully reset all the settings of the island {0} to default values!'
+SETTINGS_RESET_SELF: '&e&lIsland | &7Successfully reset all the settings of the island to default values!'
 SETTINGS_UPDATED: '&e&lיא | &7{1} לש יאב החלצהב הנכדוע {0} הרדגהה.'
 SETTINGS_UPDATED_NAME: '&e&lיא | &7{1} יאב החלצהב הנכדוע {0} הרדגהה.'
 SETTINGS_UPDATED_ALL: '&e&lיא | &7םייאה לכב החלצהב הנכדוע {0} הרדגהה.'
 SIZE_BIGGER_MAX: '&c&lError | &7You cannot set a size bigger than the max island size.'
+SPAWN_PROTECTED: '&c&lError | &7Spawn is protected.'
+SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Successfully teleported {0} to spawn.'
 SPAWN_SET_SUCCESS: '&e&lSpawn | &7Successfully updated the spawn location to {0}.'
 SPY_TEAM_CHAT_FORMAT: '&7[יומס] &e[{0}] {1}&f: &7{2}'
@@ -718,6 +752,8 @@ TOGGLED_BYPASS_OFF: '&e&lהפיקע | &7הפיקעה בצמ תא &cתיביכ&7.
 TOGGLED_BYPASS_ON: '&e&lהפיקע | &7הפיקעה בצמ תא &aתקלדה&7.'
 TOGGLED_FLY_OFF: '&e&lהפועת | &7תיטמוטואה הפועתה בצמ תא &cתיביכ&7.'
 TOGGLED_FLY_ON: '&e&lהפועת | &7תיטמוטואה הפועתה בצמ תא &aתקלדה&7.'
+TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
+TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
 TOGGLED_SCHEMATIC_OFF: '&e&lםינבמ רצוי | &7םינבמה תריצי בצמ תא &cתיביכ&7.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lםינבמ רצוי | &7םינבמה תריצי בצמ תא &aתקלדה&7.
@@ -742,11 +778,14 @@ UNCOOP_AUTO_ANNOUNCEMENT: '&e&lIsland | &7There are no island members online and
 UNCOOP_LEFT_ANNOUNCEMENT: '&e&lיא | &7דוע יאה לש הלועפ ףתשמ וניא ןכלו תרשה תא בזע {0}.'
 UNIGNORED_ISLAND: '&e&lיא | &7החלצהב םיבוטה םייאה תמישרל ףסוותה {0} לש יאה.'
 UNIGNORED_ISLAND_NAME: '&e&lיא | &7החלצהב םיבוטה םייאה תמישרל ףסוותה {0} יאה.'
-UNLOCK_WORLD_ANNOUNCEMENT: '&e&lתומלוע | &7יאב וישכעמ חותפ {0} םלועה!'
+UNLOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now unlocked for all islands!'
+UNLOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now unlocked for the island {1}!'
+UNLOCK_WORLD_ANNOUNCEMENT: '&e&lWorlds | &7The world {0} is now unlocked for {1}''s island!'
 UNSAFE_WARP: '&e&lיא | &7&oרחא םוקימ הסנ אנא .חוטב וניא םוקימה יכ הארנ.'
 UPDATED_PERMISSION: '&e&lיא | &7{0} ל תואשרהה ונכדוע.'
 UPDATED_SETTINGS: '&e&lיא | &7{0} תורדגהה ונכדוע.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lError | &7You may only upgrade again in {0}.'
+VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lהאיגש | &7םירחא םייאב וזה הדוקפב שמתשהל לוכי אל התא.'
 WARP_ALREADY_EXIST: '&c&lהאיגש | &7הזה םשה םע םוקימ םייק רבכ.'
 WARP_CATEGORY_ICON_NEW_LORE: |
@@ -784,5 +823,5 @@ WITHDRAW_ANNOUNCEMENT: '&e&lקנב | &7יאה לש קנבהמ ${1} ךשמ {0}!'
 WITHDRAW_ERROR: '&c&lError | &7{0}.'
 WITHDRAWN_MONEY: '&e&lקנב | &7{1} לש יאה לש קנבהמ ${0} תכשמ!'
 WITHDRAWN_MONEY_NAME: '&e&lקנב | &7{1} יאה לש קנבהמ ${0} תכשמ!'
-WORLD_NOT_ENABLED: '&e&lWorlds | &7This world is not enabled on the server.'
+WORLD_NOT_ENABLED: '&e&lWorlds | &7The {0} world is not enabled on the server.'
 WORLD_NOT_UNLOCKED: '&e&lתומלוע | &7הזה יאב חותפ אל ןיידע {0} םלועה.'

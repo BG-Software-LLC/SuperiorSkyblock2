@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.database.bridge;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
@@ -21,11 +22,14 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LegacyMasks;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
+import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import org.bukkit.Location;
@@ -48,8 +52,6 @@ import java.util.function.Consumer;
 public class IslandsDatabaseBridge {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
-    private static final Location LOCATION = new Location(null, 0, 100, 0);
 
     private static final Map<UUID, Map<FutureSave, Set<Object>>> SAVE_METHODS_TO_BE_EXECUTED = new ConcurrentHashMap<>();
 
@@ -100,8 +102,8 @@ public class IslandsDatabaseBridge {
         ));
     }
 
-    public static void saveIslandHome(Island island, Dimension dimension, Location location) {
-        if (location == null) {
+    public static void saveIslandHome(Island island, Dimension dimension, @Nullable WorldPosition worldPosition) {
+        if (worldPosition == null) {
             runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_homes",
                     createFilter("island", island, new Pair<>("environment", dimension.getName()))
             ));
@@ -109,23 +111,23 @@ public class IslandsDatabaseBridge {
             runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("islands_homes",
                     new Pair<>("island", island.getUniqueId().toString()),
                     new Pair<>("environment", dimension.getName()),
-                    new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(location))
+                    new Pair<>("location", Serializers.WORLD_POSITION_SERIALIZER.serialize(worldPosition))
             ));
         }
     }
 
-    public static void saveVisitorLocation(Island island, Dimension dimension, Location location) {
-        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("islands_visitor_homes",
-                new Pair<>("island", island.getUniqueId().toString()),
-                new Pair<>("environment", dimension.getName()),
-                new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(location))
-        ));
-    }
-
-    public static void removeVisitorLocation(Island island, Dimension dimension) {
-        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_visitor_homes",
-                createFilter("island", island, new Pair<>("environment", dimension.getName()))
-        ));
+    public static void saveVisitorLocation(Island island, Dimension dimension, @Nullable WorldPosition worldPosition) {
+        if (worldPosition == null) {
+            runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_visitor_homes",
+                    createFilter("island", island, new Pair<>("environment", dimension.getName()))
+            ));
+        } else {
+            runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("islands_visitor_homes",
+                    new Pair<>("island", island.getUniqueId().toString()),
+                    new Pair<>("environment", dimension.getName()),
+                    new Pair<>("location", Serializers.WORLD_POSITION_SERIALIZER.serialize(worldPosition))
+            ));
+        }
     }
 
     public static void saveUnlockedWorlds(Island island) {
@@ -167,7 +169,7 @@ public class IslandsDatabaseBridge {
     public static void saveName(Island island) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands",
                 createFilter("uuid", island),
-                new Pair<>("name", island.getName())
+                new Pair<>("name", IslandNames.getNameForDatabase(island))
         ));
     }
 
@@ -302,6 +304,12 @@ public class IslandsDatabaseBridge {
                 createFilter("island", island)));
     }
 
+    public static void removeEntityLimit(Island island, Key entity) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_entity_limits",
+                createFilter("island", island, new Pair<>("entity", entity.toString()))
+        ));
+    }
+
     public static void saveTeamLimit(Island island) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands_settings",
                 createFilter("island", island),
@@ -352,14 +360,18 @@ public class IslandsDatabaseBridge {
     public static void saveWarp(Island island, IslandWarp islandWarp) {
         WarpCategory category = islandWarp.getCategory();
         ItemStack icon = islandWarp.getRawIcon();
-        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("islands_warps",
-                new Pair<>("island", island.getUniqueId().toString()),
-                new Pair<>("name", islandWarp.getName()),
-                new Pair<>("category", category == null ? "" : category.getName()),
-                new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(islandWarp.getLocation(LOCATION))),
-                new Pair<>("private", islandWarp.hasPrivateFlag()),
-                new Pair<>("icon", Serializers.ITEM_STACK_SERIALIZER.serialize(icon))
-        ));
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
+            try (ObjectsPools.Wrapper<LazyWorldLocation> wrapper = ObjectsPools.LAZY_LOCATION.obtain()) {
+                databaseBridge.insertObject("islands_warps",
+                        new Pair<>("island", island.getUniqueId().toString()),
+                        new Pair<>("name", islandWarp.getName()),
+                        new Pair<>("category", category == null ? "" : category.getName()),
+                        new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(islandWarp.getLocation(wrapper.getHandle()))),
+                        new Pair<>("private", islandWarp.hasPrivateFlag()),
+                        new Pair<>("icon", Serializers.ITEM_STACK_SERIALIZER.serialize(icon))
+                );
+            }
+        });
     }
 
     public static void updateWarpName(Island island, IslandWarp islandWarp, String oldName) {
@@ -370,10 +382,14 @@ public class IslandsDatabaseBridge {
     }
 
     public static void updateWarpLocation(Island island, IslandWarp islandWarp) {
-        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands_warps",
-                createFilter("island", island, new Pair<>("name", islandWarp.getName())),
-                new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(islandWarp.getLocation(LOCATION)))
-        ));
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
+            try (ObjectsPools.Wrapper<LazyWorldLocation> wrapper = ObjectsPools.LAZY_LOCATION.obtain()) {
+                databaseBridge.updateObject("islands_warps",
+                        createFilter("island", island, new Pair<>("name", islandWarp.getName())),
+                        new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(islandWarp.getLocation(wrapper.getHandle())))
+                );
+            }
+        });
     }
 
     public static void updateWarpPrivateStatus(Island island, IslandWarp islandWarp) {
@@ -444,6 +460,11 @@ public class IslandsDatabaseBridge {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_flags",
                 createFilter("island", island, new Pair<>("name", islandFlag.getName()))
         ));
+    }
+
+    public static void clearIslandFlags(Island island) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_flags",
+                createFilter("island", island)));
     }
 
     public static void saveGeneratorRate(Island island, Dimension dimension, Key blockKey, int rate) {
@@ -616,7 +637,7 @@ public class IslandsDatabaseBridge {
         ));
     }
 
-    public static void insertIsland(Island island, List<ChunkPosition> dirtyChunks) {
+    public static void insertIsland(Island island, @Nullable List<ChunkPosition> dirtyChunks) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
             BlockPosition centerPosition = island.getCenterPosition();
             WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, Dimensions.NORMAL);
@@ -632,12 +653,12 @@ public class IslandsDatabaseBridge {
                     new Pair<>("levels_bonus", island.getBonusLevel() + ""),
                     new Pair<>("locked", island.isLocked()),
                     new Pair<>("ignored", island.isIgnored()),
-                    new Pair<>("name", island.getName()),
+                    new Pair<>("name", IslandNames.getNameForDatabase(island)),
                     new Pair<>("description", island.getDescription()),
                     new Pair<>("generated_schematics", LegacyMasks.convertGeneratedSchematicsMask(island.getGeneratedSchematics())),
                     new Pair<>("unlocked_worlds", LegacyMasks.convertUnlockedWorldsMask(island.getUnlockedWorlds())),
                     new Pair<>("last_time_updated", System.currentTimeMillis() / 1000L),
-                    new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunkPositions(dirtyChunks)),
+                    new Pair<>("dirty_chunks", dirtyChunks == null ? "" : IslandsSerializer.serializeDirtyChunkPositions(dirtyChunks)),
                     new Pair<>("block_counts", IslandsSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger())),
                     new Pair<>("entity_counts", IslandsSerializer.serializeEntityCounts(island.getEntitiesTracker().getEntitiesCounts()))
             );
@@ -669,6 +690,7 @@ public class IslandsDatabaseBridge {
             databaseBridge.deleteObject("islands", createFilter("uuid", island));
             databaseBridge.deleteObject("islands_banks", islandFilter);
             databaseBridge.deleteObject("islands_settings", islandFilter);
+            databaseBridge.deleteObject("bank_transactions", islandFilter);
 
 
             if (!island.getBannedPlayers().isEmpty())
@@ -691,7 +713,7 @@ public class IslandsDatabaseBridge {
                     break;
                 }
             }
-            if (!island.getIslandHomesAsDimensions().isEmpty())
+            if (!island.getIslandHomes().isEmpty())
                 databaseBridge.deleteObject("islands_homes", islandFilter);
             if (!island.getIslandMembers(false).isEmpty())
                 databaseBridge.deleteObject("islands_members", islandFilter);
@@ -708,7 +730,7 @@ public class IslandsDatabaseBridge {
             if (!island.getUpgrades().isEmpty())
                 databaseBridge.deleteObject("islands_upgrades", islandFilter);
             for (Dimension dimension : Dimension.values()) {
-                if (island.getVisitorsLocation(dimension) != null) {
+                if (island.getVisitorsPosition(dimension) != null) {
                     databaseBridge.deleteObject("islands_visitor_homes", islandFilter);
                     break;
                 }

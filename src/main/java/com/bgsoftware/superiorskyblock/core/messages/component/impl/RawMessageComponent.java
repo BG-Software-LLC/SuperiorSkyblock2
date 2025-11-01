@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class RawMessageComponent implements IMessageComponent {
 
@@ -26,17 +27,18 @@ public class RawMessageComponent implements IMessageComponent {
 
     @Override
     public String getMessage() {
-        return this.content.getContent().orElse("");
+        return this.content.getContent(null).orElse("");
     }
 
     @Override
     public String getMessage(Object... args) {
-        return this.content.getContent(args).orElse("");
+        return this.content.getContent(null, args).orElse("");
     }
 
     @Override
     public void sendMessage(CommandSender sender, Object... args) {
-        this.content.getContent(args).ifPresent(sender::sendMessage);
+        Player player = sender instanceof Player ? (Player) sender : null;
+        this.content.getContent(player, args).ifPresent(sender::sendMessage);
     }
 
 }

@@ -1,18 +1,25 @@
 package com.bgsoftware.superiorskyblock.core.threads;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class BukkitExecutor {
 
+    private static final int DEFAULT_SHUTDOWN_TIMEOUT = 1000 * 20;
+    private static final int SHUTDOWN_INTERVAL_WAIT_TIME = 100;
+
     private static SuperiorSkyblockPlugin plugin;
-    private static boolean shutdown = false;
-    private static boolean syncBukkitCalls = false;
+    private static State state = State.RUNNING;
+
+    private static final AtomicLong ACTIVE_TASKS_COUNT = new AtomicLong(0);
 
     private BukkitExecutor() {
 
@@ -26,7 +33,7 @@ public class BukkitExecutor {
         if (ensureNotShudown())
             return;
 
-        if (!syncBukkitCalls && !Bukkit.isPrimaryThread()) {
+        if (state != State.PREPARE_SHUTDOWN && !Bukkit.isPrimaryThread()) {
             sync(runnable);
         } else {
             runnable.run();
@@ -41,7 +48,7 @@ public class BukkitExecutor {
         if (ensureNotShudown())
             return null;
 
-        if (syncBukkitCalls) {
+        if (state == State.PREPARE_SHUTDOWN) {
             runnable.run();
             return null;
         } else {
@@ -53,7 +60,7 @@ public class BukkitExecutor {
         if (ensureNotShudown())
             return;
 
-        if (syncBukkitCalls) {
+        if (state == State.PREPARE_SHUTDOWN) {
             runnable.run();
         } else {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
@@ -64,7 +71,7 @@ public class BukkitExecutor {
         if (ensureNotShudown())
             return;
 
-        if (syncBukkitCalls) {
+        if (state == State.PREPARE_SHUTDOWN) {
             runnable.run();
         } else {
             Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, delay);
@@ -89,16 +96,35 @@ public class BukkitExecutor {
         return new NestedTask<Void>().complete();
     }
 
-    public static void prepareDisable() {
-        syncBukkitCalls = true;
+    public static void prepareShutdown() {
+        state = State.PREPARE_SHUTDOWN;
     }
 
-    public static void close() {
-        shutdown = true;
+    public static void close(SuperiorSkyblockPlugin plugin) {
+        // Waiting for all active tasks to finish
+
+        Log.info("This can take up to " + (DEFAULT_SHUTDOWN_TIMEOUT / 1000) + " seconds to complete");
+
+        long timeoutLeft = DEFAULT_SHUTDOWN_TIMEOUT;
+
+        while (ACTIVE_TASKS_COUNT.get() != 0 && timeoutLeft > 0) {
+            try {
+                Thread.sleep(SHUTDOWN_INTERVAL_WAIT_TIME);
+                timeoutLeft -= SHUTDOWN_INTERVAL_WAIT_TIME;
+            } catch (Throwable ignored) {
+            }
+        }
+
+        if (ACTIVE_TASKS_COUNT.get() != 0) {
+            new RuntimeException("Not all active tasks finished").printStackTrace();
+        }
+
+        state = State.SHUTDOWN;
+        Bukkit.getScheduler().cancelTasks(plugin);
     }
 
     private static boolean ensureNotShudown() {
-        if (shutdown) {
+        if (state == State.SHUTDOWN) {
             new RuntimeException("Tried to call BukkitExecutor after it was shut down").printStackTrace();
             return true;
         }
@@ -114,48 +140,80 @@ public class BukkitExecutor {
         }
 
         public <R> NestedTask<R> runSync(Function<T, R> function) {
+            ensureNotShudown();
+
             NestedTask<R> nestedTask = new NestedTask<>();
-            if (syncBukkitCalls) {
+            if (state == State.PREPARE_SHUTDOWN) {
                 nestedTask.value.complete(function.apply(value.join()));
             } else {
-                value.whenComplete((value, ex) -> BukkitExecutor.ensureMain(() -> nestedTask.value.complete(function.apply(value))));
+                onCreate();
+                value.whenComplete((value, ex) -> BukkitExecutor.ensureMain(() -> {
+                    try {
+                        nestedTask.value.complete(function.apply(value));
+                    } finally {
+                        onComplete();
+                    }
+                }));
             }
             return nestedTask;
         }
 
         public NestedTask<Void> runSync(Consumer<T> consumer) {
+            ensureNotShudown();
+
             NestedTask<Void> nestedTask = new NestedTask<>();
-            if (syncBukkitCalls) {
+            if (state == State.PREPARE_SHUTDOWN) {
                 consumer.accept(value.join());
                 nestedTask.value.complete(null);
             } else {
+                onCreate();
                 value.whenComplete((value, ex) -> BukkitExecutor.ensureMain(() -> {
-                    consumer.accept(value);
-                    nestedTask.value.complete(null);
+                    try {
+                        consumer.accept(value);
+                        nestedTask.value.complete(null);
+                    } finally {
+                        onComplete();
+                    }
                 }));
             }
             return nestedTask;
         }
 
         public <R> NestedTask<R> runAsync(Function<T, R> function) {
+            ensureNotShudown();
+
             NestedTask<R> nestedTask = new NestedTask<>();
-            if (syncBukkitCalls) {
+            if (state == State.PREPARE_SHUTDOWN) {
                 nestedTask.value.complete(function.apply(value.join()));
             } else {
-                value.whenComplete((value, ex) -> BukkitExecutor.async(() -> nestedTask.value.complete(function.apply(value))));
+                onCreate();
+                value.whenComplete((value, ex) -> BukkitExecutor.async(() -> {
+                    try {
+                        nestedTask.value.complete(function.apply(value));
+                    } finally {
+                        onComplete();
+                    }
+                }));
             }
             return nestedTask;
         }
 
         public NestedTask<Void> runAsync(Consumer<T> consumer) {
+            ensureNotShudown();
+
             NestedTask<Void> nestedTask = new NestedTask<>();
-            if (syncBukkitCalls) {
+            if (state == State.PREPARE_SHUTDOWN) {
                 consumer.accept(value.join());
                 nestedTask.value.complete(null);
             } else {
+                onCreate();
                 value.whenComplete((value, ex) -> BukkitExecutor.async(() -> {
-                    consumer.accept(value);
-                    nestedTask.value.complete(null);
+                    try {
+                        consumer.accept(value);
+                        nestedTask.value.complete(null);
+                    } finally {
+                        onComplete();
+                    }
                 }));
             }
             return nestedTask;
@@ -165,6 +223,28 @@ public class BukkitExecutor {
             value.complete(null);
             return this;
         }
+
+        private static void onCreate() {
+            long curr = ACTIVE_TASKS_COUNT.incrementAndGet();
+            Log.debug(Debug.TRACK_TASK, curr);
+        }
+
+        private static void onComplete() {
+            long curr = ACTIVE_TASKS_COUNT.decrementAndGet();
+            Log.debug(Debug.TRACK_TASK, curr);
+            if (curr < 0) {
+                new RuntimeException("Active tasks count is less than 0").printStackTrace();
+                ACTIVE_TASKS_COUNT.set(0);
+            }
+        }
+
+    }
+
+    private enum State {
+
+        RUNNING,
+        PREPARE_SHUTDOWN,
+        SHUTDOWN
 
     }
 

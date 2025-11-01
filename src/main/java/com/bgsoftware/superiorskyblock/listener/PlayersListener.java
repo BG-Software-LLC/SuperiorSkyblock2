@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
@@ -113,8 +112,10 @@ public class PlayersListener extends AbstractGameEventListener {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
-        if (superiorPlayer instanceof SuperiorNPCPlayer)
+        if (superiorPlayer instanceof SuperiorNPCPlayer) {
+            ((SuperiorNPCPlayer) superiorPlayer).release();
             return;
+        }
 
         // Updating the name of the player.
         if (!superiorPlayer.getName().equals(player.getName())) {
@@ -175,16 +176,16 @@ public class PlayersListener extends AbstractGameEventListener {
         Player player = e.getArgs().player;
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
-        if (superiorPlayer instanceof SuperiorNPCPlayer)
+        if (superiorPlayer instanceof SuperiorNPCPlayer) {
+            ((SuperiorNPCPlayer) superiorPlayer).release();
             return;
+        }
 
         // Removing coop status from other islands.
-        for (Island _island : plugin.getGrid().getIslands()) {
-            if (_island.isCoop(superiorPlayer)) {
-                if (PluginEventsFactory.callIslandUncoopPlayerEvent(_island, null, superiorPlayer, IslandUncoopPlayerEvent.UncoopReason.SERVER_LEAVE)) {
-                    _island.removeCoop(superiorPlayer);
-                    IslandUtils.sendMessage(_island, Message.UNCOOP_LEFT_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
-                }
+        for (Island coopIsland : superiorPlayer.getCoopIslands()) {
+            if (PluginEventsFactory.callIslandUncoopPlayerEvent(coopIsland, null, superiorPlayer, IslandUncoopPlayerEvent.UncoopReason.SERVER_LEAVE)) {
+                coopIsland.removeCoop(superiorPlayer);
+                IslandUtils.sendMessage(coopIsland, Message.UNCOOP_LEFT_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
             }
         }
 
@@ -233,7 +234,12 @@ public class PlayersListener extends AbstractGameEventListener {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
-        if (superiorPlayer instanceof SuperiorNPCPlayer || superiorPlayer.hasPlayerStatus(PlayerStatus.VOID_TELEPORT))
+        if (superiorPlayer instanceof SuperiorNPCPlayer) {
+            ((SuperiorNPCPlayer) superiorPlayer).release();
+            return;
+        }
+
+        if (superiorPlayer.hasPlayerStatus(PlayerStatus.VOID_TELEPORT))
             return;
 
         MoveResult moveResult = this.regionManagerService.get().handlePlayerMove(
@@ -254,8 +260,13 @@ public class PlayersListener extends AbstractGameEventListener {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getArgs().entity);
 
-        if (superiorPlayer == null || superiorPlayer instanceof SuperiorNPCPlayer)
+        if (superiorPlayer == null)
             return;
+
+        if (superiorPlayer instanceof SuperiorNPCPlayer) {
+            ((SuperiorNPCPlayer) superiorPlayer).release();
+            return;
+        }
 
         MoveResult moveResult = this.regionManagerService.get().handlePlayerTeleport(
                 superiorPlayer, e.getArgs().from, e.getArgs().to);
@@ -265,6 +276,11 @@ public class PlayersListener extends AbstractGameEventListener {
 
     private void onPlayerChangeWorld(GameEvent<GameEventArgs.PlayerChangedWorldEvent> e) {
         Player player = e.getArgs().player;
+
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(player.getWorld()))
+            return;
 
         Island island;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -290,12 +306,9 @@ public class PlayersListener extends AbstractGameEventListener {
         Player player = (Player) e.getArgs().entity;
         SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
-        if (targetPlayer instanceof SuperiorNPCPlayer)
+        if (targetPlayer instanceof SuperiorNPCPlayer) {
+            ((SuperiorNPCPlayer) targetPlayer).release();
             return;
-
-        Island island;
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            island = plugin.getGrid().getIslandAt(player.getLocation(wrapper.getHandle()));
         }
 
         SuperiorPlayer damagerPlayer = e.getArgs().damager == null ? null :
@@ -303,14 +316,27 @@ public class PlayersListener extends AbstractGameEventListener {
                         .map(plugin.getPlayers()::getSuperiorPlayer).orElse(null);
 
         // Some plugins, such as Sentinel, may actually cause a NPC to attack.
-        if (damagerPlayer instanceof SuperiorNPCPlayer)
+        if (damagerPlayer instanceof SuperiorNPCPlayer) {
+            ((SuperiorNPCPlayer) damagerPlayer).release();
             return;
+        }
 
         if (damagerPlayer == null) {
+            // We do not care about spawn island when spawn protection is disabled or player damage is enabled in spawn,
+            // and therefore only island worlds are relevant.
+            if ((!plugin.getSettings().getSpawn().isProtected() || plugin.getSettings().getSpawn().isPlayersDamage()) &&
+                    !plugin.getGrid().isIslandsWorld(player.getWorld()))
+                return;
+
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(player.getLocation(wrapper.getHandle()));
+            }
+
             if (island != null) {
                 if (island.isSpawn() ? (plugin.getSettings().getSpawn().isProtected() && !plugin.getSettings().getSpawn().isPlayersDamage()) :
-                        ((!plugin.getSettings().isVisitorsDamage() && island.isVisitor(targetPlayer, false)) ||
-                                (!plugin.getSettings().isCoopDamage() && island.isCoop(targetPlayer))))
+                        ((!plugin.getSettings().isCoopDamage() && island.isCoop(targetPlayer)) ||
+                                (!plugin.getSettings().isVisitorsDamage() && island.isVisitor(targetPlayer, true))))
                     e.setCancelled();
             }
 
@@ -478,6 +504,24 @@ public class PlayersListener extends AbstractGameEventListener {
         }
     }
 
+    private void onPlayerRespawnMonitor(GameEvent<GameEventArgs.PlayerRespawnEvent> e) {
+        Location respawnLocation = e.getArgs().bukkitEvent.getRespawnLocation();
+        Player player = e.getArgs().player;
+
+        BukkitExecutor.sync(() -> {
+            if (!player.isOnline())
+                return;
+
+            Island respawnAtIsland = plugin.getGrid().getIslandAt(respawnLocation);
+            if (respawnAtIsland != null) {
+                SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+                superiorPlayer.updateWorldBorder(respawnAtIsland);
+            }
+        }, 2L);
+
+
+    }
+
     /* INTERNAL */
 
     private void registerListeners() {
@@ -494,6 +538,7 @@ public class PlayersListener extends AbstractGameEventListener {
         registerCallback(GameEventType.INVENTORY_CLICK_EVENT, GameEventPriority.LOWEST, this::onIslandChestInteract);
         registerCallback(GameEventType.ENTITY_DAMAGE_EVENT, GameEventPriority.NORMAL, this::onPlayerFall);
         registerCallback(GameEventType.PLAYER_RESPAWN_EVENT, GameEventPriority.NORMAL, this::onPlayerRespawn);
+        registerCallback(GameEventType.PLAYER_RESPAWN_EVENT, GameEventPriority.MONITOR, this::onPlayerRespawnMonitor);
         // PlayerChat should be on LOWEST priority so other chat plugins don't conflict.
         registerCallback(GameEventType.PLAYER_CHAT_EVENT, GameEventPriority.LOWEST, this::onPlayerChatLowest);
         registerCallback(GameEventType.PLAYER_CHAT_EVENT, GameEventPriority.NORMAL, this::onPlayerChat);

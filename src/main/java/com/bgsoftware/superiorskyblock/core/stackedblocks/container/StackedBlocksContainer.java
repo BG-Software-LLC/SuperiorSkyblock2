@@ -22,4 +22,6 @@ public interface StackedBlocksContainer {
 
     void removeStackedBlocks(ChunkPosition chunkPosition, Consumer<StackedBlock> consumer);
 
+    int size();
+
 }

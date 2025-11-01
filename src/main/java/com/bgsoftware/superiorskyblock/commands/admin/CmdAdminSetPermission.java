@@ -68,12 +68,11 @@ public class CmdAdminSetPermission implements IAdminIslandCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         IslandPrivilege islandPrivilege = CommandArguments.getIslandPrivilege(sender, args[3]);
-
         if (islandPrivilege == null)
             return;
 
-        PlayerRole playerRole = CommandArguments.getPlayerRole(sender, args[4]);
-
+        PlayerRole playerRole = islandPrivilege.getType() == IslandPrivilege.Type.COMMAND ?
+                CommandArguments.getPlayerRoleFromLadder(sender, args[4]) : CommandArguments.getPlayerRole(sender, args[4]);
         if (playerRole == null)
             return;
 
@@ -99,8 +98,31 @@ public class CmdAdminSetPermission implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getIslandPrivileges(args[3]) :
-                args.length == 5 ? CommandTabCompletes.getPlayerRoles(plugin, args[4]) : Collections.emptyList();
+        switch (args.length) {
+            case 4:
+                return CommandTabCompletes.getIslandPrivileges(args[3]);
+            case 5: {
+                IslandPrivilege islandPrivilege = getIslandPrivilegeSafe(args[3]);
+
+                if (islandPrivilege == null)
+                    return Collections.emptyList();
+                else if (islandPrivilege.getType() == IslandPrivilege.Type.COMMAND)
+                    return CommandTabCompletes.getPlayerRoles(plugin, args[4], PlayerRole::isRoleLadder);
+                else
+                    return CommandTabCompletes.getPlayerRoles(plugin, args[4], null);
+            }
+            default:
+                return Collections.emptyList();
+        }
+    }
+
+    @Nullable
+    private static IslandPrivilege getIslandPrivilegeSafe(String name) {
+        try {
+            return IslandPrivilege.getByName(name);
+        } catch (NullPointerException error) {
+            return null;
+        }
     }
 
 }

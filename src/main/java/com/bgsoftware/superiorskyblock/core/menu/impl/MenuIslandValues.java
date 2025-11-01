@@ -14,8 +14,8 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
@@ -24,6 +24,8 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.ValuesButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IPlayerMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -86,7 +88,7 @@ public class MenuIslandValues extends AbstractMenu<MenuIslandValues.View, Island
         return new MenuIslandValues(menuParseResult);
     }
 
-    public static class View extends AbstractMenuView<View, IslandViewArgs> {
+    public static class View extends AbstractMenuView<View, IslandViewArgs> implements IIslandMenuView, IPlayerMenuView {
 
         private final Island island;
         private SuperiorPlayer targetPlayer;
@@ -98,16 +100,18 @@ public class MenuIslandValues extends AbstractMenu<MenuIslandValues.View, Island
             this.targetPlayer = args.getIsland().getOwner();
         }
 
+        @Override
         public Island getIsland() {
             return island;
         }
 
-        public void setTargetPlayer(SuperiorPlayer targetPlayer) {
-            this.targetPlayer = targetPlayer;
+        @Override
+        public SuperiorPlayer getSuperiorPlayer() {
+            return targetPlayer;
         }
 
-        public SuperiorPlayer getTargetPlayer() {
-            return targetPlayer;
+        public void setTargetPlayer(SuperiorPlayer targetPlayer) {
+            this.targetPlayer = targetPlayer;
         }
 
         @Override
@@ -141,7 +145,7 @@ public class MenuIslandValues extends AbstractMenu<MenuIslandValues.View, Island
 
         int charCounter = 0;
 
-        if (cfg.contains("values-gui.fill-items")) {
+        if (cfg.isConfigurationSection("values-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("values-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
@@ -167,16 +171,16 @@ public class MenuIslandValues extends AbstractMenu<MenuIslandValues.View, Island
         return true;
     }
 
-    private static void copySection(ConfigurationSection source, ConfigurationSection dest, Function<String, String> stringReplacer) {
+    private static void copySection(ConfigurationSection source, ConfigurationSection destination, Function<String, String> stringReplacer) {
         for (String key : source.getKeys(false)) {
             if (source.isConfigurationSection(key)) {
-                copySection(source.getConfigurationSection(key), dest.createSection(key), stringReplacer);
+                copySection(source.getConfigurationSection(key), destination.createSection(key), stringReplacer);
             } else if (source.isList(key)) {
-                dest.set(key, source.getStringList(key).stream().map(stringReplacer).collect(Collectors.toList()));
+                destination.set(key, source.getStringList(key).stream().map(stringReplacer).collect(Collectors.toList()));
             } else if (source.isString(key)) {
-                dest.set(key, stringReplacer.apply(source.getString(key)));
+                destination.set(key, stringReplacer.apply(source.getString(key)));
             } else {
-                dest.set(key, source.getString(key));
+                destination.set(key, source.getString(key));
             }
         }
     }

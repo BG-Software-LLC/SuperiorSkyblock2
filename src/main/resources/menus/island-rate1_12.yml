@@ -1,0 +1,77 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lRate Island'
+previous-menu: true
+
+pattern:
+  - '# ~ @ % # * ^ & #'
+
+zero-stars: '~'
+one-star: '@'
+two-stars: '%'
+three-stars: '*'
+four-stars: '^'
+five-stars: '&'
+
+items:
+  '~':
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODViZDFlNjEzZmYzMmI1MjNjY2Y5ZTU3NGNjMzExYjc5OGMyYjNhNjgyOGYwZjcxYTI1NGM5OTVlNmRiOGU1In19fQ=='
+    name: '&4Horrible (0/5)'
+  '@':
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmNmYWZmYThjNmM3ZjYyNjIxNjgyZmU1NjcxMWRjM2I4OTQ0NjVmZGY3YTYyZjQzYjMxYTBkMzQwM2YzNGU3In19fQ=='
+    name: '&6Ugly (1/5)'
+  '%':
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNThjY2ExZTBmYjVkOWJmNzdmNTI3MzU2ZThiZjRlNTNjYjRhNGM1NmYxMWU3NzlhYmFkYWU1NDFiYmVkYzYifX19'
+    name: '&eNice (2/5)'
+  '*':
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzQyMjZmMmViNjRhYmM4NmIzOGI2MWQxNDk3NzY0Y2JhMDNkMTc4YWZjMzNiN2I4MDIzY2Y0OGI0OTMxMSJ9fX0='
+    name: '&aGood (3/5)'
+  '^':
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGI1MjdiMjRiNWQyYmNkYzc1NmY5OTVkMzRlYWU1NzlkNzQxNGIwYTVmMjZjNGZmYTRhNTU4ZWNhZjZiNyJ9fX0='
+    name: '&2Beautiful (4/5)'
+  '&':
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDkzNTdjYjQ2NjQ0MjZhOWFlMGY5Yzc3MjVlYTQzNTFkYzY5ZjE1YTgwNjJjMDM1OTFlMjZhYzExYmJjNWEifX19'
+    name: '&5Fabulous (5/5)'
+
+sounds:
+  '~':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '@':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '%':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '*':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '^':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '&':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2

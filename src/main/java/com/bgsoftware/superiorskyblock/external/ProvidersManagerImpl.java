@@ -28,6 +28,8 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.JavaVersion;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -46,6 +48,7 @@ import com.bgsoftware.superiorskyblock.external.spawners.SpawnersProvider_AutoDe
 import com.bgsoftware.superiorskyblock.external.spawners.SpawnersProvider_Default;
 import com.bgsoftware.superiorskyblock.external.stackedblocks.StackedBlocksProvider_AutoDetect;
 import com.bgsoftware.superiorskyblock.external.stackedblocks.StackedBlocksProvider_Default;
+import com.bgsoftware.superiorskyblock.external.vanish.VanishProvider_Default;
 import com.bgsoftware.superiorskyblock.external.worlds.WorldsProvider_Default;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import com.google.common.base.Preconditions;
@@ -81,7 +84,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private EconomyProvider bankEconomyProvider = new EconomyProvider_Default();
     private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
     private PricesProvider pricesProvider = new PricesProvider_Default();
-    private VanishProvider vanishProvider = player -> false;
+    private VanishProvider vanishProvider = new VanishProvider_Default();
     private AsyncProvider asyncProvider = new AsyncProvider_Default();
     private WorldsProvider worldsProvider;
     private ChunksProvider chunksProvider = new ChunksProvider_Default();
@@ -182,6 +185,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     public void setWorldsProvider(WorldsProvider worldsProvider) {
         Preconditions.checkNotNull(worldsProvider, "worldsProvider parameter cannot be null.");
         this.worldsProvider = worldsProvider;
+        PluginEventsFactory.callWorldsProviderUpdateEvent();
     }
 
     @Override
@@ -467,6 +471,10 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder"))
             registerHook("ItemsAdderHook");
 
+        if (Bukkit.getPluginManager().isPluginEnabled("CraftEngine"))
+            // We load the hook with an extra delay to let CraftEngine load its data first
+            BukkitExecutor.sync(() -> registerHook("CraftEngineHook"), 5L);
+
         if (canRegisterHook("SmoothTimber"))
             registerHook("SmoothTimberHook");
 
@@ -518,7 +526,9 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         } else if (canRegisterHook("EpicSpawners") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("EpicSpawners"))) {
             String version = Bukkit.getPluginManager().getPlugin("EpicSpawners").getDescription().getVersion();
-            if (version.startsWith("8")) {
+            if (version.startsWith("9")) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_EpicSpawners9");
+            } else if (version.startsWith("8")) {
                 spawnersProvider = createInstance("spawners.SpawnersProvider_EpicSpawners8");
             } else if (version.startsWith("7")) {
                 spawnersProvider = createInstance("spawners.SpawnersProvider_EpicSpawners7");
@@ -527,7 +537,11 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             }
         } else if (canRegisterHook("UltimateStacker") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("UltimateStacker"))) {
-            if (Bukkit.getPluginManager().getPlugin("UltimateStacker").getDescription().getVersion().startsWith("3")) {
+            String version = Bukkit.getPluginManager().getPlugin("UltimateStacker").getDescription().getVersion();
+            int majorVersion = Integer.parseInt(String.valueOf(version.charAt(0)));
+            if (majorVersion >= 4) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_UltimateStacker4");
+            } else if (majorVersion == 3) {
                 spawnersProvider = createInstance("spawners.SpawnersProvider_UltimateStacker3");
             } else {
                 spawnersProvider = createInstance("spawners.SpawnersProvider_UltimateStacker");
@@ -701,7 +715,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private static boolean hasMiniMessageSupport() {
         try {
             Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
-            return true;
+            return ServerVersion.isAtLeast(ServerVersion.v1_18);
         } catch (ClassNotFoundException error) {
             return false;
         }

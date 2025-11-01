@@ -46,23 +46,39 @@ import java.io.IOException;
  */
 public class ByteTag extends NumberTag<Byte> {
 
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagByte");
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = NMSTagConverter.choice(
+            new String[]{"NBTTagByte", "ByteTag"}, byte.class);
 
-    /**
-     * Creates the tag.
-     *
-     * @param value The value.
-     */
-    public ByteTag(byte value) {
-        super(value, CLASS, byte.class);
+    private static final ByteTag[] CACHE = new ByteTag[256];
+
+    private ByteTag(byte value) {
+        super(value);
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeByte(value);
+    }
+
+    @Override
+    protected NMSTagConverter getNMSConverter() {
+        return TAG_CONVERTER;
+    }
+
+    public static ByteTag of(byte value) {
+        int index = value - Byte.MIN_VALUE;
+        ByteTag tag = CACHE[index];
+        if (tag == null)
+            tag = CACHE[index] = new ByteTag(value);
+        return tag;
     }
 
     public static ByteTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ByteTag!");
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to ByteTag!");
 
         try {
             byte value = plugin.getNMSTags().getNBTByteValue(tag);
-            return new ByteTag(value);
+            return ByteTag.of(value);
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while converting tag byte from NMS:");
             return null;
@@ -70,12 +86,7 @@ public class ByteTag extends NumberTag<Byte> {
     }
 
     public static ByteTag fromStream(DataInputStream is) throws IOException {
-        return new ByteTag(is.readByte());
-    }
-
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeByte(value);
+        return ByteTag.of(is.readByte());
     }
 
 }

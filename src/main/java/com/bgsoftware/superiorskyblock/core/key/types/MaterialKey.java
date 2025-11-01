@@ -40,8 +40,7 @@ public class MaterialKey extends BaseKey<MaterialKey> {
             if (MaterialKey.this.isAPIKey())
                 throw new UnsupportedOperationException();
 
-            return new MaterialKey(MaterialKey.this.type, MaterialKey.this.durability, MaterialKey.this.isGlobalType,
-                    MaterialKey.this.materialKeySource, true);
+            return createAPIKeyForCacheInternal();
         }
     };
 
@@ -124,6 +123,11 @@ public class MaterialKey extends BaseKey<MaterialKey> {
     @Override
     public MaterialKey createAPIKeyInternal() {
         return this.apiKeyCache.get();
+    }
+
+    protected MaterialKey createAPIKeyForCacheInternal() {
+        return new MaterialKey(MaterialKey.this.type, MaterialKey.this.durability, MaterialKey.this.isGlobalType,
+                MaterialKey.this.materialKeySource, true);
     }
 
     public Material getMaterial() {

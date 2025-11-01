@@ -5,7 +5,7 @@
 ##                                                  ##
 ######################################################
 
-title: '&lIsland Visitors ({0})'
+title: '&lIsland Unique Visitors ({0})'
 previous-menu: true
 
 pattern:
@@ -29,6 +29,9 @@ items:
     lore:
       - '&7Island Owner: {1}'
       - '&7Last Time Joined: {3}'
+      - ''
+      - '&7Left-Click to expel the player.'
+      - '&7Right-Click to invite the player.'
   '%':
     type: PAPER
     name: '{0}Previous Page'
@@ -47,6 +50,6 @@ items:
 
 sounds:
   '@':
-    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    type: ORB_PICKUP
     volume: 0.2
     pitch: 0.2

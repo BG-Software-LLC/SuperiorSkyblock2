@@ -2,8 +2,11 @@ package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
+import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -63,10 +66,25 @@ public class DefaultValuesSection extends SettingsContainerHolder implements Set
 
     @Override
     public Map<Key, Integer>[] getGenerators() {
-        return getGeneratorsUnsafe().clone();
+        Map<Key, Integer>[] generators = new Map[Dimension.values().size()];
+
+        if (!getContainer().defaultGenerator.isEmpty()) {
+            for (Dimension dimension : Dimension.values()) {
+                Map<Key, Integer> dimensionGeneratorRates = getContainer().defaultGenerator.get(dimension);
+                if (dimensionGeneratorRates != null)
+                    generators[dimension.ordinal()] = dimensionGeneratorRates;
+            }
+        }
+
+        return generators;
     }
 
-    public Map<Key, Integer>[] getGeneratorsUnsafe() {
+    @Override
+    public Map<Dimension, Map<Key, Integer>> getGeneratorsMap() {
+        return getContainer().defaultGenerator.collect(Dimension.values());
+    }
+
+    public EnumerateMap<Dimension, Map<Key, Integer>> getRealGeneratorsMap() {
         return getContainer().defaultGenerator;
     }
 
@@ -79,4 +97,8 @@ public class DefaultValuesSection extends SettingsContainerHolder implements Set
         return getContainer().defaultRoleLimits;
     }
 
+    @Override
+    public Map<PotionEffectType, Integer> getIslandEffects() {
+        return getContainer().defaultIslandEffects;
+    }
 }

@@ -1,9 +1,8 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.google.common.base.Preconditions;
-import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 
 /**
@@ -11,6 +10,7 @@ import org.bukkit.event.Cancellable;
  */
 public class IslandRemoveVisitorHomeEvent extends IslandEvent implements Cancellable {
 
+    @Nullable
     private final SuperiorPlayer superiorPlayer;
 
     private boolean cancelled = false;
@@ -19,9 +19,10 @@ public class IslandRemoveVisitorHomeEvent extends IslandEvent implements Cancell
      * The constructor of the event.
      *
      * @param superiorPlayer The player that removed the island visitor home.
+     *                       If null, then the warp was deleted by the console or another source
      * @param island         The island that the visitor home was removed.
      */
-    public IslandRemoveVisitorHomeEvent(SuperiorPlayer superiorPlayer, Island island) {
+    public IslandRemoveVisitorHomeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island) {
         super(island);
         this.superiorPlayer = superiorPlayer;
     }
@@ -29,6 +30,7 @@ public class IslandRemoveVisitorHomeEvent extends IslandEvent implements Cancell
     /**
      * Get the player who removed the island visitor home.
      */
+    @Nullable
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
     }

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.player.respawn;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
@@ -37,7 +38,8 @@ public class RespawnActions {
         public void perform(PlayerRespawnEvent event) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(event.getPlayer());
             assert superiorPlayer.getIsland() != null;
-            superiorPlayer.teleport(superiorPlayer.getIsland());
+            superiorPlayer.teleport(superiorPlayer.getIsland(),
+                    result -> onTeleportCallback(superiorPlayer, result));
         }
 
     });
@@ -52,7 +54,8 @@ public class RespawnActions {
         @Override
         public void perform(PlayerRespawnEvent event) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(event.getPlayer());
-            superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+            superiorPlayer.teleport(plugin.getGrid().getSpawnIsland(),
+                    result -> onTeleportCallback(superiorPlayer, result));
         }
 
     });
@@ -82,6 +85,15 @@ public class RespawnActions {
     private static RespawnAction register(RespawnAction respawnAction) {
         RespawnAction.register(respawnAction);
         return respawnAction;
+    }
+
+    private static void onTeleportCallback(SuperiorPlayer superiorPlayer, boolean result) {
+        if (result) {
+            BukkitExecutor.sync(() -> {
+                if (superiorPlayer.isOnline())
+                    superiorPlayer.updateWorldBorder(superiorPlayer.getIsland());
+            }, 2L);
+        }
     }
 
 }

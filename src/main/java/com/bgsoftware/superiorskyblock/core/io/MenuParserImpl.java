@@ -24,8 +24,10 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.BackButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.DummyButton;
 import com.bgsoftware.superiorskyblock.core.menu.layout.PagedMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularMenuLayoutImpl;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -285,7 +287,7 @@ public class MenuParserImpl implements MenuParser {
         if (sourceItem != null) {
             templateItem = getItemStackUnsafe(fileName, section.getRoot().getConfigurationSection(sourceItem));
         } else {
-            if (!section.contains("type"))
+            if (!section.isString("type"))
                 return null;
 
             Material type;
@@ -307,7 +309,7 @@ public class MenuParserImpl implements MenuParser {
                     data = (short) section.getInt("data");
                 }
             } catch (IllegalArgumentException error) {
-                throw new MenuParseException("Couldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & data sections!");
+                throw new MenuParseException("Couldn't convert " + section.getCurrentPath() + " into an item stack. Check type & data sections!");
             }
 
             templateItem = new TemplateItem(new ItemBuilder(type, data));
@@ -315,28 +317,28 @@ public class MenuParserImpl implements MenuParser {
 
         ItemBuilder itemBuilder = templateItem.getEditableBuilder();
 
-        if (section.contains("name"))
+        if (section.isString("name"))
             itemBuilder.withName(Formatters.COLOR_FORMATTER.format(section.getString("name")));
 
-        if (section.contains("lore"))
+        if (section.isList("lore"))
             itemBuilder.withLore(section.getStringList("lore"));
 
         if (section.isInt("amount"))
             itemBuilder.withAmount(section.getInt("amount"));
 
-        if (section.contains("enchants")) {
-            for (String _enchantment : section.getConfigurationSection("enchants").getKeys(false)) {
+        if (section.isConfigurationSection("enchants")) {
+            for (String enchantmentName : section.getConfigurationSection("enchants").getKeys(false)) {
                 Enchantment enchantment;
 
                 try {
-                    enchantment = getMinecraftEnum(Enchantment.class, _enchantment, Enchantment::getByName);
+                    enchantment = getMinecraftEnum(Enchantment.class, enchantmentName, Enchantment::getByName);
                 } catch (IllegalArgumentException ex) {
                     Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
-                            ".enchants.", _enchantment.toUpperCase(Locale.ENGLISH), " into an enchantment, skipping...");
+                            ".enchants.", enchantmentName.toUpperCase(Locale.ENGLISH), " into an enchantment, skipping...");
                     continue;
                 }
 
-                itemBuilder.withEnchant(enchantment, section.getInt("enchants." + _enchantment));
+                itemBuilder.withEnchant(enchantment, section.getInt("enchants." + enchantmentName));
             }
         }
 
@@ -344,19 +346,19 @@ public class MenuParserImpl implements MenuParser {
             itemBuilder.makeItemGlow();
         }
 
-        if (section.contains("flags")) {
+        if (section.isList("flags")) {
             for (String flag : section.getStringList("flags")) {
                 String flagName = flag.toUpperCase(Locale.ENGLISH);
                 try {
                     itemBuilder.withFlags(ItemFlag.valueOf(flagName));
                 } catch (IllegalArgumentException error) {
                     Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
-                            " (", flagName, ") into an ItemFlag, skipping...");
+                            " (", flagName, ") into an item flag, skipping...");
                 }
             }
         }
 
-        if (section.contains("skull")) {
+        if (section.isString("skull")) {
             itemBuilder.asSkullOf(section.getString("skull"));
         }
 
@@ -364,25 +366,25 @@ public class MenuParserImpl implements MenuParser {
             itemBuilder.setUnbreakable();
         }
 
-        if (section.contains("effects")) {
+        if (section.isConfigurationSection("effects")) {
             ConfigurationSection effectsSection = section.getConfigurationSection("effects");
-            for (String _effect : effectsSection.getKeys(false)) {
+            for (String effectName : effectsSection.getKeys(false)) {
                 PotionEffectType potionEffectType;
 
                 try {
-                    potionEffectType = getMinecraftEnum(PotionEffectType.class, _effect, PotionEffectType::getByName);
+                    potionEffectType = getMinecraftEnum(PotionEffectType.class, effectName, PotionEffectType::getByName);
                 } catch (IllegalArgumentException error) {
                     Log.warnFromFile(fileName, "Couldn't convert ", effectsSection.getCurrentPath(),
-                            ".", _effect.toUpperCase(Locale.ENGLISH), " into a potion effect, skipping...");
+                            ".", effectName.toUpperCase(Locale.ENGLISH), " into a potion effect, skipping...");
                     continue;
                 }
 
-                int duration = effectsSection.getInt(_effect + ".duration", -1);
-                int amplifier = effectsSection.getInt(_effect + ".amplifier", 0);
+                int duration = effectsSection.getInt(effectName + ".duration", -1);
+                int amplifier = effectsSection.getInt(effectName + ".amplifier", 0);
 
                 if (duration == -1) {
                     Log.warnFromFile(fileName, "Potion effect ", effectsSection.getCurrentPath(),
-                            ".", _effect, " is missing duration, skipping...");
+                            ".", effectName, " is missing duration, skipping...");
                     continue;
                 }
 
@@ -390,7 +392,7 @@ public class MenuParserImpl implements MenuParser {
             }
         }
 
-        if (section.contains("entity")) {
+        if (section.isString("entity")) {
             String entity = section.getString("entity");
             try {
                 itemBuilder.withEntityType(getMinecraftEnum(EntityType.class, entity));
@@ -399,11 +401,68 @@ public class MenuParserImpl implements MenuParser {
             }
         }
 
-        if (section.contains("customModel")) {
+        if (section.isConfigurationSection("bannerMeta")) {
+            for (String dyeColorName : section.getConfigurationSection("bannerMeta").getKeys(false)) {
+                DyeColor dyeColor;
+                PatternType patternType;
+
+                try {
+                    dyeColor = DyeColor.valueOf(dyeColorName.toUpperCase(Locale.ENGLISH));
+                } catch (IllegalArgumentException error) {
+                    Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
+                            ".bannerMeta.", dyeColorName.toUpperCase(Locale.ENGLISH), " into an dye color, skipping...");
+                    continue;
+                }
+
+                try {
+                    patternType = PatternType.valueOf(section.getString("bannerMeta." + dyeColorName));
+                } catch (IllegalArgumentException error) {
+                    Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
+                            ".bannerMeta.", dyeColorName.toUpperCase(Locale.ENGLISH), ".",
+                            section.getString("bannerMeta." + dyeColorName), " into an pattern type, skipping...");
+                    continue;
+                }
+
+                itemBuilder.withBannerMeta(dyeColor, patternType);
+            }
+        }
+
+        if (section.isInt("customModel")) {
             itemBuilder.withCustomModel(section.getInt("customModel"));
         }
 
-        if (section.contains("leatherColor")) {
+        if (section.isString("itemModel")) {
+            itemBuilder.withItemModel(section.getString("itemModel"));
+        }
+
+        if (section.isString("rarity")) {
+            String rarity = section.getString("rarity");
+
+            try {
+                itemBuilder.withRarity(rarity);
+            } catch (IllegalArgumentException error) {
+                Log.warnFromFile(fileName, "Couldn't convert ", rarity, " into a rarity, skipping...");
+            }
+        }
+
+        if (section.isConfigurationSection("trim")) {
+            String trimMaterial = section.getString("trim.material");
+            String trimPattern = section.getString("trim.pattern");
+
+            if (trimMaterial == null) {
+                Log.warnFromFile(fileName, "Couldn't find trim material for item with trim pattern, skipping...");
+            } else if (trimPattern == null) {
+                Log.warnFromFile(fileName, "Couldn't find trim pattern for item with trim material, skipping...");
+            } else {
+                try {
+                    itemBuilder.withTrim(trimMaterial, trimPattern);
+                } catch (IllegalArgumentException error) {
+                    Log.warnFromFile(fileName, error.getMessage());
+                }
+            }
+        }
+
+        if (section.isString("leatherColor")) {
             String leatherColor = section.getString("leatherColor");
             if (leatherColor.startsWith("#"))
                 leatherColor = leatherColor.substring(1);
@@ -419,7 +478,7 @@ public class MenuParserImpl implements MenuParser {
     }
 
     public List<Integer> parseButtonSlots(ConfigurationSection section, String key, MenuPatternSlots menuPatternSlots) {
-        return !section.contains(key) ? Collections.emptyList() : menuPatternSlots.getSlots(section.getString(key));
+        return !section.isString(key) ? Collections.emptyList() : menuPatternSlots.getSlots(section.getString(key));
     }
 
     private static <T> T getMinecraftEnum(Class<T> type, String name) throws IllegalArgumentException {

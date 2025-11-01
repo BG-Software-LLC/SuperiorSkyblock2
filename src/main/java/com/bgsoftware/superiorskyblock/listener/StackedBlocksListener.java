@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.StackedBlocksDepositMenu;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
@@ -24,14 +25,16 @@ import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +44,11 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     @Nullable
     private static final Material COPPER_BLOCK = EnumHelper.getEnum(Material.class, "COPPER_BLOCK");
     private static final Material HONEYCOMB = EnumHelper.getEnum(Material.class, "HONEYCOMB");
+    @Nullable
+    private static final CreatureSpawnEvent.SpawnReason BUILD_COPPERGOLEM = EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "BUILD_COPPERGOLEM");
+    @Nullable
+    private static final Material COPPER_CHEST = EnumHelper.getEnum(Material.class, "COPPER_CHEST");
+
     private final Map<CreatureSpawnEvent.SpawnReason, List<BlockOffset>> ENTITY_TEMPLATE_OFFSETS = buildEntityTemplateOffsetsMap();
 
     private final LazyReference<StackedBlocksInteractionService> stackedBlocksInteractionService = new LazyReference<StackedBlocksInteractionService>() {
@@ -67,6 +75,11 @@ public class StackedBlocksListener extends AbstractGameEventListener {
 
     private void onStackedBlockPlace(GameEvent<GameEventArgs.BlockPlaceEvent> e) {
         Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
         Block againstBlock = e.getArgs().againstBlock;
 
         if (againstBlock.equals(block))
@@ -97,6 +110,9 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     }
 
     private boolean handleStackedBlockPlace(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
+        if (!plugin.getSettings().getStackedBlocks().isEnabled())
+            return false;
+
         boolean cancelled = false;
 
         Player player = e.getArgs().player;
@@ -149,6 +165,10 @@ public class StackedBlocksListener extends AbstractGameEventListener {
 
         Block clickedBlock = e.getArgs().clickedBlock;
 
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(clickedBlock.getWorld()))
+            return false;
+
         if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) <= 1)
             return false;
 
@@ -182,10 +202,17 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     }
 
     private void onStackedBlockExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
-        List<Block> blockList = new LinkedList<>(e.getArgs().blocks);
-        ItemStack blockItem;
+        if (e.getArgs().isSoftExplosion)
+            return;
 
-        for (Block block : blockList) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().entity.getWorld()))
+            return;
+
+        Iterator<Block> blockIterator = e.getArgs().blocks.iterator();
+        while (blockIterator.hasNext()) {
+            Block block = blockIterator.next();
+
             // Check if block is stackable
             if (!plugin.getSettings().getStackedBlocks().getWhitelisted().contains(Keys.of(block)))
                 continue;
@@ -196,9 +223,9 @@ public class StackedBlocksListener extends AbstractGameEventListener {
                 continue;
 
             // All checks are done. We can remove the block from the list.
-            e.getArgs().blocks.remove(block);
+            blockIterator.remove();
 
-            blockItem = block.getState().getData().toItemStack(amount);
+            ItemStack blockItem = block.getState().getData().toItemStack(amount);
 
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 Location location = block.getLocation(wrapper.getHandle());
@@ -213,12 +240,17 @@ public class StackedBlocksListener extends AbstractGameEventListener {
                 // Dropping the item
                 block.getWorld().dropItemNaturally(location, blockItem);
             }
+
         }
     }
 
     /* STACKED-BLOCKS PROTECTION */
 
     private void onPistonExtend(GameEvent<GameEventArgs.PistonExtendEvent> e) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().block.getWorld()))
+            return;
+
         for (Block block : e.getArgs().blocks) {
             if (plugin.getStackedBlocks().getStackedBlockAmount(block) > 1) {
                 e.setCancelled();
@@ -228,6 +260,10 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     }
 
     public void onPistonRetract(GameEvent<GameEventArgs.PistonRetractEvent> e) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().block.getWorld()))
+            return;
+
         for (Block block : e.getArgs().blocks) {
             if (plugin.getStackedBlocks().getStackedBlockAmount(block) > 1) {
                 e.setCancelled();
@@ -237,18 +273,27 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     }
 
     private void onBlockChangeState(GameEvent<GameEventArgs.BlockFormEvent> e) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().block.getWorld()))
+            return;
+
         if (plugin.getStackedBlocks().getStackedBlockAmount(e.getArgs().block) > 1)
             e.setCancelled();
     }
 
     private void onGolemCreate(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
         List<BlockOffset> entityTemplateOffsets = ENTITY_TEMPLATE_OFFSETS.get(e.getArgs().spawnReason);
-
         if (entityTemplateOffsets == null)
             return;
 
+        Entity entity = e.getArgs().entity;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
+            return;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location entityLocation = e.getArgs().entity.getLocation(wrapper.getHandle());
+            Location entityLocation = entity.getLocation(wrapper.getHandle());
 
             if (plugin.getStackedBlocks().getStackedBlockAmount(entityLocation) > 1) {
                 e.setCancelled();
@@ -258,18 +303,37 @@ public class StackedBlocksListener extends AbstractGameEventListener {
             for (BlockOffset blockOffset : entityTemplateOffsets) {
                 if (plugin.getStackedBlocks().getStackedBlockAmount(blockOffset.applyToLocation(entityLocation)) > 1) {
                     e.setCancelled();
+                    if (e.getArgs().spawnReason == BUILD_COPPERGOLEM)
+                        onCopperGolemCancel(entityLocation);
                     return;
                 }
             }
         }
     }
 
+    private void onCopperGolemCancel(Location entityLocation) {
+        Block copperChestBlock = entityLocation.getBlock().getRelative(BlockFace.DOWN);
+        BukkitExecutor.sync(() -> {
+            if (copperChestBlock.getType() == COPPER_CHEST) {
+                copperChestBlock.setType(COPPER_BLOCK);
+            }
+        }, 1L);
+    }
+
     private void onSpongeAbsorb(GameEvent<GameEventArgs.SpongeAbsorbEvent> e) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().block.getWorld()))
+            return;
+
         if (plugin.getStackedBlocks().getStackedBlockAmount(e.getArgs().block) > 1)
             e.setCancelled();
     }
 
     private void onStackedBlockPhysics(GameEvent<GameEventArgs.BlockPhysicsEvent> e) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().block.getWorld()))
+            return;
+
         if (plugin.getStackedBlocks().getStackedBlockAmount(e.getArgs().block) > 1)
             e.setCancelled();
     }
@@ -277,7 +341,15 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     /* INTERNAL */
 
     private void registerListeners() {
-        registerCallback(GameEventType.BLOCK_PLACE_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockPlace);
+        if (!plugin.getSettings().getStackedBlocks().isEnabled()) {
+            // Even if stacked blocks are disabled, we might want to keep the break or change related listeners.
+            // We only want to keep them if there are any stacked blocks registered.
+            if (!plugin.getStackedBlocks().hasStackedBlocks())
+                return;
+        } else {
+            registerCallback(GameEventType.BLOCK_PLACE_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockPlace);
+        }
+
         registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockBreak);
         registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockInteract);
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockBreakByEntity);
@@ -286,39 +358,47 @@ public class StackedBlocksListener extends AbstractGameEventListener {
         registerCallback(GameEventType.PISTON_RETRACT_EVENT, GameEventPriority.LOWEST, this::onPistonRetract);
         registerCallback(GameEventType.BLOCK_FORM_EVENT, GameEventPriority.LOWEST, this::onBlockChangeState);
         registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.LOWEST, this::onGolemCreate);
-        registerCallback(GameEventType.BLOCK_PHYSICS_EVENT, GameEventPriority.LOWEST, this::onStackedBlockPhysics);
         registerCallback(GameEventType.SPONGE_ABSORB_EVENT, GameEventPriority.LOWEST, this::onSpongeAbsorb);
+
+        if (plugin.getSettings().isPhysicsListener())
+            registerCallback(GameEventType.BLOCK_PHYSICS_EVENT, GameEventPriority.LOWEST, this::onStackedBlockPhysics);
     }
 
     private static Map<CreatureSpawnEvent.SpawnReason, List<BlockOffset>> buildEntityTemplateOffsetsMap() {
         EnumMap<CreatureSpawnEvent.SpawnReason, List<BlockOffset>> offsetsMap = new EnumMap<>(CreatureSpawnEvent.SpawnReason.class);
 
-        offsetsMap.put(CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM, Arrays.asList(
-                SBlockOffset.fromOffsets(0, 1, 0),
-                SBlockOffset.fromOffsets(1, 1, 0),
-                SBlockOffset.fromOffsets(1, 1, 1),
-                SBlockOffset.fromOffsets(-1, 1, 0),
-                SBlockOffset.fromOffsets(-1, 1, -1),
-                SBlockOffset.fromOffsets(0, 2, 0)
-        ));
+        List<BlockOffset> blockOffsets = new LinkedList<>();
+        blockOffsets.add(SBlockOffset.fromOffsets(0, 1, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(1, 1, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(1, 1, 1));
+        blockOffsets.add(SBlockOffset.fromOffsets(-1, 1, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(-1, 1, -1));
+        blockOffsets.add(SBlockOffset.fromOffsets(0, 2, 0));
+        offsetsMap.put(CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM, blockOffsets);
 
-        offsetsMap.put(CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN, Arrays.asList(
-                SBlockOffset.fromOffsets(0, 1, 0),
-                SBlockOffset.fromOffsets(0, 2, 0)
-        ));
+        blockOffsets = new LinkedList<>();
+        blockOffsets.add(SBlockOffset.fromOffsets(0, 1, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(0, 2, 0));
+        offsetsMap.put(CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN, blockOffsets);
 
-        offsetsMap.put(CreatureSpawnEvent.SpawnReason.BUILD_WITHER, Arrays.asList(
-                SBlockOffset.fromOffsets(0, 1, 0),
-                SBlockOffset.fromOffsets(1, 1, 0),
-                SBlockOffset.fromOffsets(1, 1, 1),
-                SBlockOffset.fromOffsets(-1, 1, 0),
-                SBlockOffset.fromOffsets(-1, 1, -1),
-                SBlockOffset.fromOffsets(0, 2, 0),
-                SBlockOffset.fromOffsets(1, 2, 0),
-                SBlockOffset.fromOffsets(1, 2, 1),
-                SBlockOffset.fromOffsets(-1, 2, 0),
-                SBlockOffset.fromOffsets(-1, 2, -1)
-        ));
+        blockOffsets = new LinkedList<>();
+        blockOffsets.add(SBlockOffset.fromOffsets(0, 1, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(1, 1, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(1, 1, 1));
+        blockOffsets.add(SBlockOffset.fromOffsets(-1, 1, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(-1, 1, -1));
+        blockOffsets.add(SBlockOffset.fromOffsets(0, 2, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(1, 2, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(1, 2, 1));
+        blockOffsets.add(SBlockOffset.fromOffsets(-1, 2, 0));
+        blockOffsets.add(SBlockOffset.fromOffsets(-1, 2, -1));
+        offsetsMap.put(CreatureSpawnEvent.SpawnReason.BUILD_WITHER, blockOffsets);
+
+        if (BUILD_COPPERGOLEM != null) {
+            blockOffsets = new LinkedList<>();
+            blockOffsets.add(SBlockOffset.fromOffsets(0, -1, 0));
+            offsetsMap.put(BUILD_COPPERGOLEM, blockOffsets);
+        }
 
         return Collections.unmodifiableMap(offsetsMap);
     }

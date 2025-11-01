@@ -2,12 +2,14 @@ package com.bgsoftware.superiorskyblock.world.schematic;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
+import org.bukkit.Location;
 
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +40,11 @@ public abstract class BaseSchematic implements Schematic {
     @Override
     public Map<Key, Integer> getBlockCounts() {
         return Collections.unmodifiableMap(cachedCounts);
+    }
+
+    @Override
+    public void pasteSchematic(Island island, Location location, Runnable callback) {
+        pasteSchematic(island, location, callback, null);
     }
 
     public abstract List<ChunkPosition> getAffectedChunks();

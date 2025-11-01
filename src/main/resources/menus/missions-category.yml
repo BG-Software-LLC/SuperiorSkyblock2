@@ -33,15 +33,19 @@ items:
 
 sounds:
   '@':
+    locked:
+      type: ANVIL_LAND
+      volume: 0.2
+      pitch: 0.2
     completed:
-      type: BLOCK_ANVIL_PLACE
+      type: ANVIL_LAND
       volume: 0.2
       pitch: 0.2
     not-completed:
-      type: BLOCK_ANVIL_PLACE
+      type: ANVIL_LAND
       volume: 0.2
       pitch: 0.2
     can-complete:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2

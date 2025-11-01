@@ -2,8 +2,6 @@ package com.bgsoftware.superiorskyblock.island.upgrade;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.api.world.Dimension;
-import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
 import com.bgsoftware.superiorskyblock.core.value.IntValue;
 import com.bgsoftware.superiorskyblock.core.value.Value;
@@ -25,21 +23,17 @@ public class DefaultUpgradeLevel extends SUpgradeLevel {
                 IntValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getWarpsLimit()),
                 IntValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getCoopLimit()),
                 IntValue.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getIslandSize()),
-                (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getBlockLimits(),
-                (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getEntityLimits(),
-                convertFromArray(plugin.getSettings().getDefaultValues().getGeneratorsUnsafe()),
-                Collections.emptyMap(),
+                Value.syncedSupplied(() -> (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getBlockLimits()),
+                Value.syncedSupplied(() -> (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getEntityLimits()),
+                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getRealGeneratorsMap()),
+                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getIslandEffects()),
                 Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getBankLimit()),
-                plugin.getSettings().getDefaultValues().getRoleLimitsAsView()
+                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getRoleLimitsAsView())
         );
     }
 
     public static DefaultUpgradeLevel getInstance() {
         return INSTANCE;
-    }
-
-    private static <V> EnumerateMap<Dimension, V> convertFromArray(V[] arr) {
-        return new EnumerateMap<>(arr);
     }
 
 }

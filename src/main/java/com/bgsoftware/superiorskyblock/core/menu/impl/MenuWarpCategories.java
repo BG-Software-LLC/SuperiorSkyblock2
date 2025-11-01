@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpCategoryPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -69,7 +70,7 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
         return new MenuWarpCategories(menuParseResult, editLore, rowsSize);
     }
 
-    public static class View extends AbstractPagedMenuView<View, IslandViewArgs, WarpCategory> {
+    public static class View extends AbstractPagedMenuView<View, IslandViewArgs, WarpCategory> implements IIslandMenuView {
 
         private final Island island;
         private final boolean hasManagePerms;
@@ -82,20 +83,19 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
         }
 
         @Override
-        protected List<WarpCategory> requestObjects() {
-            DynamicArray<WarpCategory> warpCategories = new DynamicArray<>();
-            island.getWarpCategories().values().forEach(warpCategory -> {
-                warpCategory.getWarps()
-                        .stream()
-                        .filter(islandWarp -> island.isMember(getInventoryViewer()) || !islandWarp.hasPrivateFlag())
-                        .findAny()
-                        .ifPresent(unused -> warpCategories.set(warpCategory.getSlot(), warpCategory));
-            });
-            return warpCategories.toList();
-        }
-
         public Island getIsland() {
             return island;
+        }
+
+        @Override
+        protected List<WarpCategory> requestObjects() {
+            DynamicArray<WarpCategory> warpCategories = new DynamicArray<>();
+            island.getWarpCategories().values().forEach(warpCategory -> warpCategory.getWarps()
+                    .stream()
+                    .filter(islandWarp -> island.isMember(getInventoryViewer()) || !islandWarp.hasPrivateFlag())
+                    .findAny()
+                    .ifPresent(unused -> warpCategories.set(warpCategory.getSlot(), warpCategory)));
+            return warpCategories.toList();
         }
 
         public boolean hasManagePerms() {
@@ -105,7 +105,7 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
     }
 
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
-        if (newMenu.contains("slots") || !newMenu.contains("items"))
+        if (newMenu.isString("slots") || !newMenu.isConfigurationSection("items"))
             return false;
 
         String itemChar = newMenu.getConfigurationSection("items")

@@ -41,24 +41,24 @@ import java.io.IOException;
  *
  * @author Graham Edgecombe
  */
-@SuppressWarnings("WeakerAccess")
 public class EndTag extends Tag<Object> {
 
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagEnd");
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = NMSTagConverter.choice("NBTTagEnd", "EndTag");
 
-    /**
-     * Creates the tag.
-     */
-    public EndTag() {
-        super(null, CLASS);
+    private static final EndTag INSTANCE = new EndTag();
+
+    private EndTag() {
+        super(null);
     }
 
-    public static EndTag fromStream(DataInputStream is, int depth) throws IOException {
-        if (depth == 0) {
-            throw new IOException("TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
-        } else {
-            return new EndTag();
-        }
+    @Override
+    protected void writeData(DataOutputStream os) {
+        // Do nothing.
+    }
+
+    @Override
+    protected NMSTagConverter getNMSConverter() {
+        return TAG_CONVERTER;
     }
 
     @Override
@@ -66,9 +66,16 @@ public class EndTag extends Tag<Object> {
         return "TAG_End";
     }
 
-    @Override
-    protected void writeData(DataOutputStream os) {
-        // Do nothing.
+    public static EndTag of() {
+        return INSTANCE;
+    }
+
+    public static EndTag fromStream(DataInputStream is, int depth) throws IOException {
+        if (depth == 0) {
+            throw new IOException("TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
+        } else {
+            return EndTag.INSTANCE;
+        }
     }
 
 }

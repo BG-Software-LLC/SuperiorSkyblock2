@@ -22,6 +22,8 @@ public class KeyBlocksCache {
         return BLOCK_TO_KEY.computeIfAbsent(blockData, unused -> {
             Block block = blockData.getBlock();
             Material blockType = CraftMagicNumbers.getMaterial(block);
+            if (blockType == null)
+                return null;
             byte data = (byte) block.toLegacyData(blockData);
             return Keys.of(blockType, data);
         });

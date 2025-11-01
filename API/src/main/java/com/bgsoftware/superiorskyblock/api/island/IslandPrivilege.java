@@ -14,16 +14,37 @@ public class IslandPrivilege implements Enumerable {
     private static int ordinalCounter = 0;
 
     private final String name;
+    private final Type type;
     private final int ordinal;
 
-    private IslandPrivilege(String name) {
+    private IslandPrivilege(String name, Type type) {
         this.name = name.toUpperCase(Locale.ENGLISH);
+        this.type = type;
         this.ordinal = ordinalCounter++;
     }
 
     @Override
     public int ordinal() {
         return this.ordinal;
+    }
+
+    /**
+     * Get the name of the island privilege.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Get the type of the privilege.
+     */
+    public Type getType() {
+        return type;
+    }
+
+    @Override
+    public String toString() {
+        return "IslandPrivilege{name=" + name + ", type=" + type + "}";
     }
 
     /**
@@ -49,30 +70,48 @@ public class IslandPrivilege implements Enumerable {
     }
 
     /**
-     * Register a new island privilege.
+     * Register a new {@link Type#ACTION} island privilege.
      *
      * @param name The name for the island privilege.
      */
     public static void register(String name) {
+        register(name, Type.ACTION);
+    }
+
+    /**
+     * Register a new island privilege.
+     *
+     * @param name The name for the island privilege.
+     * @param type The type of the privilege.
+     */
+    public static void register(String name, Type type) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
+        Preconditions.checkNotNull(type, "name parameter cannot be null.");
 
         name = name.toUpperCase(Locale.ENGLISH);
 
         Preconditions.checkState(!islandPrivileges.containsKey(name), "IslandPrivilege with the name " + name + " already exists.");
 
-        islandPrivileges.put(name, new IslandPrivilege(name));
+        islandPrivileges.put(name, new IslandPrivilege(name, type));
     }
 
     /**
-     * Get the name of the island privilege.
+     * Represents the type of IslandPrivilege.
      */
-    public String getName() {
-        return name;
-    }
+    public enum Type {
 
-    @Override
-    public String toString() {
-        return "IslandPrivilege{name=" + name + "}";
+        /**
+         * The ACTION type is given for privileges that allow player to do actions on islands.
+         * Privileges of this type can be given to visitors, coops and players that are not part of the island team.
+         */
+        ACTION,
+
+        /**
+         * The COMMAND type is given for privileges that give access to commands on the island.
+         * Privileges of this type can only be given to players that are part of the island.
+         */
+        COMMAND
+
     }
 
 }

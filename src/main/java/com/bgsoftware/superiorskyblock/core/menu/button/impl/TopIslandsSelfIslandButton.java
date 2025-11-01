@@ -114,9 +114,7 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
         ItemBuilder itemBuilder = islandItem.getBuilder().asSkullOf(islandOwner);
 
         String islandName = !plugin.getSettings().getIslandNames().isIslandTop() ||
-                island.getName().isEmpty() ? islandOwner.getName() :
-                plugin.getSettings().getIslandNames().isColorSupport() ?
-                        Formatters.COLOR_FORMATTER.format(island.getName()) : island.getName();
+                island.getName().isEmpty() ? islandOwner.getName() : island.getName();
 
         itemBuilder.replaceName("{0}", islandName)
                 .replaceName("{1}", String.valueOf(place))

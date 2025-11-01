@@ -12,7 +12,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -27,14 +26,6 @@ import java.util.List;
 public class GameEventArgs implements IEventArgs {
 
     private GameEventArgs() {
-
-    }
-
-    public static class AttemptEntitySpawnEvent extends GameEventArgs {
-
-        public EntityType entityType;
-        public Location spawnLocation;
-        public CreatureSpawnEvent.SpawnReason spawnReason;
 
     }
 
@@ -237,6 +228,7 @@ public class GameEventArgs implements IEventArgs {
     public static class EntityExplodeEvent extends EntityEvent {
 
         public List<Block> blocks;
+        public boolean isSoftExplosion;
 
     }
 
@@ -313,11 +305,16 @@ public class GameEventArgs implements IEventArgs {
 
     }
 
-
     public static class BlockDispenseEvent extends BlockEvent {
 
         public ItemStack dispensedItem;
         public Vector velocity;
+
+    }
+
+    public static class BlockFadeEvent extends BlockEvent {
+
+        public BlockState newState;
 
     }
 

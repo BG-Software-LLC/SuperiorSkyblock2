@@ -1,0 +1,123 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lSelect Language...'
+previous-menu: true
+
+pattern:
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ # % * + ^ ~ 1 @'
+  - '@ @ - = ! 2 3 @ @'
+  - '@ @ @ @ @ @ @ @ @'
+
+items:
+  '#':
+    language: 'en-US'
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGNhYzk3NzRkYTEyMTcyNDg1MzJjZTE0N2Y3ODMxZjY3YTEyZmRjY2ExY2YwY2I0YjM4NDhkZTZiYzk0YjQifX19'
+    name: '&eEnglish'
+    lore:
+      - '&7Change language to English.'
+  '%':
+    language: 'iw-IL'
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWJhMDg2YTJjYzcyNzJjZjViYTQ5YzgwMjQ4NTQ2YzIyZTVlZjFiYWI1NDEyMGU4YThlNWQ5ZTc1YjZhIn19fQ=='
+    name: '&eHebrew'
+    lore:
+      - '&7Change language to Hebrew.'
+  '*':
+    language: 'vi-VN'
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGE1N2I5ZDdkZDA0MTY5NDc4Y2ZkYjhkMGI2ZmQwYjhjODJiNjU2NmJiMjgzNzFlZTlhN2M3YzE2NzFhZDBiYiJ9fX0='
+    name: '&eVietnamese'
+    lore:
+      - '&7Change language to Vietnamese.'
+  '+':
+    language: 'pl-PL'
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTIxYjJhZjhkMjMyMjI4MmZjZTRhMWFhNGYyNTdhNTJiNjhlMjdlYjMzNGY0YTE4MWZkOTc2YmFlNmQ4ZWIifX19'
+    name: '&ePolish'
+    lore:
+      - '&7Change language to Polish.'
+  '2':
+    language: 'pt-BR'
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWE0NjQ3NWQ1ZGNjODE1ZjZjNWYyODU5ZWRiYjEwNjExZjNlODYxYzBlYjE0ZjA4ODE2MWIzYzBjY2IyYjBkOSJ9fX0='
+    name: '&eBrazilian Portuguese'
+    lore:
+      - '&7Change language to Brazilian Portuguese.'
+  '^':
+    language: 'it-IT'
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODVjZTg5MjIzZmE0MmZlMDZhZDY1ZDhkNDRjYTQxMmFlODk5YzgzMTMwOWQ2ODkyNGRmZTBkMTQyZmRiZWVhNCJ9fX0='
+    name: '&eItalian'
+    lore:
+      - '&7Change language to Italian.'
+  '~':
+    language: 'zh-CN'
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2Y5YmMwMzVjZGM4MGYxYWI1ZTExOThmMjlmM2FkM2ZkZDJiNDJkOWE2OWFlYjY0ZGU5OTA2ODE4MDBiOThkYyJ9fX0='
+    name: '&eSimplified Chinese'
+    lore:
+      - '&7Change language to Simplified Chinese.'
+  '1':
+    language: 'ru-RU'
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTZlYWZlZjk4MGQ2MTE3ZGFiZTg5ODJhYzRiNDUwOTg4N2UyYzQ2MjFmNmE4ZmU1YzliNzM1YTgzZDc3NWFkIn19fQ=='
+    name: '&eRussian'
+    lore:
+      - '&7Change language to Russian.'
+  '-':
+    language: 'fr-FR'
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTEyNjlhMDY3ZWUzN2U2MzYzNWNhMWU3MjNiNjc2ZjEzOWRjMmRiZGRmZjk2YmJmZWY5OWQ4YjM1Yzk5NmJjIn19fQ=='
+    name: '&eFrench'
+    lore:
+      - '&7Change language to French.'
+  '=':
+    language: 'es-ES'
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzJiZDQ1MjE5ODMzMDllMGFkNzZjMWVlMjk4NzQyODc5NTdlYzNkOTZmOGQ4ODkzMjRkYThjODg3ZTQ4NWVhOCJ9fX0='
+    name: '&eSpanish'
+    lore:
+      - '&7Change language to Spanish.'
+  '!':
+    language: 'de-DE'
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWU3ODk5YjQ4MDY4NTg2OTdlMjgzZjA4NGQ5MTczZmU0ODc4ODY0NTM3NzQ2MjZiMjRiZDhjZmVjYzc3YjNmIn19fQ=='
+    name: '&eGerman'
+    lore:
+      - '&7Change language to German.'
+  '3':
+    language: 'tr-TR'
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmJiZWFmNTJlMWM0YmZjZDhhMWY0YzY5MTMyMzRiODQwMjQxYWE0ODgyOWMxNWFiYzZmZjhmZGY5MmNkODllIn19fQ=='
+    name: '&eTurkish'
+    lore:
+      - '&7Change language to Turkish.'
+
+sounds:
+  '#':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '^':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2

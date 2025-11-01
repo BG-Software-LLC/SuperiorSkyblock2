@@ -1,0 +1,57 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&8&l{}'
+previous-menu: true
+
+pattern:
+  - '$ $ $ $ $ $ $ $ $'
+  - '$ # # # # # # # $'
+  - '$ # @ # % # ^ # $'
+  - '$ # # # # # # # $'
+  - '$ $ $ $ $ $ $ $ $'
+
+roles: '@'
+ban: '%'
+kick: '^'
+
+items:
+  '$':
+    type: STAINED_GLASS_PANE
+    data: 15
+    name: '&f'
+  '@':
+    type: DIAMOND_CHESTPLATE
+    name: '&ePlayer Role'
+    lore:
+      - '&7Click to edit player''s role.'
+    flags:
+      - HIDE_ATTRIBUTES
+  '%':
+    type: BARRIER
+    name: '&eBan Player'
+    lore:
+      - '&7Click to ban the player from the island.'
+  '^':
+    type: SKULL_ITEM
+    name: '&eKick Player'
+    lore:
+      - '&7Click to kick the player from the island.'
+
+sounds:
+  '@':
+    type: BLOCK_CHEST_OPEN
+    volume: 0.8
+    pitch: 1
+  '%':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '^':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2

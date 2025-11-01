@@ -19,4 +19,6 @@ public interface RolesContainer {
 
     void addPlayerRole(PlayerRole playerRole);
 
+    void clearRoles();
+
 }

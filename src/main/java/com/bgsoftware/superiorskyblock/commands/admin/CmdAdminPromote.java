@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -97,6 +98,13 @@ public class CmdAdminPromote implements IAdminPlayerCommand {
 
         Message.PROMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getPlayerRole());
         Message.GOT_PROMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
+    }
+
+    @Override
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        return args.length == 3 ? CommandTabCompletes.getOnlinePlayersWithIsland(plugin, args[2], false,
+                superiorPlayer -> !superiorPlayer.getIslandLeader().equals(superiorPlayer) &&
+                        !superiorPlayer.getPlayerRole().getNextRole().isLastRole()) : Collections.emptyList();
     }
 
 }

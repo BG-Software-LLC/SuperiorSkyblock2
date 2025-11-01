@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
@@ -18,6 +19,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpManageLocationB
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpManagePrivateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpManageRenameButton;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class MenuWarpManage extends AbstractMenu<MenuWarpManage.View, MenuWarpManage.Args> {
@@ -80,13 +82,18 @@ public class MenuWarpManage extends AbstractMenu<MenuWarpManage.View, MenuWarpMa
 
     }
 
-    public static class View extends AbstractMenuView<View, Args> {
+    public static class View extends AbstractMenuView<View, Args> implements IIslandMenuView {
 
         private final IslandWarp islandWarp;
 
         protected View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView, Menu<View, Args> menu, Args args) {
             super(inventoryViewer, previousMenuView, menu);
             this.islandWarp = args.islandWarp;
+        }
+
+        @Override
+        public Island getIsland() {
+            return this.islandWarp.getIsland();
         }
 
         public IslandWarp getIslandWarp() {

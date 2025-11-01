@@ -44,14 +44,14 @@ items:
 
 sounds:
   '@':
-    type: BLOCK_CHEST_OPEN
+    type: CHEST_OPEN
     volume: 0.8
     pitch: 1
   '%':
-    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    type: ORB_PICKUP
     volume: 0.2
     pitch: 0.2
   '^':
-    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    type: ORB_PICKUP
     volume: 0.2
     pitch: 0.2

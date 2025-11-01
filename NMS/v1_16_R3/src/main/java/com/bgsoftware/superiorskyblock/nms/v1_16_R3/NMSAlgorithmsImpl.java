@@ -102,7 +102,7 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         IBlockData blockData;
         try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
-            wrapper.getHandle().setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            wrapper.getHandle().d(location.getBlockX(), location.getBlockY(), location.getBlockZ());
             blockData = world.getType(wrapper.getHandle());
         }
         return Block.getCombinedId(blockData);
@@ -187,6 +187,21 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public void setCustomModel(ItemMeta itemMeta, int customModel) {
         itemMeta.setCustomModelData(customModel);
+    }
+
+    @Override
+    public void setItemModel(ItemMeta itemMeta, String itemModel) {
+        // Doesn't exist
+    }
+
+    @Override
+    public void setRarity(ItemMeta itemMeta, String rarity) {
+        // Doesn't exist
+    }
+
+    @Override
+    public void setTrim(ItemMeta itemMeta, String trimMaterial, String trimPattern) {
+        // Doesn't exist
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
@@ -17,9 +19,11 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.Directional;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class SignsListener extends AbstractGameEventListener {
 
@@ -33,8 +37,13 @@ public class SignsListener extends AbstractGameEventListener {
     }
 
     private void onSignPlace(GameEvent<GameEventArgs.SignChangeEvent> e) {
-        Player player = e.getArgs().player;
         Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
+        Player player = e.getArgs().player;
         String[] lines = e.getArgs().lines;
 
         String[] signLines;
@@ -80,21 +89,64 @@ public class SignsListener extends AbstractGameEventListener {
         }, 1L);
     }
 
-    public void onSignBreak(GameEvent<GameEventArgs.BlockBreakEvent> e) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
+    private void onSignBreak(GameEvent<GameEventArgs.BlockBreakEvent> e) {
         Block block = e.getArgs().block;
 
-        if (block.getState() instanceof Sign) {
-            IslandSigns.Result result = IslandSigns.handleSignBreak(superiorPlayer, (Sign) block.getState());
-            if (result.isCancelEvent())
-                e.setCancelled();
-
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
             return;
+
+        Island island;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            island = plugin.getGrid().getIslandAt(block.getLocation(wrapper.getHandle()));
+        }
+
+        if (!isValidIsland(island))
+            return;
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
+
+        IslandSigns.Result result = handleBlockBreak(island, block, superiorPlayer);
+        if (result.isCancelEvent())
+            e.setCancelled();
+    }
+
+    private void onSignExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
+        if (e.getArgs().isSoftExplosion)
+            return;
+
+        Entity entity = e.getArgs().entity;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
+            return;
+
+        Island island;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            island = plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()));
+        }
+
+        if (!isValidIsland(island))
+            return;
+
+        Iterator<Block> iterator = e.getArgs().blocks.iterator();
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+            IslandSigns.Result result = handleBlockBreak(island, block, null);
+            if (result.isCancelEvent())
+                iterator.remove();
+        }
+    }
+
+    private IslandSigns.Result handleBlockBreak(Island island, Block block, @Nullable SuperiorPlayer superiorPlayer) {
+        BlockState blockState = block.getState();
+        if (blockState instanceof Sign) {
+            return IslandSigns.handleSignBreak(island, superiorPlayer, (Sign) blockState);
         }
 
         for (BlockFace blockFace : NEARBY_BLOCKS) {
             Block faceBlock = block.getRelative(blockFace);
-            BlockState blockState = faceBlock.getState();
+            blockState = faceBlock.getState();
             if (!(blockState instanceof Sign))
                 continue;
 
@@ -125,18 +177,21 @@ public class SignsListener extends AbstractGameEventListener {
             }
 
             if (isSignGonnaBreak) {
-                IslandSigns.Result result = IslandSigns.handleSignBreak(superiorPlayer, (Sign) blockState);
-                if (result.isCancelEvent()) {
-                    e.setCancelled();
-                    return;
-                }
+                return IslandSigns.handleSignBreak(null, superiorPlayer, (Sign) blockState);
             }
         }
+
+        return new IslandSigns.Result(IslandSigns.Reason.SUCCESS, false);
     }
 
     private void registerListeners() {
-        registerCallback(GameEventType.SIGN_CHANGE_EVENT, GameEventPriority.NORMAL, this::onSignPlace);
-        registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.NORMAL, this::onSignBreak);
+        registerCallback(GameEventType.SIGN_CHANGE_EVENT, GameEventPriority.MONITOR, this::onSignPlace);
+        registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.MONITOR, this::onSignBreak);
+        registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.MONITOR, this::onSignExplode);
+    }
+
+    private static boolean isValidIsland(Island island) {
+        return island != null && (!island.getIslandWarps().isEmpty() || island.getVisitorsPosition(null) != null);
     }
 
 }

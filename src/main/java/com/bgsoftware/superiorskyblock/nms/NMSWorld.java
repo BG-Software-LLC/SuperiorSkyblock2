@@ -54,6 +54,8 @@ public interface NMSWorld {
 
     int getDefaultAmount(BlockState blockState);
 
+    boolean canPlayerSuffocate(Block block);
+
     void placeSign(Island island, Location location);
 
     void playGeneratorSound(Location location);
@@ -69,6 +71,8 @@ public interface NMSWorld {
     IslandsGenerator createGenerator(Dimension dimension);
 
     WorldEditSession createEditSession(World world);
+
+    WorldEditSession createPartialEditSession(Dimension dimension);
 
     ChunkReader createChunkReader(Chunk chunk);
 

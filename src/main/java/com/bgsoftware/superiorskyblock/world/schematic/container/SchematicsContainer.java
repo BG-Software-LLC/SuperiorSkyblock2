@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SchematicsContainer {
 
@@ -13,10 +14,12 @@ public interface SchematicsContainer {
 
     void addSchematic(Schematic schematic);
 
-    List<String> getSchematicNames();
+    Map<String, Schematic> getSchematics();
 
     void addSchematicParser(SchematicParser schematicParser);
 
     List<SchematicParser> getSchematicParsers();
+
+    void clearSchematics();
 
 }

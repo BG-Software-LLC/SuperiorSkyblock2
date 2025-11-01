@@ -1,6 +1,10 @@
 package com.bgsoftware.superiorskyblock.island.flag;
 
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+
+import java.util.Comparator;
+import java.util.Locale;
 
 public class IslandFlags {
 
@@ -27,12 +31,26 @@ public class IslandFlags {
     public static final IslandFlag WATER_FLOW = register("WATER_FLOW");
     public static final IslandFlag WITHER_EXPLOSION = register("WITHER_EXPLOSION");
 
+    private static String ALL_FLAG_NAMES;
+    private static int KNOWN_FLAGS_COUNT;
+
     private IslandFlags() {
 
     }
 
     public static void registerFlags() {
         // Do nothing, only trigger all the register calls
+    }
+
+    public static String getFlagsNames() {
+        if (ALL_FLAG_NAMES == null || KNOWN_FLAGS_COUNT != IslandFlag.values().size()) {
+            ALL_FLAG_NAMES = Formatters.COMMA_FORMATTER.format(IslandFlag.values().stream()
+                    .sorted(Comparator.comparing(IslandFlag::getName))
+                    .map(islandFlag -> islandFlag.getName().toLowerCase(Locale.ENGLISH)));
+            KNOWN_FLAGS_COUNT = IslandFlag.values().size();
+        }
+
+        return ALL_FLAG_NAMES;
     }
 
     private static IslandFlag register(String name) {

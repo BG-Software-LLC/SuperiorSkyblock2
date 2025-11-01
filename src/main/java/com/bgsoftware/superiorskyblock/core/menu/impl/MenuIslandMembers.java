@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.MembersPagedObjectB
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -45,7 +46,7 @@ public class MenuIslandMembers extends AbstractPagedMenu<MenuIslandMembers.View,
         return menuParseResult == null ? null : new MenuIslandMembers(menuParseResult);
     }
 
-    public static class View extends AbstractPagedMenuView<MenuIslandMembers.View, IslandViewArgs, SuperiorPlayer> {
+    public static class View extends AbstractPagedMenuView<MenuIslandMembers.View, IslandViewArgs, SuperiorPlayer> implements IIslandMenuView {
 
         private final Island island;
 
@@ -53,6 +54,17 @@ public class MenuIslandMembers extends AbstractPagedMenu<MenuIslandMembers.View,
              Menu<View, IslandViewArgs> menu, IslandViewArgs args) {
             super(inventoryViewer, previousMenuView, menu);
             this.island = args.getIsland();
+        }
+
+        @Override
+        public Island getIsland() {
+            return this.island;
+        }
+
+        @Override
+        public String replaceTitle(String title) {
+            return title.replace("{0}", String.valueOf(island.getIslandMembers(true).size())).
+                    replace("{1}", String.valueOf(island.getTeamLimit()));
         }
 
         @Override
@@ -84,7 +96,7 @@ public class MenuIslandMembers extends AbstractPagedMenu<MenuIslandMembers.View,
 
         int charCounter = 0;
 
-        if (cfg.contains("members-panel.fill-items")) {
+        if (cfg.isConfigurationSection("members-panel.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("members-panel.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

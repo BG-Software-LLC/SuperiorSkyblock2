@@ -9,15 +9,15 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
-import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
-import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
 import com.bgsoftware.superiorskyblock.core.value.IntValue;
@@ -25,7 +25,9 @@ import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgrade;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.island.upgrade.UpgradeRequirement;
+import com.bgsoftware.superiorskyblock.island.upgrade.container.IslandUpgrades;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
+import com.bgsoftware.superiorskyblock.module.IModuleConfiguration;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRankup;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetUpgrade;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSyncUpgrades;
@@ -45,9 +47,8 @@ import org.bukkit.potion.PotionEffectType;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -55,20 +56,35 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class UpgradesModule extends BuiltinModule {
+public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static final String[] IGNORED_SECTIONS = new String[]{"upgrades"};
     private static final int MAX_UPGRADES_NAME_LENGTH = 255;
 
-    private final List<IUpgradeType> enabledUpgrades = new LinkedList<>();
+    private final Map<Class<?>, IUpgradeType> classToUpgrade = new IdentityHashMap<>();
 
     public UpgradesModule() {
         super("upgrades");
     }
 
     @Override
-    protected void onPluginInit(SuperiorSkyblockPlugin plugin) {
-        super.onPluginInit(plugin);
-        convertOldUpgradesFile(plugin);
+    protected boolean onConfigCreate(SuperiorSkyblockPlugin plugin, CommentedConfiguration config, boolean firstTime) {
+        File oldUpgradesFile = new File(plugin.getDataFolder(), "upgrades.yml");
+        if (!oldUpgradesFile.exists())
+            return false;
+
+        CommentedConfiguration oldConfig = CommentedConfiguration.loadConfiguration(oldUpgradesFile);
+        boolean updatedConfig = false;
+
+        if (oldConfig.isConfigurationSection("upgrades")) {
+            config.set("upgrades", oldConfig.getConfigurationSection("upgrades"));
+        }
+
+        oldUpgradesFile.delete();
+
+        return updatedConfig;
     }
 
     @Override
@@ -88,12 +104,9 @@ public class UpgradesModule extends BuiltinModule {
 
     @Override
     public Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin) {
-        if (!isEnabled())
-            return null;
-
         List<Listener> listenersList = new ArrayList<>();
 
-        for (IUpgradeType upgradeType : enabledUpgrades) {
+        for (IUpgradeType upgradeType : this.configuration.enabledUpgrades) {
             listenersList.addAll(upgradeType.getListeners());
         }
 
@@ -107,10 +120,7 @@ public class UpgradesModule extends BuiltinModule {
 
     @Override
     public SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin) {
-        if (!isEnabled())
-            return null;
-
-        List<SuperiorCommand> adminCommands = enabledUpgrades.stream()
+        List<SuperiorCommand> adminCommands = this.configuration.enabledUpgrades.stream()
                 .map(IUpgradeType::getCommands)
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
@@ -123,62 +133,81 @@ public class UpgradesModule extends BuiltinModule {
     }
 
     @Override
-    public boolean isEnabled() {
-        return !enabledUpgrades.isEmpty() && isInitialized();
-    }
-
-    @Override
     protected String[] getIgnoredSections() {
-        return new String[]{"upgrades"};
+        return IGNORED_SECTIONS;
     }
 
     @Override
-    protected void updateConfig(SuperiorSkyblockPlugin plugin) {
-        enabledUpgrades.clear();
-
-        if (config.getBoolean("crop-growth", true))
-            enabledUpgrades.add(new UpgradeTypeCropGrowth(plugin));
-        if (config.getBoolean("mob-drops", true))
-            enabledUpgrades.add(new UpgradeTypeMobDrops(plugin));
-        if (config.getBoolean("island-effects", true))
-            enabledUpgrades.add(new UpgradeTypeIslandEffects(plugin));
-        if (config.getBoolean("spawner-rates", true))
-            enabledUpgrades.add(new UpgradeTypeSpawnerRates(plugin));
-        if (config.getBoolean("block-limits", true))
-            enabledUpgrades.add(new UpgradeTypeBlockLimits(plugin));
-        if (config.getBoolean("entity-limits", true))
-            enabledUpgrades.add(new UpgradeTypeEntityLimits(plugin));
-
-        if (enabledUpgrades.isEmpty())
-            return;
-
-        ConfigurationSection upgrades = config.getConfigurationSection("upgrades");
-
-        if (upgrades == null)
-            return;
-
-        for (String upgradeName : upgrades.getKeys(false)) {
-            if (upgradeName.length() > MAX_UPGRADES_NAME_LENGTH)
-                upgradeName = upgradeName.substring(0, MAX_UPGRADES_NAME_LENGTH);
-
-            SUpgrade upgrade = new SUpgrade(upgradeName);
-            for (String _level : upgrades.getConfigurationSection(upgradeName).getKeys(false)) {
-                loadUpgradeLevelFromSection(plugin, upgrade, _level, upgrades.getConfigurationSection(upgradeName + "." + _level));
-            }
-
-            plugin.getUpgrades().addUpgrade(upgrade);
+    protected Configuration createConfigFile(CommentedConfiguration config) {
+        this.classToUpgrade.clear();
+        Configuration configuration = new Configuration(config);
+        for (IUpgradeType enabledUpgrade : configuration.enabledUpgrades) {
+            this.classToUpgrade.put(enabledUpgrade.getClass(), enabledUpgrade);
         }
+        return configuration;
     }
 
     @Nullable
     public <T extends IUpgradeType> T getEnabledUpgradeType(Class<T> clazz) {
-        return enabledUpgrades.stream()
-                .filter(upgradeType -> upgradeType.getClass().equals(clazz))
-                .findFirst().map(clazz::cast).orElse(null);
+        IUpgradeType enabledUpgrade = this.classToUpgrade.get(clazz);
+        return enabledUpgrade == null ? null : (T) enabledUpgrade;
     }
 
     public boolean isUpgradeTypeEnabled(Class<? extends IUpgradeType> clazz) {
         return getEnabledUpgradeType(clazz) != null;
+    }
+
+    public class Configuration implements IModuleConfiguration {
+
+        private final boolean enabled;
+        private final List<IUpgradeType> enabledUpgrades = new LinkedList<>();
+
+        Configuration(CommentedConfiguration config) {
+            loadUpgrades(config);
+            this.enabled = !this.enabledUpgrades.isEmpty();
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return this.enabled;
+        }
+
+        private void loadUpgrades(CommentedConfiguration config) {
+            if (config.getBoolean("crop-growth", true))
+                enabledUpgrades.add(new UpgradeTypeCropGrowth(plugin));
+            if (config.getBoolean("mob-drops", true))
+                enabledUpgrades.add(new UpgradeTypeMobDrops(plugin));
+            if (config.getBoolean("island-effects", true))
+                enabledUpgrades.add(new UpgradeTypeIslandEffects(plugin));
+            if (config.getBoolean("spawner-rates", true))
+                enabledUpgrades.add(new UpgradeTypeSpawnerRates(plugin));
+            if (config.getBoolean("block-limits", true))
+                enabledUpgrades.add(new UpgradeTypeBlockLimits(plugin));
+            if (config.getBoolean("entity-limits", true))
+                enabledUpgrades.add(new UpgradeTypeEntityLimits(plugin));
+
+            plugin.getUpgrades().clearUpgrades();
+
+            if (!enabledUpgrades.isEmpty()) {
+                ConfigurationSection upgrades = config.getConfigurationSection("upgrades");
+                if (upgrades != null) {
+                    for (String upgradeName : upgrades.getKeys(false)) {
+                        if (upgradeName.length() > MAX_UPGRADES_NAME_LENGTH)
+                            upgradeName = upgradeName.substring(0, MAX_UPGRADES_NAME_LENGTH);
+
+                        SUpgrade upgrade = new SUpgrade(upgradeName);
+                        for (String _level : upgrades.getConfigurationSection(upgradeName).getKeys(false)) {
+                            loadUpgradeLevelFromSection(plugin, upgrade, _level, upgrades.getConfigurationSection(upgradeName + "." + _level));
+                        }
+
+                        plugin.getUpgrades().addUpgrade(upgrade);
+                    }
+                }
+            }
+
+            IslandUpgrades.onUpgradesUpdate();
+        }
+
     }
 
     private void loadUpgradeLevelFromSection(SuperiorSkyblockPlugin plugin, SUpgrade upgrade,
@@ -189,7 +218,7 @@ public class UpgradesModule extends BuiltinModule {
         UpgradeCostLoader costLoader = plugin.getUpgrades().getUpgradeCostLoader(priceType);
 
         if (costLoader == null) {
-            Log.warn("Upgrade by name ", upgrade.getName(), " (level ", level, ") has invalid price-type. Skipping...");
+            getLogger().w("Upgrade by name " + upgrade.getName() + " (level " + level + ") has invalid price-type. Skipping...");
             return;
         }
 
@@ -198,7 +227,7 @@ public class UpgradesModule extends BuiltinModule {
         try {
             upgradeCost = costLoader.loadCost(levelSection);
         } catch (UpgradeCostLoadException error) {
-            Log.error(error, "Upgrade by name ", upgrade.getName(), " (level ", level, ") failed to initialize:");
+            getLogger().e("Upgrade by name " + upgrade.getName() + " (level " + level + ") failed to initialize:", error);
             return;
         }
 
@@ -219,7 +248,7 @@ public class UpgradesModule extends BuiltinModule {
         IntValue borderSize = IntValue.syncedFixed(levelSection.getInt("border-size", -1));
 
         if (borderSize.get() > plugin.getSettings().getMaxIslandSize()) {
-            Log.warn("Upgrade by name ", upgrade.getName(), " (level ", level, ") has illegal border-size, skipping...");
+            getLogger().w("Upgrade by name " + upgrade.getName() + " (level " + level + ") has illegal border-size, skipping...");
             return;
         }
 
@@ -269,32 +298,13 @@ public class UpgradesModule extends BuiltinModule {
                 }
             }
         }
-        upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, upgradeCost, commands, permission, requirements,
-                cropGrowth, spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize, blockLimits,
-                entityLimits, generatorRates, islandEffects, bankLimit, rolesLimits));
-    }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void convertOldUpgradesFile(SuperiorSkyblockPlugin plugin) {
-        File upgradesFile = new File(plugin.getDataFolder(), "upgrades.yml");
+        SUpgradeLevel upgradeLevel = new SUpgradeLevel(level, upgradeCost, commands, permission, requirements,
+                cropGrowth, spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize,
+                Value.syncedFixed(blockLimits), Value.syncedFixed(entityLimits), Value.syncedFixed(generatorRates),
+                Value.syncedFixed(islandEffects), bankLimit, Value.syncedFixed(rolesLimits));
 
-        if (upgradesFile.exists()) {
-            CommentedConfiguration config = CommentedConfiguration.loadConfiguration(upgradesFile);
-
-            super.config.set("upgrades", config.get("upgrades"));
-
-            File moduleConfigFile = new File(getModuleFolder(), "config.yml");
-
-            try {
-                super.config.save(moduleConfigFile);
-                config.save(upgradesFile);
-            } catch (Exception error) {
-                Log.entering("UpgradesModule", "convertOldUpgradesFile", "ENTER");
-                Log.error(error, "An error occurred while saving config file:");
-            }
-
-            upgradesFile.delete();
-        }
+        upgrade.addUpgradeLevel(level, upgradeLevel);
     }
 
 }

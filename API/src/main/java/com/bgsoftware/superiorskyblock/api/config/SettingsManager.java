@@ -3,17 +3,23 @@ package com.bgsoftware.superiorskyblock.api.config;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -85,16 +91,40 @@ public interface SettingsManager {
     boolean isRoundedIslandLevels();
 
     /**
+     * The rounding mode used for the island level when rounded-island-level feature is enabled.
+     * Config path: island-level-rounding-mode
+     */
+    RoundingMode getIslandLevelRoundingMode();
+
+    /**
+     * Whether to automatic track block counts when players place and break blocks.
+     * Config path: auto-blocks-tracking
+     */
+    boolean isAutoBlocksTracking();
+
+    /**
      * The default island-top sorting type.
      * Config path: island-top-order
      */
     String getIslandTopOrder();
 
     /**
+     * The default global-warps sorting type.
+     * Config path: global-warps-order
+     */
+    String getGlobalWarpsOrder();
+
+    /**
      * Whether coop members are enabled.
      * Config path: coop-members
      */
     boolean isCoopMembers();
+
+    /**
+     * Should players be able to edit island privileges for other players?
+     * Config path: edit-player-permissions
+     */
+    boolean isEditPlayerPermissions();
 
     /**
      * All settings related to the island-roles.
@@ -121,7 +151,7 @@ public interface SettingsManager {
     VisitorsSign getVisitorsSign();
 
     /**
-     * All settings related to the worlds of the plugin..
+     * All settings related to the worlds of the plugin.
      * Config path: worlds
      */
     Worlds getWorlds();
@@ -167,9 +197,9 @@ public interface SettingsManager {
     boolean isCoopDamage();
 
     /**
-     * The default amount of disbands players receive when they first join the server.
-     * If 0, then the disbands limit is disabled.
-     * Config-path: disband-count
+     * The default number of disbands players receive when they first join the server.
+     * If -1, then the disbands limit is disabled.
+     * Config-path: default-disband-count
      */
     int getDisbandCount();
 
@@ -210,6 +240,12 @@ public interface SettingsManager {
     boolean isLeaveConfirm();
 
     /**
+     * Whether confirmation menu should be opened before transfering an island or not.
+     * Config-path: transfer-confirm
+     */
+    boolean isTransferConfirm();
+
+    /**
      * The spawners-provider to use.
      * If set to AUTO, the plugin will automatically detect an available spawners provider and use it.
      * Config-path: spawners-provider
@@ -225,8 +261,12 @@ public interface SettingsManager {
 
     /**
      * Whether inventory of island members should be cleared when their island is disbanded or not.
-     * Config-path: disband-inventory-clear
+     * Return true if clear-on-disband contains both ENDER_CHEST and INVENTORY.
+     * This method will be deleted in the future!
+     *
+     * @deprecated See {@link #getClearActionsOnDisband()}
      */
+    @Deprecated
     boolean isDisbandInventoryClear();
 
     /**
@@ -234,6 +274,12 @@ public interface SettingsManager {
      * Config path: island-names
      */
     IslandNames getIslandNames();
+
+    /**
+     * Whether to teleport players to their island when they create it or not.
+     * Config path: teleport-on-create
+     */
+    boolean isTeleportOnCreate();
 
     /**
      * Whether to teleport players to their island when they join it or not.
@@ -248,16 +294,56 @@ public interface SettingsManager {
     boolean isTeleportOnKick();
 
     /**
+     * Whether to teleport players to the spawn when they leave an island or not.
+     * Config-path: teleport-on-leave
+     */
+    boolean isTeleportOnLeave();
+
+    /**
      * Whether to clear players' inventories when they join a new island or not.
+     * Return true if clear-on-join contains both ENDER_CHEST and INVENTORY.
+     * This method will be deleted in the future!
+     *
+     * @deprecated See {@link #getClearActionsOnJoin()}
+     */
+    @Deprecated
+    boolean isClearOnJoin();
+
+    /**
+     * Get the list of clear actions to perform on island members when their island is disbanded.
+     * Config-path: clear-on-disband
+     */
+    List<ClearAction> getClearActionsOnDisband();
+
+    /**
+     * Get the list of clear actions to perform on players when they accept an invite.
      * Config-path: clear-on-join
      */
-    boolean isClearOnJoin();
+    List<ClearAction> getClearActionsOnJoin();
+
+    /**
+     * Get the list of clear actions to perform on players when they are kicked from their island.
+     * Config-path: clear-on-kick
+     */
+    List<ClearAction> getClearActionsOnKick();
+
+    /**
+     * Get the list of clear actions to perform on players when they leave an island.
+     * Config-path: clear-on-leave
+     */
+    List<ClearAction> getClearActionsOnLeave();
 
     /**
      * Whether players can rate their own island or not.
      * Config-path: rate-own-island
      */
     boolean isRateOwnIsland();
+
+    /**
+     * Whether players can change island rating or not.
+     * Config-path: change-island-rating
+     */
+    boolean isChangeIslandRating();
 
     /**
      * All the default island-flags that will be enabled for new islands.
@@ -533,8 +619,17 @@ public interface SettingsManager {
      * List of preview-island locations.
      * Represented by a map with keys as schematic names, and values as locations for the preview islands.
      * Config-path: preview-islands
+     *
+     * @deprecated See {@link #getIslandPreviews()}
      */
+    @Deprecated
     Map<String, Location> getPreviewIslands();
+
+    /**
+     * All settings related to the island previews.
+     * Config path: island-previews
+     */
+    IslandPreviews getIslandPreviews();
 
     /**
      * Whether vanished players should be hidden from command tab completes or not.
@@ -549,10 +644,19 @@ public interface SettingsManager {
     boolean isDropsUpgradePlayersMultiply();
 
     /**
-     * The delay between protect messages, in ticks.
-     * Config-path: protected-message-delay
+     * The delay set for the ISLAND_PROTECTED message.
+     *
+     * @deprecated See {@link #getMessageDelays()}
      */
+    @Deprecated
     long getProtectedMessageDelay();
+
+    /**
+     * A list of messages that should have a delay, in milliseconds.
+     * Represented by a map with string as the message name, and values as the delays.
+     * Config-path: message-delays
+     */
+    Map<String, Long> getMessageDelays();
 
     /**
      * Whether the warp categories system is enabled or not.
@@ -578,6 +682,12 @@ public interface SettingsManager {
      * Config-path: public-warps
      */
     boolean isPublicWarps();
+
+    /**
+     * Whether islands should be locked by default or not.
+     * Config-path: locked-islands
+     */
+    boolean isLockedIslands();
 
     /**
      * Cooldown between recalculations of an island, in seconds.
@@ -639,6 +749,18 @@ public interface SettingsManager {
      * Config-path: commands-per-page
      */
     int getCommandsPerPage();
+
+    /**
+     * Whether the plugin should cache schematics for faster placement of schematics.
+     * Config-path: cache-schematics
+     */
+    boolean isCacheSchematics();
+
+    /**
+     * Custom entity categories to be used by the plugin.
+     * Config-path: entity-categories
+     */
+    Map<String, KeySet> getEntityCategories();
 
     interface Database {
 
@@ -795,8 +917,18 @@ public interface SettingsManager {
          * Represented by an array of maps with keys as the blocks, and values as the rates.
          * The maps are sorted by the {@link Dimension} they belong to.
          * Config-path: default-values.generator
+         *
+         * @deprecated See {@link #getGeneratorsMap()}
          */
+        @Deprecated
         Map<Key, Integer>[] getGenerators();
+
+        /**
+         * The default generator-rates for new islands.
+         * Represented by maps with keys as the blocks, and values as the rates.
+         * Config-path: default-values.generator
+         */
+        Map<Dimension, Map<Key, Integer>> getGeneratorsMap();
 
         /**
          * The default role-limits for new islands.
@@ -804,6 +936,13 @@ public interface SettingsManager {
          * Config-path: default-values.role-limits
          */
         Map<Integer, Integer> getRoleLimits();
+
+        /**
+         * The default island effects for new islands.
+         * Represented by a map with keys as the effect types, and values as the effect levels.
+         * Config-path: default-values.island-effects
+         */
+        Map<PotionEffectType, Integer> getIslandEffects();
 
     }
 
@@ -1183,5 +1322,33 @@ public interface SettingsManager {
 
     }
 
+    interface IslandPreviews {
+
+        /**
+         * The game mode that will be set for the player when they enter preview mode.
+         * Config-path: island-previews.game-mode
+         */
+        GameMode getGameMode();
+
+        /**
+         * The maximum distance a player can move before the preview mode is canceled.
+         * Config-path: island-previews.max-distance
+         */
+        int getMaxDistance();
+
+        /**
+         * A list of commands that cannot be executed by players in preview mode.
+         * Config-path: island-previews.blocked-commands
+         */
+        List<String> getBlockedCommands();
+
+        /**
+         * List of island preview locations.
+         * Represented by a map with keys as schematic names, and values as locations for the preview islands.
+         * Config-path: island-previews.locations
+         */
+        Map<String, Location> getLocations();
+
+    }
 
 }

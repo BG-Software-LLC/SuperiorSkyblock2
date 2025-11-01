@@ -179,7 +179,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
             databaseBridge.batchOperations(false);
         }
 
-        return Collections.unmodifiableMap(removedStackedBlocks);
+        return removedStackedBlocks.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(removedStackedBlocks);
     }
 
     @Override
@@ -194,19 +194,25 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
         Map<Location, Integer> chunkStackedBlocks = new LinkedHashMap<>();
 
         try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ)) {
-            this.stackedBlocksContainer.forEach(chunkPosition, stackedBlock ->
-                    chunkStackedBlocks.put(stackedBlock.getLocation(), stackedBlock.getAmount()));
+            this.stackedBlocksContainer.forEach(chunkPosition, stackedBlock -> {
+                chunkStackedBlocks.put(stackedBlock.getLocation(), stackedBlock.getAmount());
+            });
         }
 
-        return Collections.unmodifiableMap(chunkStackedBlocks);
+        return chunkStackedBlocks.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(chunkStackedBlocks);
     }
 
     @Override
     public Map<Location, Integer> getStackedBlocks() {
         Map<Location, Integer> allStackedBlocks = new LinkedHashMap<>();
-        this.stackedBlocksContainer.forEach(stackedBlock ->
-                allStackedBlocks.put(stackedBlock.getLocation(), stackedBlock.getAmount()));
-        return Collections.unmodifiableMap(allStackedBlocks);
+        this.stackedBlocksContainer.forEach(stackedBlock -> {
+            allStackedBlocks.put(stackedBlock.getLocation(), stackedBlock.getAmount());
+        });
+        return allStackedBlocks.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(allStackedBlocks);
+    }
+
+    public boolean hasStackedBlocks() {
+        return this.stackedBlocksContainer.size() > 0;
     }
 
     @Override
@@ -262,21 +268,6 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
 
     public void forEach(ChunkPosition chunkPosition, Consumer<StackedBlock> consumer) {
         this.stackedBlocksContainer.forEach(chunkPosition, consumer);
-    }
-
-    public void saveStackedBlocks() {
-        StackedBlocksDatabaseBridge.deleteStackedBlocks(this);
-
-        try {
-            databaseBridge.batchOperations(true);
-            this.stackedBlocksContainer.forEach(stackedBlock -> {
-                if (stackedBlock.getAmount() > 1) {
-                    StackedBlocksDatabaseBridge.saveStackedBlock(this, stackedBlock);
-                }
-            });
-        } finally {
-            databaseBridge.batchOperations(false);
-        }
     }
 
     private void loadStackedBlock(DatabaseResult resultSet) {

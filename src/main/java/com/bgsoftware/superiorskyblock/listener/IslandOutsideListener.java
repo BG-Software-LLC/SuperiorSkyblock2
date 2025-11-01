@@ -25,9 +25,6 @@ public class IslandOutsideListener extends AbstractGameEventListener {
     }
 
     private void onMinecartRightClick(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
-        if (!plugin.getSettings().isStopLeaving())
-            return;
-
         Entity rightClicked = e.getArgs().clickedEntity;
         if (rightClicked == null)
             return;

@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.value;
 
-public class ValueFixedSynced<V extends Number> implements Value<V> {
+public class ValueFixedSynced<V> implements Value<V> {
 
     private final V value;
 

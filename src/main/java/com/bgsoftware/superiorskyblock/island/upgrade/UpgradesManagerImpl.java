@@ -6,14 +6,18 @@ import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.upgrade.container.UpgradesContainer;
 import com.google.common.base.Preconditions;
 
 import java.util.Collection;
+import java.util.Locale;
 
 public class UpgradesManagerImpl extends Manager implements UpgradesManager {
 
     private final UpgradesContainer upgradesContainer;
+
+    private String ALL_UPGRADE_NAMES;
 
     public UpgradesManagerImpl(SuperiorSkyblockPlugin plugin, UpgradesContainer upgradesContainer) {
         super(plugin);
@@ -39,6 +43,7 @@ public class UpgradesManagerImpl extends Manager implements UpgradesManager {
     @Override
     public void addUpgrade(Upgrade upgrade) {
         this.upgradesContainer.addUpgrade(upgrade);
+        ALL_UPGRADE_NAMES = null;
     }
 
     @Override
@@ -74,6 +79,19 @@ public class UpgradesManagerImpl extends Manager implements UpgradesManager {
     public UpgradeCostLoader getUpgradeCostLoader(String id) {
         Preconditions.checkNotNull(id, "id parameter cannot be null.");
         return this.upgradesContainer.getUpgradeCostLoader(id);
+    }
+
+    public void clearUpgrades() {
+        this.upgradesContainer.clearUpgrades();
+    }
+
+    public String getUpgradesNames() {
+        if (ALL_UPGRADE_NAMES == null) {
+            ALL_UPGRADE_NAMES = Formatters.COMMA_FORMATTER.format(plugin.getUpgrades().getUpgrades().stream()
+                    .map(upgrade -> upgrade.getName().toLowerCase(Locale.ENGLISH)));
+        }
+
+        return ALL_UPGRADE_NAMES;
     }
 
 }

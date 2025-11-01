@@ -1,0 +1,8 @@
+NMS_VERSION=v1_17
+CRAFTBUKKIT_PACKAGE=org.bukkit.craftbukkit.v1_17_R1
+COMMON_NMS_PACKAGE=com.bgsoftware.superiorskyblock.nms
+PAPER_CHUNK_BLOCK_CONTROLLER_CLASS=com.destroystokyo.paper.antixray.ChunkPacketBlockController
+REGISTRY_CLASS=net.minecraft.core.Registry
+CHUNK_STATUS_CLASS=net.minecraft.world.level.chunk.ChunkStatus
+SERVER_LEVEL_RANDOM_TYPE=java.util.Random
+STAR_LIGHT_INTERFACE_CLASS=ca.spottedleaf.starlight.light.StarLightInterface

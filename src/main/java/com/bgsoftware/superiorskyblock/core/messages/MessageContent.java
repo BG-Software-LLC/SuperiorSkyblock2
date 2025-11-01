@@ -1,6 +1,11 @@
 package com.bgsoftware.superiorskyblock.core.messages;
 
+import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import org.bukkit.OfflinePlayer;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -14,8 +19,15 @@ public class MessageContent {
 
     public static final MessageContent EMPTY = new MessageContent(Collections.emptyList()) {
         @Override
-        public Optional<String> getContent(Object... arguments) {
+        public Optional<String> getContent(@Nullable OfflinePlayer unused, Object... unused2) {
             return Optional.empty();
+        }
+    };
+
+    private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
+        @Override
+        protected PlaceholdersService create() {
+            return SuperiorSkyblockPlugin.getPlugin().getServices().getService(PlaceholdersService.class);
         }
     };
 
@@ -66,7 +78,7 @@ public class MessageContent {
         this.contentParts.addAll(contentParts);
     }
 
-    public Optional<String> getContent(Object... arguments) {
+    public Optional<String> getContent(@Nullable OfflinePlayer offlinePlayer, Object... arguments) {
         StringBuilder content = new StringBuilder();
         for (IPart part : contentParts) {
             if (part instanceof StaticPart) {
@@ -81,7 +93,10 @@ public class MessageContent {
             }
         }
 
-        return content.length() == 0 ? Optional.empty() : Optional.of(content.toString());
+        if (content.length() == 0)
+            return Optional.empty();
+
+        return Optional.of(placeholdersService.get().parsePlaceholders(offlinePlayer, content.toString()));
     }
 
     public static String getArgumentString(Object argument) {

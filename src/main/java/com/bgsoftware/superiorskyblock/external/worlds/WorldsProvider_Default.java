@@ -34,6 +34,8 @@ public class WorldsProvider_Default implements WorldsProvider {
     private final Map<UUID, Dimension> islandWorldsToDimensions = new HashMap<>();
     private final SuperiorSkyblockPlugin plugin;
 
+    private World islandsWorld;
+
     private final LazyReference<DragonBattleService> dragonBattleService = new LazyReference<DragonBattleService>() {
         @Override
         protected DragonBattleService create() {
@@ -58,6 +60,8 @@ public class WorldsProvider_Default implements WorldsProvider {
                         ((SettingsManager.Worlds.End) dimensionConfig).isDragonFight()) {
                     dragonBattleService.get().prepareEndWorld(world);
                 }
+                if (dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension())
+                    this.islandsWorld = world;
             }
         }
     }
@@ -81,51 +85,53 @@ public class WorldsProvider_Default implements WorldsProvider {
     }
 
     @Override
-    public Location getNextLocation(Location previousLocation, int islandsHeight, int maxIslandSize, UUID islandOwner, UUID islandUUID) {
-        Preconditions.checkNotNull(previousLocation, "previousLocation parameter cannot be null.");
+    public Location getNextLocation(BlockPosition previousPosition, int islandsHeight, int maxIslandSize, UUID islandOwner, UUID islandUUID) {
+        Preconditions.checkNotNull(previousPosition, "previousPosition parameter cannot be null.");
 
-        Location location = previousLocation.clone();
-        location.setY(islandsHeight);
-        BlockFace islandFace = getIslandFace(location);
+        BlockFace islandFace = getIslandFace(previousPosition);
+
+        BlockPosition nextPosition;
 
         int islandRange = maxIslandSize * 3;
 
         if (islandFace == BlockFace.NORTH) {
-            location.add(islandRange, 0, 0);
+            nextPosition = nextPosition(previousPosition, islandsHeight, islandRange, 0);
         } else if (islandFace == BlockFace.EAST) {
-            if (location.getX() == -location.getZ())
-                location.add(islandRange, 0, 0);
-            else if (location.getX() == location.getZ())
-                location.subtract(islandRange, 0, 0);
+            if (previousPosition.getX() == -previousPosition.getZ())
+                nextPosition = nextPosition(previousPosition, islandsHeight, islandRange, 0);
+            else if (previousPosition.getX() == previousPosition.getZ())
+                nextPosition = nextPosition(previousPosition, islandsHeight, -islandRange, 0);
             else
-                location.add(0, 0, islandRange);
+                nextPosition = nextPosition(previousPosition, islandsHeight, 0, islandRange);
         } else if (islandFace == BlockFace.SOUTH) {
-            if (location.getX() == -location.getZ())
-                location.subtract(0, 0, islandRange);
+            if (previousPosition.getX() == -previousPosition.getZ())
+                nextPosition = nextPosition(previousPosition, islandsHeight, 0, -islandRange);
             else
-                location.subtract(islandRange, 0, 0);
+                nextPosition = nextPosition(previousPosition, islandsHeight, -islandRange, 0);
         } else if (islandFace == BlockFace.WEST) {
-            if (location.getX() == location.getZ())
-                location.add(islandRange, 0, 0);
+            if (previousPosition.getX() == previousPosition.getZ())
+                nextPosition = nextPosition(previousPosition, islandsHeight, islandRange, 0);
             else
-                location.subtract(0, 0, islandRange);
+                nextPosition = nextPosition(previousPosition, islandsHeight, 0, -islandRange);
+        } else {
+            throw new IllegalStateException();
         }
 
-        BlockPosition blockPosition = new SBlockPosition(location);
+        Location nextLocation = nextPosition.toLocation(this.islandsWorld);
 
-        if (servedPositions.contains(blockPosition) || plugin.getGrid().getIslandAt(location) != null) {
-            return getNextLocation(location.clone(), islandsHeight, maxIslandSize, islandOwner, islandUUID);
+        if (servedPositions.contains(nextPosition) || plugin.getGrid().getIslandAt(nextLocation) != null) {
+            return getNextLocation(nextPosition, islandsHeight, maxIslandSize, islandOwner, islandUUID);
         }
 
-        servedPositions.add(blockPosition);
+        servedPositions.add(nextPosition);
 
-        return location;
+        return nextLocation;
     }
 
     @Override
     public void finishIslandCreation(Location islandLocation, UUID islandOwner, UUID islandUUID) {
         Preconditions.checkNotNull(islandLocation, "islandLocation parameter cannot be null.");
-        servedPositions.remove(new SBlockPosition(islandLocation));
+        servedPositions.remove(SBlockPosition.of(islandLocation));
     }
 
     @Override
@@ -154,14 +160,14 @@ public class WorldsProvider_Default implements WorldsProvider {
         return dimensionConfig != null && dimensionConfig.isEnabled() && dimensionConfig.isUnlocked();
     }
 
-    private BlockFace getIslandFace(Location location) {
+    private BlockFace getIslandFace(BlockPosition blockPosition) {
         //Possibilities: North / East
-        if (location.getX() >= location.getZ()) {
-            return -location.getX() > location.getZ() ? BlockFace.NORTH : BlockFace.EAST;
+        if (blockPosition.getX() >= blockPosition.getZ()) {
+            return -blockPosition.getX() > blockPosition.getZ() ? BlockFace.NORTH : BlockFace.EAST;
         }
         //Possibilities: South / West
         else {
-            return -location.getX() > location.getZ() ? BlockFace.WEST : BlockFace.SOUTH;
+            return -blockPosition.getX() > blockPosition.getZ() ? BlockFace.WEST : BlockFace.SOUTH;
         }
     }
 
@@ -173,7 +179,7 @@ public class WorldsProvider_Default implements WorldsProvider {
         }
 
         World world = WorldCreator.name(worldName)
-                .type(WorldType.NORMAL)
+                .type(WorldType.FLAT)
                 .environment(dimension.getEnvironment())
                 .generator(WorldGenerator.getWorldGenerator(dimension))
                 .createWorld();
@@ -190,6 +196,10 @@ public class WorldsProvider_Default implements WorldsProvider {
         }
 
         return world;
+    }
+
+    private static BlockPosition nextPosition(BlockPosition previousPosition, int islandsHeight, int offsetX, int offsetZ) {
+        return SBlockPosition.of(previousPosition.getX() + offsetX, islandsHeight, previousPosition.getZ() + offsetZ);
     }
 
 }

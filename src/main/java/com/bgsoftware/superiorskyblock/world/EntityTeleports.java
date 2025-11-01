@@ -14,8 +14,10 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
@@ -28,6 +30,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Objects;
@@ -40,6 +43,18 @@ public class EntityTeleports {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private EntityTeleports() {
+    }
+
+    public static void warmupTeleport(SuperiorPlayer superiorPlayer, long warmupInMillis, TeleportCallback teleportCallback) {
+        if (warmupInMillis > 0 && !superiorPlayer.hasBypassModeEnabled() &&
+                !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
+            Message.TELEPORT_WARMUP.send(superiorPlayer, Formatters.TIME_FORMATTER.format(
+                    Duration.ofMillis(warmupInMillis), superiorPlayer.getUserLocale()));
+
+            superiorPlayer.setTeleportTask(BukkitExecutor.sync(() -> teleportCallback.accept(true), warmupInMillis / 50));
+        } else {
+            teleportCallback.accept(false);
+        }
     }
 
     public static void teleport(Entity entity, Location location) {
@@ -73,7 +88,7 @@ public class EntityTeleports {
 
     public static CompletableFuture<Location> findIslandSafeLocation(Island island, Dimension dimension) {
         CompletableFuture<Location> result = new CompletableFuture<>();
-        IslandWorlds.accessIslandWorldAsync(island, dimension, islandWorldResult -> {
+        IslandWorlds.accessIslandWorldAsync(island, dimension, true, islandWorldResult -> {
             islandWorldResult.ifRight(result::completeExceptionally).ifLeft(world ->
                     findIslandSafeLocation(island, dimension, result));
         });
@@ -252,6 +267,12 @@ public class EntityTeleports {
         Log.debugResult(Debug.FIND_SAFE_TELEPORT, "Result Location", newHomeLocation);
 
         return newHomeLocation;
+    }
+
+    public interface TeleportCallback {
+
+        void accept(boolean afterWarmup);
+
     }
 
 }

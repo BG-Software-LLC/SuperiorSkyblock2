@@ -111,6 +111,10 @@ public enum Materials {
         return hasTag(material, Tag.CARPET);
     }
 
+    public static boolean isHarness(Material material) {
+        return hasTag(material, Tag.HARNESS);
+    }
+
     public static boolean isBed(Material material) {
         return hasTag(material, Tag.BED);
     }
@@ -170,6 +174,8 @@ public enum Materials {
                 materialTags.add(Tag.SPAWN_EGG);
             if (materialName.contains("CARPET"))
                 materialTags.add(Tag.CARPET);
+            if (materialName.contains("HARNESS"))
+                materialTags.add(Tag.HARNESS);
             if (materialName.contains("BED"))
                 materialTags.add(Tag.BED);
 
@@ -207,7 +213,8 @@ public enum Materials {
         DYE,
         SPAWN_EGG,
         CARPET,
-        BED
+        BED,
+        HARNESS
 
     }
 

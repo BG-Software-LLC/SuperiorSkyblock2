@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class CmdAdminSetRate implements IAdminIslandCommand {
@@ -86,8 +87,18 @@ public class CmdAdminSetRate implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getRatedPlayers(plugin, island, args[3]) :
-                args.length == 5 ? CommandTabCompletes.getRatings(args[4]) : Collections.emptyList();
+        switch (args.length) {
+            case 4: {
+                List<String> tabCompletes = new LinkedList<>();
+                tabCompletes.addAll(CommandTabCompletes.getRatedPlayers(plugin, island, args[3]));
+                tabCompletes.addAll(CommandTabCompletes.getOnlinePlayers(plugin, args[3], false));
+                return tabCompletes.isEmpty() ? Collections.emptyList() : tabCompletes;
+            }
+            case 5:
+                return CommandTabCompletes.getRatings(args[4]);
+            default:
+                return Collections.emptyList();
+        }
     }
 
 }

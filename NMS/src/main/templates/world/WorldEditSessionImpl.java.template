@@ -1,0 +1,373 @@
+package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.world;
+
+import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.ObjectsPool;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.collections.view.LongIterator;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.NMSUtils;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.SetBlockContext;
+import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
+import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
+import com.google.common.base.Preconditions;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ThreadedLevelLightEngine;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.LevelHeightAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.ProtoChunk;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.levelgen.Heightmap;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.World;
+import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
+import org.bukkit.generator.ChunkGenerator;
+
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
+
+public class WorldEditSessionImpl implements WorldEditSession {
+
+    private static final ObjectsPool<WorldEditSessionImpl> POOL = new ObjectsPool<>(WorldEditSessionImpl::new);
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final boolean isStarLightInterface = ((Supplier<Boolean>) () -> {
+        try {
+            Class.forName("${STAR_LIGHT_INTERFACE_CLASS}");
+            return true;
+        } catch (ClassNotFoundException error) {
+            return false;
+        }
+    }).get();
+
+    private final Long2ObjectMapView<ChunkData> chunks = CollectionsFactory.createLong2ObjectArrayMap();
+    private final List<Pair<BlockPos, BlockState>> blocksToUpdate = new LinkedList<>();
+    private final List<Pair<BlockPos, CompoundTag>> blockEntities = new LinkedList<>();
+    private final Set<ChunkPos> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
+
+    private Dimension dimension;
+    private LevelHeightAccessor levelHeightAccessor;
+
+    @Nullable
+    private ServerLevel serverLevel;
+
+    private final SetBlockContext SET_BLOCK_CONTEXT = new SetBlockContext() {
+
+        ChunkData chunkData;
+
+        @Override
+        public LevelHeightAccessor levelHeightAccessor() {
+            return levelHeightAccessor;
+        }
+
+        @Override
+        public void prepareChunkAccess(ChunkPos chunkPos) {
+            chunkData = chunks.computeIfAbsent(chunkPos.toLong(), ChunkData::new);
+        }
+
+        @Override
+        public LevelChunkSection getChunkSection(int i) {
+            return chunkData.chunkSections[i];
+        }
+
+        @Override
+        public Map<Heightmap.Types, Heightmap> getHeightmaps() {
+            return chunkData.heightmaps;
+        }
+
+        @Override
+        public void onSetBlockWithUpdate(BlockPos blockPos, BlockState blockState) {
+            blocksToUpdate.add(new Pair<>(blockPos, blockState));
+        }
+
+        @Override
+        public void onPostSetBlock(BlockPos blockPos, BlockState blockState) {
+            // Do nothing
+        }
+
+        @Override
+        public void onLightUpdate(BlockPos blockPos, BlockState blockState, boolean isOriginallyChunkSectionEmpty, boolean isChunkSectionEmpty) {
+            if (plugin.getSettings().isLightsUpdate() && !isStarLightInterface && blockState.getLightEmission() > 0)
+                chunkData.lights.add(blockPos);
+        }
+
+        @Override
+        public void onBlockEntityUpdate(BlockPos blockPos, CompoundTag blockEntityTag) {
+            blockEntities.add(new Pair<>(blockPos, blockEntityTag));
+        }
+
+    };
+
+    public static WorldEditSessionImpl obtain(ServerLevel serverLevel) {
+        return POOL.obtain().initialize(serverLevel);
+    }
+
+    public static WorldEditSessionImpl obtain(Dimension dimension) {
+        return POOL.obtain().initialize(dimension);
+    }
+
+    private WorldEditSessionImpl() {
+    }
+
+    private WorldEditSessionImpl initialize(ServerLevel serverLevel) {
+        this.serverLevel = serverLevel;
+        this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(serverLevel.getWorld());
+        this.levelHeightAccessor = serverLevel;
+        return this;
+    }
+
+    private WorldEditSessionImpl initialize(Dimension dimension) {
+        DimensionType dimensionType = NMSUtilsVersioned.getDimensionTypeFromDimension(dimension);
+        this.serverLevel = null;
+        this.dimension = dimension;
+        this.levelHeightAccessor = createLevelHeightAccessor(dimensionType.minY(), dimensionType.height());
+        return this;
+    }
+
+    @Override
+    public void setBlock(Location location, int combinedId, @Nullable CompoundTag statesTag,
+                         @Nullable CompoundTag blockEntityData) {
+        BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        NMSUtils.setBlock(SET_BLOCK_CONTEXT, blockPos, combinedId, statesTag, blockEntityData);
+    }
+
+    @Override
+    public List<ChunkPosition> getAffectedChunks() {
+        Preconditions.checkState(this.serverLevel != null, "Cannot call WorldEditSession#getAffectedChunks on partial initialized session");
+
+        if (chunks.isEmpty())
+            return Collections.emptyList();
+
+        List<ChunkPosition> chunkPositions = new LinkedList<>();
+        World bukkitWorld = serverLevel.getWorld();
+        LongIterator iterator = chunks.keyIterator();
+        while (iterator.hasNext()) {
+            long chunkKey = iterator.next();
+            int chunkX = (int) chunkKey;
+            int chunkZ = (int) (chunkKey >> 32);
+            chunkPositions.add(ChunkPosition.of(bukkitWorld, chunkX, chunkZ, false));
+        }
+        return chunkPositions;
+    }
+
+    @Override
+    public void applyBlocks(Chunk bukkitChunk) {
+        Preconditions.checkState(this.serverLevel != null, "Cannot call WorldEditSession#applyBlocks on partial initialized session");
+
+        ServerLevel serverLevel = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
+        LevelChunk levelChunk = serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
+        ChunkPos chunkPos = levelChunk.getPos();
+
+        long chunkKey = chunkPos.toLong();
+        ChunkData chunkData = this.chunks.remove(chunkKey);
+
+        if (chunkData == null)
+            return;
+
+        int chunkSectionsCount = Math.min(chunkData.chunkSections.length, levelChunk.getSections().length);
+        for (int i = 0; i < chunkSectionsCount; ++i) {
+            levelChunk.getSections()[i] = chunkData.chunkSections[i];
+        }
+
+        chunkData.heightmaps.forEach(((type, heightmap) -> {
+            levelChunk.setHeightmap(type, heightmap.getRawData());
+        }));
+
+        if (plugin.getSettings().isLightsUpdate()) {
+            if (isStarLightInterface) {
+                this.lightenChunks.add(chunkPos);
+            } else {
+                ThreadedLevelLightEngine threadedLevelLightEngine = serverLevel.getChunkSource().getLightEngine();
+                chunkData.lights.forEach(threadedLevelLightEngine::checkBlock);
+                // Queues chunk light for this chunk.
+                threadedLevelLightEngine.lightChunk(levelChunk, false);
+            }
+        }
+
+        NMSUtilsVersioned.markUnsaved(levelChunk);
+    }
+
+    @Override
+    public void finish(Island island) {
+        Preconditions.checkState(this.serverLevel != null, "Cannot call WorldEditSession#finish on partial initialized session");
+
+        // Update blocks
+        blocksToUpdate.forEach(data -> serverLevel.setBlock(data.getKey(), data.getValue(), 3));
+
+        // Update block entities
+        blockEntities.forEach(data -> {
+            net.minecraft.nbt.CompoundTag blockEntityCompound = (net.minecraft.nbt.CompoundTag) data.getValue().toNBT();
+            if (blockEntityCompound != null) {
+                BlockPos blockPos = data.getKey();
+                blockEntityCompound.putInt("x", blockPos.getX());
+                blockEntityCompound.putInt("y", blockPos.getY());
+                blockEntityCompound.putInt("z", blockPos.getZ());
+
+                NMSUtilsVersioned.rewriteSignLines(blockEntityCompound);
+
+                BlockEntity worldBlockEntity = serverLevel.getBlockEntity(blockPos);
+                if (worldBlockEntity != null) {
+                    NMSUtilsVersioned.loadBlockEntity(worldBlockEntity, blockEntityCompound);
+                }
+            }
+        });
+
+        if (plugin.getSettings().isLightsUpdate() && isStarLightInterface && !lightenChunks.isEmpty()) {
+            ThreadedLevelLightEngine threadedLevelLightEngine = serverLevel.getChunkSource().getLightEngine();
+            NMSUtilsVersioned.relightChunks(threadedLevelLightEngine, lightenChunks);
+            this.lightenChunks.clear();
+        }
+
+        release();
+    }
+
+    @Override
+    public Data readData(Location baseLocation) {
+        return new WorldEditSessionDataImpl(baseLocation, this.chunks, this.blocksToUpdate, this.blockEntities, this.lightenChunks);
+    }
+
+    @Override
+    public void applyData(Data data, Location baseLocation) {
+        WorldEditSessionDataImpl dataImpl = (WorldEditSessionDataImpl) data;
+
+        int baseBlockPosXAxis = baseLocation.getBlockX();
+        int baseBlockPosYAxis = baseLocation.getBlockY();
+        int baseBlockPosZAxis = baseLocation.getBlockZ();
+        int baseChunkPosXAxis = baseBlockPosXAxis >> 4;
+        int baseChunkPosZAxis = baseBlockPosZAxis >> 4;
+
+        // We need to transform all data to the new base location values
+
+        dataImpl.readChunks(baseChunkPosXAxis, baseChunkPosZAxis, baseBlockPosXAxis, baseBlockPosYAxis,
+                baseBlockPosZAxis, this, this.chunks);
+        dataImpl.readBlocksToUpdate(baseBlockPosXAxis, baseBlockPosYAxis, baseBlockPosZAxis, this.blocksToUpdate);
+        dataImpl.readBlockEntities(baseBlockPosXAxis, baseBlockPosYAxis, baseBlockPosZAxis, this.blockEntities);
+        dataImpl.readLights(baseChunkPosXAxis, baseChunkPosZAxis, this.lightenChunks);
+    }
+
+    @Override
+    public void release() {
+        this.chunks.clear();
+        this.blocksToUpdate.clear();
+        this.blockEntities.clear();
+        this.lightenChunks.clear();
+        this.serverLevel = null;
+        this.dimension = null;
+        this.levelHeightAccessor = null;
+        POOL.release(this);
+    }
+
+    public ChunkData createChunkData(LevelChunkSection[] chunkSections, Map<Heightmap.Types, Heightmap> heightmaps, List<BlockPos> lights) {
+        return new ChunkData(chunkSections, heightmaps, lights);
+    }
+
+    private boolean isValidPosition(BlockPos blockPos) {
+        return blockPos.getX() >= -30000000 && blockPos.getZ() >= -30000000 &&
+                blockPos.getX() < 30000000 && blockPos.getZ() < 30000000 &&
+                !this.levelHeightAccessor.isOutsideBuildHeight(blockPos.getY());
+    }
+
+    private static LevelHeightAccessor createLevelHeightAccessor(int minY, int height) {
+        return new LevelHeightAccessor() {
+            @Override
+            public int getHeight() {
+                return height;
+            }
+
+            public int getMinBuildHeight() {
+                return minY;
+            }
+
+            public int getMinY() {
+                return minY;
+            }
+        };
+    }
+
+    public class ChunkData {
+
+        private final LevelChunkSection[] chunkSections;
+        private final Map<Heightmap.Types, Heightmap> heightmaps;
+        private final List<BlockPos> lights;
+
+        private ChunkData(long chunkKey) {
+            this(new LevelChunkSection[levelHeightAccessor.getSectionsCount()], new EnumMap<>(Heightmap.Types.class),
+                    isStarLightInterface ? Collections.emptyList() : new LinkedList<>());
+
+            ChunkPos chunkPos = new ChunkPos(chunkKey);
+
+            NMSUtilsVersioned.createChunkSections(serverLevel, levelHeightAccessor, this.chunkSections, dimension);
+
+            ProtoChunk tempChunk = NMSUtilsVersioned.createProtoChunk(
+                    chunkPos, this.chunkSections, levelHeightAccessor, serverLevel);
+
+            createHeightmaps(tempChunk);
+            if (serverLevel != null)
+                runCustomWorldGenerator(tempChunk);
+        }
+
+        private ChunkData(LevelChunkSection[] chunkSections, Map<Heightmap.Types, Heightmap> heightmaps, List<BlockPos> lights) {
+            this.chunkSections = chunkSections;
+            this.heightmaps = heightmaps;
+            this.lights = lights;
+        }
+
+        public LevelChunkSection[] chunkSections() {
+            return this.chunkSections;
+        }
+
+        public Map<Heightmap.Types, Heightmap> heightmaps() {
+            return this.heightmaps;
+        }
+
+        public List<BlockPos> lights() {
+            return this.lights;
+        }
+
+        private void runCustomWorldGenerator(ProtoChunk tempChunk) {
+            ChunkGenerator bukkitGenerator = serverLevel.getWorld().getGenerator();
+
+            if (bukkitGenerator == null || bukkitGenerator instanceof IslandsGenerator)
+                return;
+
+            NMSUtilsVersioned.buildSurfaceForChunk(serverLevel, bukkitGenerator, tempChunk);
+
+            // We want to copy the level chunk sections back
+            LevelChunkSection[] tempChunkSections = tempChunk.getSections();
+            for (int i = 0; i < Math.min(this.chunkSections.length, tempChunkSections.length); ++i) {
+                LevelChunkSection chunkSection = tempChunkSections[i];
+                if (chunkSection != null)
+                    this.chunkSections[i] = chunkSection;
+            }
+        }
+
+        private void createHeightmaps(ProtoChunk tempChunk) {
+            for (Heightmap.Types heightmapType : Heightmap.Types.values()) {
+                if (${CHUNK_STATUS_CLASS}.FULL.heightmapsAfter().contains(heightmapType)) {
+                    this.heightmaps.put(heightmapType, new Heightmap(tempChunk, heightmapType));
+                }
+            }
+        }
+
+    }
+
+
+}

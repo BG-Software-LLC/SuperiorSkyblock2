@@ -31,7 +31,7 @@ public class BanButton extends AbstractMenuViewButton<MenuConfirmBan.View> {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
 
         if (getTemplate().banPlayer)
-            IslandUtils.handleBanPlayer(clickedPlayer, menuView.getIsland(), menuView.getTargetPlayer());
+            IslandUtils.handleBanPlayer(clickedPlayer, menuView.getIsland(), menuView.getSuperiorPlayer());
 
         BukkitExecutor.sync(menuView::closeView, 1L);
     }

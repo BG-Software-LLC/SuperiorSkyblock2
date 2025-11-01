@@ -60,12 +60,12 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final IntValue warpsLimit;
     private final IntValue coopLimit;
     private final IntValue borderSize;
-    private final KeyMap<Integer> blockLimits;
-    private final KeyMap<Integer> entityLimits;
-    private final EnumerateMap<Dimension, Map<Key, Integer>> generatorRates;
-    private final Map<PotionEffectType, Integer> islandEffects;
+    private final Value<KeyMap<Integer>> blockLimits;
+    private final Value<KeyMap<Integer>> entityLimits;
+    private final Value<EnumerateMap<Dimension, Map<Key, Integer>>> generatorRates;
+    private final Value<Map<PotionEffectType, Integer>> islandEffects;
     private final Value<BigDecimal> bankLimit;
-    private final Int2IntMapView roleLimits;
+    private final Value<Int2IntMapView> roleLimits;
 
     @Nullable
     private ItemData itemData;
@@ -73,10 +73,10 @@ public class SUpgradeLevel implements UpgradeLevel {
     public SUpgradeLevel(int level, UpgradeCost cost, List<String> commands, String permission, Set<UpgradeRequirement> requirements,
                          DoubleValue cropGrowth, DoubleValue spawnerRates, DoubleValue mobDrops,
                          IntValue teamLimit, IntValue warpsLimit, IntValue coopLimit,
-                         IntValue borderSize, KeyMap<Integer> blockLimits,
-                         KeyMap<Integer> entityLimits, EnumerateMap<Dimension, Map<Key, Integer>> generatorRates,
-                         Map<PotionEffectType, Integer> islandEffects, Value<BigDecimal> bankLimit,
-                         Int2IntMapView roleLimits) {
+                         IntValue borderSize, Value<KeyMap<Integer>> blockLimits,
+                         Value<KeyMap<Integer>> entityLimits, Value<EnumerateMap<Dimension, Map<Key, Integer>>> generatorRates,
+                         Value<Map<PotionEffectType, Integer>> islandEffects, Value<BigDecimal> bankLimit,
+                         Value<Int2IntMapView> roleLimits) {
         this.level = level;
         this.cost = cost;
         this.commands = commands;
@@ -161,18 +161,18 @@ public class SUpgradeLevel implements UpgradeLevel {
     @Override
     public int getBlockLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return blockLimits.getOrDefault(key, -1);
+        return blockLimits.get().getOrDefault(key, -1);
     }
 
     @Override
     public int getExactBlockLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return blockLimits.getRaw(key, -1);
+        return blockLimits.get().getRaw(key, -1);
     }
 
     @Override
     public Map<Key, Integer> getBlockLimits() {
-        return Collections.unmodifiableMap(blockLimits);
+        return Collections.unmodifiableMap(blockLimits.get());
     }
 
     @Override
@@ -184,12 +184,12 @@ public class SUpgradeLevel implements UpgradeLevel {
     @Override
     public int getEntityLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return entityLimits.getOrDefault(key, -1);
+        return entityLimits.get().getOrDefault(key, -1);
     }
 
     @Override
     public Map<Key, Integer> getEntityLimitsAsKeys() {
-        return Collections.unmodifiableMap(entityLimits);
+        return Collections.unmodifiableMap(entityLimits.get());
     }
 
     @Override
@@ -216,7 +216,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     public int getGeneratorAmount(Key key, Dimension dimension) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-        Map<Key, Integer> generatorRates = this.generatorRates.get(dimension);
+        Map<Key, Integer> generatorRates = this.generatorRates.get().get(dimension);
         return (generatorRates == null ? 0 : generatorRates.getOrDefault(key, 0));
     }
 
@@ -229,7 +229,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     @Override
     public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-        Map<Key, Integer> generatorRates = this.generatorRates.get(dimension);
+        Map<Key, Integer> generatorRates = this.generatorRates.get().get(dimension);
         return generatorRates == null ? Collections.emptyMap() : generatorRates.entrySet().stream().collect(Collectors.toMap(
                 entry -> entry.getKey().toString(),
                 Map.Entry::getValue));
@@ -244,12 +244,12 @@ public class SUpgradeLevel implements UpgradeLevel {
     @Override
     public int getPotionEffect(PotionEffectType potionEffectType) {
         Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
-        return islandEffects.getOrDefault(potionEffectType, 0);
+        return islandEffects.get().getOrDefault(potionEffectType, 0);
     }
 
     @Override
     public Map<PotionEffectType, Integer> getPotionEffects() {
-        return Collections.unmodifiableMap(islandEffects);
+        return Collections.unmodifiableMap(islandEffects.get());
     }
 
     @Override
@@ -260,25 +260,27 @@ public class SUpgradeLevel implements UpgradeLevel {
     @Override
     public int getRoleLimit(PlayerRole playerRole) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-        return roleLimits.getOrDefault(playerRole.getId(), 0);
+        return roleLimits.get().getOrDefault(playerRole.getId(), 0);
     }
 
     @Override
     public Map<PlayerRole, Integer> getRoleLimits() {
-        if (this.roleLimits.isEmpty())
+        Int2IntMapView roleLimits = this.roleLimits.get();
+
+        if (roleLimits.isEmpty())
             return Collections.emptyMap();
 
-        Map<PlayerRole, Integer> roleLimits = new LinkedHashMap<>();
+        Map<PlayerRole, Integer> roleLimitsConverted = new LinkedHashMap<>();
 
-        Iterator<Int2IntMapView.Entry> iterator = this.roleLimits.entryIterator();
+        Iterator<Int2IntMapView.Entry> iterator = roleLimits.entryIterator();
         while (iterator.hasNext()) {
             Int2IntMapView.Entry entry = iterator.next();
             PlayerRole playerRole = SPlayerRole.fromId(entry.getKey());
             if (playerRole != null)
-                roleLimits.put(playerRole, entry.getValue());
+                roleLimitsConverted.put(playerRole, entry.getValue());
         }
 
-        return roleLimits.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(roleLimits);
+        return roleLimitsConverted.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(roleLimitsConverted);
     }
 
     public DoubleValue getCropGrowthUpgradeValue() {
@@ -294,14 +296,14 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     public Map<Key, IntValue> getBlockLimitsUpgradeValue() {
-        return blockLimits.entrySet().stream().collect(Collectors.toMap(
+        return blockLimits.get().entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
                 entry -> IntValue.syncedFixed(entry.getValue()))
         );
     }
 
     public Map<Key, IntValue> getEntityLimitsUpgradeValue() {
-        return entityLimits.entrySet().stream().collect(Collectors.toMap(
+        return entityLimits.get().entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
                 entry -> IntValue.syncedFixed(entry.getValue()))
         );
@@ -324,23 +326,25 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     public EnumerateMap<Dimension, Map<Key, IntValue>> getGeneratorUpgradeValue() {
-        EnumerateMap<Dimension, Map<Key, IntValue>> generatorRates = new EnumerateMap<>(Dimension.values());
+        EnumerateMap<Dimension, Map<Key, Integer>> generatorRates = this.generatorRates.get();
+
+        EnumerateMap<Dimension, Map<Key, IntValue>> generatorRatesConverted = new EnumerateMap<>(Dimension.values());
 
         for (Dimension dimension : Dimension.values()) {
-            Map<Key, Integer> worldGeneratorRates = this.generatorRates.get(dimension);
+            Map<Key, Integer> worldGeneratorRates = generatorRates.get(dimension);
             if (worldGeneratorRates != null) {
                 Map<Key, IntValue> result = worldGeneratorRates.entrySet().stream().collect(Collectors.toMap(
                         Map.Entry::getKey,
                         entry -> IntValue.syncedFixed(entry.getValue())));
-                generatorRates.put(dimension, result);
+                generatorRatesConverted.put(dimension, result);
             }
         }
 
-        return generatorRates;
+        return generatorRatesConverted;
     }
 
     public Map<PotionEffectType, IntValue> getPotionEffectsUpgradeValue() {
-        return islandEffects.entrySet().stream().collect(Collectors.toMap(
+        return islandEffects.get().entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
                 entry -> IntValue.syncedFixed(entry.getValue()))
         );
@@ -351,20 +355,22 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     public Map<PlayerRole, IntValue> getRoleLimitsUpgradeValue() {
-        if (this.roleLimits.isEmpty())
+        Int2IntMapView roleLimits = this.roleLimits.get();
+
+        if (roleLimits.isEmpty())
             return Collections.emptyMap();
 
-        Map<PlayerRole, IntValue> roleLimits = new LinkedHashMap<>();
+        Map<PlayerRole, IntValue> roleLimitsConverted = new LinkedHashMap<>();
 
-        Iterator<Int2IntMapView.Entry> iterator = this.roleLimits.entryIterator();
+        Iterator<Int2IntMapView.Entry> iterator = roleLimits.entryIterator();
         while (iterator.hasNext()) {
             Int2IntMapView.Entry entry = iterator.next();
             PlayerRole playerRole = SPlayerRole.fromId(entry.getKey());
             if (playerRole != null)
-                roleLimits.put(playerRole, IntValue.syncedFixed(entry.getValue()));
+                roleLimitsConverted.put(playerRole, IntValue.syncedFixed(entry.getValue()));
         }
 
-        return roleLimits.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(roleLimits);
+        return roleLimitsConverted.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(roleLimitsConverted);
     }
 
     public void setItemData(TemplateItem hasNextLevel, TemplateItem noNextLevel,

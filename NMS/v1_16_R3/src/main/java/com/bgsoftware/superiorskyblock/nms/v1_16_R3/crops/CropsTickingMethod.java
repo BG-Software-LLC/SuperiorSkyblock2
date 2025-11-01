@@ -99,7 +99,7 @@ public abstract class CropsTickingMethod {
                     if (!CROPS_TO_GROW_CACHE.contains(blockData.getBlock()))
                         continue;
 
-                    chunkTickMutablePosition.setValues((location & 15) | chunkOffsetX,
+                    chunkTickMutablePosition.d((location & 15) | chunkOffsetX,
                             ((location >>> 8) & 255) | offsetY,
                             ((location >>> 4) & 15) | chunkOffsetZ);
 
@@ -134,7 +134,7 @@ public abstract class CropsTickingMethod {
                         int y = factor >> 16 & 15;
                         IBlockData blockData = chunkSection.getType(x, y, z);
                         if (blockData.isTicking() && CROPS_TO_GROW_CACHE.contains(blockData.getBlock())) {
-                            chunkTickMutablePosition.setValues(x + chunkOffsetX, y + chunkSection.getYPosition(), z + chunkOffsetZ);
+                            chunkTickMutablePosition.d(x + chunkOffsetX, y + chunkSection.getYPosition(), z + chunkOffsetZ);
                             blockData.b(worldServer, chunkTickMutablePosition, worldServer.random);
                         }
                     }

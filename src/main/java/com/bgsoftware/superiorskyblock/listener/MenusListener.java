@@ -2,7 +2,8 @@ package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
-import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
@@ -15,13 +16,9 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
 public class MenusListener extends AbstractGameEventListener {
 
-    private final Map<UUID, ItemStack> latestClickedItem = AutoRemovalMap.newHashMap(1, TimeUnit.SECONDS);
+    private final Int2ObjectMapView<ItemStack> latestClickedItem = CollectionsFactory.createInt2ObjectArrayMap();
 
     public MenusListener(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -45,13 +42,15 @@ public class MenusListener extends AbstractGameEventListener {
         Inventory inventory = e.getArgs().bukkitEvent.getClickedInventory();
 
         if (clickedItem != null && inventory != null && inventory.getHolder() instanceof MenuView) {
-            latestClickedItem.put(e.getArgs().bukkitEvent.getWhoClicked().getUniqueId(), clickedItem);
+            int entityId = e.getArgs().bukkitEvent.getWhoClicked().getEntityId();
+            latestClickedItem.put(entityId, clickedItem);
+            BukkitExecutor.sync(() -> latestClickedItem.remove(entityId), 20L);
         }
     }
 
     private void onInventoryCloseDupePatch(GameEvent<GameEventArgs.InventoryCloseEvent> e) {
         Player player = (Player) e.getArgs().bukkitEvent.getPlayer();
-        ItemStack clickedItem = latestClickedItem.get(player.getUniqueId());
+        ItemStack clickedItem = latestClickedItem.remove(player.getEntityId());
         if (clickedItem != null) {
             BukkitExecutor.sync(() -> {
                 player.getInventory().removeItem(clickedItem);

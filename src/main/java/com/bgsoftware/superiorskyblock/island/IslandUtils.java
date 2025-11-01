@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
+import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -19,6 +20,7 @@ import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.SynchronizedTasks;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
@@ -186,6 +188,34 @@ public class IslandUtils {
         return totalAmount == 0 ? 0 : (island.getGeneratorAmount(key, dimension) * 100D) / totalAmount;
     }
 
+    public static boolean checkTransferRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
+        if (!superiorPlayer.getPlayerRole().isLastRole()) {
+            Message.NO_TRANSFER_PERMISSION.send(superiorPlayer);
+            return false;
+        }
+
+        if (!island.isMember(targetPlayer)) {
+            Message.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
+            return false;
+        }
+
+        if (island.getOwner().getUniqueId().equals(targetPlayer.getUniqueId())) {
+            Message.TRANSFER_ALREADY_LEADER.send(superiorPlayer);
+            return false;
+        }
+
+        return true;
+    }
+
+    public static void handleTransferIsland(SuperiorPlayer caller, Island island, SuperiorPlayer target) {
+        if (!PluginEventsFactory.callIslandTransferEvent(island, caller, target))
+            return;
+
+        island.transferIsland(target);
+
+        IslandUtils.sendMessage(island, Message.TRANSFER_BROADCAST, Collections.emptyList(), target.getName());
+    }
+
     public static boolean checkKickRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
         if (!island.isMember(targetPlayer)) {
             Message.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
@@ -200,6 +230,17 @@ public class IslandUtils {
         return true;
     }
 
+    public static void handleLeaveIsland(SuperiorPlayer superiorPlayer, Island island) {
+        if (!PluginEventsFactory.callIslandQuitEvent(island, superiorPlayer))
+            return;
+
+        island.removeMember(superiorPlayer, MemberRemoveReason.LEAVE);
+
+        IslandUtils.sendMessage(island, Message.LEAVE_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
+
+        Message.LEFT_ISLAND.send(superiorPlayer);
+    }
+
     public static void handleKickPlayer(SuperiorPlayer caller, Island island, SuperiorPlayer target) {
         handleKickPlayer(caller, caller.getName(), island, target);
     }
@@ -208,7 +249,7 @@ public class IslandUtils {
         if (!PluginEventsFactory.callIslandKickEvent(island, caller, target))
             return;
 
-        island.kickMember(target);
+        island.removeMember(target, MemberRemoveReason.KICK);
 
         IslandUtils.sendMessage(island, Message.KICK_ANNOUNCEMENT, Collections.emptyList(), target.getName(), callerName);
 
@@ -243,11 +284,13 @@ public class IslandUtils {
     }
 
     public static void deleteChunks(Island island, List<ChunkPosition> chunkPositions, Runnable onFinish) {
-        plugin.getNMSChunks().deleteChunks(island, chunkPositions, onFinish);
+        SynchronizedTasks synchronizedTasks = new SynchronizedTasks(1, onFinish);
         chunkPositions.forEach(chunkPosition -> {
             plugin.getStackedBlocks().removeStackedBlocks(chunkPosition);
             PluginEventsFactory.callIslandChunkResetEvent(island, chunkPosition);
         });
+        plugin.getNMSChunks().deleteChunks(island, chunkPositions, synchronizedTasks::notifyTaskComplete);
+        synchronizedTasks.waitAllAsync();
     }
 
     public static boolean isValidRoleForLimit(PlayerRole playerRole) {

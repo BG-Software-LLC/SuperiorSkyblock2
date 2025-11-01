@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.IslandChestPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.layout.PagedMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -80,7 +81,7 @@ public class MenuIslandChest extends AbstractPagedMenu<MenuIslandChest.View, Isl
         return new MenuIslandChest(menuParseResult);
     }
 
-    public static class View extends AbstractPagedMenuView<MenuIslandChest.View, IslandViewArgs, IslandChest> {
+    public static class View extends AbstractPagedMenuView<MenuIslandChest.View, IslandViewArgs, IslandChest> implements IIslandMenuView {
 
         private final Island island;
 
@@ -88,6 +89,11 @@ public class MenuIslandChest extends AbstractPagedMenu<MenuIslandChest.View, Isl
              Menu<View, IslandViewArgs> menu, IslandViewArgs args) {
             super(inventoryViewer, previousMenuView, menu);
             this.island = args.getIsland();
+        }
+
+        @Override
+        public Island getIsland() {
+            return this.island;
         }
 
         @Override

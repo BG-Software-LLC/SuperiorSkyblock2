@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -31,7 +32,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class CmdAdminShow implements IAdminIslandCommand {
 
@@ -47,9 +53,9 @@ public class CmdAdminShow implements IAdminIslandCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin show <" +
+        return "admin show [" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
     }
 
     @Override
@@ -59,7 +65,7 @@ public class CmdAdminShow implements IAdminIslandCommand {
 
     @Override
     public int getMinArgs() {
-        return 3;
+        return 2;
     }
 
     @Override
@@ -78,7 +84,13 @@ public class CmdAdminShow implements IAdminIslandCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        Island island = args.length == 2 ? CommandArguments.getIslandWhereStanding(plugin, sender).getIsland() :
+                CommandArguments.getIsland(plugin, sender, args[2]).getIsland();
+
+        if (island == null)
+            return;
+
         java.util.Locale locale = PlayerLocales.getLocale(sender);
         long lastTime = island.getLastTimeUpdate();
 
@@ -145,12 +157,14 @@ public class CmdAdminShow implements IAdminIslandCommand {
             infoMessage.append(Message.ISLAND_INFO_LEVEL.getMessage(locale, island.getIslandLevel())).append("\n");
 
         // Island discord
-        if (!Message.ISLAND_INFO_DISCORD.isEmpty(locale))
+        if (!Message.ISLAND_INFO_DISCORD.isEmpty(locale) && !"None".equals(island.getDiscord())) {
             infoMessage.append(Message.ISLAND_INFO_DISCORD.getMessage(locale, island.getDiscord())).append("\n");
+        }
 
         // Island paypal
-        if (!Message.ISLAND_INFO_PAYPAL.isEmpty(locale))
+        if (!Message.ISLAND_INFO_PAYPAL.isEmpty(locale) && !"None".equals(island.getPaypal())) {
             infoMessage.append(Message.ISLAND_INFO_PAYPAL.getMessage(locale, island.getPaypal())).append("\n");
+        }
 
         boolean upgradesModule = BuiltinModules.UPGRADES.isEnabled();
 
@@ -166,102 +180,54 @@ public class CmdAdminShow implements IAdminIslandCommand {
         }
 
         // Island admin size
-        if (!Message.ISLAND_INFO_ADMIN_SIZE.isEmpty(locale)) {
-            infoMessage.append(Message.ISLAND_INFO_ADMIN_SIZE.getMessage(locale, island.getIslandSize()));
-            if (island.getIslandSizeRaw() != island.getIslandSize())
-                infoMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-            infoMessage.append("\n");
-        }
+        collectIslandData(locale, infoMessage, island::getIslandSize, island::getIslandSizeRaw, Message.ISLAND_INFO_ADMIN_SIZE);
 
         // Island team limit
-        if (!Message.ISLAND_INFO_ADMIN_TEAM_LIMIT.isEmpty(locale)) {
-            infoMessage.append(Message.ISLAND_INFO_ADMIN_TEAM_LIMIT.getMessage(locale, island.getTeamLimit()));
-            if (island.getTeamLimitRaw() != island.getTeamLimit())
-                infoMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-            infoMessage.append("\n");
-        }
+        collectIslandData(locale, infoMessage, island::getTeamLimit, island::getTeamLimitRaw, Message.ISLAND_INFO_ADMIN_TEAM_LIMIT);
 
         // Island warps limit
-        if (!Message.ISLAND_INFO_ADMIN_WARPS_LIMIT.isEmpty(locale)) {
-            infoMessage.append(Message.ISLAND_INFO_ADMIN_WARPS_LIMIT.getMessage(locale, island.getWarpsLimit()));
-            if (island.getWarpsLimitRaw() != island.getWarpsLimit())
-                infoMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-            infoMessage.append("\n");
-        }
+        collectIslandData(locale, infoMessage, island::getWarpsLimit, island::getWarpsLimitRaw, Message.ISLAND_INFO_ADMIN_WARPS_LIMIT);
 
         // Island coop limit
-        if (plugin.getSettings().isCoopMembers() && !Message.ISLAND_INFO_ADMIN_COOP_LIMIT.isEmpty(locale)) {
-            infoMessage.append(Message.ISLAND_INFO_ADMIN_COOP_LIMIT.getMessage(locale, island.getCoopLimit()));
-            if (island.getCoopLimitRaw() != island.getCoopLimit())
-                infoMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-            infoMessage.append("\n");
-        }
+        if (plugin.getSettings().isCoopMembers())
+            collectIslandData(locale, infoMessage, island::getCoopLimit, island::getCoopLimitRaw, Message.ISLAND_INFO_ADMIN_COOP_LIMIT);
 
         // Island bank limit
-        if (!Message.ISLAND_INFO_ADMIN_BANK_LIMIT.isEmpty(locale)) {
-            infoMessage.append(Message.ISLAND_INFO_ADMIN_BANK_LIMIT.getMessage(locale,
-                    Formatters.NUMBER_FORMATTER.format(island.getBankLimit())));
-            if (!island.getBankLimitRaw().equals(island.getBankLimit()))
-                infoMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-            infoMessage.append("\n");
-        }
+        collectIslandData(locale, infoMessage, island::getBankLimit, island::getBankLimitRaw, Message.ISLAND_INFO_ADMIN_BANK_LIMIT,
+                Formatters.NUMBER_FORMATTER::format);
 
         if (upgradesModule) {
             // Island spawners multiplier
-            if (!Message.ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER.isEmpty(locale) &&
-                    BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeSpawnerRates.class)) {
-                infoMessage.append(Message.ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER.getMessage(locale, island.getSpawnerRatesMultiplier()));
-                if (island.getSpawnerRatesRaw() != island.getSpawnerRatesMultiplier())
-                    infoMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-                infoMessage.append("\n");
+            if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeSpawnerRates.class)) {
+                collectIslandData(locale, infoMessage, island::getSpawnerRatesMultiplier, island::getSpawnerRatesRaw,
+                        Message.ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER);
             }
 
+
             // Island drops multiplier
-            if (!Message.ISLAND_INFO_ADMIN_DROPS_MULTIPLIER.isEmpty(locale) &&
-                    BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeMobDrops.class)) {
-                infoMessage.append(Message.ISLAND_INFO_ADMIN_DROPS_MULTIPLIER.getMessage(locale, island.getMobDropsMultiplier()));
-                if (island.getMobDropsRaw() != island.getMobDropsMultiplier())
-                    infoMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-                infoMessage.append("\n");
+            if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeMobDrops.class)) {
+                collectIslandData(locale, infoMessage, island::getMobDropsMultiplier, island::getMobDropsRaw,
+                        Message.ISLAND_INFO_ADMIN_DROPS_MULTIPLIER);
             }
 
             // Island crops multiplier
-            if (!Message.ISLAND_INFO_ADMIN_CROPS_MULTIPLIER.isEmpty(locale) &&
-                    BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class)) {
-                infoMessage.append(Message.ISLAND_INFO_ADMIN_CROPS_MULTIPLIER.getMessage(locale, island.getCropGrowthMultiplier()));
-                if (island.getCropGrowthRaw() != island.getCropGrowthMultiplier())
-                    infoMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-                infoMessage.append("\n");
+            if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class)) {
+                collectIslandData(locale, infoMessage, island::getCropGrowthMultiplier, island::getCropGrowthRaw,
+                        Message.ISLAND_INFO_ADMIN_CROPS_MULTIPLIER);
             }
 
             // Island entity limits
-            if (!Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS.isEmpty(locale) &&
-                    !Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE.isEmpty(locale) &&
-                    BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
-                StringBuilder entitiesString = new StringBuilder();
-                for (Map.Entry<Key, Integer> entry : island.getEntitiesLimitsAsKeys().entrySet()) {
-                    entitiesString.append(Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE.getMessage(locale,
-                            Formatters.CAPITALIZED_FORMATTER.format(entry.getKey().toString()), entry.getValue()));
-                    if (!island.getCustomEntitiesLimits().containsKey(entry.getKey()))
-                        entitiesString.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-                    entitiesString.append("\n");
-                }
-                infoMessage.append(Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS.getMessage(locale, entitiesString));
+            if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
+                collectIslandData(locale, island::getEntitiesLimitsAsKeys, island::getCustomEntitiesLimits,
+                        Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS, Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE)
+                        .ifPresent(message -> infoMessage.append(Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS.getMessage(locale, message)));
             }
 
             // Island block limits
-            if (!Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS.isEmpty(locale) &&
-                    !Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE.isEmpty(locale) &&
-                    BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeBlockLimits.class)) {
-                StringBuilder blocksString = new StringBuilder();
-                for (Map.Entry<Key, Integer> entry : island.getBlocksLimits().entrySet()) {
-                    blocksString.append(Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE.getMessage(locale,
-                            Formatters.CAPITALIZED_FORMATTER.format(entry.getKey().toString()), entry.getValue()));
-                    if (!island.getCustomBlocksLimits().containsKey(entry.getKey()))
-                        blocksString.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-                    blocksString.append("\n");
-                }
-                infoMessage.append(Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS.getMessage(locale, blocksString));
+            if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeBlockLimits.class)) {
+                collectIslandData(locale, island::getBlocksLimits, island::getCustomBlocksLimits,
+                        Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS, Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE)
+                        .ifPresent(message -> infoMessage.append(Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS.getMessage(locale, message)));
             }
         }
 
@@ -282,37 +248,24 @@ public class CmdAdminShow implements IAdminIslandCommand {
                             generatorString.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
                         generatorString.append("\n");
                     }
-                    infoMessage.append(Message.ISLAND_INFO_ADMIN_GENERATOR_RATES.getMessage(locale, generatorString,
-                            Formatters.CAPITALIZED_FORMATTER.format(dimension.getName())));
+                    if (generatorString.length() > 0)
+                        infoMessage.append(Message.ISLAND_INFO_ADMIN_GENERATOR_RATES.getMessage(locale, generatorString,
+                                Formatters.CAPITALIZED_FORMATTER.format(dimension.getName())));
                 }
             }
         }
 
-        if (upgradesModule) {
-            // Island effects
-            if (!Message.ISLAND_INFO_ADMIN_ISLAND_EFFECTS.isEmpty(locale) &&
-                    !Message.ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE.isEmpty(locale) &&
-                    BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class)) {
-                StringBuilder blocksString = new StringBuilder();
-                for (Map.Entry<PotionEffectType, Integer> entry : island.getPotionEffects().entrySet()) {
-                    blocksString.append(Message.ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE.getMessage(locale,
-                            Formatters.CAPITALIZED_FORMATTER.format(entry.getKey().getName()), entry.getValue())).append("\n");
-                }
-                infoMessage.append(Message.ISLAND_INFO_ADMIN_ISLAND_EFFECTS.getMessage(locale, blocksString));
-            }
+        // Island effects
+        if (upgradesModule && BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class)) {
+            collectIslandData(locale, island::getPotionEffects, island::getCustomPotionEffects,
+                    Message.ISLAND_INFO_ADMIN_ISLAND_EFFECTS, Message.ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE, PotionEffectType::getName)
+                    .ifPresent(message -> infoMessage.append(Message.ISLAND_INFO_ADMIN_ISLAND_EFFECTS.getMessage(locale, message)));
         }
 
-        // Island entity limits
-        if (!Message.ISLAND_INFO_ADMIN_ROLE_LIMITS.isEmpty(locale) && !Message.ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE.isEmpty(locale)) {
-            StringBuilder entitiesString = new StringBuilder();
-            for (Map.Entry<PlayerRole, Integer> entry : island.getRoleLimits().entrySet()) {
-                entitiesString.append(Message.ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE.getMessage(locale, entry.getKey(), entry.getValue()));
-                if (!island.getCustomRoleLimits().containsKey(entry.getKey()))
-                    entitiesString.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-                entitiesString.append("\n");
-            }
-            infoMessage.append(Message.ISLAND_INFO_ADMIN_ROLE_LIMITS.getMessage(locale, entitiesString));
-        }
+        // Island role limits
+        collectIslandData(locale, island::getRoleLimits, island::getCustomRoleLimits,
+                Message.ISLAND_INFO_ADMIN_ROLE_LIMITS, Message.ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE)
+                .ifPresent(message -> infoMessage.append(Message.ISLAND_INFO_ADMIN_ROLE_LIMITS.getMessage(locale, message)));
 
         // Island members
         if (!Message.ISLAND_INFO_ROLES.isEmpty(locale)) {
@@ -327,14 +280,73 @@ public class CmdAdminShow implements IAdminIslandCommand {
 
             rolesStrings.keySet().stream()
                     .sorted(Collections.reverseOrder(Comparator.comparingInt(PlayerRole::getWeight)))
-                    .forEach(playerRole ->
-                            infoMessage.append(Message.ISLAND_INFO_ROLES.getMessage(locale, playerRole, rolesStrings.get(playerRole))));
+                    .forEach(playerRole -> {
+                        StringBuilder players = rolesStrings.get(playerRole);
+                        if (players != null && players.length() > 0)
+                            infoMessage.append(Message.ISLAND_INFO_ROLES.getMessage(locale, playerRole, players));
+                    });
         }
 
         if (!Message.ISLAND_INFO_FOOTER.isEmpty(locale))
             infoMessage.append(Message.ISLAND_INFO_FOOTER.getMessage(locale));
 
         Message.CUSTOM.send(sender, infoMessage.toString(), false);
+    }
+
+    private static <K, V> Optional<StringBuilder> collectIslandData(Locale locale,
+                                                                    Supplier<Map<K, V>> dataFunction,
+                                                                    Supplier<Map<K, V>> customDataFunction,
+                                                                    Message dataMessage, Message dataLineMessage) {
+        return collectIslandData(locale, dataFunction, customDataFunction, dataMessage, dataLineMessage, null);
+    }
+
+    private static <K, V> Optional<StringBuilder> collectIslandData(Locale locale,
+                                                                    Supplier<Map<K, V>> dataFunction,
+                                                                    Supplier<Map<K, V>> customDataFunction,
+                                                                    Message dataMessage, Message dataLineMessage,
+                                                                    @Nullable Function<K, String> formatter) {
+        if (dataMessage.isEmpty(locale) || dataLineMessage.isEmpty(locale))
+            return Optional.empty();
+
+        StringBuilder dataValue = new StringBuilder();
+
+        Map<K, V> islandData = dataFunction.get();
+        Map<K, V> islandCustomData = customDataFunction.get();
+
+        islandData.forEach((key, value) -> {
+            String keyStringValue = formatter == null ? key.toString() : formatter.apply(key);
+            dataValue.append(dataLineMessage.getMessage(locale, Formatters.CAPITALIZED_FORMATTER.format(keyStringValue), value));
+            if (!islandCustomData.containsKey(key))
+                dataValue.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
+            dataValue.append("\n");
+        });
+
+        return dataValue.length() > 0 ? Optional.of(dataValue) : Optional.empty();
+    }
+
+    private static <T> void collectIslandData(Locale locale, StringBuilder message,
+                                              Supplier<T> dataFunction,
+                                              Supplier<T> customDataFunction,
+                                              Message dataLineMessage) {
+        collectIslandData(locale, message, dataFunction, customDataFunction, dataLineMessage, null);
+    }
+
+    private static <T> void collectIslandData(Locale locale, StringBuilder message,
+                                              Supplier<T> dataFunction,
+                                              Supplier<T> customDataFunction,
+                                              Message dataLineMessage,
+                                              @Nullable Function<T, ?> formatter) {
+        if (dataLineMessage.isEmpty(locale))
+            return;
+
+        T islandData = dataFunction.get();
+        T islandCustomData = customDataFunction.get();
+
+        Object formattedIslandData = formatter == null ? islandData : formatter.apply(islandData);
+        message.append(dataLineMessage.getMessage(locale, formattedIslandData));
+        if (!Objects.equals(islandData, islandCustomData))
+            message.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
+        message.append("\n");
     }
 
 }

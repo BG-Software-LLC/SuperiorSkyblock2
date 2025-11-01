@@ -29,6 +29,8 @@ public class MissionData {
     @Nullable
     private final TemplateItem canComplete;
     @Nullable
+    private final TemplateItem locked;
+    @Nullable
     private final TemplateItem completed;
     private final int resetAmount;
 
@@ -41,7 +43,7 @@ public class MissionData {
         this.leaveReset = section.getBoolean("leave-reset", false);
         this.resetAmount = section.getInt("reset-amount", 1);
 
-        if (section.contains("rewards.items")) {
+        if (section.isConfigurationSection("rewards.items")) {
             for (String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
                 TemplateItem templateItem = MenuParserImpl.getInstance().getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key));
                 if (templateItem != null) {
@@ -58,6 +60,7 @@ public class MissionData {
 
         this.notCompleted = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.not-completed"));
         this.canComplete = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.can-complete"));
+        this.locked = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.locked"));
         this.completed = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.completed"));
     }
 
@@ -97,8 +100,16 @@ public class MissionData {
         return resetAmount;
     }
 
+    public boolean hasLocked() {
+        return locked != null;
+    }
+
     public ItemBuilder getCompleted() {
         return (completed == null ? TemplateItem.AIR : completed).getBuilder();
+    }
+
+    public ItemBuilder getLocked() {
+        return (locked == null ? TemplateItem.AIR : locked).getBuilder();
     }
 
     public ItemBuilder getCanComplete() {

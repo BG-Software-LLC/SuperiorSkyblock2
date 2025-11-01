@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
@@ -29,7 +30,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
@@ -159,17 +159,14 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<IslandPrivilege> islandPrivilege = playerPermissions.getString("permission").map(name -> {
+            IslandPrivilege islandPrivilege = playerPermissions.getString("permission").map(name -> {
                 try {
                     return IslandPrivilege.getByName(name);
                 } catch (NullPointerException error) {
-                    return null;
+                    IslandPrivilege.register(name);
+                    return IslandPrivilege.getByName(name);
                 }
-            });
-            if (!islandPrivilege.isPresent()) {
-                Log.warn("Cannot load player permissions with invalid permission for player ", playerUUID.get(), ", skipping...");
-                return;
-            }
+            }).orElseThrow(IllegalStateException::new);
 
             Optional<Byte> status = playerPermissions.getByte("status");
             if (!status.isPresent()) {
@@ -178,7 +175,7 @@ public class IslandsDeserializer {
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-            builder.setPlayerPermission(superiorPlayer, islandPrivilege.get(), status.get() == 1);
+            builder.setPlayerPermission(superiorPlayer, islandPrivilege, status.get() == 1);
         });
     }
 
@@ -198,20 +195,17 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<IslandPrivilege> islandPrivilege = rolePermissions.getString("permission").map(name -> {
+            IslandPrivilege islandPrivilege = rolePermissions.getString("permission").map(name -> {
                 try {
                     return IslandPrivilege.getByName(name);
                 } catch (NullPointerException error) {
-                    return null;
+                    IslandPrivilege.register(name);
+                    return IslandPrivilege.getByName(name);
                 }
-            });
-            if (!islandPrivilege.isPresent()) {
-                Log.warn("Cannot load role permissions with invalid permission for ", uuid.get(), ", skipping...");
-                return;
-            }
+            }).orElseThrow(IllegalStateException::new);
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-            builder.setRolePermission(islandPrivilege.get(), playerRole.get());
+            builder.setRolePermission(islandPrivilege, playerRole.get());
         });
     }
 
@@ -454,17 +448,14 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<IslandFlag> islandFlag = islandFlagResult.getString("name").map(name -> {
+            IslandFlag islandFlag = islandFlagResult.getString("name").map(name -> {
                 try {
                     return IslandFlag.getByName(name);
                 } catch (NullPointerException error) {
-                    return null;
+                    IslandFlag.register(name);
+                    return IslandFlag.getByName(name);
                 }
-            });
-            if (!islandFlag.isPresent()) {
-                Log.warn("Cannot load island flags with invalid flags for ", uuid.get(), ", skipping...");
-                return;
-            }
+            }).orElseThrow(IllegalStateException::new);
 
             Optional<Byte> status = islandFlagResult.getByte("status");
             if (!status.isPresent()) {
@@ -473,7 +464,7 @@ public class IslandsDeserializer {
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-            builder.setIslandFlag(islandFlag.get(), status.get() == 1);
+            builder.setIslandFlag(islandFlag, status.get() == 1);
         });
     }
 
@@ -526,14 +517,14 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<Location> location = islandHomes.getString("location").map(Serializers.LOCATION_SERIALIZER::deserialize);
+            Optional<WorldPosition> location = islandHomes.getString("location").map(Serializers.WORLD_POSITION_SERIALIZER::deserialize);
             if (!location.isPresent()) {
                 Log.warn("Cannot load island homes with invalid location for ", uuid.get(), ", skipping...");
                 return;
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-            builder.setIslandHome(location.get(), dimension.get());
+            builder.setIslandHome(dimension.get(), location.get());
         });
     }
 
@@ -553,14 +544,14 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<Location> location = islandVisitorHomes.getString("location").map(Serializers.LOCATION_SERIALIZER::deserialize);
+            Optional<WorldPosition> location = islandVisitorHomes.getString("location").map(Serializers.WORLD_POSITION_SERIALIZER::deserialize);
             if (!location.isPresent()) {
                 Log.warn("Cannot load island homes with invalid location for ", uuid.get(), ", skipping...");
                 return;
             }
 
             Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-            builder.setVisitorHome(location.get(), dimension.get());
+            builder.setVisitorHome(dimension.get(), location.get());
         });
     }
 
@@ -736,20 +727,22 @@ public class IslandsDeserializer {
     }
 
     public static void deserializeBankTransactions(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
-        if (BuiltinModules.BANK.bankLogs && BuiltinModules.BANK.cacheAllLogs) {
-            databaseBridge.loadAllObjects("bank_transactions", bankTransactionRow -> {
-                DatabaseResult bankTransaction = new DatabaseResult(bankTransactionRow);
+        if (!BuiltinModules.BANK.getConfiguration().isBankLogs() ||
+                !BuiltinModules.BANK.getConfiguration().isCacheAllLogs())
+            return;
 
-                Optional<UUID> uuid = bankTransaction.getUUID("island");
-                if (!uuid.isPresent()) {
-                    Log.warn("Cannot load bank transaction for null islands, skipping...");
-                    return;
-                }
+        databaseBridge.loadAllObjects("bank_transactions", bankTransactionRow -> {
+            DatabaseResult bankTransaction = new DatabaseResult(bankTransactionRow);
 
-                Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
-                SBankTransaction.fromDatabase(bankTransaction).ifPresent(builder::addBankTransaction);
-            });
-        }
+            Optional<UUID> uuid = bankTransaction.getUUID("island");
+            if (!uuid.isPresent()) {
+                Log.warn("Cannot load bank transaction for null islands, skipping...");
+                return;
+            }
+
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            SBankTransaction.fromDatabase(bankTransaction).ifPresent(builder::addBankTransaction);
+        });
     }
 
     public static void deserializePersistentDataContainer(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {

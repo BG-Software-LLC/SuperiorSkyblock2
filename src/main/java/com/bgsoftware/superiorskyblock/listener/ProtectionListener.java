@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
@@ -21,11 +22,13 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
+import com.bgsoftware.superiorskyblock.world.entity.EntityCategory;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Entity;
@@ -204,7 +207,7 @@ public class ProtectionListener extends AbstractGameEventListener {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
         InteractionResult interactionResult = this.protectionManager.get().handleEntityInteract(superiorPlayer,
-                e.getArgs().clickedEntity, e.getArgs().player.getItemInHand());
+                e.getArgs().clickedEntity, e.getArgs().usedItem);
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
             return true;
@@ -386,14 +389,8 @@ public class ProtectionListener extends AbstractGameEventListener {
         if (!(rider instanceof Player))
             return;
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(rider);
-
-        InteractionResult interactionResult;
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location vehicleLocation = e.getArgs().vehicle.getLocation(wrapper.getHandle());
-            interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer,
-                    vehicleLocation, IslandPrivileges.MINECART_ENTER);
-        }
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) rider);
+        InteractionResult interactionResult = this.protectionManager.get().handleEntityRide(superiorPlayer, e.getArgs().vehicle);
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled();
     }
@@ -404,12 +401,15 @@ public class ProtectionListener extends AbstractGameEventListener {
         if (!(inventoryHolder instanceof Vehicle))
             return;
 
+        IslandPrivilege islandPrivilege = BukkitEntities.isHorse((Vehicle) inventoryHolder) ? IslandPrivileges.HORSE_INTERACT :
+                inventoryHolder instanceof Animals ? IslandPrivileges.ENTITY_RIDE : IslandPrivileges.MINECART_OPEN;
+
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().bukkitEvent.getPlayer());
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location minecartLocation = ((Vehicle) inventoryHolder).getLocation(wrapper.getHandle());
             interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer,
-                    minecartLocation, IslandPrivileges.MINECART_OPEN);
+                    minecartLocation, islandPrivilege);
         }
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled();
@@ -501,8 +501,12 @@ public class ProtectionListener extends AbstractGameEventListener {
                     if (hitEntity == null)
                         return;
 
+                    EntityCategory entityCategory = EntityCategory.getEntityCategory(Keys.of(entity));
+                    if (entityCategory == null)
+                        return;
+
                     location = hitEntity.getLocation(wrapper.getHandle());
-                    islandPrivilege = BukkitEntities.getCategory(entity.getType()).getDamagePrivilege();
+                    islandPrivilege = entityCategory.getDamagePrivilege();
                     hitBlock = null;
                 } else {
                     hitBlock = e.getArgs().hitBlock;
@@ -512,6 +516,9 @@ public class ProtectionListener extends AbstractGameEventListener {
                     location = hitBlock.getLocation(wrapper.getHandle());
                     islandPrivilege = IslandPrivileges.BREAK;
                 }
+
+                if (islandPrivilege == null)
+                    return;
 
                 interactionResult = this.protectionManager.get().handleCustomInteraction(shooterPlayer, location, islandPrivilege);
             }
@@ -531,10 +538,11 @@ public class ProtectionListener extends AbstractGameEventListener {
         });
     }
 
-    private void onWindChargeExplodeEvent(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
-        Entity entity = e.getArgs().entity;
-        if (entity.getType() != WIND_CHARGE)
+    private void onSoftExplodeEvent(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
+        if (!e.getArgs().isSoftExplosion)
             return;
+
+        Entity entity = e.getArgs().entity;
 
         BukkitEntities.getPlayerSource(entity).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(shooterPlayer -> {
             Iterator<Block> blocksIterator = e.getArgs().blocks.iterator();
@@ -598,7 +606,7 @@ public class ProtectionListener extends AbstractGameEventListener {
         registerCallback(GameEventType.PLAYER_PICKUP_ITEM_EVENT, GameEventPriority.NORMAL, this::onPlayerPickupItem);
         registerCallback(GameEventType.PROJECTILE_LAUNCH_EVENT, GameEventPriority.NORMAL, this::onPlayerLaunchProjectile);
         registerCallback(GameEventType.PROJECTILE_HIT_EVENT, GameEventPriority.NORMAL, this::onProjectileHit);
-        registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.NORMAL, this::onWindChargeExplodeEvent);
+        registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.NORMAL, this::onSoftExplodeEvent);
         registerCallback(GameEventType.PLAYER_PICKUP_ARROW_EVENT, GameEventPriority.NORMAL, this::onPlayerPickupArrow);
         registerCallback(GameEventType.RAID_TRIGGER_EVENT, GameEventPriority.NORMAL, this::onRaidTrigger);
     }

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 import java.util.regex.Matcher;
@@ -21,13 +22,10 @@ public class BukkitListeners {
 
     public void registerListeners() {
         new AdminPlayersListener(this.plugin);
-        new BlockChangesListener(this.plugin);
         new ChunksListener(this.plugin);
         new EntityTrackingListener(this.plugin);
         new FeaturesListener(this.plugin);
         new IslandFlagsListener(this.plugin);
-        new IslandOutsideListener(this.plugin);
-        new IslandPreviewListener(this.plugin);
         new IslandWorldEventsListener(this.plugin);
         new MenusListener(this.plugin);
         new PlayersListener(this.plugin);
@@ -37,7 +35,21 @@ public class BukkitListeners {
         new StackedBlocksListener(this.plugin);
         new WorldDestructionListener(this.plugin);
 
+        if (plugin.getSettings().isStopLeaving())
+            new IslandOutsideListener(this.plugin);
+
+        if (plugin.getSettings().isAutoBlocksTracking())
+            new BlockChangesListener(this.plugin);
+
+        if (!plugin.getSettings().getIslandPreviews().getLocations().isEmpty())
+            new IslandPreviewListener(this.plugin);
+
         safeEventsRegister(new BukkitEventsListener(this.plugin));
+    }
+
+    public void unregisterListeners() {
+        plugin.getGameEventsDispatcher().clearCallbacks();
+        HandlerList.unregisterAll(this.plugin);
     }
 
     public void registerListenerFailureFilter() {

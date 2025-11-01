@@ -88,7 +88,7 @@ public class CmdHelp implements ISuperiorCommand {
                 .build(plugin.getCommands().getSubCommands());
 
         if (subCommands.isEmpty()) {
-            Message.NO_COMMAND_PERMISSION.send(sender);
+            Message.NO_COMMAND_PERMISSION.send(sender, getPermission());
             return;
         }
 

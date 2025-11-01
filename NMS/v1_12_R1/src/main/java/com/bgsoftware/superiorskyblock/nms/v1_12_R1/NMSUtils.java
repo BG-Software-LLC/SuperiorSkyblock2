@@ -49,7 +49,7 @@ public class NMSUtils {
     private static final ReflectMethod<Void> TILE_ENTITY_LOAD = new ReflectMethod<>(
             TileEntity.class, "a", NBTTagCompound.class);
 
-    private static final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
+    private static final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newConcurrentMap();
 
     private static final List<CompletableFuture<Void>> PENDING_CHUNK_ACTIONS = new LinkedList<>();
 
@@ -71,7 +71,7 @@ public class NMSUtils {
 
         try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
             BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
-            blockPosition.setValues(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            blockPosition.c(location.getBlockX(), location.getBlockY(), location.getBlockZ());
             TileEntity tileEntity = worldServer.getTileEntity(blockPosition);
             return !type.isInstance(tileEntity) ? null : type.cast(tileEntity);
         }

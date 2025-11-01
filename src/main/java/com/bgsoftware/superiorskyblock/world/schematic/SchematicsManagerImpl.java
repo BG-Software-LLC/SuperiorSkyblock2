@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.io.Files;
@@ -32,6 +33,7 @@ import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.world.WorldReader;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.schematic.container.SchematicsContainer;
+import com.bgsoftware.superiorskyblock.world.schematic.impl.CachedSuperiorSchematic;
 import com.bgsoftware.superiorskyblock.world.schematic.impl.SuperiorSchematic;
 import com.bgsoftware.superiorskyblock.world.schematic.parser.DefaultSchematicParser;
 import com.google.common.base.Preconditions;
@@ -85,6 +87,14 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
         loadDefaultSchematicParsers();
 
+        loadSchematics();
+    }
+
+    public void loadSchematics() throws ManagerLoadException {
+        this.schematicsContainer.clearSchematics();
+
+        File schematicsFolder = new File(plugin.getDataFolder(), "schematics");
+
         for (File schemFile : Files.listFolderFiles(schematicsFolder, false)) {
             String schemName = Files.getFileName(schemFile).toLowerCase(Locale.ENGLISH);
             Schematic schematic = loadFromFile(schemName, schemFile);
@@ -93,12 +103,38 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             }
         }
 
-        if (this.schematicsContainer.getSchematicNames().isEmpty()) {
+        if (this.schematicsContainer.getSchematics().isEmpty()) {
             throw new ManagerLoadException("&cThere were no valid schematics.",
                     ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
 
         System.gc();
+    }
+
+    public void cacheSchematics() {
+        if (!plugin.getSettings().isCacheSchematics() || plugin.getSettings().getMaxIslandSize() % 4 != 0 || true)
+            return;
+
+        List<Schematic> newSchematics = new LinkedList<>();
+        boolean cachedSchematic = false;
+
+        for (Schematic schematic : this.schematicsContainer.getSchematics().values()) {
+            if (schematic instanceof SuperiorSchematic) {
+                try {
+                    schematic = new CachedSuperiorSchematic((SuperiorSchematic) schematic);
+                    cachedSchematic = true;
+                } catch (Throwable error) {
+                    Log.warn("Cannot cache schematic ", schematic.getName(), ", skipping...");
+                }
+            }
+            newSchematics.add(schematic);
+        }
+
+        if (!cachedSchematic)
+            return;
+
+        this.schematicsContainer.clearSchematics();
+        newSchematics.forEach(this.schematicsContainer::addSchematic);
     }
 
     private void loadDefaultSchematicParsers() {
@@ -120,7 +156,8 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
     @Override
     public List<String> getSchematics() {
-        return this.schematicsContainer.getSchematicNames();
+        return new SequentialListBuilder<String>()
+                .build(this.schematicsContainer.getSchematics().keySet());
     }
 
     @Override
@@ -164,7 +201,9 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
                 .setSaveAir(saveAir)
                 .build();
 
-        saveSchematic(pos1.parse(), pos2.parse(), schematicOptions, () -> Message.SCHEMATIC_SAVED.send(superiorPlayer));
+        World world = offset.getWorld();
+        saveSchematic(pos1.toLocation(world), pos2.toLocation(world), schematicOptions,
+                () -> Message.SCHEMATIC_SAVED.send(superiorPlayer));
 
         superiorPlayer.setSchematicPos1(null);
         superiorPlayer.setSchematicPos2(null);
@@ -306,21 +345,21 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             }
 
             Map<String, Tag<?>> compoundValue = new HashMap<>();
-            compoundValue.put("xSize", new IntTag(xSize));
-            compoundValue.put("ySize", new IntTag(ySize));
-            compoundValue.put("zSize", new IntTag(zSize));
-            compoundValue.put("blocks", new ListTag(CompoundTag.class, blocks));
-            compoundValue.put("entities", new ListTag(CompoundTag.class, entities));
-            compoundValue.put("offsetX", new IntTag(schematicOptions.getOffsetX()));
-            compoundValue.put("offsetY", new IntTag(schematicOptions.getOffsetY()));
-            compoundValue.put("offsetZ", new IntTag(schematicOptions.getOffsetZ()));
-            compoundValue.put("yaw", new FloatTag(schematicOptions.getYaw()));
-            compoundValue.put("pitch", new FloatTag(schematicOptions.getPitch()));
-            compoundValue.put("version", new StringTag(ServerVersion.getBukkitVersion()));
+            compoundValue.put("xSize", IntTag.of(xSize));
+            compoundValue.put("ySize", IntTag.of(ySize));
+            compoundValue.put("zSize", IntTag.of(zSize));
+            compoundValue.put("blocks", ListTag.of(blocks, CompoundTag.class));
+            compoundValue.put("entities", ListTag.of(entities, CompoundTag.class));
+            compoundValue.put("offsetX", IntTag.of(schematicOptions.getOffsetX()));
+            compoundValue.put("offsetY", IntTag.of(schematicOptions.getOffsetY()));
+            compoundValue.put("offsetZ", IntTag.of(schematicOptions.getOffsetZ()));
+            compoundValue.put("yaw", FloatTag.of(schematicOptions.getYaw()));
+            compoundValue.put("pitch", FloatTag.of(schematicOptions.getPitch()));
+            compoundValue.put("version", StringTag.of(ServerVersion.getBukkitVersion()));
             if (!ServerVersion.isLegacy())
-                compoundValue.put("minecraftDataVersion", new IntTag(plugin.getNMSAlgorithms().getDataVersion()));
+                compoundValue.put("minecraftDataVersion", IntTag.of(plugin.getNMSAlgorithms().getDataVersion()));
 
-            CompoundTag schematicTag = new CompoundTag(compoundValue);
+            CompoundTag schematicTag = CompoundTag.of(compoundValue);
             SuperiorSchematic schematic = new SuperiorSchematic(schematicOptions.getSchematicName(), schematicTag);
             this.schematicsContainer.addSchematic(schematic);
             saveIntoFile(schematicOptions.getSchematicName(), schematicTag);
@@ -333,7 +372,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
     public String getDefaultSchematic(Dimension dimension) {
         String suffix = "_" + dimension.getName().toLowerCase(Locale.ENGLISH);
-        for (String schematicName : this.schematicsContainer.getSchematicNames()) {
+        for (String schematicName : this.schematicsContainer.getSchematics().keySet()) {
             if (getSchematic(schematicName + suffix) != null)
                 return schematicName;
         }

@@ -1,0 +1,88 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lTop Islands'
+previous-menu: true
+
+pattern:
+  - '~ ~ ~ ~ ~ ~ ~ ~ ~'
+  - '@ % @ @ @ # @ @ @'
+  - '@ * @ @ # # # @ @'
+  - '@ ^ @ # # # # # @'
+  - '@ & @ @ @ $ @ @ @'
+  - '~ ~ ! ~ - ~ + ~ ~'
+
+slots: '#'
+previous-page: '!'
+current-page: '-'
+next-page: '+'
+
+player-island: '$'
+sort-glow-when-selected: true
+
+items:
+  '#':
+    island:
+      type: SKULL_ITEM
+      data: 3
+      name: '&e&l[!] Island: &6&n{0}&7 (#{1})'
+      lore:
+        - '&7'
+        - '&6&l* &e&lIsland Level &7{2}'
+        - '&7'
+        - '&6&l* &e&lPlace &7#{1}'
+        - '&6&l* &e&lWorth &7${3}'
+        - '&6&l* &e&lRating {8} &7({9})'
+        - '&6&l* &e&lPlayers &7{10}'
+        - '&7'
+        - '&6&l* &e&lMembers:'
+        - '{4}:&f  - &7{}'
+        - '&7'
+        - '&7&o(( &f&oLeft-Click &7&oto view their items. ))'
+        - '&7&o(( &f&oRight-Click &7&oto teleport to island warp. ))'
+    no-island:
+      type: SKULL_ITEM
+      data: 3
+      name: '&cInvalid Island'
+  '%':
+    type: DIAMOND
+    sorting-type: 'WORTH'
+    name: '&6Sort by Worth'
+  '*':
+    type: GOLD_INGOT
+    sorting-type: 'LEVEL'
+    name: '&6Sort by Level'
+  '^':
+    type: EMERALD
+    sorting-type: 'RATING'
+    name: '&6Sort by Rating'
+  '&':
+    type: SKULL_ITEM
+    data: 3
+    sorting-type: 'PLAYERS'
+    name: '&6Sort by Players'
+  '!':
+    type: PAPER
+    name: '{0}Previous Page'
+  '-':
+    type: DOUBLE_PLANT
+    name: '&aCurrent Page'
+    lore:
+      - '&7Page {0}'
+  '+':
+    type: PAPER
+    name: '{0}Next Page'
+  '~':
+    type: STAINED_GLASS_PANE
+    data: 15
+    name: '&f'
+
+sounds:
+  '@':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2

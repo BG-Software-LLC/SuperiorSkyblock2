@@ -21,6 +21,8 @@ import java.util.Locale;
 
 public class CmdPermissions implements IPermissibleCommand {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     @Override
     public List<String> getAliases() {
         return Arrays.asList("permissions", "perms", "setpermission", "setperm");
@@ -33,7 +35,11 @@ public class CmdPermissions implements IPermissibleCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "permissions [" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "] [reset]";
+        if (plugin.getSettings().isEditPlayerPermissions()) {
+            return "permissions [" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "] [reset]";
+        } else {
+            return "permissions [reset]";
+        }
     }
 
     @Override
@@ -48,7 +54,7 @@ public class CmdPermissions implements IPermissibleCommand {
 
     @Override
     public int getMaxArgs() {
-        return 3;
+        return plugin.getSettings().isEditPlayerPermissions() ? 3 : 2;
     }
 
     @Override
@@ -72,7 +78,7 @@ public class CmdPermissions implements IPermissibleCommand {
 
         boolean setToDefault = (args.length == 2 ? args[1] : args.length == 3 ? args[2] : "").equalsIgnoreCase("reset");
 
-        if ((!setToDefault && args.length == 2) || args.length == 3) {
+        if (plugin.getSettings().isEditPlayerPermissions() && ((!setToDefault && args.length == 2) || args.length == 3)) {
             SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
 
             if (targetPlayer == null) {
@@ -115,23 +121,14 @@ public class CmdPermissions implements IPermissibleCommand {
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         List<String> tabVariables = new LinkedList<>();
 
-        switch (args.length) {
-            case 2:
-                if ("reset".contains(args[1].toLowerCase(Locale.ENGLISH)))
-                    tabVariables.add("reset");
-                tabVariables.addAll(CommandTabCompletes.getOnlinePlayers(plugin, args[1],
-                        plugin.getSettings().isTabCompleteHideVanished()));
-                break;
-            case 3:
-                break;
-        }
-
         if (args.length == 2) {
             if ("reset".contains(args[1].toLowerCase(Locale.ENGLISH)))
                 tabVariables.add("reset");
-            tabVariables.addAll(CommandTabCompletes.getOnlinePlayers(plugin, args[1],
-                    plugin.getSettings().isTabCompleteHideVanished()));
-        } else if (args.length == 3) {
+            if (plugin.getSettings().isEditPlayerPermissions()) {
+                tabVariables.addAll(CommandTabCompletes.getOnlinePlayers(plugin, args[1],
+                        plugin.getSettings().isTabCompleteHideVanished()));
+            }
+        } else if (plugin.getSettings().isEditPlayerPermissions() && args.length == 3) {
             if ("reset".contains(args[2].toLowerCase(Locale.ENGLISH)))
                 tabVariables.add("reset");
         }

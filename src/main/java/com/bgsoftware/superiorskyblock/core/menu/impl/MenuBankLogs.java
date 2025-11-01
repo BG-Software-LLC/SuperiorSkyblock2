@@ -18,6 +18,8 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankLogsSortButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.IPlayerMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -69,7 +71,7 @@ public class MenuBankLogs extends AbstractPagedMenu<MenuBankLogs.View, IslandVie
         return new MenuBankLogs(menuParseResult);
     }
 
-    public static class View extends AbstractPagedMenuView<View, IslandViewArgs, BankTransaction> {
+    public static class View extends AbstractPagedMenuView<View, IslandViewArgs, BankTransaction> implements IIslandMenuView, IPlayerMenuView {
 
         private final Island island;
 
@@ -80,6 +82,17 @@ public class MenuBankLogs extends AbstractPagedMenu<MenuBankLogs.View, IslandVie
              Menu<View, IslandViewArgs> menu, IslandViewArgs args) {
             super(inventoryViewer, previousMenuView, menu);
             this.island = args.getIsland();
+        }
+
+        @Override
+        public Island getIsland() {
+            return this.island;
+        }
+
+        @Override
+        public SuperiorPlayer getSuperiorPlayer() {
+            return this.filteredPlayer == null || this.filteredPlayer.equals(CONSOLE_UUID) ? null :
+                    plugin.getPlayers().getSuperiorPlayer(filteredPlayer);
         }
 
         public void setSorting(Comparator<BankTransaction> sorting) {
@@ -154,7 +167,7 @@ public class MenuBankLogs extends AbstractPagedMenu<MenuBankLogs.View, IslandVie
 
         int charCounter = 0;
 
-        if (cfg.contains("members-panel.fill-items")) {
+        if (cfg.isConfigurationSection("members-panel.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("members-panel.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }

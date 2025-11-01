@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
-import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -69,15 +68,9 @@ public class CmdAdminSetRoleLimit implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        PlayerRole playerRole = CommandArguments.getPlayerRole(sender, args[3]);
-
+        PlayerRole playerRole = CommandArguments.getPlayerRoleForLimit(sender, args[3]);
         if (playerRole == null)
             return;
-
-        if (!IslandUtils.isValidRoleForLimit(playerRole)) {
-            Message.INVALID_ROLE.send(sender, args[3], SPlayerRole.getValuesString());
-            return;
-        }
 
         NumberArgument<Integer> arguments = CommandArguments.getLimit(sender, args[4]);
 

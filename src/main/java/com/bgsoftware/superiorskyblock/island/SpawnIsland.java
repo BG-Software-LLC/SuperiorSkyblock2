@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -19,6 +20,7 @@ import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTracker
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
+import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -32,6 +34,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
@@ -50,6 +53,7 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandEntitiesTrackerAlgorithm;
+import com.bgsoftware.superiorskyblock.island.cache.IslandCacheImpl;
 import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
@@ -122,48 +126,48 @@ public class SpawnIsland implements Island {
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
     private final DirtyChunksContainer dirtyChunksContainer;
+    private final LazyReference<IslandCache> islandCache = new LazyReference<IslandCache>() {
+        @Override
+        protected IslandCache create() {
+            return new IslandCacheImpl(SpawnIsland.this);
+        }
+    };
 
     private final BlockPosition center;
     private final World spawnWorld;
     private final WorldInfo spawnWorldInfo;
-    private final IslandArea islandArea;
     private final int islandSize;
-
-    private final float homeYaw;
-    private final float homePitch;
+    private final IslandArea islandArea = new IslandArea();
 
     private Biome biome = Biome.PLAINS;
 
 
     public SpawnIsland() throws ManagerLoadException {
         String spawnLocation = plugin.getSettings().getSpawn().getLocation();
-        Location smartCenter = Serializers.LOCATION_SPACED_SERIALIZER.deserialize(spawnLocation);
-        if (smartCenter == null) {
+        Location centerLocation = Serializers.LOCATION_SPACED_SERIALIZER.deserialize(spawnLocation);
+        if (centerLocation == null) {
             throw new ManagerLoadException("The spawn location could not be parsed", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
 
         String worldName = spawnLocation.split(", ")[0];
 
-        if (smartCenter.getWorld() == null)
+        if (centerLocation.getWorld() == null)
             plugin.getProviders().runWorldsListeners(worldName);
 
-        this.spawnWorld = smartCenter.getWorld();
+        this.spawnWorld = centerLocation.getWorld();
 
         if (this.spawnWorld == null)
             throw new ManagerLoadException("The spawn location is in invalid world.", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
 
         this.islandSize = plugin.getSettings().getSpawn().getSize();
 
-        this.center = new SBlockPosition(worldName, smartCenter.getBlockX(), smartCenter.getBlockY(), smartCenter.getBlockZ());
-        this.islandArea = IslandArea.of(this.center, this.islandSize, false);
+        this.center = SBlockPosition.of(centerLocation);
+        this.islandArea.update(this.center, this.islandSize);
         this.spawnWorldInfo = new WorldInfoImpl(this.spawnWorld.getName(), Dimensions.fromEnvironment(this.spawnWorld.getEnvironment()));
-
-        this.homeYaw = smartCenter.getYaw();
-        this.homePitch = smartCenter.getPitch();
 
         this.dirtyChunksContainer = new DirtyChunksContainer(this);
 
-        BukkitExecutor.sync(() -> biome = getCenter((Dimension) null /* unused */).getBlock().getBiome());
+        BukkitExecutor.sync(() -> biome = getCenter(null /* unused */).getBlock().getBiome());
     }
 
     @Override
@@ -189,6 +193,11 @@ public class SpawnIsland implements Island {
     @Override
     public void updateDatesFormatter() {
         // Do nothing.
+    }
+
+    @Override
+    public IslandCache getCache() {
+        return this.islandCache.get();
     }
 
     @Override
@@ -257,7 +266,13 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public void kickMember(SuperiorPlayer superiorPlayer) {
+        // Do nothing.
+    }
+
+    @Override
+    public void removeMember(SuperiorPlayer superiorPlayer, MemberRemoveReason memberRemoveReason) {
         // Do nothing.
     }
 
@@ -331,18 +346,17 @@ public class SpawnIsland implements Island {
 
     @Override
     public Location getCenter(Dimension unused) {
-        return center.parse(this.spawnWorld).add(0.5, 0, 0.5);
-    }
-
-    @Override
-    @Deprecated
-    public Location getCenter(World.Environment environment) {
-        return getCenter((Dimension) null /* unused */);
+        return this.center.toWorldPosition().toLocation(this.spawnWorld);
     }
 
     @Override
     public BlockPosition getCenterPosition() {
         return this.center;
+    }
+
+    @Override
+    public CompletableFuture<World> accessIslandWorld(Dimension unused) {
+        return CompletableFuture.completedFuture(this.spawnWorld);
     }
 
     public World getSpawnWorld() {
@@ -354,56 +368,28 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public Location getTeleportLocation(World.Environment unused) {
-        return this.getIslandHome((Dimension) null /*unused*/);
-    }
-
-    @Override
-    @Deprecated
-    public Map<World.Environment, Location> getTeleportLocations() {
-        return Collections.emptyMap();
-    }
-
-    @Override
-    @Deprecated
-    public void setTeleportLocation(Location teleportLocation) {
-        // Do nothing.
-    }
-
-    @Override
-    @Deprecated
-    public void setTeleportLocation(World.Environment environment, @Nullable Location teleportLocation) {
-        // Do nothing.
-    }
-
-    @Override
     public Location getIslandHome(Dimension unused) {
-        Location center = getCenter((Dimension) null /*unused*/);
-        center.setYaw(this.homeYaw);
-        center.setPitch(this.homePitch);
-        return center;
+        return getCenter(null /*unused*/);
     }
 
     @Override
-    @Deprecated
-    public Location getIslandHome(World.Environment environment) {
-        return getIslandHome((Dimension) null /*unused*/);
+    public WorldPosition getIslandHomePosition(Dimension unused) {
+        return getCenterPosition().toWorldPosition();
     }
 
     @Override
     public Map<Dimension, Location> getIslandHomesAsDimensions() {
         return Collections.singletonMap(
                 plugin.getSettings().getWorlds().getDefaultWorldDimension(),
-                getIslandHome((Dimension) null /*unused*/));
+                getIslandHome(null /*unused*/));
     }
 
     @Override
     @Deprecated
-    public Map<World.Environment, Location> getIslandHomes() {
+    public Map<Dimension, WorldPosition> getIslandHomes() {
         return Collections.singletonMap(
-                plugin.getSettings().getWorlds().getDefaultWorldDimension().getEnvironment(),
-                getIslandHome((Dimension) null /*unused*/));
+                plugin.getSettings().getWorlds().getDefaultWorldDimension(),
+                getIslandHomePosition(null /*unused*/));
     }
 
     @Override
@@ -417,26 +403,18 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public void setIslandHome(World.Environment environment, @Nullable Location homeLocation) {
+    public void setIslandHome(Dimension dimension, WorldPosition homePosition) {
         // Do nothing.
     }
 
     @Override
-    public Location getVisitorsLocation() {
-        return getVisitorsLocation((Dimension) null /* unused */);
+    public Location getVisitorsLocation(Dimension unused) {
+        return this.getIslandHome(null /*unused*/);
     }
 
     @Override
-    public Location getVisitorsLocation(Dimension dimension) {
-        return this.getIslandHome((Dimension) null /*unused*/);
-    }
-
-    @Nullable
-    @Override
-    @Deprecated
-    public Location getVisitorsLocation(World.Environment unused) {
-        return this.getIslandHome((Dimension) null /*unused*/);
+    public WorldPosition getVisitorsPosition(Dimension unused) {
+        return getIslandHomePosition(null /*unused*/);
     }
 
     @Override
@@ -445,13 +423,18 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void setVisitorsLocation(Dimension dimension, WorldPosition visitorsPosition) {
+        // Do nothing.
+    }
+
+    @Override
     public Location getMinimum() {
-        return this.getMinimumPosition().parse(this.spawnWorld).add(0.5, 0, 0.5);
+        return this.getMinimumPosition().toWorldPosition().toLocation(this.spawnWorld);
     }
 
     @Override
     public BlockPosition getMinimumPosition() {
-        return this.center.offset(-this.islandSize, 0, -this.islandSize);
+        return getCenterPosition().offset(-this.islandSize, 0, -this.islandSize);
     }
 
     @Override
@@ -466,12 +449,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public Location getMaximum() {
-        return this.getMaximumPosition().parse(this.spawnWorld).add(0.5, 0, 0.5);
+        return this.getMaximumPosition().toWorldPosition().toLocation(this.spawnWorld);
     }
 
     @Override
     public BlockPosition getMaximumPosition() {
-        return this.center.offset(this.islandSize, 0, this.islandSize);
+        return getCenterPosition().offset(this.islandSize, 0, this.islandSize);
     }
 
     @Override
@@ -528,39 +511,6 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public List<Chunk> getAllChunks(World.Environment environment) {
-        return getAllChunks((Dimension) null /*unused*/, 0);
-    }
-
-    @Override
-    @Deprecated
-    public List<Chunk> getAllChunks(World.Environment environment, @IslandChunkFlags int flags) {
-        return getAllChunks((Dimension) null /*unused*/, flags);
-    }
-
-    @Override
-    @Deprecated
-    public List<Chunk> getAllChunks(boolean onlyProtected) {
-        return getAllChunks(onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0);
-    }
-
-    @Override
-    @Deprecated
-    public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
-        return getAllChunks(Dimensions.fromEnvironment(environment), onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0);
-    }
-
-    @Override
-    @Deprecated
-    public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
-        int flags = 0;
-        if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
-        if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
-        return getAllChunks(Dimensions.fromEnvironment(environment), flags);
-    }
-
-    @Override
     public List<Chunk> getLoadedChunks() {
         return getLoadedChunks(0);
     }
@@ -601,34 +551,6 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public List<Chunk> getLoadedChunks(World.Environment unused) {
-        return getLoadedChunks((Dimension) null /*unused*/, 0);
-    }
-
-    @Override
-    public List<Chunk> getLoadedChunks(World.Environment unused, @IslandChunkFlags int flags) {
-        return getLoadedChunks((Dimension) null /*unused*/, flags);
-    }
-
-    @Override
-    @Deprecated
-    public List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks) {
-        int flags = 0;
-        if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
-        if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
-        return getLoadedChunks(flags);
-    }
-
-    @Override
-    @Deprecated
-    public List<Chunk> getLoadedChunks(World.Environment unused, boolean onlyProtected, boolean noEmptyChunks) {
-        int flags = 0;
-        if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
-        if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
-        return getLoadedChunks((Dimension) null /*unused*/, flags);
-    }
-
-    @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension unused) {
         return getAllChunksAsync((Dimension) null /*unused*/, 0);
     }
@@ -649,46 +571,6 @@ public class SpawnIsland implements Island {
                                                             @IslandChunkFlags int flags,
                                                             @Nullable Consumer<Chunk> onChunkLoad) {
         return IslandUtils.getAllChunksAsync(this, spawnWorldInfo, flags, ChunkLoadReason.API_REQUEST, onChunkLoad);
-    }
-
-    @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment unused) {
-        return getAllChunksAsync((Dimension) null /*unused*/);
-    }
-
-    @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment unused, @IslandChunkFlags int flags) {
-        return getAllChunksAsync((Dimension) null /*unused*/, flags);
-    }
-
-    @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment unused,
-                                                            @Nullable Consumer<Chunk> onChunkLoad) {
-        return getAllChunksAsync((Dimension) null /*unused*/, onChunkLoad);
-    }
-
-    @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment unused, @IslandChunkFlags int flags,
-                                                            @Nullable Consumer<Chunk> onChunkLoad) {
-        return getAllChunksAsync((Dimension) null /*unused*/, flags, onChunkLoad);
-    }
-
-    @Override
-    @Deprecated
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment unused, boolean onlyProtected,
-                                                            @Nullable Consumer<Chunk> onChunkLoad) {
-        return getAllChunksAsync((Dimension) null /*unused*/, onlyProtected ? IslandChunkFlags.ONLY_PROTECTED : 0, onChunkLoad);
-    }
-
-    @Override
-    @Deprecated
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment unused,
-                                                            boolean onlyProtected, boolean noEmptyChunks,
-                                                            @Nullable Consumer<Chunk> onChunkLoad) {
-        int flags = 0;
-        if (onlyProtected) flags |= IslandChunkFlags.ONLY_PROTECTED;
-        if (noEmptyChunks) flags |= IslandChunkFlags.NO_EMPTY_CHUNKS;
-        return getAllChunksAsync((Dimension) null /*unused*/, flags, onChunkLoad);
     }
 
     @Override
@@ -732,52 +614,8 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public void resetChunks(World.Environment environment) {
-        // Do nothing.
-    }
-
-    @Override
-    public void resetChunks(World.Environment environment, @Nullable Runnable onFinish) {
-        // Do nothing.
-    }
-
-    @Override
-    public void resetChunks(World.Environment environment, @IslandChunkFlags int flags) {
-        // Do nothing.
-    }
-
-    @Override
-    public void resetChunks(World.Environment environment, @IslandChunkFlags int flags, @Nullable Runnable onFinish) {
-        // Do nothing.
-    }
-
-    @Override
-    @Deprecated
-    public void resetChunks(World.Environment environment, boolean onlyProtected) {
-        // Do nothing.
-    }
-
-    @Override
-    @Deprecated
-    public void resetChunks(World.Environment environment, boolean onlyProtected, @Nullable Runnable onFinish) {
-        // Do nothing.
-    }
-
-    @Override
-    @Deprecated
-    public void resetChunks(boolean onlyProtected) {
-        // Do nothing.
-    }
-
-    @Override
-    @Deprecated
-    public void resetChunks(boolean onlyProtected, @Nullable Runnable onFinish) {
-        // Do nothing.
-    }
-
-    @Override
     public boolean isInside(Location location) {
-        return isInside(location, 0);
+        return isInside(location, 0D);
     }
 
     @Override
@@ -791,35 +629,92 @@ public class SpawnIsland implements Island {
         if (bukkitWorld == null || !bukkitWorld.equals(this.spawnWorld))
             return false;
 
-        try (IslandArea islandArea = this.islandArea.copy()) {
-            if (extraRadius != 0) {
-                islandArea.expand(extraRadius);
-            }
+        return this.islandArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
+    }
 
-            return islandArea.intercepts(location.getBlockX(), location.getBlockZ());
-        }
+    @Override
+    public boolean isInside(BlockPosition blockPosition) {
+        return isInside(blockPosition, 0D);
+    }
+
+    @Override
+    public boolean isInside(BlockPosition blockPosition, int extraRadius) {
+        return isInside(blockPosition, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInside(BlockPosition blockPosition, double extraRadius) {
+        return this.islandArea.expandAndIntercepts(blockPosition.getX(), blockPosition.getZ(), extraRadius);
+    }
+
+    @Override
+    public boolean isInside(WorldPosition worldPosition) {
+        return isInside(worldPosition, 0D);
+    }
+
+    @Override
+    public boolean isInside(WorldPosition worldPosition, int extraRadius) {
+        return isInside(worldPosition, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInside(WorldPosition worldPosition, double extraRadius) {
+        return this.islandArea.expandAndIntercepts(worldPosition.getX(), worldPosition.getZ(), extraRadius);
+    }
+
+    @Override
+    public boolean isInside(Chunk chunk) {
+        return isInside(chunk.getWorld(), chunk.getX(), chunk.getZ());
     }
 
     @Override
     public boolean isInside(World world, int chunkX, int chunkZ) {
-        return world.equals(this.spawnWorld) && isChunkInside(chunkX, chunkZ);
+        return isInside(world, chunkX, chunkZ, 0D);
+    }
+
+    @Override
+    public boolean isInside(World world, int chunkX, int chunkZ, int extraRadius) {
+        return isInside(world, chunkX, chunkZ, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInside(World world, int chunkX, int chunkZ, double extraRadius) {
+        return world.equals(this.spawnWorld) && isInside(chunkX, chunkZ, extraRadius);
     }
 
     @Override
     public boolean isInside(WorldInfo worldInfo, int chunkX, int chunkZ) {
-        return this.spawnWorldInfo.getName().equals(worldInfo.getName()) && isChunkInside(chunkX, chunkZ);
+        return isInside(worldInfo, chunkX, chunkZ, 0D);
     }
 
-    public boolean isChunkInside(int chunkX, int chunkZ) {
-        try (IslandArea islandArea = this.islandArea.copy()) {
-            islandArea.rshift(4);
-            return islandArea.intercepts(chunkX, chunkZ);
-        }
+    @Override
+    public boolean isInside(WorldInfo worldInfo, int chunkX, int chunkZ, int extraRadius) {
+        return isInside(worldInfo, chunkX, chunkZ, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInside(WorldInfo worldInfo, int chunkX, int chunkZ, double extraRadius) {
+        return this.spawnWorldInfo.getName().equals(worldInfo.getName()) && isInside(chunkX, chunkZ, extraRadius);
+    }
+
+    @Override
+    public boolean isInside(int chunkX, int chunkZ) {
+        return isInside(chunkX, chunkZ, 0D);
+    }
+
+    @Override
+    public boolean isInside(int chunkX, int chunkZ, int extraRadius) {
+        return isInside(chunkX, chunkZ, (double) extraRadius);
+    }
+
+    @Override
+    public boolean isInside(int chunkX, int chunkZ, double extraRadius) {
+        return this.islandArea.expandRshiftAndIntercepts(chunkX, chunkZ, extraRadius, 4);
     }
 
     @Override
     public boolean isInsideRange(Location location) {
-        return isInsideRange(location, 0);
+        return isInside(location);
     }
 
     @Override
@@ -833,15 +728,83 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public boolean isInsideRange(BlockPosition blockPosition) {
+        return isInside(blockPosition);
+    }
+
+    @Override
+    public boolean isInsideRange(BlockPosition blockPosition, int extraRadius) {
+        return isInside(blockPosition, extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(BlockPosition blockPosition, double extraRadius) {
+        return isInside(blockPosition, extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(WorldPosition worldPosition) {
+        return isInside(worldPosition);
+    }
+
+    @Override
+    public boolean isInsideRange(WorldPosition worldPosition, int extraRadius) {
+        return isInside(worldPosition, extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(WorldPosition worldPosition, double extraRadius) {
+        return isInside(worldPosition, extraRadius);
+    }
+
+    @Override
     public boolean isInsideRange(Chunk chunk) {
-        if (!chunk.getWorld().equals(this.spawnWorld))
-            return false;
+        return isInside(chunk);
+    }
 
-        Location min = getMinimum();
-        Location max = getMaximum();
+    @Override
+    public boolean isInsideRange(World world, int chunkX, int chunkZ) {
+        return isInside(world, chunkX, chunkZ);
+    }
 
-        return (min.getBlockX() >> 4) <= chunk.getX() && (min.getBlockZ() >> 4) <= chunk.getZ() &&
-                (max.getBlockX() >> 4) >= chunk.getX() && (max.getBlockZ() >> 4) >= chunk.getZ();
+    @Override
+    public boolean isInsideRange(World world, int chunkX, int chunkZ, int extraRadius) {
+        return isInside(world, chunkX, chunkZ, extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(World world, int chunkX, int chunkZ, double extraRadius) {
+        return isInside(world, chunkX, chunkZ, extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(WorldInfo worldInfo, int chunkX, int chunkZ) {
+        return isInside(worldInfo, chunkX, chunkZ);
+    }
+
+    @Override
+    public boolean isInsideRange(WorldInfo worldInfo, int chunkX, int chunkZ, int extraRadius) {
+        return isInside(worldInfo, chunkX, chunkZ, extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(WorldInfo worldInfo, int chunkX, int chunkZ, double extraRadius) {
+        return isInside(worldInfo, chunkX, chunkZ, extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(int chunkX, int chunkZ) {
+        return isInside(chunkX, chunkZ);
+    }
+
+    @Override
+    public boolean isInsideRange(int chunkX, int chunkZ, int extraRadius) {
+        return isInside(chunkX, chunkZ, extraRadius);
+    }
+
+    @Override
+    public boolean isInsideRange(int chunkX, int chunkZ, double extraRadius) {
+        return isInside(chunkX, chunkZ, extraRadius);
     }
 
     @Override
@@ -980,6 +943,16 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public String getStrippedName() {
+        return "";
+    }
+
+    @Override
+    public String getFormattedName() {
+        return "";
+    }
+
+    @Override
     public String getDescription() {
         return "";
     }
@@ -1100,7 +1073,17 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void sendMessage(String message) {
+        // Do nothing.
+    }
+
+    @Override
     public void sendMessage(String message, UUID... ignoredMembers) {
+        // Do nothing.
+    }
+
+    @Override
+    public void sendMessage(IMessageComponent messageComponent) {
         // Do nothing.
     }
 
@@ -1110,12 +1093,27 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers) {
+        // Do nothing.
+    }
+
+    @Override
     public void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers, Object... args) {
         // Do nothing.
     }
 
     @Override
+    public void sendTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut) {
+        // Do nothing.
+    }
+
+    @Override
     public void sendTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers) {
+        // Do nothing.
+    }
+
+    @Override
+    public void executeCommand(String command, boolean onlyOnlineMembers) {
         // Do nothing.
     }
 
@@ -1413,7 +1411,7 @@ public class SpawnIsland implements Island {
     @Override
     public boolean isChunkDirty(String worldName, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null.");
-        Preconditions.checkArgument(this.spawnWorldInfo.getName().equals(worldName) && isChunkInside(chunkX, chunkZ),
+        Preconditions.checkArgument(this.spawnWorldInfo.getName().equals(worldName) && isInside(chunkX, chunkZ),
                 "Chunk must be within the island boundaries.");
         try (ChunkPosition chunkPosition = ChunkPosition.of(this.spawnWorldInfo, chunkX, chunkZ)) {
             return this.dirtyChunksContainer.isMarkedDirty(chunkPosition);
@@ -1696,6 +1694,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void removeEntityLimit(Key key) {
+        // Do nothing.
+    }
+
+    @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType) {
         return hasReachedEntityLimit(entityType, 1);
     }
@@ -1767,6 +1770,11 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<PotionEffectType, Integer> getPotionEffects() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Map<PotionEffectType, Integer> getCustomPotionEffects() {
         return Collections.emptyMap();
     }
 
@@ -1861,6 +1869,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public IslandWarp createWarp(String s, WorldInfo worldInfo, WorldPosition worldPosition, WarpCategory warpCategory) {
+        return null;
+    }
+
+    @Override
     public void renameWarp(IslandWarp islandWarp, String newName) {
         // Do nothing.
     }
@@ -1876,7 +1889,12 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public void warpPlayer(SuperiorPlayer superiorPlayer, String warp) {
+    public void warpPlayer(SuperiorPlayer superiorPlayer, String warpName) {
+        // Do nothing.
+    }
+
+    @Override
+    public void warpPlayer(SuperiorPlayer superiorPlayer, String warpName, boolean force) {
         // Do nothing.
     }
 
@@ -1951,6 +1969,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void resetSettings() {
+        // Do nothing.
+    }
+
+    @Override
     public void setGeneratorPercentage(Key key, int percentage, Dimension dimension) {
         // Do nothing.
     }
@@ -1962,26 +1985,7 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public void setGeneratorPercentage(Key key, int percentage, World.Environment environment) {
-        // Do nothing.
-    }
-
-    @Override
-    @Deprecated
-    public boolean setGeneratorPercentage(Key key, int percentage, World.Environment environment,
-                                          @Nullable SuperiorPlayer caller, boolean callEvent) {
-        return true;
-    }
-
-    @Override
     public int getGeneratorPercentage(Key key, Dimension dimension) {
-        return 0;
-    }
-
-    @Override
-    @Deprecated
-    public int getGeneratorPercentage(Key key, World.Environment environment) {
         return 0;
     }
 
@@ -1991,19 +1995,7 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public Map<String, Integer> getGeneratorPercentages(World.Environment environment) {
-        return Collections.emptyMap();
-    }
-
-    @Override
     public void setGeneratorAmount(Key key, @Size int amount, Dimension dimension) {
-        // Do nothing.
-    }
-
-    @Override
-    @Deprecated
-    public void setGeneratorAmount(Key key, int amount, World.Environment environment) {
         // Do nothing.
     }
 
@@ -2013,19 +2005,7 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public void removeGeneratorAmount(Key key, World.Environment environment) {
-        // Do nothing.
-    }
-
-    @Override
     public int getGeneratorAmount(Key key, Dimension dimension) {
-        return 0;
-    }
-
-    @Override
-    @Deprecated
-    public int getGeneratorAmount(Key key, World.Environment environment) {
         return 0;
     }
 
@@ -2035,19 +2015,7 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public int getGeneratorTotalAmount(World.Environment environment) {
-        return 0;
-    }
-
-    @Override
     public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
-        return Collections.emptyMap();
-    }
-
-    @Override
-    @Deprecated
-    public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
         return Collections.emptyMap();
     }
 
@@ -2057,19 +2025,7 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public Map<Key, Integer> getCustomGeneratorAmounts(World.Environment environment) {
-        return Collections.emptyMap();
-    }
-
-    @Override
     public void clearGeneratorAmounts(Dimension dimension) {
-        // Do nothing.
-    }
-
-    @Override
-    @Deprecated
-    public void clearGeneratorAmounts(World.Environment environment) {
         // Do nothing.
     }
 
@@ -2084,22 +2040,9 @@ public class SpawnIsland implements Island {
         return null;
     }
 
-    @Nullable
-    @Override
-    @Deprecated
-    public Key generateBlock(Location location, World.Environment environment, boolean optimizeDefaultBlock) {
-        return null;
-    }
-
     @Override
     public boolean wasSchematicGenerated(Dimension dimension) {
         return false;
-    }
-
-    @Override
-    @Deprecated
-    public boolean wasSchematicGenerated(World.Environment environment) {
-        return true;
     }
 
     @Override
@@ -2109,18 +2052,6 @@ public class SpawnIsland implements Island {
 
     @Override
     public void setSchematicGenerate(Dimension dimension, boolean generated) {
-        // Do nothing.
-    }
-
-    @Override
-    @Deprecated
-    public void setSchematicGenerate(World.Environment environment) {
-        // Do nothing.
-    }
-
-    @Override
-    @Deprecated
-    public void setSchematicGenerate(World.Environment environment, boolean generated) {
         // Do nothing.
     }
 

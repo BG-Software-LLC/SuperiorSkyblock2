@@ -41,7 +41,7 @@ public class NMSUtils {
     private static final ReflectField<IChunkLoader> CHUNK_LOADER = new ReflectField<>(
             ChunkProviderServer.class, IChunkLoader.class, "chunkLoader");
 
-    private static final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
+    private static final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newConcurrentMap();
 
     public static final ObjectsPool<ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition>> BLOCK_POS_POOL =
             ObjectsPools.createNewPool(() -> new BlockPosition.MutableBlockPosition(0, 0, 0));

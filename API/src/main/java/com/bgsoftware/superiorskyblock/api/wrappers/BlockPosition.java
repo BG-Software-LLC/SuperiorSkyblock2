@@ -1,30 +1,16 @@
 package com.bgsoftware.superiorskyblock.api.wrappers;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.handlers.FactoriesManager;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 
 /**
  * This object represents a position of a block in the world.
- * You can create a new instance of this class by using {@link com.bgsoftware.superiorskyblock.api.handlers.FactoriesManager}
+ * You can create a new instance of this class by using {@link FactoriesManager}
  */
 public interface BlockPosition {
-
-    /**
-     * Get the name of the world of the position.
-     */
-    @Deprecated
-    String getWorldName();
-
-    /**
-     * Get the world of the position.
-     *
-     * @return The world object. May be null if the {@link #getWorldName()} is not a valid world.
-     */
-    @Nullable
-    @Deprecated
-    World getWorld();
 
     /**
      * Get the x value of the position.
@@ -51,21 +37,42 @@ public interface BlockPosition {
     BlockPosition offset(int x, int y, int z);
 
     /**
-     * Get the block object of that position.
+     * Get the bukkit representation of this block position in the provided world.
+     *
+     * @param world The world for this block position.
      */
-    @Deprecated
-    Block getBlock();
+    Location toLocation(@Nullable World world);
 
     /**
-     * Get the location of that position in a specific world.
+     * Get the bukkit representation of this block position in the provided world.
+     *
+     * @param world    The world for this block position.
+     * @param location The location to write the output to. If null, null will be returned as well.
      */
-    @Deprecated
-    Location parse(World world);
+    @Nullable
+    Location toLocation(@Nullable World world, @Nullable Location location);
 
     /**
-     * Get the location of that position in the default world.
+     * Get the bukkit representation of this block position in the provided world.
+     * If the world is unloaded, the location's getWorld will return null.
+     *
+     * @param worldInfo The world information for this world position.
      */
-    @Deprecated
-    Location parse();
+    Location toLocation(WorldInfo worldInfo);
+
+    /**
+     * Get the bukkit representation of this block position in the provided world.
+     * If the world is unloaded, the location's getWorld will return null.
+     *
+     * @param worldInfo The world information for this world position.
+     * @param location  The location to write the output to. If null, null will be returned as well.
+     */
+    @Nullable
+    Location toLocation(WorldInfo worldInfo, @Nullable Location location);
+
+    /**
+     * Get the world position representation of this block position.
+     */
+    WorldPosition toWorldPosition();
 
 }

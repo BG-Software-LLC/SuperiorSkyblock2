@@ -44,21 +44,44 @@ import java.io.IOException;
  *
  * @author Graham Edgecombe
  */
-@SuppressWarnings("WeakerAccess")
 public class LongTag extends NumberTag<Long> {
 
-    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagLong");
+    /*package*/ static final NMSTagConverter TAG_CONVERTER = NMSTagConverter.choice(
+            new String[]{"NBTTagLong", "LongTag"}, long.class);
 
-    public LongTag(long value) {
-        super(value, CLASS, long.class);
+    private static final LongTag[] CACHE = new LongTag[100];
+
+    private LongTag(long value) {
+        super(value);
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeLong(value);
+    }
+
+    @Override
+    protected NMSTagConverter getNMSConverter() {
+        return TAG_CONVERTER;
+    }
+
+    public static LongTag of(long value) {
+        if (value >= 0 && value < CACHE.length) {
+            LongTag tag = CACHE[(int) value];
+            if (tag == null)
+                tag = CACHE[(int) value] = new LongTag(value);
+            return tag;
+        } else {
+            return new LongTag(value);
+        }
     }
 
     public static LongTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to LongTag!");
+        Preconditions.checkArgument(tag.getClass().equals(TAG_CONVERTER.getNBTClass()), "Cannot convert " + tag.getClass() + " to LongTag!");
 
         try {
             long value = plugin.getNMSTags().getNBTLongValue(tag);
-            return new LongTag(value);
+            return LongTag.of(value);
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while converting tag long from NMS:");
             return null;
@@ -66,12 +89,7 @@ public class LongTag extends NumberTag<Long> {
     }
 
     public static LongTag fromStream(DataInputStream is) throws IOException {
-        return new LongTag(is.readLong());
-    }
-
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeLong(value);
+        return LongTag.of(is.readLong());
     }
 
 }

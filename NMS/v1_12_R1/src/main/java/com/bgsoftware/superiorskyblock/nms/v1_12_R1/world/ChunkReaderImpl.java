@@ -120,7 +120,7 @@ public class ChunkReaderImpl implements ChunkReader {
     public CompoundTag getTileEntity(int x, int y, int z) {
         try (ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
             BlockPosition.MutableBlockPosition blockPosition = wrapper.getHandle();
-            blockPosition.setValues((this.x << 4) + x, y, (this.z << 4) + z);
+            blockPosition.c((this.x << 4) + x, y, (this.z << 4) + z);
             return this.tileEntities.get(blockPosition);
         }
     }
@@ -189,7 +189,7 @@ public class ChunkReaderImpl implements ChunkReader {
             this.x = entity.locX;
             this.y = entity.locY;
             this.z = entity.locZ;
-            this.yaw = entity.getBukkitYaw();
+            this.yaw = entity.yaw;
             this.pitch = entity.pitch;
             this.entityType = entity.getBukkitEntity().getType();
 

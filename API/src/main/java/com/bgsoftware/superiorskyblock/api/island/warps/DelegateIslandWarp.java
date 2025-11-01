@@ -2,7 +2,9 @@ package com.bgsoftware.superiorskyblock.api.island.warps;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
@@ -42,6 +44,21 @@ public class DelegateIslandWarp implements IslandWarp {
     @Override
     public void setLocation(Location location) {
         this.handle.setLocation(location);
+    }
+
+    @Override
+    public WorldPosition getPosition() {
+        return this.handle.getPosition();
+    }
+
+    @Override
+    public Dimension getPositionDimension() {
+        return this.handle.getPositionDimension();
+    }
+
+    @Override
+    public void setPosition(Dimension dimension, WorldPosition worldPosition) {
+        this.handle.setPosition(dimension, worldPosition);
     }
 
     @Override
