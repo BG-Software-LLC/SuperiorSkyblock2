@@ -331,6 +331,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().schematicNameArgument;
     }
 
+    public boolean isOverrideDefaultAliases() {
+        return getContainer().overrideDefaultAliases;
+    }
+
     public Map<String, List<String>> getCommandAliases() {
         return getContainer().commandAliases;
     }

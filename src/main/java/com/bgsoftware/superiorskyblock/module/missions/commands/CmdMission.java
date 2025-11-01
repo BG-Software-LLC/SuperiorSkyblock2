@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -58,7 +59,7 @@ public class CmdMission implements ISuperiorCommand {
 
         if (!args[1].equalsIgnoreCase("complete")) {
             Locale locale = PlayerLocales.getLocale(sender);
-            Message.COMMAND_USAGE.send(sender, plugin.getCommands().getLabel() + " " + getUsage(locale));
+            Message.COMMAND_USAGE.send(sender, CommandsHelper.getCommandUsage(this, locale));
             return;
         }
 

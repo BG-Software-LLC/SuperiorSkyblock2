@@ -558,6 +558,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public boolean isOverrideDefaultAliases() {
+        return this.global.isOverrideDefaultAliases();
+    }
+
+    @Override
     public Map<String, List<String>> getCommandAliases() {
         return this.global.getCommandAliases();
     }
