@@ -7,7 +7,6 @@ import org.bukkit.event.Listener;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.logging.Logger;
 
 /**
  * Plugin modules are similar to plugins. The difference between them and regular plugins is that the modules are
@@ -195,7 +194,7 @@ public abstract class PluginModule {
     /**
      * Get the logger of the module {@link ModuleLogger}
      */
-    public final Logger getLogger() {
+    public final ModuleLogger getLogger() {
         return logger;
     }
 
@@ -276,8 +275,8 @@ public abstract class PluginModule {
      * Initialize the module.
      * This method cannot be called twice - do not call it unless you know what you are doing.
      *
-     * @param plugin       An instance to the plugin.
-     * @param context      The initialize context.
+     * @param plugin  An instance to the plugin.
+     * @param context The initialize context.
      */
     public final void initModule(SuperiorSkyblock plugin, ModuleInitializeData context) {
         if (this.initialized)

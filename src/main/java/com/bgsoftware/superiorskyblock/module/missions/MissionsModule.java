@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
 import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
 import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookupFactory;
-import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandMembers;
@@ -170,12 +169,12 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
             File categoryFolder = new File(getModuleFolder(), "categories/" + categoryName);
 
             if (!categoryFolder.exists()) {
-                Log.warn("The directory of the mission category ", categoryName, " doesn't exist, skipping...");
+                getLogger().w("The directory of the mission category " + categoryName + " doesn't exist, skipping...");
                 return false;
             }
 
             if (!categoryFolder.isDirectory()) {
-                Log.warn("The directory of the mission category ", categoryName, " is not valid, skipping...");
+                getLogger().w("The directory of the mission category " + categoryName + " is not valid, skipping...");
                 return false;
             }
 
@@ -183,7 +182,7 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
                     file.isFile() && file.getName().endsWith(".yml"));
 
             if (missionFiles == null || missionFiles.length == 0) {
-                Log.warn("The mission category ", categoryName, " doesn't have missions, skipping...");
+                getLogger().w("The mission category " + categoryName + " doesn't have missions, skipping...");
                 return false;
             }
 
@@ -201,10 +200,10 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
                     try {
                         missionConfigFile.load(missionFile);
                     } catch (InvalidConfigurationException error) {
-                        Log.error(error, "A format-error occurred while parsing the mission file ", missionFile.getName() + ":");
+                        getLogger().e("A format-error occurred while parsing the mission file " + missionFile.getName() + ":", error);
                         continue;
                     } catch (IOException error) {
-                        Log.error(error, "An unexpected error occurred while parsing the mission file ", missionFile.getName() + ":");
+                        getLogger().e("An unexpected error occurred while parsing the mission file " + missionFile.getName() + ":", error);
                         continue;
                     }
 
@@ -220,7 +219,7 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
             }
 
             if (categoryMissions.isEmpty()) {
-                Log.warn("The mission category ", categoryName, " doesn't have missions, skipping...");
+                getLogger().w("The mission category " + categoryName + " doesn't have missions, skipping...");
                 return false;
             }
 
@@ -281,7 +280,7 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
             try {
                 missionFile.createNewFile();
             } catch (IOException error) {
-                Log.error(error, "An unexpected error occurred while converting non-categorized mission ", missionName, ":");
+                getLogger().e("An unexpected error occurred while converting non-categorized mission " + missionName + ":", error);
                 continue;
             }
 
@@ -291,7 +290,7 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
             try {
                 missionConfigFile.save(missionFile);
             } catch (Exception error) {
-                Log.error(error, "An unexpected error occurred while saving non-categorized mission ", missionName, ":");
+                getLogger().e("An unexpected error occurred while saving non-categorized mission " + missionName + ":", error);
             }
         }
 
@@ -340,7 +339,7 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
         try {
             java.nio.file.Files.copy(Paths.get(oldMissionsMenuFile.toURI()), Paths.get(newMissionsCategoryMenuFile.toURI()));
         } catch (IOException error) {
-            Log.error(error, "An unexpected error occurred while copying old missions-menu to the new format:");
+            getLogger().e("An unexpected error occurred while copying old missions-menu to the new format:", error);
             return;
         }
 
