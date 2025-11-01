@@ -11,6 +11,8 @@ public class PlayerCommandsMap extends CommandsMap {
 
     @Override
     public void loadDefaultCommands() {
+        clearCommands();
+
         registerCommand(new CmdAccept());
         registerCommand(new CmdAdmin());
         registerCommand(new CmdBan());

@@ -101,6 +101,11 @@ public abstract class CommandsMap {
         return listBuilder.build(this.subCommands.values());
     }
 
+    protected void clearCommands() {
+        this.subCommands.clear();
+        this.aliasesToCommand.clear();
+    }
+
     private boolean isCommandEnabled(SuperiorCommand superiorCommand) {
         return superiorCommand instanceof IAdminIslandCommand ||
                 !DISABLED_COMMANDS_CACHE.contains(superiorCommand.getAliases().get(0).toLowerCase(Locale.ENGLISH));

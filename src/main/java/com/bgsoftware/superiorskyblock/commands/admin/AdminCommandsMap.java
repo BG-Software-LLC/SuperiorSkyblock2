@@ -11,6 +11,8 @@ public class AdminCommandsMap extends CommandsMap {
 
     @Override
     public void loadDefaultCommands() {
+        clearCommands();
+
         registerCommand(new CmdAdminAdd());
         registerCommand(new CmdAdminAddBlockLimit());
         registerCommand(new CmdAdminAddBonus());
