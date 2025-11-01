@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.nms.v1_20_3.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.v1_20_3.utils.TickingBlockList;
 import com.google.common.base.Suppliers;
+import com.google.gson.JsonParseException;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
@@ -19,6 +20,8 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -29,12 +32,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
@@ -53,7 +58,6 @@ import net.minecraft.world.ticks.ProtoChunkTicks;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R3.block.CraftBiome;
-import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_20_R3.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers;
@@ -62,13 +66,18 @@ import org.bukkit.generator.ChunkGenerator;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 public class NMSUtilsVersioned {
+
+    private static final Component[] COMPONENT_ARRAY_TYPE = new Component[0];
 
     private static final ReflectField<PersistentEntitySectionManager<Entity>> SERVER_LEVEL_ENTITY_MANAGER = new ReflectField<>(
             ServerLevel.class, PersistentEntitySectionManager.class, Modifier.PUBLIC | Modifier.FINAL, 1);
@@ -174,16 +183,9 @@ public class NMSUtilsVersioned {
     }
 
     public static void rewriteSignLines(CompoundTag compoundTag) {
-        if (compoundTag.getByte("SSB.HasSignLines") == 1) {
-            // We want to convert the sign lines from raw string to json
-            for (int i = 1; i <= 4; ++i) {
-                String line = compoundTag.getString("SSB.Text" + i);
-                if (!Text.isBlank(line)) {
-                    Component newLine = CraftChatMessage.fromString(line)[0];
-                    compoundTag.putString("Text" + i, Component.Serializer.toJson(newLine));
-                }
-            }
-        }
+        applySignTextLines(compoundTag, "front_text");
+        applySignTextLines(compoundTag, "back_text");
+        convertLegacySignTextLines(compoundTag);
     }
 
     public static DimensionType getDimensionTypeFromDimension(Dimension dimension) {
@@ -303,6 +305,58 @@ public class NMSUtilsVersioned {
 
     public static void markUnsaved(LevelChunk levelChunk) {
         levelChunk.setUnsaved(true);
+    }
+
+    private static void applySignTextLines(CompoundTag blockEntityCompound, String key) {
+        if (blockEntityCompound.contains(key)) {
+            CompoundTag frontText = blockEntityCompound.getCompound(key);
+            ListTag messages = frontText.getList("messages", net.minecraft.nbt.Tag.TAG_STRING);
+            List<Component> textLines = new ArrayList<>();
+            for (net.minecraft.nbt.Tag lineTag : messages) {
+                try {
+                    textLines.add(CraftChatMessage.fromJSON(lineTag.getAsString()));
+                } catch (JsonParseException error) {
+                    textLines.add(CraftChatMessage.fromString(lineTag.getAsString())[0]);
+                }
+            }
+
+            while (textLines.size() < 4)
+                textLines.add(Component.empty());
+
+            Component[] textLinesArray = textLines.toArray(COMPONENT_ARRAY_TYPE);
+
+            SignText signText = new SignText(textLinesArray, textLinesArray, DyeColor.BLACK, false);
+            SignText.DIRECT_CODEC.encodeStart(NbtOps.INSTANCE, signText).result()
+                    .ifPresent(frontTextNBT -> blockEntityCompound.put(key, frontTextNBT));
+        }
+    }
+
+    private static void convertLegacySignTextLines(CompoundTag blockEntityCompound) {
+        Component[] signLines = new Component[4];
+        Arrays.fill(signLines, Component.empty());
+        boolean hasAnySignLines = false;
+        // We try to convert old text sign lines
+        for (int i = 1; i <= 4; ++i) {
+            if (blockEntityCompound.contains("SSB.Text" + i)) {
+                String signLine = blockEntityCompound.getString("SSB.Text" + i);
+                if (!Text.isBlank(signLine)) {
+                    signLines[i - 1] = CraftChatMessage.fromString(signLine)[0];
+                    hasAnySignLines = true;
+                }
+            } else {
+                String signLine = blockEntityCompound.getString("Text" + i);
+                if (!Text.isBlank(signLine)) {
+                    signLines[i - 1] = CraftChatMessage.fromJSON(signLine);
+                    hasAnySignLines = true;
+                }
+            }
+        }
+
+        if (hasAnySignLines) {
+            SignText signText = new SignText(signLines, signLines, DyeColor.BLACK, false);
+            SignText.DIRECT_CODEC.encodeStart(NbtOps.INSTANCE, signText).result()
+                    .ifPresent(frontTextNBT -> blockEntityCompound.put("front_text", frontTextNBT));
+        }
     }
 
     private NMSUtilsVersioned() {

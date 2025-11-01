@@ -5,3 +5,4 @@ PAPER_CHUNK_BLOCK_CONTROLLER_CLASS=com.destroystokyo.paper.antixray.ChunkPacketB
 REGISTRY_CLASS=net.minecraft.core.Registry
 CHUNK_STATUS_CLASS=net.minecraft.world.level.chunk.ChunkStatus
 SERVER_LEVEL_RANDOM_TYPE=java.util.Random
+STAR_LIGHT_INTERFACE_CLASS=ca.spottedleaf.starlight.common.light.StarLightInterface

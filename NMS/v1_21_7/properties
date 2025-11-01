@@ -5,3 +5,4 @@ PAPER_CHUNK_BLOCK_CONTROLLER_CLASS=io.papermc.paper.antixray.ChunkPacketBlockCon
 REGISTRY_CLASS=net.minecraft.core.registries.BuiltInRegistries
 CHUNK_STATUS_CLASS=net.minecraft.world.level.chunk.status.ChunkStatus
 SERVER_LEVEL_RANDOM_TYPE=net.minecraft.util.RandomSource
+STAR_LIGHT_INTERFACE_CLASS=ca.spottedleaf.moonrise.patches.starlight.light.StarLightInterface
