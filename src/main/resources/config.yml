@@ -175,6 +175,10 @@ auto-blocks-tracking: true
 # Use WORTH, LEVEL, RATING or PLAYERS.
 island-top-order: 'WORTH'
 
+# How should the global warps be ordered by default?
+# Use WORTH, LEVEL, RATING or PLAYERS.
+global-warps-order: 'WORTH'
+
 # Whether coop members should be enabled or not.
 coop-members: true
 

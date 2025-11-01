@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -54,8 +55,12 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().autoBlocksTracking;
     }
 
-    public String getIslandTopOrder() {
+    public SortingType getIslandTopOrder() {
         return getContainer().islandTopOrder;
+    }
+
+    public SortingType getGlobalWarpsOrder() {
+        return getContainer().globalWarpsOrder;
     }
 
     public boolean isCoopMembers() {

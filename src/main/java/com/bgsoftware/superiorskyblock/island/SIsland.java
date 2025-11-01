@@ -4857,13 +4857,12 @@ public class SIsland implements Island {
         if (other == null)
             return -1;
 
-        if (plugin.getSettings().getIslandTopOrder().equals("WORTH")) {
-            int compare = getWorth().compareTo(other.getWorth());
-            if (compare != 0) return compare;
-        } else {
-            int compare = getIslandLevel().compareTo(other.getIslandLevel());
-            if (compare != 0) return compare;
-        }
+        SortingType sortingType = SortingTypes.getIslandTopSorting();
+        Comparator<Island> comparator = sortingType.getComparator();
+
+        int result = comparator.compare(this, other);
+        if (result != 0)
+            return result;
 
         return getOwner().getName().compareTo(other.getOwner().getName());
     }

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.menu.impl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
@@ -19,7 +20,7 @@ import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
-import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
+import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -86,7 +87,7 @@ public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, Emp
         @Override
         protected List<Island> requestObjects() {
             return new SequentialListBuilder<Island>()
-                    .sorted(SortingComparators.WORTH_COMPARATOR)
+                    .sorted(SortingTypes.getGlobalWarpsSorting().getComparator())
                     .filter(ISLANDS_FILTER)
                     .build(plugin.getGrid().getIslands());
         }
