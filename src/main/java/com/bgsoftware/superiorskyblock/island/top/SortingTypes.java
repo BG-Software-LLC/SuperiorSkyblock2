@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 
 import java.util.Comparator;
-import java.util.Objects;
 
 public class SortingTypes {
 
@@ -16,16 +15,16 @@ public class SortingTypes {
     public static final SortingType BY_RATING = register("RATING", SortingComparators.RATING_COMPARATOR, false);
     public static final SortingType BY_PLAYERS = register("PLAYERS", SortingComparators.PLAYERS_COMPARATOR, false);
 
-    private static volatile SortingType ISLAND_TOP_SORTING = resolveByName(
-            SuperiorSkyblockPlugin.getPlugin().getSettings().getIslandTopOrder());
-    private static volatile SortingType GLOBAL_WARPS_SORTING = resolveByName(
-            SuperiorSkyblockPlugin.getPlugin().getSettings().getGlobalWarpsOrder());
+    private static volatile SortingType ISLAND_TOP_SORTING;
+    private static volatile SortingType GLOBAL_WARPS_SORTING;
 
     private SortingTypes() {
     }
 
-    public static void registerSortingTypes() {
-        // Do nothing, only trigger all the register calls
+    public static void registerSortingTypes(SuperiorSkyblockPlugin plugin) {
+        // We actually register the settings update listener in here, as otherwise it causes errors
+        // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/2752
+        registerListeners(plugin.getPluginEventsDispatcher());
     }
 
     private static SortingType register(String name, Comparator<Island> comparator, boolean handleEqualsIslands) {
@@ -41,7 +40,7 @@ public class SortingTypes {
         return GLOBAL_WARPS_SORTING;
     }
 
-    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+    private static void registerListeners(PluginEventsDispatcher dispatcher) {
         dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, SortingTypes::onSettingsUpdate);
     }
 

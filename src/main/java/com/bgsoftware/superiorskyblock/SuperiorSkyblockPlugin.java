@@ -179,7 +179,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         Runtime.getRuntime().addShutdownHook(new ShutdownTask(this));
 
         IslandPrivileges.registerPrivileges();
-        SortingTypes.registerSortingTypes();
+        SortingTypes.registerSortingTypes(this);
         IslandFlags.registerFlags();
         ClearActions.registerActions();
         RespawnActions.registerActions();
