@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
-import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -29,7 +28,6 @@ import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -137,7 +135,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public String getIslandLevelFormula() {
-        return this.global.getIslandLevelFormula();
+        return this.global.getBlockLevelFormula();
     }
 
     @Override
@@ -724,6 +722,10 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     private void convertData(YamlConfiguration cfg) {
+        if (cfg.get("island-level-formula") != null) {
+            cfg.set("block-level-formula", cfg.getString("island-level-formula"));
+            cfg.set("island-level-formula", null);
+        }
         if (!cfg.isConfigurationSection("entity-categories")) {
             cfg.createSection("entity-categories");
         }

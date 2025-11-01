@@ -39,8 +39,8 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().worldBordersEnabled;
     }
 
-    public String getIslandLevelFormula() {
-        return getContainer().islandLevelFormula;
+    public String getBlockLevelFormula() {
+        return getContainer().blockLevelFormula;
     }
 
     public boolean isRoundedIslandLevels() {

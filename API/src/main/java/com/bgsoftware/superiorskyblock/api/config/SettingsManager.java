@@ -78,9 +78,9 @@ public interface SettingsManager {
     StackedBlocks getStackedBlocks();
 
     /**
-     * The island worth to island level conversion formula.
-     * The formula contains a placeholder: `{}`, which is replaced with the island worth.
-     * Config path: island-level-formula
+     * The formula used to calculate a block's level when it has a worth defined but no level specified.
+     * The formula can contain a placeholder: `{}`, which is replaced with the block worth.
+     * Config path: block-level-formula
      */
     String getIslandLevelFormula();
 
