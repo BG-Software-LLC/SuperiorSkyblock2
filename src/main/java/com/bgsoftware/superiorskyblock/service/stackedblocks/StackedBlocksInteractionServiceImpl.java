@@ -238,8 +238,11 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
         if (blockAmount + amountToDeposit > blockLimit)
             amountToDeposit = blockLimit - blockAmount;
 
-        if (amountToDeposit <= 0)
+        if (amountToDeposit <= 0) {
+            // Inform GUI/caller that nothing was deposited so it can refund its previewed removal
+            removalData.ifRight(cb -> cb.accept(0));
             return InteractionResult.NOT_ENOUGH_BLOCKS;
+        }
 
         Island island = plugin.getGrid().getIslandAt(stackedBlockLocation);
         if (island != null) {
@@ -264,21 +267,31 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
             }
         }
 
-        if (amountToDeposit > 0) {
-            int newStackedBlockAmount = blockAmount + amountToDeposit;
-
-            if (onlinePlayer != null && !PluginEventsFactory.callBlockStackEvent(stackedBlock, onlinePlayer, blockAmount, newStackedBlockAmount))
-                return InteractionResult.EVENT_CANCELLED;
-
-            if (!plugin.getStackedBlocks().setStackedBlock(stackedBlockLocation, blockKey, newStackedBlockAmount))
-                return InteractionResult.GLITCHED_STACKED_BLOCK;
-
-            if (island != null)
-                island.handleBlockPlace(blockKey, amountToDeposit);
-
-            plugin.getProviders().notifyStackedBlocksListeners(onlinePlayer == null ? superiorPlayer.asOfflinePlayer() : onlinePlayer,
-                    stackedBlock, IStackedBlocksListener.Action.BLOCK_PLACE);
+        if (amountToDeposit <= 0) {
+            // Island/global limit reached ⇒ notify caller so it can refund
+            removalData.ifRight(cb -> cb.accept(0));
+            return InteractionResult.NOT_ENOUGH_BLOCKS;
         }
+
+        int newStackedBlockAmount = blockAmount + amountToDeposit;
+
+        if (onlinePlayer != null && !PluginEventsFactory.callBlockStackEvent(stackedBlock, onlinePlayer, blockAmount, newStackedBlockAmount)) {
+            // Event cancelled ⇒ nothing deposited, request refund
+            removalData.ifRight(cb -> cb.accept(0));
+            return InteractionResult.EVENT_CANCELLED;
+        }
+
+        if (!plugin.getStackedBlocks().setStackedBlock(stackedBlockLocation, blockKey, newStackedBlockAmount)) {
+            // Failed to persist/update ⇒ request refund
+            removalData.ifRight(cb -> cb.accept(0));
+            return InteractionResult.GLITCHED_STACKED_BLOCK;
+        }
+
+        if (island != null)
+            island.handleBlockPlace(blockKey, amountToDeposit);
+
+        plugin.getProviders().notifyStackedBlocksListeners(onlinePlayer == null ? superiorPlayer.asOfflinePlayer() : onlinePlayer,
+                stackedBlock, IStackedBlocksListener.Action.BLOCK_PLACE);
 
         final int finalAmountToDeposit = amountToDeposit;
 
