@@ -5,12 +5,13 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
@@ -82,20 +83,8 @@ public class CmdSetWarp implements IPermissibleCommand {
 
         String warpName = args[1];
 
-        if (warpName.isEmpty()) {
-            Message.WARP_ILLEGAL_NAME.send(superiorPlayer);
+        if (!IslandNames.isValidWarpName(superiorPlayer, island, warpName, true))
             return;
-        }
-
-        if (!IslandUtils.isWarpNameLengthValid(warpName)) {
-            Message.WARP_NAME_TOO_LONG.send(superiorPlayer);
-            return;
-        }
-
-        if (island.getWarp(warpName) != null) {
-            Message.WARP_ALREADY_EXIST.send(superiorPlayer);
-            return;
-        }
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             if (!island.isInsideRange(superiorPlayer.getLocation(wrapper.getHandle()))) {
@@ -109,15 +98,8 @@ public class CmdSetWarp implements IPermissibleCommand {
         if (args.length == 3) {
             categoryName = args[2];
 
-            if (categoryName.isEmpty()) {
-                Message.WARP_CATEGORY_ILLEGAL_NAME.send(superiorPlayer);
+            if (!IslandNames.isValidWarpCategoryName(superiorPlayer, categoryName))
                 return;
-            }
-
-            if (!IslandUtils.isWarpNameLengthValid(categoryName)) {
-                Message.WARP_CATEGORY_NAME_TOO_LONG.send(superiorPlayer);
-                return;
-            }
 
             if (island.getWarpCategory(categoryName) == null &&
                     !PluginEventsFactory.callIslandCreateWarpCategoryEvent(island, superiorPlayer, categoryName))
@@ -138,6 +120,12 @@ public class CmdSetWarp implements IPermissibleCommand {
 
             Message.SET_WARP.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(warpLocation));
         }
+    }
+
+    @Override
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        return args.length == 3 && plugin.getSettings().isWarpCategories() ?
+                CommandTabCompletes.getWarpCategories(island, args[2]) : Collections.emptyList();
     }
 
 }

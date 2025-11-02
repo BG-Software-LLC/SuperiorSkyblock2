@@ -768,19 +768,19 @@ UPGRADE_COOLDOWN_FORMAT: '&c&lErreur | &7Vous devez patienter {0} afin d''effect
 VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lErreur | &7Vous ne pouvez pas utiliser cette commande sur d''autres îles.'
 WARP_ALREADY_EXIST: '&c&lErreur | &7Un warp portant ce nom éxiste déjà.'
+WARP_CATEGORY_ALREADY_EXIST: '&c&lError | &7There is already a warp category with this name.'
 WARP_CATEGORY_ICON_NEW_LORE: |
   &e&lWarps | &7Spécifiez un nouveau lore (Entrez "-cancel" to pour annuler) :
   &e&lWarps | &7Vous pouvez ajouter une nouvelle ligne en utilisant "\n".
 WARP_CATEGORY_ICON_NEW_NAME: '&e&lWarps | &7Spécifiez un nom (Entrez "-cancel" to pour annuler) :'
 WARP_CATEGORY_ICON_NEW_TYPE: '&e&lWarps | &7Spécifiez un nouveau matériau (Entrez "-cancel" to pour annuler) :'
 WARP_CATEGORY_ICON_UPDATED: '&e&lWarps | &7Mise à jour de l''icone de la catégorie.'
-WARP_CATEGORY_ILLEGAL_NAME: '&c&lErreur | &7Vous ne pouvez utiliser uniquement des lettres, nombres et ''_'' comme nom de catégorie de warp.'
+WARP_CATEGORY_INVALID_NAME: '&c&lError | &7Warp category names cannot be empty and must be one word.'
 WARP_CATEGORY_NAME_TOO_LONG: '&c&lErreur | &7Le nom d''une catégorie de warp ne peut dépasser 255 caractères.'
 WARP_CATEGORY_SLOT: '&e&lWarps | &7Spécifiez un nouvel emplacement (Entrez "-cancel" to pour annuler) :'
 WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lErreur | &7Cet emplacement est déjà utilisé par une autre catégorie.'
 WARP_CATEGORY_SLOT_SUCCESS: '&e&lWarps | &7L''emplacement de la catégorie est désormais {0}.'
 WARP_CATEGORY_RENAME: '&e&lWarps | &7Spécifiez un nom (Entrez "-cancel" to pour annuler) :'
-WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lErreur | &7Ce nom est déjà utilisé par une autre catégorie.'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lWarps | &7Cette catégorie a été renommée en {0}.'
 WARP_ICON_NEW_LORE: |
   &e&lWarps | &7Spécifiez un nouveau lore (Entrez "-cancel" to pour annuler) :
@@ -788,13 +788,12 @@ WARP_ICON_NEW_LORE: |
 WARP_ICON_NEW_NAME: '&e&lWarps | &7Spécifiez un nom (Entrez "-cancel" to pour annuler) :'
 WARP_ICON_NEW_TYPE: '&e&lWarps | &7Spécifiez un nouveau matériau (Entrez "-cancel" to pour annuler) :'
 WARP_ICON_UPDATED: '&e&lWarps | &7Mise à jour de l''icone du warp.'
-WARP_ILLEGAL_NAME: '&c&lErreur | &7Vous ne pouvez utiliser uniquement des lettres, nombres et ''_'' comme nom de warp.'
+WARP_INVALID_NAME: '&c&lError | &7Warp names cannot be empty and must be one word.'
 WARP_LOCATION_UPDATE: '&e&lWarps | &7Mise à jour de la position de téléportation du warp sur votre emplacement actuel.'
 WARP_NAME_TOO_LONG: '&c&lErreur | &7Le nom d''un warp ne peut dépasser 255 caractères.'
 WARP_PUBLIC_UPDATE: '&e&lWarps | &7Le warp est désormais accessible au public.'
 WARP_PRIVATE_UPDATE: '&e&lWarps | &7Le warp n''est plus accessible au public.'
 WARP_RENAME: '&e&lWarps | &7Spécifiez un nouveau nom (Entrez "-cancel" to pour annuler) :'
-WARP_RENAME_ALREADY_EXIST: '&c&lErreur | &7Ce nom est déjà utilisé par un autre warp.'
 WARP_RENAME_SUCCESS: '&e&lWarps | &7Le warp a été renommé en {0}.'
 WITHDRAW_ALL_MONEY: |-
   &e&lBanque | &7Le compte de l'île ne contient que {0}$.

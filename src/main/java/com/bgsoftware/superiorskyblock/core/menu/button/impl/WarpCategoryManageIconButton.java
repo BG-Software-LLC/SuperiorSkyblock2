@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategoryManage;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.warp.WarpIcons;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -31,7 +32,9 @@ public class WarpCategoryManageIconButton extends AbstractMenuViewButton<MenuWar
     public ItemStack createViewItem() {
         WarpCategory warpCategory = menuView.getWarpCategory();
 
-        ItemBuilder itemBuilder = new ItemBuilder(warpCategory.getRawIcon());
+        ItemBuilder itemBuilder = warpCategory.getRawIcon() == null ?
+                WarpIcons.DEFAULT_WARP_CATEGORY_ICON.getBuilder() : new ItemBuilder(warpCategory.getRawIcon());
+
         ItemStack buttonItem = super.createViewItem();
 
         if (buttonItem != null && buttonItem.hasItemMeta()) {

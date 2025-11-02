@@ -220,6 +220,7 @@ public class SettingsContainer {
     public final boolean dropsUpgradePlayersMultiply;
     public final Map<String, Long> messageDelays;
     public final boolean warpCategories;
+    public final String defaultWarpCategoryName;
     public final boolean physicsListener;
     public final double chargeOnWarp;
     public final boolean publicWarps;
@@ -587,6 +588,7 @@ public class SettingsContainer {
         }
         this.messageDelays = Collections.unmodifiableMap(messageDelays);
         warpCategories = config.getBoolean("warp-categories", true);
+        defaultWarpCategoryName = config.getString("default-warp-category-name", "Default").split(" ")[0];
         physicsListener = config.getBoolean("physics-listener", true);
         chargeOnWarp = config.getDouble("charge-on-warp", 0D);
         publicWarps = config.getBoolean("public-warps");

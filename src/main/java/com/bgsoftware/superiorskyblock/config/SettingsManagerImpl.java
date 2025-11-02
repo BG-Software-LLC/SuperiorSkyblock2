@@ -605,6 +605,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public String getDefaultWarpCategoryName() {
+        return this.global.getDefaultWarpCategoryName();
+    }
+
+    @Override
     public boolean isPhysicsListener() {
         return this.global.isPhysicsListener();
     }

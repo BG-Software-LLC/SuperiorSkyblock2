@@ -76,4 +76,49 @@ public class IslandNames {
         return Formatters.STRIP_COLOR_FORMATTER.format(name).toLowerCase(Locale.ENGLISH);
     }
 
+    public static boolean isWarpNameLengthValid(String warpName) {
+        return warpName.length() <= getMaxWarpNameLength();
+    }
+
+    public static int getMaxWarpNameLength() {
+        return 255;
+    }
+
+    public static boolean isValidWarpName(SuperiorPlayer superiorPlayer, Island island,
+                                          String warpName, boolean sendMessage) {
+        if (warpName.isEmpty() || warpName.contains(" ")) {
+            if (sendMessage)
+                Message.WARP_INVALID_NAME.send(superiorPlayer);
+            return false;
+        }
+
+        if (!isWarpNameLengthValid(warpName)) {
+            if (sendMessage)
+                Message.WARP_NAME_TOO_LONG.send(superiorPlayer);
+            return false;
+        }
+
+        if (island.getWarp(warpName) != null) {
+            if (sendMessage)
+                Message.WARP_ALREADY_EXIST.send(superiorPlayer);
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean isValidWarpCategoryName(SuperiorPlayer superiorPlayer, String categoryName) {
+        if (categoryName.isEmpty() || categoryName.contains(" ")) {
+            Message.WARP_CATEGORY_INVALID_NAME.send(superiorPlayer);
+            return false;
+        }
+
+        if (!isWarpNameLengthValid(categoryName)) {
+            Message.WARP_CATEGORY_NAME_TOO_LONG.send(superiorPlayer);
+            return false;
+        }
+
+        return true;
+    }
+
 }

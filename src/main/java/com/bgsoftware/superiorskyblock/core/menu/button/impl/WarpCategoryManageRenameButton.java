@@ -1,7 +1,9 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
@@ -12,7 +14,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategoryManage;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -26,6 +28,7 @@ public class WarpCategoryManageRenameButton extends AbstractMenuViewButton<MenuW
     @Override
     public void onButtonClick(InventoryClickEvent clickEvent) {
         Player player = (Player) clickEvent.getWhoClicked();
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
         Message.WARP_CATEGORY_RENAME.send(player);
 
@@ -33,16 +36,15 @@ public class WarpCategoryManageRenameButton extends AbstractMenuViewButton<MenuW
 
         PlayerChat.listen(player, newName -> {
             WarpCategory warpCategory = menuView.getWarpCategory();
+            Island island = warpCategory.getIsland();
 
             if (warpCategory.getIsland().getWarpCategory(warpCategory.getName()) != null &&
                     !newName.equalsIgnoreCase("-cancel")) {
-                if (warpCategory.getIsland().getWarpCategory(newName) != null) {
-                    Message.WARP_CATEGORY_RENAME_ALREADY_EXIST.send(player);
+                if (!IslandNames.isValidWarpCategoryName(superiorPlayer, newName))
                     return true;
-                }
 
-                if (!IslandUtils.isWarpNameLengthValid(newName)) {
-                    Message.WARP_CATEGORY_NAME_TOO_LONG.send(player);
+                if (island.getWarpCategory(newName) != null) {
+                    Message.WARP_CATEGORY_ALREADY_EXIST.send(superiorPlayer);
                     return true;
                 }
 

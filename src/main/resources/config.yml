@@ -862,6 +862,11 @@ message-delays:
 # Should players be able to create warp categories?
 warp-categories: true
 
+# The name of the default warp category. The name must be a single word - cannot contain spaces!
+# If a player creates a warp without specifying a category, and no warp category already exists,
+# a new category with that name will be created.
+default-warp-category-name: 'Default'
+
 # Should the physics listener be activated?
 # This must be enabled if one of the stacked blocks can be affected by gravity or other things.
 # Disabling this listener can help with performance.

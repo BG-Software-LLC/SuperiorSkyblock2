@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.IconRenameButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpCategoryIconEditConfirmButton;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractIconProviderMenu;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.warp.WarpIcons;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class MenuWarpCategoryIconEdit extends AbstractMenu<AbstractIconProviderMenu.View<WarpCategory>, AbstractIconProviderMenu.Args<WarpCategory>> {
@@ -65,7 +66,8 @@ public class MenuWarpCategoryIconEdit extends AbstractMenu<AbstractIconProviderM
     public static class Args extends AbstractIconProviderMenu.Args<WarpCategory> {
 
         public Args(WarpCategory warpCategory) {
-            super(warpCategory, warpCategory == null ? null : new TemplateItem(new ItemBuilder(warpCategory.getRawIcon())));
+            super(warpCategory, warpCategory == null ? null : warpCategory.getRawIcon() == null ?
+                    WarpIcons.DEFAULT_WARP_CATEGORY_ICON : new TemplateItem(new ItemBuilder(warpCategory.getRawIcon())));
         }
 
     }

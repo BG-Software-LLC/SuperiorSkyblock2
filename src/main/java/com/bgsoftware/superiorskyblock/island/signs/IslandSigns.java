@@ -13,7 +13,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.IslandNames;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -98,19 +98,8 @@ public class IslandSigns {
 
         Reason result = Reason.SUCCESS;
 
-        if (warpName.isEmpty()) {
-            if (sendMessage)
-                Message.WARP_ILLEGAL_NAME.send(superiorPlayer);
-            result = Reason.ILLEGAL_NAME;
-        } else if (island.getWarp(warpName) != null) {
-            if (sendMessage)
-                Message.WARP_ALREADY_EXIST.send(superiorPlayer);
-            result = Reason.ALREADY_EXIST;
-        } else if (!IslandUtils.isWarpNameLengthValid(warpName)) {
-            if (sendMessage)
-                Message.WARP_NAME_TOO_LONG.send(superiorPlayer);
-            result = Reason.NAME_TOO_LONG;
-        }
+        if (!IslandNames.isValidWarpName(superiorPlayer, island, warpName, sendMessage))
+            result = Reason.INVALID_NAME;
 
         if (!PluginEventsFactory.callIslandCreateWarpEvent(island, superiorPlayer, warpName, warpLocation, !privateFlag, null))
             result = Reason.EVENT_CANCELLED;
@@ -195,9 +184,7 @@ public class IslandSigns {
     public enum Reason {
 
         NOT_IN_ISLAND,
-        ILLEGAL_NAME,
-        ALREADY_EXIST,
-        NAME_TOO_LONG,
+        INVALID_NAME,
         LIMIT_REACHED,
         EVENT_CANCELLED,
         SUCCESS

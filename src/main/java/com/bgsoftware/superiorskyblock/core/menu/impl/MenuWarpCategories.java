@@ -5,19 +5,25 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.DynamicArray;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpCategoryPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.warp.WarpIcons;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -66,6 +72,12 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
 
         List<String> editLore = cfg.getStringList("edit-lore");
         int rowsSize = cfg.getStringList("pattern").size();
+
+        ItemStack defaultWarpCategoryIcon = menuParseResult.getLayoutBuilder().build().getButtons().stream()
+                .filter(button -> button.getViewButtonType().equals(WarpCategoryPagedObjectButton.class))
+                .findFirst().map(MenuTemplateButton::getButtonItem)
+                .orElse(null);
+        WarpIcons.DEFAULT_WARP_CATEGORY_ICON = new TemplateItem(defaultWarpCategoryIcon == null ? new ItemBuilder(Material.AIR) : new ItemBuilder(defaultWarpCategoryIcon));
 
         return new MenuWarpCategories(menuParseResult, editLore, rowsSize);
     }

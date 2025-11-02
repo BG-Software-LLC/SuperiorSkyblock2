@@ -515,7 +515,7 @@ public class MenusProvider_Default implements MenusProvider {
             Menus.MENU_WARP_CATEGORIES.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
         } else {
             WarpCategory warpCategory = targetIsland.getWarpCategories().values().stream().findFirst()
-                    .orElseGet(() -> targetIsland.createWarpCategory("Default Category"));
+                    .orElseGet(() -> targetIsland.createWarpCategory(plugin.getSettings().getDefaultWarpCategoryName()));
             openWarps(targetPlayer, previousMenu, warpCategory);
         }
     }

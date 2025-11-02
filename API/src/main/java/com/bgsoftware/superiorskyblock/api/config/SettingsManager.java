@@ -665,6 +665,12 @@ public interface SettingsManager {
     boolean isWarpCategories();
 
     /**
+     * The name of the default warp category.
+     * Config-path: default-warp-category-name
+     */
+    String getDefaultWarpCategoryName();
+
+    /**
      * Whether the plugin should listen for the physics event or not.
      * Config-path: physics-listener
      */

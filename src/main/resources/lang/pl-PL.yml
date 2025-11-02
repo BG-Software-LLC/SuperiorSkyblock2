@@ -766,34 +766,33 @@ UPGRADE_COOLDOWN_FORMAT: '&c&lBlad | &7Mozesz uaktualnic ponownie dopiero za {0}
 VAULT_NOT_INSTALLED: '&c&lBlad | &7Na serwerze nie ma zainstalowanego pluginu Vault, wiec transakcje sa wylaczone.'
 VISITOR_BLOCK_COMMAND: '&c&lBlad | &7Nie mozesz uzyc tego polecenia na innych wyspach.'
 WARP_ALREADY_EXIST: '&c&lBlad | &7Istnieje juz warp o tej nazwie.'
+WARP_CATEGORY_ALREADY_EXIST: '&c&lBlad | &7Istnieje juz kategoria warpu o tej nazwie.'
 WARP_CATEGORY_ICON_NEW_LORE: |
-  &e&lWarpy | &7Wprowadz nowa wiedze (wpisz -cancel", aby anulowac):
-  &e&lWarpy | &7Mozesz oddzielic wiersze, uzywajac '\n.'
-WARP_CATEGORY_ICON_NEW_NAME: '&e&lWarpy | &7Wpisz nazwe (wpisz "-cancel", aby anulowac):'
+  &e&lWarpy | &7Wprowadz nowy opis (wpisz "-cancel", aby anulowac):
+  &e&lWarpy | &7Mozesz oddzielic wiersze, uzywajac "\n".
+WARP_CATEGORY_ICON_NEW_NAME: '&e&lWarpy | &7Wprowadz nowa nazwe (wpisz "-cancel", aby anulowac):'
 WARP_CATEGORY_ICON_NEW_TYPE: '&e&lWarpy | &7Wprowadz nowy typ materialu (wpisz "-cancel", aby anulowac):'
 WARP_CATEGORY_ICON_UPDATED: '&e&lWarpy | &7Pomyslnie zaktualizowano ikone kategorii.'
-WARP_CATEGORY_ILLEGAL_NAME: '&c&lBlad | &7W nazwach kategorii wypaczenia mozna uzywac tylko liter alfabetu, cyfr i ''_''.'
-WARP_CATEGORY_NAME_TOO_LONG: '&c&lError | Warp category names cannot be longer than 255 chars.'
+WARP_CATEGORY_INVALID_NAME: '&c&lBlad | &7Nazwy kategorii warpów nie moga byc puste i musza byc jednym slowem.'
+WARP_CATEGORY_NAME_TOO_LONG: '&c&lBlad | &7Nazwy kategorii warpów nie moga byc dluzsze niz 255 znaków.'
 WARP_CATEGORY_SLOT: '&e&lWarpy | &7Wprowadz nowe miejsce (wpisz "-cancel", aby anulowac):'
 WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lBlad | &7To miejsce jest juz zajete przez inna kategorie.'
 WARP_CATEGORY_SLOT_SUCCESS: '&e&lWarpy | &7Pomyslnie zmieniono miejsce kategorii na {0}.'
 WARP_CATEGORY_RENAME: '&e&lWarpy | &7Wprowadz nowa nazwe (wpisz "-cancel", aby anulowac):'
-WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lBlad | &7Ta nazwa jest juz zajeta przez inna kategorie.'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lWarpy | &7Pomyslnie zmieniono nazwe kategorii na {0}.'
 WARP_ICON_NEW_LORE: |
-  &e&lWarpy | &7Wprowadz nowa wiedze (wpisz "-cancel", aby anulowac):
-  &e&lWarpy | &7Mozesz oddzielic wiersze, uzywajac '\n.'
-WARP_ICON_NEW_NAME: '&e&lWarpy | &7Wpisz nazwe (wpisz "-cancel", aby anulowac):'
+  &e&lWarpy | &7Wprowadz nowy opis (wpisz "-cancel", aby anulowac):
+  &e&lWarpy | &7Mozesz oddzielic wiersze, uzywajac "\n".
+WARP_ICON_NEW_NAME: '&e&lWarpy | &7Wprowadz nowa nazwe (wpisz "-cancel", aby anulowac):'
 WARP_ICON_NEW_TYPE: '&e&lWarpy | &7Wprowadz nowy typ materialu (wpisz "-cancel", aby anulowac):'
-WARP_ICON_UPDATED: '&e&lWarpy | &7Pomyslnie zaktualizowano ikone wypaczenia.'
-WARP_ILLEGAL_NAME: '&c&lBlad | &7W nazwach wypaczeń mozna uzywac tylko liter alfabetu, cyfr i ''_''.'
-WARP_LOCATION_UPDATE: '&e&lWarpy | &7Pomyslnie zaktualizowano lokalizacje wypaczenia do Twojej lokalizacji.'
-WARP_NAME_TOO_LONG: '&c&lError | Warp names cannot be longer than 255 chars.'
-WARP_PUBLIC_UPDATE: '&e&lWarpy | &7Udalo sie otworzyc osnowe dla publicznosci.'
-WARP_PRIVATE_UPDATE: '&e&lWarpy | &7Z powodzeniem zamknieto osnowe dla publicznosci.'
+WARP_ICON_UPDATED: '&e&lWarpy | &7Pomyslnie zaktualizowano ikone warpu.'
+WARP_INVALID_NAME: '&c&lBlad | &7Nazwy warpów nie moga byc puste i musza byc jednym slowem.'
+WARP_LOCATION_UPDATE: '&e&lWarpy | &7Pomyslnie zaktualizowano lokalizacje warpu do Twojej lokalizacji.'
+WARP_NAME_TOO_LONG: '&c&lBlad | &7Nazwy warpów nie moga byc dluzsze niz 255 znaków.'
+WARP_PUBLIC_UPDATE: '&e&lWarpy | &7Pomyslnie otwarto warp dla publicznosci.'
+WARP_PRIVATE_UPDATE: '&e&lWarpy | &7Pomyslnie zamknieto warp dla publicznosci.'
 WARP_RENAME: '&e&lWarpy | &7Wprowadz nowa nazwe (wpisz "-cancel", aby anulowac):'
-WARP_RENAME_ALREADY_EXIST: '&c&lBlad | &7Ta nazwa jest juz przejeta przez inna osnowe.'
-WARP_RENAME_SUCCESS: '&e&lWarpy | &7Pomyslnie zmieniono nazwe wypaczenia na {0}.'
+WARP_RENAME_SUCCESS: '&e&lWarpy | &7Pomyslnie zmieniono nazwe warpu na {0}.'
 WITHDRAW_ALL_MONEY: |-
   &e&lBank | &7Island Bank ma w sobie tylko {0} dolarów.
   &e&lBank | &7&oWyplata wszystkich pieniedzy..."

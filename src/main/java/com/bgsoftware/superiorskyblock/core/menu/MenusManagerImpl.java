@@ -494,8 +494,8 @@ public class MenusManagerImpl extends Manager implements MenusManager {
 
     @Override
     public void openIslandWarpsMenu(SuperiorPlayer superiorPlayer, Island island) {
-        openWarps(superiorPlayer, null, island.getWarpCategories().values()
-                .stream().findFirst().orElseGet(() -> island.createWarpCategory("Default Category")));
+        openWarps(superiorPlayer, null, island.getWarpCategories().values().stream().findFirst()
+                .orElseGet(() -> island.createWarpCategory(plugin.getSettings().getDefaultWarpCategoryName())));
     }
 
     @Override
