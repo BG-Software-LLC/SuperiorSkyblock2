@@ -179,6 +179,7 @@ COMMAND_ARGUMENT_LIMIT: limit
 COMMAND_ARGUMENT_MATERIAL: Material
 COMMAND_ARGUMENT_MENU: Menüname
 COMMAND_ARGUMENT_MESSAGE: Nachricht...
+COMMAND_ARGUMENT_MISSION_CATEGORY: 'mission-category'
 COMMAND_ARGUMENT_MISSION_NAME: mission-name
 COMMAND_ARGUMENT_MODULE_NAME: Modulname
 COMMAND_ARGUMENT_MULTIPLIER: Multiplikator
@@ -503,6 +504,7 @@ INVALID_MATERIAL: '&c&lError | &7Ungültiges Material {0}.'
 INVALID_MATERIAL_DATA: '&c&lError | &7Ungültige Materialdaten {0}.'
 INVALID_MENU: '&c&lError | &7Invalid menu {0}.'
 INVALID_MISSION: '&c&lError | &7Ungültige Mission {0}.'
+INVALID_MISSION_CATEGORY: '&c&lError | &7Invalid mission category {0}.'
 INVALID_MODULE: '&c&lError | &7Ungültiges Modul {0}.'
 INVALID_MULTIPLIER: '&c&lError | &7Ungültiger Multiplikator {0}.'
 INVALID_PAGE: '&c&lError | &7Ungültige Seite {0}.'

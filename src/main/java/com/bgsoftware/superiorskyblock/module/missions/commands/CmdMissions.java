@@ -2,8 +2,11 @@ package com.bgsoftware.superiorskyblock.module.missions.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -26,7 +29,7 @@ public class CmdMissions implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "missions";
+        return "missions [" + Message.COMMAND_ARGUMENT_MISSION_CATEGORY.getMessage(locale) + "]";
     }
 
     @Override
@@ -52,18 +55,42 @@ public class CmdMissions implements ISuperiorCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        boolean requireIsland = plugin.getMissions().getAllMissions().stream().allMatch(Mission::getIslandMission);
 
-        if (requireIsland && !superiorPlayer.hasIsland()) {
-            Message.INVALID_ISLAND.send(superiorPlayer);
-            return;
+        if (args.length == 1) {
+            boolean requireIsland = plugin.getMissions().getAllMissions().stream().allMatch(Mission::getIslandMission);
+
+            if (requireIsland && !superiorPlayer.hasIsland()) {
+                Message.INVALID_ISLAND.send(superiorPlayer);
+                return;
+            }
+
+            plugin.getMenus().openMissions(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()));
+        } else {
+            MissionCategory missionCategory = CommandArguments.getMissionCategory(plugin, sender, args[1]);
+
+            if (missionCategory == null)
+                return;
+
+            boolean requireIsland = missionCategory.getMissions().stream().allMatch(Mission::getIslandMission);
+
+            if (requireIsland && !superiorPlayer.hasIsland()) {
+                Message.INVALID_ISLAND.send(superiorPlayer);
+                return;
+            }
+
+            plugin.getMenus().openMissionsCategory(superiorPlayer,
+                    MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), missionCategory);
         }
-
-        plugin.getMenus().openMissions(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()));
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        if (args.length == 2) {
+            boolean hasIsland = plugin.getPlayers().getSuperiorPlayer(sender).hasIsland();
+            return CommandTabCompletes.getMissionCategories(plugin, args[1], category ->
+                    hasIsland || category.getMissions().stream().anyMatch(mission -> !mission.getIslandMission()));
+        }
+
         return Collections.emptyList();
     }
 

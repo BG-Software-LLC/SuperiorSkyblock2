@@ -135,6 +135,7 @@ COMMAND_ARGUMENT_LIMIT: הלבגמ
 COMMAND_ARGUMENT_MATERIAL: רמוח
 COMMAND_ARGUMENT_MENU: 'menu-name'
 COMMAND_ARGUMENT_MESSAGE: '...העדוה'
+COMMAND_ARGUMENT_MISSION_CATEGORY: 'mission-category'
 COMMAND_ARGUMENT_MISSION_NAME: המישמה םש
 COMMAND_ARGUMENT_MODULE_NAME: 'module-name'
 COMMAND_ARGUMENT_MULTIPLIER: סונוב
@@ -409,6 +410,7 @@ INVALID_MATERIAL: '&c&lהאיגש | &7{0} תיקוח אל רמוח.'
 INVALID_MATERIAL_DATA: '&c&lError | &7Invalid material-data {0}.'
 INVALID_MENU: '&c&lError | &7Invalid menu {0}.'
 INVALID_MISSION: '&c&lהאיגש | &7{0} תיקוח אל המישמ.'
+INVALID_MISSION_CATEGORY: '&c&lError | &7Invalid mission category {0}.'
 INVALID_MODULE: '&c&lError | &7Invalid module {0}.'
 INVALID_MULTIPLIER: '&c&lהאיגש | &7{0} יקוח אל סונוב.'
 INVALID_PAGE: '&c&lError | &7Invalid page {0}.'
