@@ -27,10 +27,12 @@ public class DefaultModulesContainer implements ModulesContainer {
 
     private final SuperiorSkyblockPlugin plugin;
     private final File globalLogsFolder;
+    private final File globalArchiveLogsFolder;
 
     public DefaultModulesContainer(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         this.globalLogsFolder = new File(plugin.getDataFolder(), "logs" + File.separator + "modules");
+        this.globalArchiveLogsFolder = new File(plugin.getDataFolder(), "logs" + File.separator + "archive");
     }
 
     @Override
@@ -44,7 +46,7 @@ public class DefaultModulesContainer implements ModulesContainer {
         File logsFolder = new File(this.globalLogsFolder, pluginModule.getName());
 
         ModuleLogger moduleLogger = new ModuleLogger(pluginModule);
-        ModuleLoggerFileHandler.addToLogger(new File(logsFolder, "latest.log"), moduleLogger);
+        ModuleLoggerFileHandler.addToLogger(logsFolder, this.globalArchiveLogsFolder, moduleLogger);
 
         try {
             ModuleInitializeDataImpl context = new ModuleInitializeDataImpl(dataFolder, moduleFolder, moduleLogger);

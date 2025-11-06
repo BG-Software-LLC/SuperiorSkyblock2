@@ -27,9 +27,9 @@ public class Log {
         logger.setUseParentHandlers(true);
 
         File logsFolder = new File(plugin.getDataFolder(), "logs");
-        File logsFile = new File(logsFolder, "latest.log");
+        File archiveLogsFile = new File(logsFolder, "archive");
 
-        ModuleLoggerFileHandler.addToLogger(logsFile, logger);
+        ModuleLoggerFileHandler.addToLogger(logsFolder, archiveLogsFile, logger);
 
         return logger;
     }
