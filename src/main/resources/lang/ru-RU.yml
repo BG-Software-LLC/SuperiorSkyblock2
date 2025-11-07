@@ -697,6 +697,7 @@ SCHEMATIC_RIGHT_SELECT: '&e&lСхемы | &7Выбрана позиция #1 ({0
 SCHEMATIC_SAVED: '&e&lСхемы | &7Схема успешно сохранена!'
 SELF_ROLE_CHANGE: '&c&lОшибка | &7Вы не можете изменить свою роль.'
 SET_UPGRADE_LEVEL: '&e&lУлучшения | &7Успешно обновлен уровень {0} для острова {1}.'
+SET_UPGRADE_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of {0} for all islands.'
 SET_UPGRADE_LEVEL_NAME: '&e&lУлучшения | &7Успешно обновлен уровень {0} для {1}.'
 SET_WARP: '&e&lОстров | &7Успешно создан новый варп на {0}.'
 SET_WARP_OUTSIDE: '&c&lОшибка | &7Вы не можете устанавливать варпы за пределами вашего острова.'

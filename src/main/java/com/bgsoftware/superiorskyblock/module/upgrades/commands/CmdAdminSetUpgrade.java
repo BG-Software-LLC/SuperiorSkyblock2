@@ -35,7 +35,8 @@ public class CmdAdminSetUpgrade implements IAdminIslandCommand {
     public String getUsage(java.util.Locale locale) {
         return "admin setupgrade <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
                 Message.COMMAND_ARGUMENT_UPGRADE_NAME.getMessage(locale) + "> <" +
                 Message.COMMAND_ARGUMENT_LEVEL.getMessage(locale) + ">";
     }
@@ -62,11 +63,11 @@ public class CmdAdminSetUpgrade implements IAdminIslandCommand {
 
     @Override
     public boolean supportMultipleIslands() {
-        return false;
+        return true;
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         Upgrade upgrade = CommandArguments.getUpgrade(plugin, sender, args[3]);
 
         if (upgrade == null)
@@ -85,16 +86,24 @@ public class CmdAdminSetUpgrade implements IAdminIslandCommand {
             return;
         }
 
-        PluginEvent<PluginEventArgs.IslandUpgrade> event = PluginEventsFactory.callIslandUpgradeEvent(
-                island, sender, upgrade, upgrade.getUpgradeLevel(level), IslandUpgradeEvent.Cause.ADMIN_SET_UPGRADE);
+        int islandsChangedCount = 0;
 
-        if (event.isCancelled())
+        for (Island island : islands) {
+            PluginEvent<PluginEventArgs.IslandUpgrade> event = PluginEventsFactory.callIslandUpgradeEvent(
+                    island, sender, upgrade, upgrade.getUpgradeLevel(level), IslandUpgradeEvent.Cause.ADMIN_SET_UPGRADE);
+            if (!event.isCancelled()) {
+                island.setUpgradeLevel(upgrade, level);
+                ++islandsChangedCount;
+            }
+        }
+
+        if (islandsChangedCount <= 0)
             return;
 
-        island.setUpgradeLevel(upgrade, level);
-
-        if (targetPlayer == null)
-            Message.SET_UPGRADE_LEVEL_NAME.send(sender, upgrade.getName(), island.getName());
+        if (islandsChangedCount > 1)
+            Message.SET_UPGRADE_LEVEL_ALL.send(sender, upgrade.getName());
+        else if (targetPlayer == null)
+            Message.SET_UPGRADE_LEVEL_NAME.send(sender, upgrade.getName(), islands.get(0).getName());
         else
             Message.SET_UPGRADE_LEVEL.send(sender, upgrade.getName(), targetPlayer.getName());
     }

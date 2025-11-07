@@ -826,6 +826,7 @@ SCHEMATIC_SAVED: '&e&lŞematikler | &7Şematik başarıyla kaydedildi!'
 SELF_ROLE_CHANGE: '&c&lHata | &7Kendi rolünü değiştiremezsin.'
 SET_UPGRADE_LEVEL: '&e&lYükseltmeler | &7{1}''in adası için {0} seviyesi başarıyla
   güncellendi.'
+SET_UPGRADE_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of {0} for all islands.'
 SET_UPGRADE_LEVEL_NAME: '&e&lYükseltmeler | &7{1} adası için {0} seviyesi başarıyla
   güncellendi.'
 SET_WARP: '&e&lAda | &7{0} konumunda yeni bir ışınlanma noktası başarıyla oluşturuldu.'

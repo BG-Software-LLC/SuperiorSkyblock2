@@ -782,6 +782,7 @@ SCHEMATIC_SAVED: '&e&lSchematics | &7Lưu thành công schematic!'
 SELF_ROLE_CHANGE: '&c&lLỗi | &7Bạn không thể thay đổi vai trò của chính mình.'
 SET_UPGRADE_LEVEL: '&e&lNâng Cấp | &7Nâng cấp thành công cấp độ của {0} cho đảo của
   {1}.'
+SET_UPGRADE_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of {0} for all islands.'
 SET_UPGRADE_LEVEL_NAME: '&e&lNâng Cấp | &7Thay đổi thành công cấp độ {0} cho đảo {1}.'
 SET_WARP: '&e&lĐảo | &7Tạo thành công một khu vực mới tại {0}.'
 SET_WARP_OUTSIDE: '&c&lLỗi | &7Bạn không thể đặt khu vực bên ngoài hòn đảo của bạn.'
