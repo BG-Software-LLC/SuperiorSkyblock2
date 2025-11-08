@@ -5,7 +5,13 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
 import com.bgsoftware.superiorskyblock.module.IModuleConfiguration;
-import com.bgsoftware.superiorskyblock.module.bank.commands.*;
+import com.bgsoftware.superiorskyblock.module.bank.commands.CmdAdminDeposit;
+import com.bgsoftware.superiorskyblock.module.bank.commands.CmdAdminSetBankLimit;
+import com.bgsoftware.superiorskyblock.module.bank.commands.CmdAdminWithdraw;
+import com.bgsoftware.superiorskyblock.module.bank.commands.CmdBalance;
+import com.bgsoftware.superiorskyblock.module.bank.commands.CmdBank;
+import com.bgsoftware.superiorskyblock.module.bank.commands.CmdDeposit;
+import com.bgsoftware.superiorskyblock.module.bank.commands.CmdWithdraw;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 
