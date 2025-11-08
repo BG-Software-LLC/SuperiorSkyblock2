@@ -14,6 +14,9 @@ import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddBlockLimit;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRemoveBlockLimit;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetBlockLimit;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -33,10 +36,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class UpgradeTypeBlockLimits implements IUpgradeType {
+
+    private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddBlockLimit(),
+            new CmdAdminRemoveBlockLimit(), new CmdAdminSetBlockLimit());
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -51,7 +58,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
     @Override
     public List<ISuperiorCommand> getCommands() {
-        return Collections.emptyList();
+        return commands;
     }
 
     private class BlockLimitsListener implements Listener {

@@ -5,6 +5,8 @@
 ##                                                  ##
 ######################################################
 
+enabled: true
+
 # Whether crop-growth should be enabled.
 # When disabled, the plugin will not alter crop growth.
 crop-growth: true
