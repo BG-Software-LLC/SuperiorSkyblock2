@@ -397,7 +397,7 @@ public class CommandArguments {
         }
 
         if (dimension == null)
-            Message.INVALID_ENVIRONMENT.send(sender, argument);
+            Message.INVALID_DIMENSION.send(sender, argument);
 
         return dimension;
     }

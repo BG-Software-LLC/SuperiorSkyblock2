@@ -34,7 +34,8 @@ public class CmdAdminUnlockWorld implements IAdminIslandCommand {
         return "admin unlockworld <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <nether/the_end/normal> <true/false>";
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_DIMENSION.getMessage(locale) + "> <true/false>";
     }
 
     @Override
@@ -70,7 +71,7 @@ public class CmdAdminUnlockWorld implements IAdminIslandCommand {
             return;
 
         if (dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
-            Message.INVALID_ENVIRONMENT.send(sender, args[3]);
+            Message.INVALID_DIMENSION.send(sender, args[3]);
             return;
         }
 
@@ -85,13 +86,8 @@ public class CmdAdminUnlockWorld implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        if (args.length == 5)
-            return CommandTabCompletes.getCustomComplete(args[4], "true", "false");
-
-        if (args.length != 4)
-            return Collections.emptyList();
-
-        return CommandTabCompletes.getDimensions(args[3]);
+        return args.length == 4 ? CommandTabCompletes.getDimensions(plugin, args[3]) : args.length == 5 ?
+                CommandTabCompletes.getCustomComplete(args[4], "true", "false") : Collections.emptyList();
     }
 
     private void handleWorldUnlock(CommandSender sender, List<Island> islands, Dimension dimension,

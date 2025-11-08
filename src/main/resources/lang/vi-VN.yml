@@ -140,6 +140,7 @@ COMMAND_ARGUMENT_AMOUNT: so-luong
 COMMAND_ARGUMENT_BIOME: quan-xa
 COMMAND_ARGUMENT_BORDER_COLOR: 'border-color'
 COMMAND_ARGUMENT_COMMAND: lenh...
+COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EFFECT: hieu-ung-thuoc
 COMMAND_ARGUMENT_EMAIL: email
@@ -428,9 +429,9 @@ INVALID_AMOUNT: '&c&lLỗi | &7Số lượng không hợp lệ {0}.'
 INVALID_BIOME: '&c&lLỗi | &7Quần xã không chính xác {0}.'
 INVALID_BLOCK: '&c&lLỗi | &7Vị trí khối không hợp lệ {0}.'
 INVALID_BORDER_COLOR: '&c&lError | &7Invalid border color {0}.'
+INVALID_DIMENSION: '&c&lError | &7Invalid dimension {0}.'
 INVALID_EFFECT: '&c&lLỗi | &7Hiệu ứng không hợp lệ {0}.'
 INVALID_ENTITY: '&c&lLỗi | &7Vật thể không chính xác {0}.'
-INVALID_ENVIRONMENT: '&c&lLỗi | &7Thế giới {0} không hợp lệ.'
 INVALID_INTERVAL: '&c&lLỗi | &7Thời gian nghỉ không hợp lệ {0}.'
 INVALID_ISLAND: '&c&lLỗi | &7Bạn không có một hòn đảo.'
 INVALID_ISLAND_LOCATION: '&c&lLỗi | &7Không có đảo nào ở vị trí của bạn.'

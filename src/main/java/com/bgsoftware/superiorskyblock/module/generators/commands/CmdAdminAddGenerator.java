@@ -42,7 +42,7 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
                 Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
                 Message.COMMAND_ARGUMENT_MATERIAL.getMessage(locale) + "> <" +
                 Message.COMMAND_ARGUMENT_VALUE.getMessage(locale) + "> [" +
-                Message.COMMAND_ARGUMENT_WORLD.getMessage(locale) + "]";
+                Message.COMMAND_ARGUMENT_DIMENSION.getMessage(locale) + "]";
     }
 
     @Override
@@ -140,7 +140,7 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
         return args.length == 4 ? CommandTabCompletes.getMaterialsForGenerators(args[3]) :
-                args.length == 6 ? CommandTabCompletes.getDimensions(args[5]) : Collections.emptyList();
+                args.length == 6 ? CommandTabCompletes.getDimensions(plugin, args[5]) : Collections.emptyList();
     }
 
 }

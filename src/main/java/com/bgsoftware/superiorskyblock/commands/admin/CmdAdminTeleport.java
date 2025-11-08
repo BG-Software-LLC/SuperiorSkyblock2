@@ -47,7 +47,8 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
     public String getUsage(java.util.Locale locale) {
         return "admin teleport <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> [normal/nether/the_end]";
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> [" +
+                Message.COMMAND_ARGUMENT_DIMENSION.getMessage(locale) + "]";
     }
 
     @Override
@@ -118,7 +119,7 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getDimensions(args[3]) : Collections.emptyList();
+        return args.length == 4 ? CommandTabCompletes.getDimensions(plugin, args[3]) : Collections.emptyList();
     }
 
 }
