@@ -16,8 +16,6 @@ public abstract class BuiltinModule<T extends IModuleConfiguration> extends Plug
 
     protected T configuration;
 
-    protected final ModuleLogger logger = (ModuleLogger) getLogger();
-
     public BuiltinModule(String moduleName) {
         super(moduleName, "Ome_R");
     }
@@ -98,7 +96,7 @@ public abstract class BuiltinModule<T extends IModuleConfiguration> extends Plug
             try {
                 config.save(configFile);
             } catch (Exception error) {
-                this.logger.e("An error occurred while saving config file for module " + getName() + ":", error);
+                this.logger().e("An error occurred while saving config file for module " + getName() + ":", error);
             }
         }
 
@@ -107,11 +105,15 @@ public abstract class BuiltinModule<T extends IModuleConfiguration> extends Plug
                     Resources.getResource("modules/" + getName() + "/config.yml"),
                     getIgnoredSections());
         } catch (Exception error) {
-            this.logger.e("An error occurred while loading config file:", error);
+            this.logger().e("An error occurred while loading config file:", error);
         }
 
 
         this.configuration = createConfigFile(config);
+    }
+
+    protected ModuleLogger logger() {
+        return (ModuleLogger) super.getLogger();
     }
 
     protected boolean onConfigCreate(SuperiorSkyblockPlugin plugin, CommentedConfiguration config, boolean firstTime) {

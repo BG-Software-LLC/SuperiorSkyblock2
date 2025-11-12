@@ -169,12 +169,12 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
             File categoryFolder = new File(getModuleFolder(), "categories/" + categoryName);
 
             if (!categoryFolder.exists()) {
-                logger.w("The directory of the mission category " + categoryName + " doesn't exist, skipping...");
+                logger().w("The directory of the mission category " + categoryName + " doesn't exist, skipping...");
                 return false;
             }
 
             if (!categoryFolder.isDirectory()) {
-                logger.w("The directory of the mission category " + categoryName + " is not valid, skipping...");
+                logger().w("The directory of the mission category " + categoryName + " is not valid, skipping...");
                 return false;
             }
 
@@ -182,7 +182,7 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
                     file.isFile() && file.getName().endsWith(".yml"));
 
             if (missionFiles == null || missionFiles.length == 0) {
-                logger.w("The mission category " + categoryName + " doesn't have missions, skipping...");
+                logger().w("The mission category " + categoryName + " doesn't have missions, skipping...");
                 return false;
             }
 
@@ -200,10 +200,10 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
                     try {
                         missionConfigFile.load(missionFile);
                     } catch (InvalidConfigurationException error) {
-                        logger.e("A format-error occurred while parsing the mission file " + missionFile.getName() + ":", error);
+                        logger().e("A format-error occurred while parsing the mission file " + missionFile.getName() + ":", error);
                         continue;
                     } catch (IOException error) {
-                        logger.e("An unexpected error occurred while parsing the mission file " + missionFile.getName() + ":", error);
+                        logger().e("An unexpected error occurred while parsing the mission file " + missionFile.getName() + ":", error);
                         continue;
                     }
 
@@ -219,7 +219,7 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
             }
 
             if (categoryMissions.isEmpty()) {
-                logger.w("The mission category " + categoryName + " doesn't have missions, skipping...");
+                logger().w("The mission category " + categoryName + " doesn't have missions, skipping...");
                 return false;
             }
 
@@ -280,7 +280,7 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
             try {
                 missionFile.createNewFile();
             } catch (IOException error) {
-                logger.e("An unexpected error occurred while converting non-categorized mission " + missionName + ":", error);
+                logger().e("An unexpected error occurred while converting non-categorized mission " + missionName + ":", error);
                 continue;
             }
 
@@ -290,7 +290,7 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
             try {
                 missionConfigFile.save(missionFile);
             } catch (Exception error) {
-                logger.e("An unexpected error occurred while saving non-categorized mission " + missionName + ":", error);
+                logger().e("An unexpected error occurred while saving non-categorized mission " + missionName + ":", error);
             }
         }
 
@@ -339,7 +339,7 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
         try {
             java.nio.file.Files.copy(Paths.get(oldMissionsMenuFile.toURI()), Paths.get(newMissionsCategoryMenuFile.toURI()));
         } catch (IOException error) {
-            logger.e("An unexpected error occurred while copying old missions-menu to the new format:", error);
+            logger().e("An unexpected error occurred while copying old missions-menu to the new format:", error);
             return;
         }
 

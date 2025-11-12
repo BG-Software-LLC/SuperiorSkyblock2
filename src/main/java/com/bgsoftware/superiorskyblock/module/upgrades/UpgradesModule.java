@@ -218,7 +218,7 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
         UpgradeCostLoader costLoader = plugin.getUpgrades().getUpgradeCostLoader(priceType);
 
         if (costLoader == null) {
-            this.logger.w("Upgrade by name " + upgrade.getName() + " (level " + level + ") has invalid price-type. Skipping...");
+            this.logger().w("Upgrade by name " + upgrade.getName() + " (level " + level + ") has invalid price-type. Skipping...");
             return;
         }
 
@@ -227,7 +227,7 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
         try {
             upgradeCost = costLoader.loadCost(levelSection);
         } catch (UpgradeCostLoadException error) {
-            this.logger.e("Upgrade by name " + upgrade.getName() + " (level " + level + ") failed to initialize:", error);
+            this.logger().e("Upgrade by name " + upgrade.getName() + " (level " + level + ") failed to initialize:", error);
             return;
         }
 
@@ -248,7 +248,7 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
         IntValue borderSize = IntValue.syncedFixed(levelSection.getInt("border-size", -1));
 
         if (borderSize.get() > plugin.getSettings().getMaxIslandSize()) {
-            this.logger.w("Upgrade by name " + upgrade.getName() + " (level " + level + ") has illegal border-size, skipping...");
+            this.logger().w("Upgrade by name " + upgrade.getName() + " (level " + level + ") has illegal border-size, skipping...");
             return;
         }
 
