@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.modules.ModuleLogger;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
@@ -140,7 +141,8 @@ public class CmdRankup implements IPermissibleCommand {
                         try {
                             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsedCommand);
                         } catch (Throwable error) {
-                            BuiltinModules.UPGRADES.getLogger().e("An unexpected error occurred while executing command:\n" + parsedCommand, error);
+                            ModuleLogger logger = (ModuleLogger) BuiltinModules.UPGRADES.getLogger();
+                            logger.e("An unexpected error occurred while executing command:\n" + parsedCommand, error);
                         }
                     }
 
