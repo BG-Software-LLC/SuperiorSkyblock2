@@ -4,6 +4,7 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.api.modules.ModuleLogger;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
 import org.bukkit.event.Listener;
@@ -14,6 +15,8 @@ import java.util.Objects;
 public abstract class BuiltinModule<T extends IModuleConfiguration> extends PluginModule {
 
     protected T configuration;
+
+    protected final ModuleLogger logger = (ModuleLogger) getLogger();
 
     public BuiltinModule(String moduleName) {
         super(moduleName, "Ome_R");
@@ -95,7 +98,7 @@ public abstract class BuiltinModule<T extends IModuleConfiguration> extends Plug
             try {
                 config.save(configFile);
             } catch (Exception error) {
-                getLogger().e("An error occurred while saving config file for module " + getName() + ":", error);
+                this.logger.e("An error occurred while saving config file for module " + getName() + ":", error);
             }
         }
 
@@ -104,7 +107,7 @@ public abstract class BuiltinModule<T extends IModuleConfiguration> extends Plug
                     Resources.getResource("modules/" + getName() + "/config.yml"),
                     getIgnoredSections());
         } catch (Exception error) {
-            getLogger().e("An error occurred while loading config file:", error);
+            this.logger.e("An error occurred while loading config file:", error);
         }
 
 
