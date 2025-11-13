@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.missions;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.missions.store.UnifiedPayload;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.google.common.base.Preconditions;
 import org.bukkit.configuration.ConfigurationSection;
@@ -189,8 +190,29 @@ public abstract class Mission<V> {
     /**
      * Save mission's progress.
      *
-     * @param section The mission's section in the config.
+     * @param out The mission's section in the config.
      */
+    public void saveProgress(UnifiedPayload out) {
+        // Should be overridden by missions.
+    }
+
+
+    /**
+     * Load mission's progress.
+     *
+     * @param in The mission's section in the config.
+     */
+    public void loadProgress(UnifiedPayload in) {
+        // Should be overridden by missions.
+    }
+
+    /**
+     * Save mission's progress.
+     *
+     * @param section The mission's section in the config.
+     * @deprecated Use {@link #saveProgress(UnifiedPayload)} instead.
+     */
+    @Deprecated
     public void saveProgress(ConfigurationSection section) {
         // Should be overridden by missions.
     }
@@ -199,7 +221,9 @@ public abstract class Mission<V> {
      * Load mission's progress.
      *
      * @param section The mission's section in the config.
+     * @deprecated Use {@link #loadProgress(UnifiedPayload)} instead.
      */
+    @Deprecated
     public void loadProgress(ConfigurationSection section) {
         // Should be overridden by missions.
     }
