@@ -719,6 +719,7 @@ SCHEMATIC_RIGHT_SELECT: '&e&lםינבמ רצוי | &7הנושאר הדוקנ ת�
 SCHEMATIC_SAVED: '&e&lםינבמ רצוי | &7החלצהב רמשנ הנבמה!'
 SELF_ROLE_CHANGE: '&c&lהאיגש | &7ךמצע לש הגרדה תא תונשל לוכי אל התא.'
 SET_UPGRADE_LEVEL: '&e&lםיגורדש | &7החלצהב התנוש {1} לש יאב {0} גורדשה לש המרה.'
+SET_UPGRADE_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of {0} for all islands.'
 SET_UPGRADE_LEVEL_NAME: '&e&lםיגורדש | &7החלצהב התנוש {1} יאב {0} גורדשה לש המרה.'
 SET_WARP: '&e&lיא | &7{0} ב החלצהב שדח םוקימ תרצי.'
 SET_WARP_OUTSIDE: '&c&lהאיגש | &7ךלש יאל ץוחמ םימוקימ רוציל לוכי אל התא.'
