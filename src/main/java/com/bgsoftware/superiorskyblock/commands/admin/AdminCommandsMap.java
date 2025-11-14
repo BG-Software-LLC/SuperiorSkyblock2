@@ -54,7 +54,6 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminResetSettings());
         registerCommand(new CmdAdminResetWorld());
         registerCommand(new CmdAdminSchematic());
-        registerCommand(new CmdAdminSetBankLimit());
         registerCommand(new CmdAdminSetBiome());
         registerCommand(new CmdAdminSetBlockAmount());
         registerCommand(new CmdAdminSetBlockLimit());

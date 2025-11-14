@@ -193,7 +193,8 @@ public class CmdAdminShow implements IAdminIslandCommand {
             collectIslandData(locale, infoMessage, island::getCoopLimit, island::getCoopLimitRaw, Message.ISLAND_INFO_ADMIN_COOP_LIMIT);
 
         // Island bank limit
-        collectIslandData(locale, infoMessage, island::getBankLimit, island::getBankLimitRaw, Message.ISLAND_INFO_ADMIN_BANK_LIMIT,
+        if (BuiltinModules.BANK.isEnabled())
+            collectIslandData(locale, infoMessage, island::getBankLimit, island::getBankLimitRaw, Message.ISLAND_INFO_ADMIN_BANK_LIMIT,
                 Formatters.NUMBER_FORMATTER::format);
 
         if (upgradesModule) {
