@@ -103,7 +103,7 @@ public class SettingsContainer {
     public final boolean stackedBlocksAutoPickup;
     public final boolean stackedBlocksMenuEnabled;
     public final String stackedBlocksMenuTitle;
-    public final String islandLevelFormula;
+    public final String blockLevelFormula;
     public final boolean roundedIslandLevel;
     public final RoundingMode islandLevelRoundingMode;
     public final boolean autoBlocksTracking;
@@ -307,7 +307,7 @@ public class SettingsContainer {
         stackedBlocksAutoPickup = config.getBoolean("stacked-blocks.auto-collect", false);
         stackedBlocksMenuEnabled = config.getBoolean("stacked-blocks.deposit-menu.enabled", true);
         stackedBlocksMenuTitle = Formatters.COLOR_FORMATTER.format(config.getString("stacked-blocks.deposit-menu.title", "&lDeposit Blocks"));
-        islandLevelFormula = config.getString("island-level-formula", "{} / 2");
+        blockLevelFormula = config.getString("block-level-formula", "{} / 2");
         roundedIslandLevel = config.getBoolean("rounded-island-level", false);
         islandLevelRoundingMode = Optional.ofNullable(EnumHelper.getEnum(RoundingMode.class,
                         config.getString("island-level-rounding-mode").toUpperCase(Locale.ENGLISH)))

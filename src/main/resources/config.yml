@@ -151,11 +151,9 @@ stacked-blocks:
     # The title of the menu.
     title: '&lDeposit Blocks'
 
-# Set a formula to calculate the island level by it's worth.
+# The formula used to calculate a block's level when it has a worth defined but no level specified.
 # Use {} as a placeholder for worth. Make sure you only use digits and mathematical operations!
-# If you use Java 15 or above (Minecraft 1.16+), check out this page:
-# https://wiki.bg-software.com/superiorskyblock/new-java-engine
-island-level-formula: '{} / 2'
+block-level-formula: '{} / 2'
 
 # Should the island levels be a rounded integer?
 rounded-island-level: false
