@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
@@ -31,6 +32,8 @@ public class EntityCategories {
     private static final Class<?> HOGLIN_CLASS = getEntityTypeClass("org.bukkit.entity.Hoglin");
     private static final Class<?> SKELETON_HORSE_CLASS = getEntityTypeClass("org.bukkit.entity.SkeletonHorse");
     private static final Class<?> ZOMBIE_HORSE_CLASS = getEntityTypeClass("org.bukkit.entity.ZombieHorse");
+    @Nullable
+    private static final EntityType GLOW_ITEM_FRAME = EnumHelper.getEnum(EntityType.class, "GLOW_ITEM_FRAME");
 
     public static void registerListeners(PluginEventsDispatcher dispatcher) {
         dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, EntityCategories::onSettingsUpdate);
@@ -54,8 +57,11 @@ public class EntityCategories {
         new Builder("PAINTING", createEntityTypesSet(EntityType.PAINTING))
                 .damagePrivilege(IslandPrivileges.PAINTING).spawnPrivilege(IslandPrivileges.BUILD)
                 .naturalSpawnFlag(null).spawnerSpawnFlag(null).build();
-        new Builder("ITEM_FRAME", createEntityTypesSet(EntityType.ITEM_FRAME))
+        new Builder("ITEM_FRAME", createEntityTypesSet(EntityType.ITEM_FRAME, GLOW_ITEM_FRAME))
                 .damagePrivilege(IslandPrivileges.ITEM_FRAME).spawnPrivilege(IslandPrivileges.BUILD)
+                .naturalSpawnFlag(null).spawnerSpawnFlag(null).build();
+        new Builder("ARMOR_STAND", createEntityTypesSet(EntityType.ARMOR_STAND))
+                .damagePrivilege(IslandPrivileges.BREAK).spawnPrivilege(IslandPrivileges.BUILD)
                 .naturalSpawnFlag(null).spawnerSpawnFlag(null).build();
         new Builder("VEHICLE", createEntityTypesSet(EntityCategories::isVehicleType))
                 .damagePrivilege(IslandPrivileges.MINECART_DAMAGE).spawnPrivilege(IslandPrivileges.MINECART_PLACE)
@@ -110,10 +116,13 @@ public class EntityCategories {
         return entityTypes;
     }
 
-    private static KeySet createEntityTypesSet(EntityType entityType) {
-        KeySet entityTypes = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE);
-        entityTypes.add(Keys.of(entityType));
-        return entityTypes;
+    private static KeySet createEntityTypesSet(EntityType... entityTypes) {
+        KeySet entities = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE);
+        for (EntityType entityType : entityTypes) {
+            if (entityType != null)
+                entities.add(Keys.of(entityType));
+        }
+        return entities;
     }
 
     private static Class<?> getEntityTypeClass(String clazz) {
