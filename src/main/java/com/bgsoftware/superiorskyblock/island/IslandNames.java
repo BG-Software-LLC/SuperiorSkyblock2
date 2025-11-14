@@ -5,10 +5,13 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.Locale;
 
 public class IslandNames {
@@ -66,6 +69,14 @@ public class IslandNames {
         }
 
         return true;
+    }
+
+    public static void announceChange(Island island, Message message, Object... args) {
+        if (plugin.getSettings().getIslandNames().isAnnounceChangeToAll())
+            for (Player player : Bukkit.getOnlinePlayers())
+                message.send(player, args);
+        else
+            IslandUtils.sendMessage(island, message, Collections.emptyList(), args);
     }
 
     public static String getNameForDatabase(Island island) {

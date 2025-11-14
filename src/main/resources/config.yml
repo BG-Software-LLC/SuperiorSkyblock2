@@ -494,6 +494,10 @@ island-names:
   # Should the plugin prevent players from using player names as island names?
   prevent-player-names: false
 
+  # Should the name change announcement be sent to all players?
+  # When disabled, only island members will see the announcement.
+  announce-change-to-all: true
+
 # Should players get teleported to the island when they create it?
 teleport-on-create: true
 

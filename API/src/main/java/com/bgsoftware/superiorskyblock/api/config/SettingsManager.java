@@ -1272,6 +1272,12 @@ public interface SettingsManager {
          */
         boolean isPreventPlayerNames();
 
+        /**
+         * Whether the name change announcement should be sent to all players or not.
+         * Config-path: island-names.announce-change-to-all
+         */
+        boolean isAnnounceChangeToAll();
+
     }
 
     interface AFKIntegrations {
