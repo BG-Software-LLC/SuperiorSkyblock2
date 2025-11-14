@@ -38,7 +38,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.SBlockPosition;
+import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.WorldInfoImpl;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
@@ -133,7 +133,7 @@ public class SpawnIsland implements Island {
         }
     };
 
-    private final BlockPosition center;
+    private final WorldPosition center;
     private final World spawnWorld;
     private final WorldInfo spawnWorldInfo;
     private final int islandSize;
@@ -161,8 +161,8 @@ public class SpawnIsland implements Island {
 
         this.islandSize = plugin.getSettings().getSpawn().getSize();
 
-        this.center = SBlockPosition.of(centerLocation);
-        this.islandArea.update(this.center, this.islandSize);
+        this.center = SWorldPosition.of(centerLocation);
+        this.islandArea.update(this.center.toBlockPosition(), this.islandSize);
         this.spawnWorldInfo = new WorldInfoImpl(this.spawnWorld.getName(), Dimensions.fromEnvironment(this.spawnWorld.getEnvironment()));
 
         this.dirtyChunksContainer = new DirtyChunksContainer(this);
@@ -346,12 +346,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public Location getCenter(Dimension unused) {
-        return this.center.toWorldPosition().toLocation(this.spawnWorld);
+        return this.center.toLocation(this.spawnWorld);
     }
 
     @Override
     public BlockPosition getCenterPosition() {
-        return this.center;
+        return this.center.toBlockPosition();
     }
 
     @Override
