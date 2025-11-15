@@ -159,6 +159,7 @@ COMMAND_ARGUMENT_AMOUNT: miktar
 COMMAND_ARGUMENT_BIOME: biyom
 COMMAND_ARGUMENT_BORDER_COLOR: sınır-rengi
 COMMAND_ARGUMENT_COMMAND: komut...
+COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EFFECT: iksir-efekti
 COMMAND_ARGUMENT_EMAIL: e-posta
@@ -462,7 +463,7 @@ INVALID_BLOCK: '&c&lHata | &7Geçersiz blok konumu {0}.'
 INVALID_BORDER_COLOR: '&c&lHata | &7Geçersiz sınır rengi {0}.'
 INVALID_EFFECT: '&c&lHata | &7Geçersiz efekt {0}.'
 INVALID_ENTITY: '&c&lHata | &7Geçersiz varlık {0}.'
-INVALID_ENVIRONMENT: '&c&lHata | &7Geçersiz dünya {0}.'
+INVALID_ENVIRONMENT: '&c&lError | &7Invalid dimension {0}.'
 INVALID_INTERVAL: '&c&lHata | &7Geçersiz aralık {0}.'
 INVALID_ISLAND: '&c&lHata | &7Bir adan yok.'
 INVALID_ISLAND_LOCATION: '&c&lHata | &7Konumunda bir ada bulunmuyor.'

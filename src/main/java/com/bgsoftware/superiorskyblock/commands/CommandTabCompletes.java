@@ -259,10 +259,12 @@ public class CommandTabCompletes {
                 .build(IslandFlag.values(), islandFlag -> islandFlag.getName().toLowerCase(Locale.ENGLISH));
     }
 
-    public static List<String> getDimensions(String argument) {
-        return filterByArgument(Dimension.values(),
-                dimension -> dimension.getName().toLowerCase(Locale.ENGLISH),
-                argument.toLowerCase(Locale.ENGLISH));
+    public static List<String> getDimensions(SuperiorSkyblockPlugin plugin, String argument) {
+        String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
+        return new SequentialListBuilder<String>().build(Dimension.values().stream()
+                .filter(dimension -> plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension) &&
+                        dimension.getName().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
+                .map(dimension -> dimension.getName().toLowerCase(Locale.ENGLISH)));
     }
 
     public static List<String> getBorderColors(String argument) {

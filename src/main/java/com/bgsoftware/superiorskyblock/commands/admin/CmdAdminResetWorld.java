@@ -53,7 +53,8 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
         return "admin resetworld <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <normal/nether/the_end>";
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_DIMENSION.getMessage(locale) + ">";
     }
 
     @Override
@@ -164,18 +165,7 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        if (args.length != 4)
-            return Collections.emptyList();
-
-        List<String> environments = new ArrayList<>();
-
-        for (Dimension dimension : Dimension.values()) {
-            if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
-                environments.add(dimension.getName().toLowerCase(Locale.ENGLISH));
-            }
-        }
-
-        return CommandTabCompletes.getCustomComplete(args[3], environments.toArray(new String[0]));
+        return args.length == 4 ? CommandTabCompletes.getDimensions(plugin, args[3]) : Collections.emptyList();
     }
 
 }

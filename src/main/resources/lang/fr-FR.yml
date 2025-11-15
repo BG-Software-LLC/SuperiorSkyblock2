@@ -115,6 +115,7 @@ COMMAND_ARGUMENT_AMOUNT: quantité
 COMMAND_ARGUMENT_BIOME: biome
 COMMAND_ARGUMENT_BORDER_COLOR: 'border-color'
 COMMAND_ARGUMENT_COMMAND: 'commande...'
+COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: discord
 COMMAND_ARGUMENT_EFFECT: effet-de-potion
 COMMAND_ARGUMENT_EMAIL: email
@@ -378,8 +379,8 @@ INVALID_BLOCK: '&c&lErreur | &7Emplacement {0} du bloc invalide.'
 INVALID_BORDER_COLOR: '&c&lError | &7Invalid border color {0}.'
 INVALID_EFFECT: '&c&lErreur | &7Effet invalide {0}.'
 INVALID_ENTITY: '&c&lErreur | &7Entité invalide {0}.'
+INVALID_ENVIRONMENT: '&c&lError | &7Invalid dimension {0}.'
 INVALID_SCHEMATIC: '&c&lErreur | &7Il n''existe aucun schematic portant le nom {0}.'
-INVALID_ENVIRONMENT: '&c&lErreur | &7Monde invalide {0}.'
 INVALID_INTERVAL: '&c&lErreur | &7Interval invalide {0}.'
 INVALID_ISLAND: '&c&lErreur | &7Vous n''avez pas d''île.'
 INVALID_ISLAND_LOCATION: '&c&lErreur | &7Il n''y a pas d''île sur votre position.'

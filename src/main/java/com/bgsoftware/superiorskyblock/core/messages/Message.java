@@ -142,6 +142,7 @@ public enum Message {
     COMMAND_ARGUMENT_BIOME("biome"),
     COMMAND_ARGUMENT_BORDER_COLOR("border-color"),
     COMMAND_ARGUMENT_COMMAND("command..."),
+    COMMAND_ARGUMENT_DIMENSION("dimension"),
     COMMAND_ARGUMENT_DISCORD("discord..."),
     COMMAND_ARGUMENT_EFFECT("effect"),
     COMMAND_ARGUMENT_EMAIL("email"),
