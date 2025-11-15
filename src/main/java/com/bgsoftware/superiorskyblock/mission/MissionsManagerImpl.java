@@ -15,8 +15,6 @@ import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
 import com.bgsoftware.superiorskyblock.core.io.Files;
@@ -45,31 +43,12 @@ import java.lang.reflect.Constructor;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public class MissionsManagerImpl extends Manager implements MissionsManager {
-
-    private static Set<String> PLAYER_MISSION_CATEGORIES_CACHE;
-
-    private static void onSettingsUpdate() {
-        PLAYER_MISSION_CATEGORIES_CACHE = new HashSet<>();
-
-        SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-        for (MissionCategory missionCategory : plugin.getMissions().getMissionCategories()) {
-            if (missionCategory.getMissions().stream().anyMatch(mission -> !mission.getIslandMission())) {
-                PLAYER_MISSION_CATEGORIES_CACHE.add(missionCategory.getName());
-            }
-        }
-    }
-
-    public static void registerListeners(PluginEventsDispatcher dispatcher) {
-        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, MissionsManagerImpl::onSettingsUpdate);
-    }
 
     private static final Object DATA_FOLDER_MUTEX = new Object();
 
@@ -518,11 +497,11 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
     }
 
     public boolean isPlayerMissionCategory(MissionCategory missionCategory) {
-        return PLAYER_MISSION_CATEGORIES_CACHE.contains(missionCategory.getName());
+        return this.missionsContainer.isPlayerMissionCategory(missionCategory);
     }
 
     public boolean isPlayerMissionCategories() {
-        return !PLAYER_MISSION_CATEGORIES_CACHE.isEmpty();
+        return this.missionsContainer.isPlayerMissionCategories();
     }
 
     @SuppressWarnings("deprecation")

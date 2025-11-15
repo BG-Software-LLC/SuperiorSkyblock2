@@ -8,12 +8,16 @@ import com.bgsoftware.superiorskyblock.mission.MissionData;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 public class DefaultMissionsContainer implements MissionsContainer {
+
+    private final Set<MissionCategory> PLAYER_MISSION_CATEGORIES_CACHE = new HashSet<>();
 
     private final Map<String, Mission<?>> missionMap = new HashMap<>();
     private final Map<String, MissionData> missionDataMap = new HashMap<>();
@@ -59,6 +63,9 @@ public class DefaultMissionsContainer implements MissionsContainer {
     @Override
     public void addMissionCategory(MissionCategory missionCategory) {
         this.missionCategoryMap.put(missionCategory.getName().toLowerCase(Locale.ENGLISH), missionCategory);
+
+        if (missionCategory.getMissions().stream().anyMatch(mission -> !mission.getIslandMission()))
+            PLAYER_MISSION_CATEGORIES_CACHE.add(missionCategory);
     }
 
     @Nullable
@@ -73,7 +80,18 @@ public class DefaultMissionsContainer implements MissionsContainer {
     }
 
     @Override
+    public boolean isPlayerMissionCategory(MissionCategory missionCategory) {
+        return PLAYER_MISSION_CATEGORIES_CACHE.contains(missionCategory);
+    }
+
+    @Override
+    public boolean isPlayerMissionCategories() {
+        return !PLAYER_MISSION_CATEGORIES_CACHE.isEmpty();
+    }
+
+    @Override
     public void clearMissionsData() {
+        this.PLAYER_MISSION_CATEGORIES_CACHE.clear();
         this.missionMap.clear();
         this.missionDataMap.clear();
         this.missionCategoryMap.clear();
