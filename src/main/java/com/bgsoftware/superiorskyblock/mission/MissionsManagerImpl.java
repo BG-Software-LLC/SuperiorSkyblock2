@@ -500,8 +500,8 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
         return this.missionsContainer.isPlayerMissionCategory(missionCategory);
     }
 
-    public boolean isPlayerMissionCategories() {
-        return this.missionsContainer.isPlayerMissionCategories();
+    public boolean hasAnyPlayerMissionCategories() {
+        return this.missionsContainer.hasAnyPlayerMissionCategories();
     }
 
     @SuppressWarnings("deprecation")

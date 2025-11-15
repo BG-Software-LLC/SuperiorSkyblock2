@@ -34,7 +34,7 @@ public interface MissionsContainer {
 
     boolean isPlayerMissionCategory(MissionCategory missionCategory);
 
-    boolean isPlayerMissionCategories();
+    boolean hasAnyPlayerMissionCategories();
 
     void clearMissionsData();
 

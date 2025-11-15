@@ -56,7 +56,7 @@ public class CmdMissions implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
         if (args.length == 1) {
-            if (!superiorPlayer.hasIsland() && !plugin.getMissions().isPlayerMissionCategories()) {
+            if (!superiorPlayer.hasIsland() && !plugin.getMissions().hasAnyPlayerMissionCategories()) {
                 Message.INVALID_ISLAND.send(superiorPlayer);
                 return;
             }

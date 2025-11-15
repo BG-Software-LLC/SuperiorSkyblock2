@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 
 public class DefaultMissionsContainer implements MissionsContainer {
 
-    private final Set<MissionCategory> PLAYER_MISSION_CATEGORIES_CACHE = new HashSet<>();
+    private final Set<MissionCategory> playerMissionCategoriesCache = new HashSet<>();
 
     private final Map<String, Mission<?>> missionMap = new HashMap<>();
     private final Map<String, MissionData> missionDataMap = new HashMap<>();
@@ -65,7 +65,7 @@ public class DefaultMissionsContainer implements MissionsContainer {
         this.missionCategoryMap.put(missionCategory.getName().toLowerCase(Locale.ENGLISH), missionCategory);
 
         if (missionCategory.getMissions().stream().anyMatch(mission -> !mission.getIslandMission()))
-            PLAYER_MISSION_CATEGORIES_CACHE.add(missionCategory);
+            playerMissionCategoriesCache.add(missionCategory);
     }
 
     @Nullable
@@ -81,17 +81,17 @@ public class DefaultMissionsContainer implements MissionsContainer {
 
     @Override
     public boolean isPlayerMissionCategory(MissionCategory missionCategory) {
-        return PLAYER_MISSION_CATEGORIES_CACHE.contains(missionCategory);
+        return playerMissionCategoriesCache.contains(missionCategory);
     }
 
     @Override
-    public boolean isPlayerMissionCategories() {
-        return !PLAYER_MISSION_CATEGORIES_CACHE.isEmpty();
+    public boolean hasAnyPlayerMissionCategories() {
+        return !playerMissionCategoriesCache.isEmpty();
     }
 
     @Override
     public void clearMissionsData() {
-        this.PLAYER_MISSION_CATEGORIES_CACHE.clear();
+        this.playerMissionCategoriesCache.clear();
         this.missionMap.clear();
         this.missionDataMap.clear();
         this.missionCategoryMap.clear();
