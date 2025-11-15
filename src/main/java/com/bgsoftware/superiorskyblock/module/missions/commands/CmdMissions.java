@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.missions.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
@@ -57,9 +56,7 @@ public class CmdMissions implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
         if (args.length == 1) {
-            boolean requireIsland = plugin.getMissions().getAllMissions().stream().allMatch(Mission::getIslandMission);
-
-            if (requireIsland && !superiorPlayer.hasIsland()) {
+            if (!superiorPlayer.hasIsland() && !plugin.getMissions().isPlayerMissionCategories()) {
                 Message.INVALID_ISLAND.send(superiorPlayer);
                 return;
             }
@@ -71,9 +68,7 @@ public class CmdMissions implements ISuperiorCommand {
             if (missionCategory == null)
                 return;
 
-            boolean requireIsland = missionCategory.getMissions().stream().allMatch(Mission::getIslandMission);
-
-            if (requireIsland && !superiorPlayer.hasIsland()) {
+            if (!superiorPlayer.hasIsland() && !plugin.getMissions().isPlayerMissionCategory(missionCategory)) {
                 Message.INVALID_ISLAND.send(superiorPlayer);
                 return;
             }
@@ -88,7 +83,7 @@ public class CmdMissions implements ISuperiorCommand {
         if (args.length == 2) {
             boolean hasIsland = plugin.getPlayers().getSuperiorPlayer(sender).hasIsland();
             return CommandTabCompletes.getMissionCategories(plugin, args[1], category ->
-                    hasIsland || category.getMissions().stream().anyMatch(mission -> !mission.getIslandMission()));
+                    hasIsland || plugin.getMissions().isPlayerMissionCategory(category));
         }
 
         return Collections.emptyList();
