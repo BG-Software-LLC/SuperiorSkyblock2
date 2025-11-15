@@ -813,11 +813,18 @@ island-chests:
   # This number must be between 1 and 6.
   default-size: 3
 
+# Should custom aliases for plugin's commands override the default aliases?
+# When true, default aliases will be disabled, and the plugin will attempt to replace
+# default command labels in command usage messages with the first custom alias.
+override-default-aliases: false
+
 # Custom aliases for plugin's commands.
-command-aliases:
-  example-command:
-    - 'Aliase1'
-    - 'Aliase2'
+# The following example will add '/is gui' and '/is menu' as aliases for the '/is panel' command:
+# command-aliases:
+#   panel:
+#   - gui
+#   - menu
+command-aliases: [ ]
 
 # A list of valuable blocks.
 # These blocks require the "VALUABLE_BREAK" permission in order to break them.

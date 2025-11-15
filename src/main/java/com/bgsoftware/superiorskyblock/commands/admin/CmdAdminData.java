@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataType;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
@@ -71,13 +72,13 @@ public class CmdAdminData implements ISuperiorCommand {
         SubCommand subCommand = subCommands.get(args[2].toLowerCase(Locale.ENGLISH));
 
         if (subCommand == null) {
-            Message.COMMAND_USAGE.send(sender, plugin.getCommands().getLabel() + " " + getUsage(PlayerLocales.getLocale(sender)));
+            Message.COMMAND_USAGE.send(sender, CommandsHelper.getCommandUsage(this, PlayerLocales.getLocale(sender)));
             return;
         }
 
         if (args.length < subCommand.getMinArgs() || args.length > subCommand.getMaxArgs()) {
             Locale senderLocale = PlayerLocales.getLocale(sender);
-            Message.COMMAND_USAGE.send(sender, plugin.getCommands().getLabel() + " " + getUsage(senderLocale) + subCommand.getUsage(senderLocale));
+            Message.COMMAND_USAGE.send(sender, CommandsHelper.getCommandUsage(this, senderLocale) + subCommand.getUsage(senderLocale));
             return;
         }
 
@@ -90,7 +91,7 @@ public class CmdAdminData implements ISuperiorCommand {
             persistentDataHolder = CommandArguments.getPlayer(plugin, sender, args[4]);
         } else {
             Locale senderLocale = PlayerLocales.getLocale(sender);
-            Message.COMMAND_USAGE.send(sender, plugin.getCommands().getLabel() + " " + getUsage(senderLocale) + subCommand.getUsage(senderLocale));
+            Message.COMMAND_USAGE.send(sender, CommandsHelper.getCommandUsage(this, senderLocale) + subCommand.getUsage(senderLocale));
             return;
         }
 

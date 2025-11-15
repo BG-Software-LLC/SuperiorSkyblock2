@@ -211,6 +211,7 @@ public class SettingsContainer {
     public final String islandChestTitle;
     public final int islandChestsDefaultPage;
     public final int islandChestsDefaultSize;
+    public final boolean overrideDefaultAliases;
     public final Map<String, List<String>> commandAliases;
     public final KeySet valuableBlocks;
     public final GameMode islandPreviewsGameMode;
@@ -547,6 +548,7 @@ public class SettingsContainer {
         islandChestTitle = Formatters.COLOR_FORMATTER.format(config.getString("island-chests.chest-title", "&4Island Chest"));
         islandChestsDefaultPage = config.getInt("island-chests.default-pages", 0);
         islandChestsDefaultSize = Math.min(6, Math.max(1, config.getInt("island-chests.default-size", 3)));
+        overrideDefaultAliases = config.getBoolean("override-default-aliases", false);
         Map<String, List<String>> commandAliases = new HashMap<>();
         if (config.isConfigurationSection("command-aliases")) {
             for (String label : config.getConfigurationSection("command-aliases").getKeys(false)) {

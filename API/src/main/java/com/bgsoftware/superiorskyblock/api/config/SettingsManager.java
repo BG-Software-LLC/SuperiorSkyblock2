@@ -602,6 +602,14 @@ public interface SettingsManager {
     IslandChests getIslandChests();
 
     /**
+     * Whether command-aliases should override the default command aliases or not.
+     * When true, the default aliases will not work and the command names in their
+     * usage will be replaced with the first alias added - will be the new label.
+     * Config-path: override-default-aliases
+     */
+    boolean isOverrideDefaultAliases();
+
+    /**
      * Custom aliases for commands of the plugin.
      * Represented by a map with keys as commands, and values as aliases.
      * Config-path: command-aliases
