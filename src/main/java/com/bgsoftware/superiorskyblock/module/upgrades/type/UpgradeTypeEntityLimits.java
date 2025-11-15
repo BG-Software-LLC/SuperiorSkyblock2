@@ -49,9 +49,6 @@ import java.util.concurrent.TimeUnit;
 
 public class UpgradeTypeEntityLimits implements IUpgradeType {
 
-    private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddEntityLimit(),
-            new CmdAdminRemoveEntityLimit(), new CmdAdminSetEntityLimit());
-
     private final Map<EntityType, SpawningPlayerData> entityBreederPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
     private final Map<Location, SpawningPlayerData> vehiclesOwners = AutoRemovalMap.newMap(2, TimeUnit.SECONDS, Location2ObjectMap::new);
     private final Map<EntityType, SpawningPlayerData> spawnEggPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
@@ -75,7 +72,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
     @Override
     public List<ISuperiorCommand> getCommands() {
-        return commands;
+        return Arrays.asList(new CmdAdminAddEntityLimit(), new CmdAdminRemoveEntityLimit(), new CmdAdminSetEntityLimit());
     }
 
     private Optional<Listener> checkEntityBreedListener() {

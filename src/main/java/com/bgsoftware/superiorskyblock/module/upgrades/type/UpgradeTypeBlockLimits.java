@@ -42,9 +42,6 @@ import java.util.List;
 
 public class UpgradeTypeBlockLimits implements IUpgradeType {
 
-    private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddBlockLimit(),
-            new CmdAdminRemoveBlockLimit(), new CmdAdminSetBlockLimit());
-
     private final SuperiorSkyblockPlugin plugin;
 
     public UpgradeTypeBlockLimits(SuperiorSkyblockPlugin plugin) {
@@ -58,7 +55,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
     @Override
     public List<ISuperiorCommand> getCommands() {
-        return commands;
+        return Arrays.asList(new CmdAdminAddBlockLimit(), new CmdAdminRemoveBlockLimit(), new CmdAdminSetBlockLimit());
     }
 
     private class BlockLimitsListener implements Listener {
