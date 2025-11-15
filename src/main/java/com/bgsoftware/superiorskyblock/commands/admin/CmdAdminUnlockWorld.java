@@ -71,7 +71,7 @@ public class CmdAdminUnlockWorld implements IAdminIslandCommand {
             return;
 
         if (dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
-            Message.INVALID_DIMENSION.send(sender, args[3]);
+            Message.INVALID_ENVIRONMENT.send(sender, args[3]);
             return;
         }
 
