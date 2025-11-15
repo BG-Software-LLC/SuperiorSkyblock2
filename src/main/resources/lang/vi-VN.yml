@@ -153,6 +153,7 @@ COMMAND_ARGUMENT_LIMIT: gioi-han
 COMMAND_ARGUMENT_MATERIAL: vat-lieu
 COMMAND_ARGUMENT_MENU: ten-giao-dien
 COMMAND_ARGUMENT_MESSAGE: tin-nhan...
+COMMAND_ARGUMENT_MISSION_CATEGORY: 'mission-category'
 COMMAND_ARGUMENT_MISSION_NAME: ten-nhiem-vu
 COMMAND_ARGUMENT_MODULE_NAME: ten-module
 COMMAND_ARGUMENT_MULTIPLIER: he-so
@@ -446,6 +447,7 @@ INVALID_MATERIAL: '&c&lLỗi | &7Vật liệu không hợp lệ {0}.'
 INVALID_MATERIAL_DATA: '&c&lLỗi | &7Dữ liệu-vật liệu không hợp lệ {0}.'
 INVALID_MENU: '&c&lLỗi | &7Menu không hợp lệ {0}.'
 INVALID_MISSION: '&c&lLỗi | &7Nhiệm vụ không hợp lệ {0}.'
+INVALID_MISSION_CATEGORY: '&c&lError | &7Invalid mission category {0}.'
 INVALID_MODULE: '&c&lLỗi | &7Module không hợp lệ {0}.'
 INVALID_MULTIPLIER: '&c&lLỗi | &7Hệ số không hợp lệ {0}.'
 INVALID_PAGE: '&c&lLỗi | &7Trang không hợp lệ {0}.'

@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
@@ -216,8 +217,17 @@ public class CommandTabCompletes {
     public static List<String> getMissions(SuperiorSkyblockPlugin plugin, String argument, Predicate<Mission<?>> predicate) {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
         return new SequentialListBuilder<String>().build(plugin.getMissions().getAllMissions().stream()
-                .filter(mission -> predicate.test(mission) && mission.getName().contains(lowerArgument))
+                .filter(mission -> predicate.test(mission) &&
+                        mission.getName().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
                 .map(mission -> mission.getName().toLowerCase(Locale.ENGLISH)));
+    }
+
+    public static List<String> getMissionCategories(SuperiorSkyblockPlugin plugin, String argument, Predicate<MissionCategory> predicate) {
+        String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
+        return new SequentialListBuilder<String>().build(plugin.getMissions().getMissionCategories().stream()
+                .filter(category -> predicate.test(category) &&
+                        category.getName().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
+                .map(category -> category.getName().toLowerCase(Locale.ENGLISH)));
     }
 
     public static List<String> getCustomMenus(SuperiorSkyblockPlugin plugin, String argument) {

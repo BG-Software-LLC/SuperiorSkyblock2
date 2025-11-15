@@ -172,6 +172,7 @@ COMMAND_ARGUMENT_LIMIT: limit
 COMMAND_ARGUMENT_MATERIAL: materyal
 COMMAND_ARGUMENT_MENU: menü-adı
 COMMAND_ARGUMENT_MESSAGE: mesaj...
+COMMAND_ARGUMENT_MISSION_CATEGORY: 'mission-category'
 COMMAND_ARGUMENT_MISSION_NAME: görev-adı
 COMMAND_ARGUMENT_MODULE_NAME: modül-adı
 COMMAND_ARGUMENT_MULTIPLIER: çarpan
@@ -478,6 +479,7 @@ INVALID_MATERIAL: '&c&lHata | &7Geçersiz materyal {0}.'
 INVALID_MATERIAL_DATA: '&c&lHata | &7Geçersiz materyal-veri {0}.'
 INVALID_MENU: '&c&lError | &7Invalid menu {0}.'
 INVALID_MISSION: '&c&lHata | &7Geçersiz görev {0}.'
+INVALID_MISSION_CATEGORY: '&c&lError | &7Invalid mission category {0}.'
 INVALID_MODULE: '&c&lHata | &7Geçersiz modül {0}.'
 INVALID_MULTIPLIER: '&c&lHata | &7Geçersiz çarpan {0}.'
 INVALID_PAGE: '&c&lHata | &7Geçersiz sayfa {0}.'

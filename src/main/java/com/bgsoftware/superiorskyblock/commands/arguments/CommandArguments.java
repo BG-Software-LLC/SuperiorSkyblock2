@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
@@ -158,6 +159,15 @@ public class CommandArguments {
         }
 
         return Collections.unmodifiableList(missions);
+    }
+
+    public static MissionCategory getMissionCategory(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
+        MissionCategory missionCategory = plugin.getMissions().getMissionCategory(argument);
+
+        if (missionCategory == null)
+            Message.INVALID_MISSION_CATEGORY.send(sender, argument);
+
+        return missionCategory;
     }
 
     public static Upgrade getUpgrade(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument) {
