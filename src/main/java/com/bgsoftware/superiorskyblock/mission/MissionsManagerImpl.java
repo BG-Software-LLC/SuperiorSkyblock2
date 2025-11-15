@@ -54,7 +54,7 @@ import java.util.function.Consumer;
 
 public class MissionsManagerImpl extends Manager implements MissionsManager {
 
-    private static Set<MissionCategory> PLAYER_MISSION_CATEGORIES_CACHE;
+    private static Set<String> PLAYER_MISSION_CATEGORIES_CACHE;
 
     private static void onSettingsUpdate() {
         PLAYER_MISSION_CATEGORIES_CACHE = new HashSet<>();
@@ -62,7 +62,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
         for (MissionCategory missionCategory : plugin.getMissions().getMissionCategories()) {
             if (missionCategory.getMissions().stream().anyMatch(mission -> !mission.getIslandMission())) {
-                PLAYER_MISSION_CATEGORIES_CACHE.add(missionCategory);
+                PLAYER_MISSION_CATEGORIES_CACHE.add(missionCategory.getName());
             }
         }
     }
@@ -518,7 +518,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
     }
 
     public boolean isPlayerMissionCategory(MissionCategory missionCategory) {
-        return PLAYER_MISSION_CATEGORIES_CACHE.contains(missionCategory);
+        return PLAYER_MISSION_CATEGORIES_CACHE.contains(missionCategory.getName());
     }
 
     public boolean isPlayerMissionCategories() {
