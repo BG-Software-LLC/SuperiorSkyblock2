@@ -19,9 +19,6 @@ import java.util.List;
 
 public class UpgradeTypeIslandEffects implements IUpgradeType {
 
-    private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddEffect(),
-            new CmdAdminSetEffect());
-
     private final SuperiorSkyblockPlugin plugin;
 
     public UpgradeTypeIslandEffects(SuperiorSkyblockPlugin plugin) {
@@ -37,7 +34,7 @@ public class UpgradeTypeIslandEffects implements IUpgradeType {
 
     @Override
     public List<ISuperiorCommand> getCommands() {
-        return commands;
+        return Arrays.asList(new CmdAdminAddEffect(), new CmdAdminSetEffect());
     }
 
     private class IslandEffectsListener implements Listener {

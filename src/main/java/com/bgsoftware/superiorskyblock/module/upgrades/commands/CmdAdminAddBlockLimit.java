@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.commands.admin;
+package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;

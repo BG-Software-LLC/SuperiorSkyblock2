@@ -15,6 +15,9 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddEntityLimit;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRemoveEntityLimit;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetEntityLimit;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
@@ -37,7 +40,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.lang.ref.WeakReference;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +72,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
     @Override
     public List<ISuperiorCommand> getCommands() {
-        return Collections.emptyList();
+        return Arrays.asList(new CmdAdminAddEntityLimit(), new CmdAdminRemoveEntityLimit(), new CmdAdminSetEntityLimit());
     }
 
     private Optional<Listener> checkEntityBreedListener() {

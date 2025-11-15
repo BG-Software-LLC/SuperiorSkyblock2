@@ -18,7 +18,6 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
-import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
 import com.bgsoftware.superiorskyblock.core.value.IntValue;
 import com.bgsoftware.superiorskyblock.core.value.Value;
@@ -72,17 +71,36 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
     @Override
     protected boolean onConfigCreate(SuperiorSkyblockPlugin plugin, CommentedConfiguration config, boolean firstTime) {
         File oldUpgradesFile = new File(plugin.getDataFolder(), "upgrades.yml");
-        if (!oldUpgradesFile.exists())
-            return false;
-
-        CommentedConfiguration oldConfig = CommentedConfiguration.loadConfiguration(oldUpgradesFile);
         boolean updatedConfig = false;
 
-        if (oldConfig.isConfigurationSection("upgrades")) {
-            config.set("upgrades", oldConfig.getConfigurationSection("upgrades"));
+        if (oldUpgradesFile.exists()) {
+            CommentedConfiguration oldConfig = CommentedConfiguration.loadConfiguration(oldUpgradesFile);
+
+            if (oldConfig.isConfigurationSection("upgrades"))
+                config.set("upgrades", oldConfig.getConfigurationSection("upgrades"));
+
+            oldUpgradesFile.delete();
         }
 
-        oldUpgradesFile.delete();
+        if (!config.isBoolean("enabled")) {
+            boolean status = false;
+
+            if (config.getBoolean("crop-growth", true))
+                status = true;
+            else if (config.getBoolean("mob-drops", true))
+                status = true;
+            else if (config.getBoolean("island-effects", true))
+                status = true;
+            else if (config.getBoolean("spawner-rates", true))
+                status = true;
+            else if (config.getBoolean("block-limits", true))
+                status = true;
+            else if (config.getBoolean("entity-limits", true))
+                status = true;
+
+            config.set("enabled", status);
+            updatedConfig = true;
+        }
 
         return updatedConfig;
     }
@@ -115,7 +133,7 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
 
     @Override
     public SuperiorCommand[] getSuperiorCommands(SuperiorSkyblockPlugin plugin) {
-        return !isEnabled() ? null : new SuperiorCommand[]{new CmdRankup(), new CmdUpgrade()};
+        return new SuperiorCommand[]{new CmdRankup(), new CmdUpgrade()};
     }
 
     @Override
@@ -163,8 +181,8 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
         private final List<IUpgradeType> enabledUpgrades = new LinkedList<>();
 
         Configuration(CommentedConfiguration config) {
+            this.enabled = config.getBoolean("enabled", true);
             loadUpgrades(config);
-            this.enabled = !this.enabledUpgrades.isEmpty();
         }
 
         @Override
