@@ -201,6 +201,7 @@ COMMAND_COOLDOWN_FORMAT: '&c&lHata | &7Komutu sadece {0} içinde kullanabilirsin
 COMMAND_DESCRIPTION_ACCEPT: Bir oyuncudan gelen daveti kabul et.
 COMMAND_DESCRIPTION_ADMIN: Yönetici komutlarını kullan.
 COMMAND_DESCRIPTION_ADMIN_ADD: Bir adaya kullanıcı ekle.
+COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT: 'Increase the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: Başka bir oyuncunun adası için blok limitini
   artır.
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: Bir oyuncuya bonus ekle.
@@ -264,7 +265,7 @@ COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Bir ada için bir dünyayı sıfırla.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Eklenti için şematikler oluştur.
-COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Bir adaya banka limiti belirle.
+COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Bir adanın biyomunu ayarla.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: Belirli bir konumdaki blok miktarını ayarla.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Başka bir oyuncunun adası için blok limiti
