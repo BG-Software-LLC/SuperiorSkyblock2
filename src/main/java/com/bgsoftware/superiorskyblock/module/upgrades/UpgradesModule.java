@@ -191,22 +191,24 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
         }
 
         private void loadUpgrades(CommentedConfiguration config) {
-            if (config.getBoolean("crop-growth", true))
-                enabledUpgrades.add(new UpgradeTypeCropGrowth(plugin));
-            if (config.getBoolean("mob-drops", true))
-                enabledUpgrades.add(new UpgradeTypeMobDrops(plugin));
-            if (config.getBoolean("island-effects", true))
-                enabledUpgrades.add(new UpgradeTypeIslandEffects(plugin));
-            if (config.getBoolean("spawner-rates", true))
-                enabledUpgrades.add(new UpgradeTypeSpawnerRates(plugin));
-            if (config.getBoolean("block-limits", true))
-                enabledUpgrades.add(new UpgradeTypeBlockLimits(plugin));
-            if (config.getBoolean("entity-limits", true))
-                enabledUpgrades.add(new UpgradeTypeEntityLimits(plugin));
+            if (enabled) {
+                if (config.getBoolean("crop-growth", true))
+                    enabledUpgrades.add(new UpgradeTypeCropGrowth(plugin));
+                if (config.getBoolean("mob-drops", true))
+                    enabledUpgrades.add(new UpgradeTypeMobDrops(plugin));
+                if (config.getBoolean("island-effects", true))
+                    enabledUpgrades.add(new UpgradeTypeIslandEffects(plugin));
+                if (config.getBoolean("spawner-rates", true))
+                    enabledUpgrades.add(new UpgradeTypeSpawnerRates(plugin));
+                if (config.getBoolean("block-limits", true))
+                    enabledUpgrades.add(new UpgradeTypeBlockLimits(plugin));
+                if (config.getBoolean("entity-limits", true))
+                    enabledUpgrades.add(new UpgradeTypeEntityLimits(plugin));
+            }
 
             plugin.getUpgrades().clearUpgrades();
 
-            if (!enabledUpgrades.isEmpty()) {
+            if (enabled) {
                 ConfigurationSection upgrades = config.getConfigurationSection("upgrades");
                 if (upgrades != null) {
                     for (String upgradeName : upgrades.getKeys(false)) {
