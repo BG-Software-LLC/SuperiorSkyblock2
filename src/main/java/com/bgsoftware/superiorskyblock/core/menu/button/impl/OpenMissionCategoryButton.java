@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
-import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
@@ -65,7 +64,7 @@ public class OpenMissionCategoryButton extends AbstractMenuViewButton<BaseMenuVi
             super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
                     OpenMissionCategoryButton.class, OpenMissionCategoryButton::new);
             this.missionCategory = Objects.requireNonNull(missionCategory, "missionCategory cannot be null");
-            this.requireIsland = missionCategory.getMissions().stream().allMatch(Mission::getIslandMission);
+            this.requireIsland = !plugin.getMissions().isPlayerMissionCategory(missionCategory);
         }
 
     }

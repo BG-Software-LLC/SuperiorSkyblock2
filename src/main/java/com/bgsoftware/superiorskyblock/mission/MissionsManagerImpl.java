@@ -496,6 +496,14 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
         return true;
     }
 
+    public boolean isPlayerMissionCategory(MissionCategory missionCategory) {
+        return this.missionsContainer.isPlayerMissionCategory(missionCategory);
+    }
+
+    public boolean hasAnyPlayerMissionCategories() {
+        return this.missionsContainer.hasAnyPlayerMissionCategories();
+    }
+
     @SuppressWarnings("deprecation")
     public Mission<?> loadMission(String missionName, String missionCategoryName, FilesLookup filesLookup, ConfigurationSection missionSection) {
         Mission<?> newMission = null;
