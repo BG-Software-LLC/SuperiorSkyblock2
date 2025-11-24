@@ -66,6 +66,7 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
             .put("CHERRY_WALL_HANGING_SIGN", "CHERRY_HANGING_SIGN")
             .put("CHERRY_WALL_SIGN", "CHERRY_SIGN")
             .put("COCOA", ServerVersion.isLegacy() ? "INK_SACK:3" : "COCOA_BEANS")
+            .put("COPPER_WALL_TORCH", "COPPER_TORCH")
             .put("CREEPER_WALL_HEAD", "CREEPER_HEAD")
             .put("CRIMSON_WALL_HANGING_SIGN", "CRIMSON_HANGING_SIGN")
             .put("CRIMSON_WALL_SIGN", "CRIMSON_SIGN")
