@@ -183,6 +183,7 @@ COMMAND_DESCRIPTION_ACCEPT: Chấp nhận lời mời từ người chơi.
 COMMAND_DESCRIPTION_ADMIN: Sử dụng các lệnh của admin.
 COMMAND_DESCRIPTION_ADMIN_BONUS: Cấp tiền thưởng cho người chơi.
 COMMAND_DESCRIPTION_ADMIN_ADD: Thêm người vào đảo.
+COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT: 'Increase the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: 'Tăng giới hạn khối cho đảo của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: 'Thêm thưởng cho người chơi.'
 COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT: 'Tăng giới hạn thành viên đảo co-op của người chơi khác.'
@@ -235,7 +236,7 @@ COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Tái tạo lại thế giới cho một hòn đảo.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Tạo các schematic cho plugin.
-COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Đặt mức giới hạn ngân hàng cho một hòn đảo.'
+COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Đặt quần xã cho đảo.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: 'Đặt số lượng khối ở một vị trí cụ thể.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Đặt giới hạn khối cho đảo của người chơi

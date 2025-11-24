@@ -209,6 +209,7 @@ COMMAND_COOLDOWN_FORMAT: '&c&lError | &7Du darfst den Befehl nur in {0} verwende
 COMMAND_DESCRIPTION_ACCEPT: Eine Einladung von einem Spieler annehmen.
 COMMAND_DESCRIPTION_ADMIN: Verwende die Admin-Befehle.
 COMMAND_DESCRIPTION_ADMIN_ADD: Einen Benutzer zu einer Insel hinzufügen.
+COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT: 'Increase the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: Blocklimit für die Insel eines anderen
   Spielers erhöhen.
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: Einem Spieler einen Bonus hinzufügen.
@@ -274,7 +275,7 @@ COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Setze eine Welt für eine Insel zurück.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Schaltpläne für das Plugin erstellen.
-COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Banklimit für eine Insel festlegen.
+COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Lege das Biom einer Insel fest.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: Blockierungsbetrag an einem bestimmten
   Ort festlegen.

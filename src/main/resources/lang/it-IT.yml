@@ -160,6 +160,7 @@ COMMAND_COOLDOWN_FORMAT: '&c&lErrore | &7È possibile utilizzare questo comando 
 COMMAND_DESCRIPTION_ACCEPT: Accetta un invito da un giocatore.
 COMMAND_DESCRIPTION_ADMIN: Utilizzare i comandi di amministrazione.
 COMMAND_DESCRIPTION_ADMIN_ADD: Aggiungi un utente a un'isola.
+COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT: 'Increase the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: Aumenta il limite di blocchi per l'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: Aggiungi un bonus a un giocatore.
 COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT: Aumenta il limite dei giocatori coop per l'isola di un altro giocatore.
@@ -209,7 +210,7 @@ COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Rimuovi tutte le valutazioni fornite d
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Ripristina il mondo su un''isole.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Crea una schematica per il plugin.
-COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Imposta un limite di banca per un'isola.
+COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Imposta il bioma di un'isola.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: Imposta la quantità di un blocco in una posizione specifica.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Imposta il limite di un blocco per l'isola di un giocatore.
