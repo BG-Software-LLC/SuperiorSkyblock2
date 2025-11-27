@@ -125,7 +125,9 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
                 .replaceName("{7}", Formatters.NUMBER_FORMATTER.format(island.getTotalRating()))
                 .replaceName("{8}", Formatters.RATING_FORMATTER.format(island.getTotalRating(), inventoryViewer.getUserLocale()))
                 .replaceName("{9}", Formatters.NUMBER_FORMATTER.format(island.getRatingAmount()))
-                .replaceName("{10}", Formatters.NUMBER_FORMATTER.format(island.getAllPlayersInside().size()));
+                .replaceName("{10}", Formatters.NUMBER_FORMATTER.format(island.getAllPlayersInside().size()))
+                .replaceName("{11}", Formatters.NUMBER_FORMATTER.format(island.getIslandBank().getBalance()))
+                .replaceName("{12}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandBank().getBalance(), inventoryViewer.getUserLocale()));
 
         ItemMeta itemMeta = itemBuilder.getItemMeta();
 
@@ -136,7 +138,7 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
                 if (line.contains("{4}")) {
                     List<SuperiorPlayer> members = new LinkedList<>(island.getIslandMembers(plugin.getSettings().isIslandTopIncludeLeader()));
                     String memberFormat = line.split("\\{4}:")[1];
-                    if (members.size() == 0) {
+                    if (members.isEmpty()) {
                         lore.add(memberFormat.replace("{}", "None"));
                     } else {
                         if (plugin.getSettings().getTopIslandMembersSorting() != TopIslandMembersSorting.NAMES)
@@ -166,7 +168,9 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
                             .replace("{7}", Formatters.NUMBER_FORMATTER.format(island.getTotalRating()))
                             .replace("{8}", Formatters.RATING_FORMATTER.format(island.getTotalRating(), inventoryViewer.getUserLocale()))
                             .replace("{9}", Formatters.NUMBER_FORMATTER.format(island.getRatingAmount()))
-                            .replace("{10}", Formatters.NUMBER_FORMATTER.format(island.getAllPlayersInside().size())));
+                            .replace("{10}", Formatters.NUMBER_FORMATTER.format(island.getAllPlayersInside().size()))
+                            .replace("{11}", Formatters.NUMBER_FORMATTER.format(island.getIslandBank().getBalance()))
+                            .replace("{12}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandBank().getBalance(), inventoryViewer.getUserLocale())));
                 }
             }
 

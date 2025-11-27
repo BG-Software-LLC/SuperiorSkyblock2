@@ -88,6 +88,9 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "level-sort", menuPatternSlots),
                 new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_LEVEL));
 
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "bank-sort", menuPatternSlots),
+                new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_BANK));
+
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "rating-sort", menuPatternSlots),
                 new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_RATING));
 

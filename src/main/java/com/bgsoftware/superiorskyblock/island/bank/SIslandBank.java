@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.island.bank.logs.CacheBankLogs;
 import com.bgsoftware.superiorskyblock.island.bank.logs.DatabaseBankLogs;
 import com.bgsoftware.superiorskyblock.island.bank.logs.IBankLogs;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -115,6 +116,8 @@ public class SIslandBank implements IslandBank {
             IslandUtils.sendMessage(island, Message.DEPOSIT_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(),
                     Formatters.NUMBER_FORMATTER.format(amount));
 
+            plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_BANK, island);
+
             plugin.getMenus().refreshBankLogs(island);
             plugin.getMenus().refreshIslandBank(island);
         } else {
@@ -155,6 +158,8 @@ public class SIslandBank implements IslandBank {
 
         if (!event.isCancelled())
             increaseBalance(amount);
+
+        plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_BANK, island);
 
         plugin.getMenus().refreshBankLogs(island);
         plugin.getMenus().refreshIslandBank(island);
@@ -218,6 +223,8 @@ public class SIslandBank implements IslandBank {
             IslandUtils.sendMessage(island, Message.WITHDRAW_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(),
                     Formatters.NUMBER_FORMATTER.format(withdrawAmount));
 
+            plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_BANK, island);
+
             plugin.getMenus().refreshBankLogs(island);
             plugin.getMenus().refreshIslandBank(island);
 
@@ -258,6 +265,8 @@ public class SIslandBank implements IslandBank {
             decreaseBalance(amount);
 
         addTransaction(bankTransaction, true);
+
+        plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_BANK, island);
 
         plugin.getMenus().refreshBankLogs(island);
         plugin.getMenus().refreshIslandBank(island);

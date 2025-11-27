@@ -227,7 +227,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
         if (existingIslands.size() <= 1) {
             sortedIslands = existingIslands;
         } else try {
-            if (sortingType == SortingTypes.BY_LEVEL || sortingType == SortingTypes.BY_WORTH ||
+            if (sortingType == SortingTypes.BY_LEVEL || sortingType == SortingTypes.BY_WORTH || sortingType == SortingTypes.BY_BANK ||
                     sortingType == SortingTypes.BY_PLAYERS || sortingType == SortingTypes.BY_RATING) {
                 sortedIslands = sortIslandsBuiltinSortingType(existingIslands, sortingType);
             } else {
@@ -252,6 +252,8 @@ public class DefaultIslandsContainer implements IslandsContainer {
             existingIslands.forEach(island -> islandMetadatas.add(new IslandSortValueMetadata(island, island.getWorth())));
         else if (sortingType == SortingTypes.BY_LEVEL)
             existingIslands.forEach(island -> islandMetadatas.add(new IslandSortValueMetadata(island, island.getIslandLevel())));
+        else if (sortingType == SortingTypes.BY_BANK)
+            existingIslands.forEach(island -> islandMetadatas.add(new IslandSortValueMetadata(island, island.getIslandBank().getBalance())));
         else if (sortingType == SortingTypes.BY_RATING)
             existingIslands.forEach(island -> islandMetadatas.add(new IslandSortRatingMetadata(island)));
         else /* BY_PLAYERS */

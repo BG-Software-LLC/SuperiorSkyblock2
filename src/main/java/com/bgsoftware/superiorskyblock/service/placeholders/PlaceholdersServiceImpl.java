@@ -83,6 +83,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern TOP_PLACEHOLDER_PATTERN = Pattern.compile("island_top_(.+)");
     private static final Pattern TOP_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("worth_(.+)");
     private static final Pattern TOP_LEVEL_PLACEHOLDER_PATTERN = Pattern.compile("level_(.+)");
+    private static final Pattern TOP_BANK_PLACEHOLDER_PATTERN = Pattern.compile("bank_(.+)");
     private static final Pattern TOP_RATING_PLACEHOLDER_PATTERN = Pattern.compile("rating_(.+)");
     private static final Pattern TOP_PLAYERS_PLACEHOLDER_PATTERN = Pattern.compile("players_(.+)");
     private static final Pattern TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN = Pattern.compile("value_format_(.+)");
@@ -449,6 +450,8 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             Formatters.FANCY_NUMBER_FORMATTER.format(targetIsland.getWorth(), superiorPlayer.getUserLocale()))
                     .put(SortingTypes.BY_LEVEL, (targetIsland, superiorPlayer) ->
                             Formatters.FANCY_NUMBER_FORMATTER.format(targetIsland.getIslandLevel(), superiorPlayer.getUserLocale()))
+                    .put(SortingTypes.BY_BANK, (targetIsland, superiorPlayer) ->
+                            Formatters.FANCY_NUMBER_FORMATTER.format(targetIsland.getIslandBank().getBalance(), superiorPlayer.getUserLocale()))
                     .put(SortingTypes.BY_RATING, (targetIsland, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(targetIsland.getTotalRating()))
                     .put(SortingTypes.BY_PLAYERS, (targetIsland, superiorPlayer) ->
@@ -459,6 +462,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             new ImmutableMap.Builder<SortingType, Function<Island, String>>()
                     .put(SortingTypes.BY_WORTH, targetIsland -> targetIsland.getWorth().toString())
                     .put(SortingTypes.BY_LEVEL, targetIsland -> targetIsland.getIslandLevel().toString())
+                    .put(SortingTypes.BY_BANK, targetIsland -> targetIsland.getIslandBank().getBalance() + "")
                     .put(SortingTypes.BY_RATING, targetIsland -> targetIsland.getTotalRating() + "")
                     .put(SortingTypes.BY_PLAYERS, targetIsland -> targetIsland.getAllPlayersInside().size() + "")
                     .build();
@@ -467,6 +471,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             new ImmutableMap.Builder<SortingType, Function<Island, String>>()
                     .put(SortingTypes.BY_WORTH, targetIsland -> Formatters.NUMBER_FORMATTER.format(targetIsland.getWorth()))
                     .put(SortingTypes.BY_LEVEL, targetIsland -> Formatters.NUMBER_FORMATTER.format(targetIsland.getIslandLevel()))
+                    .put(SortingTypes.BY_BANK, targetIsland -> Formatters.NUMBER_FORMATTER.format(targetIsland.getIslandBank().getBalance()))
                     .put(SortingTypes.BY_RATING, targetIsland -> Formatters.NUMBER_FORMATTER.format(targetIsland.getTotalRating()))
                     .put(SortingTypes.BY_PLAYERS, targetIsland -> Formatters.NUMBER_FORMATTER.format(targetIsland.getAllPlayersInside().size()))
                     .build();
@@ -827,6 +832,8 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             sortingType = SortingTypes.BY_WORTH;
         } else if ((matcher = TOP_LEVEL_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
             sortingType = SortingTypes.BY_LEVEL;
+        } else if ((matcher = TOP_BANK_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            sortingType = SortingTypes.BY_BANK;
         } else if ((matcher = TOP_RATING_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
             sortingType = SortingTypes.BY_RATING;
         } else if ((matcher = TOP_PLAYERS_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
