@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.ChangeSortingTypeButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.SwitchTopIslandsSortingTypeButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.TopIslandsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.TopIslandsSelfIslandButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
@@ -81,6 +82,7 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
         MenuLayout.Builder<View> patternBuilder = menuParseResult.getLayoutBuilder();
 
         boolean sortGlowWhenSelected = cfg.getBoolean("sort-glow-when-selected", false);
+        String sort = cfg.getString("sort-islands", null);
 
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "worth-sort", menuPatternSlots),
                 new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_WORTH));
@@ -101,18 +103,34 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
             for (String itemSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
                 ConfigurationSection itemSection = cfg.getConfigurationSection("items." + itemSectionName);
 
-                if (!itemSection.isString("sorting-type"))
-                    continue;
+                if (sort != null && sort.equals(itemSectionName)) {
+                    SwitchTopIslandsSortingTypeButton.Builder button = new SwitchTopIslandsSortingTypeButton.Builder();
 
-                SortingType sortingType = SortingType.getByName(itemSection.getString("sorting-type"));
+                    for (String sortSectionName : cfg.getConfigurationSection("items." + itemSectionName).getKeys(false)) {
+                        ConfigurationSection sortSection = cfg.getConfigurationSection("items." + itemSectionName + "." + sortSectionName);
 
-                if (sortingType == null) {
-                    Log.warnFromFile("top-islands.yml", "The sorting type is invalid for the item ", itemSectionName);
-                    continue;
+                        SortingType sortingType = SortingType.getByName(sortSectionName);
+
+                        if (sortingType == null) {
+                            Log.warnFromFile("top-islands.yml", "The sorting type is invalid for the item ", itemSectionName);
+                            continue;
+                        }
+
+                        button.addItem(sortingType, MenuParserImpl.getInstance().getItemStack("menus/top-islands.yml", sortSection));
+                    }
+
+                    patternBuilder.mapButtons(menuPatternSlots.getSlots(itemSectionName), button);
+                } else if (itemSection.isString("sorting-type")) {
+                    SortingType sortingType = SortingType.getByName(itemSection.getString("sorting-type"));
+
+                    if (sortingType == null) {
+                        Log.warnFromFile("top-islands.yml", "The sorting type is invalid for the item ", itemSectionName);
+                        continue;
+                    }
+
+                    patternBuilder.mapButtons(menuPatternSlots.getSlots(itemSectionName),
+                            new ChangeSortingTypeButton.Builder().setSortingType(sortingType));
                 }
-
-                patternBuilder.mapButtons(menuPatternSlots.getSlots(itemSectionName),
-                        new ChangeSortingTypeButton.Builder().setSortingType(sortingType));
             }
         }
 

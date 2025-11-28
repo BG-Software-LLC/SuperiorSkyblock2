@@ -9,20 +9,20 @@ title: '&lTop Islands'
 previous-menu: true
 
 pattern:
-  - '~ ~ ~ ~ ~ ~ ~ ~ ~'
-  - '@ % @ @ @ # @ @ @'
-  - '@ * @ @ # # # @ @'
-  - '@ ^ @ # # # # # @'
-  - '@ & @ @ @ $ @ @ @'
-  - '~ ~ ! ~ - ~ + ~ ~'
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ # @ @ @'
+  - '@ $ @ @ # # # @ @'
+  - '@ @ @ # # # # # @'
+  - '~ ~ ~ ~ % ~ ~ ~ ~'
+  - '@ @ ! @ - @ + @ @'
 
 slots: '#'
 previous-page: '!'
 current-page: '-'
 next-page: '+'
 
+sort-islands: '%'
 player-island: '$'
-sort-glow-when-selected: true
 
 items:
   '#':
@@ -32,12 +32,13 @@ items:
       name: '&e&l[!] Island: &6&n{0}&7 (#{1})'
       lore:
         - '&7'
-        - '&6&l* &e&lIsland Level &7{2}'
-        - '&7'
         - '&6&l* &e&lPlace &7#{1}'
+        - '&7'
+        - '&6&l* &e&lLevel: &7{2}'
         - '&6&l* &e&lWorth &7${3}'
         - '&6&l* &e&lRating {8} &7({9})'
         - '&6&l* &e&lPlayers &7{10}'
+        - '&6&l* &e&lBank &7${11}'
         - '&7'
         - '&6&l* &e&lMembers:'
         - '{4}:&f  - &7{}'
@@ -49,22 +50,37 @@ items:
       data: 3
       name: '&cInvalid Island'
   '%':
-    type: DIAMOND
-    sorting-type: 'WORTH'
-    name: '&6Sort by Worth'
-  '*':
-    type: GOLD_INGOT
-    sorting-type: 'LEVEL'
-    name: '&6Sort by Level'
-  '^':
-    type: EMERALD
-    sorting-type: 'RATING'
-    name: '&6Sort by Rating'
-  '&':
-    type: SKULL_ITEM
-    data: 3
-    sorting-type: 'PLAYERS'
-    name: '&6Sort by Players'
+    WORTH:
+      type: DIAMOND
+      name: '&6Switch Sorting'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Currently sorted by &aWorth&7.'
+    LEVEL:
+      type: GOLD_INGOT
+      name: '&6Switch Sorting'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Currently sorted by &aLevel&7.'
+    RATING:
+      type: NETHER_STAR
+      name: '&6Switch Sorting'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Currently sorted by &aRating&7.'
+    PLAYERS:
+      type: SKULL_ITEM
+      data: 3
+      name: '&6Switch Sorting'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Currently sorted by &aPlayers&7.'
+    BANK:
+      type: EMERALD
+      name: '&6Switch Sorting'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Currently sorted by &aBank&7.'
   '!':
     type: PAPER
     name: '{0}Previous Page'
