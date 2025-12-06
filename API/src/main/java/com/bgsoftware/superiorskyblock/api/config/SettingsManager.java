@@ -1106,6 +1106,12 @@ public interface SettingsManager {
          */
         String getDifficulty();
 
+        /**
+         * The sea level of island worlds.
+         * Config path: worlds.sea-level-height
+         */
+        int getSeaLevelHeight();
+
         interface DimensionConfig {
 
             /**

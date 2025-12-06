@@ -59,6 +59,11 @@ public class WorldsSection extends SettingsContainerHolder implements SettingsMa
     }
 
     @Override
+    public int getSeaLevelHeight() {
+        return getContainer().seaLevelHeight;
+    }
+
+    @Override
     public DimensionConfig getDimensionConfig(Dimension dimension) {
         return getContainer().dimensionConfigs.get(dimension);
     }

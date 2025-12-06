@@ -8,8 +8,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.SculkSensorBlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.FlatLevelSource;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_18_R2.generator.CustomChunkGenerator;
 
 public class NMSWorldImpl extends com.bgsoftware.superiorskyblock.nms.v1_18.AbstractNMSWorld {
 
@@ -20,6 +25,26 @@ public class NMSWorldImpl extends com.bgsoftware.superiorskyblock.nms.v1_18.Abst
     @Override
     protected Component[] getSignBlockEntityText(SignBlockEntity signBlockEntity) {
         return signBlockEntity.messages;
+    }
+
+    @Override
+    protected ChunkGenerator getChunkGeneratorDelegate(CustomChunkGenerator chunkGenerator) {
+        return chunkGenerator.delegate;
+    }
+
+    @Override
+    protected FlatLevelSource createFlatLevelSource(FlatLevelSource original, int seaLevel) {
+        return new FlatLevelSource(original.structureSets, original.settings()) {
+            @Override
+            public int getSeaLevel() {
+                return seaLevel;
+            }
+        };
+    }
+
+    @Override
+    protected NoiseGeneratorSettings getNoiseGeneratorSettings(NoiseBasedChunkGenerator noiseBasedChunkGenerator) {
+        return noiseBasedChunkGenerator.settings.value();
     }
 
     @Override

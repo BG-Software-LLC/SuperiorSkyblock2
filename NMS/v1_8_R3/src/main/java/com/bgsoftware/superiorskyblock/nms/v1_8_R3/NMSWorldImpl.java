@@ -321,6 +321,11 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
+    public void setOceanLevel(World world) {
+        ((CraftWorld) world).getHandle().b(plugin.getSettings().getWorlds().getSeaLevelHeight());
+    }
+
+    @Override
     public IslandsGenerator createGenerator(Dimension dimension) {
         return new IslandsGeneratorImpl(dimension);
     }

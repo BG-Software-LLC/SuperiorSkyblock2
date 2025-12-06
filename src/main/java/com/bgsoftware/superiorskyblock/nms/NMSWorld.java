@@ -68,6 +68,8 @@ public interface NMSWorld {
 
     void removeAntiXray(World world);
 
+    void setOceanLevel(World world);
+
     IslandsGenerator createGenerator(Dimension dimension);
 
     WorldEditSession createEditSession(World world);

@@ -35,6 +35,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().islandsHeight;
     }
 
+    public int getSeaLevelHeight() {
+        return getContainer().seaLevelHeight;
+    }
+
     public boolean isWorldBorders() {
         return getContainer().worldBordersEnabled;
     }

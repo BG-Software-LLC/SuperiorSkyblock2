@@ -382,6 +382,9 @@ worlds:
   # The difficulty of the island worlds.
   difficulty: EASY
 
+  # Set the sea level height for island worlds.
+  sea-level-height: 100
+
 # All settings related to the spawn island.
 spawn:
   # The location of the island. Players will be teleported to this

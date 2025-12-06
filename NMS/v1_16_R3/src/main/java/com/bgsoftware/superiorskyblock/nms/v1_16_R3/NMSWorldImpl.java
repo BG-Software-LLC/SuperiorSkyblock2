@@ -319,6 +319,11 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
+    public void setOceanLevel(org.bukkit.World world) {
+        // Not possible in this version, it is hardcoded 63
+    }
+
+    @Override
     public IslandsGenerator createGenerator(Dimension dimension) {
         return new IslandsGeneratorImpl(dimension);
     }

@@ -94,6 +94,7 @@ public class SettingsContainer {
     public final Int2IntMapView defaultRoleLimits;
     public final Map<PotionEffectType, Integer> defaultIslandEffects;
     public final int islandsHeight;
+    public final int seaLevelHeight;
     public final boolean worldBordersEnabled;
     public final boolean stackedBlocksEnabled;
     public final KeySet whitelistedStackedBlocks;
@@ -293,6 +294,7 @@ public class SettingsContainer {
             }
         });
         islandsHeight = config.getInt("islands-height", 100);
+        seaLevelHeight = config.getInt("sea-level-height", 100);
         worldBordersEnabled = config.getBoolean("world-borders", true);
         stackedBlocksEnabled = config.getBoolean("stacked-blocks.enabled", true);
         stackedBlocksDisabledWorlds = Collections.unmodifiableList(config.getStringList("stacked-blocks.disabled-worlds"));

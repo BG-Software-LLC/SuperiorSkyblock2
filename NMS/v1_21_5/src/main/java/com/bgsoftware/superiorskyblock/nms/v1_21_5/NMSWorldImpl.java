@@ -16,10 +16,15 @@ import net.minecraft.world.level.block.entity.trialspawner.PlayerDetector;
 import net.minecraft.world.level.block.entity.trialspawner.TrialSpawner;
 import net.minecraft.world.level.block.entity.vault.VaultBlockEntity;
 import net.minecraft.world.level.block.entity.vault.VaultConfig;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.gameevent.vibrations.VibrationSystem;
+import net.minecraft.world.level.levelgen.FlatLevelSource;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import org.bukkit.Location;
 import org.bukkit.block.data.type.HangingSign;
 import org.bukkit.block.data.type.WallHangingSign;
+import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
 
 import java.lang.reflect.Modifier;
 
@@ -35,6 +40,26 @@ public class NMSWorldImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_5.Ab
     @Override
     protected Component[] getSignBlockEntityText(SignBlockEntity signBlockEntity) {
         return signBlockEntity.getFrontText().getMessages(false);
+    }
+
+    @Override
+    protected ChunkGenerator getChunkGeneratorDelegate(CustomChunkGenerator chunkGenerator) {
+        return chunkGenerator.getDelegate();
+    }
+
+    @Override
+    protected FlatLevelSource createFlatLevelSource(FlatLevelSource original, int seaLevel) {
+        return new FlatLevelSource(original.settings()) {
+            @Override
+            public int getSeaLevel() {
+                return seaLevel;
+            }
+        };
+    }
+
+    @Override
+    protected NoiseGeneratorSettings getNoiseGeneratorSettings(NoiseBasedChunkGenerator noiseBasedChunkGenerator) {
+        return noiseBasedChunkGenerator.settings.value();
     }
 
     @Override

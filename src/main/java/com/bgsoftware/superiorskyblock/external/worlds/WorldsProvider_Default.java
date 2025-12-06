@@ -10,6 +10,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.WorldGenerator;
 import com.google.common.base.Preconditions;
@@ -189,6 +191,7 @@ public class WorldsProvider_Default implements WorldsProvider {
         islandWorldsToDimensions.put(world.getUID(), dimension);
 
         plugin.getNMSWorld().removeAntiXray(world);
+        plugin.getNMSWorld().setOceanLevel(world);
 
         if (Bukkit.getPluginManager().isPluginEnabled("Multiverse-Core")) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv import " + worldName + " normal -g " + plugin.getName());
@@ -200,6 +203,20 @@ public class WorldsProvider_Default implements WorldsProvider {
 
     private static BlockPosition nextPosition(BlockPosition previousPosition, int islandsHeight, int offsetX, int offsetZ) {
         return SBlockPosition.of(previousPosition.getX() + offsetX, islandsHeight, previousPosition.getZ() + offsetZ);
+    }
+
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, WorldsProvider_Default::onSettingsUpdate);
+    }
+
+    private static void onSettingsUpdate() {
+        WorldsProvider worldsProvider = SuperiorSkyblockPlugin.getPlugin().getProviders().getWorldsProvider();
+
+        if (!(worldsProvider instanceof WorldsProvider_Default))
+            return;
+
+        WorldsProvider_Default worldsProviderDefault = (WorldsProvider_Default) worldsProvider;
+        worldsProviderDefault.islandWorlds.values().forEach(SuperiorSkyblockPlugin.getPlugin().getNMSWorld()::setOceanLevel);
     }
 
 }
