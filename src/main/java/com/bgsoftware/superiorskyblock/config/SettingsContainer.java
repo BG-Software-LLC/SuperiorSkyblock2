@@ -294,7 +294,6 @@ public class SettingsContainer {
             }
         });
         islandsHeight = config.getInt("islands-height", 100);
-        seaLevelHeight = config.getInt("sea-level-height", 100);
         worldBordersEnabled = config.getBoolean("world-borders", true);
         stackedBlocksEnabled = config.getBoolean("stacked-blocks.enabled", true);
         stackedBlocksDisabledWorlds = Collections.unmodifiableList(config.getStringList("stacked-blocks.disabled-worlds"));
@@ -388,6 +387,7 @@ public class SettingsContainer {
         }
 
         worldsDifficulty = config.getString("worlds.difficulty", "EASY").toUpperCase(Locale.ENGLISH);
+        seaLevelHeight = config.getInt("worlds.sea-level-height", 100);
         spawnLocation = config.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");
         spawnProtection = config.getBoolean("spawn.protection", true);
         spawnSettings = Collections.unmodifiableList(new LinkedList<>(config.getStringList("spawn.settings")
