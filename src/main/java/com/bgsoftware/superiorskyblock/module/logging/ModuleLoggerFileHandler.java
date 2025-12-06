@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.module.logging;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.modules.ModuleLogger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -105,7 +107,7 @@ public class ModuleLoggerFileHandler {
         file.delete();
     }
 
-    private static class AsyncFileHandler extends FileHandler {
+    private static class AsyncFileHandler extends Handler implements ModuleLogger.ModuleFileHandler {
 
         private final BlockingQueue<LogRecord> queue = new LinkedBlockingQueue<>(10000);
         private final Thread worker;
