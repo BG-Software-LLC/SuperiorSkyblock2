@@ -206,6 +206,7 @@ island-roles:
       - BUILD
       - CLOSE_BYPASS
       - CHORUS_FRUIT
+      - COPPER_GOLEM_INTERACT
       - CROPS_GROWTH
       - DROP_ITEMS
       - DYE_SHEEP

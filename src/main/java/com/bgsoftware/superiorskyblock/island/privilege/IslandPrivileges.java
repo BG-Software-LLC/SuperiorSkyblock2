@@ -3,8 +3,10 @@ package com.bgsoftware.superiorskyblock.island.privilege;
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import org.bukkit.entity.EntityType;
 
 import java.util.Comparator;
 import java.util.Locale;
@@ -27,6 +29,7 @@ public class IslandPrivileges {
     public static final IslandPrivilege CLOSE_BYPASS = register("CLOSE_BYPASS");
     public static final IslandPrivilege CLOSE_ISLAND = register("CLOSE_ISLAND", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege COOP_MEMBER = register("COOP_MEMBER", IslandPrivilege.Type.COMMAND);
+    public static final IslandPrivilege COPPER_GOLEM_INTERACT = register("COPPER_GOLEM_INTERACT", EnumHelper.getEnum(EntityType.class, "COPPER_GOLEM") != null);
     public static final IslandPrivilege DELETE_WARP = register("DELETE_WARP", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege DEMOTE_MEMBERS = register("DEMOTE_MEMBERS", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege DEPOSIT_MONEY = register("DEPOSIT_MONEY", IslandPrivilege.Type.COMMAND);

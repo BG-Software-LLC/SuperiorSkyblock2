@@ -549,6 +549,39 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  copper_golem_interact:
+    display-menu: true
+    permission-enabled:
+      type: COPPER_GOLEM_STATUE
+      name: '&6Copper Golem Interact'
+      lore:
+        - '&7Access to take items from copper golems.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: COPPER_GOLEM_STATUE
+      name: '&6Copper Golem Interact'
+      lore:
+        - '&7Access to take items from copper golems.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: COPPER_GOLEM_STATUE
+      name: '&6Copper Golem Interact'
+      lore:
+        - '&7Access to take items from copper golems.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   delete_warp:
     display-menu: true
     permission-enabled:

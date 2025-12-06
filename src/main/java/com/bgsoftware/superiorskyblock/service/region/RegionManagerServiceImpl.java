@@ -89,6 +89,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     private static final EntityType HAPPY_GHAST_TYPE = EnumHelper.getEnum(EntityType.class, "HAPPY_GHAST");
     @Nullable
     private static final EntityType PARROT_TYPE = EnumHelper.getEnum(EntityType.class, "PARROT");
+    @Nullable
+    private static final EntityType COPPER_GOLEM_TYPE = EnumHelper.getEnum(EntityType.class, "COPPER_GOLEM");
 
     private static final int MAX_PICKUP_DISTANCE = 1;
     private static EnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
@@ -298,6 +300,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             } else if (BukkitEntities.isHorse(entity)) {
                 islandPrivilege = IslandPrivileges.HORSE_INTERACT;
                 closeInventory = true;
+            } else if (entityType == COPPER_GOLEM_TYPE) {
+                islandPrivilege = IslandPrivileges.COPPER_GOLEM_INTERACT;
             } else if (usedItemType == Material.FLINT_AND_STEEL && entity instanceof Creeper) {
                 islandPrivilege = IslandPrivileges.IGNITE_CREEPER;
             } else if (usedItemType == Material.WATER_BUCKET && entityType == AXOLOTL_TYPE && ServerVersion.isAtLeast(ServerVersion.v1_17)) {
