@@ -162,7 +162,7 @@ public enum Materials {
                     material == Material.TRAPPED_CHEST || materialName.contains("SHULKER_BOX") ||
                     materialName.equals("BARREL"))
                 materialTags.add(Tag.CHEST);
-            if (materialName.contains("BOAT"))
+            if (materialName.contains("BOAT") || materialName.contains("_RAFT"))
                 materialTags.add(Tag.BOAT);
             if (materialName.contains("LAVA"))
                 materialTags.add(Tag.LAVA);
