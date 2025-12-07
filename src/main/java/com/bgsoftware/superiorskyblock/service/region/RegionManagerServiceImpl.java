@@ -217,6 +217,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 islandPrivilege = IslandPrivileges.MINECART_PLACE;
             } else if (Materials.isChest(blockType)) {
                 islandPrivilege = IslandPrivileges.CHEST_ACCESS;
+            } else if (blockType == LECTERN) {
+                islandPrivilege = IslandPrivileges.PICKUP_LECTERN_BOOK;
             } else if (blockState instanceof InventoryHolder) {
                 islandPrivilege = IslandPrivileges.USE;
             } else if (usedItem != null && blockType == VAULT && (usedItem.getType() == TRIAL_KEY || usedItem.getType() == OMINOUS_TRIAL_KEY)) {
@@ -235,8 +237,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 islandPrivilege = IslandPrivileges.BREAK;
             } else if (blockType == Material.PUMPKIN) {
                 islandPrivilege = IslandPrivileges.BREAK;
-            } else if (blockType == LECTERN) {
-                islandPrivilege = IslandPrivileges.PICKUP_LECTERN_BOOK;
             } else {
                 islandPrivilege = IslandPrivileges.INTERACT;
             }
