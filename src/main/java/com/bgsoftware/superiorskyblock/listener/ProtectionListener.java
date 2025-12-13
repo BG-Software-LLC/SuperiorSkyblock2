@@ -61,6 +61,8 @@ public class ProtectionListener extends AbstractGameEventListener {
     private static final Material POINTED_DRIPSTONE = EnumHelper.getEnum(Material.class, "POINTED_DRIPSTONE");
     @Nullable
     private static final EntityType TRIDENT = EnumHelper.getEnum(EntityType.class, "TRIDENT");
+    @Nullable
+    private static final Material DECORATED_POT = EnumHelper.getEnum(Material.class, "DECORATED_POT");
 
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
         @Override
@@ -510,7 +512,7 @@ public class ProtectionListener extends AbstractGameEventListener {
                     hitBlock = null;
                 } else {
                     hitBlock = e.getArgs().hitBlock;
-                    if (hitBlock == null || hitBlock.getType() != CHORUS_FLOWER)
+                    if (hitBlock == null || (hitBlock.getType() != CHORUS_FLOWER && hitBlock.getType() != DECORATED_POT))
                         return;
 
                     location = hitBlock.getLocation(wrapper.getHandle());
