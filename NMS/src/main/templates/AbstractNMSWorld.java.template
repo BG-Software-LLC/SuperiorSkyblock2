@@ -164,11 +164,11 @@ public abstract class AbstractNMSWorld implements NMSWorld {
                     break;
                 case GREEN:
                     worldBorder.setSize((islandSize * 2) + 1.001D);
-                    worldBorder.lerpSizeBetween(worldBorder.getSize() - 0.001D, worldBorder.getSize(), Long.MAX_VALUE);
+                    lerpSizeBetween(worldBorder, worldBorder.getSize() - 0.001D, worldBorder.getSize());
                     break;
                 case RED:
                     worldBorder.setSize((islandSize * 2) + 1D);
-                    worldBorder.lerpSizeBetween(worldBorder.getSize(), worldBorder.getSize() - 0.001D, Long.MAX_VALUE);
+                    lerpSizeBetween(worldBorder, worldBorder.getSize(), worldBorder.getSize() - 0.001D);
                     break;
             }
         }
@@ -176,6 +176,8 @@ public abstract class AbstractNMSWorld implements NMSWorld {
         ClientboundInitializeBorderPacket initializeBorderPacket = new ClientboundInitializeBorderPacket(worldBorder);
         ((CraftPlayer) player).getHandle().connection.send(initializeBorderPacket);
     }
+
+    protected abstract void lerpSizeBetween(WorldBorder worldBorder, double oldSize, double newSize);
 
     @Override
     public Object getBlockData(org.bukkit.block.Block block) {

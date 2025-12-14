@@ -6,3 +6,5 @@ REGISTRY_CLASS=net.minecraft.core.registries.BuiltInRegistries
 CHUNK_STATUS_CLASS=net.minecraft.world.level.chunk.status.ChunkStatus
 SERVER_LEVEL_RANDOM_TYPE=net.minecraft.util.RandomSource
 STAR_LIGHT_INTERFACE_CLASS=ca.spottedleaf.starlight.common.light.StarLightInterface
+ABSTRACT_MINECART_SUBPACKAGE=vehicle
+GET_RANDOM_TICK_SPEED_METHOD=getInt(net.minecraft.world.level.GameRules.RULE_RANDOMTICKING)

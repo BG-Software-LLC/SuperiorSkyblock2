@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.SculkSensorBlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
@@ -20,6 +21,11 @@ public class NMSWorldImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.Abst
 
     public NMSWorldImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
+    }
+
+    @Override
+    protected void lerpSizeBetween(WorldBorder worldBorder, double oldSize, double newSize) {
+        worldBorder.lerpSizeBetween(oldSize, newSize, Long.MAX_VALUE);
     }
 
     @Override
