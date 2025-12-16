@@ -1540,6 +1540,39 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  nautilus_interact:
+    display-menu: true
+    permission-enabled:
+      type: NAUTILUS_SHELL
+      name: '&6Nautilus Interact'
+      lore:
+        - '&7Access to interact with nautiluses inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: NAUTILUS_SHELL
+      name: '&6Nautilus Interact'
+      lore:
+        - '&7Access to interact with nautiluses inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: NAUTILUS_SHELL
+      name: '&6Nautilus Interact'
+      lore:
+        - '&7Access to interact with nautiluses inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   name_entity:
     display-menu: true
     permission-enabled:

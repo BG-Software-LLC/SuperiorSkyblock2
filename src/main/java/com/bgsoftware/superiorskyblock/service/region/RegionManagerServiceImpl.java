@@ -300,6 +300,9 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             } else if (BukkitEntities.isHorse(entity)) {
                 islandPrivilege = IslandPrivileges.HORSE_INTERACT;
                 closeInventory = true;
+            } else if (BukkitEntities.isNautilus(entityType)) {
+                islandPrivilege = IslandPrivileges.NAUTILUS_INTERACT;
+                closeInventory = true;
             } else if (entityType == COPPER_GOLEM_TYPE) {
                 islandPrivilege = IslandPrivileges.COPPER_GOLEM_INTERACT;
             } else if (usedItemType == Material.FLINT_AND_STEEL && entity instanceof Creeper) {
@@ -395,7 +398,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             return InteractionResult.SUCCESS;
 
         IslandPrivilege islandPrivilege = BukkitEntities.isHorse(vehicle) ? IslandPrivileges.HORSE_INTERACT :
-                vehicle instanceof Animals ? IslandPrivileges.ENTITY_RIDE : IslandPrivileges.MINECART_ENTER;
+                BukkitEntities.isNautilus(vehicle.getType()) ? IslandPrivileges.NAUTILUS_INTERACT :
+                        vehicle instanceof Animals ? IslandPrivileges.ENTITY_RIDE : IslandPrivileges.MINECART_ENTER;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location entityLocation = vehicle.getLocation(wrapper.getHandle());

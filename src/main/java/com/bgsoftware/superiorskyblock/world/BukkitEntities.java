@@ -42,6 +42,10 @@ public class BukkitEntities {
     private static final Synchronized<Int2ObjectMapView<List<ItemStack>>> entityContent = Synchronized.of(CollectionsFactory.createInt2ObjectArrayMap());
     @Nullable
     private static final EntityType CAMEL_TYPE = EnumHelper.getEnum(EntityType.class, "CAMEL");
+    @Nullable
+    private static final EntityType CAMEL_HUSK_TYPE = EnumHelper.getEnum(EntityType.class, "CAMEL_HUSK");
+    @Nullable
+    private static final EntityType NAUTILUS_TYPE = EnumHelper.getEnum(EntityType.class, "NAUTILUS");
 
     private BukkitEntities() {
 
@@ -153,8 +157,13 @@ public class BukkitEntities {
     }
 
     public static boolean isHorse(Entity entity) {
-        return entity instanceof Horse || entity.getType() == CAMEL_TYPE ||
+        EntityType entityType = entity.getType();
+        return entity instanceof Horse || entityType == CAMEL_TYPE || entityType == CAMEL_HUSK_TYPE ||
                 (ServerVersion.isAtLeast(ServerVersion.v1_11) && (entity instanceof Mule || entity instanceof Donkey));
+    }
+
+    public static boolean isNautilus(EntityType entityType) {
+        return entityType == NAUTILUS_TYPE;
     }
 
 }

@@ -404,7 +404,8 @@ public class ProtectionListener extends AbstractGameEventListener {
             return;
 
         IslandPrivilege islandPrivilege = BukkitEntities.isHorse((Vehicle) inventoryHolder) ? IslandPrivileges.HORSE_INTERACT :
-                inventoryHolder instanceof Animals ? IslandPrivileges.ENTITY_RIDE : IslandPrivileges.MINECART_OPEN;
+                BukkitEntities.isNautilus(((Vehicle) inventoryHolder).getType()) ? IslandPrivileges.NAUTILUS_INTERACT :
+                        inventoryHolder instanceof Animals ? IslandPrivileges.ENTITY_RIDE : IslandPrivileges.MINECART_OPEN;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().bukkitEvent.getPlayer());
         InteractionResult interactionResult;
