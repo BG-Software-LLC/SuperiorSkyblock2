@@ -191,6 +191,10 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
         }
 
         private void loadUpgrades(CommentedConfiguration config) {
+            plugin.getUpgrades().clearUpgrades();
+
+            if (!enabled) return;
+
             if (config.getBoolean("crop-growth", true))
                 enabledUpgrades.add(new UpgradeTypeCropGrowth(plugin));
             if (config.getBoolean("mob-drops", true))
@@ -204,22 +208,18 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
             if (config.getBoolean("entity-limits", true))
                 enabledUpgrades.add(new UpgradeTypeEntityLimits(plugin));
 
-            plugin.getUpgrades().clearUpgrades();
+            ConfigurationSection upgrades = config.getConfigurationSection("upgrades");
+            if (upgrades != null) {
+                for (String upgradeName : upgrades.getKeys(false)) {
+                    if (upgradeName.length() > MAX_UPGRADES_NAME_LENGTH)
+                        upgradeName = upgradeName.substring(0, MAX_UPGRADES_NAME_LENGTH);
 
-            if (!enabledUpgrades.isEmpty()) {
-                ConfigurationSection upgrades = config.getConfigurationSection("upgrades");
-                if (upgrades != null) {
-                    for (String upgradeName : upgrades.getKeys(false)) {
-                        if (upgradeName.length() > MAX_UPGRADES_NAME_LENGTH)
-                            upgradeName = upgradeName.substring(0, MAX_UPGRADES_NAME_LENGTH);
-
-                        SUpgrade upgrade = new SUpgrade(upgradeName);
-                        for (String _level : upgrades.getConfigurationSection(upgradeName).getKeys(false)) {
-                            loadUpgradeLevelFromSection(plugin, upgrade, _level, upgrades.getConfigurationSection(upgradeName + "." + _level));
-                        }
-
-                        plugin.getUpgrades().addUpgrade(upgrade);
+                    SUpgrade upgrade = new SUpgrade(upgradeName);
+                    for (String _level : upgrades.getConfigurationSection(upgradeName).getKeys(false)) {
+                        loadUpgradeLevelFromSection(plugin, upgrade, _level, upgrades.getConfigurationSection(upgradeName + "." + _level));
                     }
+
+                    plugin.getUpgrades().addUpgrade(upgrade);
                 }
             }
 
