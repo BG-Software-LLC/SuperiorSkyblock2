@@ -13,13 +13,11 @@ import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import org.bukkit.Material;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Donkey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mule;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -41,11 +39,9 @@ public class BukkitEntities {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final Synchronized<Int2ObjectMapView<List<ItemStack>>> entityContent = Synchronized.of(CollectionsFactory.createInt2ObjectArrayMap());
     @Nullable
-    private static final EntityType CAMEL_TYPE = EnumHelper.getEnum(EntityType.class, "CAMEL");
-    @Nullable
-    private static final EntityType CAMEL_HUSK_TYPE = EnumHelper.getEnum(EntityType.class, "CAMEL_HUSK");
-    @Nullable
     private static final EntityType NAUTILUS_TYPE = EnumHelper.getEnum(EntityType.class, "NAUTILUS");
+    @Nullable
+    private static final EntityType ZOMBIE_NAUTILUS_TYPE = EnumHelper.getEnum(EntityType.class, "ZOMBIE_NAUTILUS");
 
     private BukkitEntities() {
 
@@ -157,13 +153,11 @@ public class BukkitEntities {
     }
 
     public static boolean isHorse(Entity entity) {
-        EntityType entityType = entity.getType();
-        return entity instanceof Horse || entityType == CAMEL_TYPE || entityType == CAMEL_HUSK_TYPE ||
-                (ServerVersion.isAtLeast(ServerVersion.v1_11) && (entity instanceof Mule || entity instanceof Donkey));
+        return entity instanceof Horse || (ServerVersion.isAtLeast(ServerVersion.v1_11) && entity instanceof org.bukkit.entity.AbstractHorse);
     }
 
     public static boolean isNautilus(EntityType entityType) {
-        return entityType == NAUTILUS_TYPE;
+        return entityType == NAUTILUS_TYPE || entityType == ZOMBIE_NAUTILUS_TYPE;
     }
 
 }
