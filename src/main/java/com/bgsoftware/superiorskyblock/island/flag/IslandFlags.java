@@ -30,6 +30,7 @@ public class IslandFlags {
     public static final IslandFlag TREE_GROWTH = register("TREE_GROWTH");
     public static final IslandFlag WATER_FLOW = register("WATER_FLOW");
     public static final IslandFlag WITHER_EXPLOSION = register("WITHER_EXPLOSION");
+    public static final IslandFlag BEEHIVE_BEES_SPAWN = register("BEEHIVE_BEES_SPAWN");
 
     private static String ALL_FLAG_NAMES;
     private static int KNOWN_FLAGS_COUNT;

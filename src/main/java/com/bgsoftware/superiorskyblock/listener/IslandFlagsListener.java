@@ -45,6 +45,14 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
     private static final EnumSet<CreatureSpawnEvent.SpawnReason> NATURAL_SPAWN_REASONS = initializeNaturalSpawnReasons();
 
+    @Nullable
+    private static final CreatureSpawnEvent.SpawnReason BEEHIVE_SPAWN_REASON =
+            EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "BEEHIVE");
+
+    @Nullable
+    private static final EntityType BEE_ENTITY_TYPE =
+            EnumHelper.getEnum(EntityType.class, "BEE");
+
     private final Int2ObjectMapView<ProjectileSource> originalFireballsDamager = CollectionsFactory.createInt2ObjectArrayMap();
 
     private World spawnIslandWorld;
@@ -81,6 +89,14 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
     private boolean checkPreventEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e, Location entityLocation) {
         CreatureSpawnEvent.SpawnReason spawnReason = e.getArgs().spawnReason;
+
+        if (BEE_ENTITY_TYPE != null &&
+                e.getArgs().entity.getType() == BEE_ENTITY_TYPE &&
+                BEEHIVE_SPAWN_REASON != null &&
+                spawnReason == BEEHIVE_SPAWN_REASON) {
+
+            return preventAction(entityLocation, IslandFlags.BEEHIVE_BEES_SPAWN);
+        }
 
         IslandFlag actionFlag;
 
@@ -395,7 +411,6 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "VILLAGE_INVASION")).ifPresent(naturalSpawnReasons::add);
         Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "VILLAGE_DEFENSE")).ifPresent(naturalSpawnReasons::add);
         Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "PATROL")).ifPresent(naturalSpawnReasons::add);
-        Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "BEEHIVE")).ifPresent(naturalSpawnReasons::add);
         Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "LIGHTNING")).ifPresent(naturalSpawnReasons::add);
         Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "DEFAULT")).ifPresent(naturalSpawnReasons::add);
         Optional.ofNullable(EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "JOCKEY")).ifPresent(naturalSpawnReasons::add);
