@@ -1,10 +1,15 @@
 package com.bgsoftware.superiorskyblock.island.flag;
 
+import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 
 import java.util.Comparator;
 import java.util.Locale;
+import java.util.Objects;
 
 public class IslandFlags {
 
@@ -30,7 +35,7 @@ public class IslandFlags {
     public static final IslandFlag TREE_GROWTH = register("TREE_GROWTH");
     public static final IslandFlag WATER_FLOW = register("WATER_FLOW");
     public static final IslandFlag WITHER_EXPLOSION = register("WITHER_EXPLOSION");
-    public static final IslandFlag BEEHIVE_BEES_SPAWN = register("BEEHIVE_BEES_SPAWN");
+    public static final IslandFlag BEEHIVE_BEES_SPAWN = register("BEEHIVE_BEES_SPAWN", ServerVersion.isAtLeast(ServerVersion.v1_15));
 
     private static String ALL_FLAG_NAMES;
     private static int KNOWN_FLAGS_COUNT;
@@ -54,9 +59,18 @@ public class IslandFlags {
         return ALL_FLAG_NAMES;
     }
 
+    @NotNull
     private static IslandFlag register(String name) {
+        return Objects.requireNonNull(register(name, true));
+    }
+
+    private static IslandFlag register(String name, boolean condition) {
+        if (!condition)
+            return null;
+
         IslandFlag.register(name);
         return IslandFlag.getByName(name);
     }
+
 
 }
