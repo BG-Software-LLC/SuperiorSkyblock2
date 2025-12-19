@@ -151,6 +151,25 @@ settings:
       volume: 0.2
       pitch: 0.2
 
+  beehive_bees_spawn:
+    display-menu: true
+    settings-enabled:
+      type: BEE_NEST
+      name: '&6Beehive Bees Spawn'
+      lore:
+        - '&7Allow bees to spawn from beehives and bee nests.'
+        - '&7Currently &aENABLED&7.'
+    settings-disabled:
+      type: BEE_NEST
+      name: '&6Beehive Bees Spawn'
+      lore:
+        - '&7Allow bees to spawn from beehives and bee nests.'
+        - '&7Currently &cDISABLED&7.'
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
+
   creeper_explosion:
     display-menu: true
     settings-enabled:
@@ -464,24 +483,5 @@ settings:
         - '&7Currently &cDISABLED&7.'
     sound:
       type: ENTITY_EXPERIENCE_ORB_PICKUP
-      volume: 0.2
-      pitch: 0.2
-
-  beehive_bees_spawn:
-    display-menu: true
-    settings-enabled:
-      type: BEE_NEST
-      name: '&6Beehive Bees Spawn'
-      lore:
-        - '&7Allow bees to spawn from beehives and bee nests.'
-        - '&7Currently &aENABLED&7.'
-    settings-disabled:
-      type: BEE_NEST
-      name: '&6Beehive Bees Spawn'
-      lore:
-        - '&7Allow bees to spawn from beehives and bee nests.'
-        - '&7Currently &cDISABLED&7.'
-    sound:
-      type: ORB_PICKUP
       volume: 0.2
       pitch: 0.2
