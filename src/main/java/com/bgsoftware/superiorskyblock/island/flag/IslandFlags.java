@@ -19,6 +19,8 @@ public class IslandFlags {
     public static final IslandFlag ALWAYS_MIDDLE_NIGHT = register("ALWAYS_MIDDLE_NIGHT");
     public static final IslandFlag ALWAYS_RAIN = register("ALWAYS_RAIN");
     public static final IslandFlag ALWAYS_SHINY = register("ALWAYS_SHINY");
+    @Nullable
+    public static final IslandFlag BEEHIVE_BEES_SPAWN = register("BEEHIVE_BEES_SPAWN", ServerVersion.isAtLeast(ServerVersion.v1_15));
     public static final IslandFlag CREEPER_EXPLOSION = register("CREEPER_EXPLOSION");
     public static final IslandFlag CROPS_GROWTH = register("CROPS_GROWTH");
     public static final IslandFlag EGG_LAY = register("EGG_LAY");
@@ -35,7 +37,6 @@ public class IslandFlags {
     public static final IslandFlag TREE_GROWTH = register("TREE_GROWTH");
     public static final IslandFlag WATER_FLOW = register("WATER_FLOW");
     public static final IslandFlag WITHER_EXPLOSION = register("WITHER_EXPLOSION");
-    public static final IslandFlag BEEHIVE_BEES_SPAWN = register("BEEHIVE_BEES_SPAWN", ServerVersion.isAtLeast(ServerVersion.v1_15));
 
     private static String ALL_FLAG_NAMES;
     private static int KNOWN_FLAGS_COUNT;
