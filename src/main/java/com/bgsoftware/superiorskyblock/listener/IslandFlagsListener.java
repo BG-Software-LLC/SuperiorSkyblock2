@@ -86,10 +86,6 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     private boolean checkPreventEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e, Location entityLocation) {
         CreatureSpawnEvent.SpawnReason spawnReason = e.getArgs().spawnReason;
 
-        if (spawnReason == BEEHIVE_SPAWN_REASON) {
-            return preventAction(entityLocation, IslandFlags.BEEHIVE_BEES_SPAWN);
-        }
-
         IslandFlag actionFlag;
 
         if (spawnReason == CreatureSpawnEvent.SpawnReason.SPAWNER ||
@@ -103,9 +99,12 @@ public class IslandFlagsListener extends AbstractGameEventListener {
             if (entityCategory == null)
                 return false;
             actionFlag = entityCategory.getNaturalSpawnFlag();
+        } else if (spawnReason == BEEHIVE_SPAWN_REASON) {
+            actionFlag = IslandFlags.BEEHIVE_BEES_SPAWN;
         } else {
             return false;
         }
+
 
         return actionFlag != null && preventAction(entityLocation, actionFlag);
     }
