@@ -31,10 +31,11 @@ public class IslandPreviewListener extends AbstractGameEventListener {
 
         // Cancelling island preview mode
         if (plugin.getGrid().getIslandPreview(superiorPlayer) != null) {
+            GameMode gameMode = plugin.getGrid().getIslandPreview(superiorPlayer).getPreviousGameMode();
             plugin.getGrid().cancelIslandPreview(superiorPlayer);
             /* cancelIslandPreview changes the GameMode and teleports the player later.
             In this case tho, we want the things to be instant - no async, no nothing. */
-            player.setGameMode(GameMode.SURVIVAL);
+            player.setGameMode(gameMode);
             player.teleport(plugin.getGrid().getSpawnIsland().getCenter(
                     plugin.getSettings().getWorlds().getDefaultWorldDimension()));
         }
@@ -52,7 +53,7 @@ public class IslandPreviewListener extends AbstractGameEventListener {
             return;
         }
 
-        if (((Player) entity).getGameMode() == GameMode.SPECTATOR &&
+        if (((Player) entity).getGameMode() == plugin.getSettings().getIslandPreviews().getGameMode() &&
                 plugin.getGrid().getIslandPreview(superiorPlayer) != null)
             e.setCancelled();
     }
