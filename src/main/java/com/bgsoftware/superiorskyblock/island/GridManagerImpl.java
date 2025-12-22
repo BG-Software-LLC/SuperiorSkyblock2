@@ -565,7 +565,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         if (spawnIsland != null && spawnIsland.isInside(location))
             return spawnIsland;
 
-        return isIslandsWorld(world) ? this.islandsContainer.getIslandAt(location) : null;
+        return this.islandsContainer.getIslandAt(location);
     }
 
     @Override

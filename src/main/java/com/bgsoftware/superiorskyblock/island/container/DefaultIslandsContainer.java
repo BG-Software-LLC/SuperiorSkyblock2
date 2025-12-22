@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.IslandPosition;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
@@ -29,6 +30,7 @@ import com.bgsoftware.superiorskyblock.island.top.metadata.IslandSortValueMetada
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -154,17 +156,27 @@ public class DefaultIslandsContainer implements IslandsContainer {
     @Nullable
     @Override
     public Island getIslandAt(Location location) {
+        return plugin.getProviders().hasCustomWorldsSupport() ?
+                customWorldsSupportIslandLookup(location) : nativeIslandLookup(location);
+    }
+
+    private Island customWorldsSupportIslandLookup(Location location) {
         long packedPos = IslandPosition.calculatePackedPosFromLocation(location.getBlockX(), location.getBlockZ());
+        String worldName = LazyWorldLocation.getWorldName(location);
+        Island island = this.islandsGrid.getIslandAt(worldName, packedPos);
+        // We already checked for the world by calling `IslandsGrid#getIslandAt` with the world name parameter.
+        // We will only check that the location's position is inside the island.
+        return island == null || !island.isInside(SWorldPosition.of(location))  ? null : island;
+    }
 
-        Island island;
-        if (plugin.getProviders().hasCustomWorldsSupport()) {
-            String worldName = LazyWorldLocation.getWorldName(location);
-            island = this.islandsGrid.getIslandAt(worldName, packedPos);
-        } else {
-            island = this.islandsGrid.getIslandAt(null, packedPos);
-        }
+    private Island nativeIslandLookup(Location location) {
+        // We first check that the world is an islands world.
+        World world = location.getWorld();
+        if(world == null || !plugin.getGrid().isIslandsWorld(world))
+            return null;
 
-        return island == null || !island.isInside(location) ? null : island;
+        long packedPos = IslandPosition.calculatePackedPosFromLocation(location.getBlockX(), location.getBlockZ());
+        return this.islandsGrid.getIslandAt(null, packedPos);
     }
 
     @Override

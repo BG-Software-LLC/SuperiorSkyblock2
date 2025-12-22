@@ -1224,8 +1224,7 @@ public class SIsland implements Island {
     @Override
     public boolean isInside(Location location, double extraRadius) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
-        return isIslandWorld(location.getWorld()) && this.entireArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
+        return isIslandWorld(location) && this.entireArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
     }
 
     @Override
@@ -1326,8 +1325,7 @@ public class SIsland implements Island {
     @Override
     public boolean isInsideRange(Location location, double extraRadius) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
-        return isIslandWorld(location.getWorld()) && this.protectedArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
+        return isIslandWorld(location) && this.protectedArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
     }
 
     @Override
@@ -1414,15 +1412,23 @@ public class SIsland implements Island {
         return this.protectedArea.expandRshiftAndIntercepts(chunkX, chunkZ, extraRadius, 4);
     }
 
-    private static boolean isIslandWorld(@Nullable World world) {
-        return world != null && plugin.getProviders().getWorldsProvider().isIslandsWorld(world);
+    private boolean isIslandWorld(Location location) {
+        return isIslandWorld(LazyWorldLocation.getWorldName(location));
+    }
+
+    private boolean isIslandWorld(@Nullable World world) {
+        return world != null && isIslandWorld(world.getName());
     }
 
     private boolean isIslandWorld(@Nullable WorldInfo worldInfo) {
-        if (worldInfo == null)
+        return worldInfo != null && isIslandWorld(worldInfo.getName());
+    }
+
+    private boolean isIslandWorld(@Nullable String worldName) {
+        if (worldName == null)
             return false;
 
-        return plugin.getGrid().getIslandsWorldInfo(this, worldInfo.getName()) != null;
+        return plugin.getGrid().getIslandsWorldInfo(this, worldName) != null;
     }
 
     @Override
