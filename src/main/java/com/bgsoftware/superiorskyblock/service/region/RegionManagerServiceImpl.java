@@ -206,14 +206,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
             IslandPrivilege islandPrivilege;
 
-            if (spawnType != EntityType.UNKNOWN) {
-                EntityCategory entityCategory = EntityCategory.getEntityCategory(Keys.of(spawnType));
-                if (entityCategory == null)
-                    return InteractionResult.SUCCESS;
-                islandPrivilege = entityCategory.getSpawnPrivilege();
-                if (islandPrivilege == null)
-                    return InteractionResult.SUCCESS;
-            } else if (usedItem != null && Materials.isMinecart(usedItem.getType()) ? Materials.isRail(blockType) : Materials.isBoat(blockType)) {
+            if (usedItem != null && Materials.isMinecart(usedItem.getType()) ? Materials.isRail(blockType) : Materials.isBoat(blockType)) {
                 islandPrivilege = IslandPrivileges.MINECART_PLACE;
             } else if (Materials.isChest(blockType)) {
                 islandPrivilege = IslandPrivileges.CHEST_ACCESS;
@@ -237,6 +230,13 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 islandPrivilege = IslandPrivileges.BREAK;
             } else if (blockType == Material.PUMPKIN) {
                 islandPrivilege = IslandPrivileges.BREAK;
+            } else if (spawnType != EntityType.UNKNOWN) {
+                EntityCategory entityCategory = EntityCategory.getEntityCategory(Keys.of(spawnType));
+                if (entityCategory == null) {
+                    islandPrivilege = IslandPrivileges.INTERACT;
+                } else {
+                    islandPrivilege = Optional.ofNullable(entityCategory.getSpawnPrivilege()).orElse(IslandPrivileges.INTERACT);
+                }
             } else {
                 islandPrivilege = IslandPrivileges.INTERACT;
             }
