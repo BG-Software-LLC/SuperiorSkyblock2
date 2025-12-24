@@ -235,8 +235,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
             Key newSpawnerKey = Keys.of(clickedBlock);
             if (!oldSpawnerKey.equals(newSpawnerKey)) {
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    this.worldRecordService.get().recordBlockPlace(newSpawnerKey, clickedBlock.getLocation(wrapper.getHandle()),
-                            1, oldBlockState, REGULAR_RECORD_FLAGS);
+                    Location location = clickedBlock.getLocation(wrapper.getHandle());
+                    int spawnerCount = plugin.getProviders().getSpawnersProvider().getSpawner(location).getKey();
+                    this.worldRecordService.get().recordBlockBreak(oldSpawnerKey, location, spawnerCount, REGULAR_RECORD_FLAGS);
+                    this.worldRecordService.get().recordBlockPlace(newSpawnerKey, location, spawnerCount, null, REGULAR_RECORD_FLAGS);
                 }
             }
         }, 1L);
