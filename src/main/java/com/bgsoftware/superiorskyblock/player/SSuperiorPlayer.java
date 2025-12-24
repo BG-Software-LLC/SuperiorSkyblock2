@@ -36,6 +36,7 @@ import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.bgsoftware.superiorskyblock.player.cache.PlayerCacheImpl;
+import com.bgsoftware.superiorskyblock.player.permissions.PlayerPermissionsStore;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -73,12 +74,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private final PlayerTeleportAlgorithm playerTeleportAlgorithm;
     @Nullable
     private PersistentDataContainer persistentDataContainer; // Lazy loading
-    private LazyReference<PlayerCache> playerCache = new LazyReference<PlayerCache>() {
+    private final LazyReference<PlayerCache> playerCache = new LazyReference<PlayerCache>() {
         @Override
         protected PlayerCache create() {
             return new PlayerCacheImpl(SSuperiorPlayer.this);
         }
     };
+    private final PlayerPermissionsStore permissionsStore;
 
     private final Map<MissionReference, Counter> completedMissions = new ConcurrentHashMap<>();
     private final List<UUID> pendingInvites = new LinkedList<>();
@@ -129,6 +131,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         this.databaseBridge = plugin.getFactory().createDatabaseBridge(this);
         this.playerTeleportAlgorithm = plugin.getFactory().createPlayerTeleportAlgorithm(this);
+        this.permissionsStore = new PlayerPermissionsStore(this);
 
         databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
     }
@@ -325,6 +328,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public boolean hasPermission(String permission) {
         Preconditions.checkNotNull(permission, "permission parameter cannot be null.");
 
+        Log.debugResult(Debug.PERMISSION_LOOKUP, "Checking for permission", permission);
+
         if (permission.isEmpty())
             return true;
 
@@ -347,22 +352,21 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public boolean hasPermissionWithoutOP(String permission) {
         Preconditions.checkNotNull(permission, "permission parameter cannot be null.");
 
+        Log.debugResult(Debug.PERMISSION_LOOKUP, "Checking for permission", permission);
+
         if (permission.isEmpty())
             return true;
 
         Log.debug(Debug.PERMISSION_LOOKUP, getName(), permission, "No-Op Check");
 
         Player player = asPlayer();
-        if (player == null) {
-            Log.debugResult(Debug.PERMISSION_LOOKUP, "Result", "Player is not online");
-            return false;
-        }
 
-        boolean res = plugin.getProviders().getPermissionsProvider().hasPermission(player, permission);
+        PlayerPermissionsStore.PermissionResult permissionResult =
+                this.permissionsStore.hasCustomPermission(player, permission);
 
-        Log.debugResult(Debug.PERMISSION_LOOKUP, "Result", res);
+        Log.debugResult(Debug.PERMISSION_LOOKUP, "Result", permissionResult);
 
-        return res;
+        return permissionResult == PlayerPermissionsStore.PermissionResult.PRIVILEGED;
     }
 
     @Override
@@ -370,6 +374,22 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(permission, "permission parameter cannot be null.");
         Island island = getIsland();
         return island != null && island.hasPermission(this, permission);
+    }
+
+    @Override
+    public boolean hasBypassPermission(IslandPrivilege permission) {
+        Preconditions.checkNotNull(permission, "permission parameter cannot be null.");
+
+        Log.debugResult(Debug.PERMISSION_LOOKUP, "Checking for IslandPrivilege bypass permission", permission);
+
+        Player player = asPlayer();
+
+        PlayerPermissionsStore.PermissionResult permissionResult =
+                this.permissionsStore.hasBypassPermission(player, permission);
+
+        Log.debugResult(Debug.PERMISSION_LOOKUP, "Result", permissionResult);
+
+        return permissionResult == PlayerPermissionsStore.PermissionResult.PRIVILEGED;
     }
 
     /*

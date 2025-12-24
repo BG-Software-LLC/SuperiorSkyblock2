@@ -146,22 +146,37 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     boolean isShownAsOnline();
 
     /**
-     * Check whether or not the player has a permission.
-     * When the player is offline, false will be returned.
+     * Check whether the player has a permission.
+     *
+     * @param permission The permission to check.
+     * @return When the player is offline, false will be returned.
      */
     boolean hasPermission(String permission);
 
     /**
-     * Check whether or not the player has a permission without having op.
-     * When the player is offline, false will be returned.
+     * Check whether the player has a permission without having op.
+     *
+     * @param permission The permission to check.
+     * @return When the player is offline, false may be returned.
      */
     boolean hasPermissionWithoutOP(String permission);
 
     /**
-     * Check whether or not the player has a permission on his island.
+     * Check whether the player has a permission on his island.
+     *
+     * @param permission The {@link IslandPrivilege} to check.
+     * @return Whether the player has the permission on his island.
      * When the player doesn't have an island, false will be returned.
      */
     boolean hasPermission(IslandPrivilege permission);
+
+    /**
+     * Check whether the player has the bypass permission for the provided {@link IslandPrivilege}.
+     *
+     * @param permission The {@link IslandPrivilege} to check.
+     * @return Whether the player has the bypass permission. If the player is offline, false may be returned.
+     */
+    boolean hasBypassPermission(IslandPrivilege permission);
 
     /**
      * Check whether or not this player can hit another player.

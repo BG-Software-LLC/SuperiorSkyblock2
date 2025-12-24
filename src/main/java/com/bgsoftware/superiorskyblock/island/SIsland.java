@@ -1509,8 +1509,8 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
 
         PermissionNode playerNode = getPermissionNode(superiorPlayer);
-        return superiorPlayer.hasBypassModeEnabled() || superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass.*") ||
-                superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass." + islandPrivilege.getName()) ||
+        return superiorPlayer.hasBypassModeEnabled() || superiorPlayer.hasBypassPermission(islandPrivilege) ||
+                superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass.*") ||
                 (playerNode != null && playerNode.hasPermission(islandPrivilege));
     }
 

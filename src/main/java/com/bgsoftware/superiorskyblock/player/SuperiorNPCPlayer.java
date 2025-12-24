@@ -170,6 +170,11 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
     }
 
     @Override
+    public boolean hasBypassPermission(IslandPrivilege islandPrivilege) {
+        return false;
+    }
+
+    @Override
     public HitActionResult canHit(SuperiorPlayer other) {
         return HitActionResult.NOT_ONLINE;
     }

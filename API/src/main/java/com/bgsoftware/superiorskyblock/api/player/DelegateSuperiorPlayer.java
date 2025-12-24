@@ -149,6 +149,11 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public boolean hasBypassPermission(IslandPrivilege permission) {
+        return this.handle.hasBypassPermission(permission);
+    }
+
+    @Override
     public HitActionResult canHit(SuperiorPlayer otherPlayer) {
         return this.handle.canHit(otherPlayer);
     }

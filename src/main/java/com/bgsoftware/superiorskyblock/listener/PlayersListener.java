@@ -32,6 +32,7 @@ import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.player.permissions.PlayerPermissionsStore;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
@@ -126,6 +127,11 @@ public class PlayersListener extends AbstractGameEventListener {
         // Handling player join
         if (superiorPlayer.isShownAsOnline())
             IslandNotifications.notifyPlayerJoin(superiorPlayer);
+
+        // Refresh PermissionsStore
+        PlayerPermissionsStore permissionsStore = PlayerPermissionsStore.getPermissionsStore(player.getUniqueId());
+        if (permissionsStore != null)
+            permissionsStore.refreshCache(player);
 
         MoveResult moveResult;
         Island island;
