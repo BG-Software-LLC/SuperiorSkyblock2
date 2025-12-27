@@ -573,7 +573,7 @@ public class SettingsContainer {
         if (config.isConfigurationSection("island-previews.locations")) {
             for (String schematic : config.getConfigurationSection("island-previews.locations").getKeys(false)) {
                 try {
-                    islandPreviewsLocations.put(schematic.toLowerCase(Locale.ENGLISH), Serializers.LOCATION_SERIALIZER
+                    islandPreviewsLocations.put(schematic.toLowerCase(Locale.ENGLISH), Serializers.LOCATION_SPACED_CENTERED_SERIALIZER
                             .deserialize(config.getString("island-previews.locations." + schematic)));
                 } catch (Exception error) {
                     Log.warnFromFile("config.yml", "Cannot deserialize island preview for ", schematic, ", skipping...");
