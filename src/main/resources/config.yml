@@ -198,6 +198,7 @@ island-roles:
   coop:
     name: 'Coop'
     permissions:
+      - ALLAY_INTERACT
       - ANIMAL_BREED
       - ANIMAL_DAMAGE
       - ANIMAL_SHEAR
