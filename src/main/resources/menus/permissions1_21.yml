@@ -75,6 +75,39 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  allay_interact:
+    display-menu: true
+    permission-enabled:
+      type: ALLAY_SPAWN_EGG
+      name: '&6Allay Interact'
+      lore:
+        - '&7Access to interact with allays inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: ALLAY_SPAWN_EGG
+      name: '&6Allay Interact'
+      lore:
+        - '&7Access to interact with allays inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: ALLAY_SPAWN_EGG
+      name: '&6Allay Interact'
+      lore:
+        - '&7Access to interact with allays inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   animal_breed:
     display-menu: true
     permission-enabled:

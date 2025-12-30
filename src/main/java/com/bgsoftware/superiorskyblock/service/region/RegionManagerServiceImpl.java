@@ -82,6 +82,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     @Nullable
     private static final Material OMINOUS_TRIAL_KEY = EnumHelper.getEnum(Material.class, "OMINOUS_TRIAL_KEY");
     @Nullable
+    private static final EntityType ALLAY_TYPE = EnumHelper.getEnum(EntityType.class, "ALLAY");
+    @Nullable
     private static final EntityType AXOLOTL_TYPE = EnumHelper.getEnum(EntityType.class, "AXOLOTL");
     @Nullable
     private static final EntityType LLAMA_TYPE = EnumHelper.getEnum(EntityType.class, "LLAMA");
@@ -305,6 +307,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 closeInventory = true;
             } else if (entityType == COPPER_GOLEM_TYPE) {
                 islandPrivilege = IslandPrivileges.COPPER_GOLEM_INTERACT;
+            } else if (entityType == ALLAY_TYPE) {
+                islandPrivilege = IslandPrivileges.ALLAY_INTERACT;
             } else if (usedItemType == Material.FLINT_AND_STEEL && entity instanceof Creeper) {
                 islandPrivilege = IslandPrivileges.IGNITE_CREEPER;
             } else if (usedItemType == Material.WATER_BUCKET && entityType == AXOLOTL_TYPE && ServerVersion.isAtLeast(ServerVersion.v1_17)) {

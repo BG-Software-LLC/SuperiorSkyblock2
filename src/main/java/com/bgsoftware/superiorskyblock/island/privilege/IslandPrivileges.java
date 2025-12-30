@@ -15,6 +15,7 @@ import java.util.Objects;
 public class IslandPrivileges {
 
     public static final IslandPrivilege ALL = register("ALL");
+    public static final IslandPrivilege ALLAY_INTERACT = register("ALLAY_INTERACT", ServerVersion.isAtLeast(ServerVersion.v1_19));
     public static final IslandPrivilege ANIMAL_BREED = register("ANIMAL_BREED");
     public static final IslandPrivilege ANIMAL_DAMAGE = register("ANIMAL_DAMAGE");
     public static final IslandPrivilege ANIMAL_SHEAR = register("ANIMAL_SHEAR");
