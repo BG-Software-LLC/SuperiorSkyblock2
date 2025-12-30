@@ -18,6 +18,9 @@ public class ConstantKeys {
     public static final Key CARVED_PUMPKIN = Keys.of(EnumHelper.getEnum(Material.class, "CARVED_PUMPKIN", "PUMPKIN"));
     public static final Key CAULDRON = Keys.of(Material.CAULDRON);
     public static final Key CHEST = Keys.of(Material.CHEST);
+    @Nullable
+    public static final Key CHORUS_PLANT = Optional.ofNullable(EnumHelper.getEnum(Material.class, "CHORUS_PLANT"))
+            .map(Keys::of).orElse(null);
     public static final Key COBBLESTONE = Keys.of(Material.COBBLESTONE);
     public static final Key COMMAND_BLOCK = Keys.of(EnumHelper.getEnum(Material.class, "COMMAND_BLOCK", "COMMAND"));
     public static final Key EGG_MOB_SPAWNER = Keys.ofSpawner("EGG");

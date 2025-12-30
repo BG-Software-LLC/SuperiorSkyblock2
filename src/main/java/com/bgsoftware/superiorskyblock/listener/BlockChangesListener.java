@@ -69,6 +69,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
     }
 
     private final Collection<Location> alreadySpongeAbosrbCalled = AutoRemovalCollection.newArrayList(5L * 50, TimeUnit.MILLISECONDS);
+    private final Collection<Location> alreadyChorusFlowerTracked = AutoRemovalCollection.newArrayList(1L * 50, TimeUnit.MILLISECONDS);
 
     private final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {
         @Override
@@ -179,12 +180,33 @@ public class BlockChangesListener extends AbstractGameEventListener {
         if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
             return;
 
+        Block source = e.getArgs().source;
         BlockState newState = e.getArgs().newState;
 
+
+        Key spreadBlock = null;
+
+        if (newState.getType() == CHORUS_FLOWER && source.getType() == CHORUS_FLOWER) {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location spreadBlockLocation = source.getLocation(wrapper.getHandle());
+                // When a chorus flower grows, it is replaced with a flower plant and multiple new flowers can grow.
+                // Therefore, we want to track a plant one time instead of a new flower.
+                if (!alreadyChorusFlowerTracked.contains(spreadBlockLocation)) {
+                    spreadBlock = ConstantKeys.CHORUS_PLANT;
+                    alreadyChorusFlowerTracked.add(spreadBlockLocation.clone());
+                }
+            }
+        }
+
+        if (spreadBlock == null) {
+            spreadBlock = Keys.of(newState);
+        }
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            this.worldRecordService.get().recordBlockPlace(Keys.of(newState),
+            this.worldRecordService.get().recordBlockPlace(spreadBlock,
                     block.getLocation(wrapper.getHandle()),
                     1, block.getState(), REGULAR_RECORD_FLAGS);
+
         }
     }
 
