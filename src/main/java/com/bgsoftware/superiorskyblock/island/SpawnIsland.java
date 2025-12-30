@@ -144,7 +144,7 @@ public class SpawnIsland implements Island {
 
     public SpawnIsland() throws ManagerLoadException {
         String spawnLocation = plugin.getSettings().getSpawn().getLocation();
-        Location centerLocation = Serializers.LOCATION_SPACED_SERIALIZER.deserialize(spawnLocation);
+        Location centerLocation = Serializers.LOCATION_SPACED_CENTERED_SERIALIZER.deserialize(spawnLocation);
         if (centerLocation == null) {
             throw new ManagerLoadException("The spawn location could not be parsed", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
