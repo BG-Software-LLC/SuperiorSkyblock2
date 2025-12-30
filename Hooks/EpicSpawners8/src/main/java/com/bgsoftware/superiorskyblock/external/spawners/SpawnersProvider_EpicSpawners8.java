@@ -27,17 +27,12 @@ import org.bukkit.inventory.ItemStack;
 @SuppressWarnings("unused")
 public class SpawnersProvider_EpicSpawners8 implements SpawnersProvider {
 
-    private static boolean registered = false;
-
     private final SuperiorSkyblockPlugin plugin;
 
     public SpawnersProvider_EpicSpawners8(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
-            registered = true;
-            Log.info("Using EpicSpawners as a spawners provider.");
-        }
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
+        Log.info("Using EpicSpawners as a spawners provider.");
     }
 
     @Override

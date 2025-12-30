@@ -98,13 +98,18 @@ public class OraxenHook {
         }
     };
 
+    private static boolean registered = false;
+
     private static SuperiorSkyblockPlugin plugin;
 
     public static void register(SuperiorSkyblockPlugin plugin) {
         OraxenHook.plugin = plugin;
-        plugin.getBlockValues().registerKeyParser(new OraxenKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
-        plugin.getProviders().registerCustomBlocksProvider(new OraxenCustomBlocksProvider());
         plugin.getServer().getPluginManager().registerEvents(new OraxenListener(), plugin);
+        if (!registered) {
+            registered = true;
+            plugin.getProviders().registerCustomBlocksProvider(new OraxenCustomBlocksProvider());
+            plugin.getBlockValues().registerKeyParser(new OraxenKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
+        }
     }
 
     private static class OraxenCustomBlocksProvider implements ICustomBlocksProvider {

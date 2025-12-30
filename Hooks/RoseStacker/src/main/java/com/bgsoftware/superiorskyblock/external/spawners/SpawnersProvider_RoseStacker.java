@@ -25,17 +25,13 @@ public class SpawnersProvider_RoseStacker implements SpawnersProvider_AutoDetect
 
     private static final ReflectMethod<EntityType> GET_STACKED_ITEM_ENTITY_TYPE =
             new ReflectMethod<>(StackerUtils.class, "getStackedItemEntityType", ItemStack.class);
-    private static boolean registered = false;
 
     private final SuperiorSkyblockPlugin plugin;
 
     public SpawnersProvider_RoseStacker(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
-            registered = true;
-            Log.info("Using RoseStacker as a spawners provider.");
-        }
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
+        Log.info("Using RoseStacker as a spawners provider.");
     }
 
     @Override

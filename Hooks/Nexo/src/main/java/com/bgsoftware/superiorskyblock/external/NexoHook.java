@@ -60,14 +60,19 @@ public class NexoHook {
         }
     };
 
+    private static boolean registered = false;
+
     private static SuperiorSkyblockPlugin plugin;
 
     public static void register(SuperiorSkyblockPlugin plugin) {
         NexoHook.plugin = plugin;
-        plugin.getBlockValues().registerKeyParser(new NexoKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
-        plugin.getProviders().registerCustomBlocksProvider(new NexuCustomBlocksProvider());
         plugin.getServer().getPluginManager().registerEvents(new NexoListener(), plugin);
-        BukkitExecutor.sync(NexoHook::initializeMechanics, 1L);
+        if (!registered) {
+            registered = true;
+            plugin.getProviders().registerCustomBlocksProvider(new NexuCustomBlocksProvider());
+            BukkitExecutor.sync(NexoHook::initializeMechanics, 1L);
+            plugin.getBlockValues().registerKeyParser(new NexoKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
+        }
     }
 
     private static void initializeMechanics() {

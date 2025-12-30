@@ -36,8 +36,6 @@ import java.util.Map;
 
 public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpawnerType, SpawnersSnapshotProvider {
 
-    private static boolean registered = false;
-
     private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
         @Override
@@ -48,12 +46,9 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
 
     public SpawnersProvider_WildStacker(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
-            Bukkit.getPluginManager().registerEvents(new WildStackerListener(), plugin);
-            registered = true;
-            Log.info("Using WildStacker as a spawners provider.");
-        }
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new WildStackerListener(), plugin);
+        Log.info("Using WildStacker as a spawners provider.");
     }
 
     @Override

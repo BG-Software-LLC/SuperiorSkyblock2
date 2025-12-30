@@ -45,10 +45,10 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
     public StackedBlocksProvider_WildStacker(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
-            registered = true;
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
 
+        if (!registered) {
+            registered = true;
             SuperiorSkyblockAPI.getBlockValues().registerKeyParser(new CustomKeyParser() {
 
                 private final SystemManager systemManager = WildStackerAPI.getWildStacker().getSystemManager();
@@ -67,8 +67,9 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
             }, ConstantKeys.CAULDRON);
 
-            Log.info("Using WildStacker as a stacked-blocks provider.");
         }
+
+        Log.info("Using WildStacker as a stacked-blocks provider.");
     }
 
     @Override
