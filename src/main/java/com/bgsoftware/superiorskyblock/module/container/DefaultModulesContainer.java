@@ -97,9 +97,8 @@ public class DefaultModulesContainer implements ModulesContainer {
     }
 
     @Override
-    @Nullable
-    public ModuleData getModuleData(PluginModule module) {
-        return this.modulesData.get(module);
+    public void removeModuleData(PluginModule module) {
+        this.modulesData.remove(module);
     }
 
     private static class ModuleInitializeDataImpl implements ModuleInitializeData {
