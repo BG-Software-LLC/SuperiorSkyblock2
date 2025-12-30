@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.module.container;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleInitializeData;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLogger;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
@@ -12,9 +13,9 @@ import com.bgsoftware.superiorskyblock.module.ModuleData;
 import com.bgsoftware.superiorskyblock.module.logging.ModuleLoggerFileHandler;
 import com.google.common.base.Preconditions;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
@@ -65,14 +66,20 @@ public class DefaultModulesContainer implements ModulesContainer {
         ModuleData moduleData = modulesData.remove(pluginModule);
 
         if (moduleData != null) {
-            if (moduleData.getListeners() != null)
-                Arrays.stream(moduleData.getListeners()).forEach(HandlerList::unregisterAll);
+            if (moduleData.getListeners() != null) {
+                for (Listener listener : moduleData.getListeners())
+                    HandlerList.unregisterAll(listener);
+            }
 
-            if (moduleData.getCommands() != null)
-                Arrays.stream(moduleData.getCommands()).forEach(plugin.getCommands()::unregisterCommand);
+            if (moduleData.getCommands() != null) {
+                for (SuperiorCommand superiorCommand : moduleData.getCommands())
+                    plugin.getCommands().unregisterCommand(superiorCommand);
+            }
 
-            if (moduleData.getAdminCommands() != null)
-                Arrays.stream(moduleData.getAdminCommands()).forEach(plugin.getCommands()::unregisterAdminCommand);
+            if (moduleData.getAdminCommands() != null) {
+                for (SuperiorCommand superiorCommand : moduleData.getAdminCommands())
+                    plugin.getCommands().unregisterAdminCommand(superiorCommand);
+            }
         }
 
         pluginModule.disableModule();
