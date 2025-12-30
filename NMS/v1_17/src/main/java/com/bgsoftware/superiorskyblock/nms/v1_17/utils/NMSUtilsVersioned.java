@@ -59,6 +59,7 @@ import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
@@ -284,6 +285,14 @@ public class NMSUtilsVersioned {
 
     public static void markUnsaved(LevelChunk levelChunk) {
         levelChunk.markUnsaved();
+    }
+
+    public static Optional<CompoundTag> loadPlayerData(ServerPlayer serverPlayer) {
+        return Optional.ofNullable(MinecraftServer.getServer().getPlayerList().load(serverPlayer));
+    }
+
+    public static long getCompoundTagLong(net.minecraft.nbt.CompoundTag compoundTag, String key, long def) {
+        return compoundTag.getLong(key);
     }
 
     private NMSUtilsVersioned() {

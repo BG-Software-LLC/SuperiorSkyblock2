@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.nms.v1_21_5.NMSUtils;
-import com.bgsoftware.superiorskyblock.nms.v1_21_5.utils.TickingBlockList;
 import com.google.common.base.Suppliers;
 import com.google.gson.JsonParseException;
 import com.mojang.authlib.GameProfile;
@@ -139,7 +138,7 @@ public class NMSUtilsVersioned {
                         int chunkZ = chunkPosition.getZ();
                         MoonriseRegionFileIO.RegionDataController.ReadData readData =
                                 regionDataController.readData(chunkX, chunkZ);
-                        if(readData != null) {
+                        if (readData != null) {
                             CompoundTag entityData = switch (readData.result()) {
                                 case HAS_DATA -> regionDataController.finishRead(chunkX, chunkZ, readData);
                                 case SYNC_READ -> readData.syncRead();
@@ -323,6 +322,14 @@ public class NMSUtilsVersioned {
 
     public static void markUnsaved(LevelChunk levelChunk) {
         levelChunk.markUnsaved();
+    }
+
+    public static Optional<CompoundTag> loadPlayerData(ServerPlayer serverPlayer) {
+        return MinecraftServer.getServer().getPlayerList().load(serverPlayer);
+    }
+
+    public static long getCompoundTagLong(net.minecraft.nbt.CompoundTag compoundTag, String key, long def) {
+        return compoundTag.getLongOr(key, def);
     }
 
     private static void applySignTextLines(CompoundTag blockEntityCompound, String key) {

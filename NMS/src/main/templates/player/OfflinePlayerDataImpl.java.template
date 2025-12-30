@@ -2,9 +2,13 @@ package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.player;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.core.ObjectsPool;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.nms.player.OfflinePlayerData;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import com.mojang.authlib.GameProfile;
+import com.mojang.serialization.Dynamic;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,12 +17,14 @@ import net.minecraft.world.level.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import ${CRAFTBUKKIT_PACKAGE}.CraftServer;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class OfflinePlayerDataImpl implements OfflinePlayerData {
 
@@ -46,8 +52,31 @@ public class OfflinePlayerDataImpl implements OfflinePlayerData {
             return null;
 
         ServerPlayer serverPlayer = NMSUtilsVersioned.createServerPlayer(serverLevel, profile);
+        NMSUtilsVersioned.loadPlayerData(serverPlayer).ifPresent(playerData -> {
+            ResourceKey<Level> resourceKey;
+            if (playerData.contains("WorldUUIDMost") && playerData.contains("WorldUUIDLeast")) {
+                long worldUUIDMost = NMSUtilsVersioned.getCompoundTagLong(playerData, "WorldUUIDMost", 0L);
+                long worldUUIDLeast = NMSUtilsVersioned.getCompoundTagLong(playerData, "WorldUUIDLeast", 0L);
+                UUID uid = new UUID(worldUUIDMost, worldUUIDLeast);
+                World bukkitWorld = Bukkit.getServer().getWorld(uid);
+                if (bukkitWorld != null) {
+                    resourceKey = ((CraftWorld) bukkitWorld).getHandle().dimension();
+                } else {
+                    resourceKey = Level.OVERWORLD;
+                }
+            } else {
+                resourceKey = Level.OVERWORLD;
+            }
+
+            ServerLevel worldServer = server.getLevel(resourceKey);
+            if (worldServer == null) {
+                worldServer = server.overworld();
+            }
+
+            serverPlayer.setLevel(worldServer);
+        });
+
         this.fakePlayer = serverPlayer.getBukkitEntity();
-        this.fakePlayer.loadData();
 
         return this;
     }

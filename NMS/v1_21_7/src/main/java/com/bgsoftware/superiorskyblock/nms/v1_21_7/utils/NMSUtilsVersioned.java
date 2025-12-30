@@ -340,6 +340,22 @@ public class NMSUtilsVersioned {
         levelChunk.markUnsaved();
     }
 
+    public static Optional<CompoundTag> loadPlayerData(ServerPlayer serverPlayer) {
+        try (ProblemReporter.ScopedCollector scopedCollector = new ProblemReporter.ScopedCollector(serverPlayer.problemPath(), LOGGER)) {
+            return MinecraftServer.getServer().getPlayerList().playerIo.load(
+                    serverPlayer.getName().getString(), serverPlayer.getStringUUID(), scopedCollector)
+                    .map(playerData -> {
+                        ValueInput valueInput = TagValueInput.create(scopedCollector, serverPlayer.registryAccess(), playerData);
+                        serverPlayer.load(valueInput);
+                        return playerData;
+                    });
+        }
+    }
+
+    public static long getCompoundTagLong(net.minecraft.nbt.CompoundTag compoundTag, String key, long def) {
+        return compoundTag.getLongOr(key, def);
+    }
+
     private static void applySignTextLines(CompoundTag blockEntityCompound, String key) {
         blockEntityCompound.getCompound(key).ifPresent(textCompound -> {
             ListTag messages = textCompound.getListOrEmpty("messages");

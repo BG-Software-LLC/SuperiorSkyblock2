@@ -359,6 +359,14 @@ public class NMSUtilsVersioned {
         levelChunk.setUnsaved(true);
     }
 
+    public static Optional<CompoundTag> loadPlayerData(ServerPlayer serverPlayer) {
+        return MinecraftServer.getServer().getPlayerList().load(serverPlayer);
+    }
+
+    public static long getCompoundTagLong(net.minecraft.nbt.CompoundTag compoundTag, String key, long def) {
+        return compoundTag.getLong(key);
+    }
+
     private NMSUtilsVersioned() {
 
     }

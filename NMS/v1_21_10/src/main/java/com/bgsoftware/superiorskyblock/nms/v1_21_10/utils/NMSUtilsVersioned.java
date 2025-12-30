@@ -350,6 +350,14 @@ public class NMSUtilsVersioned {
         ).createForBiomes();
     }
 
+    public static Optional<CompoundTag> loadPlayerData(ServerPlayer serverPlayer) {
+        return MinecraftServer.getServer().getPlayerList().loadPlayerData(serverPlayer.nameAndId());
+    }
+
+    public static long getCompoundTagLong(net.minecraft.nbt.CompoundTag compoundTag, String key, long def) {
+        return compoundTag.getLongOr(key, def);
+    }
+
     private static void applySignTextLines(CompoundTag blockEntityCompound, String key) {
         blockEntityCompound.getCompound(key).ifPresent(textCompound -> {
             ListTag messages = textCompound.getListOrEmpty("messages");
