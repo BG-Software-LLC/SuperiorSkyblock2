@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
@@ -71,7 +72,7 @@ public class MenuIslandRatings extends AbstractPagedMenu<MenuIslandRatings.View,
 
         @Override
         public String replaceTitle(String title) {
-            return title.replace("{0}", String.valueOf(island.getTotalRating()));
+            return title.replace("{0}", Formatters.NUMBER_FORMATTER.format(island.getTotalRating()));
         }
 
         @Override
