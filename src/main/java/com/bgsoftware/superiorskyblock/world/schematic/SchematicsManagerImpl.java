@@ -154,7 +154,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
     public void cacheSchematics() {
         // Skip caching if disabled or invalid island size
-        if (!plugin.getSettings().isCacheSchematics() || plugin.getSettings().getMaxIslandSize() % 4 != 0)
+        if (!plugin.getSettings().isCacheSchematics() || plugin.getSettings().getMaxIslandSize() % 4 != 0 || true)
             return;
 
         List<Schematic> newSchematics = new ArrayList<>(this.schematicsContainer.getSchematics().size());

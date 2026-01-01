@@ -498,7 +498,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         // Cache schematics asynchronously to avoid blocking startup
         BukkitExecutor.async(() -> {
             // Prepare cached schematics in async thread
-            if (!plugin.getSettings().isCacheSchematics() || plugin.getSettings().getMaxIslandSize() % 4 != 0)
+            if (!plugin.getSettings().isCacheSchematics() || plugin.getSettings().getMaxIslandSize() % 4 != 0 || true)
                 return;
 
             // Read current schematics (thread-safe read from unmodifiable map)
