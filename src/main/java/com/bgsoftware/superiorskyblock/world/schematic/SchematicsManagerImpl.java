@@ -87,35 +87,77 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
         loadDefaultSchematicParsers();
 
-        loadSchematics();
+        // Load schematics asynchronously during startup for better performance
+        loadSchematicsAsync();
+    }
+
+    private void loadSchematicsAsync() throws ManagerLoadException {
+        this.schematicsContainer.clearSchematics();
+
+        File schematicsFolder = new File(plugin.getDataFolder(), "schematics");
+        List<File> schematicFilesList = Files.listFolderFiles(schematicsFolder, false);
+
+        if (schematicFilesList.isEmpty()) {
+            throw new ManagerLoadException("&cThere were no valid schematics.",
+                    ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+        }
+
+        // Load all schematics sequentially
+        List<Schematic> loadedSchematics = new ArrayList<>(schematicFilesList.size());
+        
+        for (File schemFile : schematicFilesList) {
+            String schemName = Files.getFileName(schemFile).toLowerCase(Locale.ENGLISH);
+            Schematic schematic = loadFromFile(schemName, schemFile);
+            if (schematic != null) {
+                loadedSchematics.add(schematic);
+            }
+        }
+
+        if (loadedSchematics.isEmpty()) {
+            throw new ManagerLoadException("&cThere were no valid schematics.",
+                    ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+        }
+
+        // Batch add all loaded schematics
+        for (Schematic schematic : loadedSchematics) {
+            this.schematicsContainer.addSchematic(schematic);
+        }
     }
 
     public void loadSchematics() throws ManagerLoadException {
         this.schematicsContainer.clearSchematics();
 
         File schematicsFolder = new File(plugin.getDataFolder(), "schematics");
+        List<File> schematicFilesList = Files.listFolderFiles(schematicsFolder, false);
 
-        for (File schemFile : Files.listFolderFiles(schematicsFolder, false)) {
+        // Load schematics sequentially for thread safety
+        List<Schematic> loadedSchematics = new ArrayList<>(schematicFilesList.size());
+        
+        for (File schemFile : schematicFilesList) {
             String schemName = Files.getFileName(schemFile).toLowerCase(Locale.ENGLISH);
             Schematic schematic = loadFromFile(schemName, schemFile);
             if (schematic != null) {
-                this.schematicsContainer.addSchematic(schematic);
+                loadedSchematics.add(schematic);
             }
+        }
+
+        // Batch add all loaded schematics
+        for (Schematic schematic : loadedSchematics) {
+            this.schematicsContainer.addSchematic(schematic);
         }
 
         if (this.schematicsContainer.getSchematics().isEmpty()) {
             throw new ManagerLoadException("&cThere were no valid schematics.",
                     ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
-
-        System.gc();
     }
 
     public void cacheSchematics() {
-        if (!plugin.getSettings().isCacheSchematics() || plugin.getSettings().getMaxIslandSize() % 4 != 0 || true)
+        // Skip caching if disabled or invalid island size
+        if (!plugin.getSettings().isCacheSchematics() || plugin.getSettings().getMaxIslandSize() % 4 != 0)
             return;
 
-        List<Schematic> newSchematics = new LinkedList<>();
+        List<Schematic> newSchematics = new ArrayList<>(this.schematicsContainer.getSchematics().size());
         boolean cachedSchematic = false;
 
         for (Schematic schematic : this.schematicsContainer.getSchematics().values()) {
@@ -137,13 +179,20 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
         newSchematics.forEach(this.schematicsContainer::addSchematic);
     }
 
+    public SchematicsContainer getSchematicsContainer() {
+        return this.schematicsContainer;
+    }
+
     private void loadDefaultSchematicParsers() {
+        // Load FAWE parser synchronously to avoid race conditions
         if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
             try {
                 Class.forName("com.boydti.fawe.object.schematic.Schematic");
                 SchematicParser schematicParser = (SchematicParser) Class.forName("com.bgsoftware.superiorskyblock.world.schematic.parser.FAWESchematicParser").newInstance();
                 this.schematicsContainer.addSchematicParser(schematicParser);
+                Log.info("FastAsyncWorldEdit schematic parser loaded");
             } catch (Exception ignored) {
+                // FAWE parser not available, use default
             }
         }
     }

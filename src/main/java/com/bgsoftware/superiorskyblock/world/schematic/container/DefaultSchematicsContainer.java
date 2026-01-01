@@ -34,7 +34,10 @@ public class DefaultSchematicsContainer implements SchematicsContainer {
 
     @Override
     public void addSchematicParser(SchematicParser schematicParser) {
-        this.schematicParsers.add(schematicParser);
+        // Avoid duplicate parsers
+        if (!this.schematicParsers.contains(schematicParser)) {
+            this.schematicParsers.add(schematicParser);
+        }
     }
 
     @Override

@@ -9,6 +9,7 @@ import com.bgsoftware.common.nmsloader.config.NMSConfiguration;
 import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
@@ -85,6 +86,8 @@ import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.bgsoftware.superiorskyblock.world.entity.EntityCategories;
 import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
+import com.bgsoftware.superiorskyblock.world.schematic.impl.CachedSuperiorSchematic;
+import com.bgsoftware.superiorskyblock.world.schematic.impl.SuperiorSchematic;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -92,7 +95,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
@@ -272,15 +278,19 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             loadingStage = PluginLoadingStage.CHUNKS_PROVIDER_INITIALIZED;
 
-            if (updater.isOutdated()) {
-                Log.info("");
-                Log.info("A new version is available (v", updater.getLatestVersion(), ")!");
-                Log.info("Version's description: \"", updater.getVersionDescription(), "\"");
-                Log.info("");
-            }
+            // Check for updates asynchronously
+            BukkitExecutor.async(() -> {
+                if (updater.isOutdated()) {
+                    Log.info("");
+                    Log.info("A new version is available (v", updater.getLatestVersion(), ")!");
+                    Log.info("Version's description: \"", updater.getVersionDescription(), "\"");
+                    Log.info("");
+                }
+            });
 
             // Calculate the maximum amount of islands that fit into the world.
-            if (calculateMaxPossibleIslands() < 1000) {
+            long maxIslands = calculateMaxPossibleIslands();
+            if (maxIslands < 1000) {
                 Log.warn("It seems like you configured your max-world-size in server.properties to be a small number (", nmsAlgorithms.getMaxWorldSize(), ").");
                 Log.warn("This can lead to weird behaviors when new islands are generated beyond this limit.");
                 Log.warn("Increase the value to for better experience (Default: 29999984)");
@@ -311,7 +321,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                             island.setPlayerInside(superiorPlayer, true);
                     }
                 }
-            }, 1L);
+            }, 5L); // Delay to allow other systems to initialize first
 
             PluginEventsFactory.callPluginInitializedEvent();
 
@@ -485,7 +495,39 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             stackedBlocksHandler.loadData();
         }
 
-        BukkitExecutor.sync(schematicsHandler::cacheSchematics);
+        // Cache schematics asynchronously to avoid blocking startup
+        BukkitExecutor.async(() -> {
+            // Prepare cached schematics in async thread
+            if (!plugin.getSettings().isCacheSchematics() || plugin.getSettings().getMaxIslandSize() % 4 != 0)
+                return;
+
+            // Read current schematics (thread-safe read from unmodifiable map)
+            Map<String, Schematic> currentSchematics = schematicsHandler.getSchematicsContainer().getSchematics();
+            List<Schematic> newSchematics = new ArrayList<>(currentSchematics.size());
+            boolean cachedSchematic = false;
+
+            for (Schematic schematic : currentSchematics.values()) {
+                if (schematic instanceof SuperiorSchematic) {
+                    try {
+                        schematic = new CachedSuperiorSchematic((SuperiorSchematic) schematic);
+                        cachedSchematic = true;
+                    } catch (Throwable error) {
+                        Log.warn("Cannot cache schematic ", schematic.getName(), ", skipping...");
+                    }
+                }
+                newSchematics.add(schematic);
+            }
+
+            if (!cachedSchematic)
+                return;
+
+            // Update container in sync thread for thread safety
+            List<Schematic> finalSchematics = newSchematics;
+            BukkitExecutor.sync(() -> {
+                schematicsHandler.getSchematicsContainer().clearSchematics();
+                finalSchematics.forEach(schematicsHandler.getSchematicsContainer()::addSchematic);
+            });
+        });
 
         modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_MODULE_DATA_LOAD, reloadReason == PluginReloadReason.COMMAND);
 
@@ -498,7 +540,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                     if (island != null) island.applyEffects(superiorPlayer);
                 }
             }
-        });
+        }, 1L); // Delay to avoid blocking reload
 
         CalcTask.startTask();
 
