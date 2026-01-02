@@ -482,7 +482,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             gridHandler.loadData();
             schematicsHandler.loadData();
         } else {
-            gridHandler.updateSpawn();
+            BukkitExecutor.sync(gridHandler::updateSpawn, 1L);
             gridHandler.syncUpgrades();
             schematicsHandler.loadSchematics();
         }
@@ -497,14 +497,16 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
         modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_MODULE_DATA_LOAD, reloadReason == PluginReloadReason.COMMAND);
 
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
-                Island island = gridHandler.getIslandAt(player.getLocation(wrapper.getHandle()));
-                superiorPlayer.updateWorldBorder(island);
-                if (island != null) island.applyEffects(superiorPlayer);
+        BukkitExecutor.sync(() -> {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
+                    Island island = gridHandler.getIslandAt(player.getLocation(wrapper.getHandle()));
+                    superiorPlayer.updateWorldBorder(island);
+                    if (island != null) island.applyEffects(superiorPlayer);
+                }
             }
-        }
+        }, 1L);
 
         CalcTask.startTask();
 
