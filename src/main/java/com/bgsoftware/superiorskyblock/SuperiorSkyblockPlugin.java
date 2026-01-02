@@ -321,7 +321,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                             island.setPlayerInside(superiorPlayer, true);
                     }
                 }
-            }, 5L); // Delay to allow other systems to initialize first
+            }, 1L);
 
             PluginEventsFactory.callPluginInitializedEvent();
 
@@ -482,7 +482,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             gridHandler.loadData();
             schematicsHandler.loadData();
         } else {
-            BukkitExecutor.sync(gridHandler::updateSpawn, 1L);
+            gridHandler.updateSpawn();
             gridHandler.syncUpgrades();
             schematicsHandler.loadSchematics();
         }
@@ -495,52 +495,16 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             stackedBlocksHandler.loadData();
         }
 
-        // Cache schematics asynchronously to avoid blocking startup
-        BukkitExecutor.async(() -> {
-            // Prepare cached schematics in async thread
-            if (!plugin.getSettings().isCacheSchematics() || plugin.getSettings().getMaxIslandSize() % 4 != 0 || true)
-                return;
-
-            // Read current schematics (thread-safe read from unmodifiable map)
-            Map<String, Schematic> currentSchematics = schematicsHandler.getSchematicsContainer().getSchematics();
-            List<Schematic> newSchematics = new ArrayList<>(currentSchematics.size());
-            boolean cachedSchematic = false;
-
-            for (Schematic schematic : currentSchematics.values()) {
-                if (schematic instanceof SuperiorSchematic) {
-                    try {
-                        schematic = new CachedSuperiorSchematic((SuperiorSchematic) schematic);
-                        cachedSchematic = true;
-                    } catch (Throwable error) {
-                        Log.warn("Cannot cache schematic ", schematic.getName(), ", skipping...");
-                    }
-                }
-                newSchematics.add(schematic);
-            }
-
-            if (!cachedSchematic)
-                return;
-
-            // Update container in sync thread for thread safety
-            List<Schematic> finalSchematics = newSchematics;
-            BukkitExecutor.sync(() -> {
-                schematicsHandler.getSchematicsContainer().clearSchematics();
-                finalSchematics.forEach(schematicsHandler.getSchematicsContainer()::addSchematic);
-            });
-        });
-
         modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_MODULE_DATA_LOAD, reloadReason == PluginReloadReason.COMMAND);
 
-        BukkitExecutor.sync(() -> {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
-                    Island island = gridHandler.getIslandAt(player.getLocation(wrapper.getHandle()));
-                    superiorPlayer.updateWorldBorder(island);
-                    if (island != null) island.applyEffects(superiorPlayer);
-                }
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
+                Island island = gridHandler.getIslandAt(player.getLocation(wrapper.getHandle()));
+                superiorPlayer.updateWorldBorder(island);
+                if (island != null) island.applyEffects(superiorPlayer);
             }
-        }, 1L); // Delay to avoid blocking reload
+        }
 
         CalcTask.startTask();
 
