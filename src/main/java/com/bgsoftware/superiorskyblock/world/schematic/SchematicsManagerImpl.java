@@ -154,6 +154,9 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             throw new ManagerLoadException("&cThere were no valid schematics.",
                     ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
+
+        // Force garbage collection to release file handles on Windows
+        System.gc();
     }
 
     public void cacheSchematics() {
