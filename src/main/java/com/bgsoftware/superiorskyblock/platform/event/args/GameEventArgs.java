@@ -385,6 +385,12 @@ public class GameEventArgs implements IEventArgs {
 
     }
 
+    public static class BlockUpdateShapeEvent extends BlockEvent {
+
+        public BlockState oldState;
+
+    }
+
     private static class BlockEvent extends GameEventArgs {
 
         public Block block;

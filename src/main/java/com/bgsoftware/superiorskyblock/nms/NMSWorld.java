@@ -70,6 +70,8 @@ public interface NMSWorld {
 
     void setOceanLevel(World world);
 
+    void listenBlockStateChanges(World world);
+
     IslandsGenerator createGenerator(Dimension dimension);
 
     WorldEditSession createEditSession(World world);

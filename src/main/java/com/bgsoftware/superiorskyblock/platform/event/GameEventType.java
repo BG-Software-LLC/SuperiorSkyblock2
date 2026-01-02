@@ -20,6 +20,7 @@ import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.BlockPlaceEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.BlockRedstoneEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.BlockSpreadEvent;
+import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.BlockUpdateShapeEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.ChunkLoadEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.ChunkUnloadEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntityBlockFormEvent;
@@ -86,6 +87,7 @@ public class GameEventType<Args extends IEventArgs> extends EventType<Args, Game
     public static final GameEventType<BlockPlaceEvent> BLOCK_PLACE_EVENT = register(BlockPlaceEvent.class);
     public static final GameEventType<BlockRedstoneEvent> BLOCK_REDSTONE_EVENT = register(BlockRedstoneEvent.class);
     public static final GameEventType<BlockSpreadEvent> BLOCK_SPREAD_EVENT = register(BlockSpreadEvent.class);
+    public static final GameEventType<BlockUpdateShapeEvent> BLOCK_UPDATE_SHAPE_EVENT = register(BlockUpdateShapeEvent.class);
     public static final GameEventType<LeavesDecayEvent> LEAVES_DECAY_EVENT = register(LeavesDecayEvent.class);
     public static final GameEventType<PistonExtendEvent> PISTON_EXTEND_EVENT = register(PistonExtendEvent.class);
     public static final GameEventType<PistonRetractEvent> PISTON_RETRACT_EVENT = register(PistonRetractEvent.class);

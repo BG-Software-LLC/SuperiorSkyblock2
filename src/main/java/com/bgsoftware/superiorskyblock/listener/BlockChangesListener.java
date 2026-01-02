@@ -50,16 +50,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
     @Nullable
     private static final Material CHORUS_FLOWER = EnumHelper.getEnum(Material.class, "CHORUS_FLOWER");
     @Nullable
-    private static final Material BAMBOO = EnumHelper.getEnum(Material.class, "BAMBOO");
-    @Nullable
-    private static final Material BAMBOO_SAPLING = EnumHelper.getEnum(Material.class, "BAMBOO_SAPLING");
-    @Nullable
     private static final CreatureSpawnEvent.SpawnReason BUILD_COPPERGOLEM = EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "BUILD_COPPERGOLEM");
 
     @WorldRecordFlags
     private static final int REGULAR_RECORD_FLAGS = WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS;
-    @WorldRecordFlags
-    private static final int ALL_RECORD_FLAGS = REGULAR_RECORD_FLAGS | WorldRecordFlags.HANDLE_NEARBY_BLOCKS;
 
     static {
         for (Material material : Material.values()) {
@@ -199,15 +193,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
                     alreadyChorusFlowerTracked.add(spreadBlockLocation.clone());
                 }
             }
-        } else if (newStateType == BAMBOO && sourceType == BAMBOO_SAPLING) {
-            // Bamboo saplings are turned into a bamboo.
-            // We want to record an additional block place for that sapling.
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                this.worldRecordService.get().recordBlockPlace(ConstantKeys.BAMBOO,
-                        block.getLocation(wrapper.getHandle()),
-                        1, source.getState(), REGULAR_RECORD_FLAGS);
-
-            }
         }
 
         if (spreadBlock == null) {
@@ -218,7 +203,31 @@ public class BlockChangesListener extends AbstractGameEventListener {
             this.worldRecordService.get().recordBlockPlace(spreadBlock,
                     block.getLocation(wrapper.getHandle()),
                     1, block.getState(), REGULAR_RECORD_FLAGS);
+        }
+    }
 
+    private void onBlockShapeUpdate(GameEvent<GameEventArgs.BlockUpdateShapeEvent> e) {
+        Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
+        Key newStateKey = Keys.of(block);
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location blockLocation = block.getLocation(wrapper.getHandle());
+
+            if (newStateKey.equals(ConstantKeys.AIR)) {
+                // New state is AIR, so this is a block break
+                Key oldStateKey = Keys.of(e.getArgs().oldState);
+                this.worldRecordService.get().recordBlockBreak(oldStateKey, blockLocation,
+                        1, REGULAR_RECORD_FLAGS);
+            } else {
+                this.worldRecordService.get().recordBlockPlace(newStateKey,
+                        block.getLocation(wrapper.getHandle()),
+                        1, e.getArgs().oldState, REGULAR_RECORD_FLAGS);
+            }
         }
     }
 
@@ -300,12 +309,12 @@ public class BlockChangesListener extends AbstractGameEventListener {
             if (!oldBlockKey.equals(ConstantKeys.AIR)) {
                 this.worldRecordService.get().recordBlockBreak(oldBlockKey, blockLocation,
                         plugin.getNMSWorld().getDefaultAmount(block),
-                        ALL_RECORD_FLAGS);
+                        REGULAR_RECORD_FLAGS);
             }
 
             if (!newBlockKey.equals(ConstantKeys.AIR)) {
                 this.worldRecordService.get().recordBlockPlace(newBlockKey, blockLocation, 1,
-                        null, ALL_RECORD_FLAGS);
+                        null, REGULAR_RECORD_FLAGS);
             }
         }
     }
@@ -319,7 +328,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
         if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
             return;
 
-        this.worldRecordService.get().recordBlockBreak(block, ALL_RECORD_FLAGS);
+        this.worldRecordService.get().recordBlockBreak(block, REGULAR_RECORD_FLAGS);
     }
 
     private void onBucketFill(GameEvent<GameEventArgs.PlayerFillBucketEvent> e) {
@@ -531,6 +540,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
         registerCallback(GameEventType.BLOCK_GROW_EVENT, GameEventPriority.MONITOR, this::onBlockGrow);
         registerCallback(GameEventType.BLOCK_FORM_EVENT, GameEventPriority.MONITOR, this::onBlockForm);
         registerCallback(GameEventType.BLOCK_SPREAD_EVENT, GameEventPriority.MONITOR, this::onBlockSpread);
+        registerCallback(GameEventType.BLOCK_UPDATE_SHAPE_EVENT, GameEventPriority.MONITOR, this::onBlockShapeUpdate);
         registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.MONITOR, this::onSpawnerChange);
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.MONITOR, this::onEntityChangeBlock);
         registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.MONITOR, this::onBlockBreak);

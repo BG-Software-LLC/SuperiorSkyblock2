@@ -3,11 +3,11 @@ package com.bgsoftware.superiorskyblock.external.worlds;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.IWorldLoadListener;
+import com.bgsoftware.superiorskyblock.api.hooks.world.WorldLoadFlags;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
-import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
@@ -25,28 +25,29 @@ import org.bukkit.WorldType;
 import org.bukkit.block.BlockFace;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 public class WorldsProvider_Default implements WorldsProvider {
 
+    @WorldLoadFlags
+    private static final int SUPPORTED_LOAD_FLAGS = WorldLoadFlags.END_DRAGON_FIGHT | WorldLoadFlags.REMOVE_ANTI_XRAY |
+            WorldLoadFlags.UPDATE_OCEAN_LEVEL | WorldLoadFlags.LISTEN_BLOCK_CHANGES;
+
     private final Set<BlockPosition> servedPositions = Sets.newHashSet();
     private final EnumerateMap<Dimension, World> islandWorlds = new EnumerateMap<>(Dimension.values());
     private final Map<UUID, Dimension> islandWorldsToDimensions = new HashMap<>();
+    private final List<IWorldLoadListener> worldLoadListenerList = new LinkedList<>();
     private final SuperiorSkyblockPlugin plugin;
 
     private World islandsWorld;
 
-    private final LazyReference<DragonBattleService> dragonBattleService = new LazyReference<DragonBattleService>() {
-        @Override
-        protected DragonBattleService create() {
-            return plugin.getServices().getService(DragonBattleService.class);
-        }
-    };
-
     public WorldsProvider_Default(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+        this.worldLoadListenerList.add(DefaultWorldLoadListener.INSTANCE);
     }
 
     @Override
@@ -57,11 +58,6 @@ public class WorldsProvider_Default implements WorldsProvider {
             if (dimensionConfig != null && dimensionConfig.isEnabled()) {
                 String worldName = dimensionConfig.getName();
                 World world = loadWorld(worldName, difficulty, dimension);
-                if (dimension.getEnvironment() == World.Environment.THE_END &&
-                        dimensionConfig instanceof SettingsManager.Worlds.End &&
-                        ((SettingsManager.Worlds.End) dimensionConfig).isDragonFight()) {
-                    dragonBattleService.get().prepareEndWorld(world);
-                }
                 if (dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension())
                     this.islandsWorld = world;
             }
@@ -162,6 +158,17 @@ public class WorldsProvider_Default implements WorldsProvider {
         return dimensionConfig != null && dimensionConfig.isEnabled() && dimensionConfig.isUnlocked();
     }
 
+    @Override
+    public void addWorldLoadListener(IWorldLoadListener worldLoadListener) {
+        Preconditions.checkNotNull(worldLoadListener, "worldLoadListener parameter cannot be null");
+        this.worldLoadListenerList.add(worldLoadListener);
+    }
+
+    private void notifyWorldLoadListeners(World world, Dimension worldDimension) {
+        for (IWorldLoadListener worldLoadListener : this.worldLoadListenerList)
+            worldLoadListener.onWorldLoad(world, worldDimension, SUPPORTED_LOAD_FLAGS);
+    }
+
     private BlockFace getIslandFace(BlockPosition blockPosition) {
         //Possibilities: North / East
         if (blockPosition.getX() >= blockPosition.getZ()) {
@@ -190,8 +197,7 @@ public class WorldsProvider_Default implements WorldsProvider {
         islandWorlds.put(dimension, world);
         islandWorldsToDimensions.put(world.getUID(), dimension);
 
-        plugin.getNMSWorld().removeAntiXray(world);
-        plugin.getNMSWorld().setOceanLevel(world);
+        notifyWorldLoadListeners(world, dimension);
 
         if (Bukkit.getPluginManager().isPluginEnabled("Multiverse-Core")) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv import " + worldName + " normal -g " + plugin.getName());

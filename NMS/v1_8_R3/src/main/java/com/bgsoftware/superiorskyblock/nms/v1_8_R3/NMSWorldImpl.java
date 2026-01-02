@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.island.signs.IslandSigns;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
@@ -56,6 +57,8 @@ public class NMSWorldImpl implements NMSWorld {
 
     private static final ReflectField<MobSpawnerAbstract> MOB_SPAWNER_ABSTRACT = new ReflectField<MobSpawnerAbstract>(
             TileEntityMobSpawner.class, MobSpawnerAbstract.class, Modifier.PRIVATE | Modifier.FINAL, 1).removeFinal();
+
+    private static boolean alreadyWarned = false;
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -343,6 +346,14 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public ChunkReader createChunkReader(Chunk chunk) {
         return new ChunkReaderImpl(chunk);
+    }
+
+    @Override
+    public void listenBlockStateChanges(org.bukkit.World world) {
+        if (!alreadyWarned) {
+            Log.warn("This version is old and you may experience issues with block changes detection");
+            alreadyWarned = true;
+        }
     }
 
 }

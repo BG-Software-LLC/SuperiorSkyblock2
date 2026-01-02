@@ -49,6 +49,7 @@ import com.bgsoftware.superiorskyblock.external.spawners.SpawnersProvider_Defaul
 import com.bgsoftware.superiorskyblock.external.stackedblocks.StackedBlocksProvider_AutoDetect;
 import com.bgsoftware.superiorskyblock.external.stackedblocks.StackedBlocksProvider_Default;
 import com.bgsoftware.superiorskyblock.external.vanish.VanishProvider_Default;
+import com.bgsoftware.superiorskyblock.external.worlds.DefaultWorldLoadListener;
 import com.bgsoftware.superiorskyblock.external.worlds.WorldsProvider_Default;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import com.google.common.base.Preconditions;
@@ -87,6 +88,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private VanishProvider vanishProvider = new VanishProvider_Default();
     private AsyncProvider asyncProvider = new AsyncProvider_Default();
     private WorldsProvider worldsProvider;
+    private boolean isCustomWorldsProvider;
     private ChunksProvider chunksProvider = new ChunksProvider_Default();
     private MenusProvider menusProvider;
     private boolean listenToSpawnerChanges = true;
@@ -106,7 +108,12 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     public ProvidersManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
         this.worldsProvider = new WorldsProvider_Default(plugin);
+        this.isCustomWorldsProvider = false;
         this.menusProvider = new MenusProvider_Default(plugin);
+    }
+
+    private void hookDefaultWorldLoadCallbacks() {
+
     }
 
     @Override
@@ -185,6 +192,8 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     public void setWorldsProvider(WorldsProvider worldsProvider) {
         Preconditions.checkNotNull(worldsProvider, "worldsProvider parameter cannot be null.");
         this.worldsProvider = worldsProvider;
+        this.worldsProvider.addWorldLoadListener(DefaultWorldLoadListener.INSTANCE);
+        this.isCustomWorldsProvider = !(worldsProvider instanceof WorldsProvider_Default);
         PluginEventsFactory.callWorldsProviderUpdateEvent();
     }
 
@@ -416,7 +425,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     }
 
     public boolean hasCustomWorldsSupport() {
-        return !(worldsProvider instanceof WorldsProvider_Default);
+        return this.isCustomWorldsProvider;
     }
 
     public boolean isAFK(Player player) {
