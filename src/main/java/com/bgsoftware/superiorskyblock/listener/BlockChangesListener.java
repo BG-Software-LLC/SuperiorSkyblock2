@@ -22,7 +22,6 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
-import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -323,16 +322,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
         this.worldRecordService.get().recordBlockBreak(block, ALL_RECORD_FLAGS);
     }
 
-    private void onBlockDestroy(GameEvent<GameEventArgs.BlockDestroyEvent> e) {
-        Block block = e.getArgs().block;
-
-        // We do not care about spawn island, and therefore only island worlds are relevant.
-        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
-            return;
-
-        this.worldRecordService.get().recordBlockBreak(block, WorldRecordFlags.DIRTY_CHUNKS);
-    }
-
     private void onBucketFill(GameEvent<GameEventArgs.PlayerFillBucketEvent> e) {
         Block clickedBlock = e.getArgs().clickedBlock;
 
@@ -560,7 +549,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
         registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.MONITOR, this::onSpawnerChange);
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.MONITOR, this::onEntityChangeBlock);
         registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.MONITOR, this::onBlockBreak);
-        registerCallback(GameEventType.BLOCK_DESTROY_EVENT, GameEventPriority.MONITOR, this::onBlockDestroy);
         registerCallback(GameEventType.PLAYER_FILL_BUCKET_EVENT, GameEventPriority.MONITOR, this::onBucketFill);
         registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.MONITOR, this::onEntitySpawn);
         registerCallback(GameEventType.PISTON_EXTEND_EVENT, GameEventPriority.MONITOR, this::onPistonExtend);

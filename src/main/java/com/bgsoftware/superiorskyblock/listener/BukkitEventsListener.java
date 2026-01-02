@@ -200,12 +200,6 @@ public class BukkitEventsListener implements Listener {
         }
 
         try {
-            Class.forName("com.destroystokyo.paper.event.block.BlockDestroyEvent");
-            createEventListener(GameEventType.BLOCK_DESTROY_EVENT, com.destroystokyo.paper.event.block.BlockDestroyEvent.class, new BlockDestroyEventFunction());
-        } catch (ClassNotFoundException ignored) {
-        }
-
-        try {
             Class.forName("com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent");
             createEventListener(GameEventType.ENTITY_DEATH_EVENT, com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent.class, new EntityRemoveFromWorldEventFunction());
         } catch (ClassNotFoundException ignored) {
@@ -890,19 +884,6 @@ public class BukkitEventsListener implements Listener {
             spongeAbsorbEvent.block = e.getBlock();
             spongeAbsorbEvent.blocks = e.getBlocks();
             return eventType.createEvent(spongeAbsorbEvent);
-        }
-    }
-
-    private static class BlockDestroyEventFunction implements GameEventCreator<GameEventArgs.BlockDestroyEvent, com.destroystokyo.paper.event.block.BlockDestroyEvent> {
-
-        @Override
-        public GameEvent<GameEventArgs.BlockDestroyEvent> execute(GameEventType<GameEventArgs.BlockDestroyEvent> eventType, GameEventPriority priority, com.destroystokyo.paper.event.block.BlockDestroyEvent e) {
-            if (e.getNewState().getMaterial() != Material.AIR)
-                return null;
-
-            GameEventArgs.BlockDestroyEvent blockDestroyEvent = new GameEventArgs.BlockDestroyEvent();
-            blockDestroyEvent.block = e.getBlock();
-            return eventType.createEvent(blockDestroyEvent);
         }
     }
 

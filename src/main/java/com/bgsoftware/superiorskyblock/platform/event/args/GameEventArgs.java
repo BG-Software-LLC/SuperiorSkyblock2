@@ -213,10 +213,6 @@ public class GameEventArgs implements IEventArgs {
 
     }
 
-    public static class BlockDestroyEvent extends BlockEvent {
-
-    }
-
     public static class EntityDeathEvent extends EntityEvent {
 
     }
