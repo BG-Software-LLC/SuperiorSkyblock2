@@ -11,8 +11,6 @@ import org.bukkit.World;
 
 public class DefaultWorldLoadListener implements IWorldLoadListener {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
     private final LazyReference<DragonBattleService> dragonBattleService = new LazyReference<DragonBattleService>() {
         @Override
         protected DragonBattleService create() {
@@ -20,10 +18,10 @@ public class DefaultWorldLoadListener implements IWorldLoadListener {
         }
     };
 
-    public static final DefaultWorldLoadListener INSTANCE = new DefaultWorldLoadListener();
+    private final SuperiorSkyblockPlugin plugin;
 
-    private DefaultWorldLoadListener() {
-
+    public DefaultWorldLoadListener(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
     }
 
     @Override

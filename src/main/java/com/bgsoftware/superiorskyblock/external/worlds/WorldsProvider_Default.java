@@ -47,7 +47,6 @@ public class WorldsProvider_Default implements WorldsProvider {
 
     public WorldsProvider_Default(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        this.worldLoadListenerList.add(DefaultWorldLoadListener.INSTANCE);
     }
 
     @Override

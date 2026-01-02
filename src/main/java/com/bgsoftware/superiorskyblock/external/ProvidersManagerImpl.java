@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.api.hooks.VanishProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.ISkinsListener;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.IWorldLoadListener;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IWorldsListener;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -80,7 +81,6 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private List<Runnable> pricesLoadCallbacks = new LinkedList<>();
     private SpawnersProvider spawnersProvider = new SpawnersProvider_Default();
     private StackedBlocksProvider stackedBlocksProvider = new StackedBlocksProvider_Default();
-    private List<EntitiesProvider> entitiesProviders = new LinkedList<>();
     private EconomyProvider economyProvider = new EconomyProvider_Default();
     private EconomyProvider bankEconomyProvider = new EconomyProvider_Default();
     private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
@@ -104,16 +104,14 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private final List<IStackedBlocksListener> stackedBlocksListeners = new LinkedList<>();
     private final List<IWorldsListener> worldsListeners = new LinkedList<>();
     private final List<ICustomBlocksProvider> customBlocksProviders = new LinkedList<>();
+    private final List<EntitiesProvider> entitiesProviders = new LinkedList<>();
+
+    private final IWorldLoadListener DEFAULT_WORLD_LOAD_LISTENER = new DefaultWorldLoadListener(plugin);
 
     public ProvidersManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
-        this.worldsProvider = new WorldsProvider_Default(plugin);
-        this.isCustomWorldsProvider = false;
+        setWorldsProviderInternal(new WorldsProvider_Default(plugin));
         this.menusProvider = new MenusProvider_Default(plugin);
-    }
-
-    private void hookDefaultWorldLoadCallbacks() {
-
     }
 
     @Override
@@ -191,10 +189,14 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     @Override
     public void setWorldsProvider(WorldsProvider worldsProvider) {
         Preconditions.checkNotNull(worldsProvider, "worldsProvider parameter cannot be null.");
-        this.worldsProvider = worldsProvider;
-        this.worldsProvider.addWorldLoadListener(DefaultWorldLoadListener.INSTANCE);
-        this.isCustomWorldsProvider = !(worldsProvider instanceof WorldsProvider_Default);
+        setWorldsProviderInternal(worldsProvider);
         PluginEventsFactory.callWorldsProviderUpdateEvent();
+    }
+
+    private void setWorldsProviderInternal(WorldsProvider worldsProvider) {
+        this.worldsProvider = worldsProvider;
+        this.worldsProvider.addWorldLoadListener(DEFAULT_WORLD_LOAD_LISTENER);
+        this.isCustomWorldsProvider = !(worldsProvider instanceof WorldsProvider_Default);
     }
 
     @Override
