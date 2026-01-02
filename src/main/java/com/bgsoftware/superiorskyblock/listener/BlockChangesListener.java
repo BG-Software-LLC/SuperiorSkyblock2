@@ -51,8 +51,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
     @Nullable
     private static final Material CHORUS_FLOWER = EnumHelper.getEnum(Material.class, "CHORUS_FLOWER");
     @Nullable
-    private static final Material POINTED_DRIPSTONE = EnumHelper.getEnum(Material.class, "POINTED_DRIPSTONE");
-    @Nullable
     private static final Material BAMBOO = EnumHelper.getEnum(Material.class, "BAMBOO");
     @Nullable
     private static final Material BAMBOO_SAPLING = EnumHelper.getEnum(Material.class, "BAMBOO_SAPLING");
@@ -499,7 +497,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
         e.getArgs().blocks.forEach(block -> {
             Material blockType = block.getType();
             // Soft explosions only break chorus flowers and pointed drip-stones
-            if (e.getArgs().isSoftExplosion && blockType != CHORUS_FLOWER && blockType != POINTED_DRIPSTONE)
+            if (e.getArgs().isSoftExplosion && blockType != CHORUS_FLOWER)
                 return;
 
             Key blockKey = Keys.of(block);
