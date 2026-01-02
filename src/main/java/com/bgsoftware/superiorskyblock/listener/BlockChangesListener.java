@@ -53,6 +53,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
     @Nullable
     private static final Material POINTED_DRIPSTONE = EnumHelper.getEnum(Material.class, "POINTED_DRIPSTONE");
     @Nullable
+    private static final Material BAMBOO = EnumHelper.getEnum(Material.class, "BAMBOO");
+    @Nullable
+    private static final Material BAMBOO_SAPLING = EnumHelper.getEnum(Material.class, "BAMBOO_SAPLING");
+    @Nullable
     private static final CreatureSpawnEvent.SpawnReason BUILD_COPPERGOLEM = EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "BUILD_COPPERGOLEM");
 
     @WorldRecordFlags
@@ -183,10 +187,12 @@ public class BlockChangesListener extends AbstractGameEventListener {
         Block source = e.getArgs().source;
         BlockState newState = e.getArgs().newState;
 
+        Material newStateType = newState.getType();
+        Material sourceType = source.getType();
 
         Key spreadBlock = null;
 
-        if (newState.getType() == CHORUS_FLOWER && source.getType() == CHORUS_FLOWER) {
+        if (newStateType == CHORUS_FLOWER && sourceType == CHORUS_FLOWER) {
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 Location spreadBlockLocation = source.getLocation(wrapper.getHandle());
                 // When a chorus flower grows, it is replaced with a flower plant and multiple new flowers can grow.
@@ -195,6 +201,15 @@ public class BlockChangesListener extends AbstractGameEventListener {
                     spreadBlock = ConstantKeys.CHORUS_PLANT;
                     alreadyChorusFlowerTracked.add(spreadBlockLocation.clone());
                 }
+            }
+        } else if (newStateType == BAMBOO && sourceType == BAMBOO_SAPLING) {
+            // Bamboo saplings are turned into a bamboo.
+            // We want to record an additional block place for that sapling.
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                this.worldRecordService.get().recordBlockPlace(ConstantKeys.BAMBOO,
+                        block.getLocation(wrapper.getHandle()),
+                        1, source.getState(), REGULAR_RECORD_FLAGS);
+
             }
         }
 

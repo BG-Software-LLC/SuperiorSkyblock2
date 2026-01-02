@@ -13,6 +13,9 @@ public class ConstantKeys {
 
     public static final Key AIR = Keys.of(Material.AIR);
     @Nullable
+    public static final Key BAMBOO = Optional.ofNullable(EnumHelper.getEnum(Material.class, "BAMBOO"))
+            .map(Keys::of).orElse(null);
+    @Nullable
     public static final Key BASALT = Optional.ofNullable(EnumHelper.getEnum(Material.class, "BASALT"))
             .map(Keys::of).orElse(null);
     public static final Key CARVED_PUMPKIN = Keys.of(EnumHelper.getEnum(Material.class, "CARVED_PUMPKIN", "PUMPKIN"));
