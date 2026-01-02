@@ -502,21 +502,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
         }
     }
 
-    private void onChorusHit(GameEvent<GameEventArgs.ProjectileHitEvent> e) {
-        Entity entity = e.getArgs().entity;
-
-        // We do not care about spawn island, and therefore only island worlds are relevant.
-        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
-            return;
-
-        BukkitEntities.getPlayerSource(entity).ifPresent(shooter -> {
-            Block hitBlock = e.getArgs().hitBlock;
-            if (hitBlock != null && hitBlock.getType() == CHORUS_FLOWER) {
-                this.worldRecordService.get().recordBlockBreak(hitBlock, 1, REGULAR_RECORD_FLAGS);
-            }
-        });
-    }
-
     private void onSpongeAbsorb(GameEvent<GameEventArgs.SpongeAbsorbEvent> e) {
         Block block = e.getArgs().block;
 
@@ -556,7 +541,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
         registerCallback(GameEventType.BLOCK_FROM_TO_EVENT, GameEventPriority.MONITOR, this::onBlockFromTo);
         registerCallback(GameEventType.BLOCK_FADE_EVENT, GameEventPriority.MONITOR, this::onBlockFade);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.MONITOR, this::onEntityExplode);
-        registerCallback(GameEventType.PROJECTILE_HIT_EVENT, GameEventPriority.MONITOR, this::onChorusHit);
         registerCallback(GameEventType.SPONGE_ABSORB_EVENT, GameEventPriority.MONITOR, this::onSpongeAbsorb);
     }
 
