@@ -405,13 +405,19 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                 continue;
             }
 
-            if (data.getKeys(true).isEmpty())
-                continue;
+            boolean anyDataToWrite = !data.getKeys(true).isEmpty();
 
             File dataFile = new File(dataFolder, mission.getName() + ".yml");
+            boolean dataFileExists = dataFile.exists();
+
+            if (!anyDataToWrite) {
+                if (dataFileExists)
+                    dataFile.delete();
+                continue;
+            }
 
             try {
-                if (!dataFile.exists())
+                if (!dataFileExists)
                     dataFile.createNewFile();
                 synchronized (DATA_FOLDER_MUTEX) {
                     data.save(dataFile);
