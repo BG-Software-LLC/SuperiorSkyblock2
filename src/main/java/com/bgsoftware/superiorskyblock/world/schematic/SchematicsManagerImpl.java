@@ -37,6 +37,7 @@ import com.bgsoftware.superiorskyblock.world.schematic.impl.CachedSuperiorSchema
 import com.bgsoftware.superiorskyblock.world.schematic.impl.SuperiorSchematic;
 import com.bgsoftware.superiorskyblock.world.schematic.parser.DefaultSchematicParser;
 import com.google.common.base.Preconditions;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -51,11 +52,15 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -86,42 +91,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
         }
 
         loadDefaultSchematicParsers();
-
-        // Load schematics asynchronously during startup for better performance
-        loadSchematicsAsync();
-    }
-
-    private void loadSchematicsAsync() throws ManagerLoadException {
-        this.schematicsContainer.clearSchematics();
-
-        File schematicsFolder = new File(plugin.getDataFolder(), "schematics");
-        List<File> schematicFilesList = Files.listFolderFiles(schematicsFolder, false);
-
-        if (schematicFilesList.isEmpty()) {
-            throw new ManagerLoadException("&cThere were no valid schematics.",
-                    ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
-        }
-
-        // Load all schematics sequentially
-        List<Schematic> loadedSchematics = new ArrayList<>(schematicFilesList.size());
-        
-        for (File schemFile : schematicFilesList) {
-            String schemName = Files.getFileName(schemFile).toLowerCase(Locale.ENGLISH);
-            Schematic schematic = loadFromFile(schemName, schemFile);
-            if (schematic != null) {
-                loadedSchematics.add(schematic);
-            }
-        }
-
-        if (loadedSchematics.isEmpty()) {
-            throw new ManagerLoadException("&cThere were no valid schematics.",
-                    ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
-        }
-
-        // Batch add all loaded schematics
-        for (Schematic schematic : loadedSchematics) {
-            this.schematicsContainer.addSchematic(schematic);
-        }
+        loadSchematics();
     }
 
     public void loadSchematics() throws ManagerLoadException {
@@ -130,20 +100,54 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
         File schematicsFolder = new File(plugin.getDataFolder(), "schematics");
         List<File> schematicFilesList = Files.listFolderFiles(schematicsFolder, false);
 
-        // Load schematics sequentially for thread safety
-        List<Schematic> loadedSchematics = new ArrayList<>(schematicFilesList.size());
-        
-        for (File schemFile : schematicFilesList) {
-            String schemName = Files.getFileName(schemFile).toLowerCase(Locale.ENGLISH);
-            Schematic schematic = loadFromFile(schemName, schemFile);
-            if (schematic != null) {
-                loadedSchematics.add(schematic);
-            }
-        }
+        if (!schematicFilesList.isEmpty()) {
+            int schematicFilesCount = schematicFilesList.size();
+            List<Schematic> loadedSchematics = Collections.synchronizedList(new LinkedList<>());
 
-        // Batch add all loaded schematics
-        for (Schematic schematic : loadedSchematics) {
-            this.schematicsContainer.addSchematic(schematic);
+            CountDownLatch latch = new CountDownLatch(schematicFilesCount);
+
+            int threadCount = Math.min(schematicFilesCount, Runtime.getRuntime().availableProcessors() * 2);
+            ExecutorService loadService = Executors.newFixedThreadPool(threadCount,
+                    new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Load Schematic Worker #%d").build());
+
+            Log.info("Loading " + schematicFilesCount + " schematics using " + threadCount + " threads...");
+
+            try {
+                for (File schemFile : schematicFilesList) {
+                    loadService.submit(() -> {
+                        String schemName = Files.getFileName(schemFile).toLowerCase(Locale.ENGLISH);
+                        try {
+                            Schematic schematic = loadFromFile(schemName, schemFile);
+                            if (schematic != null) {
+                                loadedSchematics.add(schematic);
+                            }
+                        } catch (Throwable error) {
+                            Log.error(error, "An unexpected error occurred while loading schematic " + schemName);
+                        } finally {
+                            latch.countDown();
+
+                            long remaining = latch.getCount();
+                            if (remaining > 0 && remaining % 50 == 0) {
+                                Log.info("Schematic loading progress: " + (schematicFilesCount - remaining) + "/" + schematicFilesCount);
+                            }
+                        }
+                    });
+                }
+
+                latch.await();
+
+                loadService.shutdown();
+
+                Log.info("Successfully loaded " + loadedSchematics.size() + " schematics.");
+
+                for (Schematic schematic : loadedSchematics) {
+                    this.schematicsContainer.addSchematic(schematic);
+                }
+            } catch (InterruptedException e) {
+                Log.error("Schematic loading thread was interrupted.");
+                loadService.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
         }
 
         if (this.schematicsContainer.getSchematics().isEmpty()) {
