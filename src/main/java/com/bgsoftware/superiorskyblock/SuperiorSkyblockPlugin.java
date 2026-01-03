@@ -82,7 +82,6 @@ import com.bgsoftware.superiorskyblock.service.ServicesHandler;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.WorldGenerator;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
-import com.bgsoftware.superiorskyblock.world.entity.EntityCategories;
 import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
 import org.bstats.bukkit.Metrics;
@@ -272,15 +271,19 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             loadingStage = PluginLoadingStage.CHUNKS_PROVIDER_INITIALIZED;
 
-            if (updater.isOutdated()) {
-                Log.info("");
-                Log.info("A new version is available (v", updater.getLatestVersion(), ")!");
-                Log.info("Version's description: \"", updater.getVersionDescription(), "\"");
-                Log.info("");
-            }
+            // Check for updates asynchronously
+            BukkitExecutor.async(() -> {
+                if (updater.isOutdated()) {
+                    Log.info("");
+                    Log.info("A new version is available (v", updater.getLatestVersion(), ")!");
+                    Log.info("Version's description: \"", updater.getVersionDescription(), "\"");
+                    Log.info("");
+                }
+            });
 
             // Calculate the maximum amount of islands that fit into the world.
-            if (calculateMaxPossibleIslands() < 1000) {
+            long maxIslands = calculateMaxPossibleIslands();
+            if (maxIslands < 1000) {
                 Log.warn("It seems like you configured your max-world-size in server.properties to be a small number (", nmsAlgorithms.getMaxWorldSize(), ").");
                 Log.warn("This can lead to weird behaviors when new islands are generated beyond this limit.");
                 Log.warn("Increase the value to for better experience (Default: 29999984)");
