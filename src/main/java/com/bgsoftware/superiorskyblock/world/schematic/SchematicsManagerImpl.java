@@ -160,7 +160,6 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
     }
 
     public void cacheSchematics() {
-        // Skip caching if disabled or invalid island size
         if (!plugin.getSettings().isCacheSchematics() || plugin.getSettings().getMaxIslandSize() % 4 != 0 || true)
             return;
 
@@ -187,14 +186,12 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
     }
 
     private void loadDefaultSchematicParsers() {
-        // Load FAWE parser synchronously to avoid race conditions
         if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
             try {
                 Class.forName("com.boydti.fawe.object.schematic.Schematic");
                 SchematicParser schematicParser = (SchematicParser) Class.forName("com.bgsoftware.superiorskyblock.world.schematic.parser.FAWESchematicParser").newInstance();
                 this.schematicsContainer.addSchematicParser(schematicParser);
             } catch (Exception ignored) {
-                // FAWE parser not available, use default
             }
         }
     }

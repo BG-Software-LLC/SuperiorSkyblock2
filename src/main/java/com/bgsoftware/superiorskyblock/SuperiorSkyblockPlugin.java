@@ -296,30 +296,32 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 Log.warn("Increase the value to for better experience (Default: 29999984)");
             }
 
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
-                    superiorPlayer.updateLastTimeStatus();
+            BukkitExecutor.sync(() -> {
+                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
+                        superiorPlayer.updateLastTimeStatus();
 
-                    Island island = gridHandler.getIslandAt(player.getLocation(wrapper.getHandle()));
-                    Island playerIsland = superiorPlayer.getIsland();
+                        Island island = gridHandler.getIslandAt(player.getLocation(wrapper.getHandle()));
+                        Island playerIsland = superiorPlayer.getIsland();
 
-                    if (superiorPlayer.hasIslandFlyEnabled()) {
-                        if (island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
-                            player.setAllowFlight(true);
-                            player.setFlying(true);
-                        } else {
-                            superiorPlayer.toggleIslandFly();
+                        if (superiorPlayer.hasIslandFlyEnabled()) {
+                            if (island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
+                                player.setAllowFlight(true);
+                                player.setFlying(true);
+                            } else {
+                                superiorPlayer.toggleIslandFly();
+                            }
                         }
+
+                        if (playerIsland != null)
+                            playerIsland.setCurrentlyActive(true);
+
+                        if (island != null)
+                            island.setPlayerInside(superiorPlayer, true);
                     }
-
-                    if (playerIsland != null)
-                        playerIsland.setCurrentlyActive(true);
-
-                    if (island != null)
-                        island.setPlayerInside(superiorPlayer, true);
                 }
-            }
+            }, 1L);
 
             PluginEventsFactory.callPluginInitializedEvent();
 
