@@ -9,7 +9,6 @@ import com.bgsoftware.common.nmsloader.config.NMSConfiguration;
 import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
-import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
@@ -83,11 +82,8 @@ import com.bgsoftware.superiorskyblock.service.ServicesHandler;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.WorldGenerator;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
-import com.bgsoftware.superiorskyblock.world.entity.EntityCategories;
 import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
-import com.bgsoftware.superiorskyblock.world.schematic.impl.CachedSuperiorSchematic;
-import com.bgsoftware.superiorskyblock.world.schematic.impl.SuperiorSchematic;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -95,10 +91,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 
 public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
