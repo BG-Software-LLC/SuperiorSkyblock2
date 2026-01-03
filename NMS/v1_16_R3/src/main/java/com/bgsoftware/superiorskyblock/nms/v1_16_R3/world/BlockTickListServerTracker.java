@@ -17,6 +17,7 @@ import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlockState;
 
 import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class BlockTickListServerTracker {
@@ -50,7 +51,16 @@ public class BlockTickListServerTracker {
         IBlockData blockState = worldServer.getType(blockPosition);
         if (blockState.a(nextTickData.b())) {
             IBlockData oldData = worldServer.getType(blockPosition);
-            blockState.a(worldServer, blockPosition, worldServer.random);
+            try {
+                plugin.getGameEventsDispatcher().startCaptureEvents();
+                blockState.a(worldServer, blockPosition, worldServer.random);
+            } finally {
+                List<GameEvent<?>> capturedEvents = plugin.getGameEventsDispatcher().stopCaptureEvents();
+                // We don't want to fire the BlockUpdateShapeEvent if another event was fired in that tick.
+                // This is to prevent blocks from being considered updated twice.
+                if (!capturedEvents.isEmpty())
+                    return;
+            }
             IBlockData newData = worldServer.getType(blockPosition);
             if (oldData.getBlock() != newData.getBlock()) {
                 // Block was changed, let's call an update

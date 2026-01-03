@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_19.world;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventFlags;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
@@ -13,6 +14,7 @@ import net.minecraft.world.ticks.LevelTicks;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlockStates;
 
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
@@ -35,7 +37,19 @@ public class BlockLevelTicksTracker extends LevelTicks<Block> {
     public void tick(long gameTime, int maxAllowedTicks, BiConsumer<BlockPos, Block> ticker) {
         super.tick(gameTime, maxAllowedTicks, (blockPos, block) -> {
             BlockState oldState = this.serverLevel.getBlockState(blockPos);
-            ticker.accept(blockPos, block);
+            try {
+                // Only capture blocks related events
+                plugin.getGameEventsDispatcher().startCaptureEvents(GameEventFlags.BLOCK_EVENT | GameEventFlags.MAYBE_BLOCK_EVENT);
+                ticker.accept(blockPos, block);
+            } finally {
+                List<GameEvent<?>> capturedEvents = plugin.getGameEventsDispatcher().stopCaptureEvents();
+                // Remove BlockPhysicsEvent which we don't listen to
+                capturedEvents.removeIf(gameEvent -> gameEvent.getType() == GameEventType.BLOCK_PHYSICS_EVENT);
+                // We don't want to fire the BlockUpdateShapeEvent if another event was fired in the tick method.
+                // This is to prevent blocks from being considered updated twice.
+                if (!capturedEvents.isEmpty())
+                    return;
+            }
             BlockState newState = this.serverLevel.getBlockState(blockPos);
             if (oldState.getBlock() != newState.getBlock()) {
                 // Block was changed, let's call an update

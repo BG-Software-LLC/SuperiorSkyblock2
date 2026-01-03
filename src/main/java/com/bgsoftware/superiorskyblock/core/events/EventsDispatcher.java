@@ -18,6 +18,8 @@ public class EventsDispatcher<L, T extends EventType<?, ?>, P extends Enum<P>, E
     protected final SuperiorSkyblockPlugin plugin;
     protected final Class<P> priorityClass;
 
+    private List<E> capturedEvents = null;
+
     protected EventsDispatcher(SuperiorSkyblockPlugin plugin, Class<P> priorityClass, Collection<T> allTypes) {
         this.plugin = plugin;
         this.priorityClass = priorityClass;
@@ -32,6 +34,16 @@ public class EventsDispatcher<L, T extends EventType<?, ?>, P extends Enum<P>, E
 
     public void clearCallbacks() {
         this.callbacks.clear();
+    }
+
+    public void startCaptureEvents() {
+        this.capturedEvents = new LinkedList<>();
+    }
+
+    public List<E> stopCaptureEvents() {
+        List<E> capturedEvents = this.capturedEvents;
+        this.capturedEvents = null;
+        return capturedEvents;
     }
 
     public void onGameEvent(E event, P priority) {
@@ -55,6 +67,13 @@ public class EventsDispatcher<L, T extends EventType<?, ?>, P extends Enum<P>, E
                 }
             }
         }
+
+        if (this.capturedEvents != null && filterCapturedEvent(event))
+            this.capturedEvents.add(event);
+    }
+
+    protected boolean filterCapturedEvent(E event) {
+        return true;
     }
 
     public Map<P, List<EventCallback>> getCallbacks(T eventType) {
