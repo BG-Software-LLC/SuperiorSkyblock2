@@ -49,6 +49,12 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
     @Nullable
     private static final Material CHORUS_FLOWER = EnumHelper.getEnum(Material.class, "CHORUS_FLOWER");
+
+    @Nullable
+    private static final Material CLOSED_EYEBLOSSOM = EnumHelper.getEnum(Material.class, "CLOSED_EYEBLOSSOM");
+
+    @Nullable
+    private static final Material OPEN_EYEBLOSSOM = EnumHelper.getEnum(Material.class, "OPEN_EYEBLOSSOM");
     @Nullable
     private static final CreatureSpawnEvent.SpawnReason BUILD_COPPERGOLEM = EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "BUILD_COPPERGOLEM");
 
@@ -529,6 +535,38 @@ public class BlockChangesListener extends AbstractGameEventListener {
         }
     }
 
+    private void onGenericGame(GameEvent<GameEventArgs.GenericGameEvent> e) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().world))
+            return;
+
+        // We only care about block_change
+        if (!e.getArgs().gameEvent.equals("block_change"))
+            return;
+
+        Location blockLocation = e.getArgs().location;
+        Block block = blockLocation.getBlock();
+        Material blockType = block.getType();
+
+        Key newBlockKey;
+        Key oldBlockKey;
+
+        if (blockType == OPEN_EYEBLOSSOM) {
+            // OPEN_EYEBLOSSOM was changed, we want to remove CLOSED_EYEBLOSSOM and replace it with OPEN_EYEBLOSSOM
+            newBlockKey = ConstantKeys.OPEN_EYEBLOSSOM;
+            oldBlockKey = ConstantKeys.CLOSED_EYEBLOSSOM;
+        } else if (blockType == CLOSED_EYEBLOSSOM) {
+            // CLOSED_EYEBLOSSOM was changed, we want to remove OPEN_EYEBLOSSOM and replace it with CLOSED_EYEBLOSSOM
+            newBlockKey = ConstantKeys.CLOSED_EYEBLOSSOM;
+            oldBlockKey = ConstantKeys.OPEN_EYEBLOSSOM;
+        } else {
+            return;
+        }
+
+        worldRecordService.get().recordBlockPlace(newBlockKey, blockLocation, 1, null, 0);
+        worldRecordService.get().recordBlockBreak(oldBlockKey, blockLocation, 1, REGULAR_RECORD_FLAGS);
+    }
+
     /* INTERNAL */
 
     private void registerListeners() {
@@ -550,6 +588,9 @@ public class BlockChangesListener extends AbstractGameEventListener {
         registerCallback(GameEventType.BLOCK_FADE_EVENT, GameEventPriority.MONITOR, this::onBlockFade);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.MONITOR, this::onEntityExplode);
         registerCallback(GameEventType.SPONGE_ABSORB_EVENT, GameEventPriority.MONITOR, this::onSpongeAbsorb);
+
+        if (CLOSED_EYEBLOSSOM != null || OPEN_EYEBLOSSOM != null)
+            registerCallback(GameEventType.GENERIC_GAME_EVENT, GameEventPriority.MONITOR, this::onGenericGame);
     }
 
     @Nullable

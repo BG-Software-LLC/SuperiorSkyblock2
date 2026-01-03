@@ -236,6 +236,13 @@ public class BukkitEventsListener implements Listener {
             createEventListener(GameEventType.RAID_TRIGGER_EVENT, org.bukkit.event.raid.RaidTriggerEvent.class, new RaidTriggerEventFunctions());
         } catch (Exception ignored) {
         }
+
+
+        try {
+            Class genericGameEventClass = Class.forName("org.bukkit.event.world.GenericGameEvent");
+            createEventListener(GameEventType.GENERIC_GAME_EVENT, genericGameEventClass, plugin.getNMSAlgorithms().getGenericGameCreator());
+        } catch (Exception ignored) {
+        }
     }
 
     /*
@@ -859,7 +866,7 @@ public class BukkitEventsListener implements Listener {
         return itemStack;
     }
 
-    private interface GameEventCreator<Args extends IEventArgs, E extends Event> {
+    public interface GameEventCreator<Args extends IEventArgs, E extends Event> {
 
         @Nullable
         GameEvent<Args> execute(GameEventType<Args> eventType, GameEventPriority priority, E e);

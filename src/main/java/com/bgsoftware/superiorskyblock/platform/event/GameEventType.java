@@ -36,6 +36,7 @@ import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntitySpawnEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntityTargetEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntityTeleportEvent;
+import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.GenericGameEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.HangingBreakEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.HangingPlaceEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.InventoryClickEvent;
@@ -100,6 +101,7 @@ public class GameEventType<Args extends IEventArgs> extends EventType<Args, Game
     public static final GameEventType<ChunkUnloadEvent> CHUNK_UNLOAD_EVENT = register(ChunkUnloadEvent.class, GameEventFlags.GENERIC_WORLD_EVENT);
     public static final GameEventType<WorldUnloadEvent> WORLD_UNLOAD_EVENT = register(WorldUnloadEvent.class, GameEventFlags.GENERIC_WORLD_EVENT);
     public static final GameEventType<RaidTriggerEvent> RAID_TRIGGER_EVENT = register(RaidTriggerEvent.class, GameEventFlags.GENERIC_WORLD_EVENT | GameEventFlags.PLAYER_EVENT);
+    public static final GameEventType<GenericGameEvent> GENERIC_GAME_EVENT = register(GenericGameEvent.class, GameEventFlags.GENERIC_WORLD_EVENT | GameEventFlags.MAYBE_BLOCK_EVENT | GameEventFlags.MAYBE_ENTITY_EVENT);
 
     // Entity Events
     public static final GameEventType<EntityBlockFormEvent> ENTITY_BLOCK_FORM_EVENT = register(EntityBlockFormEvent.class, GameEventFlags.BLOCK_EVENT | GameEventFlags.ENTITY_EVENT);

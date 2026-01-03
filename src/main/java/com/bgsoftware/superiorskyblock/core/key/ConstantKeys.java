@@ -13,9 +13,6 @@ public class ConstantKeys {
 
     public static final Key AIR = Keys.of(Material.AIR);
     @Nullable
-    public static final Key BAMBOO = Optional.ofNullable(EnumHelper.getEnum(Material.class, "BAMBOO"))
-            .map(Keys::of).orElse(null);
-    @Nullable
     public static final Key BASALT = Optional.ofNullable(EnumHelper.getEnum(Material.class, "BASALT"))
             .map(Keys::of).orElse(null);
     public static final Key CARVED_PUMPKIN = Keys.of(EnumHelper.getEnum(Material.class, "CARVED_PUMPKIN", "PUMPKIN"));
@@ -23,6 +20,9 @@ public class ConstantKeys {
     public static final Key CHEST = Keys.of(Material.CHEST);
     @Nullable
     public static final Key CHORUS_PLANT = Optional.ofNullable(EnumHelper.getEnum(Material.class, "CHORUS_PLANT"))
+            .map(Keys::of).orElse(null);
+    @Nullable
+    public static final Key CLOSED_EYEBLOSSOM = Optional.ofNullable(EnumHelper.getEnum(Material.class, "CLOSED_EYEBLOSSOM"))
             .map(Keys::of).orElse(null);
     public static final Key COBBLESTONE = Keys.of(Material.COBBLESTONE);
     public static final Key COMMAND_BLOCK = Keys.of(EnumHelper.getEnum(Material.class, "COMMAND_BLOCK", "COMMAND"));
@@ -36,6 +36,9 @@ public class ConstantKeys {
     public static final Key LAVA = Keys.of(Material.LAVA);
     public static final Key MOB_SPAWNER = Keys.of(Materials.SPAWNER.toBukkitType());
     public static final Key OBSIDIAN = Keys.of(Material.OBSIDIAN);
+    @Nullable
+    public static final Key OPEN_EYEBLOSSOM = Optional.ofNullable(EnumHelper.getEnum(Material.class, "OPEN_EYEBLOSSOM"))
+            .map(Keys::of).orElse(null);
     public static final Key SNOW_BLOCK = Keys.of(Material.SNOW_BLOCK);
     public static final Key SOUL_SAND = Keys.of(Material.SOUL_SAND);
     public static final Key TNT = Keys.of(Material.TNT);

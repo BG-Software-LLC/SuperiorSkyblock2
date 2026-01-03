@@ -391,6 +391,13 @@ public class GameEventArgs implements IEventArgs {
 
     }
 
+    public static class GenericGameEvent extends WorldEvent {
+
+        public String gameEvent;
+        public Location location;
+
+    }
+
     private static class BlockEvent extends GameEventArgs {
 
         public Block block;
