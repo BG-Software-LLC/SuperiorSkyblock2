@@ -485,6 +485,9 @@ public class BlockChangesListener extends AbstractGameEventListener {
     }
 
     private void onEntityExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
+        if (e.getArgs().isSoftExplosion)
+            return;
+
         Entity entity = e.getArgs().entity;
 
         // We do not care about spawn island, and therefore only island worlds are relevant.
@@ -493,11 +496,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
         KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         e.getArgs().blocks.forEach(block -> {
-            Material blockType = block.getType();
-            // Soft explosions only break chorus flowers and pointed drip-stones
-            if (e.getArgs().isSoftExplosion && blockType != CHORUS_FLOWER)
-                return;
-
             Key blockKey = Keys.of(block);
             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
         });
