@@ -25,6 +25,13 @@ public interface PagedMenuTemplateButton<V extends MenuView<V, ?>, E> extends Me
     int getButtonIndex();
 
     /**
+     * Sets the index within the menu of this paged object button.
+     *
+     * @param buttonIndex The new index to set.
+     */
+    void setButtonIndex(int buttonIndex);
+
+    /**
      * Create a view-button object to be used by the provided menu view.
      * Unlike the template button, the view button handles the logic for buttons within the view.
      *

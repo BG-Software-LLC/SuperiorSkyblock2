@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
+import com.google.common.base.Preconditions;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -16,8 +17,8 @@ public class PagedMenuTemplateButtonImpl<V extends MenuView<V, ?>, E> extends Ab
     protected static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final TemplateItem nullItem;
-    private final int buttonIndex;
     private final PagedMenuViewButtonCreator<V, E> viewButtonCreator;
+    private int buttonIndex;
 
     public PagedMenuTemplateButtonImpl(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
                                        String requiredPermission, GameSound lackPermissionSound, TemplateItem nullItem,
@@ -40,6 +41,12 @@ public class PagedMenuTemplateButtonImpl<V extends MenuView<V, ?>, E> extends Ab
     @Override
     public int getButtonIndex() {
         return this.buttonIndex;
+    }
+
+    @Override
+    public void setButtonIndex(int buttonIndex) {
+        Preconditions.checkArgument(buttonIndex >= 0, "buttonIndex cannot be negative.");
+        this.buttonIndex = buttonIndex;
     }
 
     @Override
