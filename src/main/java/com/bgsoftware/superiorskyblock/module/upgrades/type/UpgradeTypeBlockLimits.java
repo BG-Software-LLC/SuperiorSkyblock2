@@ -138,9 +138,17 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
                 island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation(wrapper.getHandle()));
             }
 
-            if (island != null && island.hasReachedBlockLimit(newSpawnerKey)) {
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(newSpawnerKey.toString()));
-                return true;
+            if (island == null)
+                return false;
+
+            try {
+                island.handleBlockBreak(oldSpawnerKey, 1, 0);
+                if (island.hasReachedBlockLimit(newSpawnerKey)) {
+                    Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(newSpawnerKey.toString()));
+                    return true;
+                }
+            } finally {
+                island.handleBlockPlace(oldSpawnerKey, 1, 0);
             }
 
             return false;
