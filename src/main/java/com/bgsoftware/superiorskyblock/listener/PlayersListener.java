@@ -13,8 +13,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.ChatFormatter;
@@ -35,7 +33,6 @@ import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.player.permissions.PlayerPermissionsStore;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -253,6 +250,12 @@ public class PlayersListener extends AbstractGameEventListener {
         switch (moveResult) {
             case VOID_TELEPORT:
             case SUCCESS:
+                break;
+            case LEAVE_ISLAND_TO_OUTSIDE:
+                // Only cancel the event if player is not inside vehicle. If the player is inside the vehicle,
+                // IslandOutsideListener will detect it and teleport him away.
+                if (!player.isInsideVehicle())
+                    e.setCancelled();
                 break;
             default:
                 e.setCancelled();
