@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
-import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -99,9 +98,6 @@ public class CmdAccept implements ISuperiorCommand {
             Message.JOINED_ISLAND_NAME.send(superiorPlayer, island.getName());
         else
             Message.JOINED_ISLAND.send(superiorPlayer, targetPlayer.getName());
-
-        ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnJoin(),
-                plugin.getSettings().isTeleportOnJoin() ? island : null);
     }
 
     @Override

@@ -577,6 +577,9 @@ public class SIsland implements Island {
 
         updateLastTime();
 
+        ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnJoin(),
+                plugin.getSettings().isTeleportOnJoin() ? this : null);
+
         if (superiorPlayer.isOnline()) {
             updateIslandFly(superiorPlayer);
             setCurrentlyActive();

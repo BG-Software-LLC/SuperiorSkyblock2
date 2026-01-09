@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
-import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -89,9 +88,6 @@ public class CmdAdminAdd implements IAdminIslandCommand {
             Message.JOINED_ISLAND.send(targetPlayer, superiorPlayer.getName());
             Message.ADMIN_ADD_PLAYER.send(sender, targetPlayer.getName(), superiorPlayer.getName());
         }
-
-        ClearActions.runClearActions(targetPlayer, plugin.getSettings().getClearActionsOnJoin(),
-                plugin.getSettings().isTeleportOnJoin() ? island : null);
     }
 
     @Override
