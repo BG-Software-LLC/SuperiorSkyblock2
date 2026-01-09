@@ -463,8 +463,12 @@ public class BlockChangesListener extends AbstractGameEventListener {
             this.worldRecordService.get().recordBlockBreak(toBlock, 1, WorldRecordFlags.DIRTY_CHUNKS);
         } else {
             BukkitExecutor.sync(() -> {
-                // Do not save block counts
-                this.worldRecordService.get().recordBlockPlace(toBlock, 1, null, WorldRecordFlags.DIRTY_CHUNKS);
+                // Ignore cobblestone blocks, otherwise it will add +1 to the count of cobblestone when generated
+                // from cobblestone generator
+                if (toBlock.getType() != Material.COBBLESTONE) {
+                    // Do not save block counts
+                    this.worldRecordService.get().recordBlockPlace(toBlock, 1, null, WorldRecordFlags.DIRTY_CHUNKS);
+                }
             });
         }
     }
