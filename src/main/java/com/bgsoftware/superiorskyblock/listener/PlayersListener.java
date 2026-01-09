@@ -407,23 +407,7 @@ public class PlayersListener extends AbstractGameEventListener {
 
             String message = e.getArgs().message;
 
-            PluginEvent<PluginEventArgs.IslandChat> event = PluginEventsFactory.callIslandChatEvent(island, superiorPlayer,
-                    superiorPlayer.hasPermissionWithoutOP("superior.chat.color") ? Formatters.COLOR_FORMATTER.format(message) : message);
-
-            if (event.isCancelled())
-                return;
-
-            IslandUtils.sendMessage(island, Message.TEAM_CHAT_FORMAT, Collections.emptyList(),
-                    superiorPlayer.getPlayerRole(), superiorPlayer.getName(), event.getArgs().message);
-
-            Message.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole().getDisplayName(),
-                    superiorPlayer.getName(), event.getArgs().message);
-            for (Player _onlinePlayer : Bukkit.getOnlinePlayers()) {
-                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(_onlinePlayer);
-                if (onlinePlayer.hasAdminSpyEnabled())
-                    Message.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole().getDisplayName(),
-                            superiorPlayer.getName(), event.getArgs().message);
-            }
+            IslandUtils.handleIslandChat(island, superiorPlayer, message);
         } else if (e.getArgs().format != null) {
             e.getArgs().format = Formatters.CHAT_FORMATTER.format(new ChatFormatter.ChatFormatArgs(e.getArgs().format, superiorPlayer, island));
         }
