@@ -7,7 +7,8 @@ import java.util.NoSuchElementException;
 
 public class VarintArray {
 
-    private static final byte[] VARINT_BUF = new byte[10];
+    private static final ThreadLocal<byte[]> VARINT_BUF = ThreadLocal.withInitial(() -> new byte[10]);
+
     private static final byte[] ZERO_BYTE = new byte[]{0};
 
     private final ByteBigArray backend;
@@ -44,13 +45,15 @@ public class VarintArray {
         if (value == 0)
             return ZERO_BYTE;
 
+        byte[] varintBuf = VARINT_BUF.get();
+
         int varintBytesCount = 0;
         while (value != 0) {
             byte nextByte = (byte) (value & 0x7f);
             value >>= 7;
-            VARINT_BUF[varintBytesCount++] = value == 0 ? nextByte : (byte) (nextByte | 0x80);
+            varintBuf[varintBytesCount++] = value == 0 ? nextByte : (byte) (nextByte | 0x80);
         }
-        return Arrays.copyOf(VARINT_BUF, varintBytesCount);
+        return Arrays.copyOf(varintBuf, varintBytesCount);
     }
 
     public class Itr {
