@@ -618,15 +618,22 @@ public class SIsland implements Island {
         boolean isInside = superiorPlayer.isInsideIsland();
         superiorPlayer.setIsland(null);
 
-        if (reason == MemberRemoveReason.DISBAND)
+        if (reason == MemberRemoveReason.DISBAND) {
             ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnDisband(),
                     isInside ? plugin.getGrid().getSpawnIsland() : null);
-        else if (reason == MemberRemoveReason.KICK)
+        } else if (reason == MemberRemoveReason.KICK) {
+            boolean shouldTeleport = plugin.getSettings().isTeleportOnKick() && isInside;
             ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnKick(),
-                    plugin.getSettings().isTeleportOnKick() && isInside ? plugin.getGrid().getSpawnIsland() : null);
-        else if (reason == MemberRemoveReason.LEAVE)
+                    shouldTeleport ? plugin.getGrid().getSpawnIsland() : null);
+            if (!shouldTeleport)
+                updateIslandFly(superiorPlayer);
+        } else if (reason == MemberRemoveReason.LEAVE) {
+            boolean shouldTeleport = plugin.getSettings().isTeleportOnLeave() && isInside;
             ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnLeave(),
-                    plugin.getSettings().isTeleportOnLeave() && isInside ? plugin.getGrid().getSpawnIsland() : null);
+                    shouldTeleport ? plugin.getGrid().getSpawnIsland() : null);
+            if (!shouldTeleport)
+                updateIslandFly(superiorPlayer);
+        }
 
         superiorPlayer.runIfOnline(player -> {
             MenuView<?, ?> openedView = superiorPlayer.getOpenedView();
