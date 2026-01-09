@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -32,6 +33,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
@@ -181,6 +183,26 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
                 Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
             } else {
                 island.handleBlockPlace(blockKey, increaseAmount);
+            }
+        }
+
+        @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+        public void onBarrelInteract(PlayerInteractEvent e) {
+            if (e.getClickedBlock() == null || WildStackerAPI.getStackedBarrel(e.getClickedBlock()) == null)
+                return;
+
+            Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
+
+            if (island == null)
+                return;
+
+            Player player = e.getPlayer();
+
+            IslandPrivilege privilege = player.isSneaking() ? IslandPrivileges.BUILD : IslandPrivileges.BREAK;
+
+            if (!island.hasPermission(player, privilege)) {
+                e.setCancelled(true);
+                ProtectionHelper.sendProtectionMessage(player);
             }
         }
 
