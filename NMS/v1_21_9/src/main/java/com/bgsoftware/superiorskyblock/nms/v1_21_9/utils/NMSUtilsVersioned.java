@@ -152,7 +152,7 @@ public class NMSUtilsVersioned {
                         int chunkZ = chunkPosition.getZ();
                         MoonriseRegionFileIO.RegionDataController.ReadData readData =
                                 regionDataController.readData(chunkX, chunkZ);
-                        if(readData != null) {
+                        if (readData != null) {
                             CompoundTag entityData = switch (readData.result()) {
                                 case HAS_DATA -> regionDataController.finishRead(chunkX, chunkZ, readData);
                                 case SYNC_READ -> readData.syncRead();
@@ -353,7 +353,14 @@ public class NMSUtilsVersioned {
     }
 
     public static Optional<CompoundTag> loadPlayerData(ServerPlayer serverPlayer) {
-        return MinecraftServer.getServer().getPlayerList().loadPlayerData(serverPlayer.nameAndId());
+        try (ProblemReporter.ScopedCollector scopedCollector = new ProblemReporter.ScopedCollector(serverPlayer.problemPath(), LOGGER)) {
+            return MinecraftServer.getServer().getPlayerList().loadPlayerData(serverPlayer.nameAndId())
+                    .map(playerData -> {
+                        ValueInput valueInput = TagValueInput.create(scopedCollector, serverPlayer.registryAccess(), playerData);
+                        serverPlayer.load(valueInput);
+                        return playerData;
+                    });
+        }
     }
 
     public static long getCompoundTagLong(net.minecraft.nbt.CompoundTag compoundTag, String key, long def) {
