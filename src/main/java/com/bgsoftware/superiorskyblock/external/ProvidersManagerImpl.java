@@ -195,8 +195,12 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
     private void setWorldsProviderInternal(WorldsProvider worldsProvider) {
         this.worldsProvider = worldsProvider;
-        this.worldsProvider.addWorldLoadListener(DEFAULT_WORLD_LOAD_LISTENER);
         this.isCustomWorldsProvider = !(worldsProvider instanceof WorldsProvider_Default);
+        try {
+            this.worldsProvider.addWorldLoadListener(DEFAULT_WORLD_LOAD_LISTENER);
+        } catch (UnsupportedOperationException ignored) {
+            // Ignore UnsupportedOperationException
+        }
     }
 
     @Override
