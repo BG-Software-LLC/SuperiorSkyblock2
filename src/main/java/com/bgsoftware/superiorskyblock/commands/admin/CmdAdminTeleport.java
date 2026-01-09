@@ -98,12 +98,12 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
         if (dimension != plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
             if (!island.wasSchematicGenerated(dimension)) {
                 PortalType portalType = dimension.getEnvironment() == World.Environment.NETHER ? PortalType.NETHER : PortalType.ENDER;
-                WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
-                Location homeLocation = island.getIslandHomePosition(dimension).toLocation(worldInfo);
-                IslandWorlds.accessIslandWorldAsync(island, homeLocation, true, islandWorldResult -> {
+                IslandWorlds.accessIslandWorldAsync(island, dimension, true, islandWorldResult -> {
                     islandWorldResult.ifRight(Throwable::printStackTrace).ifLeft(world -> {
-                        homeLocation.setWorld(world);
-                        portalsManager.get().handlePlayerPortalFromIsland(superiorPlayer, island, homeLocation, portalType, false);
+                        Location simulatedPortalLocation = island.getCenter(
+                                plugin.getSettings().getWorlds().getDefaultWorldDimension());
+                        portalsManager.get().handlePlayerPortalFromIsland(superiorPlayer, island,
+                                simulatedPortalLocation, portalType, false);
                     });
                 });
                 return;
