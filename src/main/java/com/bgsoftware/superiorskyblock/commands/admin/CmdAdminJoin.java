@@ -81,10 +81,8 @@ public class CmdAdminJoin implements IAdminIslandCommand {
         else
             Message.JOINED_ISLAND.send(superiorPlayer, targetPlayer.getName());
 
-        if (plugin.getSettings().isTeleportOnJoin())
-            superiorPlayer.teleport(island);
-
-        ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnJoin());
+        ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnJoin(),
+                plugin.getSettings().isTeleportOnJoin() ? island : null);
     }
 
 }

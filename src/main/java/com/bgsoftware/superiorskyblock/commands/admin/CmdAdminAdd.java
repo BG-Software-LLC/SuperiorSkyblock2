@@ -90,10 +90,8 @@ public class CmdAdminAdd implements IAdminIslandCommand {
             Message.ADMIN_ADD_PLAYER.send(sender, targetPlayer.getName(), superiorPlayer.getName());
         }
 
-        if (plugin.getSettings().isTeleportOnJoin() && targetPlayer.isOnline())
-            targetPlayer.teleport(island);
-
-        ClearActions.runClearActions(targetPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnJoin());
+        ClearActions.runClearActions(targetPlayer, plugin.getSettings().getClearActionsOnJoin(),
+                plugin.getSettings().isTeleportOnJoin() ? island : null);
     }
 
     @Override
