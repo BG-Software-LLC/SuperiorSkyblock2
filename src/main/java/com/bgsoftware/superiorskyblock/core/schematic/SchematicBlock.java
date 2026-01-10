@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
+import com.bgsoftware.superiorskyblock.tag.Tag;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.inventory.InventoryType;
@@ -17,6 +18,7 @@ import java.util.Collections;
 public class SchematicBlock {
 
     private static final ListTag EMPTY_LIST_TAG = ListTag.of(Collections.emptyList());
+    private static final char LEGACY_COLOR_CHAR = '\u00A7';
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -130,6 +132,7 @@ public class SchematicBlock {
         if (frontText == null || backText == null) {
             // This should never occur
             Log.error("Invalid sign tile entity data: ", tileEntityData);
+            return;
         }
 
         ListTag frontTextMessages = frontText.getList("messages").orElse(EMPTY_LIST_TAG);
@@ -147,7 +150,7 @@ public class SchematicBlock {
             if (i < plugin.getSettings().getDefaultSign().size()) {
                 line = plugin.getSettings().getDefaultSign().get(i);
             } else {
-                line = ((StringTag) messages.getValue().get(realIndex)).getValue();
+                line = getSignMessageLine(messages, realIndex);
             }
 
             line = line.replace("{player}", island.getOwner().getName())
@@ -158,6 +161,123 @@ public class SchematicBlock {
 
         frontText.setTag("messages", newFrontTextMessages);
         backText.setTag("messages", newBackTextMessages);
+    }
+
+    private static String getSignMessageLine(ListTag messages, int index) {
+        if (index >= messages.getValue().size())
+            return "";
+
+        Tag<?> messageTag = messages.getValue().get(index);
+        if (messageTag instanceof StringTag)
+            return ((StringTag) messageTag).getValue();
+        if (messageTag instanceof CompoundTag) {
+            return toLegacyComponent((CompoundTag) messageTag);
+        }
+
+        return "";
+    }
+
+    private static String toLegacyComponent(CompoundTag compound) {
+        StringBuilder builder = new StringBuilder();
+        appendLegacyComponent(builder, compound);
+        return builder.toString();
+    }
+
+    private static void appendLegacyComponent(StringBuilder builder, CompoundTag compound) {
+        appendLegacyFormatting(builder, compound);
+
+        String text = compound.getString("text").orElse("");
+        builder.append(text);
+
+        ListTag extra = compound.getList("extra").orElse(null);
+        if (extra != null) {
+            for (Tag<?> extraTag : extra.getValue()) {
+                if (extraTag instanceof StringTag) {
+                    builder.append(((StringTag) extraTag).getValue());
+                } else if (extraTag instanceof CompoundTag) {
+                    appendLegacyComponent(builder, (CompoundTag) extraTag);
+                }
+            }
+        }
+    }
+
+    private static void appendLegacyFormatting(StringBuilder builder, CompoundTag compound) {
+        String color = compound.getString("color").orElse(null);
+        if (color != null) {
+            String legacyColor = toLegacyColor(color);
+            if (!legacyColor.isEmpty())
+                builder.append(legacyColor);
+        }
+
+        if (isTrue(compound, "bold"))
+            builder.append(LEGACY_COLOR_CHAR).append('l');
+        if (isTrue(compound, "italic"))
+            builder.append(LEGACY_COLOR_CHAR).append('o');
+        if (isTrue(compound, "underlined"))
+            builder.append(LEGACY_COLOR_CHAR).append('n');
+        if (isTrue(compound, "strikethrough"))
+            builder.append(LEGACY_COLOR_CHAR).append('m');
+        if (isTrue(compound, "obfuscated"))
+            builder.append(LEGACY_COLOR_CHAR).append('k');
+    }
+
+    private static boolean isTrue(CompoundTag compound, String key) {
+        Number value = compound.getNumber(key).orElse(null);
+        return value != null && value.intValue() != 0;
+    }
+
+    private static String toLegacyColor(String color) {
+        if (color.startsWith("#") && color.length() == 7)
+            return toLegacyHexColor(color);
+
+        switch (color) {
+            case "black":
+                return "" + LEGACY_COLOR_CHAR + '0';
+            case "dark_blue":
+                return "" + LEGACY_COLOR_CHAR + '1';
+            case "dark_green":
+                return "" + LEGACY_COLOR_CHAR + '2';
+            case "dark_aqua":
+                return "" + LEGACY_COLOR_CHAR + '3';
+            case "dark_red":
+                return "" + LEGACY_COLOR_CHAR + '4';
+            case "dark_purple":
+                return "" + LEGACY_COLOR_CHAR + '5';
+            case "gold":
+                return "" + LEGACY_COLOR_CHAR + '6';
+            case "gray":
+                return "" + LEGACY_COLOR_CHAR + '7';
+            case "dark_gray":
+                return "" + LEGACY_COLOR_CHAR + '8';
+            case "blue":
+                return "" + LEGACY_COLOR_CHAR + '9';
+            case "green":
+                return "" + LEGACY_COLOR_CHAR + 'a';
+            case "aqua":
+                return "" + LEGACY_COLOR_CHAR + 'b';
+            case "red":
+                return "" + LEGACY_COLOR_CHAR + 'c';
+            case "light_purple":
+                return "" + LEGACY_COLOR_CHAR + 'd';
+            case "yellow":
+                return "" + LEGACY_COLOR_CHAR + 'e';
+            case "white":
+                return "" + LEGACY_COLOR_CHAR + 'f';
+            case "reset":
+                return "" + LEGACY_COLOR_CHAR + 'r';
+            default:
+                return "";
+        }
+    }
+
+    private static String toLegacyHexColor(String color) {
+        String hex = color.substring(1).toLowerCase();
+        StringBuilder builder = new StringBuilder(14);
+        builder.append(LEGACY_COLOR_CHAR).append('x');
+        for (int i = 0; i < hex.length(); i++) {
+            builder.append(LEGACY_COLOR_CHAR).append(hex.charAt(i));
+        }
+        return builder.toString();
     }
 
     private static void legacySignLinesReplace(CompoundTag tileEntityData, Island island) {
