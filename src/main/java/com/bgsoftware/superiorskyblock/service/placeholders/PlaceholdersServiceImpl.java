@@ -27,6 +27,8 @@ import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.collect.ImmutableMap;
@@ -148,7 +150,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("bank_last_interest", (island, superiorPlayer) ->
                             Formatters.TIME_FORMATTER.format(Duration.ofSeconds(island.getLastInterestTime()), superiorPlayer.getUserLocale()))
                     .put("bank_next_interest", (island, superiorPlayer) ->
-                            Formatters.TIME_FORMATTER.format(Duration.ofSeconds(island.getNextInterest()), superiorPlayer.getUserLocale()))
+                            formatBankNextInterest(island, superiorPlayer))
                     .put("bans_count", (island, superiorPlayer) ->
                             island.getBannedPlayers().size() + "")
                     .put("bans_list", (island, superiorPlayer) -> {
@@ -887,6 +889,35 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
 
     private static Dimension getDefaultWorldDimension() {
         return plugin.getSettings().getWorlds().getDefaultWorldDimension();
+    }
+
+    private static String formatBankNextInterest(Island island, SuperiorPlayer superiorPlayer) {
+        Locale locale = superiorPlayer.getUserLocale();
+
+        if (!BuiltinModules.BANK.getConfiguration().isBankInterestEnabled()) {
+            return Message.BANK_INTEREST_DISABLED.getMessage(locale);
+        }
+
+        long nextInterest = island.getNextInterest();
+        if (nextInterest > 0) {
+            return Formatters.TIME_FORMATTER.format(Duration.ofSeconds(nextInterest), locale);
+        }
+
+        int recentActive = BuiltinModules.BANK.getConfiguration().getBankInterestRecentActive();
+        long currentTime = System.currentTimeMillis() / 1000;
+        if (recentActive > 0 && !island.getOwner().isOnline() &&
+                currentTime - island.getOwner().getLastTimeStatus() > recentActive) {
+            return Message.BANK_INTEREST_OWNER_INACTIVE.getMessage(locale);
+        }
+
+        int percentage = BuiltinModules.BANK.getConfiguration().getBankInterestPercentage();
+        BigDecimal balance = island.getIslandBank().getBalance().max(BigDecimal.ONE);
+        BigDecimal balanceToGive = balance.multiply(new BigDecimal(percentage / 100D));
+        if (!island.getIslandBank().canDepositMoney(balanceToGive)) {
+            return Message.BANK_INTEREST_BANK_FULL.getMessage(locale);
+        }
+
+        return Message.BANK_INTEREST_READY.getMessage(locale);
     }
 
 }
