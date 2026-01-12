@@ -205,10 +205,10 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 Location location = block.getLocation(wrapper.getHandle());
 
-                stackedBarrel = WildStackerAPI.getWildStacker().getSystemManager().getStackedBarrel(location);
-                if (stackedBarrel == null)
+                if(!WildStackerAPI.getWildStacker().getSystemManager().isStackedBarrel(location))
                     return;
 
+                stackedBarrel = WildStackerAPI.getWildStacker().getSystemManager().getStackedBarrel(location);
                 island = plugin.getGrid().getIslandAt(location);
             }
 
