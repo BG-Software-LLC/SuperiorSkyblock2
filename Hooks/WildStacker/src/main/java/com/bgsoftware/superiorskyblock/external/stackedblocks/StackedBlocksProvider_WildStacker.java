@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
@@ -28,6 +29,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -155,7 +157,12 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
             if (island == null)
                 return;
 
-            if (!island.hasPermission(player, IslandPrivileges.BREAK)) {
+            Key blockKey = getBarrelKey(e.getBarrel());
+
+            IslandPrivilege islandPrivilege = plugin.getSettings().getValuableBlocks().contains(blockKey) ?
+                    IslandPrivileges.VALUABLE_BREAK : IslandPrivileges.BREAK;
+
+            if (!island.hasPermission(player, islandPrivilege)) {
                 e.setCancelled(true);
                 ProtectionHelper.sendProtectionMessage(player);
             }
@@ -188,17 +195,32 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
         @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
         public void onBarrelInteract(PlayerInteractEvent e) {
-            if (e.getClickedBlock() == null || WildStackerAPI.getStackedBarrel(e.getClickedBlock()) == null)
+            Block block = e.getClickedBlock();
+            if (block == null)
                 return;
 
-            Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
+            StackedBarrel stackedBarrel;
+            Island island;
+
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location location = block.getLocation(wrapper.getHandle());
+
+                if(!WildStackerAPI.getWildStacker().getSystemManager().isStackedBarrel(location))
+                    return;
+
+                stackedBarrel = WildStackerAPI.getWildStacker().getSystemManager().getStackedBarrel(location);
+                island = plugin.getGrid().getIslandAt(location);
+            }
 
             if (island == null)
                 return;
 
             Player player = e.getPlayer();
+            Key blockKey = getBarrelKey(stackedBarrel);
 
-            IslandPrivilege privilege = player.isSneaking() ? IslandPrivileges.BUILD : IslandPrivileges.BREAK;
+            IslandPrivilege privilege = player.isSneaking() ? IslandPrivileges.BUILD :
+                    plugin.getSettings().getValuableBlocks().contains(blockKey) ?
+                            IslandPrivileges.VALUABLE_BREAK : IslandPrivileges.BREAK;
 
             if (!island.hasPermission(player, privilege)) {
                 e.setCancelled(true);

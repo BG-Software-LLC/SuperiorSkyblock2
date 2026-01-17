@@ -2813,7 +2813,7 @@ public class SIsland implements Island {
     @Override
     public void markChunkDirty(WorldInfo worldInfo, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
-        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ), "Chunk must be within the island boundaries.");
+        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ), "Chunk {" + worldInfo.getName() + "," + chunkX + "," + chunkZ + "} must be within the island boundaries.");
         try (ChunkPosition chunkPosition = ChunkPosition.of(worldInfo, chunkX, chunkZ)) {
             this.dirtyChunksContainer.markDirty(chunkPosition, save);
         }
@@ -2827,7 +2827,7 @@ public class SIsland implements Island {
 
     @Override
     public void markChunkEmpty(WorldInfo worldInfo, int chunkX, int chunkZ, boolean save) {
-        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ), "Chunk must be within the island boundaries.");
+        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ), "Chunk {" + worldInfo.getName() + "," + chunkX + "," + chunkZ + "} must be within the island boundaries.");
         try (ChunkPosition chunkPosition = ChunkPosition.of(worldInfo, chunkX, chunkZ)) {
             this.dirtyChunksContainer.markEmpty(chunkPosition, save);
         }
