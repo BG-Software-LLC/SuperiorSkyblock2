@@ -21,21 +21,25 @@ import java.util.TreeMap;
 
 public abstract class CommandsMap {
 
-    private static Set<String> DISABLED_COMMANDS_CACHE;
+    private static Set<SuperiorCommand> DISABLED_COMMANDS_CACHE;
 
     private static void onSettingsUpdate() {
         DISABLED_COMMANDS_CACHE = new HashSet<>();
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
         plugin.getSettings().getDisabledCommands().forEach(commandLabel -> {
             SuperiorCommand superiorCommand = plugin.getCommands().getCommand(commandLabel);
-            if (superiorCommand != null && !(superiorCommand instanceof IAdminIslandCommand))
-                DISABLED_COMMANDS_CACHE.add(superiorCommand.getAliases().get(0).toLowerCase(Locale.ENGLISH));
+            if (superiorCommand != null && !(superiorCommand instanceof IAdminIslandCommand)
+                    && !(superiorCommand instanceof IAdminPlayerCommand))
+                DISABLED_COMMANDS_CACHE.add(superiorCommand);
         });
     }
 
     public static void registerListeners(PluginEventsDispatcher dispatcher) {
         dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, CommandsMap::onSettingsUpdate);
     }
+
+    //This map allows to specify a command in code when its default aliases are disabled.
+    private final Map<String, SuperiorCommand> defaultLabels = new HashMap<>();
 
     private final Map<String, SuperiorCommand> subCommands = new TreeMap<>();
     private final Map<String, List<SuperiorCommand>> aliasesToCommand = new HashMap<>();
@@ -49,16 +53,16 @@ public abstract class CommandsMap {
     public abstract void loadDefaultCommands();
 
     public void registerCommand(SuperiorCommand superiorCommand) {
-        List<String> aliases = new LinkedList<>(superiorCommand.getAliases());
-        String label = aliases.remove(0).toLowerCase(Locale.ENGLISH);
-        aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, Collections.emptyList()));
+        Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
 
-        removeCommand(label);
+        List<String> aliases = new LinkedList<>(CommandsHelper.getCommandAliases(superiorCommand));
+        String label = aliases.remove(0).toLowerCase(Locale.ENGLISH);
+
+        defaultLabels.put(superiorCommand.getAliases().get(0), superiorCommand);
         subCommands.put(label, superiorCommand);
 
-        for (String alias : aliases) {
+        for (String alias : aliases)
             aliasesToCommand.computeIfAbsent(alias.toLowerCase(Locale.ENGLISH), a -> new LinkedList<>()).add(superiorCommand);
-        }
 
         PluginEventsFactory.callCommandsUpdateEvent();
     }
@@ -66,10 +70,7 @@ public abstract class CommandsMap {
     public void unregisterCommand(SuperiorCommand superiorCommand) {
         Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
 
-        List<String> aliases = new LinkedList<>(superiorCommand.getAliases());
-        String label = aliases.remove(0).toLowerCase(Locale.ENGLISH);
-        aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, Collections.emptyList()));
-
+        String label = CommandsHelper.getCommandLabel(superiorCommand);
         removeCommand(label);
 
         PluginEventsFactory.callCommandsUpdateEvent();
@@ -89,6 +90,10 @@ public abstract class CommandsMap {
             }
         }
 
+        superiorCommand = defaultLabels.get(label);
+        if (superiorCommand != null && isCommandEnabled(superiorCommand))
+            return superiorCommand;
+
         return null;
     }
 
@@ -107,8 +112,8 @@ public abstract class CommandsMap {
     }
 
     private boolean isCommandEnabled(SuperiorCommand superiorCommand) {
-        return superiorCommand instanceof IAdminIslandCommand ||
-                !DISABLED_COMMANDS_CACHE.contains(superiorCommand.getAliases().get(0).toLowerCase(Locale.ENGLISH));
+        return superiorCommand instanceof IAdminIslandCommand || superiorCommand instanceof IAdminPlayerCommand ||
+                !DISABLED_COMMANDS_CACHE.contains(superiorCommand);
     }
 
     private void removeCommand(String label) {

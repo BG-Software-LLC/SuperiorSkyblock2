@@ -90,8 +90,9 @@ public class CmdAdmin implements ISuperiorCommand {
                 }
 
                 if (args.length < command.getMinArgs() || args.length > command.getMaxArgs()) {
-                    Log.debugResult(Debug.EXECUTE_COMMAND, "Return Incorrect Usage", command.getUsage(locale));
-                    Message.COMMAND_USAGE.send(sender, locale, plugin.getCommands().getLabel() + " " + command.getUsage(locale));
+                    String usage = CommandsHelper.getCommandUsage(command, locale);
+                    Log.debugResult(Debug.EXECUTE_COMMAND, "Return Incorrect Usage", usage);
+                    Message.COMMAND_USAGE.send(sender, locale, usage);
                     return;
                 }
 
@@ -157,7 +158,7 @@ public class CmdAdmin implements ISuperiorCommand {
             String description = subCommand.getDescription(locale);
             if (description == null)
                 new NullPointerException("The description of the command " + subCommand.getAliases().get(0) + " is null.").printStackTrace();
-            Message.ADMIN_HELP_LINE.send(sender, locale, plugin.getCommands().getLabel() + " " + subCommand.getUsage(locale), description);
+            Message.ADMIN_HELP_LINE.send(sender, locale, CommandsHelper.getCommandUsage(subCommand, locale), description);
         }
 
         if (page != lastPage)
@@ -182,8 +183,7 @@ public class CmdAdmin implements ISuperiorCommand {
 
         for (SuperiorCommand subCommand : plugin.getCommands().getAdminSubCommands()) {
             if (CommandsHelper.shouldDisplayCommandForPlayer(subCommand, sender)) {
-                List<String> aliases = new LinkedList<>(subCommand.getAliases());
-                aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), Collections.emptyList()));
+                List<String> aliases = new LinkedList<>(CommandsHelper.getCommandAliases(subCommand));
                 for (String alias : aliases) {
                     if (alias.contains(args[1].toLowerCase(Locale.ENGLISH))) {
                         list.add(alias);

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandChangeWorthBonusEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
@@ -78,7 +79,7 @@ public class CmdAdminSetBonus implements IAdminIslandCommand {
             isWorthBonus = false;
         } else {
             Locale locale = PlayerLocales.getLocale(sender);
-            Message.COMMAND_USAGE.send(sender, locale, plugin.getCommands().getLabel() + " " + getUsage(locale));
+            Message.COMMAND_USAGE.send(sender, locale, CommandsHelper.getCommandUsage(this, locale));
             return;
         }
 

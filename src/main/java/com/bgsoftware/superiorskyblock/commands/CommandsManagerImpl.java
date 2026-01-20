@@ -40,7 +40,7 @@ import java.util.UUID;
 
 public class CommandsManagerImpl extends Manager implements CommandsManager {
 
-    private final Map<UUID, Map<String, Long>> commandsCooldown = new HashMap<>();
+    private final Map<UUID, Map<SuperiorCommand, Long>> commandsCooldown = new HashMap<>();
 
     private final CommandsMap playerCommandsMap;
     private final CommandsMap adminCommandsMap;
@@ -262,14 +262,16 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                     }
 
                     if (!CommandsHelper.hasCommandAccess(command, sender)) {
-                        Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", command.getPermission());
-                        Message.NO_COMMAND_PERMISSION.send(sender, locale, command.getPermission());
+                        String permission = command.getPermission();
+                        Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", permission);
+                        Message.NO_COMMAND_PERMISSION.send(sender, locale, permission);
                         return false;
                     }
 
                     if (args.length < command.getMinArgs() || args.length > command.getMaxArgs()) {
-                        Log.debugResult(Debug.EXECUTE_COMMAND, "Return Incorrect Usage", command.getUsage(locale));
-                        Message.COMMAND_USAGE.send(sender, locale, getLabel() + " " + command.getUsage(locale));
+                        String usage = CommandsHelper.getCommandUsage(command, locale);
+                        Log.debugResult(Debug.EXECUTE_COMMAND, "Return Incorrect Usage", usage);
+                        Message.COMMAND_USAGE.send(sender, locale, usage);
                         return false;
                     }
 
@@ -279,13 +281,11 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                         if (!superiorPlayer.hasPermission("superior.admin.bypass.cooldowns")) {
                             Pair<Integer, String> commandCooldown = getCooldown(command);
                             if (commandCooldown != null) {
-                                String commandLabel = command.getAliases().get(0);
-
-                                Map<String, Long> playerCooldowns = commandsCooldown.get(uuid);
+                                Map<SuperiorCommand, Long> playerCooldowns = commandsCooldown.get(uuid);
                                 long timeNow = System.currentTimeMillis();
 
                                 if (playerCooldowns != null) {
-                                    Long timeToExecute = playerCooldowns.get(commandLabel);
+                                    Long timeToExecute = playerCooldowns.get(command);
                                     if (timeToExecute != null) {
                                         if (timeNow < timeToExecute) {
                                             String formattedTime = Formatters.TIME_FORMATTER.format(Duration.ofMillis(timeToExecute - timeNow), locale);
@@ -296,7 +296,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                                     }
                                 }
 
-                                commandsCooldown.computeIfAbsent(uuid, u -> new HashMap<>()).put(commandLabel,
+                                commandsCooldown.computeIfAbsent(uuid, u -> new HashMap<>()).put(command,
                                         timeNow + commandCooldown.getKey());
                             }
                         }
@@ -315,13 +315,13 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
                     String subCommandToExecute;
                     if (args.length != 0) {
-                        subCommandToExecute = "help";
+                        subCommandToExecute = CommandsHelper.getCommandLabel(getCommand("help"));
                     } else if (island == null) {
-                        subCommandToExecute = "create";
+                        subCommandToExecute = CommandsHelper.getCommandLabel(getCommand("create"));
                     } else if (superiorPlayer.hasToggledPanel()) {
-                        subCommandToExecute = "panel";
+                        subCommandToExecute = CommandsHelper.getCommandLabel(getCommand("panel"));
                     } else {
-                        subCommandToExecute = "tp";
+                        subCommandToExecute = CommandsHelper.getCommandLabel(getCommand("teleport"));
                     }
 
                     // We don't want to end up in an infinite loop
@@ -334,8 +334,9 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
             }
 
             // We don't want to end up in an infinite loop
-            if (!"help".equalsIgnoreCase(executedSubCommand)) {
-                dispatchSubCommand(sender, "help");
+            String helpLabel = CommandsHelper.getCommandLabel(getCommand("help"));
+            if (!helpLabel.equalsIgnoreCase(executedSubCommand)) {
+                dispatchSubCommand(sender, helpLabel);
             }
 
             return false;
@@ -355,8 +356,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
             for (SuperiorCommand subCommand : getSubCommands()) {
                 if (CommandsHelper.shouldDisplayCommandForPlayer(subCommand, sender)) {
-                    List<String> aliases = new LinkedList<>(subCommand.getAliases());
-                    aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), Collections.emptyList()));
+                    List<String> aliases = new LinkedList<>(CommandsHelper.getCommandAliases(subCommand));
                     for (String alias : aliases) {
                         if (alias.contains(args[0].toLowerCase(Locale.ENGLISH))) {
                             list.add(alias);
