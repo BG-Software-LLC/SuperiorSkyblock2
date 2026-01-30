@@ -133,26 +133,26 @@ public class PlayersDatabaseBridge {
     }
 
     public static void insertPlayer(SuperiorPlayer superiorPlayer) {
-        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> {
-            Locale userLocale = superiorPlayer.getUserLocale();
+        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("players",
+                new Pair<>("uuid", superiorPlayer.getUniqueId().toString()),
+                new Pair<>("last_used_name", superiorPlayer.getName()),
+                new Pair<>("last_used_skin", superiorPlayer.getTextureValue()),
+                new Pair<>("disbands", superiorPlayer.getDisbands()),
+                new Pair<>("last_time_updated", superiorPlayer.getLastTimeStatus())
+        ));
+        insertPlayerSettings(superiorPlayer);
+    }
 
-            databaseBridge.insertObject("players",
-                    new Pair<>("uuid", superiorPlayer.getUniqueId().toString()),
-                    new Pair<>("last_used_name", superiorPlayer.getName()),
-                    new Pair<>("last_used_skin", superiorPlayer.getTextureValue()),
-                    new Pair<>("disbands", superiorPlayer.getDisbands()),
-                    new Pair<>("last_time_updated", superiorPlayer.getLastTimeStatus())
-            );
-
-            databaseBridge.insertObject("players_settings",
-                    new Pair<>("player", superiorPlayer.getUniqueId().toString()),
-                    new Pair<>("language", userLocale.getLanguage() + "-" + userLocale.getCountry()),
-                    new Pair<>("toggled_panel", superiorPlayer.hasToggledPanel()),
-                    new Pair<>("border_color", superiorPlayer.getBorderColor().name()),
-                    new Pair<>("toggled_border", superiorPlayer.hasWorldBorderEnabled()),
-                    new Pair<>("island_fly", superiorPlayer.hasIslandFlyEnabled())
-            );
-        });
+    public static void insertPlayerSettings(SuperiorPlayer superiorPlayer) {
+        Locale userLocale = superiorPlayer.getUserLocale();
+        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("players_settings",
+                new Pair<>("player", superiorPlayer.getUniqueId().toString()),
+                new Pair<>("language", userLocale.getLanguage() + "-" + userLocale.getCountry()),
+                new Pair<>("toggled_panel", superiorPlayer.hasToggledPanel()),
+                new Pair<>("border_color", superiorPlayer.getBorderColor().name()),
+                new Pair<>("toggled_border", superiorPlayer.hasWorldBorderEnabled()),
+                new Pair<>("island_fly", superiorPlayer.hasIslandFlyEnabled())
+        ));
     }
 
     public static void replacePlayer(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer) {

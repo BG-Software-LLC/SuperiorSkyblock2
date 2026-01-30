@@ -32,7 +32,6 @@ import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
-import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
@@ -662,25 +661,32 @@ public class IslandsDatabaseBridge {
                     new Pair<>("block_counts", IslandsSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger())),
                     new Pair<>("entity_counts", IslandsSerializer.serializeEntityCounts(island.getEntitiesTracker().getEntitiesCounts()))
             );
-
-            databaseBridge.insertObject("islands_banks",
-                    new Pair<>("island", island.getUniqueId().toString()),
-                    new Pair<>("balance", island.getIslandBank().getBalance() + ""),
-                    new Pair<>("last_interest_time", island.getLastInterestTime())
-            );
-
-            databaseBridge.insertObject("islands_settings",
-                    new Pair<>("island", island.getUniqueId().toString()),
-                    new Pair<>("size", island.getIslandSizeRaw()),
-                    new Pair<>("bank_limit", island.getBankLimitRaw() + ""),
-                    new Pair<>("coops_limit", island.getCoopLimitRaw()),
-                    new Pair<>("members_limit", island.getTeamLimitRaw()),
-                    new Pair<>("warps_limit", island.getWarpsLimitRaw()),
-                    new Pair<>("crop_growth_multiplier", island.getCropGrowthRaw()),
-                    new Pair<>("spawner_rates_multiplier", island.getSpawnerRatesRaw()),
-                    new Pair<>("mob_drops_multiplier", island.getMobDropsRaw())
-            );
         });
+
+        insertIslandBanks(island);
+        insertIslandSettings(island);
+    }
+
+    public static void insertIslandBanks(Island island) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("islands_banks",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("balance", island.getIslandBank().getBalance() + ""),
+                new Pair<>("last_interest_time", island.getLastInterestTime())
+        ));
+    }
+
+    public static void insertIslandSettings(Island island) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("islands_settings",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("size", island.getIslandSizeRaw()),
+                new Pair<>("bank_limit", island.getBankLimitRaw() + ""),
+                new Pair<>("coops_limit", island.getCoopLimitRaw()),
+                new Pair<>("members_limit", island.getTeamLimitRaw()),
+                new Pair<>("warps_limit", island.getWarpsLimitRaw()),
+                new Pair<>("crop_growth_multiplier", island.getCropGrowthRaw()),
+                new Pair<>("spawner_rates_multiplier", island.getSpawnerRatesRaw()),
+                new Pair<>("mob_drops_multiplier", island.getMobDropsRaw())
+        ));
     }
 
     public static void deleteIsland(Island island) {

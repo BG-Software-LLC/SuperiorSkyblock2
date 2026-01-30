@@ -71,11 +71,10 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_members");
 
             PlayerRole playerRole = members.getInt("role").map(SPlayerRole::fromId)
                     .orElse(SPlayerRole.defaultRole());
-
 
             superiorPlayer.setPlayerRole(playerRole);
             builder.addIslandMember(superiorPlayer);
@@ -104,7 +103,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_bans");
             builder.addBannedPlayer(superiorPlayer);
         });
     }
@@ -131,7 +130,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(islandUUID.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_visitors");
             long visitTime = visitors.getLong("visit_time").orElse(System.currentTimeMillis());
             builder.addUniqueVisitor(visitorPlayer, visitTime);
         });
@@ -174,7 +173,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_player_permissions");
             builder.setPlayerPermission(superiorPlayer, islandPrivilege, status.get() == 1);
         });
     }
@@ -204,7 +203,7 @@ public class IslandsDeserializer {
                 }
             }).orElseThrow(IllegalStateException::new);
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_role_permissions");
             builder.setRolePermission(islandPrivilege, playerRole.get());
         });
     }
@@ -231,7 +230,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_upgrades");
             builder.setUpgrade(upgrade.get(), level.get());
         });
     }
@@ -260,7 +259,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_warps");
             builder.addWarp(name.get(), islandWarp.getString("category").orElse(""),
                     location.get(), islandWarp.getBoolean("private").orElse(!plugin.getSettings().isPublicWarps()),
                     islandWarp.getString("icon").map(Serializers.ITEM_STACK_SERIALIZER::deserialize).orElse(null));
@@ -334,7 +333,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_block_limits");
             builder.setBlockLimit(block.get(), limit.get());
         });
     }
@@ -361,7 +360,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_entity_limits");
             builder.setEntityLimit(entity.get(), limit.get());
         });
     }
@@ -400,7 +399,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(islandUUID.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_ratings");
             builder.setRating(ratingPlayer, rating.get());
         });
     }
@@ -433,7 +432,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_missions");
             builder.setCompletedMission(mission.get(), finishCount.get());
         });
     }
@@ -463,7 +462,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_flags");
             builder.setIslandFlag(islandFlag, status.get() == 1);
         });
     }
@@ -496,7 +495,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_generators");
             builder.setGeneratorRate(block.get(), rate.get(), dimension.get());
         });
     }
@@ -523,7 +522,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_homes");
             builder.setIslandHome(dimension.get(), location.get());
         });
     }
@@ -550,7 +549,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_visitor_homes");
             builder.setVisitorHome(dimension.get(), location.get());
         });
     }
@@ -578,7 +577,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_effects");
             builder.setIslandEffect(effectType.get(), level.get());
         });
     }
@@ -623,7 +622,7 @@ public class IslandsDeserializer {
                 chestContents = contents.get();
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_chests");
             builder.setIslandChest(index.get(), chestContents);
         });
     }
@@ -650,7 +649,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_role_limits");
             builder.setRoleLimit(playerRole.get(), limit.get());
         });
     }
@@ -671,7 +670,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_warp_categories");
             builder.addWarpCategory(name.get(), warpCategory.getInt("slot").orElse(-1),
                     warpCategory.getString("icon").map(Serializers.ITEM_STACK_SERIALIZER::deserialize).orElse(null));
         });
@@ -695,7 +694,7 @@ public class IslandsDeserializer {
 
             long currentTime = System.currentTimeMillis() / 1000;
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_banks");
             builder.setBalance(balance.get());
             long lastInterestTime = islandBank.getLong("last_interest_time").orElse(currentTime);
             builder.setLastInterestTime(lastInterestTime > currentTime ? lastInterestTime / 1000 : lastInterestTime);
@@ -713,7 +712,7 @@ public class IslandsDeserializer {
             }
 
             UUID uuid = UUID.fromString(island.get());
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid, IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid, "islands_settings");
 
             builder.setIslandSize(islandSettings.getInt("size").orElse(-1));
             builder.setTeamLimit(islandSettings.getInt("members_limit").orElse(-1));
@@ -740,7 +739,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "bank_transactions");
             SBankTransaction.fromDatabase(bankTransaction).ifPresent(builder::addBankTransaction);
         });
     }
@@ -760,8 +759,16 @@ public class IslandsDeserializer {
             if (persistentData.length == 0)
                 return;
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_custom_data");
             builder.setPersistentData(persistentData);
         });
     }
+
+    private static Island.Builder lookupIsland(DatabaseCache<Island.Builder> databaseCache, UUID uuid, String tableName) {
+        DatabaseCache.Record<Island.Builder> islandRecord =
+                databaseCache.computeIfAbsentInfo(uuid, IslandBuilderImpl::new);
+        islandRecord.recordTable(tableName);
+        return islandRecord.get();
+    }
+
 }
