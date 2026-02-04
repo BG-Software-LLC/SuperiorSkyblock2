@@ -752,7 +752,7 @@ public interface SettingsManager {
     /**
      * Whether players should receive a help instead of a `INVALID_COMMAND` message
      * when using a command that doesn't exist or not.
-     * Config-path: help-on-no-permission
+     * Config-path: help-on-invalid-command
      */
     boolean isHelpOnInvalidCommand();
 
