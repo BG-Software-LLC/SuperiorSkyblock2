@@ -75,7 +75,7 @@ public class CmdSetWarp implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        if (island.getIslandWarps().size() >= island.getWarpsLimit()) {
+        if (island.getWarpsLimit() >= 0 && island.getIslandWarps().size() >= island.getWarpsLimit()) {
             Message.NO_MORE_WARPS.send(superiorPlayer);
             return;
         }

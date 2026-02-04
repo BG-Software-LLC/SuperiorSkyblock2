@@ -90,7 +90,7 @@ public class CmdCoop implements IPermissibleCommand {
             return;
         }
 
-        if (island.getCoopPlayers().size() >= island.getCoopLimit()) {
+        if (island.getCoopLimit() >= 0 && island.getCoopPlayers().size() >= island.getCoopLimit()) {
             Message.COOP_LIMIT_EXCEED.send(superiorPlayer);
             return;
         }
