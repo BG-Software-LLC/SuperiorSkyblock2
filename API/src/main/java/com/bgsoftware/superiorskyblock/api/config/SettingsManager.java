@@ -750,6 +750,20 @@ public interface SettingsManager {
     int getCommandsPerPage();
 
     /**
+     * Whether players should receive a help instead of a `NO_COMMAND_PERMISSION` message
+     * when using a command that doesn't exist or not.
+     * Config-path: help-on-no-permission
+     */
+    boolean isHelpOnInvalidCommand();
+
+    /**
+     * Whether players should receive a help instead of a `NO_COMMAND_PERMISSION` message
+     * when using a command they don't have permission for or not.
+     * Config-path: help-on-no-permission
+     */
+    boolean isHelpOnNoPermission();
+
+    /**
      * Whether the plugin should cache schematics for faster placement of schematics.
      * Config-path: cache-schematics
      */

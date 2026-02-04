@@ -4,7 +4,6 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
-import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
@@ -247,7 +246,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
         public boolean execute(CommandSender sender, String label, String[] args) {
             java.util.Locale locale = PlayerLocales.getLocale(sender);
 
-            String executedSubCommand = null;
+            String executedSubCommand;
 
             if (args.length > 0) {
                 executedSubCommand = args[0];
@@ -263,7 +262,12 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
                     if (!CommandsHelper.hasCommandAccess(command, sender)) {
                         Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", command.getPermission());
-                        Message.NO_COMMAND_PERMISSION.send(sender, locale, command.getPermission());
+
+                        if (!plugin.getSettings().isHelpOnNoPermission())
+                            Message.NO_COMMAND_PERMISSION.send(sender, locale, command.getPermission());
+                        else if (!"help".equalsIgnoreCase(executedSubCommand))
+                            dispatchSubCommand(sender, "help");
+
                         return false;
                     }
 
@@ -305,37 +309,31 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                     command.execute(plugin, sender, args);
                     return false;
                 }
+
+                if (!plugin.getSettings().isHelpOnInvalidCommand())
+                    Message.INVALID_COMMAND.send(sender, locale, executedSubCommand);
+                else if (!"help".equalsIgnoreCase(executedSubCommand))
+                    dispatchSubCommand(sender, "help");
+
+                return false;
             }
 
             if (sender instanceof Player) {
                 SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
                 if (superiorPlayer != null) {
-                    Island island = superiorPlayer.getIsland();
-
                     String subCommandToExecute;
-                    if (args.length != 0) {
-                        subCommandToExecute = "help";
-                    } else if (island == null) {
+
+                    if (!superiorPlayer.hasIsland())
                         subCommandToExecute = "create";
-                    } else if (superiorPlayer.hasToggledPanel()) {
+                    else if (superiorPlayer.hasToggledPanel())
                         subCommandToExecute = "panel";
-                    } else {
+                    else
                         subCommandToExecute = "tp";
-                    }
 
-                    // We don't want to end up in an infinite loop
-                    if (!subCommandToExecute.equalsIgnoreCase(executedSubCommand)) {
-                        dispatchSubCommand(sender, subCommandToExecute);
-                    }
-
+                    dispatchSubCommand(sender, subCommandToExecute);
                     return false;
                 }
-            }
-
-            // We don't want to end up in an infinite loop
-            if (!"help".equalsIgnoreCase(executedSubCommand)) {
-                dispatchSubCommand(sender, "help");
             }
 
             return false;

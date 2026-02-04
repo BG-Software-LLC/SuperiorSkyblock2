@@ -415,6 +415,14 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().commandsPerPage;
     }
 
+    public boolean isHelpOnInvalidCommand() {
+        return getContainer().helpOnInvalidCommand;
+    }
+
+    public boolean isHelpOnNoPermission() {
+        return getContainer().helpOnNoPermission;
+    }
+
     public boolean isCacheSchematics() {
         return getContainer().cacheSchematics;
     }
