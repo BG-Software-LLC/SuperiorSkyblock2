@@ -492,6 +492,7 @@ ISLAND_BEING_CALCULATED: '&c&lLỗi | &7Bạn không thể tương tác với c�
 ISLAND_CLOSED: '&e&lĐảo | &7Thành công đóng cửa đảo cho công cộng.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lLỗi | &7Bạn đã có một nhiệm vụ tạo đảo đang diễn ra.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&lĐảo | &7Đang xử lý yêu cầu của bạn...'
+ISLAND_DESCRIPTION_NONE: None
 ISLAND_FLY_DISABLED: '&e&lBay | &7Bay trong đảo đã tự động &cvô hiệu hóad&7.'
 ISLAND_FLY_ENABLED: '&e&lBay | &7Bay trong đảo đã tự động &akích hoạt&7.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lĐảo | &7&oBạn đã ở trong một hòn đảo đã

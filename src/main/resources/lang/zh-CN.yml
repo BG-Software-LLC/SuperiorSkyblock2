@@ -438,6 +438,7 @@ ISLAND_BEING_CALCULATED: '&c&l错误 | &7正在进行计算, 不可以与方块�
 ISLAND_CLOSED: '&e&l岛屿 | &7成功将岛屿设置为不对公众开放.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&l错误 | &7你已经有一个正在进行的岛屿创建进程了.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&l岛屿 | &7正在处理你的请求...'
+ISLAND_DESCRIPTION_NONE: None
 ISLAND_FLY_DISABLED: '&e&l飞行 | &7岛屿飞行已自动 &c关闭&7.'
 ISLAND_FLY_ENABLED: '&e&l飞行 | &7岛屿飞行已自动 &a打开&7.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&l岛屿 | &7&o你正处于一个被解散的岛屿, 正在将你传送回主城...'

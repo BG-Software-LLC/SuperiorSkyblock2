@@ -553,6 +553,7 @@ ISLAND_BEING_CALCULATED: '&c&lError | &7Du kannst nicht mit Blöcken interagiere
 ISLAND_CLOSED: '&e&lInsel | &7Die Insel wurde erfolgreich für die Öffentlichkeit geschlossen.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lError | &7Du hast eine bereits laufende Inselerstellungsaufgabe.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&lInsel | &7Deine Anfrage wird bearbeitet...'
+ISLAND_DESCRIPTION_NONE: None
 ISLAND_FLY_DISABLED: '&e&lFly | &7Inselflug wurde automatisch &cdeaktiviert&7.'
 ISLAND_FLY_ENABLED: '&e&lFly | &7Inselflug wurde automatisch &aktiviert&7.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lInsel | &7&oDu warst auf einer Insel, die aufgelöst

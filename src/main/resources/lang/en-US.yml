@@ -438,6 +438,7 @@ ISLAND_BEING_CALCULATED: '&c&lError | &7You cannot interact with blocks when isl
 ISLAND_CLOSED: '&e&lIsland | &7Successfully closed the island to the public.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lError | &7You have an already ongoing island creation task.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&lIsland | &7Processing your request...'
+ISLAND_DESCRIPTION_NONE: None
 ISLAND_FLY_DISABLED: '&e&lFly | &7Island fly was automatically &cdisabled&7.'
 ISLAND_FLY_ENABLED: '&e&lFly | &7Island fly was automatically &aenabled&7.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lIsland | &7&oYou had been inside an island that been disbanded, so you were teleported back to spawn...'

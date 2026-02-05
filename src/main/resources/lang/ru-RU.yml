@@ -438,6 +438,7 @@ ISLAND_BEING_CALCULATED: '&c&lОшибка | &7Вы не можете взаим
 ISLAND_CLOSED: '&e&lОстров | &7Остров успешно закрыт для публики.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lОшибка | &7У вас уже есть запущенная задача создания острова.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&lОстров | &7Обработка вашего запроса...'
+ISLAND_DESCRIPTION_NONE: None
 ISLAND_FLY_DISABLED: '&e&lПолёт | &7Полёт на острове автоматически &cвыключен&7.'
 ISLAND_FLY_ENABLED: '&e&lПолёт | &7Полёт на острове автоматически &aвключён&7.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lОстров | &7&oВы были внутри острова, который был расформирован, поэтому вы были телепортированы обратно в спаун...'

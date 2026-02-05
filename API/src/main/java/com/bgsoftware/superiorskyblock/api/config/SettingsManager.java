@@ -1045,6 +1045,12 @@ public interface SettingsManager {
          */
         String getInactive();
 
+        /**
+         * The format in which the island description lines will be saved.
+         * Config-path: visitors-sign.description-line-format
+         */
+        String getDescriptionLineFormat();
+
     }
 
     interface Worlds {
