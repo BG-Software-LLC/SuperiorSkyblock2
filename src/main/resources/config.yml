@@ -855,8 +855,26 @@ island-previews:
 # Should vanished players be hidden in tab completes?
 tab-complete-hide-vanished: true
 
-# When enabled, the drops multiplier will only multiply drops of entities that were killed by players.
-drops-upgrade-players-multiply: false
+# Settings related to mob drops multiplier.
+mob-drops:
+  # Should mob drops multiplier will only multiply drops of entities that were killed by players.
+  only-player-kills: false
+
+  # List of whitelisted items that will be multiplied.
+  # You can disable this feature by setting the section to 'whitelisted-items: []'
+  whitelisted-items: [ ]
+
+  # List of blacklisted items that won't be multiplied.
+  # You can disable this feature by setting the section to 'blacklisted-items: []'
+  blacklisted-items: [ ]
+
+  # List of whitelisted entities whose drops will be multiplied.
+  # You can disable this feature by setting the section to 'whitelisted-entities: []'
+  whitelisted-entities: [ ]
+
+  # List of blacklisted entities whose drops won't be multiplied.
+  # You can disable this feature by setting the section to 'blacklisted-entities: []'
+  blacklisted-entities: [ ]
 
 # List of messages that should have a delay. (in milliseconds)
 message-delays:

@@ -648,8 +648,17 @@ public interface SettingsManager {
     /**
      * Whether drops multiplier should only affect entities that are killed by players or not.
      * Config-path: drops-upgrade-players-multiply
+     *
+     * @deprecated See {@link #getMobDrops()}
      */
+    @Deprecated
     boolean isDropsUpgradePlayersMultiply();
+
+    /**
+     * All settings related to mob drops multiplier.
+     * Config path: mob-drops
+     */
+    MobDrops getMobDrops();
 
     /**
      * The delay set for the ISLAND_PROTECTED message.
@@ -1409,6 +1418,40 @@ public interface SettingsManager {
          */
         @Nullable
         IslandPrivilege getRequiredPrivilege(Key key);
+
+    }
+
+    interface MobDrops {
+
+        /**
+         * Whether the mob drops multiplier will only multiply drops of entities that were killed by players.
+         * Config-path: mob-drops.only-player-kills
+         */
+        boolean isOnlyPlayerKills();
+
+        /**
+         * List of whitelisted items that will be multiplied.
+         * Config-path: mob-drops.whitelisted-items
+         */
+        Set<Key> getWhitelistedItems();
+
+        /**
+         * List of blacklisted items that won't be multiplied.
+         * Config-path: mob-drops.blacklisted-items
+         */
+        Set<Key> getBlacklistedItems();
+
+        /**
+         * List of whitelisted entities whose drops will be multiplied.
+         * Config-path: mob-drops.whitelisted-entities
+         */
+        Set<Key> getWhitelistedEntities();
+
+        /**
+         * List of blacklisted entities whose drops won't be multiplied.
+         * Config-path: mob-drops.blacklisted-entities
+         */
+        Set<Key> getBlacklistedEntities();
 
     }
 

@@ -348,10 +348,6 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().tabCompleteHideVanished;
     }
 
-    public boolean isDropsUpgradePlayersMultiply() {
-        return getContainer().dropsUpgradePlayersMultiply;
-    }
-
     public Map<String, Long> getMessageDelays() {
         return getContainer().messageDelays;
     }

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.module.upgrades.type;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddMobDrops;
@@ -25,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class UpgradeTypeMobDrops implements IUpgradeType {
 
@@ -79,6 +81,9 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
             if (!canDupeDropsForEntity(e.getEntity()))
                 return;
 
+            if (!isWhitelisted(e.getEntity()) || isBlacklisted(e.getEntity()))
+                return;
+
             Island island;
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 island = plugin.getGrid().getIslandAt(e.getEntity().getLocation(wrapper.getHandle()));
@@ -86,7 +91,7 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
             if (island == null)
                 return;
 
-            if (plugin.getSettings().isDropsUpgradePlayersMultiply()) {
+            if (plugin.getSettings().getMobDrops().isOnlyPlayerKills()) {
                 EntityDamageEvent lastDamage = e.getEntity().getLastDamageCause();
                 if (!(lastDamage instanceof EntityDamageByEntityEvent) ||
                         !BukkitEntities.getPlayerSource(((EntityDamageByEntityEvent) lastDamage).getDamager()).isPresent())
@@ -105,6 +110,9 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
 
             for (ItemStack itemStack : drops) {
                 if (itemStack != null && !BukkitEntities.isEquipment(livingEntity, itemStack)) {
+                    if (!isWhitelisted(itemStack) || isBlacklisted(itemStack))
+                        continue;
+
                     int newAmount = (int) Math.floor(itemStack.getAmount() * mobDropsMultiplier);
 
                     if (isWildStackerInstalled) {
@@ -142,6 +150,26 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
                 drops.addAll(dropsToAdd);
         }
 
+    }
+
+    private boolean isWhitelisted(ItemStack itemStack) {
+        Set<Key> whitelistedItems = plugin.getSettings().getMobDrops().getWhitelistedItems();
+        return whitelistedItems.isEmpty() || whitelistedItems.contains(Key.of(itemStack));
+    }
+
+    private boolean isBlacklisted(ItemStack itemStack) {
+        Set<Key> blacklistedItems = plugin.getSettings().getMobDrops().getBlacklistedItems();
+        return blacklistedItems.contains(Key.of(itemStack));
+    }
+
+    private boolean isWhitelisted(Entity entity) {
+        Set<Key> whitelistedEntities = plugin.getSettings().getMobDrops().getWhitelistedEntities();
+        return whitelistedEntities.isEmpty() || whitelistedEntities.contains(Key.of(entity));
+    }
+
+    private boolean isBlacklisted(Entity entity) {
+        Set<Key> blacklistedEntities = plugin.getSettings().getMobDrops().getBlacklistedEntities();
+        return blacklistedEntities.contains(Key.of(entity));
     }
 
 }

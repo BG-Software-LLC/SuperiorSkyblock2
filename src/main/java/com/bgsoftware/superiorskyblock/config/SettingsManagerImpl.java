@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.config.section.IslandChestsSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandNamesSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandPreviewsSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandRolesSection;
+import com.bgsoftware.superiorskyblock.config.section.MobDropsSection;
 import com.bgsoftware.superiorskyblock.config.section.SpawnSection;
 import com.bgsoftware.superiorskyblock.config.section.StackedBlocksSection;
 import com.bgsoftware.superiorskyblock.config.section.VisitorsSignSection;
@@ -68,6 +69,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     private final DefaultContainersSection defaultContainers = new DefaultContainersSection();
     private final IslandChestsSection islandChests = new IslandChestsSection();
     private final IslandPreviewsSection islandPreviews = new IslandPreviewsSection();
+    private final MobDropsSection mobDrops = new MobDropsSection();
 
     public SettingsManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -594,7 +596,12 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public boolean isDropsUpgradePlayersMultiply() {
-        return this.global.isDropsUpgradePlayersMultiply();
+        return this.mobDrops.isOnlyPlayerKills();
+    }
+
+    @Override
+    public MobDropsSection getMobDrops() {
+        return this.mobDrops;
     }
 
     @Override
@@ -740,9 +747,14 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         this.defaultContainers.setContainer(container);
         this.islandChests.setContainer(container);
         this.islandPreviews.setContainer(container);
+        this.mobDrops.setContainer(container);
     }
 
     private void convertData(YamlConfiguration cfg) {
+        if (cfg.isBoolean("drops-upgrade-players-multiply")) {
+            cfg.set("mob-drops.only-player-kills", cfg.getBoolean("drops-upgrade-players-multiply"));
+            cfg.set("drops-upgrade-players-multiply", null);
+        }
         if (cfg.get("island-level-formula") != null) {
             cfg.set("block-level-formula", cfg.getString("island-level-formula"));
             cfg.set("island-level-formula", null);
