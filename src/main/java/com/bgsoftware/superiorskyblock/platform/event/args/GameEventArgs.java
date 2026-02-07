@@ -398,6 +398,13 @@ public class GameEventArgs implements IEventArgs {
 
     }
 
+    public static class EntityInteractEvent extends EntityEvent {
+
+        @Nullable
+        public Block block;
+
+    }
+
     private static class BlockEvent extends GameEventArgs {
 
         public Block block;
