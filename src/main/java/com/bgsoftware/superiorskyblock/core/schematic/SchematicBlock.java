@@ -210,11 +210,11 @@ public class SchematicBlock {
     }
 
     private static boolean isSignId(String id) {
-        return id.equals("Sign") || id.equals("minecraft:sign");
+        return id.equals("Sign") || id.equals("minecraft:sign") || id.equals("minecraft:hanging_sign");
     }
 
     private static boolean isChestId(String id) {
-        return id.equals("Chest") || id.equals("minecraft:chest");
+        return id.equals("Chest") || id.equals("minecraft:chest") || id.equals("minecraft:trapped_chest");
     }
 
     public static class Extra {
