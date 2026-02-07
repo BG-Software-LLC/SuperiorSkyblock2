@@ -150,8 +150,10 @@ public class IslandSigns {
 
         for (int i = 1; i < 4; i++) {
             String line = warpLines[i];
-            if (!line.isEmpty())
-                descriptionBuilder.append("\n").append(ChatColor.RESET).append(line);
+            if (!line.isEmpty()) {
+                String formattedLine = plugin.getSettings().getVisitorsSign().getDescriptionLineFormat().replace("{0}", line);
+                descriptionBuilder.append("\n").append(ChatColor.RESET).append(formattedLine);
+            }
         }
 
         String description = descriptionBuilder.length() < 1 ? "" : descriptionBuilder.substring(1);

@@ -120,6 +120,7 @@ public class SettingsContainer {
     public final String visitorsSignLine;
     public final String visitorsSignActive;
     public final String visitorsSignInactive;
+    public final String visitorsSignDescriptionLineFormat;
     public final Dimension defaultWorldDimension;
     public final String defaultWorldName;
     public final String islandWorldName;
@@ -342,6 +343,7 @@ public class SettingsContainer {
         visitorsSignLine = config.getString("visitors-sign.line", "[Welcome]");
         visitorsSignActive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.active", "&a[Welcome]"));
         visitorsSignInactive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.inactive", "&c[Welcome]"));
+        visitorsSignDescriptionLineFormat = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.description-line-format", "{0}"));
         islandWorldName = config.getString("worlds.world-name", "SuperiorWorld");
 
         {

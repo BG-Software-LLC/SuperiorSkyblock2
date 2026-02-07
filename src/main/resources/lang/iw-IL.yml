@@ -454,6 +454,7 @@ ISLAND_BEING_CALCULATED: '&c&lהאיגש | &7שדחמ בשוחמ יאהש ןמז
 ISLAND_CLOSED: '&e&lיא | &7החלצהב רוביצל רגסנ יאה.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lError | &7You have an already ongoing island creation task.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&lיא | &7ךתשקב תא דבעמ...'
+ISLAND_DESCRIPTION_NONE: None
 ISLAND_FLY_DISABLED: '&e&lהפועת | &7יטמוטוא הפועת בצמ &cקספוה&7.'
 ISLAND_FLY_ENABLED: '&e&lהפועת | &7יטמוטוא הפועת בצמ &aלעפוה&7.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lיא | &7&oןואפסה לא תרגוש ןכל ,קחמנש יא ךותב

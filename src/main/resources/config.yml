@@ -324,6 +324,10 @@ visitors-sign:
   active: '&a[Welcome]'
   # The line that will be displayed when the sign is inactive.
   inactive: '&c[Welcome]'
+  # The format in which the island description lines will be saved, players can set the island description
+  # by entering it in the next lines of the Visitors Sign. Useful if you want to display a description
+  # in the global-warps menu and want to give it a default color. {0} represents the text on that line.
+  description-line-format: '{0}'
 
 # Settings related to the island worlds.
 worlds:

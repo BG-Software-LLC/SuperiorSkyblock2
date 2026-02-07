@@ -438,6 +438,7 @@ ISLAND_BEING_CALCULATED: '&c&lBlad | &7Nie mozesz wchodzic w interakcje z blokam
 ISLAND_CLOSED: '&e&lWyspa | &7Pomyslnie zamknelismy wyspe dla publicznosci.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lBlad | &7Masz juz trwajace zadanie tworzenia wyspy.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&lWyspa | &7Przetwarzanie zadania...'
+ISLAND_DESCRIPTION_NONE: None
 ISLAND_FLY_DISABLED: '&e&lFly | &7Mucha na wyspe zostala automatycznie &cwylaczona&7.'
 ISLAND_FLY_ENABLED: '&e&lFly | &7Lot na wyspe zostal automatycznie &wlaczony&7.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lWyspa | &7&oByles na wyspie, która zostala rozwiazana, wiec zostales przeteleportowany z powrotem na miejsce odrodzenia...'

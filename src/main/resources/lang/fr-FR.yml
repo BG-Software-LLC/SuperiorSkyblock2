@@ -438,6 +438,7 @@ ISLAND_BEING_CALCULATED: '&c&lErreur | &7Vous ne pouvez pas interagir avec des b
 ISLAND_CLOSED: '&e&lIle | &7L''île est désormais fermée au public.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lErreur | &7Votre île est déjà en cours de création.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&lIle | &7Requête en cours de traitement...'
+ISLAND_DESCRIPTION_NONE: None
 ISLAND_FLY_DISABLED: '&e&lVol | &7Le mode vol de l''île a été &cdésactivé &7automatiquement.'
 ISLAND_FLY_ENABLED: '&e&lVol | &7Le mode vol de l''île &aactivé &7automatiquement.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lIle | &7&oVous vous trouviez sur une île ayant été supprimée, vous avez donc été téléporté(e) au spawn...'
