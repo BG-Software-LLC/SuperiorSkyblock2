@@ -212,7 +212,7 @@ public class IslandsDatabaseBridge {
     }
 
     public static void saveSize(Island island) {
-        updateIslandValue(island, "size", island.getIslandSize());
+        updateIslandSettingsValue(island, "size", island.getIslandSize());
     }
 
     public static void saveDiscord(Island island) {
@@ -236,7 +236,7 @@ public class IslandsDatabaseBridge {
     }
 
     public static void saveBankLimit(Island island) {
-        updateIslandValue(island, "bank_limit", island.getBankLimit() + "");
+        updateIslandSettingsValue(island, "bank_limit", island.getBankLimit() + "");
     }
 
     public static void saveBonusWorth(Island island) {
