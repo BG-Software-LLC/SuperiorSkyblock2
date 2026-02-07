@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
+import com.bgsoftware.superiorskyblock.tag.NumberTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.google.gson.Gson;
@@ -156,7 +157,13 @@ public class SchematicBlock {
                 if (tag instanceof CompoundTag) {
                     JsonObject jsonObject = new JsonObject();
                     for (Map.Entry<String, Tag<?>> entry : ((CompoundTag) tag).entrySet()) {
-                        jsonObject.addProperty(entry.getKey(), String.valueOf(entry.getValue().getValue()));
+                        Tag<?> valueTag = entry.getValue();
+                        if (valueTag instanceof NumberTag) {
+                            // Booleans are parsed as NumberTag
+                            jsonObject.addProperty(entry.getKey(), ((NumberTag<?>) valueTag).getValue().intValue() == 1);
+                        } else {
+                            jsonObject.addProperty(entry.getKey(), String.valueOf(valueTag.getValue()));
+                        }
                     }
                     line = GSON.toJson(jsonObject);
                 } else {
