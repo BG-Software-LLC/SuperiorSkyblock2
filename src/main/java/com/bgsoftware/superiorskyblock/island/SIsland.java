@@ -4754,14 +4754,14 @@ public class SIsland implements Island {
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkArgument(mission.getIslandMission(), "mission parameter must be island-mission.");
-        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(1));
+        this.changeAmountMissionsCompletedInternal(mission, false, counter -> counter.inc(1));
     }
 
     @Override
     public void resetMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkArgument(mission.getIslandMission(), "mission parameter must be island-mission.");
-        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(-1));
+        this.changeAmountMissionsCompletedInternal(mission, true, counter -> counter.inc(-1));
     }
 
     @Override
@@ -4796,10 +4796,10 @@ public class SIsland implements Island {
     public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkArgument(mission.getIslandMission(), "mission parameter must be island-mission.");
-        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.set(finishCount));
+        this.changeAmountMissionsCompletedInternal(mission, true, counter -> counter.set(finishCount));
     }
 
-    private void changeAmountMissionsCompletedInternal(Mission<?> mission, Function<Counter, Integer> action) {
+    private void changeAmountMissionsCompletedInternal(Mission<?> mission, boolean clearData, Function<Counter, Integer> action) {
         String missionName = mission.getName();
 
         MissionReference missionReference = new MissionReference(mission);
@@ -4810,8 +4810,8 @@ public class SIsland implements Island {
 
         Log.debug(Debug.SET_ISLAND_MISSION_COMPLETED, missionName, finishCount);
 
-        // We always want to reset data
-        mission.clearData(getOwner());
+        if (clearData)
+            mission.clearData(getOwner());
 
         if (newFinishCount > 0) {
             if (newFinishCount == oldFinishCount)

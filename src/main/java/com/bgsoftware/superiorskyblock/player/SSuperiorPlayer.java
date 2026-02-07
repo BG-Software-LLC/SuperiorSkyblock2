@@ -1045,14 +1045,14 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkArgument(!mission.getIslandMission(), "mission parameter must be player-mission.");
-        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(1));
+        this.changeAmountMissionsCompletedInternal(mission, false, counter -> counter.inc(1));
     }
 
     @Override
     public void resetMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkArgument(!mission.getIslandMission(), "mission parameter must be player-mission.");
-        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(-1));
+        this.changeAmountMissionsCompletedInternal(mission, true, counter -> counter.inc(-1));
     }
 
     @Override
@@ -1087,10 +1087,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkArgument(!mission.getIslandMission(), "mission parameter must be player-mission.");
-        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.set(finishCount));
+        this.changeAmountMissionsCompletedInternal(mission, true, counter -> counter.set(finishCount));
     }
 
-    private void changeAmountMissionsCompletedInternal(Mission<?> mission, Function<Counter, Integer> action) {
+    private void changeAmountMissionsCompletedInternal(Mission<?> mission, boolean clearData, Function<Counter, Integer> action) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
 
         MissionReference missionReference = new MissionReference(mission);
@@ -1101,8 +1101,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         Log.debug(Debug.SET_PLAYER_MISSION_COMPLETED, getName(), mission.getName(), newFinishCount);
 
-        // We always want to reset data
-        mission.clearData(this);
+        if (clearData)
+            mission.clearData(this);
 
         if (newFinishCount > 0) {
             if (newFinishCount == oldFinishCount)

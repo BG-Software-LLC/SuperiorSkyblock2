@@ -43,6 +43,7 @@ import java.lang.reflect.Constructor;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -245,11 +246,6 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 
-        if (Bukkit.isPrimaryThread()) {
-            BukkitExecutor.async(() -> rewardMission(mission, superiorPlayer, checkAutoReward, forceReward, result));
-            return;
-        }
-
         Optional<MissionData> missionDataOptional = getMissionData(mission);
 
         if (!missionDataOptional.isPresent()) {
@@ -260,95 +256,136 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
         Log.debug(Debug.REWARD_MISSION, mission.getName(), superiorPlayer.getName(), checkAutoReward, forceReward);
 
-        synchronized (superiorPlayer) {
-            MissionData missionData = missionDataOptional.get();
+        MissionData missionData = missionDataOptional.get();
 
-            IMissionsHolder missionsHolder = missionData.isIslandMission() ? superiorPlayer.getIsland() : superiorPlayer;
+        IMissionsHolder missionsHolder = missionData.isIslandMission() ? superiorPlayer.getIsland() : superiorPlayer;
 
-            if (missionsHolder == null) {
-                mission.onCompleteFail(superiorPlayer);
-                if (result != null)
-                    result.accept(false);
-                throw new IllegalStateException("Cannot reward island mission " + mission.getName() + " as the player " + superiorPlayer.getName() + " does not have island.");
-            }
-
-            if (!forceReward) {
-                if (!canCompleteAgain(superiorPlayer, mission)) {
-                    mission.onCompleteFail(superiorPlayer);
-                    if (result != null)
-                        result.accept(false);
-                    return;
-                }
-
-                if (!canComplete(superiorPlayer, mission)) {
-                    if (result != null)
-                        result.accept(false);
-                    return;
-                }
-
-                if (checkAutoReward) {
-                    boolean shouldAutoReward = isAutoReward(mission);
-                    if (shouldAutoReward && !BuiltinModules.MISSIONS.getConfiguration().isAutoRewardOutsideIslands() &&
-                            !plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld())) {
-                        if (result != null)
-                            result.accept(false);
-                        return;
-                    }
-
-                    if (!shouldAutoReward) {
-                        if (canCompleteAgain(superiorPlayer, mission)) {
-                            Message.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
-                            if (result != null)
-                                result.accept(false);
-                            return;
-                        }
-                    }
-                }
-            }
-
-            List<ItemStack> itemRewards = new ArrayList<>();
-            List<String> commandRewards;
-
-            //noinspection SynchronizationOnLocalVariableOrMethodParameter
-            synchronized (missionData) {
-                missionData.getItemRewards().forEach(itemStack -> itemRewards.add(itemStack.clone()));
-                commandRewards = new ArrayList<>(missionData.getCommandRewards());
-            }
-
-            PluginEvent<PluginEventArgs.MissionComplete> event = PluginEventsFactory.callMissionCompleteEvent(
-                    superiorPlayer, missionsHolder, mission, itemRewards, commandRewards);
-
-            if (event.isCancelled()) {
-                if (!forceReward)
-                    mission.onCompleteFail(superiorPlayer);
-                if (result != null)
-                    result.accept(false);
-                return;
-            }
-
-            if (!forceReward)
-                mission.onComplete(superiorPlayer);
-
-            missionsHolder.completeMission(mission);
-
+        if (missionsHolder == null) {
+            mission.onCompleteFail(superiorPlayer);
             if (result != null)
-                result.accept(true);
+                result.accept(false);
+            throw new IllegalStateException("Cannot reward island mission " + mission.getName() + " as the player " + superiorPlayer.getName() + " does not have island.");
+        }
 
-            for (ItemStack itemStack : event.getArgs().itemRewards) {
-                ItemStack toGive = new ItemBuilder(itemStack)
-                        .replaceAll("{0}", mission.getName())
-                        .replaceAll("{1}", superiorPlayer.getName())
-                        .replaceAll("{2}", getIslandPlaceholder(missionsHolder))
-                        .build();
-                toGive.setAmount(itemStack.getAmount());
-                BukkitExecutor.ensureMain(() -> superiorPlayer.runIfOnline(player -> {
-                    try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                        BukkitItems.addItem(toGive, player.getInventory(), player.getLocation(wrapper.getHandle()));
-                    }
-                }));
+        if (Bukkit.isPrimaryThread()) {
+            BukkitExecutor.async(() -> rewardMissionAsyncInternal(mission, missionData, superiorPlayer,
+                    missionsHolder, checkAutoReward, forceReward, result));
+        } else {
+            rewardMissionAsyncInternal(mission, missionData, superiorPlayer, missionsHolder, checkAutoReward, forceReward, result);
+        }
+    }
+
+    private void rewardMissionAsyncInternal(Mission<?> mission, MissionData missionData, SuperiorPlayer superiorPlayer,
+                                            IMissionsHolder missionsHolder, boolean checkAutoReward, boolean forceReward,
+                                            @Nullable Consumer<Boolean> result) {
+        boolean rewarded;
+        synchronized (superiorPlayer) {
+            rewarded = tryRewardMissionLockedInternal(mission, missionData, superiorPlayer, missionsHolder, checkAutoReward, forceReward);
+        }
+        if (result != null)
+            result.accept(rewarded);
+    }
+
+    private boolean tryRewardMissionLockedInternal(Mission<?> mission, MissionData missionData, SuperiorPlayer superiorPlayer,
+                                                   IMissionsHolder missionsHolder, boolean checkAutoReward, boolean forceReward) {
+        if (!forceReward) {
+            if (!canCompleteAgain(superiorPlayer, mission)) {
+                mission.onCompleteFail(superiorPlayer);
+                return false;
             }
 
+            if (!canComplete(superiorPlayer, mission)) {
+                return false;
+            }
+
+            if (checkAutoReward) {
+                boolean shouldAutoReward = isAutoReward(mission);
+                if (shouldAutoReward && !BuiltinModules.MISSIONS.getConfiguration().isAutoRewardOutsideIslands() &&
+                        !plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld())) {
+                    return false;
+                }
+
+                if (!shouldAutoReward) {
+                    if (canCompleteAgain(superiorPlayer, mission)) {
+                        Message.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
+                        return false;
+                    }
+                }
+            }
+        }
+
+        List<ItemStack> itemRewards = new ArrayList<>();
+        List<String> commandRewards;
+
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
+        synchronized (missionData) {
+            missionData.getItemRewards().forEach(itemStack -> itemRewards.add(itemStack.clone()));
+            commandRewards = new LinkedList<>(missionData.getCommandRewards());
+        }
+
+        PluginEvent<PluginEventArgs.MissionComplete> event = PluginEventsFactory.callMissionCompleteEvent(
+                superiorPlayer, missionsHolder, mission, itemRewards, commandRewards);
+
+        if (event.isCancelled()) {
+            if (!forceReward)
+                mission.onCompleteFail(superiorPlayer);
+            return false;
+        }
+
+        if (!forceReward)
+            mission.onComplete(superiorPlayer);
+
+        missionsHolder.completeMission(mission);
+
+        if (missionData.isResetAfterFinish()) {
+            mission.clearData(superiorPlayer);
+        } else {
+            // We want to add the data to the next missions as well
+            Object playerMissionProgress = mission.get(superiorPlayer);
+            for (Mission otherMission : mission.getMissionCategory().getMissions()) {
+                if (otherMission.getRequiredMissions().contains(mission.getName()) &&
+                        canCompleteNoProgress(superiorPlayer, otherMission)) {
+                    try {
+                        otherMission.insertData(superiorPlayer, playerMissionProgress);
+                    } catch (ClassCastException error) {
+                        // We use raw parameterized values, therefore cast-errors can occur.
+                        // In this case, we'll just ignore these.
+                    }
+                }
+            }
+        }
+
+        List<ItemStack> rewardedItems = new LinkedList<>();
+        for (ItemStack itemStack : event.getArgs().itemRewards) {
+            ItemStack toGive = new ItemBuilder(itemStack)
+                    .replaceAll("{0}", mission.getName())
+                    .replaceAll("{1}", superiorPlayer.getName())
+                    .replaceAll("{2}", getIslandPlaceholder(missionsHolder))
+                    .build();
+            toGive.setAmount(itemStack.getAmount());
+            rewardedItems.add(toGive);
+        }
+
+        // Auto complete other missions that depend on the mission that was just completed
+        for (Mission<?> otherMission : getAllMissions()) {
+            if (otherMission.getRequiredMissions().contains(mission.getName()) && otherMission.canComplete(superiorPlayer)) {
+                // Auto reward the next mission
+                rewardMission(otherMission, superiorPlayer, true);
+            }
+        }
+
+        if (!rewardedItems.isEmpty() || !event.getArgs().commandRewards.isEmpty()) {
             BukkitExecutor.ensureMain(() -> {
+                if (!rewardedItems.isEmpty()) {
+                    superiorPlayer.runIfOnline(player -> {
+                        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                            for (ItemStack toGive : itemRewards) {
+                                BukkitItems.addItem(toGive, player.getInventory(), player.getLocation(wrapper.getHandle()));
+                            }
+                        }
+                    });
+                }
+
                 for (String command : event.getArgs().commandRewards) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
                             .replace("%mission%", mission.getName())
@@ -357,15 +394,9 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                     );
                 }
             });
-
-            // Auto complete other missions that depend on the mission that was just completed
-            for (Mission<?> otherMission : getAllMissions()) {
-                if (otherMission.getRequiredMissions().contains(mission.getName()) && otherMission.canComplete(superiorPlayer)) {
-                    // Auto reward the next mission
-                    rewardMission(otherMission, superiorPlayer, true);
-                }
-            }
         }
+
+        return true;
     }
 
     private boolean moveOldDataFolder(File newDataFolder) {
