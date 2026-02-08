@@ -165,8 +165,10 @@ public class SIslandBank implements IslandBank {
     @Override
     public boolean canDepositMoney(BigDecimal amount) {
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
-        return this.island.getBankLimit().compareTo(NO_BANK_LIMIT) <= 0 ||
-                this.balance.get().add(amount).compareTo(this.island.getBankLimit()) <= 0;
+
+        BigDecimal bankLimit = this.island.getBankLimit();
+        return bankLimit.compareTo(NO_BANK_LIMIT) <= 0 ||
+                this.balance.get().add(amount).compareTo(bankLimit) <= 0;
     }
 
     @Override
