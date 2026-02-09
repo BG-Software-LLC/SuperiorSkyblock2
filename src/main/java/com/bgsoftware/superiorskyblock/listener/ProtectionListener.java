@@ -110,7 +110,10 @@ public class ProtectionListener extends AbstractGameEventListener {
         if (!(projectileSource instanceof Player))
             return;
 
-        handleBlockInteract(e, (Player) projectileSource, Action.PHYSICAL, clickedBlock, null);
+        if (handleBlockInteract(e, (Player) projectileSource, Action.PHYSICAL, clickedBlock, null)) {
+            // We want to remove the projectile as well when it is not possible to interact
+            entity.remove();
+        }
     }
 
     private boolean handleBlockFertilize(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
@@ -236,16 +239,20 @@ public class ProtectionListener extends AbstractGameEventListener {
         return false;
     }
 
-    private void handleBlockInteract(GameEvent<?> e, Player player, Action action,
-                                     @Nullable Block clickedBlock, @Nullable ItemStack usedItem) {
+    private boolean handleBlockInteract(GameEvent<?> e, Player player, Action action,
+                                        @Nullable Block clickedBlock, @Nullable ItemStack usedItem) {
         if (clickedBlock == null)
-            return;
+            return false;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
         InteractionResult interactionResult = this.protectionManager.get().handleBlockInteract(
                 superiorPlayer, clickedBlock, action, usedItem);
-        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
+            return true;
+        }
+
+        return false;
     }
 
     private void onBlockBreak(GameEvent<GameEventArgs.BlockBreakEvent> e) {
