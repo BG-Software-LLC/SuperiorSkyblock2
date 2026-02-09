@@ -943,6 +943,14 @@ chat-signing-support: true
 # Setting this to 0 or below will result all commands to be shown in a single page.
 commands-per-page: 7
 
+# Should players receive a help instead of an `INVALID_COMMAND` message
+# when using a command that doesn't exist?
+help-on-invalid-command: true
+
+# Should players receive a help instead of a `NO_COMMAND_PERMISSION` message
+# when using a command they don't have permission for?
+help-on-no-permission: false
+
 # Configure custom entity categories.
 # By default, there are two entity categories - ANIMALS and MONSTER
 # You can add your own custom categories in here, and configure which entities are part of the category.

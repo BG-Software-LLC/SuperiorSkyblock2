@@ -74,9 +74,11 @@ public class CmdAdmin implements ISuperiorCommand {
         java.util.Locale locale = PlayerLocales.getLocale(sender);
 
         if (args.length > 1 && !isNumber(args[1])) {
-            Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), args[1]);
+            String executedSubCommand = args[1];
 
-            SuperiorCommand command = plugin.getCommands().getAdminCommand(args[1]);
+            Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), executedSubCommand);
+
+            SuperiorCommand command = plugin.getCommands().getAdminCommand(executedSubCommand);
             if (command != null) {
                 if (!(sender instanceof Player) && !command.canBeExecutedByConsole()) {
                     Message.CUSTOM.send(sender, "&cCan be executed only by players!", true);
@@ -85,7 +87,12 @@ public class CmdAdmin implements ISuperiorCommand {
 
                 if (!CommandsHelper.hasCommandAccess(command, sender)) {
                     Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", command.getPermission());
-                    Message.NO_COMMAND_PERMISSION.send(sender, locale, command.getPermission());
+
+                    if (!plugin.getSettings().isHelpOnNoPermission())
+                        Message.NO_COMMAND_PERMISSION.send(sender, locale, command.getPermission());
+                    else
+                        plugin.getCommands().dispatchSubCommand(sender, "admin");
+
                     return;
                 }
 
@@ -98,6 +105,13 @@ public class CmdAdmin implements ISuperiorCommand {
                 command.execute(plugin, sender, args);
                 return;
             }
+
+            if (!plugin.getSettings().isHelpOnInvalidCommand())
+                Message.INVALID_COMMAND.send(sender, locale, executedSubCommand);
+            else
+                plugin.getCommands().dispatchSubCommand(sender, "admin");
+
+            return;
         }
 
         int page = 1;

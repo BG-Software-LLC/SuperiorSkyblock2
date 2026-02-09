@@ -673,6 +673,16 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public boolean isHelpOnInvalidCommand() {
+        return this.global.isHelpOnInvalidCommand();
+    }
+
+    @Override
+    public boolean isHelpOnNoPermission() {
+        return this.global.isHelpOnNoPermission();
+    }
+
+    @Override
     public boolean isCacheSchematics() {
         return this.global.isCacheSchematics();
     }
