@@ -577,6 +577,9 @@ public class SIsland implements Island {
 
         updateLastTime();
 
+        ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnJoin(),
+                plugin.getSettings().isTeleportOnJoin() ? this : null);
+
         if (superiorPlayer.isOnline()) {
             updateIslandFly(superiorPlayer);
             setCurrentlyActive();
@@ -586,35 +589,53 @@ public class SIsland implements Island {
     }
 
     @Override
-    public void removeMember(SuperiorPlayer superiorPlayer, MemberRemoveReason memberRemoveReason) {
+    public void removeMember(SuperiorPlayer superiorPlayer, MemberRemoveReason reason) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        Preconditions.checkNotNull(memberRemoveReason, "memberRemoveReason parameter cannot be null.");
+        Preconditions.checkNotNull(reason, "memberRemoveReason parameter cannot be null.");
+        Preconditions.checkArgument(!superiorPlayer.equals(owner), "superiorPlayer cannot be island owner.");
 
-        if (memberRemoveReason == MemberRemoveReason.KICK) {
+        removeMemberSafe(superiorPlayer, reason);
+    }
+
+    private void removeMemberSafe(SuperiorPlayer superiorPlayer, MemberRemoveReason reason) {
+        if (reason == MemberRemoveReason.KICK)
             Log.debug(Debug.KICK_MEMBER, owner.getName(), superiorPlayer.getName());
-        } else if (memberRemoveReason == MemberRemoveReason.LEAVE) {
+        else if (reason == MemberRemoveReason.LEAVE)
             Log.debug(Debug.LEAVE_ISLAND, owner.getName(), superiorPlayer.getName());
+
+        if (!superiorPlayer.equals(owner)) {
+            boolean removedMember = members.writeAndGet(members -> members.remove(superiorPlayer));
+
+            if (!removedMember) {
+                // If the remove method failed, we iterate through all the members and remove the member manually.
+                // Should fix issues if members are not in the correct order.
+                // Reference: https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/734
+                removedMember = members.writeAndGet(members -> members.removeIf(superiorPlayer::equals));
+            }
+
+            // This player is not a member of the island.
+            if (!removedMember)
+                return;
         }
 
-        boolean removedMember = members.writeAndGet(members -> members.remove(superiorPlayer));
-
-        if (!removedMember) {
-            // If the remove method failed, we iterate through all the members and remove the member manually.
-            // Should fix issues if members are not in the correct order.
-            // Reference: https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/734
-            removedMember = members.writeAndGet(members -> members.removeIf(superiorPlayer::equals));
-        }
-
-        // This player is not a member of the island.
-        if (!removedMember)
-            return;
-
+        boolean isInside = superiorPlayer.isInsideIsland();
         superiorPlayer.setIsland(null);
 
-        if (memberRemoveReason == MemberRemoveReason.KICK) {
-            ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnKick());
-        } else if (memberRemoveReason == MemberRemoveReason.LEAVE) {
-            ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnLeave());
+        if (reason == MemberRemoveReason.DISBAND) {
+            ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnDisband(),
+                    isInside ? plugin.getGrid().getSpawnIsland() : null);
+        } else if (reason == MemberRemoveReason.KICK) {
+            boolean shouldTeleport = plugin.getSettings().isTeleportOnKick() && isInside;
+            ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnKick(),
+                    shouldTeleport ? plugin.getGrid().getSpawnIsland() : null);
+            if (!shouldTeleport)
+                updateIslandFly(superiorPlayer);
+        } else if (reason == MemberRemoveReason.LEAVE) {
+            boolean shouldTeleport = plugin.getSettings().isTeleportOnLeave() && isInside;
+            ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnLeave(),
+                    shouldTeleport ? plugin.getGrid().getSpawnIsland() : null);
+            if (!shouldTeleport)
+                updateIslandFly(superiorPlayer);
         }
 
         superiorPlayer.runIfOnline(player -> {
@@ -622,28 +643,26 @@ public class SIsland implements Island {
 
             if (openedView != null)
                 openedView.closeView();
-
-            boolean shouldTeleport = (memberRemoveReason == MemberRemoveReason.KICK && plugin.getSettings().isTeleportOnKick()) ||
-                    (memberRemoveReason == MemberRemoveReason.LEAVE && plugin.getSettings().isTeleportOnLeave());
-
-            if (shouldTeleport && getAllPlayersInside().contains(superiorPlayer)) {
-                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-            } else {
-                updateIslandFly(superiorPlayer);
-            }
         });
 
         plugin.getMissions().getPlayerMissions().forEach(mission -> {
             MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
-            if (missionData != null && missionData.isLeaveReset())
+
+            if (missionData == null)
+                return;
+
+            if ((reason == MemberRemoveReason.DISBAND && missionData.isDisbandReset()) ||
+                    ((reason == MemberRemoveReason.KICK || reason == MemberRemoveReason.LEAVE) && missionData.isLeaveReset()))
                 superiorPlayer.resetMission(mission);
         });
 
-        plugin.getMenus().destroyMemberManage(superiorPlayer);
-        plugin.getMenus().destroyMemberRole(superiorPlayer);
-        plugin.getMenus().refreshMembers(this);
+        if (reason == MemberRemoveReason.KICK || reason == MemberRemoveReason.LEAVE) {
+            plugin.getMenus().destroyMemberManage(superiorPlayer);
+            plugin.getMenus().destroyMemberRole(superiorPlayer);
+            plugin.getMenus().refreshMembers(this);
 
-        IslandsDatabaseBridge.removeMember(this, superiorPlayer);
+            IslandsDatabaseBridge.removeMember(this, superiorPlayer);
+        }
     }
 
     @Override
@@ -1735,20 +1754,7 @@ public class SIsland implements Island {
         long profilerId = Profiler.start(ProfileType.DISBAND_ISLAND, 2);
 
         forEachIslandMember(EMPTY_IGNORED_MEMBERS, false, islandMember -> {
-            if (islandMember.equals(owner)) {
-                owner.setIsland(null);
-            } else {
-                removeMember(islandMember, MemberRemoveReason.DISBAND);
-            }
-
-            ClearActions.runClearActions(islandMember.asOfflinePlayer(), true, plugin.getSettings().getClearActionsOnDisband());
-
-            for (Mission<?> mission : plugin.getMissions().getPlayerMissions()) {
-                MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
-                if (missionData != null && missionData.isDisbandReset()) {
-                    islandMember.resetMission(mission);
-                }
-            }
+            removeMemberSafe(islandMember, MemberRemoveReason.DISBAND);
         });
 
         this.activeTasks.write(activeTasks -> {
