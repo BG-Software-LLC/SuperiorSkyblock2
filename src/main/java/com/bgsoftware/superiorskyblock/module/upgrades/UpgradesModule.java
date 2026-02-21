@@ -18,8 +18,6 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
-import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
-import com.bgsoftware.superiorskyblock.core.value.IntValue;
 import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgrade;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
@@ -52,6 +50,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -257,20 +258,20 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
             requirements.add(new UpgradeRequirement(sections[0], Formatters.COLOR_FORMATTER.format(sections[1])));
         }
 
-        DoubleValue cropGrowth = DoubleValue.syncedFixed(levelSection.getDouble("crop-growth", -1D));
-        DoubleValue spawnerRates = DoubleValue.syncedFixed(levelSection.getDouble("spawner-rates", -1D));
-        DoubleValue mobDrops = DoubleValue.syncedFixed(levelSection.getDouble("mob-drops", -1D));
-        IntValue teamLimit = IntValue.syncedFixed(levelSection.getInt("team-limit", -1));
-        IntValue warpsLimit = IntValue.syncedFixed(levelSection.getInt("warps-limit", -1));
-        IntValue coopLimit = IntValue.syncedFixed(levelSection.getInt("coop-limit", -1));
-        IntValue borderSize = IntValue.syncedFixed(levelSection.getInt("border-size", -1));
+        Value<OptionalDouble> cropGrowth = Value.syncedFixed(readDouble(levelSection, "crop-growth"));
+        Value<OptionalDouble> spawnerRates = Value.syncedFixed(readDouble(levelSection, "spawner-rates"));
+        Value<OptionalDouble> mobDrops = Value.syncedFixed(readDouble(levelSection, "mob-drops"));
+        Value<OptionalInt> teamLimit = Value.syncedFixed(readInt(levelSection, "team-limit"));
+        Value<OptionalInt> warpsLimit = Value.syncedFixed(readInt(levelSection, "warps-limit"));
+        Value<OptionalInt> coopLimit = Value.syncedFixed(readInt(levelSection, "coop-limit"));
+        Value<OptionalInt> borderSize = Value.syncedFixed(readInt(levelSection, "border-size"));
 
-        if (borderSize.get() > plugin.getSettings().getMaxIslandSize()) {
+        if (borderSize.get().orElse(-1) > plugin.getSettings().getMaxIslandSize()) {
             this.logger().w("Upgrade by name " + upgrade.getName() + " (level " + level + ") has illegal border-size, skipping...");
             return;
         }
 
-        Value<BigDecimal> bankLimit = Value.syncedFixed(new BigDecimal(levelSection.getString("bank-limit", "-1")));
+        Value<Optional<BigDecimal>> bankLimit = Value.syncedFixed(readString(levelSection, "bank-limit").map(BigDecimal::new));
         KeyMap<Integer> blockLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         if (levelSection.isConfigurationSection("block-limits")) {
             for (String block : levelSection.getConfigurationSection("block-limits").getKeys(false)) {
@@ -323,6 +324,27 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
                 Value.syncedFixed(islandEffects), bankLimit, Value.syncedFixed(rolesLimits));
 
         upgrade.addUpgradeLevel(level, upgradeLevel);
+    }
+
+    private static OptionalDouble readDouble(ConfigurationSection section, String key) {
+        if (section.contains(key))
+            return OptionalDouble.of(section.getDouble(key));
+
+        return OptionalDouble.empty();
+    }
+
+    private static OptionalInt readInt(ConfigurationSection section, String key) {
+        if (section.contains(key))
+            return OptionalInt.of(section.getInt(key));
+
+        return OptionalInt.empty();
+    }
+
+    private static Optional<String> readString(ConfigurationSection section, String key) {
+        if (section.contains(key))
+            return Optional.of(section.getString(key));
+
+        return Optional.empty();
     }
 
 }

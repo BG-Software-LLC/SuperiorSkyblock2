@@ -35,6 +35,9 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,29 +56,29 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final List<String> commands;
     private final String permission;
     private final Set<UpgradeRequirement> requirements;
-    private final DoubleValue cropGrowth;
-    private final DoubleValue spawnerRates;
-    private final DoubleValue mobDrops;
-    private final IntValue teamLimit;
-    private final IntValue warpsLimit;
-    private final IntValue coopLimit;
-    private final IntValue borderSize;
+    private final Value<OptionalDouble> cropGrowth;
+    private final Value<OptionalDouble> spawnerRates;
+    private final Value<OptionalDouble> mobDrops;
+    private final Value<OptionalInt> teamLimit;
+    private final Value<OptionalInt> warpsLimit;
+    private final Value<OptionalInt> coopLimit;
+    private final Value<OptionalInt> borderSize;
     private final Value<KeyMap<Integer>> blockLimits;
     private final Value<KeyMap<Integer>> entityLimits;
     private final Value<EnumerateMap<Dimension, Map<Key, Integer>>> generatorRates;
     private final Value<Map<PotionEffectType, Integer>> islandEffects;
-    private final Value<BigDecimal> bankLimit;
+    private final Value<Optional<BigDecimal>> bankLimit;
     private final Value<Int2IntMapView> roleLimits;
 
     @Nullable
     private ItemData itemData;
 
     public SUpgradeLevel(int level, UpgradeCost cost, List<String> commands, String permission, Set<UpgradeRequirement> requirements,
-                         DoubleValue cropGrowth, DoubleValue spawnerRates, DoubleValue mobDrops,
-                         IntValue teamLimit, IntValue warpsLimit, IntValue coopLimit,
-                         IntValue borderSize, Value<KeyMap<Integer>> blockLimits,
+                         Value<OptionalDouble> cropGrowth, Value<OptionalDouble> spawnerRates, Value<OptionalDouble> mobDrops,
+                         Value<OptionalInt> teamLimit, Value<OptionalInt> warpsLimit, Value<OptionalInt> coopLimit,
+                         Value<OptionalInt> borderSize, Value<KeyMap<Integer>> blockLimits,
                          Value<KeyMap<Integer>> entityLimits, Value<EnumerateMap<Dimension, Map<Key, Integer>>> generatorRates,
-                         Value<Map<PotionEffectType, Integer>> islandEffects, Value<BigDecimal> bankLimit,
+                         Value<Map<PotionEffectType, Integer>> islandEffects, Value<Optional<BigDecimal>> bankLimit,
                          Value<Int2IntMapView> roleLimits) {
         this.level = level;
         this.cost = cost;
@@ -144,18 +147,33 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     @Override
+    public boolean hasCropGrowth() {
+        return cropGrowth.get().isPresent();
+    }
+
+    @Override
     public double getCropGrowth() {
-        return cropGrowth.get();
+        return cropGrowth.get().orElse(-1D);
+    }
+
+    @Override
+    public boolean hasSpawnerRates() {
+        return spawnerRates.get().isPresent();
     }
 
     @Override
     public double getSpawnerRates() {
-        return spawnerRates.get();
+        return spawnerRates.get().orElse(-1D);
+    }
+
+    @Override
+    public boolean hasMobDrops() {
+        return mobDrops.get().isPresent();
     }
 
     @Override
     public double getMobDrops() {
-        return mobDrops.get();
+        return mobDrops.get().orElse(-1D);
     }
 
     @Override
@@ -193,23 +211,43 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     @Override
+    public boolean hasTeamLimit() {
+        return teamLimit.get().isPresent();
+    }
+
+    @Override
     public int getTeamLimit() {
-        return teamLimit.get();
+        return teamLimit.get().orElse(-1);
+    }
+
+    @Override
+    public boolean hasWarpsLimit() {
+        return warpsLimit.get().isPresent();
     }
 
     @Override
     public int getWarpsLimit() {
-        return warpsLimit.get();
+        return warpsLimit.get().orElse(-1);
+    }
+
+    @Override
+    public boolean hasCoopLimit() {
+        return coopLimit.get().isPresent();
     }
 
     @Override
     public int getCoopLimit() {
-        return coopLimit.get();
+        return coopLimit.get().orElse(-1);
+    }
+
+    @Override
+    public boolean hasBorderSize() {
+        return borderSize.get().isPresent();
     }
 
     @Override
     public int getBorderSize() {
-        return borderSize.get();
+        return borderSize.get().orElse(-1);
     }
 
     @Override
@@ -253,8 +291,13 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     @Override
+    public boolean hasBankLimit() {
+        return bankLimit.get().isPresent();
+    }
+
+    @Override
     public BigDecimal getBankLimit() {
-        return bankLimit.get();
+        return bankLimit.get().orElseGet(() -> BigDecimal.valueOf(-1));
     }
 
     @Override
@@ -284,15 +327,15 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     public DoubleValue getCropGrowthUpgradeValue() {
-        return cropGrowth;
+        return DoubleValue.syncedSupplied(() -> cropGrowth.get().orElse(-1));
     }
 
     public DoubleValue getSpawnerRatesUpgradeValue() {
-        return spawnerRates;
+        return DoubleValue.syncedSupplied(() -> spawnerRates.get().orElse(-1));
     }
 
     public DoubleValue getMobDropsUpgradeValue() {
-        return mobDrops;
+        return DoubleValue.syncedSupplied(() -> mobDrops.get().orElse(-1));
     }
 
     public Map<Key, IntValue> getBlockLimitsUpgradeValue() {
@@ -310,19 +353,19 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     public IntValue getTeamLimitUpgradeValue() {
-        return teamLimit;
+        return IntValue.syncedSupplied(() -> teamLimit.get().orElse(-1));
     }
 
     public IntValue getWarpsLimitUpgradeValue() {
-        return warpsLimit;
+        return IntValue.syncedSupplied(() -> warpsLimit.get().orElse(-1));
     }
 
     public IntValue getCoopLimitUpgradeValue() {
-        return coopLimit;
+        return IntValue.syncedSupplied(() -> coopLimit.get().orElse(-1));
     }
 
     public IntValue getBorderSizeUpgradeValue() {
-        return borderSize;
+        return IntValue.syncedSupplied(() -> borderSize.get().orElse(-1));
     }
 
     public EnumerateMap<Dimension, Map<Key, IntValue>> getGeneratorUpgradeValue() {
@@ -351,7 +394,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     public Value<BigDecimal> getBankLimitUpgradeValue() {
-        return bankLimit;
+        return Value.syncedSupplied(() -> bankLimit.get().orElseGet(() -> BigDecimal.valueOf(-1)));
     }
 
     public Map<PlayerRole, IntValue> getRoleLimitsUpgradeValue() {

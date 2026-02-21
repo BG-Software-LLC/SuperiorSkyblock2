@@ -5065,65 +5065,91 @@ public class SIsland implements Island {
     }
 
     private void syncUpgrade(SUpgradeLevel upgradeLevel, boolean overrideCustom) {
-        cropGrowth.set(cropGrowth -> {
-            if ((overrideCustom || cropGrowth.isSynced()) && cropGrowth.get() < upgradeLevel.getCropGrowth()) {
-                notifyCropGrowthChange(upgradeLevel.getCropGrowth());
-                return upgradeLevel.getCropGrowthUpgradeValue();
-            }
+        if (upgradeLevel.hasCropGrowth()) {
+            cropGrowth.set(cropGrowth -> {
+                if (overrideCustom || cropGrowth.isSynced()) {
+                    notifyCropGrowthChange(upgradeLevel.getCropGrowth());
+                    return upgradeLevel.getCropGrowthUpgradeValue();
+                }
 
-            return cropGrowth;
-        });
+                return cropGrowth;
+            });
+        }
 
-        spawnerRates.set(spawnerRates -> {
-            if ((overrideCustom || spawnerRates.isSynced()) && spawnerRates.get() < upgradeLevel.getSpawnerRates())
-                return upgradeLevel.getSpawnerRatesUpgradeValue();
-            return spawnerRates;
-        });
+        if (upgradeLevel.hasSpawnerRates()) {
+            spawnerRates.set(spawnerRates -> {
+                if (overrideCustom || spawnerRates.isSynced())
+                    return upgradeLevel.getSpawnerRatesUpgradeValue();
+                return spawnerRates;
+            });
+        }
 
-        mobDrops.set(mobDrops -> {
-            if ((overrideCustom || mobDrops.isSynced()) && mobDrops.get() < upgradeLevel.getMobDrops())
-                return upgradeLevel.getMobDropsUpgradeValue();
-            return mobDrops;
-        });
+        if (upgradeLevel.hasMobDrops()) {
+            mobDrops.set(mobDrops -> {
+                if (overrideCustom || mobDrops.isSynced())
+                    return upgradeLevel.getMobDropsUpgradeValue();
+                return mobDrops;
+            });
+        }
 
-        teamLimit.set(teamLimit -> {
-            if ((overrideCustom || teamLimit.isSynced()) && teamLimit.get() < upgradeLevel.getTeamLimit())
-                return upgradeLevel.getTeamLimitUpgradeValue();
-            return teamLimit;
-        });
+        if (upgradeLevel.hasTeamLimit()) {
+            teamLimit.set(teamLimit -> {
+                if (overrideCustom || teamLimit.isSynced())
+                    return upgradeLevel.getTeamLimitUpgradeValue();
+                return teamLimit;
+            });
+        }
 
-        warpsLimit.set(warpsLimit -> {
-            if ((overrideCustom || warpsLimit.isSynced()) && warpsLimit.get() < upgradeLevel.getWarpsLimit())
-                return upgradeLevel.getWarpsLimitUpgradeValue();
-            return warpsLimit;
-        });
+        if (upgradeLevel.hasWarpsLimit()) {
+            warpsLimit.set(warpsLimit -> {
+                if (overrideCustom || warpsLimit.isSynced())
+                    return upgradeLevel.getWarpsLimitUpgradeValue();
+                return warpsLimit;
+            });
+        }
 
-        coopLimit.set(coopLimit -> {
-            if ((overrideCustom || coopLimit.isSynced()) && coopLimit.get() < upgradeLevel.getCoopLimit())
-                return upgradeLevel.getCoopLimitUpgradeValue();
-            return coopLimit;
-        });
+        if (upgradeLevel.hasCoopLimit()) {
+            coopLimit.set(coopLimit -> {
+                if (overrideCustom || coopLimit.isSynced())
+                    return upgradeLevel.getCoopLimitUpgradeValue();
+                return coopLimit;
+            });
+        }
 
-        IntValue islandSize = this.islandSize.get();
-        if ((overrideCustom || islandSize.isSynced()) && islandSize.get() < upgradeLevel.getBorderSize())
-            setIslandSizeInternal(upgradeLevel.getBorderSizeUpgradeValue());
+        if (upgradeLevel.hasBorderSize()) {
+            IntValue islandSize = this.islandSize.get();
+            if (overrideCustom || islandSize.isSynced())
+                setIslandSizeInternal(upgradeLevel.getBorderSizeUpgradeValue());
+        }
 
-        bankLimit.set(bankLimit -> {
-            if ((overrideCustom || bankLimit.isSynced()) && bankLimit.get().compareTo(upgradeLevel.getBankLimit()) < 0)
-                return upgradeLevel.getBankLimitUpgradeValue();
-            return bankLimit;
-        });
+        if (upgradeLevel.hasBankLimit()) {
+            bankLimit.set(bankLimit -> {
+                if (overrideCustom || bankLimit.isSynced())
+                    return upgradeLevel.getBankLimitUpgradeValue();
+                return bankLimit;
+            });
+        }
 
         for (Map.Entry<Key, IntValue> entry : upgradeLevel.getBlockLimitsUpgradeValue().entrySet()) {
             IntValue currentValue = blockLimits.getRaw(entry.getKey(), null);
-            if (currentValue == null || ((overrideCustom || currentValue.isSynced()) && currentValue.get() < entry.getValue().get()))
-                blockLimits.put(entry.getKey(), entry.getValue());
+            if (currentValue == null || overrideCustom || currentValue.isSynced()) {
+                if (entry.getValue().get() < 0) {
+                    blockLimits.remove(entry.getKey());
+                } else {
+                    blockLimits.put(entry.getKey(), entry.getValue());
+                }
+            }
         }
 
         for (Map.Entry<Key, IntValue> entry : upgradeLevel.getEntityLimitsUpgradeValue().entrySet()) {
             IntValue currentValue = entityLimits.getRaw(entry.getKey(), null);
-            if (currentValue == null || ((overrideCustom || currentValue.isSynced()) && currentValue.get() < entry.getValue().get()))
-                entityLimits.put(entry.getKey(), entry.getValue());
+            if (currentValue == null || overrideCustom || currentValue.isSynced()) {
+                if (entry.getValue().get() < 0) {
+                    entityLimits.remove(entry.getKey());
+                } else {
+                    entityLimits.put(entry.getKey(), entry.getValue());
+                }
+            }
         }
 
         EnumerateMap<Dimension, Map<Key, IntValue>> upgradeGeneratorRates = upgradeLevel.getGeneratorUpgradeValue();
@@ -5147,14 +5173,17 @@ public class SIsland implements Island {
                         IntValue rate = entry.getValue();
 
                         IntValue currentValue = worldGeneratorRates == null ? null : worldGeneratorRates.get(block);
-                        if (currentValue == null || ((overrideCustom || currentValue.isSynced()) &&
-                                currentValue.get() < rate.get())) {
-                            if (worldGeneratorRates == null) {
-                                worldGeneratorRates = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
-                                cobbleGeneratorValues.put(dimension, worldGeneratorRates);
-                            }
+                        if (currentValue == null || overrideCustom || currentValue.isSynced()) {
+                            if (rate.get() < 0) {
+                                worldGeneratorRates.remove(block);
+                            } else {
+                                if (worldGeneratorRates == null) {
+                                    worldGeneratorRates = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
+                                    cobbleGeneratorValues.put(dimension, worldGeneratorRates);
+                                }
 
-                            worldGeneratorRates.put(block, rate);
+                                worldGeneratorRates.put(block, rate);
+                            }
                         }
                     }
                 }
@@ -5165,8 +5194,12 @@ public class SIsland implements Island {
 
         for (Map.Entry<PotionEffectType, IntValue> entry : upgradeLevel.getPotionEffectsUpgradeValue().entrySet()) {
             IntValue currentValue = islandEffects.get(entry.getKey());
-            if (currentValue == null || ((overrideCustom || currentValue.isSynced()) && currentValue.get() < entry.getValue().get())) {
-                islandEffects.put(entry.getKey(), entry.getValue());
+            if (currentValue == null || overrideCustom || currentValue.isSynced()) {
+                if (entry.getValue().get() < 0) {
+                    islandEffects.remove(entry.getKey());
+                } else {
+                    islandEffects.put(entry.getKey(), entry.getValue());
+                }
                 editedIslandEffects = true;
             }
         }
@@ -5178,8 +5211,13 @@ public class SIsland implements Island {
         roleLimits.write(roleLimits -> {
             for (Map.Entry<PlayerRole, IntValue> entry : upgradeLevel.getRoleLimitsUpgradeValue().entrySet()) {
                 IntValue currentValue = roleLimits.get(entry.getKey().getId());
-                if (currentValue == null || ((overrideCustom || currentValue.isSynced()) && currentValue.get() < entry.getValue().get()))
-                    roleLimits.put(entry.getKey().getId(), entry.getValue());
+                if (currentValue == null || overrideCustom || currentValue.isSynced()) {
+                    if (entry.getValue().get() < 0) {
+                        roleLimits.remove(entry.getKey().getId());
+                    } else {
+                        roleLimits.put(entry.getKey().getId(), entry.getValue());
+                    }
+                }
             }
         });
     }
