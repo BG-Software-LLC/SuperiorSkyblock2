@@ -23,4 +23,4 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          claude --non-interactive "Analyze the following issue comment and provide a fix in a new branch with a PR: ${{ github.event.comment.body }}"
+          claude -p "Analyze the following issue comment and provide a fix in a new branch with a PR: ${{ github.event.comment.body }}" --dangerously-skip-permissions
