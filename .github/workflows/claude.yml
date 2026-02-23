@@ -9,6 +9,11 @@ jobs:
   claude-fix:
     if: contains(github.event.issue.labels.*.name, 'bug') || contains(github.event.comment.body, '@claude')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - name: Run Claude Fixer
