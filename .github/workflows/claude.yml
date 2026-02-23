@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run Claude Fixer
-        uses: anthropics/claude-code-action-official@v1
+        uses: anthropics/claude-code-action@v1
         with:
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
           command: "fix-issue ${{ github.event.issue.number }}"
