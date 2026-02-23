@@ -264,7 +264,7 @@ public abstract class Mission<V> {
      * @param superiorPlayer The player to change it's data.
      * @param value          The data to insert.
      */
-    protected void insertData(SuperiorPlayer superiorPlayer, V value) {
+    public void insertData(SuperiorPlayer superiorPlayer, V value) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(value, "value parameter cannot be null.");
         SuperiorPlayer dataKey = getDataKey(superiorPlayer);
@@ -279,7 +279,7 @@ public abstract class Mission<V> {
      * @param createFunction The function that will be run when data doesn't exist yet.
      */
     @Nullable
-    protected V getOrCreate(SuperiorPlayer superiorPlayer, Function<SuperiorPlayer, ? extends V> createFunction) {
+    public V getOrCreate(SuperiorPlayer superiorPlayer, Function<SuperiorPlayer, ? extends V> createFunction) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(createFunction, "createFunction parameter cannot be null.");
 
@@ -297,7 +297,7 @@ public abstract class Mission<V> {
      * @param superiorPlayer The player to get data from.
      */
     @Nullable
-    protected V get(SuperiorPlayer superiorPlayer) {
+    public V get(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 
         SuperiorPlayer dataKey = getDataKey(superiorPlayer);

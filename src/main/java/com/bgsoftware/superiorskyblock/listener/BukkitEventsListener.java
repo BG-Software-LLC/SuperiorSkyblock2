@@ -52,6 +52,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
@@ -150,6 +151,7 @@ public class BukkitEventsListener implements Listener {
         createEventListener(GameEventType.ENTITY_DAMAGE_EVENT, VehicleDamageEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_ENTER_PORTAL_EVENT, EntityPortalEnterEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_EXPLODE_EVENT, EntityExplodeEvent.class, this::createGameEvent);
+        createEventListener(GameEventType.ENTITY_INTERACT_EVENT, EntityInteractEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_MOVE_EVENT, PlayerMoveEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_MOVE_EVENT, VehicleMoveEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_PORTAL_EVENT, EntityPortalEvent.class, this::createGameEvent);
@@ -472,6 +474,13 @@ public class BukkitEventsListener implements Listener {
         entityExplodeEvent.entity = e.getEntity();
         entityExplodeEvent.blocks = e.blockList();
         entityExplodeEvent.isSoftExplosion = e.getEntityType() == WIND_CHARGE || e.getEntityType() == BREEZE_WIND_CHARGE;
+        return eventType.createEvent(entityExplodeEvent);
+    }
+
+    private GameEvent<GameEventArgs.EntityInteractEvent> createGameEvent(GameEventType<GameEventArgs.EntityInteractEvent> eventType, GameEventPriority priority, EntityInteractEvent e) {
+        GameEventArgs.EntityInteractEvent entityExplodeEvent = new GameEventArgs.EntityInteractEvent();
+        entityExplodeEvent.entity = e.getEntity();
+        entityExplodeEvent.block = e.getBlock();
         return eventType.createEvent(entityExplodeEvent);
     }
 

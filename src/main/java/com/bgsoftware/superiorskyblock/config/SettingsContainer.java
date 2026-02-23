@@ -120,6 +120,7 @@ public class SettingsContainer {
     public final String visitorsSignLine;
     public final String visitorsSignActive;
     public final String visitorsSignInactive;
+    public final String visitorsSignDescriptionLineFormat;
     public final Dimension defaultWorldDimension;
     public final String defaultWorldName;
     public final String islandWorldName;
@@ -236,6 +237,8 @@ public class SettingsContainer {
     public final BigInteger blockCountsSaveThreshold;
     public final boolean chatSigningSupport;
     public final int commandsPerPage;
+    public final boolean helpOnNoPermission;
+    public final boolean helpOnInvalidCommand;
     public final boolean cacheSchematics;
     public final Map<String, KeySet> entityCategories;
 
@@ -342,6 +345,7 @@ public class SettingsContainer {
         visitorsSignLine = config.getString("visitors-sign.line", "[Welcome]");
         visitorsSignActive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.active", "&a[Welcome]"));
         visitorsSignInactive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.inactive", "&c[Welcome]"));
+        visitorsSignDescriptionLineFormat = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.description-line-format", "{0}"));
         islandWorldName = config.getString("worlds.world-name", "SuperiorWorld");
 
         {
@@ -615,6 +619,8 @@ public class SettingsContainer {
         blockCountsSaveThreshold = BigInteger.valueOf(config.getInt("block-counts-save-threshold", 100));
         chatSigningSupport = config.getBoolean("chat-signing-support", true);
         commandsPerPage = config.getInt("commands-per-page", 7);
+        helpOnInvalidCommand = config.getBoolean("help-on-invalid-command", true);
+        helpOnNoPermission = config.getBoolean("help-on-no-permission", false);
         cacheSchematics = config.getBoolean("cache-schematics", true);
         entityCategories = parseEntityCategories(config.getConfigurationSection("entity-categories"));
     }

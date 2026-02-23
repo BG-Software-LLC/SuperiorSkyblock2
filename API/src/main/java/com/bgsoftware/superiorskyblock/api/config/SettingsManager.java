@@ -750,6 +750,20 @@ public interface SettingsManager {
     int getCommandsPerPage();
 
     /**
+     * Whether players should receive a help instead of a `INVALID_COMMAND` message
+     * when using a command that doesn't exist or not.
+     * Config-path: help-on-invalid-command
+     */
+    boolean isHelpOnInvalidCommand();
+
+    /**
+     * Whether players should receive a help instead of a `NO_COMMAND_PERMISSION` message
+     * when using a command they don't have permission for or not.
+     * Config-path: help-on-no-permission
+     */
+    boolean isHelpOnNoPermission();
+
+    /**
      * Whether the plugin should cache schematics for faster placement of schematics.
      * Config-path: cache-schematics
      */
@@ -1044,6 +1058,12 @@ public interface SettingsManager {
          * Config-path: visitors-sign.inactive
          */
         String getInactive();
+
+        /**
+         * The format in which the island description lines will be saved.
+         * Config-path: visitors-sign.description-line-format
+         */
+        String getDescriptionLineFormat();
 
     }
 

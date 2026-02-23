@@ -23,6 +23,7 @@ public class SchematicBlock {
 
     private static final ListTag EMPTY_LIST_TAG = ListTag.of(Collections.emptyList());
     private static final Gson GSON = new Gson();
+
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Location location;
@@ -154,31 +155,26 @@ public class SchematicBlock {
             if (i < plugin.getSettings().getDefaultSign().size()) {
                 line = plugin.getSettings().getDefaultSign().get(i);
             } else {
-                if (realIndex >= messages.getValue().size()) {
-                    line = "";
-                } else {
-                    Tag tag = messages.getValue().get(realIndex);
-                    if (tag instanceof CompoundTag) {
-                        JsonObject jsonObject = new JsonObject();
-                        for (Map.Entry<String, Tag> entry : ((CompoundTag) tag).entrySet()) {
-                            Tag valueTag = entry.getValue();
-                            if (valueTag instanceof NumberTag) {
-                                // Booleans are parsed as NumberTag
-                                jsonObject.addProperty(entry.getKey(), ((NumberTag) valueTag).getValue().intValue() == 1);
-                            } else {
-                                jsonObject.addProperty(entry.getKey(), String.valueOf(valueTag.getValue()));
-                            }
+                Tag<?> tag = messages.getValue().get(realIndex);
+                if (tag instanceof CompoundTag) {
+                    JsonObject jsonObject = new JsonObject();
+                    for (Map.Entry<String, Tag<?>> entry : ((CompoundTag) tag).entrySet()) {
+                        Tag<?> valueTag = entry.getValue();
+                        if (valueTag instanceof NumberTag) {
+                            // Booleans are parsed as NumberTag
+                            jsonObject.addProperty(entry.getKey(), ((NumberTag<?>) valueTag).getValue().intValue() == 1);
+                        } else {
+                            jsonObject.addProperty(entry.getKey(), String.valueOf(valueTag.getValue()));
                         }
-                        line = GSON.toJson(jsonObject);
-                    } else if (tag instanceof StringTag) {
-                        line = ((StringTag) tag).getValue();
-                    } else {
-                        line = String.valueOf(tag.getValue());
                     }
+                    line = GSON.toJson(jsonObject);
+                } else {
+                    line = ((StringTag) tag).getValue();
                 }
             }
 
             line = parseSignPlaceholders(island, line);
+
             newMessages.addTag(StringTag.of(line));
         }
 
@@ -204,13 +200,19 @@ public class SchematicBlock {
             }
 
             if (line != null) {
-                tileEntityData.setString((isDefaultSignLine ? "SSB.Text" : "Text") + i, parseSignPlaceholders(island, line));
+                tileEntityData.setString((isDefaultSignLine ? "SSB.Text" : "Text") + i,
+                        parseSignPlaceholders(island, line));
             }
         }
 
         if (needSignFormat) {
             tileEntityData.setByte("SSB.HasSignLines", (byte) 1);
         }
+    }
+
+    private static String parseSignPlaceholders(Island island, String val) {
+        return val.replace("{player}", island.getOwner().getName())
+                .replace("{island}", island.getName().isEmpty() ? island.getOwner().getName() : island.getName());
     }
 
     private static String parseSignPlaceholders(Island island, String val) {

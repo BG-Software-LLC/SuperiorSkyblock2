@@ -463,6 +463,7 @@ INVALID_AMOUNT: '&c&lHata | &7Geçersiz miktar {0}.'
 INVALID_BIOME: '&c&lHata | &7Geçersiz biyom {0}.'
 INVALID_BLOCK: '&c&lHata | &7Geçersiz blok konumu {0}.'
 INVALID_BORDER_COLOR: '&c&lHata | &7Geçersiz sınır rengi {0}.'
+INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lHata | &7Geçersiz efekt {0}.'
 INVALID_ENTITY: '&c&lHata | &7Geçersiz varlık {0}.'
 INVALID_ENVIRONMENT: '&c&lError | &7Invalid dimension {0}.'
@@ -524,6 +525,7 @@ ISLAND_CLOSED: '&e&lAda | &7Ada başarıyla halka kapatıldı.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lHata | &7Zaten devam eden bir ada oluşturma görevin
   var.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&lAda | &7İsteğiniz işleniyor...'
+ISLAND_DESCRIPTION_NONE: None
 ISLAND_FLY_DISABLED: '&e&lUçuş | &7Ada uçuşu otomatik olarak &ckapatıldı&7.'
 ISLAND_FLY_ENABLED: '&e&lUçuş | &7Ada uçuşu otomatik olarak &aaçıldı&7.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lAda | &7&oDağıtılan bir adanın içindeydin, bu

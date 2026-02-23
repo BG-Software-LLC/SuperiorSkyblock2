@@ -37,12 +37,14 @@ import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
@@ -63,6 +65,8 @@ public class ProtectionListener extends AbstractGameEventListener {
     private static final EntityType TRIDENT = EnumHelper.getEnum(EntityType.class, "TRIDENT");
     @Nullable
     private static final Material DECORATED_POT = EnumHelper.getEnum(Material.class, "DECORATED_POT");
+    @Nullable
+    private static final Material TARGET = EnumHelper.getEnum(Material.class, "TARGET");
 
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
         @Override
@@ -92,7 +96,26 @@ public class ProtectionListener extends AbstractGameEventListener {
         if (handleBrushUse(e)) return;
         if (handleMinecartPlace(e)) return;
         if (handleEntityInteract(e)) return;
-        handleBlockInteract(e);
+        handleBlockInteract(e, e.getArgs().player, e.getArgs().action, e.getArgs().clickedBlock, e.getArgs().usedItem);
+    }
+
+    private void onEntityInteractBlock(GameEvent<GameEventArgs.EntityInteractEvent> e) {
+        Block clickedBlock = e.getArgs().block;
+        if (clickedBlock == null)
+            return;
+
+        Entity entity = e.getArgs().entity;
+        if (!(entity instanceof Projectile))
+            return;
+
+        ProjectileSource projectileSource = ((Projectile) entity).getShooter();
+        if (!(projectileSource instanceof Player))
+            return;
+
+        if (handleBlockInteract(e, (Player) projectileSource, Action.PHYSICAL, clickedBlock, null)) {
+            // We want to remove the projectile as well when it is not possible to interact
+            entity.remove();
+        }
     }
 
     private boolean handleBlockFertilize(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
@@ -218,17 +241,20 @@ public class ProtectionListener extends AbstractGameEventListener {
         return false;
     }
 
-    private void handleBlockInteract(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
-        if (e.getArgs().clickedBlock == null)
-            return;
+    private boolean handleBlockInteract(GameEvent<?> e, Player player, Action action,
+                                        @Nullable Block clickedBlock, @Nullable ItemStack usedItem) {
+        if (clickedBlock == null)
+            return false;
 
-        ItemStack usedItem = e.getArgs().usedItem;
-
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
-        InteractionResult interactionResult = this.protectionManager.get().handleBlockInteract(superiorPlayer,
-                e.getArgs().clickedBlock, e.getArgs().action, usedItem);
-        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+        InteractionResult interactionResult = this.protectionManager.get().handleBlockInteract(
+                superiorPlayer, clickedBlock, action, usedItem);
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
+            return true;
+        }
+
+        return false;
     }
 
     private void onBlockBreak(GameEvent<GameEventArgs.BlockBreakEvent> e) {
@@ -513,11 +539,12 @@ public class ProtectionListener extends AbstractGameEventListener {
                     hitBlock = null;
                 } else {
                     hitBlock = e.getArgs().hitBlock;
-                    if (hitBlock == null || (hitBlock.getType() != CHORUS_FLOWER && hitBlock.getType() != DECORATED_POT))
+                    Material hitBlockType = hitBlock == null ? null : hitBlock.getType();
+                    if (hitBlockType != CHORUS_FLOWER && hitBlockType != DECORATED_POT && hitBlockType != TARGET)
                         return;
 
                     location = hitBlock.getLocation(wrapper.getHandle());
-                    islandPrivilege = IslandPrivileges.BREAK;
+                    islandPrivilege = hitBlockType == TARGET ? IslandPrivileges.INTERACT : IslandPrivileges.BREAK;
                 }
 
                 if (islandPrivilege == null)
@@ -588,6 +615,7 @@ public class ProtectionListener extends AbstractGameEventListener {
     private void registerListeners() {
         registerCallback(GameEventType.BLOCK_PLACE_EVENT, GameEventPriority.NORMAL, this::onBlockPlace);
         registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.NORMAL, this::onPlayerInteract);
+        registerCallback(GameEventType.ENTITY_INTERACT_EVENT, GameEventPriority.NORMAL, this::onEntityInteractBlock);
         registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.NORMAL, this::onBlockBreak);
         registerCallback(GameEventType.ENTITY_BLOCK_FORM_EVENT, GameEventPriority.NORMAL, this::onFrostWalker);
         registerCallback(GameEventType.PLAYER_EMPTY_BUCKET_EVENT, GameEventPriority.NORMAL, this::onBucketEmpty);

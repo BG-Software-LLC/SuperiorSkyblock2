@@ -577,6 +577,9 @@ public class SIsland implements Island {
 
         updateLastTime();
 
+        ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnJoin(),
+                plugin.getSettings().isTeleportOnJoin() ? this : null);
+
         if (superiorPlayer.isOnline()) {
             updateIslandFly(superiorPlayer);
             setCurrentlyActive();
@@ -586,35 +589,53 @@ public class SIsland implements Island {
     }
 
     @Override
-    public void removeMember(SuperiorPlayer superiorPlayer, MemberRemoveReason memberRemoveReason) {
+    public void removeMember(SuperiorPlayer superiorPlayer, MemberRemoveReason reason) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        Preconditions.checkNotNull(memberRemoveReason, "memberRemoveReason parameter cannot be null.");
+        Preconditions.checkNotNull(reason, "memberRemoveReason parameter cannot be null.");
+        Preconditions.checkArgument(!superiorPlayer.equals(owner), "superiorPlayer cannot be island owner.");
 
-        if (memberRemoveReason == MemberRemoveReason.KICK) {
+        removeMemberSafe(superiorPlayer, reason);
+    }
+
+    private void removeMemberSafe(SuperiorPlayer superiorPlayer, MemberRemoveReason reason) {
+        if (reason == MemberRemoveReason.KICK)
             Log.debug(Debug.KICK_MEMBER, owner.getName(), superiorPlayer.getName());
-        } else if (memberRemoveReason == MemberRemoveReason.LEAVE) {
+        else if (reason == MemberRemoveReason.LEAVE)
             Log.debug(Debug.LEAVE_ISLAND, owner.getName(), superiorPlayer.getName());
+
+        if (!superiorPlayer.equals(owner)) {
+            boolean removedMember = members.writeAndGet(members -> members.remove(superiorPlayer));
+
+            if (!removedMember) {
+                // If the remove method failed, we iterate through all the members and remove the member manually.
+                // Should fix issues if members are not in the correct order.
+                // Reference: https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/734
+                removedMember = members.writeAndGet(members -> members.removeIf(superiorPlayer::equals));
+            }
+
+            // This player is not a member of the island.
+            if (!removedMember)
+                return;
         }
 
-        boolean removedMember = members.writeAndGet(members -> members.remove(superiorPlayer));
-
-        if (!removedMember) {
-            // If the remove method failed, we iterate through all the members and remove the member manually.
-            // Should fix issues if members are not in the correct order.
-            // Reference: https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/734
-            removedMember = members.writeAndGet(members -> members.removeIf(superiorPlayer::equals));
-        }
-
-        // This player is not a member of the island.
-        if (!removedMember)
-            return;
-
+        boolean isInside = superiorPlayer.isInsideIsland();
         superiorPlayer.setIsland(null);
 
-        if (memberRemoveReason == MemberRemoveReason.KICK) {
-            ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnKick());
-        } else if (memberRemoveReason == MemberRemoveReason.LEAVE) {
-            ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnLeave());
+        if (reason == MemberRemoveReason.DISBAND) {
+            ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnDisband(),
+                    isInside ? plugin.getGrid().getSpawnIsland() : null);
+        } else if (reason == MemberRemoveReason.KICK) {
+            boolean shouldTeleport = plugin.getSettings().isTeleportOnKick() && isInside;
+            ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnKick(),
+                    shouldTeleport ? plugin.getGrid().getSpawnIsland() : null);
+            if (!shouldTeleport)
+                updateIslandFly(superiorPlayer);
+        } else if (reason == MemberRemoveReason.LEAVE) {
+            boolean shouldTeleport = plugin.getSettings().isTeleportOnLeave() && isInside;
+            ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnLeave(),
+                    shouldTeleport ? plugin.getGrid().getSpawnIsland() : null);
+            if (!shouldTeleport)
+                updateIslandFly(superiorPlayer);
         }
 
         superiorPlayer.runIfOnline(player -> {
@@ -622,28 +643,26 @@ public class SIsland implements Island {
 
             if (openedView != null)
                 openedView.closeView();
-
-            boolean shouldTeleport = (memberRemoveReason == MemberRemoveReason.KICK && plugin.getSettings().isTeleportOnKick()) ||
-                    (memberRemoveReason == MemberRemoveReason.LEAVE && plugin.getSettings().isTeleportOnLeave());
-
-            if (shouldTeleport && getAllPlayersInside().contains(superiorPlayer)) {
-                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-            } else {
-                updateIslandFly(superiorPlayer);
-            }
         });
 
         plugin.getMissions().getPlayerMissions().forEach(mission -> {
             MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
-            if (missionData != null && missionData.isLeaveReset())
+
+            if (missionData == null)
+                return;
+
+            if ((reason == MemberRemoveReason.DISBAND && missionData.isDisbandReset()) ||
+                    ((reason == MemberRemoveReason.KICK || reason == MemberRemoveReason.LEAVE) && missionData.isLeaveReset()))
                 superiorPlayer.resetMission(mission);
         });
 
-        plugin.getMenus().destroyMemberManage(superiorPlayer);
-        plugin.getMenus().destroyMemberRole(superiorPlayer);
-        plugin.getMenus().refreshMembers(this);
+        if (reason == MemberRemoveReason.KICK || reason == MemberRemoveReason.LEAVE) {
+            plugin.getMenus().destroyMemberManage(superiorPlayer);
+            plugin.getMenus().destroyMemberRole(superiorPlayer);
+            plugin.getMenus().refreshMembers(this);
 
-        IslandsDatabaseBridge.removeMember(this, superiorPlayer);
+            IslandsDatabaseBridge.removeMember(this, superiorPlayer);
+        }
     }
 
     @Override
@@ -1735,20 +1754,7 @@ public class SIsland implements Island {
         long profilerId = Profiler.start(ProfileType.DISBAND_ISLAND, 2);
 
         forEachIslandMember(EMPTY_IGNORED_MEMBERS, false, islandMember -> {
-            if (islandMember.equals(owner)) {
-                owner.setIsland(null);
-            } else {
-                removeMember(islandMember, MemberRemoveReason.DISBAND);
-            }
-
-            ClearActions.runClearActions(islandMember.asOfflinePlayer(), true, plugin.getSettings().getClearActionsOnDisband());
-
-            for (Mission<?> mission : plugin.getMissions().getPlayerMissions()) {
-                MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
-                if (missionData != null && missionData.isDisbandReset()) {
-                    islandMember.resetMission(mission);
-                }
-            }
+            removeMemberSafe(islandMember, MemberRemoveReason.DISBAND);
         });
 
         this.activeTasks.write(activeTasks -> {
@@ -4754,14 +4760,14 @@ public class SIsland implements Island {
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkArgument(mission.getIslandMission(), "mission parameter must be island-mission.");
-        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(1));
+        this.changeAmountMissionsCompletedInternal(mission, false, counter -> counter.inc(1));
     }
 
     @Override
     public void resetMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkArgument(mission.getIslandMission(), "mission parameter must be island-mission.");
-        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(-1));
+        this.changeAmountMissionsCompletedInternal(mission, true, counter -> counter.inc(-1));
     }
 
     @Override
@@ -4796,10 +4802,10 @@ public class SIsland implements Island {
     public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkArgument(mission.getIslandMission(), "mission parameter must be island-mission.");
-        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.set(finishCount));
+        this.changeAmountMissionsCompletedInternal(mission, true, counter -> counter.set(finishCount));
     }
 
-    private void changeAmountMissionsCompletedInternal(Mission<?> mission, Function<Counter, Integer> action) {
+    private void changeAmountMissionsCompletedInternal(Mission<?> mission, boolean clearData, Function<Counter, Integer> action) {
         String missionName = mission.getName();
 
         MissionReference missionReference = new MissionReference(mission);
@@ -4810,8 +4816,8 @@ public class SIsland implements Island {
 
         Log.debug(Debug.SET_ISLAND_MISSION_COMPLETED, missionName, finishCount);
 
-        // We always want to reset data
-        mission.clearData(getOwner());
+        if (clearData)
+            mission.clearData(getOwner());
 
         if (newFinishCount > 0) {
             if (newFinishCount == oldFinishCount)
@@ -5065,65 +5071,91 @@ public class SIsland implements Island {
     }
 
     private void syncUpgrade(SUpgradeLevel upgradeLevel, boolean overrideCustom) {
-        cropGrowth.set(cropGrowth -> {
-            if ((overrideCustom || cropGrowth.isSynced()) && cropGrowth.get() < upgradeLevel.getCropGrowth()) {
-                notifyCropGrowthChange(upgradeLevel.getCropGrowth());
-                return upgradeLevel.getCropGrowthUpgradeValue();
-            }
+        if (upgradeLevel.hasCropGrowth()) {
+            cropGrowth.set(cropGrowth -> {
+                if (overrideCustom || cropGrowth.isSynced()) {
+                    notifyCropGrowthChange(upgradeLevel.getCropGrowth());
+                    return upgradeLevel.getCropGrowthUpgradeValue();
+                }
 
-            return cropGrowth;
-        });
+                return cropGrowth;
+            });
+        }
 
-        spawnerRates.set(spawnerRates -> {
-            if ((overrideCustom || spawnerRates.isSynced()) && spawnerRates.get() < upgradeLevel.getSpawnerRates())
-                return upgradeLevel.getSpawnerRatesUpgradeValue();
-            return spawnerRates;
-        });
+        if (upgradeLevel.hasSpawnerRates()) {
+            spawnerRates.set(spawnerRates -> {
+                if (overrideCustom || spawnerRates.isSynced())
+                    return upgradeLevel.getSpawnerRatesUpgradeValue();
+                return spawnerRates;
+            });
+        }
 
-        mobDrops.set(mobDrops -> {
-            if ((overrideCustom || mobDrops.isSynced()) && mobDrops.get() < upgradeLevel.getMobDrops())
-                return upgradeLevel.getMobDropsUpgradeValue();
-            return mobDrops;
-        });
+        if (upgradeLevel.hasMobDrops()) {
+            mobDrops.set(mobDrops -> {
+                if (overrideCustom || mobDrops.isSynced())
+                    return upgradeLevel.getMobDropsUpgradeValue();
+                return mobDrops;
+            });
+        }
 
-        teamLimit.set(teamLimit -> {
-            if ((overrideCustom || teamLimit.isSynced()) && teamLimit.get() < upgradeLevel.getTeamLimit())
-                return upgradeLevel.getTeamLimitUpgradeValue();
-            return teamLimit;
-        });
+        if (upgradeLevel.hasTeamLimit()) {
+            teamLimit.set(teamLimit -> {
+                if (overrideCustom || teamLimit.isSynced())
+                    return upgradeLevel.getTeamLimitUpgradeValue();
+                return teamLimit;
+            });
+        }
 
-        warpsLimit.set(warpsLimit -> {
-            if ((overrideCustom || warpsLimit.isSynced()) && warpsLimit.get() < upgradeLevel.getWarpsLimit())
-                return upgradeLevel.getWarpsLimitUpgradeValue();
-            return warpsLimit;
-        });
+        if (upgradeLevel.hasWarpsLimit()) {
+            warpsLimit.set(warpsLimit -> {
+                if (overrideCustom || warpsLimit.isSynced())
+                    return upgradeLevel.getWarpsLimitUpgradeValue();
+                return warpsLimit;
+            });
+        }
 
-        coopLimit.set(coopLimit -> {
-            if ((overrideCustom || coopLimit.isSynced()) && coopLimit.get() < upgradeLevel.getCoopLimit())
-                return upgradeLevel.getCoopLimitUpgradeValue();
-            return coopLimit;
-        });
+        if (upgradeLevel.hasCoopLimit()) {
+            coopLimit.set(coopLimit -> {
+                if (overrideCustom || coopLimit.isSynced())
+                    return upgradeLevel.getCoopLimitUpgradeValue();
+                return coopLimit;
+            });
+        }
 
-        IntValue islandSize = this.islandSize.get();
-        if ((overrideCustom || islandSize.isSynced()) && islandSize.get() < upgradeLevel.getBorderSize())
-            setIslandSizeInternal(upgradeLevel.getBorderSizeUpgradeValue());
+        if (upgradeLevel.hasBorderSize()) {
+            IntValue islandSize = this.islandSize.get();
+            if (overrideCustom || islandSize.isSynced())
+                setIslandSizeInternal(upgradeLevel.getBorderSizeUpgradeValue());
+        }
 
-        bankLimit.set(bankLimit -> {
-            if ((overrideCustom || bankLimit.isSynced()) && bankLimit.get().compareTo(upgradeLevel.getBankLimit()) < 0)
-                return upgradeLevel.getBankLimitUpgradeValue();
-            return bankLimit;
-        });
+        if (upgradeLevel.hasBankLimit()) {
+            bankLimit.set(bankLimit -> {
+                if (overrideCustom || bankLimit.isSynced())
+                    return upgradeLevel.getBankLimitUpgradeValue();
+                return bankLimit;
+            });
+        }
 
         for (Map.Entry<Key, IntValue> entry : upgradeLevel.getBlockLimitsUpgradeValue().entrySet()) {
             IntValue currentValue = blockLimits.getRaw(entry.getKey(), null);
-            if (currentValue == null || ((overrideCustom || currentValue.isSynced()) && currentValue.get() < entry.getValue().get()))
-                blockLimits.put(entry.getKey(), entry.getValue());
+            if (currentValue == null || overrideCustom || currentValue.isSynced()) {
+                if (entry.getValue().get() < 0) {
+                    blockLimits.remove(entry.getKey());
+                } else {
+                    blockLimits.put(entry.getKey(), entry.getValue());
+                }
+            }
         }
 
         for (Map.Entry<Key, IntValue> entry : upgradeLevel.getEntityLimitsUpgradeValue().entrySet()) {
             IntValue currentValue = entityLimits.getRaw(entry.getKey(), null);
-            if (currentValue == null || ((overrideCustom || currentValue.isSynced()) && currentValue.get() < entry.getValue().get()))
-                entityLimits.put(entry.getKey(), entry.getValue());
+            if (currentValue == null || overrideCustom || currentValue.isSynced()) {
+                if (entry.getValue().get() < 0) {
+                    entityLimits.remove(entry.getKey());
+                } else {
+                    entityLimits.put(entry.getKey(), entry.getValue());
+                }
+            }
         }
 
         EnumerateMap<Dimension, Map<Key, IntValue>> upgradeGeneratorRates = upgradeLevel.getGeneratorUpgradeValue();
@@ -5147,14 +5179,17 @@ public class SIsland implements Island {
                         IntValue rate = entry.getValue();
 
                         IntValue currentValue = worldGeneratorRates == null ? null : worldGeneratorRates.get(block);
-                        if (currentValue == null || ((overrideCustom || currentValue.isSynced()) &&
-                                currentValue.get() < rate.get())) {
-                            if (worldGeneratorRates == null) {
-                                worldGeneratorRates = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
-                                cobbleGeneratorValues.put(dimension, worldGeneratorRates);
-                            }
+                        if (currentValue == null || overrideCustom || currentValue.isSynced()) {
+                            if (rate.get() < 0) {
+                                worldGeneratorRates.remove(block);
+                            } else {
+                                if (worldGeneratorRates == null) {
+                                    worldGeneratorRates = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
+                                    cobbleGeneratorValues.put(dimension, worldGeneratorRates);
+                                }
 
-                            worldGeneratorRates.put(block, rate);
+                                worldGeneratorRates.put(block, rate);
+                            }
                         }
                     }
                 }
@@ -5165,8 +5200,12 @@ public class SIsland implements Island {
 
         for (Map.Entry<PotionEffectType, IntValue> entry : upgradeLevel.getPotionEffectsUpgradeValue().entrySet()) {
             IntValue currentValue = islandEffects.get(entry.getKey());
-            if (currentValue == null || ((overrideCustom || currentValue.isSynced()) && currentValue.get() < entry.getValue().get())) {
-                islandEffects.put(entry.getKey(), entry.getValue());
+            if (currentValue == null || overrideCustom || currentValue.isSynced()) {
+                if (entry.getValue().get() < 0) {
+                    islandEffects.remove(entry.getKey());
+                } else {
+                    islandEffects.put(entry.getKey(), entry.getValue());
+                }
                 editedIslandEffects = true;
             }
         }
@@ -5178,8 +5217,13 @@ public class SIsland implements Island {
         roleLimits.write(roleLimits -> {
             for (Map.Entry<PlayerRole, IntValue> entry : upgradeLevel.getRoleLimitsUpgradeValue().entrySet()) {
                 IntValue currentValue = roleLimits.get(entry.getKey().getId());
-                if (currentValue == null || ((overrideCustom || currentValue.isSynced()) && currentValue.get() < entry.getValue().get()))
-                    roleLimits.put(entry.getKey().getId(), entry.getValue());
+                if (currentValue == null || overrideCustom || currentValue.isSynced()) {
+                    if (entry.getValue().get() < 0) {
+                        roleLimits.remove(entry.getKey().getId());
+                    } else {
+                        roleLimits.put(entry.getKey().getId(), entry.getValue());
+                    }
+                }
             }
         });
     }

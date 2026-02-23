@@ -156,23 +156,21 @@ public class DefaultIslandsContainer implements IslandsContainer {
     @Nullable
     @Override
     public Island getIslandAt(Location location) {
-        return plugin.getProviders().hasCustomWorldsSupport() ?
+        Island island = plugin.getProviders().hasCustomWorldsSupport() ?
                 customWorldsSupportIslandLookup(location) : nativeIslandLookup(location);
+        return island == null || !island.isInside(SWorldPosition.of(location)) ? null : island;
     }
 
     private Island customWorldsSupportIslandLookup(Location location) {
         long packedPos = IslandPosition.calculatePackedPosFromLocation(location.getBlockX(), location.getBlockZ());
         String worldName = LazyWorldLocation.getWorldName(location);
-        Island island = this.islandsGrid.getIslandAt(worldName, packedPos);
-        // We already checked for the world by calling `IslandsGrid#getIslandAt` with the world name parameter.
-        // We will only check that the location's position is inside the island.
-        return island == null || !island.isInside(SWorldPosition.of(location))  ? null : island;
+        return this.islandsGrid.getIslandAt(worldName, packedPos);
     }
 
     private Island nativeIslandLookup(Location location) {
         // We first check that the world is an islands world.
         World world = location.getWorld();
-        if(world == null || !plugin.getGrid().isIslandsWorld(world))
+        if (world == null || !plugin.getGrid().isIslandsWorld(world))
             return null;
 
         long packedPos = IslandPosition.calculatePackedPosFromLocation(location.getBlockX(), location.getBlockZ());

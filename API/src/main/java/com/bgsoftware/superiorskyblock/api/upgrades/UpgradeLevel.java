@@ -53,14 +53,29 @@ public interface UpgradeLevel {
     String checkRequirements(SuperiorPlayer superiorPlayer);
 
     /**
+     * Checks if this level has a custom crop growth multiplier.
+     */
+    boolean hasCropGrowth();
+
+    /**
      * Get the crop growth multiplier of this level.
      */
     double getCropGrowth();
 
     /**
+     * Checks if this level has a custom spawner rates multiplier.
+     */
+    boolean hasSpawnerRates();
+
+    /**
      * Get the spawner rates multiplier of this level.
      */
     double getSpawnerRates();
+
+    /**
+     * Checks if this level has a custom mob drops multiplier.
+     */
+    boolean hasMobDrops();
 
     /**
      * Get the mob drops multiplier of this level.
@@ -106,9 +121,19 @@ public interface UpgradeLevel {
     Map<Key, Integer> getEntityLimitsAsKeys();
 
     /**
+     * Checks if this level has a custom team limit.
+     */
+    boolean hasTeamLimit();
+
+    /**
      * Get the team limit of this level.
      */
     int getTeamLimit();
+
+    /**
+     * Checks if this level has a custom warps limit.
+     */
+    boolean hasWarpsLimit();
 
     /**
      * Get the warps limit of this level.
@@ -116,9 +141,19 @@ public interface UpgradeLevel {
     int getWarpsLimit();
 
     /**
+     * Checks if this level has a custom coop limit.
+     */
+    boolean hasCoopLimit();
+
+    /**
      * Get the coop players limit of this level.
      */
     int getCoopLimit();
+
+    /**
+     * Checks if this level has a custom border size.
+     */
+    boolean hasBorderSize();
 
     /**
      * Get the border size of this level.
@@ -168,6 +203,11 @@ public interface UpgradeLevel {
      * Get all the potion effects for this level.
      */
     Map<PotionEffectType, Integer> getPotionEffects();
+
+    /**
+     * Checks if this level has a custom bank limit.
+     */
+    boolean hasBankLimit();
 
     /**
      * Get the bank limit of this level.

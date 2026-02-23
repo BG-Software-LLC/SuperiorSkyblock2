@@ -18,7 +18,11 @@ public class EventsDispatcher<L, T extends EventType<?, ?>, P extends Enum<P>, E
     protected final SuperiorSkyblockPlugin plugin;
     protected final Class<P> priorityClass;
 
-    private List<E> capturedEvents = null;
+    // This must be thread-safe, as it can be accessed from multiple threads.
+    // We don't actually want it to be thread-safe, but per-thread captured events.
+    // If we don't do that, weird behaviors can occur. For reference:
+    // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/2863
+    private final ThreadLocal<List<E>> capturedEvents = new ThreadLocal<>();
 
     protected EventsDispatcher(SuperiorSkyblockPlugin plugin, Class<P> priorityClass, Collection<T> allTypes) {
         this.plugin = plugin;
@@ -37,12 +41,12 @@ public class EventsDispatcher<L, T extends EventType<?, ?>, P extends Enum<P>, E
     }
 
     public void startCaptureEvents() {
-        this.capturedEvents = new LinkedList<>();
+        this.capturedEvents.set(new LinkedList<>());
     }
 
     public List<E> stopCaptureEvents() {
-        List<E> capturedEvents = this.capturedEvents;
-        this.capturedEvents = null;
+        List<E> capturedEvents = this.capturedEvents.get();
+        this.capturedEvents.remove();
         return capturedEvents;
     }
 
@@ -68,8 +72,9 @@ public class EventsDispatcher<L, T extends EventType<?, ?>, P extends Enum<P>, E
             }
         }
 
-        if (this.capturedEvents != null && filterCapturedEvent(event))
-            this.capturedEvents.add(event);
+        List<E> capturedEvents = this.capturedEvents.get();
+        if (capturedEvents != null && filterCapturedEvent(event))
+            capturedEvents.add(event);
     }
 
     protected boolean filterCapturedEvent(E event) {
