@@ -37,8 +37,8 @@ jobs:
           
           aider --model gemini/gemini-3-flash-preview \
             --yes \
-            --no-auto-commits \
-            --message "Analyze the following issue and provide a fix in a new branch with a PR. Title: ${{ github.event.issue.title }} Description: ${{ github.event.issue.body }}"
+            --commit \
+            --message "Analyze the following issue and provide a fix in a new branch with a PR. Make changes to the source code and commit the changes to the branch $$BRANCH_NAME. Title: ${{ github.event.issue.title }} Description: ${{ github.event.issue.body }}"
           
           git push origin "$BRANCH_NAME"
           
