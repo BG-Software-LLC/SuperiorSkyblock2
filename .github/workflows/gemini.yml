@@ -35,7 +35,7 @@ jobs:
           BRANCH_NAME="bugfix/issue-${{ github.event.issue.number }}"
           git checkout -b "$BRANCH_NAME"
           
-          aider --model gemini/gemini-3-flash \
+          aider --model gemini/gemini-3-flash-preview \
             --yes \
             --no-auto-commits \
             --message "Analyze the following issue and provide a fix in a new branch with a PR. Title: ${{ github.event.issue.title }} Description: ${{ github.event.issue.body }}"
