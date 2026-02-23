@@ -16,8 +16,11 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
-      - name: Run Claude Fixer
-        uses: anthropics/claude-code-action@01e756b34ef7a1447e9508f674143b07d20c2631
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          command: "fix-issue ${{ github.event.issue.number }}"
+      - name: Install Claude CLI
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Run Claude Fix
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          claude --non-interactive "Analyze the following issue comment and provide a fix in a new branch with a PR: ${{ github.event.comment.body }}"
