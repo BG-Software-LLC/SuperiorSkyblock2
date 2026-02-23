@@ -407,7 +407,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         World world = getWorld();
 
         // Checks for island teammates pvp
-        if (getIsland() == otherPlayer.getIsland() && (world == null || !isPvPWorldInternal(world.getName())))
+        Island island = getIsland();
+        if (island != null && island == otherPlayer.getIsland() && (world == null || !isPvPWorldInternal(world.getName())))
             return HitActionResult.ISLAND_TEAM_PVP;
 
         // Checks if this player can bypass all pvp restrictions
