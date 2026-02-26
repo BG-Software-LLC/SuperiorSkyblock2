@@ -300,7 +300,7 @@ public class DataManager extends Manager {
         }
 
         if (!hasIslandsSettings) {
-            Log.warn("The island " + island.getUniqueId() + " does not have a islands_banks record - fixing it...");
+            Log.warn("The island " + island.getUniqueId() + " does not have a islands_settings record - fixing it...");
             IslandsDatabaseBridge.insertIslandSettings(island);
         }
     }
