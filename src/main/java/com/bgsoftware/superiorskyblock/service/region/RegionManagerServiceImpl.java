@@ -70,6 +70,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
     private static final Material FARMLAND = EnumHelper.getEnum(Material.class, "FARMLAND", "SOIL");
     @Nullable
+    private static final Material ROOTED_DIRT = EnumHelper.getEnum(Material.class, "ROOTED_DIRT");
+    @Nullable
     private static final Material TURTLE_EGG = EnumHelper.getEnum(Material.class, "TURTLE_EGG");
     @Nullable
     private static final Material SWEET_BERRY_BUSH = EnumHelper.getEnum(Material.class, "SWEET_BERRY_BUSH");
@@ -205,10 +207,11 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             BlockState blockState = block.getState();
             EntityType spawnType = usedItem == null ? EntityType.UNKNOWN : BukkitItems.getEntityType(usedItem);
             Material blockType = block.getType();
+            Material usedItemType = usedItem == null ? null : usedItem.getType();
 
             IslandPrivilege islandPrivilege;
 
-            if (usedItem != null && Materials.isMinecart(usedItem.getType()) ? Materials.isRail(blockType) : Materials.isBoat(blockType)) {
+            if (usedItem != null && Materials.isMinecart(usedItemType) ? Materials.isRail(blockType) : Materials.isBoat(blockType)) {
                 islandPrivilege = IslandPrivileges.MINECART_PLACE;
             } else if (Materials.isChest(blockType)) {
                 islandPrivilege = IslandPrivileges.CHEST_ACCESS;
@@ -216,13 +219,13 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 islandPrivilege = IslandPrivileges.PICKUP_LECTERN_BOOK;
             } else if (blockState instanceof InventoryHolder) {
                 islandPrivilege = IslandPrivileges.USE;
-            } else if (usedItem != null && blockType == VAULT && (usedItem.getType() == TRIAL_KEY || usedItem.getType() == OMINOUS_TRIAL_KEY)) {
+            } else if (usedItem != null && blockType == VAULT && (usedItemType == TRIAL_KEY || usedItemType == OMINOUS_TRIAL_KEY)) {
                 islandPrivilege = IslandPrivileges.USE;
             } else if (blockState instanceof Sign) {
                 islandPrivilege = IslandPrivileges.SIGN_INTERACT;
             } else if (blockType == Materials.SPAWNER.toBukkitType()) {
                 islandPrivilege = IslandPrivileges.SPAWNER_BREAK;
-            } else if (blockType == FARMLAND) {
+            } else if (blockType == FARMLAND || blockType == ROOTED_DIRT || (usedItem != null && Materials.isHoe(usedItemType))) {
                 islandPrivilege = action == Action.PHYSICAL ? IslandPrivileges.FARM_TRAMPING : IslandPrivileges.BUILD;
             } else if (blockType == TURTLE_EGG) {
                 islandPrivilege = action == Action.PHYSICAL ? IslandPrivileges.TURTLE_EGG_TRAMPING : IslandPrivileges.BUILD;
