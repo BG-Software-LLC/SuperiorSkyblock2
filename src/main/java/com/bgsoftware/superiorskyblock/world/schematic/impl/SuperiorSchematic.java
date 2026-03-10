@@ -185,11 +185,10 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
     @Override
     public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
-        if (Bukkit.isPrimaryThread()) {
-            BukkitExecutor.async(() -> pasteSchematic(island, location, callback, onFailure));
-            return;
-        }
+        BukkitExecutor.ensureAsync(() -> pasteSchematicInternal(island, location, callback, onFailure));
+    }
 
+    private void pasteSchematicInternal(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
         long profiler = Profiler.start(ProfileType.SCHEMATIC_PLACE, getName());
 
         Log.debug(Debug.PASTE_SCHEMATIC, this.name, island.getOwner().getName(), location);
