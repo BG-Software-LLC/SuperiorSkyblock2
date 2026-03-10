@@ -44,6 +44,7 @@ public class IslandsDeserializer {
 
     private static final Gson GSON = new GsonBuilder().create();
     private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
+    private static final int SYNCED_VALUE = -2;
 
     private IslandsDeserializer() {
 
@@ -713,13 +714,13 @@ public class IslandsDeserializer {
 
             Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_settings");
 
-            builder.setIslandSize(islandSettings.getInt("size").orElse(-1));
-            builder.setTeamLimit(islandSettings.getInt("members_limit").orElse(-1));
-            builder.setWarpsLimit(islandSettings.getInt("warps_limit").orElse(-1));
-            builder.setCropGrowth(islandSettings.getDouble("crop_growth_multiplier").orElse(-1D));
-            builder.setSpawnerRates(islandSettings.getDouble("spawner_rates_multiplier").orElse(-1D));
-            builder.setMobDrops(islandSettings.getDouble("mob_drops_multiplier").orElse(-1D));
-            builder.setCoopLimit(islandSettings.getInt("coops_limit").orElse(-1));
+            builder.setIslandSize(islandSettings.getInt("size").orElse(SYNCED_VALUE));
+            builder.setTeamLimit(islandSettings.getInt("members_limit").orElse(SYNCED_VALUE));
+            builder.setWarpsLimit(islandSettings.getInt("warps_limit").orElse(SYNCED_VALUE));
+            builder.setCropGrowth(islandSettings.getDouble("crop_growth_multiplier").orElse((double) SYNCED_VALUE));
+            builder.setSpawnerRates(islandSettings.getDouble("spawner_rates_multiplier").orElse((double) SYNCED_VALUE));
+            builder.setMobDrops(islandSettings.getDouble("mob_drops_multiplier").orElse((double) SYNCED_VALUE));
+            builder.setCoopLimit(islandSettings.getInt("coops_limit").orElse(SYNCED_VALUE));
             builder.setBankLimit(islandSettings.getBigDecimal("bank_limit").orElse(SYNCED_BANK_LIMIT_VALUE));
         });
     }

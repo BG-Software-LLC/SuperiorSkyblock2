@@ -32,6 +32,7 @@ import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsSerial
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
@@ -735,14 +736,14 @@ public class IslandsDatabaseBridge {
             try (ObjectsPools.Batch<DBColumn> pool = ObjectsPools.DB_COLUMN_BATCH.obtain()) {
                 databaseBridge.updateObject("islands_settings",
                         createFilter("island", island),
-                        pool.obtain().withNameAndValue("size", -1),
-                        pool.obtain().withNameAndValue("bank_limit", "-2"),
-                        pool.obtain().withNameAndValue("coops_limit", -1),
-                        pool.obtain().withNameAndValue("members_limit", -1),
-                        pool.obtain().withNameAndValue("warps_limit", -1),
-                        pool.obtain().withNameAndValue("crop_growth_multiplier", -1D),
-                        pool.obtain().withNameAndValue("spawner_rates_multiplier", -1D),
-                        pool.obtain().withNameAndValue("mob_drops_multiplier", -1D)
+                        pool.obtain().withNameAndValue("size", IslandUpgradeConstants.SYNCED_VALUE),
+                        pool.obtain().withNameAndValue("bank_limit", IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE.toString()),
+                        pool.obtain().withNameAndValue("coops_limit", IslandUpgradeConstants.SYNCED_VALUE),
+                        pool.obtain().withNameAndValue("members_limit", IslandUpgradeConstants.SYNCED_VALUE),
+                        pool.obtain().withNameAndValue("warps_limit", IslandUpgradeConstants.SYNCED_VALUE),
+                        pool.obtain().withNameAndValue("crop_growth_multiplier", IslandUpgradeConstants.SYNCED_VALUE),
+                        pool.obtain().withNameAndValue("spawner_rates_multiplier", IslandUpgradeConstants.SYNCED_VALUE),
+                        pool.obtain().withNameAndValue("mob_drops_multiplier", IslandUpgradeConstants.SYNCED_VALUE)
                 );
             }
         });
