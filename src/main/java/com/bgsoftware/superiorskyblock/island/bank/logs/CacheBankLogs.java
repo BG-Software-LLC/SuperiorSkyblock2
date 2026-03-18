@@ -21,7 +21,7 @@ public class CacheBankLogs implements IBankLogs {
 
     @Override
     public int getLastTransactionPosition() {
-        return this.transactions.readAndGet(SortedSet::size);
+        return this.transactions.readAndGet(set -> set.isEmpty() ? 0 : set.last().getPosition());
     }
 
     @Override
