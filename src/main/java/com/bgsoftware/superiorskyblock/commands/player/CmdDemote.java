@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 
 import java.util.Collections;
 import java.util.List;
@@ -84,7 +85,7 @@ public class CmdDemote implements IPermissibleCommand {
 
         do {
             previousRole = previousRole.getPreviousRole();
-            roleLimit = previousRole == null ? -1 : island.getRoleLimit(previousRole);
+            roleLimit = previousRole == null ? IslandUpgradeConstants.NO_LIMIT_VALUE : island.getRoleLimit(previousRole);
         } while (previousRole != null && !previousRole.isFirstRole() && roleLimit >= 0 && roleLimit >= island.getIslandMembers(previousRole).size());
 
         if (previousRole == null) {

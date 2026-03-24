@@ -44,6 +44,7 @@ public class IslandsDeserializer {
 
     private static final Gson GSON = new GsonBuilder().create();
     private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
+    private static final int SYNCED_VALUE = -2;
 
     private IslandsDeserializer() {
 
@@ -112,21 +113,21 @@ public class IslandsDeserializer {
         databaseBridge.loadAllObjects("islands_visitors", visitorsRow -> {
             DatabaseResult visitors = new DatabaseResult(visitorsRow);
 
-            Optional<UUID> islandUUID = visitors.getUUID("island");
-            if (!islandUUID.isPresent()) {
+            Optional<UUID> uuid = visitors.getUUID("island");
+            if (!uuid.isPresent()) {
                 Log.warn("Cannot load island visitors for null islands, skipping...");
                 return;
             }
 
-            Optional<UUID> uuid = visitors.getUUID("player");
-            if (!uuid.isPresent()) {
-                Log.warn("Cannot load island visitors with invalid uuids for ", islandUUID.get(), ", skipping...");
+            Optional<UUID> playerUUID = visitors.getUUID("player");
+            if (!playerUUID.isPresent()) {
+                Log.warn("Cannot load island visitors with invalid uuids for ", uuid.get(), ", skipping...");
                 return;
             }
 
-            SuperiorPlayer visitorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid.get(), false);
+            SuperiorPlayer visitorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get(), false);
             if (visitorPlayer == null) {
-                Log.warn("Cannot load island visitor with unrecognized uuid: " + uuid.get() + ", skipping...");
+                Log.warn("Cannot load island visitor with unrecognized uuid: " + playerUUID.get() + ", skipping...");
                 return;
             }
 
@@ -369,21 +370,21 @@ public class IslandsDeserializer {
         databaseBridge.loadAllObjects("islands_ratings", ratingsRow -> {
             DatabaseResult ratings = new DatabaseResult(ratingsRow);
 
-            Optional<UUID> islandUUID = ratings.getUUID("island");
-            if (!islandUUID.isPresent()) {
+            Optional<UUID> uuid = ratings.getUUID("island");
+            if (!uuid.isPresent()) {
                 Log.warn("Cannot load ratings for null islands, skipping...");
                 return;
             }
 
-            Optional<UUID> uuid = ratings.getUUID("player");
-            if (!uuid.isPresent()) {
-                Log.warn("Cannot load ratings with invalid players for ", islandUUID.get(), ", skipping...");
+            Optional<UUID> playerUUID = ratings.getUUID("player");
+            if (!playerUUID.isPresent()) {
+                Log.warn("Cannot load ratings with invalid players for ", uuid.get(), ", skipping...");
                 return;
             }
 
-            SuperiorPlayer ratingPlayer = plugin.getPlayers().getSuperiorPlayer(uuid.get(), false);
+            SuperiorPlayer ratingPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get(), false);
             if (ratingPlayer == null) {
-                Log.warn("Cannot load island rating with unrecognized uuid: " + uuid.get() + ", skipping...");
+                Log.warn("Cannot load island rating with unrecognized uuid: " + playerUUID.get() + ", skipping...");
                 return;
             }
 
@@ -395,7 +396,7 @@ public class IslandsDeserializer {
                 }
             });
             if (!rating.isPresent()) {
-                Log.warn("Cannot load ratings with invalid rating value for ", uuid.get(), ", skipping...");
+                Log.warn("Cannot load ratings with invalid rating value for ", playerUUID.get(), ", skipping...");
                 return;
             }
 
@@ -705,22 +706,21 @@ public class IslandsDeserializer {
         databaseBridge.loadAllObjects("islands_settings", islandSettingsRow -> {
             DatabaseResult islandSettings = new DatabaseResult(islandSettingsRow);
 
-            Optional<String> island = islandSettings.getString("island");
-            if (!island.isPresent()) {
+            Optional<UUID> uuid = islandSettings.getUUID("island");
+            if (!uuid.isPresent()) {
                 Log.warn("Cannot load island settings of null island, skipping ");
                 return;
             }
 
-            UUID uuid = UUID.fromString(island.get());
-            Island.Builder builder = lookupIsland(databaseCache, uuid, "islands_settings");
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_settings");
 
-            builder.setIslandSize(islandSettings.getInt("size").orElse(-1));
-            builder.setTeamLimit(islandSettings.getInt("members_limit").orElse(-1));
-            builder.setWarpsLimit(islandSettings.getInt("warps_limit").orElse(-1));
-            builder.setCropGrowth(islandSettings.getDouble("crop_growth_multiplier").orElse(-1D));
-            builder.setSpawnerRates(islandSettings.getDouble("spawner_rates_multiplier").orElse(-1D));
-            builder.setMobDrops(islandSettings.getDouble("mob_drops_multiplier").orElse(-1D));
-            builder.setCoopLimit(islandSettings.getInt("coops_limit").orElse(-1));
+            builder.setIslandSize(islandSettings.getInt("size").orElse(SYNCED_VALUE));
+            builder.setTeamLimit(islandSettings.getInt("members_limit").orElse(SYNCED_VALUE));
+            builder.setWarpsLimit(islandSettings.getInt("warps_limit").orElse(SYNCED_VALUE));
+            builder.setCropGrowth(islandSettings.getDouble("crop_growth_multiplier").orElse((double) SYNCED_VALUE));
+            builder.setSpawnerRates(islandSettings.getDouble("spawner_rates_multiplier").orElse((double) SYNCED_VALUE));
+            builder.setMobDrops(islandSettings.getDouble("mob_drops_multiplier").orElse((double) SYNCED_VALUE));
+            builder.setCoopLimit(islandSettings.getInt("coops_limit").orElse(SYNCED_VALUE));
             builder.setBankLimit(islandSettings.getBigDecimal("bank_limit").orElse(SYNCED_BANK_LIMIT_VALUE));
         });
     }

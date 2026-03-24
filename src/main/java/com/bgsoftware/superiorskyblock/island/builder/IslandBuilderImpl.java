@@ -62,6 +62,8 @@ import java.util.stream.Collectors;
 public class IslandBuilderImpl implements Island.Builder {
 
     private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
+    private static final int SYNCED_VALUE = -2;
+
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Nullable
@@ -102,13 +104,13 @@ public class IslandBuilderImpl implements Island.Builder {
     public final List<ItemStack[]> islandChests = new ArrayList<>(plugin.getSettings().getIslandChests().getDefaultPages());
     public final Int2ObjectMapView<IntValue> roleLimits = CollectionsFactory.createInt2ObjectArrayMap();
     public final EnumerateMap<Dimension, WorldPosition> visitorHomes = new EnumerateMap<>(Dimension.values());
-    public IntValue islandSize = IntValue.syncedFixed(-1);
-    public IntValue warpsLimit = IntValue.syncedFixed(-1);
-    public IntValue teamLimit = IntValue.syncedFixed(-1);
-    public IntValue coopLimit = IntValue.syncedFixed(-1);
-    public DoubleValue cropGrowth = DoubleValue.syncedFixed(-1D);
-    public DoubleValue spawnerRates = DoubleValue.syncedFixed(-1D);
-    public DoubleValue mobDrops = DoubleValue.syncedFixed(-1D);
+    public IntValue islandSize = IntValue.syncedFixed(SYNCED_VALUE);
+    public IntValue warpsLimit = IntValue.syncedFixed(SYNCED_VALUE);
+    public IntValue teamLimit = IntValue.syncedFixed(SYNCED_VALUE);
+    public IntValue coopLimit = IntValue.syncedFixed(SYNCED_VALUE);
+    public DoubleValue cropGrowth = DoubleValue.syncedFixed(SYNCED_VALUE);
+    public DoubleValue spawnerRates = DoubleValue.syncedFixed(SYNCED_VALUE);
+    public DoubleValue mobDrops = DoubleValue.syncedFixed(SYNCED_VALUE);
     public Value<BigDecimal> bankLimit = Value.syncedFixed(SYNCED_BANK_LIMIT_VALUE);
     public BigDecimal balance = BigDecimal.ZERO;
     public long lastInterestTime = System.currentTimeMillis() / 1000;

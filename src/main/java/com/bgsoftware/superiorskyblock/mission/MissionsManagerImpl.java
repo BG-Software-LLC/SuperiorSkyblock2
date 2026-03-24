@@ -267,12 +267,8 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             throw new IllegalStateException("Cannot reward island mission " + mission.getName() + " as the player " + superiorPlayer.getName() + " does not have island.");
         }
 
-        if (Bukkit.isPrimaryThread()) {
-            BukkitExecutor.async(() -> rewardMissionAsyncInternal(mission, missionData, superiorPlayer,
-                    missionsHolder, checkAutoReward, forceReward, result));
-        } else {
-            rewardMissionAsyncInternal(mission, missionData, superiorPlayer, missionsHolder, checkAutoReward, forceReward, result);
-        }
+        BukkitExecutor.ensureAsync(() -> rewardMissionAsyncInternal(mission, missionData, superiorPlayer,
+                missionsHolder, checkAutoReward, forceReward, result));
     }
 
     private void rewardMissionAsyncInternal(Mission<?> mission, MissionData missionData, SuperiorPlayer superiorPlayer,

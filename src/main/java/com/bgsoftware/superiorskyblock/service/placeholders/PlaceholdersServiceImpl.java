@@ -255,6 +255,8 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.getIslandLevel().toString())
                     .put("locked", (island, superiorPlayer) ->
                             Formatters.BOOLEAN_FORMATTER.format(island.isLocked(), superiorPlayer.getUserLocale()))
+                    .put("missions_completed", (island, superiorPlayer) ->
+                            island.getCompletedMissions().size() + "")
                     .put("name", (island, superiorPlayer) -> island.getName())
                     .put("name_formatted", (island, superiorPlayer) -> island.getFormattedName())
                     .put("name_leader", (island, superiorPlayer) ->

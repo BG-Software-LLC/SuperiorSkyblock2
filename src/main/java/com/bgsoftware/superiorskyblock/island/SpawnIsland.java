@@ -60,6 +60,7 @@ import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.privilege.PrivilegeNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
@@ -1166,7 +1167,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public BigDecimal getBankLimit() {
-        return BigDecimal.valueOf(-1);
+        return IslandUpgradeConstants.NO_BANK_LIMIT_VALUE;
     }
 
     @Override
@@ -1176,7 +1177,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public BigDecimal getBankLimitRaw() {
-        return BigDecimal.valueOf(-1);
+        return IslandUpgradeConstants.NO_BANK_LIMIT_VALUE;
     }
 
     @Override
@@ -1612,12 +1613,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getBlockLimit(Key key) {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
     public int getExactBlockLimit(Key key) {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
@@ -1662,12 +1663,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getEntityLimit(EntityType entityType) {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
     public int getEntityLimit(Key key) {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
@@ -1727,7 +1728,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getTeamLimit() {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
@@ -1737,12 +1738,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getTeamLimitRaw() {
-        return 0;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
     public int getWarpsLimit() {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
@@ -1752,7 +1753,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getWarpsLimitRaw() {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
@@ -1817,12 +1818,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getRoleLimit(PlayerRole playerRole) {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
     public int getRoleLimitRaw(PlayerRole playerRole) {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
@@ -2095,7 +2096,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getCoopLimitRaw() {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override

@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.google.common.base.Preconditions;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
@@ -193,7 +194,7 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
     }
 
     private boolean canTrackEntity(Key key) {
-        if (island.getEntityLimit(key) != -1)
+        if (island.getEntityLimit(key) != IslandUpgradeConstants.NO_LIMIT_VALUE)
             return true;
 
         if (key instanceof EntityTypeKey) {

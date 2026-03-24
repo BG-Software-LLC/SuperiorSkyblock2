@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.value.Value;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgrade;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.island.upgrade.UpgradeRequirement;
@@ -266,7 +267,7 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
         Value<OptionalInt> coopLimit = Value.syncedFixed(readInt(levelSection, "coop-limit"));
         Value<OptionalInt> borderSize = Value.syncedFixed(readInt(levelSection, "border-size"));
 
-        if (borderSize.get().orElse(-1) > plugin.getSettings().getMaxIslandSize()) {
+        if (borderSize.get().orElse(IslandUpgradeConstants.NO_LIMIT_VALUE) > plugin.getSettings().getMaxIslandSize()) {
             this.logger().w("Upgrade by name " + upgrade.getName() + " (level " + level + ") has illegal border-size, skipping...");
             return;
         }

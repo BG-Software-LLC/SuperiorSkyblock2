@@ -92,6 +92,7 @@ import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.island.upgrade.DefaultUpgradeLevel;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.island.upgrade.container.IslandUpgrades;
 import com.bgsoftware.superiorskyblock.island.warp.SIslandWarp;
@@ -161,9 +162,9 @@ import java.util.stream.Collectors;
 public class SIsland implements Island {
 
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
-    private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
     private static final UUID[] EMPTY_IGNORED_MEMBERS = new UUID[0];
     private static final Object[] EMPTY_MESSAGE_ARGS = new Object[0];
+
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
@@ -202,14 +203,14 @@ public class SIsland implements Island {
     /*
      * Island Upgrade Values
      */
-    private final Synchronized<IntValue> islandSize = Synchronized.of(IntValue.syncedFixed(-1));
-    private final Synchronized<IntValue> warpsLimit = Synchronized.of(IntValue.syncedFixed(-1));
-    private final Synchronized<IntValue> teamLimit = Synchronized.of(IntValue.syncedFixed(-1));
-    private final Synchronized<IntValue> coopLimit = Synchronized.of(IntValue.syncedFixed(-1));
-    private final Synchronized<DoubleValue> cropGrowth = Synchronized.of(DoubleValue.syncedFixed(-1D));
-    private final Synchronized<DoubleValue> spawnerRates = Synchronized.of(DoubleValue.syncedFixed(-1D));
-    private final Synchronized<DoubleValue> mobDrops = Synchronized.of(DoubleValue.syncedFixed(-1D));
-    private final Synchronized<Value<BigDecimal>> bankLimit = Synchronized.of(Value.syncedFixed(SYNCED_BANK_LIMIT_VALUE));
+    private final Synchronized<IntValue> islandSize = Synchronized.of(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<IntValue> warpsLimit = Synchronized.of(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<IntValue> teamLimit = Synchronized.of(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<IntValue> coopLimit = Synchronized.of(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<DoubleValue> cropGrowth = Synchronized.of(DoubleValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<DoubleValue> spawnerRates = Synchronized.of(DoubleValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<DoubleValue> mobDrops = Synchronized.of(DoubleValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<Value<BigDecimal>> bankLimit = Synchronized.of(Value.syncedFixed(IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE));
     private final Synchronized<Int2ObjectMapView<IntValue>> roleLimits = Synchronized.of(CollectionsFactory.createInt2ObjectArrayMap());
     private final Synchronized<EnumerateMap<Dimension, KeyMap<IntValue>>> cobbleGeneratorValues = Synchronized.of(new EnumerateMap<>(Dimension.values()));
     private final Map<PotionEffectType, IntValue> islandEffects = new ConcurrentHashMap<>();
@@ -794,7 +795,7 @@ public class SIsland implements Island {
 
     @Override
     public int getCoopLimitRaw() {
-        return this.coopLimit.readAndGet(coopLimit -> coopLimit.getNonSynced(-1));
+        return this.coopLimit.readAndGet(coopLimit -> coopLimit.getNonSynced(IslandUpgradeConstants.SYNCED_VALUE));
     }
 
     @Override
@@ -1941,7 +1942,7 @@ public class SIsland implements Island {
 
     @Override
     public int getIslandSizeRaw() {
-        return this.islandSize.readAndGet(islandSize -> islandSize.getNonSynced(-1));
+        return this.islandSize.readAndGet(islandSize -> islandSize.getNonSynced(IslandUpgradeConstants.SYNCED_VALUE));
     }
 
     @Override
@@ -2278,8 +2279,8 @@ public class SIsland implements Island {
         if (Objects.equals(bankLimit, getBankLimitRaw()))
             return;
 
-        if (bankLimit.compareTo(SYNCED_BANK_LIMIT_VALUE) <= 0) {
-            this.bankLimit.set(Value.syncedFixed(SYNCED_BANK_LIMIT_VALUE));
+        if (bankLimit.compareTo(IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE) <= 0) {
+            this.bankLimit.set(Value.syncedFixed(IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE));
 
             getUpgrades().forEach((upgradeName, level) -> {
                 Upgrade upgrade = plugin.getUpgrades().getUpgrade(upgradeName);
@@ -2303,7 +2304,7 @@ public class SIsland implements Island {
 
     @Override
     public BigDecimal getBankLimitRaw() {
-        return this.bankLimit.readAndGet(bankLimit -> bankLimit.getNonSynced(SYNCED_BANK_LIMIT_VALUE));
+        return this.bankLimit.readAndGet(bankLimit -> bankLimit.getNonSynced(IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE));
     }
 
     @Override
@@ -3052,7 +3053,7 @@ public class SIsland implements Island {
 
         DoubleValue oldCropGrowth = this.cropGrowth.set(DoubleValue.fixed(cropGrowth));
 
-        if (cropGrowth == DoubleValue.getNonSynced(oldCropGrowth, -1D))
+        if (cropGrowth == DoubleValue.getNonSynced(oldCropGrowth, IslandUpgradeConstants.SYNCED_VALUE))
             return;
 
         IslandsDatabaseBridge.saveCropGrowth(this);
@@ -3062,7 +3063,7 @@ public class SIsland implements Island {
 
     @Override
     public double getCropGrowthRaw() {
-        return this.cropGrowth.readAndGet(cropGrowth -> cropGrowth.getNonSynced(-1D));
+        return this.cropGrowth.readAndGet(cropGrowth -> cropGrowth.getNonSynced(IslandUpgradeConstants.SYNCED_VALUE));
     }
 
     @Override
@@ -3078,7 +3079,7 @@ public class SIsland implements Island {
 
         DoubleValue oldSpawnerRates = this.spawnerRates.set(DoubleValue.fixed(spawnerRates));
 
-        if (spawnerRates == DoubleValue.getNonSynced(oldSpawnerRates, -1D))
+        if (spawnerRates == DoubleValue.getNonSynced(oldSpawnerRates, IslandUpgradeConstants.SYNCED_VALUE))
             return;
 
         IslandsDatabaseBridge.saveSpawnerRates(this);
@@ -3086,7 +3087,7 @@ public class SIsland implements Island {
 
     @Override
     public double getSpawnerRatesRaw() {
-        return this.spawnerRates.readAndGet(spawnerRates -> spawnerRates.getNonSynced(-1D));
+        return this.spawnerRates.readAndGet(spawnerRates -> spawnerRates.getNonSynced(IslandUpgradeConstants.SYNCED_VALUE));
     }
 
     @Override
@@ -3102,7 +3103,7 @@ public class SIsland implements Island {
 
         DoubleValue oldMobDrops = this.mobDrops.set(DoubleValue.fixed(mobDrops));
 
-        if (mobDrops == DoubleValue.getNonSynced(oldMobDrops, -1D))
+        if (mobDrops == DoubleValue.getNonSynced(oldMobDrops, IslandUpgradeConstants.SYNCED_VALUE))
             return;
 
         IslandsDatabaseBridge.saveMobDrops(this);
@@ -3110,21 +3111,21 @@ public class SIsland implements Island {
 
     @Override
     public double getMobDropsRaw() {
-        return this.mobDrops.readAndGet(mobDrops -> mobDrops.getNonSynced(-1D));
+        return this.mobDrops.readAndGet(mobDrops -> mobDrops.getNonSynced(IslandUpgradeConstants.SYNCED_VALUE));
     }
 
     @Override
     public int getBlockLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         IntValue blockLimit = blockLimits.get(key);
-        return blockLimit == null ? -1 : blockLimit.get();
+        return blockLimit == null ? IslandUpgradeConstants.NO_LIMIT_VALUE : blockLimit.get();
     }
 
     @Override
     public int getExactBlockLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         IntValue blockLimit = blockLimits.getRaw(key, null);
-        return blockLimit == null ? -1 : blockLimit.get();
+        return blockLimit == null ? IslandUpgradeConstants.NO_LIMIT_VALUE : blockLimit.get();
     }
 
     @Override
@@ -3168,7 +3169,7 @@ public class SIsland implements Island {
 
         IntValue oldLimit = blockLimits.put(key, IntValue.fixed(finalLimit));
 
-        if (limit == IntValue.getNonSynced(oldLimit, -1))
+        if (limit == IntValue.getNonSynced(oldLimit, IslandUpgradeConstants.SYNCED_VALUE))
             return;
 
         plugin.getBlockValues().addCustomBlockKey(key);
@@ -3226,7 +3227,7 @@ public class SIsland implements Island {
     public int getEntityLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         IntValue entityLimit = entityLimits.get(key);
-        return entityLimit == null ? -1 : entityLimit.get();
+        return entityLimit == null ? IslandUpgradeConstants.NO_LIMIT_VALUE : entityLimit.get();
     }
 
     @Override
@@ -3270,7 +3271,7 @@ public class SIsland implements Island {
 
         IntValue oldEntityLimit = entityLimits.put(key, IntValue.fixed(limit));
 
-        if (limit == IntValue.getNonSynced(oldEntityLimit, -1))
+        if (limit == IntValue.getNonSynced(oldEntityLimit, IslandUpgradeConstants.SYNCED_VALUE))
             return;
 
         IslandsDatabaseBridge.saveEntityLimit(this, key, limit);
@@ -3339,7 +3340,7 @@ public class SIsland implements Island {
 
         IntValue oldTeamLimit = this.teamLimit.set(IntValue.fixed(teamLimit));
 
-        if (teamLimit == IntValue.getNonSynced(oldTeamLimit, -1))
+        if (teamLimit == IntValue.getNonSynced(oldTeamLimit, IslandUpgradeConstants.SYNCED_VALUE))
             return;
 
         IslandsDatabaseBridge.saveTeamLimit(this);
@@ -3347,7 +3348,7 @@ public class SIsland implements Island {
 
     @Override
     public int getTeamLimitRaw() {
-        return this.teamLimit.readAndGet(teamLimit -> teamLimit.getNonSynced(-1));
+        return this.teamLimit.readAndGet(teamLimit -> teamLimit.getNonSynced(IslandUpgradeConstants.SYNCED_VALUE));
     }
 
     @Override
@@ -3363,7 +3364,7 @@ public class SIsland implements Island {
 
         IntValue oldWarpsLimit = this.warpsLimit.set(IntValue.fixed(warpsLimit));
 
-        if (warpsLimit == IntValue.getNonSynced(oldWarpsLimit, -1))
+        if (warpsLimit == IntValue.getNonSynced(oldWarpsLimit, IslandUpgradeConstants.SYNCED_VALUE))
             return;
 
         IslandsDatabaseBridge.saveWarpsLimit(this);
@@ -3371,7 +3372,7 @@ public class SIsland implements Island {
 
     @Override
     public int getWarpsLimitRaw() {
-        return this.warpsLimit.readAndGet(warpsLimit -> warpsLimit.getNonSynced(-1));
+        return this.warpsLimit.readAndGet(warpsLimit -> warpsLimit.getNonSynced(IslandUpgradeConstants.SYNCED_VALUE));
     }
 
     @Override
@@ -3389,7 +3390,7 @@ public class SIsland implements Island {
 
         IntValue oldPotionLevel = islandEffects.put(type, IntValue.fixed(level));
 
-        if (level == IntValue.getNonSynced(oldPotionLevel, -1))
+        if (level == IntValue.getNonSynced(oldPotionLevel, IslandUpgradeConstants.SYNCED_VALUE))
             return;
 
         registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
@@ -3450,7 +3451,7 @@ public class SIsland implements Island {
         Map<PotionEffectType, Integer> islandEffects = new ArrayMap<>();
 
         this.islandEffects.forEach((potionEffectType, levelValue) -> {
-            int level = levelValue.getNonSynced(-1);
+            int level = levelValue.getNonSynced(IslandUpgradeConstants.SYNCED_VALUE);
             if (level > 0)
                 islandEffects.put(potionEffectType, level);
         });
@@ -3516,7 +3517,7 @@ public class SIsland implements Island {
         IntValue oldRoleLimit = roleLimits.writeAndGet(roleLimits ->
                 roleLimits.put(playerRole.getId(), IntValue.fixed(limit)));
 
-        if (limit == IntValue.getNonSynced(oldRoleLimit, -1))
+        if (limit == IntValue.getNonSynced(oldRoleLimit, IslandUpgradeConstants.SYNCED_VALUE))
             return;
 
         IslandsDatabaseBridge.saveRoleLimit(this, playerRole, limit);
@@ -3540,13 +3541,14 @@ public class SIsland implements Island {
     public int getRoleLimit(PlayerRole playerRole) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
         IntValue roleLimit = roleLimits.readAndGet(roleLimits -> roleLimits.get(playerRole.getId()));
-        return roleLimit == null ? -1 : roleLimit.get();
+        return roleLimit == null ? IslandUpgradeConstants.NO_LIMIT_VALUE : roleLimit.get();
     }
 
     @Override
     public int getRoleLimitRaw(PlayerRole playerRole) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-        return IntValue.getNonSynced(roleLimits.readAndGet(roleLimits -> roleLimits.get(playerRole.getId())), -1);
+        return IntValue.getNonSynced(roleLimits.readAndGet(roleLimits ->
+                roleLimits.get(playerRole.getId())), IslandUpgradeConstants.SYNCED_VALUE);
     }
 
     @Override
@@ -4208,7 +4210,7 @@ public class SIsland implements Island {
 
         IntValue oldGeneratorRate = worldGeneratorRates.put(key, IntValue.fixed(amount));
 
-        if (amount == IntValue.getNonSynced(oldGeneratorRate, -1))
+        if (amount == IntValue.getNonSynced(oldGeneratorRate, IslandUpgradeConstants.SYNCED_VALUE))
             return;
 
         IslandsDatabaseBridge.saveGeneratorRate(this, dimension, key, amount);
@@ -4982,35 +4984,35 @@ public class SIsland implements Island {
 
     private void clearUpgrades(boolean overrideCustom) {
         if (overrideCustom || this.islandSize.get().isSynced()) {
-            setIslandSizeInternal(IntValue.syncedFixed(-1));
+            setIslandSizeInternal(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
         }
 
         warpsLimit.set(warpsLimit -> {
             if (overrideCustom || warpsLimit.isSynced()) {
-                return IntValue.syncedFixed(-1);
+                return IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE);
             }
             return warpsLimit;
         });
 
         teamLimit.set(teamLimit -> {
             if (overrideCustom || teamLimit.isSynced()) {
-                return IntValue.syncedFixed(-1);
+                return IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE);
             }
             return teamLimit;
         });
 
         coopLimit.set(coopLimit -> {
             if (overrideCustom || coopLimit.isSynced()) {
-                return IntValue.syncedFixed(-1);
+                return IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE);
             }
             return coopLimit;
         });
 
         cropGrowth.set(cropGrowth -> {
             if (overrideCustom || cropGrowth.isSynced()) {
-                notifyCropGrowthChange(-1D);
+                notifyCropGrowthChange(IslandUpgradeConstants.SYNCED_VALUE);
 
-                return DoubleValue.syncedFixed(-1D);
+                return DoubleValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE);
             }
 
             return cropGrowth;
@@ -5018,51 +5020,51 @@ public class SIsland implements Island {
 
         spawnerRates.set(spawnerRates -> {
             if (overrideCustom || spawnerRates.isSynced()) {
-                return DoubleValue.syncedFixed(-1D);
+                return DoubleValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE);
             }
             return spawnerRates;
         });
 
         mobDrops.set(mobDrops -> {
             if (overrideCustom || mobDrops.isSynced()) {
-                return DoubleValue.syncedFixed(-1D);
+                return DoubleValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE);
             }
             return mobDrops;
         });
 
         bankLimit.set(bankLimit -> {
             if (overrideCustom || bankLimit.isSynced()) {
-                return Value.syncedFixed(SYNCED_BANK_LIMIT_VALUE);
+                return Value.syncedFixed(IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE);
             }
             return bankLimit;
         });
 
         blockLimits.entrySet().stream()
                 .filter(entry -> overrideCustom || entry.getValue().isSynced())
-                .forEach(entry -> entry.setValue(IntValue.syncedFixed(-1)));
+                .forEach(entry -> entry.setValue(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE)));
 
         entityLimits.entrySet().stream()
                 .filter(entry -> overrideCustom || entry.getValue().isSynced())
-                .forEach(entry -> entry.setValue(IntValue.syncedFixed(-1)));
+                .forEach(entry -> entry.setValue(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE)));
 
         cobbleGeneratorValues.write(cobbleGeneratorValues -> {
             cobbleGeneratorValues.values().forEach(cobbleGeneratorValue -> {
                 cobbleGeneratorValue.entrySet().stream()
                         .filter(entry -> overrideCustom || entry.getValue().isSynced())
-                        .forEach(entry -> entry.setValue(IntValue.syncedFixed(-1)));
+                        .forEach(entry -> entry.setValue(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE)));
             });
         });
 
         islandEffects.entrySet().stream()
                 .filter(entry -> overrideCustom || entry.getValue().isSynced())
-                .forEach(entry -> entry.setValue(IntValue.syncedFixed(-1)));
+                .forEach(entry -> entry.setValue(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE)));
 
         roleLimits.write(roleLimits -> {
             Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimits.entryIterator();
             while (iterator.hasNext()) {
                 Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
                 if (overrideCustom || entry.getValue().isSynced())
-                    entry.setValue(IntValue.syncedFixed(-1));
+                    entry.setValue(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
             }
         });
 

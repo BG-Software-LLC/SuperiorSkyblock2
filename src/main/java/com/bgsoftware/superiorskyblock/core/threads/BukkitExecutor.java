@@ -43,6 +43,19 @@ public class BukkitExecutor {
         }
     }
 
+    @Nullable
+    public static BukkitTask ensureAsync(Runnable runnable) {
+        if (ensureNotShudown())
+            return null;
+
+        if (state != State.PREPARE_SHUTDOWN && Bukkit.isPrimaryThread()) {
+            return async(runnable);
+        } else {
+            runnable.run();
+            return null;
+        }
+    }
+
     public static BukkitTask sync(Runnable runnable) {
         return sync(runnable, 0);
     }
@@ -59,14 +72,15 @@ public class BukkitExecutor {
         }
     }
 
-    public static void async(Runnable runnable) {
+    public static BukkitTask async(Runnable runnable) {
         if (ensureNotShudown())
-            return;
+            return null;
 
         if (state == State.PREPARE_SHUTDOWN) {
             runnable.run();
+            return null;
         } else {
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
+            return Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
         }
     }
 

@@ -119,6 +119,10 @@ public enum Materials {
         return hasTag(material, Tag.BED);
     }
 
+    public static boolean isHoe(Material material) {
+        return hasTag(material, Tag.HOE);
+    }
+
     public static Set<Material> getBlocksNonLegacy() {
         return Collections.unmodifiableSet(BLOCK_NON_LEGACY_MATERIALS);
     }
@@ -177,6 +181,8 @@ public enum Materials {
                 materialTags.add(Tag.HARNESS);
             if (materialName.contains("BED"))
                 materialTags.add(Tag.BED);
+            if (materialName.contains("_HOE"))
+                materialTags.add(Tag.HOE);
 
             if (!materialTags.isEmpty())
                 enumMap.put(material, materialTags);
@@ -213,7 +219,8 @@ public enum Materials {
         SPAWN_EGG,
         CARPET,
         BED,
-        HARNESS
+        HARNESS,
+        HOE
 
     }
 
