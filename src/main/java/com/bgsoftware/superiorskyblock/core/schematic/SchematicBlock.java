@@ -28,10 +28,8 @@ public class SchematicBlock {
 
     private final Location location;
     private final int blockId;
-
     @Nullable
     private final Extra extra;
-
     @Nullable
     private CompoundTag tileEntityData = null;
 
@@ -83,11 +81,13 @@ public class SchematicBlock {
 
     public void doPrePlace(Island island) {
         CompoundTag originalTileEntity = getOriginalTileEntity();
-        if (originalTileEntity == null) return;
+
+        if (originalTileEntity == null)
+            return;
 
         this.tileEntityData = CompoundTag.fromNBT(originalTileEntity.toNBT());
-
         String id = this.tileEntityData.getString("id").orElse(null);
+
         if (id == null) {
             Log.warn("Weird tile-entity data detected: " + this.tileEntityData.getValue());
             throw new RuntimeException("Detected tile-entity data with no 'id' key.");
@@ -105,9 +105,8 @@ public class SchematicBlock {
                 try {
                     InventoryType containerType = InventoryType.valueOf(inventoryType);
                     ListTag items = plugin.getSettings().getDefaultContainers().getContents(containerType);
-                    if (items != null) {
+                    if (items != null)
                         this.tileEntityData.setTag("Items", items.copy());
-                    }
                 } catch (Exception ignored) {
                 }
             }
@@ -115,7 +114,8 @@ public class SchematicBlock {
     }
 
     public boolean shouldPostPlace() {
-        if (this.tileEntityData == null) return false;
+        if (this.tileEntityData == null)
+            return false;
 
         String id = this.tileEntityData.getString("id").orElse(null);
         return id != null && isSignId(id);
@@ -136,12 +136,10 @@ public class SchematicBlock {
         if (frontText == null || backText == null) {
             // This should never occur
             Log.error("Invalid sign tile entity data: ", tileEntityData);
-            return;
         }
 
         ListTag frontTextMessages = frontText.getList("messages").orElse(EMPTY_LIST_TAG);
         ListTag backTextMessages = backText.getList("messages").orElse(EMPTY_LIST_TAG);
-
         ListTag newFrontTextMessages = ListTag.of(StringTag.class);
         ListTag newBackTextMessages = ListTag.of(StringTag.class);
 
@@ -205,14 +203,8 @@ public class SchematicBlock {
             }
         }
 
-        if (needSignFormat) {
+        if (needSignFormat)
             tileEntityData.setByte("SSB.HasSignLines", (byte) 1);
-        }
-    }
-
-    private static String parseSignPlaceholders(Island island, String val) {
-        return val.replace("{player}", island.getOwner().getName())
-                .replace("{island}", island.getName().isEmpty() ? island.getOwner().getName() : island.getName());
     }
 
     private static String parseSignPlaceholders(Island island, String val) {
@@ -236,7 +228,6 @@ public class SchematicBlock {
 
         @Nullable
         private final CompoundTag statesTag;
-
         @Nullable
         private final CompoundTag tileEntity;
 
@@ -252,5 +243,7 @@ public class SchematicBlock {
         public CompoundTag getStatesTag() {
             return statesTag;
         }
+
     }
+
 }
