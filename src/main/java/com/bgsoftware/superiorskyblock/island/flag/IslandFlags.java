@@ -3,8 +3,11 @@ package com.bgsoftware.superiorskyblock.island.flag;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class IslandFlags {
 
@@ -32,6 +35,7 @@ public class IslandFlags {
     public static final IslandFlag WITHER_EXPLOSION = register("WITHER_EXPLOSION");
 
     private static String ALL_FLAG_NAMES;
+    private static Set<String> ALL_FLAG_NAMES_SET;
     private static int KNOWN_FLAGS_COUNT;
 
     private IslandFlags() {
@@ -51,6 +55,16 @@ public class IslandFlags {
         }
 
         return ALL_FLAG_NAMES;
+    }
+
+    public static Set<String> getFlagsNamesAsSet() {
+        if (ALL_FLAG_NAMES_SET == null || KNOWN_FLAGS_COUNT != IslandFlag.values().size()) {
+            ALL_FLAG_NAMES_SET = Collections.unmodifiableSet(IslandFlag.values().stream()
+                    .map(IslandFlag::getName).collect(Collectors.toSet()));
+            KNOWN_FLAGS_COUNT = IslandFlag.values().size();
+        }
+
+        return ALL_FLAG_NAMES_SET;
     }
 
     private static IslandFlag register(String name) {
