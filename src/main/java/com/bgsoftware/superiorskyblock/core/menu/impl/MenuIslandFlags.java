@@ -81,8 +81,8 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
             }
         });
 
-        for (String islandPrivilegeName : missingFlags) {
-            Log.warnFromFile("settings.yml", "Potentially missing setting ", islandPrivilegeName);
+        for (String islandFlagName : missingFlags) {
+            Log.warnFromFile("settings.yml", "Potentially missing setting ", islandFlagName);
         }
 
         return new MenuIslandFlags(menuParseResult, islandFlags);
