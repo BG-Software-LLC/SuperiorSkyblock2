@@ -30,9 +30,12 @@ public class WorldBlocks {
         // This means that the block below it is considered "safe", and the two blocks above the safe blocks
         // cannot suffocate the player.
 
-        return !plugin.getNMSWorld().canPlayerSuffocate(block) &&
-                !plugin.getNMSWorld().canPlayerSuffocate(block.getRelative(BlockFace.UP)) &&
+        return !canPlayerSuffocateFromBlock(block) && !canPlayerSuffocateFromBlock(block.getRelative(BlockFace.UP)) &&
                 plugin.getSettings().getSafeBlocks().contains(Keys.of(block.getRelative(BlockFace.DOWN)));
+    }
+
+    private static boolean canPlayerSuffocateFromBlock(Block block) {
+        return block.getType() == Material.LAVA || plugin.getNMSWorld().canPlayerSuffocate(block);
     }
 
     public static boolean isSafeBlock(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
