@@ -8,3 +8,5 @@ SERVER_LEVEL_RANDOM_TYPE=net.minecraft.util.RandomSource
 STAR_LIGHT_INTERFACE_CLASS=ca.spottedleaf.moonrise.patches.starlight.light.StarLightInterface
 ABSTRACT_MINECART_SUBPACKAGE=vehicle.minecart
 GET_RANDOM_TICK_SPEED_METHOD=get(net.minecraft.world.level.gamerules.GameRules.RANDOM_TICK_SPEED)
+END_DRAGON_FIGHT_CLASS=EndDragonFight
+SPIKE_FEATURE_CLASS=SpikeFeature

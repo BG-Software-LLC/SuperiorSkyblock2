@@ -1,5 +1,5 @@
 plugins {
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.17"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21"
 }
 
 java {
@@ -15,22 +15,11 @@ dependencies {
     compileOnly project(":NMS:Spigot")
     compileOnly project(":NMS:Paper")
     compileOnly project(":API")
-    compileOnly rootProject
-}
-
-shadowJar {
-    archiveFileName = "${project.name}-exclude.jar"
+    compileOnly project(":")
 }
 
 assemble {
     dependsOn(reobfJar)
-}
-
-tasks {
-    reobfJar {
-        File outputFile = new File(rootProject.archiveFolder, "reobf/${project.name}.jar")
-        outputJar.set(layout.buildDirectory.file(outputFile.getPath()))
-    }
 }
 
 if (project.hasProperty('nms.compile_v1_19') && !Boolean.valueOf(project.findProperty("nms.compile_v1_19").toString())) {

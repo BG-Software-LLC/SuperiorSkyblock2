@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.world;
 
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,7 +20,7 @@ public class BlockEntityCache {
         return BLOCK_TO_ID.computeIfAbsent(blockState.getBlock(), block -> {
             for (BlockEntityType<?> blockEntityType : ${REGISTRY_CLASS}.BLOCK_ENTITY_TYPE) {
                 if (blockEntityType.isValid(blockState)) {
-                    Object resourceLocation = BlockEntityType.getKey(blockEntityType);
+                    Object resourceLocation = NMSUtilsVersioned.getBlockEntityTypeKey(blockEntityType);
                     if (resourceLocation != null)
                         return resourceLocation.toString();
                 }

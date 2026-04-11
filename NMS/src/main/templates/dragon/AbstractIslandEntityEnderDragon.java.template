@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.IslandEntityEnderDragon;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.DragonUtils;
-import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.EndWorldEndDragonFightHandler;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.EndDragonFightWrapper;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.IslandEndDragonFight;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import net.minecraft.core.BlockPos;
@@ -56,7 +56,7 @@ public class AbstractIslandEntityEnderDragon extends EnderDragon {
     }
 
     protected void finalizeIslandEnderDragon() {
-        if (!(NMSUtilsVersioned.getEndDragonFight(this.serverLevel) instanceof EndWorldEndDragonFightHandler dragonBattleHandler))
+        if (!(NMSUtilsVersioned.getEndDragonFight(this.serverLevel) instanceof EndDragonFightWrapper dragonFight))
             return;
 
         Island island;
@@ -78,7 +78,7 @@ public class AbstractIslandEntityEnderDragon extends EnderDragon {
 
         IslandEndDragonFight dragonBattle = new IslandEndDragonFight(island, this.serverLevel,
                 this.islandBlockPos, (IslandEntityEnderDragon) this);
-        dragonBattleHandler.addDragonFight(island.getCache(), dragonBattle);
+        dragonFight.HANDLER.addDragonFight(island.getCache(), dragonBattle);
     }
 
 }

@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.state.pattern.BlockPattern;
 import net.minecraft.world.level.block.state.pattern.BlockPatternBuilder;
 import net.minecraft.world.level.block.state.predicate.BlockPredicate;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.dimension.end.EndDragonFight;
+import net.minecraft.world.level.dimension.end.${END_DRAGON_FIGHT_CLASS};
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
@@ -39,16 +39,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class IslandEndDragonFight extends EndDragonFight {
+public class IslandEndDragonFight extends EndDragonFightWrapper {
 
-    private static final ReflectField<EndDragonFight> DRAGON_BATTLE = initializeDragonBattleField();
+    private static final ReflectField<${END_DRAGON_FIGHT_CLASS}> DRAGON_BATTLE = initializeDragonBattleField();
     private static final ReflectField<Boolean> SCAN_FOR_LEGACY_PORTALS = new ReflectField<>(
-            EndDragonFight.class, boolean.class, Modifier.PRIVATE, 3);
+            ${END_DRAGON_FIGHT_CLASS}.class, boolean.class, Modifier.PRIVATE, 3);
     private static final ReflectField<Boolean> WAS_DRAGON_KILLED = new ReflectField<>(
-            EndDragonFight.class, boolean.class, Modifier.PRIVATE, 1);
+            ${END_DRAGON_FIGHT_CLASS}.class, boolean.class, Modifier.PRIVATE, 1);
 
     private static final ReflectField<Integer> TICKS_SINCE_LAST_PLAYER_SCAN = new ReflectField<>(
-            EndDragonFight.class, int.class, Modifier.PRIVATE, 4);
+            ${END_DRAGON_FIGHT_CLASS}.class, int.class, Modifier.PRIVATE, 4);
     private static final ReflectField<Vec3> LANDING_TARGET_POSITION = new ReflectField<>(
             DragonLandingPhase.class, Vec3.class, Modifier.PRIVATE, 1);
 
@@ -75,7 +75,7 @@ public class IslandEndDragonFight extends EndDragonFight {
 
     public IslandEndDragonFight(Island island, ServerLevel serverLevel, BlockPos islandBlockPos,
                                 @Nullable IslandEntityEnderDragon islandEntityEnderDragon) {
-        super(serverLevel, serverLevel.getSeed(), serverLevel.serverLevelData.endDragonFightData());
+        super(serverLevel);
 
         this.island = island;
         this.islandBlockPos = islandBlockPos;
@@ -124,8 +124,8 @@ public class IslandEndDragonFight extends EndDragonFight {
                                 this.serverLevel, blockEntity.getBlockPos());
 
                         if (blockPatternMatch != null) {
-                            if (this.portalLocation == null)
-                                this.portalLocation = blockPatternMatch.getBlock(3, 3, 3).getPos();
+                            if(getPortalPos() == null)
+                                setPortalPos(blockPatternMatch.getBlock(3, 3, 3).getPos());
 
                             return blockPatternMatch;
                         }
@@ -145,8 +145,8 @@ public class IslandEndDragonFight extends EndDragonFight {
                 BlockPattern.BlockPatternMatch blockPatternMatch = EXIT_PORTAL_PATTERN.find(this.serverLevel, currentPosition);
 
                 if (blockPatternMatch != null) {
-                    if (this.portalLocation == null)
-                        this.portalLocation = blockPatternMatch.getBlock(3, 3, 3).getPos();
+                    if(getPortalPos() == null)
+                        setPortalPos(blockPatternMatch.getBlock(3, 3, 3).getPos());
 
                     return blockPatternMatch;
                 }
@@ -210,15 +210,15 @@ public class IslandEndDragonFight extends EndDragonFight {
         return entityEnderDragon;
     }
 
-    private static ReflectField<EndDragonFight> initializeDragonBattleField() {
-        ReflectField<EndDragonFight> dragonBattleField = new ReflectField<EndDragonFight>(
-                EnderDragon.class, EndDragonFight.class, Modifier.PRIVATE | Modifier.FINAL, 1);
+    private static ReflectField<${END_DRAGON_FIGHT_CLASS}> initializeDragonBattleField() {
+        ReflectField<${END_DRAGON_FIGHT_CLASS}> dragonBattleField = new ReflectField<${END_DRAGON_FIGHT_CLASS}>(
+                EnderDragon.class, ${END_DRAGON_FIGHT_CLASS}.class, Modifier.PRIVATE | Modifier.FINAL, 1);
 
         if(dragonBattleField.isValid()) {
             dragonBattleField = dragonBattleField.removeFinal();
         } else {
-            dragonBattleField = new ReflectField<EndDragonFight>(
-                    EnderDragon.class, EndDragonFight.class, Modifier.PRIVATE, 1);
+            dragonBattleField = new ReflectField<${END_DRAGON_FIGHT_CLASS}>(
+                    EnderDragon.class, ${END_DRAGON_FIGHT_CLASS}.class, Modifier.PRIVATE, 1);
         }
 
         return dragonBattleField;
