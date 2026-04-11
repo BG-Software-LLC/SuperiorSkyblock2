@@ -43,6 +43,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
+import com.bgsoftware.superiorskyblock.core.IslandWorldsPlayersStrategy;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LegacyMasks;
@@ -2044,8 +2045,6 @@ public class SIsland implements Island {
         if (!updateBlocks)
             return;
 
-        List<Player> playersToUpdate = new SequentialListBuilder<Player>()
-                .build(getAllPlayersInside(), SuperiorPlayer::asPlayer);
 
         IslandWorlds.accessIslandWorldsAsync(this, false, result -> {
             result.ifLeft(world -> {
@@ -2053,13 +2052,21 @@ public class SIsland implements Island {
                 Biome worldBiome = plugin.getSettings().getWorlds().getDefaultWorldDimension() == worldInfo.getDimension() ?
                         biome : IslandUtils.getDefaultWorldBiome(worldInfo.getDimension());
                 List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, 0);
+                List<Player> playersToUpdate;
+                try (IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(this)) {
+                    playersToUpdate = strategy.getPlayers(worldInfo);
+                }
                 plugin.getNMSChunks().setBiome(chunkPositions, worldBiome, playersToUpdate);
             });
         });
 
-        for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
-            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(registeredWorld), 0);
-            plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
+        try (IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(this)) {
+            for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
+                WorldInfo worldInfo = WorldInfo.of(registeredWorld);
+                List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, 0);
+                List<Player> playersToUpdate = strategy.getPlayers(worldInfo);
+                plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
+            }
         }
     }
 

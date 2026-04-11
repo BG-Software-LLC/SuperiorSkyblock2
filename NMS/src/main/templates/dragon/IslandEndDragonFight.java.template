@@ -3,7 +3,8 @@ package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
+import com.bgsoftware.superiorskyblock.core.IslandWorldsPlayersStrategy;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.NMSUtils;
@@ -175,16 +176,14 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
     private void updateBattlePlayers() {
         Set<UUID> nearbyPlayers = new HashSet<>();
 
-        for (SuperiorPlayer superiorPlayer : island.getAllPlayersInside()) {
-            Player bukkitPlayer = superiorPlayer.asPlayer();
-            if (bukkitPlayer != null) {
-                ServerLevel serverLevel = ((CraftWorld) bukkitPlayer.getWorld()).getHandle();
-                if (serverLevel.equals(this.serverLevel)) {
-                    ServerPlayer serverPlayer = ((CraftPlayer) bukkitPlayer).getHandle();
-                    this.dragonEvent.addPlayer(serverPlayer);
-                    nearbyPlayers.add(serverPlayer.getUUID());
-                }
-            }
+        WorldInfo worldInfo = WorldInfo.of(this.serverLevel.getWorld());
+
+        try(IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(island)) {
+            strategy.getPlayers(worldInfo).forEach(player -> {
+                ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+                this.dragonEvent.addPlayer(serverPlayer);
+                nearbyPlayers.add(serverPlayer.getUUID());
+            });
         }
 
         List<ServerPlayer> dragonEventPlayers = new SequentialListBuilder<ServerPlayer>()
