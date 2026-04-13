@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core;
 
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -123,6 +124,10 @@ public enum Materials {
         return hasTag(material, Tag.HOE);
     }
 
+    public static boolean isShelf(Material material) {
+        return hasTag(material, Tag.SHELF);
+    }
+
     public static Set<Material> getBlocksNonLegacy() {
         return Collections.unmodifiableSet(BLOCK_NON_LEGACY_MATERIALS);
     }
@@ -183,14 +188,13 @@ public enum Materials {
                 materialTags.add(Tag.BED);
             if (materialName.contains("_HOE"))
                 materialTags.add(Tag.HOE);
+            if (materialName.contains("_SHELF"))
+                materialTags.add(Tag.SHELF);
 
             if (!materialTags.isEmpty())
                 enumMap.put(material, materialTags);
         }
 
-        Arrays.stream(Material.values()).forEach(material -> {
-
-        });
         return enumMap;
     }
 
@@ -220,7 +224,8 @@ public enum Materials {
         CARPET,
         BED,
         HARNESS,
-        HOE
+        HOE,
+        SHELF
 
     }
 

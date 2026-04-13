@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.external.worlds.WorldsProvider_Default;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
+import com.bgsoftware.superiorskyblock.nms.player_detector.IslandPlayerDetectorHelper;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.service.region.RegionManagerServiceImpl;
 import com.bgsoftware.superiorskyblock.world.entity.EntityCategories;
@@ -38,13 +39,15 @@ public class PluginEventsDispatcher extends EventsDispatcher<
         SIsland.registerListeners(this);
         CommandsMap.registerListeners(this);
         SpawnIsland.registerListeners(this);
-        RegionManagerServiceImpl.registerCallbacks(this);
+        RegionManagerServiceImpl.registerListeners(this);
         CmdHelp.registerListeners(this);
-        CmdAdmin.registerCallbacks(this);
+        CmdAdmin.registerListeners(this);
         Message.registerListeners(this);
         SSuperiorPlayer.registerListeners(this);
         EntityCategories.registerListeners(this);
         WorldsProvider_Default.registerListeners(this);
+        IslandPlayerDetectorHelper.registerListeners(this);
+
     }
 
     public void registerCallback(PluginEventType<?> type, Runnable callback) {

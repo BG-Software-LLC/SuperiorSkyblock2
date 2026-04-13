@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
@@ -83,7 +84,7 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().signWarp;
     }
 
-    public List<String> getInteractables() {
+    public SettingsManager.Interactables getInteractablesMap() {
         return getContainer().interactables;
     }
 

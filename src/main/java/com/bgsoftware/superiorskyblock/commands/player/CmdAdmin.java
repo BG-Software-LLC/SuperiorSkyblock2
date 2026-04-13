@@ -25,7 +25,7 @@ public class CmdAdmin implements ISuperiorCommand {
 
     private static final Int2ObjectMapView<List<SuperiorCommand>> commandsPerPageCache = CollectionsFactory.createInt2ObjectArrayMap();
 
-    public static void registerCallbacks(PluginEventsDispatcher dispatcher) {
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
         dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, CmdAdmin::onCommandsRefresh);
         dispatcher.registerCallback(PluginEventType.COMMANDS_UPDATE_EVENT, CmdAdmin::onCommandsRefresh);
     }

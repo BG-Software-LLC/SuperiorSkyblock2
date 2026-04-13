@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.config;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -175,8 +176,16 @@ public interface SettingsManager {
 
     /**
      * Get all the interactable blocks.
+     *
+     * @deprecated See {@link #getInteractablesMap}
      */
+    @Deprecated
     List<String> getInteractables();
+
+    /**
+     * Get all the interactable blocks and their interact privilege.
+     */
+    Interactables getInteractablesMap();
 
     /**
      * Get all the safe blocks.
@@ -1379,6 +1388,27 @@ public interface SettingsManager {
          * Config-path: island-previews.locations
          */
         Map<String, Location> getLocations();
+
+    }
+
+    interface Interactables {
+
+        /**
+         * Get all the interactables from the interactables file.
+         */
+        Set<Key> getInteractables();
+
+        /**
+         * Get all the interactables for a specific {@link IslandPrivilege}
+         */
+        @Nullable
+        Set<Key> getInteractables(IslandPrivilege islandPrivilege);
+
+        /**
+         * Get the required {@link IslandPrivilege} for a specific key.
+         */
+        @Nullable
+        IslandPrivilege getRequiredPrivilege(Key key);
 
     }
 

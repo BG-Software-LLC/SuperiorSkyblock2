@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -39,6 +40,7 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -215,7 +217,16 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public List<String> getInteractables() {
-        return this.global.getInteractables();
+        List<String> interactables = new LinkedList<>();
+        for (Key key : getInteractablesMap().getInteractables()) {
+            interactables.add(key.toString());
+        }
+        return interactables.isEmpty() ? Collections.emptyList() : interactables;
+    }
+
+    @Override
+    public Interactables getInteractablesMap() {
+        return this.global.getInteractablesMap();
     }
 
     @Override

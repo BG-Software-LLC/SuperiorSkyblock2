@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.config.section.InteractablesSection;
 import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
@@ -55,6 +56,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -137,7 +139,7 @@ public class SettingsContainer {
     public final Set<String> worldPermissions;
     public final boolean voidTeleportMembers;
     public final boolean voidTeleportVisitors;
-    public final List<String> interactables;
+    public final SettingsManager.Interactables interactables;
     public final KeySet safeBlocks;
     public final boolean visitorsDamage;
     public final boolean coopDamage;
@@ -647,7 +649,7 @@ public class SettingsContainer {
         return Collections.unmodifiableList(clearActions);
     }
 
-    private List<String> loadInteractables(SuperiorSkyblockPlugin plugin) {
+    private SettingsManager.Interactables loadInteractables(SuperiorSkyblockPlugin plugin) {
         File file = new File(plugin.getDataFolder(), "interactables.yml");
 
         if (!file.exists())
@@ -655,20 +657,31 @@ public class SettingsContainer {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        List<String> interactablesList = cfg.getStringList("interactables");
+        InteractablesSection interactables = new InteractablesSection(plugin, cfg);
 
         // Warn about interactables that the default file contains but the current
         // file does not.
+        Set<String> localInteractables = new HashSet<>();
+        for (Key key : interactables.getInteractables()) {
+            localInteractables.add(key.toString());
+        }
+
         YamlConfiguration defaultInteractablesConfig = CommentedConfiguration.loadConfiguration(plugin.getResource("interactables.yml"));
-        List<String> defaultInteractables = defaultInteractablesConfig.getStringList("interactables");
-        if (defaultInteractables != null) {
-            for (String interactableBlock : defaultInteractables) {
-                if (!interactablesList.contains(interactableBlock))
-                    Log.warn("Potentially missing interactable block ", interactableBlock);
+        for (String block : defaultInteractablesConfig.getStringList("interactables")) {
+            if (!localInteractables.contains(block)) {
+                Log.warn("Potentially missing interactable block ", block);
             }
         }
 
-        return Collections.unmodifiableList(interactablesList);
+        if (interactables.isLegacy()) {
+            try {
+                interactables.saveToFile(file);
+            } catch (IOException error) {
+                Log.errorFromFile(error, "interactables.yml", "Failed to save interactables:");
+            }
+        }
+
+        return interactables;
     }
 
     private KeySet loadSafeBlocks(SuperiorSkyblockPlugin plugin) {

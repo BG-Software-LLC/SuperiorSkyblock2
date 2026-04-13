@@ -41,6 +41,9 @@ public class ConstantKeys {
             .map(Keys::of).orElse(null);
     public static final Key SNOW_BLOCK = Keys.of(Material.SNOW_BLOCK);
     public static final Key SOUL_SAND = Keys.of(Material.SOUL_SAND);
+    @Nullable
+    public static final Key TARGET = Optional.ofNullable(EnumHelper.getEnum(Material.class, "TARGET"))
+            .map(Keys::of).orElse(null);
     public static final Key TNT = Keys.of(Material.TNT);
     public static final Key WATER = Keys.of(Material.WATER);
     public static final Key WET_SPONGE = Keys.of(EnumHelper.getEnum(Material.class, "WET_SPONGE", "SPONGE"));

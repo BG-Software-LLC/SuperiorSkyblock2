@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -108,14 +109,14 @@ public class SlimefunHook {
                 break;
             case "ACCESS_INVENTORIES":
             case "INTERACT_BLOCK":
-                islandPrivilege = IslandPrivileges.CHEST_ACCESS;
+                islandPrivilege = plugin.getSettings().getInteractablesMap().getRequiredPrivilege(ConstantKeys.CHEST);
                 break;
             default:
                 islandPrivilege = IslandPrivileges.INTERACT;
                 break;
         }
 
-        return island != null && island.hasPermission(superiorPlayer, islandPrivilege);
+        return island != null && islandPrivilege != null && island.hasPermission(superiorPlayer, islandPrivilege);
     }
 
     private static class AndroidMineListener implements Listener {

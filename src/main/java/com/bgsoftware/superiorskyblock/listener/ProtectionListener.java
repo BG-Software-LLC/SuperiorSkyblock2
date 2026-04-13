@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -431,7 +432,7 @@ public class ProtectionListener extends AbstractGameEventListener {
 
         IslandPrivilege islandPrivilege = BukkitEntities.isHorse((Vehicle) inventoryHolder) ? IslandPrivileges.HORSE_INTERACT :
                 BukkitEntities.isNautilus(((Vehicle) inventoryHolder).getType()) ? IslandPrivileges.NAUTILUS_INTERACT :
-                        inventoryHolder instanceof Animals ? IslandPrivileges.ENTITY_RIDE : IslandPrivileges.MINECART_OPEN;
+                inventoryHolder instanceof Animals ? IslandPrivileges.ENTITY_RIDE : IslandPrivileges.MINECART_OPEN;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().bukkitEvent.getPlayer());
         InteractionResult interactionResult;
@@ -543,8 +544,11 @@ public class ProtectionListener extends AbstractGameEventListener {
                     if (hitBlockType != CHORUS_FLOWER && hitBlockType != DECORATED_POT && hitBlockType != TARGET)
                         return;
 
+                    IslandPrivilege requiredPrivilege = plugin.getSettings().getInteractablesMap()
+                            .getRequiredPrivilege(ConstantKeys.TARGET);
+
                     location = hitBlock.getLocation(wrapper.getHandle());
-                    islandPrivilege = hitBlockType == TARGET ? IslandPrivileges.INTERACT : IslandPrivileges.BREAK;
+                    islandPrivilege = hitBlockType == TARGET ? requiredPrivilege : IslandPrivileges.BREAK;
                 }
 
                 if (islandPrivilege == null)
@@ -581,7 +585,10 @@ public class ProtectionListener extends AbstractGameEventListener {
                 Material blockType = block.getType();
 
                 IslandPrivilege islandPrivilege = blockType == CHORUS_FLOWER || blockType == POINTED_DRIPSTONE ?
-                        IslandPrivileges.BREAK : IslandPrivileges.INTERACT;
+                        IslandPrivileges.BREAK : plugin.getSettings().getInteractablesMap().getRequiredPrivilege(Keys.of(block));
+
+                if (islandPrivilege == null)
+                    continue;
 
                 InteractionResult interactionResult;
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {

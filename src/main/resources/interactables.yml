@@ -7,7 +7,14 @@
 
 # A list of interactable blocks.
 # Only interactable blocks & stacked blocks will be blocked from being interacted.
+# The format of the file is as so:
+# <PRIVILEGE>:
+#   - BLOCK_TYPE
+#   - ...
+# You can create as many custom privileges as you want.
+
 interactables:
+  - 'TEST'
   - 'ACACIA_BUTTON'
   - 'ACACIA_DOOR'
   - 'ACACIA_FENCE'

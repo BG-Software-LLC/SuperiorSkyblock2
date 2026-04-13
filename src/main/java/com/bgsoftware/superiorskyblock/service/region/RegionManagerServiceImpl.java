@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.MoveResult;
@@ -23,9 +22,7 @@ import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
-import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
-import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -41,8 +38,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
@@ -60,7 +55,6 @@ import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -75,8 +69,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     private static final Material TURTLE_EGG = EnumHelper.getEnum(Material.class, "TURTLE_EGG");
     @Nullable
     private static final Material SWEET_BERRY_BUSH = EnumHelper.getEnum(Material.class, "SWEET_BERRY_BUSH");
-    @Nullable
-    private static final Material LECTERN = EnumHelper.getEnum(Material.class, "LECTERN");
     @Nullable
     private static final Material VAULT = EnumHelper.getEnum(Material.class, "VAULT");
     @Nullable
@@ -98,7 +90,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
     private static final int MAX_PICKUP_DISTANCE = 1;
     private static EnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
-    private static KeySet INTERACTABLES_CACHE;
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -106,7 +97,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         this.plugin = plugin;
     }
 
-    public static void registerCallbacks(PluginEventsDispatcher dispatcher) {
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
         dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, RegionManagerServiceImpl::onSettingsUpdate);
     }
 
@@ -119,12 +110,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             } catch (Throwable ignored) {
             }
         });
-
-        INTERACTABLES_CACHE = KeySets.createHashSet(KeyIndicator.MATERIAL);
-        plugin.getSettings().getInteractables().forEach(interactableName -> {
-            INTERACTABLES_CACHE.add(Keys.ofMaterialAndData(interactableName));
-        });
-
     }
 
     @Override
@@ -201,49 +186,34 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
             int stackedBlockAmount = plugin.getStackedBlocks().getStackedBlockAmount(blockLocation);
 
-            if (!isInteractableItem && stackedBlockAmount <= 1 && !INTERACTABLES_CACHE.contains(blockKey))
+            IslandPrivilege islandPrivilege = plugin.getSettings().getInteractablesMap().getRequiredPrivilege(blockKey);
+
+            if (!isInteractableItem && stackedBlockAmount <= 1 && islandPrivilege == null)
                 return InteractionResult.SUCCESS;
 
-            BlockState blockState = block.getState();
             EntityType spawnType = usedItem == null ? EntityType.UNKNOWN : BukkitItems.getEntityType(usedItem);
             Material blockType = block.getType();
             Material usedItemType = usedItem == null ? null : usedItem.getType();
 
-            IslandPrivilege islandPrivilege;
-
             if (usedItem != null && Materials.isMinecart(usedItemType) ? Materials.isRail(blockType) : Materials.isBoat(blockType)) {
                 islandPrivilege = IslandPrivileges.MINECART_PLACE;
-            } else if (Materials.isChest(blockType)) {
-                islandPrivilege = IslandPrivileges.CHEST_ACCESS;
-            } else if (blockType == LECTERN) {
-                islandPrivilege = IslandPrivileges.PICKUP_LECTERN_BOOK;
-            } else if (blockState instanceof InventoryHolder) {
-                islandPrivilege = IslandPrivileges.USE;
-            } else if (usedItem != null && blockType == VAULT && (usedItemType == TRIAL_KEY || usedItemType == OMINOUS_TRIAL_KEY)) {
-                islandPrivilege = IslandPrivileges.USE;
-            } else if (blockState instanceof Sign) {
-                islandPrivilege = IslandPrivileges.SIGN_INTERACT;
-            } else if (blockType == Materials.SPAWNER.toBukkitType()) {
-                islandPrivilege = IslandPrivileges.SPAWNER_BREAK;
-            } else if (blockType == FARMLAND || blockType == ROOTED_DIRT || (usedItem != null && Materials.isHoe(usedItemType))) {
-                islandPrivilege = action == Action.PHYSICAL ? IslandPrivileges.FARM_TRAMPING : IslandPrivileges.BUILD;
-            } else if (blockType == TURTLE_EGG) {
-                islandPrivilege = action == Action.PHYSICAL ? IslandPrivileges.TURTLE_EGG_TRAMPING : IslandPrivileges.BUILD;
-            } else if (blockType == SWEET_BERRY_BUSH && action == Action.RIGHT_CLICK_BLOCK) {
-                islandPrivilege = Materials.BONE_MEAL.toBukkitItem().isSimilar(usedItem) ? IslandPrivileges.FERTILIZE : IslandPrivileges.FARM_TRAMPING;
+            } else if (usedItem != null && blockType == VAULT && usedItemType != TRIAL_KEY && usedItemType != OMINOUS_TRIAL_KEY) {
+                return InteractionResult.SUCCESS;
+            } else if (action == Action.PHYSICAL && blockType == FARMLAND || blockType == ROOTED_DIRT ||
+                    (usedItem != null && Materials.isHoe(usedItemType))) {
+                islandPrivilege = IslandPrivileges.BUILD;
+            } else if (action == Action.PHYSICAL && blockType == TURTLE_EGG) {
+                islandPrivilege = IslandPrivileges.BUILD;
+            } else if (blockType == SWEET_BERRY_BUSH && action == Action.RIGHT_CLICK_BLOCK &&
+                    Materials.BONE_MEAL.toBukkitItem().isSimilar(usedItem)) {
+                islandPrivilege = IslandPrivileges.FERTILIZE;
             } else if (stackedBlockAmount > 1) {
-                islandPrivilege = IslandPrivileges.BREAK;
-            } else if (blockType == Material.PUMPKIN) {
                 islandPrivilege = IslandPrivileges.BREAK;
             } else if (spawnType != EntityType.UNKNOWN) {
                 EntityCategory entityCategory = EntityCategory.getEntityCategory(Keys.of(spawnType));
-                if (entityCategory == null) {
-                    islandPrivilege = IslandPrivileges.INTERACT;
-                } else {
-                    islandPrivilege = Optional.ofNullable(entityCategory.getSpawnPrivilege()).orElse(IslandPrivileges.INTERACT);
+                if (entityCategory != null && entityCategory.getSpawnPrivilege() != null) {
+                    islandPrivilege = entityCategory.getSpawnPrivilege();
                 }
-            } else {
-                islandPrivilege = IslandPrivileges.INTERACT;
             }
 
             return handleInteractionInternal(superiorPlayer, blockLocation, islandPrivilege,
@@ -406,7 +376,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         IslandPrivilege islandPrivilege = BukkitEntities.isHorse(vehicle) ? IslandPrivileges.HORSE_INTERACT :
                 BukkitEntities.isNautilus(vehicle.getType()) ? IslandPrivileges.NAUTILUS_INTERACT :
-                        vehicle instanceof Animals ? IslandPrivileges.ENTITY_RIDE : IslandPrivileges.MINECART_ENTER;
+                vehicle instanceof Animals ? IslandPrivileges.ENTITY_RIDE : IslandPrivileges.MINECART_ENTER;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location entityLocation = vehicle.getLocation(wrapper.getHandle());
