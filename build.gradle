@@ -84,6 +84,8 @@ processResources {
     }
 }
 
+subprojects.each { evaluationDependsOn(it.path) }
+
 shadowJar {
     relocate 'org.bstats', 'com.bgsoftware.superiorskyblock.libs.org.bstats'
     relocate 'com.bgsoftware.common', 'com.bgsoftware.superiorskyblock.libs.com.bgsoftware.common'
@@ -103,12 +105,8 @@ shadowJar {
             try {
                 def reobfTask = sub.tasks.named('reobfJar')
                 dependsOn(reobfTask)
-                from(zipTree(reobfTask.outputJar)) {
-                    // Exclude metadata that might cause duplicates
-                    exclude 'META-INF/MANIFEST.MF'
-                    exclude 'META-INF/*.SF'
-                    exclude 'META-INF/*.DSA'
-                    exclude 'META-INF/*.RSA'
+                from(reobfTask.flatMap { it.outputJar }.map { zipTree(it) }) {
+                    exclude 'META-INF/MANIFEST.MF', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
                 }
             } catch (Exception ignored) {
                 from sub.sourceSets.main.output
