@@ -3,35 +3,32 @@ package com.bgsoftware.superiorskyblock.external;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import org.bukkit.Bukkit;
+import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
+import com.djrapitops.plan.capability.CapabilityService;
+import com.djrapitops.plan.extension.DataExtension;
+import com.djrapitops.plan.extension.ExtensionService;
+import com.djrapitops.plan.extension.annotation.NumberProvider;
+import com.djrapitops.plan.extension.annotation.PluginInfo;
+import com.djrapitops.plan.extension.annotation.TableProvider;
+import com.djrapitops.plan.extension.icon.Color;
+import com.djrapitops.plan.extension.icon.Icon;
+import com.djrapitops.plan.extension.table.Table;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.List;
 
 public class PlanHook {
 
     public static void register(SuperiorSkyblockPlugin plugin) {
-        if (!Bukkit.getPluginManager().isPluginEnabled("Plan")) {
-            return;
-        }
-
         try {
             Log.info("Plan detected - attempting to register SuperiorSkyblock DataExtension.");
 
-            try {
-                if (com.djrapitops.plan.capability.CapabilityService.getInstance()
-                        .hasCapability("DATA_EXTENSION_VALUES")) {
-                    com.djrapitops.plan.extension.ExtensionService.getInstance().register(
-                            new PlanDataExtension(plugin)
-                    );
-                    Log.info("Registered SuperiorSkyblock Plan DataExtension.");
-                } else {
-                    Log.info("Plan installed but DataExtension capability not available - skipping registration.");
-                }
-            } catch (NoClassDefFoundError | IllegalStateException ex) {
-                Log.error(ex, "Plan API not available or not enabled; skipping Plan integration.");
+            if (CapabilityService.getInstance().hasCapability("DATA_EXTENSION_VALUES")) {
+                ExtensionService.getInstance().register(new PlanDataExtension(plugin));
+                Log.info("Registered SuperiorSkyblock Plan DataExtension.");
+            } else {
+                Log.warn("Plan installed but DataExtension capability not available - skipping registration.");
             }
-
         } catch (Throwable t) {
             Log.error(t, "Failed to initialize Plan integration:");
         }
@@ -40,8 +37,8 @@ public class PlanHook {
     private PlanHook() {
     }
 
-    @com.djrapitops.plan.extension.annotation.PluginInfo(name = "SuperiorSkyblock")
-    private static class PlanDataExtension implements com.djrapitops.plan.extension.DataExtension {
+    @PluginInfo(name = "SuperiorSkyblock")
+    private static class PlanDataExtension implements DataExtension {
 
         private final SuperiorSkyblockPlugin plugin;
 
@@ -49,37 +46,34 @@ public class PlanHook {
             this.plugin = plugin;
         }
 
-        @com.djrapitops.plan.extension.annotation.NumberProvider(
+        @NumberProvider(
                 text = "Total Islands",
                 description = "Total number of islands on the server",
                 priority = 100
         )
         public long islandCount() {
-            Collection<Island> islands = plugin.getGrid().getIslands();
-            return islands == null ? 0L : islands.size();
+            return plugin.getGrid().getIslandsContainer().getIslandsAmount();
         }
 
-        @com.djrapitops.plan.extension.annotation.NumberProvider(
+        @NumberProvider(
                 text = "Total Island Level",
                 description = "Sum of all island levels",
                 priority = 90
         )
         public long totalLevel() {
-            BigDecimal total = plugin.getGrid().getTotalLevel();
-            return total == null ? 0L : total.toBigInteger().longValue();
+            return plugin.getGrid().getTotalLevel().toBigInteger().longValue();
         }
 
-        @com.djrapitops.plan.extension.annotation.NumberProvider(
+        @NumberProvider(
                 text = "Total Island Worth",
                 description = "Sum of all island worths",
                 priority = 80
         )
         public long totalWorth() {
-            BigDecimal total = plugin.getGrid().getTotalWorth();
-            return total == null ? 0L : total.toBigInteger().longValue();
+            return plugin.getGrid().getTotalWorth().toBigInteger().longValue();
         }
 
-        @com.djrapitops.plan.extension.annotation.NumberProvider(
+        @NumberProvider(
                 text = "Active Islands",
                 description = "Islands that currently have visitors",
                 priority = 70
@@ -90,7 +84,7 @@ public class PlanHook {
                     .count();
         }
 
-        @com.djrapitops.plan.extension.annotation.NumberProvider(
+        @NumberProvider(
                 text = "Islands With Bank Balance",
                 description = "Islands that have money in their bank",
                 priority = 60
@@ -102,14 +96,16 @@ public class PlanHook {
                     .count();
         }
 
-        @com.djrapitops.plan.extension.annotation.NumberProvider(
+        @NumberProvider(
                 text = "Average Island Level",
                 description = "Average level across all islands",
                 priority = 50
         )
         public long averageIslandLevel() {
-            List<Island> islands = new ArrayList<>(plugin.getGrid().getIslands());
-            if (islands.isEmpty()) return 0L;
+            List<Island> islands = plugin.getGrid().getIslands();
+            if (islands.isEmpty())
+                return 0L;
+
             BigDecimal sum = BigDecimal.ZERO;
             int count = 0;
             for (Island island : islands) {
@@ -119,42 +115,45 @@ public class PlanHook {
                     count++;
                 }
             }
-            if (count == 0) return 0L;
+
+            if (count == 0)
+                return 0L;
+
             return sum.divide(BigDecimal.valueOf(count), 0, plugin.getSettings().getIslandLevelRoundingMode())
                     .toBigInteger().longValue();
         }
 
-        @com.djrapitops.plan.extension.annotation.TableProvider(
-                tableColor = com.djrapitops.plan.extension.icon.Color.GREEN
+        @TableProvider(
+                tableColor = Color.GREEN
         )
-        public com.djrapitops.plan.extension.table.Table topIslandsTable() {
-            List<Island> islands = new ArrayList<>(plugin.getGrid().getIslands());
-            islands.sort((a, b) -> b.getWorth().compareTo(a.getWorth()));
+        public Table topIslandsTable() {
+            List<Island> islands = plugin.getGrid().getIslands(SortingTypes.BY_WORTH);
 
-            com.djrapitops.plan.extension.table.Table.Factory table =
-                    com.djrapitops.plan.extension.table.Table.builder()
-                            .columnOne("Pos", com.djrapitops.plan.extension.icon.Icon.called("list-ol").build())
-                            .columnTwo("Owner", com.djrapitops.plan.extension.icon.Icon.called("user").build())
-                            .columnThree("Island", com.djrapitops.plan.extension.icon.Icon.called("home").build())
-                            .columnFour("Level", com.djrapitops.plan.extension.icon.Icon.called("star").build())
-                            .columnFive("Worth", com.djrapitops.plan.extension.icon.Icon.called("coins").build());
+            Table.Factory table = Table.builder()
+                    .columnOne("Pos", Icon.called("list-ol").build())
+                    .columnTwo("Owner", Icon.called("user").build())
+                    .columnThree("Island", Icon.called("home").build())
+                    .columnFour("Level", Icon.called("star").build())
+                    .columnFive("Worth", Icon.called("coins").build());
 
             int pos = 1;
             for (Island island : islands) {
-                if (pos > 25) break;
+                if (pos > 25)
+                    break;
+
                 BigDecimal worth = island.getWorth();
                 BigDecimal level = island.getIslandLevel();
                 String ownerName = island.getOwner() == null ? "" : island.getOwner().getName();
                 String islandName = island.getName() == null || island.getName().isEmpty() ? ownerName : island.getName();
-                table.addRow(
-                        pos,
-                        ownerName,
-                        islandName,
+
+                table.addRow(pos, ownerName, islandName,
                         level == null ? 0L : level.toBigInteger().longValue(),
                         worth == null ? 0L : worth.toBigInteger().longValue()
                 );
+
                 pos++;
             }
+
             return table.build();
         }
     }
