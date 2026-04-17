@@ -1,0 +1,15 @@
+group 'Missions'
+
+subprojects {
+    dependencies {
+        implementation project(":Missions")
+        compileOnly project(":API")
+        compileOnly project(":")
+    }
+}
+
+dependencies {
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly project(":")
+}

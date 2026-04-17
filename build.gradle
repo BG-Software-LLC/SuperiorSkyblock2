@@ -116,6 +116,19 @@ shadowJar {
         }
     }
 
+    def missionsProject = project(':Missions');
+
+    missionsProject.subprojects.forEach { sub ->
+        def shadowJarTask = sub.tasks.named("shadowJar")
+        dependsOn(shadowJarTask)
+
+        from(shadowJarTask.map { it.archiveFile }) {
+            exclude 'META-INF/MANIFEST.MF', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+            rename { sub.name }
+            into("modules/missions")
+        }
+    }
+
     dependencies {
         // This includes the API and all sub-modules in the final JAR
         include project(':API')
