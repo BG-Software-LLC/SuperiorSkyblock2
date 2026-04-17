@@ -8,12 +8,9 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import org.bukkit.entity.EntityType;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class IslandPrivileges {
 
@@ -97,7 +94,6 @@ public class IslandPrivileges {
     public static final IslandPrivilege WITHDRAW_MONEY = register("WITHDRAW_MONEY", IslandPrivilege.Type.COMMAND);
 
     private static String ALL_PRIVILEGE_NAMES;
-    private static Set<String> ALL_PRIVILEGE_NAMES_SET;
     private static int KNOWN_PRIVILEGES_COUNT;
 
     private IslandPrivileges() {
@@ -117,16 +113,6 @@ public class IslandPrivileges {
         }
 
         return ALL_PRIVILEGE_NAMES;
-    }
-
-    public static Set<String> getPrivilegesNamesAsSet() {
-        if (ALL_PRIVILEGE_NAMES_SET == null || KNOWN_PRIVILEGES_COUNT != IslandPrivilege.values().size()) {
-            ALL_PRIVILEGE_NAMES_SET = Collections.unmodifiableSet(IslandPrivilege.values().stream()
-                    .map(IslandPrivilege::getName).collect(Collectors.toSet()));
-            KNOWN_PRIVILEGES_COUNT = IslandPrivilege.values().size();
-        }
-
-        return ALL_PRIVILEGE_NAMES_SET;
     }
 
     @NotNull

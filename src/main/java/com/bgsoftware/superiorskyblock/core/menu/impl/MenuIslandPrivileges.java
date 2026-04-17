@@ -24,7 +24,6 @@ import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IPlayerMenuView;
-import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -96,21 +95,24 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
         String higherRolePermission = cfg.getString("messages.higher-role-permission", "");
 
         List<MenuIslandPrivileges.IslandPrivilegeInfo> islandPrivileges = new LinkedList<>();
-        Set<String> missingPrivileges = new HashSet<>(IslandPrivileges.getPrivilegesNamesAsSet());
+        Set<String> detectedPrivileges = new HashSet<>();
 
         Optional.ofNullable(cfg.getConfigurationSection("permissions")).ifPresent(permissionsSection -> {
             for (String islandPrivilegeName : permissionsSection.getKeys(false)) {
                 Optional.ofNullable(permissionsSection.getConfigurationSection(islandPrivilegeName)).ifPresent(islandPrivilegeSection -> {
                     if (islandPrivilegeSection.getBoolean("display-menu", true)) {
                         islandPrivileges.add(loadIslandPrivilegeInfo(islandPrivilegeSection, islandPrivilegeName, islandPrivileges.size()));
-                        missingPrivileges.remove(islandPrivilegeName.toUpperCase(Locale.ENGLISH));
+                        detectedPrivileges.add(islandPrivilegeName.toUpperCase(Locale.ENGLISH));
                     }
                 });
             }
         });
 
-        for (String islandPrivilegeName : missingPrivileges) {
-            Log.warnFromFile("permissions.yml", "Potentially missing permission ", islandPrivilegeName);
+        for (IslandPrivilege islandPrivilege : IslandPrivilege.values()) {
+            String islandPrivilegeName = islandPrivilege.getName();
+            if (!detectedPrivileges.contains(islandPrivilegeName)) {
+                Log.warnFromFile("permissions.yml", "Potentially missing permission ", islandPrivilegeName);
+            }
         }
 
         return new MenuIslandPrivileges(menuParseResult, islandPrivileges, noRolePermission,

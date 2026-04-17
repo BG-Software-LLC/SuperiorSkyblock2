@@ -23,7 +23,6 @@ import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
-import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -68,21 +67,24 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
         YamlConfiguration cfg = menuParseResult.getConfig();
 
         List<MenuIslandFlags.IslandFlagInfo> islandFlags = new LinkedList<>();
-        Set<String> missingFlags = new HashSet<>(IslandFlags.getFlagsNamesAsSet());
+        Set<String> detectedFlags = new HashSet<>();
 
         Optional.ofNullable(cfg.getConfigurationSection("settings")).ifPresent(settingsSection -> {
             for (String islandFlagName : settingsSection.getKeys(false)) {
                 Optional.ofNullable(settingsSection.getConfigurationSection(islandFlagName)).ifPresent(islandFlagSection -> {
                     if (islandFlagSection.getBoolean("display-menu", true)) {
                         islandFlags.add(loadIslandFlagInfo(islandFlagSection, islandFlagName, islandFlags.size()));
-                        missingFlags.remove(islandFlagName.toUpperCase(Locale.ENGLISH));
+                        detectedFlags.add(islandFlagName.toUpperCase(Locale.ENGLISH));
                     }
                 });
             }
         });
 
-        for (String islandFlagName : missingFlags) {
-            Log.warnFromFile("settings.yml", "Potentially missing setting ", islandFlagName);
+        for (IslandFlag islandFlag : IslandFlag.values()) {
+            String islandFlagName = islandFlag.getName();
+            if (!detectedFlags.contains(islandFlagName)) {
+                Log.warnFromFile("settings.yml", "Potentially missing setting ", islandFlagName);
+            }
         }
 
         return new MenuIslandFlags(menuParseResult, islandFlags);
