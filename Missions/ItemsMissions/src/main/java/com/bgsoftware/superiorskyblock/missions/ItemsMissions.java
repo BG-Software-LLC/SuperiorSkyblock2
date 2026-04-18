@@ -35,6 +35,9 @@ import java.util.Set;
 @SuppressWarnings("unused")
 public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTracker> implements Listener {
 
+    private static final int ADDITIONAL_SLOT_START = 36; // Boots
+    private static final int ADDITIONAL_SLOT_END = 40; // Off hand
+
     private final Map<KeyRequirements, Integer> requiredItems = new LinkedHashMap<>();
 
     @Override
@@ -241,22 +244,24 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
 
         // We try to remove the item from the offhand as well.
 
-        ItemStack offHandItem;
+        for (int additionalSlot = ADDITIONAL_SLOT_START; additionalSlot < ADDITIONAL_SLOT_END; ++additionalSlot) {
+            ItemStack additionalItem;
 
-        try {
-            offHandItem = inventory.getItem(40);
-        } catch (Exception ignored) {
-            return;
-        }
+            try {
+                additionalItem = inventory.getItem(additionalSlot);
+            } catch (Exception ignored) {
+                continue;
+            }
 
-        if (offHandItem != null && offHandItem.getType() != Material.AIR) {
-            for (ItemStack itemStack : leftOvers) {
-                if (offHandItem.isSimilar(itemStack)) {
-                    if (offHandItem.getAmount() > itemStack.getAmount()) {
-                        offHandItem.setAmount(offHandItem.getAmount() - itemStack.getAmount());
-                    } else {
-                        itemStack.setAmount(itemStack.getAmount() - offHandItem.getAmount());
-                        inventory.setItem(40, new ItemStack(Material.AIR));
+            if (additionalItem != null && additionalItem.getType() != Material.AIR) {
+                for (ItemStack itemStack : leftOvers) {
+                    if (additionalItem.isSimilar(itemStack)) {
+                        if (additionalItem.getAmount() > itemStack.getAmount()) {
+                            additionalItem.setAmount(additionalItem.getAmount() - itemStack.getAmount());
+                        } else {
+                            itemStack.setAmount(itemStack.getAmount() - additionalItem.getAmount());
+                            inventory.setItem(additionalSlot, new ItemStack(Material.AIR));
+                        }
                     }
                 }
             }
