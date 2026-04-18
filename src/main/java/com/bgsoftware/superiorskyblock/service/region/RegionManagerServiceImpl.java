@@ -72,17 +72,13 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     @Nullable
     private static final Material OMINOUS_TRIAL_KEY = EnumHelper.getEnum(Material.class, "OMINOUS_TRIAL_KEY");
     @Nullable
-    private static final EntityType ALLAY_TYPE = EnumHelper.getEnum(EntityType.class, "ALLAY");
-    @Nullable
-    private static final EntityType AXOLOTL_TYPE = EnumHelper.getEnum(EntityType.class, "AXOLOTL");
-    @Nullable
     private static final EntityType LLAMA_TYPE = EnumHelper.getEnum(EntityType.class, "LLAMA");
     @Nullable
     private static final EntityType HAPPY_GHAST_TYPE = EnumHelper.getEnum(EntityType.class, "HAPPY_GHAST");
     @Nullable
     private static final EntityType PARROT_TYPE = EnumHelper.getEnum(EntityType.class, "PARROT");
     @Nullable
-    private static final EntityType COPPER_GOLEM_TYPE = EnumHelper.getEnum(EntityType.class, "COPPER_GOLEM");
+    private static final Material GOLDEN_DANDELION_TYPE = EnumHelper.getEnum(Material.class, "GOLDEN_DANDELION");
 
     private static final int MAX_PICKUP_DISTANCE = 1;
     private static EnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
@@ -267,7 +263,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             }
 
             IslandPrivilege islandPrivilege = null;
-            if (usedItem != null && entity instanceof Animals && plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) entity)) {
+            if (usedItem != null && entity instanceof Animals && (usedItemType == GOLDEN_DANDELION_TYPE ||
+                    plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) entity))) {
                 islandPrivilege = IslandPrivileges.ANIMAL_BREED;
             } else if (usedItemType == Material.NAME_TAG) {
                 islandPrivilege = IslandPrivileges.NAME_ENTITY;
