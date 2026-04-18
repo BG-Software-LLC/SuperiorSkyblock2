@@ -14,7 +14,6 @@
 # You can create as many custom privileges as you want.
 
 interactables:
-  - 'TEST'
   - 'ACACIA_BUTTON'
   - 'ACACIA_DOOR'
   - 'ACACIA_FENCE'
@@ -173,6 +172,7 @@ interactables:
   - 'JUNGLE_TRAPDOOR'
   - 'JUNGLE_WALL_HANGING_SIGN'
   - 'JUNGLE_WALL_SIGN'
+  - 'KELP'
   - 'LECTERN'
   - 'LEVER'
   - 'LIGHT_BLUE_BED'
@@ -320,6 +320,7 @@ interactables:
   - 'TRAP_DOOR'
   - 'TRAPPED_CHEST'
   - 'TURTLE_EGG'
+  - 'TWISTING_VINES'
   - 'VAULT'
   - 'WALL_SIGN'
   - 'WARPED_BUTTON'
@@ -353,6 +354,7 @@ interactables:
   - 'WEATHERED_COPPER_DOOR'
   - 'WEATHERED_COPPER_GOLEM_STATUE'
   - 'WEATHERED_COPPER_TRAPDOOR'
+  - 'WEEPING_VINES'
   - 'WHITE_BED'
   - 'WHITE_CANDLE'
   - 'WHITE_SHULKER_BOX'
