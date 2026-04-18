@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
@@ -28,9 +29,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 
 public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, IslandViewArgs, MenuIslandFlags.IslandFlagInfo> {
 
@@ -63,16 +67,25 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
         YamlConfiguration cfg = menuParseResult.getConfig();
 
         List<MenuIslandFlags.IslandFlagInfo> islandFlags = new LinkedList<>();
+        Set<String> detectedFlags = new HashSet<>();
 
         Optional.ofNullable(cfg.getConfigurationSection("settings")).ifPresent(settingsSection -> {
             for (String islandFlagName : settingsSection.getKeys(false)) {
                 Optional.ofNullable(settingsSection.getConfigurationSection(islandFlagName)).ifPresent(islandFlagSection -> {
                     if (islandFlagSection.getBoolean("display-menu", true)) {
                         islandFlags.add(loadIslandFlagInfo(islandFlagSection, islandFlagName, islandFlags.size()));
+                        detectedFlags.add(islandFlagName.toUpperCase(Locale.ENGLISH));
                     }
                 });
             }
         });
+
+        for (IslandFlag islandFlag : IslandFlag.values()) {
+            String islandFlagName = islandFlag.getName();
+            if (!detectedFlags.contains(islandFlagName)) {
+                Log.warnFromFile("settings.yml", "Potentially missing setting ", islandFlagName);
+            }
+        }
 
         return new MenuIslandFlags(menuParseResult, islandFlags);
     }

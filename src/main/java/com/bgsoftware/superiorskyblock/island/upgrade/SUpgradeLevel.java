@@ -21,10 +21,8 @@ import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
 import com.bgsoftware.superiorskyblock.core.value.IntValue;
 import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
@@ -259,24 +257,12 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     @Override
-    @Deprecated
-    public int getGeneratorAmount(Key key, World.Environment environment) {
-        return getGeneratorAmount(key, Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
     public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
         Map<Key, Integer> generatorRates = this.generatorRates.get().get(dimension);
         return generatorRates == null ? Collections.emptyMap() : generatorRates.entrySet().stream().collect(Collectors.toMap(
                 entry -> entry.getKey().toString(),
                 Map.Entry::getValue));
-    }
-
-    @Override
-    @Deprecated
-    public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
-        return getGeneratorAmounts(Dimensions.fromEnvironment(environment));
     }
 
     @Override

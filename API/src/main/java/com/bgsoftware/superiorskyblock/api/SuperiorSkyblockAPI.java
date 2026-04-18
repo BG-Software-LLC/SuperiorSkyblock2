@@ -180,17 +180,6 @@ public class SuperiorSkyblockAPI {
     }
 
     /**
-     * Get the world of an island by the world's environment.
-     *
-     * @deprecated See {@link #getIslandsWorld(Island, Dimension)}
-     */
-    @Nullable
-    @Deprecated
-    public static World getIslandsWorld(Island island, World.Environment environment) {
-        return plugin.getGrid().getIslandsWorld(island, environment);
-    }
-
-    /**
      * Get the world of an island by the world's dimension.
      */
     @Nullable

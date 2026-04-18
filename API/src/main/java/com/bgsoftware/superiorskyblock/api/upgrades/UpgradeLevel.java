@@ -169,28 +169,11 @@ public interface UpgradeLevel {
     int getGeneratorAmount(Key key, Dimension dimension);
 
     /**
-     * Get the generator rate of a block for this level in a specific world.
-     *
-     * @param key         The block to check.
-     * @param environment The world environment
-     */
-    @Deprecated
-    int getGeneratorAmount(Key key, World.Environment environment);
-
-    /**
      * Get all the generator rates for this level in a specific world.
      *
      * @param dimension The world dimension
      */
     Map<String, Integer> getGeneratorAmounts(Dimension dimension);
-
-    /**
-     * Get all the generator rates for this level in a specific world.
-     *
-     * @param environment The world environment
-     */
-    @Deprecated
-    Map<String, Integer> getGeneratorAmounts(World.Environment environment);
 
     /**
      * Get the potion effect for this level.

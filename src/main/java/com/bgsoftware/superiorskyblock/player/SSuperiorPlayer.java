@@ -37,7 +37,6 @@ import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.bgsoftware.superiorskyblock.player.cache.PlayerCacheImpl;
 import com.bgsoftware.superiorskyblock.player.permissions.PlayerPermissionsStore;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -501,18 +500,6 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         } else if (teleportResult != null) {
             teleportResult.accept(false);
         }
-    }
-
-    @Override
-    @Deprecated
-    public void teleport(Island island, World.Environment environment) {
-        teleport(island, Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
-    @Deprecated
-    public void teleport(Island island, World.Environment environment, @Nullable Consumer<Boolean> teleportResult) {
-        teleport(island, Dimensions.fromEnvironment(environment), teleportResult);
     }
 
     @Override

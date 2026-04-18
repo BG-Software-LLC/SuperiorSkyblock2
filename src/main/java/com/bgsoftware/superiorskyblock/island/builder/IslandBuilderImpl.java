@@ -22,7 +22,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.DirtyChunk;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
-import com.bgsoftware.superiorskyblock.core.LegacyMasks;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
@@ -286,21 +285,8 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
-    @Deprecated
-    public Island.Builder setGeneratedSchematics(int generatedSchematicsMask) {
-        this.generatedSchematics.addAll(LegacyMasks.convertGeneratedSchematicsMask(generatedSchematicsMask));
-        return this;
-    }
-
-    @Override
     public Set<Dimension> getGeneratedSchematics() {
         return Collections.unmodifiableSet(this.generatedSchematics.collect(Dimension.values()));
-    }
-
-    @Override
-    @Deprecated
-    public int getGeneratedSchematicsMask() {
-        return LegacyMasks.convertGeneratedSchematicsMask(this.generatedSchematics);
     }
 
     @Override
@@ -310,21 +296,8 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
-    @Deprecated
-    public Island.Builder setUnlockedWorlds(int unlockedWorldsMask) {
-        this.unlockedWorlds.addAll(LegacyMasks.convertUnlockedWorldsMask(unlockedWorldsMask));
-        return this;
-    }
-
-    @Override
     public Set<Dimension> getUnlockedWorlds() {
         return Collections.unmodifiableSet(this.unlockedWorlds.collect(Dimension.values()));
-    }
-
-    @Override
-    @Deprecated
-    public int getUnlockedWorldsMask() {
-        return LegacyMasks.convertUnlockedWorldsMask(this.unlockedWorlds);
     }
 
     @Override

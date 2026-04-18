@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.WorldGenerator;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -134,11 +133,6 @@ public class WorldsProvider_Default implements WorldsProvider {
     @Override
     public void prepareTeleport(Island island, Location location, Runnable finishCallback) {
         finishCallback.run();
-    }
-
-    @Override
-    public boolean isEndUnlocked() {
-        return isDimensionUnlocked(Dimensions.THE_END);
     }
 
     @Override

@@ -228,19 +228,6 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
     }
 
     @Override
-    @Deprecated
-    public void teleport(Island island, World.Environment environment) {
-        // Do nothing.
-    }
-
-    @Override
-    @Deprecated
-    public void teleport(Island unused, World.Environment unused2, @Nullable Consumer<Boolean> teleportResult) {
-        if (teleportResult != null)
-            teleportResult.accept(false);
-    }
-
-    @Override
     public boolean isInsideIsland() {
         return false;
     }

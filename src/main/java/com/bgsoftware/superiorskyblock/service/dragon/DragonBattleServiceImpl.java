@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.service.IService;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -46,24 +45,12 @@ public class DragonBattleServiceImpl implements DragonBattleService, IService {
     }
 
     @Override
-    @Deprecated
-    public EnderDragon getEnderDragon(Island island) {
-        return getEnderDragon(island, Dimensions.THE_END);
-    }
-
-    @Override
     public void stopEnderDragonBattle(Island island, Dimension dimension) {
         Preconditions.checkNotNull(island, "island parameter cannot be null");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null");
         Preconditions.checkArgument(dimension.getEnvironment() == World.Environment.THE_END, "dimension must be the_end environment");
 
         plugin.getNMSDragonFight().removeDragonBattle(island, dimension);
-    }
-
-    @Override
-    @Deprecated
-    public void stopEnderDragonBattle(Island island) {
-        stopEnderDragonBattle(island, Dimensions.THE_END);
     }
 
     @Override
@@ -94,12 +81,6 @@ public class DragonBattleServiceImpl implements DragonBattleService, IService {
         });
 
         return DragonBattleResetResult.SUCCESS;
-    }
-
-    @Override
-    @Deprecated
-    public DragonBattleResetResult resetEnderDragonBattle(Island island) {
-        return resetEnderDragonBattle(island, Dimensions.THE_END);
     }
 
 }

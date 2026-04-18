@@ -268,27 +268,6 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     void teleport(Island island, Dimension dimension, @Nullable Consumer<Boolean> teleportResult);
 
     /**
-     * Teleport the player to an island.
-     *
-     * @param island      The island to teleport the player to.
-     * @param environment The environment to teleport the player to.
-     * @deprecated See {@link #teleport(Island, Dimension)}
-     */
-    @Deprecated
-    void teleport(Island island, World.Environment environment);
-
-    /**
-     * Teleport the player to an island.
-     *
-     * @param island         The island to teleport the player to.
-     * @param environment    The environment to teleport the player to.
-     * @param teleportResult Consumer that will be ran when task is finished.
-     * @deprecated See {@link #teleport(Island, Dimension, Consumer)}
-     */
-    @Deprecated
-    void teleport(Island island, World.Environment environment, @Nullable Consumer<Boolean> teleportResult);
-
-    /**
      * Check whether or not the player is inside their island.
      * When the player is offline or he doesn't have an island, false will be returned.
      */

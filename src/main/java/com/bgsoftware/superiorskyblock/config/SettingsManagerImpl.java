@@ -3,9 +3,9 @@ package com.bgsoftware.superiorskyblock.config;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
-import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -41,8 +41,10 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,7 +52,7 @@ import java.util.Set;
 public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     private static final String[] IGNORED_SECTIONS = new String[]{
-            "config.yml", "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases",
+            "config.yml", "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "worlds.dimensions",
             "island-previews.locations", "default-values.block-limits", "default-values.entity-limits",
             "default-values.role-limits", "stacked-blocks.limits", "default-values.generator", "message-delays"
     };
@@ -85,6 +87,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         convertData(cfg);
         convertInteractables(plugin, cfg);
+        convertEntityCategories(plugin, cfg);
 
         try {
             cfg.syncWithConfig(file, plugin.getResource("config.yml"), IGNORED_SECTIONS);
@@ -707,7 +710,16 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public Map<String, KeySet> getEntityCategories() {
-        return this.global.getEntityCategories();
+        Map<String, KeySet> categories = new HashMap<>();
+        for (EntityCategory entityCategory : getEntityCategoriesMap().getCategories()) {
+            categories.put(entityCategory.getName(), entityCategory.getEntities());
+        }
+        return categories.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(categories);
+    }
+
+    @Override
+    public EntityCategories getEntityCategoriesMap() {
+        return this.global.getEntityCategoriesMap();
     }
 
     public void updateValue(String path, Object value) throws IOException {
@@ -718,7 +730,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         cfg.syncWithConfig(file, plugin.getResource("config.yml"), "config.yml",
-                "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "island-previews.locations");
+                "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "island-previews.locations", "worlds.dimensions");
 
         cfg.set(path, value);
 
@@ -754,6 +766,22 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         if (cfg.isBoolean("drops-upgrade-players-multiply")) {
             cfg.set("mob-drops.only-player-kills", cfg.getBoolean("drops-upgrade-players-multiply"));
             cfg.set("drops-upgrade-players-multiply", null);
+        if (cfg.getConfigurationSection("worlds.dimensions") == null) {
+            cfg.set("worlds.dimensions.normal", cfg.getConfigurationSection("worlds.normal"));
+            cfg.set("worlds.dimensions.normal.environment", "NORMAL");
+            cfg.set("worlds.dimensions.normal.portals.NETHER", "nether");
+            cfg.set("worlds.dimensions.normal.portals.ENDER", "the_end");
+            cfg.set("worlds.normal", null);
+            cfg.set("worlds.dimensions.nether", cfg.getConfigurationSection("worlds.nether"));
+            cfg.set("worlds.dimensions.nether.environment", "NETHER");
+            cfg.set("worlds.dimensions.nether.portals.NETHER", "normal");
+            cfg.set("worlds.dimensions.nether.portals.ENDER", "the_end");
+            cfg.set("worlds.nether", null);
+            cfg.set("worlds.dimensions.the_end", cfg.getConfigurationSection("worlds.end"));
+            cfg.set("worlds.dimensions.the_end.environment", "THE_END");
+            cfg.set("worlds.dimensions.the_end.portals.NETHER", "nether");
+            cfg.set("worlds.dimensions.the_end.portals.ENDER", "normal");
+            cfg.set("worlds.end", null);
         }
         if (cfg.get("island-level-formula") != null) {
             cfg.set("block-level-formula", cfg.getString("island-level-formula"));
@@ -894,11 +922,42 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
         try {
             commentedConfig.save(file);
+            cfg.set("interactables", null);
         } catch (Exception error) {
-            Log.error(error, file, "An unexpected error occurred while saving new interactables file:");
+            Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving file:");
         }
 
+    }
 
+    private void convertEntityCategories(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg) {
+        if (!cfg.isConfigurationSection("entity-categories"))
+            return;
+
+        File file = new File(plugin.getDataFolder(), "entity-categories.yml");
+
+        if (!file.exists())
+            plugin.saveResource("entity-categories.yml", false);
+
+        CommentedConfiguration commentedConfig = CommentedConfiguration.loadConfiguration(file);
+
+        for (String categoryName : cfg.getConfigurationSection("entity-categories").getKeys(false)) {
+            List<String> entities = cfg.getStringList("entity-categories." + categoryName);
+            if (!entities.isEmpty()) {
+                categoryName = categoryName.toUpperCase(Locale.ENGLISH);
+                commentedConfig.set(categoryName + ".entities", entities);
+                commentedConfig.set(categoryName + ".actions.SPAWN", categoryName + "_SPAWN");
+                commentedConfig.set(categoryName + ".actions.DAMAGE", categoryName + "_DAMAGE");
+                commentedConfig.set(categoryName + ".actions.SPAWNER_SPAWN", "SPAWNER_" + categoryName + "_SPAWN");
+                commentedConfig.set(categoryName + ".actions.NATURAL_SPAWN", "NATURAL_" + categoryName + "_SPAWN");
+            }
+        }
+
+        try {
+            commentedConfig.save(file);
+            cfg.set("entity-categories", null);
+        } catch (Exception error) {
+            Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving file:");
+        }
     }
 
 }

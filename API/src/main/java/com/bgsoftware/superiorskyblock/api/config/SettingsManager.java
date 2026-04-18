@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.config;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -13,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.PortalType;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.potion.PotionEffectType;
@@ -791,7 +793,13 @@ public interface SettingsManager {
      * Custom entity categories to be used by the plugin.
      * Config-path: entity-categories
      */
+    @Deprecated
     Map<String, KeySet> getEntityCategories();
+
+    /**
+     * Custom entity categories to be used by the plugin.
+     */
+    EntityCategories getEntityCategoriesMap();
 
     interface Database {
 
@@ -1116,19 +1124,28 @@ public interface SettingsManager {
         /**
          * All settings related to the overworld world.
          * Config-path: worlds.normal
+         *
+         * @deprecated See {@link #getDimensionConfig(Dimension)}
          */
+        @Deprecated
         Normal getNormal();
 
         /**
          * All settings related to the nether world.
          * Config-path: worlds.nether
+         *
+         * @deprecated See {@link #getDimensionConfig(Dimension)}
          */
+        @Deprecated
         Nether getNether();
 
         /**
          * All settings related to the end world.
          * Config-path: worlds.end
+         *
+         * @deprecated See {@link #getDimensionConfig(Dimension)}
          */
+        @Deprecated
         End getEnd();
 
         /**
@@ -1154,32 +1171,43 @@ public interface SettingsManager {
 
             /**
              * Whether this dimension is enabled or not.
-             * Config-path: worlds.<dimension>.enabled
+             * Config-path: worlds.dimensions.<dimension>.enabled
              */
             boolean isEnabled();
 
             /**
              * Whether this dimension is unlocked by default or not.
-             * Config-path: worlds.<dimension>.unlock
+             * Config-path: worlds.dimensions.<dimension>.unlock
              */
             boolean isUnlocked();
 
             /**
              * Whether the schematic for this dimension should be offset or not.
-             * Config-path: worlds.<dimension>.schematic-offset
+             * Config-path: worlds.dimensions.<dimension>.schematic-offset
              */
             boolean isSchematicOffset();
 
             /**
              * Get the default biome for this dimension.
+             * Config-path: worlds.dimensions.<dimension>.biome
              */
             String getBiome();
 
             /**
              * Get the world's name for this dimension.
-             * Config-path: worlds.<dimension>.name
+             * Config-path: worlds.dimensions.<dimension>.name
              */
             String getName();
+
+            /**
+             * Get the destination of a specific portal type {@link PortalType}
+             * Config-path: worlds.dimensions.<dimension>.portals
+             *
+             * @param portalType The portal type to get
+             * @return The destination of that portal type, or null if doesn't exist.
+             */
+            @Nullable
+            Dimension getPortalDestination(PortalType portalType);
 
         }
 
@@ -1452,6 +1480,27 @@ public interface SettingsManager {
          * Config-path: mob-drops.blacklisted-entities
          */
         Set<Key> getBlacklistedEntities();
+    interface EntityCategories {
+
+        /**
+         * Get all the categories from the entity-categories file.
+         */
+        List<EntityCategory> getCategories();
+
+        /**
+         * Get the entity categories for a specific entity key.
+         *
+         * @param key The entity's key
+         */
+        List<EntityCategory> getCategories(Key key);
+
+        /**
+         * Get an entity category by its name
+         *
+         * @param name The name of the category.
+         */
+        @Nullable
+        EntityCategory getCategoryByName(String name);
 
     }
 

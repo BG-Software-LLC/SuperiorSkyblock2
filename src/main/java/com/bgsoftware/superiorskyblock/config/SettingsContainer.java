@@ -12,10 +12,10 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.config.section.EntityCategoriesSection;
 import com.bgsoftware.superiorskyblock.config.section.InteractablesSection;
 import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
-import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
@@ -37,10 +37,10 @@ import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryType;
@@ -247,7 +247,7 @@ public class SettingsContainer {
     public final boolean helpOnNoPermission;
     public final boolean helpOnInvalidCommand;
     public final boolean cacheSchematics;
-    public final Map<String, KeySet> entityCategories;
+    public final SettingsManager.EntityCategories entityCategories;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws ManagerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
@@ -362,52 +362,13 @@ public class SettingsContainer {
         visitorsSignActive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.active", "&a[Welcome]"));
         visitorsSignInactive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.inactive", "&c[Welcome]"));
         visitorsSignDescriptionLineFormat = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.description-line-format", "{0}"));
+        loadDimensions(config.getConfigurationSection("worlds.dimensions"));
         islandWorldName = config.getString("worlds.world-name", "SuperiorWorld");
-
-        {
-            ConfigurationSection normalWorldSection = config.getConfigurationSection("worlds.normal");
-            if (normalWorldSection != null) {
-                dimensionConfigs.put(Dimensions.NORMAL, new WorldsSection.NormalDimensionConfig(normalWorldSection, islandWorldName));
-            } else {
-                dimensionConfigs.put(Dimensions.NORMAL, new WorldsSection.NormalDimensionConfig(
-                        true, true, true, "PLAINS", "", islandWorldName));
-            }
-        }
-
-        {
-            ConfigurationSection netherWorldSection = config.getConfigurationSection("worlds.nether");
-            if (netherWorldSection != null) {
-                dimensionConfigs.put(Dimensions.NETHER, new WorldsSection.NetherDimensionConfig(netherWorldSection, islandWorldName));
-            } else {
-                dimensionConfigs.put(Dimensions.NETHER, new WorldsSection.NetherDimensionConfig(
-                        false, true, true, "NETHER_WASTES", "", islandWorldName));
-            }
-        }
-
-        {
-            ConfigurationSection endWorldSection = config.getConfigurationSection("worlds.end");
-            if (endWorldSection != null) {
-                dimensionConfigs.put(Dimensions.THE_END, new WorldsSection.EndDimensionConfig(endWorldSection, islandWorldName));
-            } else {
-                dimensionConfigs.put(Dimensions.THE_END, new WorldsSection.EndDimensionConfig(
-                        false, false, true, "THE_END", "", islandWorldName,
-                        false, SBlockOffset.ZERO));
-            }
-        }
-
-        try {
-            Dimension defaultWorld = Dimension.getByName(config.getString("worlds.default-world"));
-            SettingsManager.Worlds.DimensionConfig dimensionConfig = this.dimensionConfigs.get(defaultWorld);
-            if (dimensionConfig == null || !dimensionConfig.isEnabled())
-                throw new Exception();
-            this.defaultWorldDimension = defaultWorld;
-            this.defaultWorldName = dimensionConfig.getName();
-        } catch (Exception error) {
-            throw new ManagerLoadException("Cannot find a default islands world.", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
-        }
-
         worldsDifficulty = config.getString("worlds.difficulty", "EASY").toUpperCase(Locale.ENGLISH);
         seaLevelHeight = config.getInt("worlds.sea-level-height", 100);
+        this.defaultWorldDimension = Dimension.getByName(config.getString("worlds.default-world"));
+        loadDimensionConfigs(config.getConfigurationSection("worlds.dimensions"));
+        this.defaultWorldName = this.dimensionConfigs.get(this.defaultWorldDimension).getName();
         spawnLocation = config.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");
         spawnProtection = config.getBoolean("spawn.protection", true);
         spawnSettings = Collections.unmodifiableList(new LinkedList<>(config.getStringList("spawn.settings")
@@ -646,7 +607,61 @@ public class SettingsContainer {
         helpOnInvalidCommand = config.getBoolean("help-on-invalid-command", true);
         helpOnNoPermission = config.getBoolean("help-on-no-permission", false);
         cacheSchematics = config.getBoolean("cache-schematics", true);
-        entityCategories = parseEntityCategories(config.getConfigurationSection("entity-categories"));
+        entityCategories = loadEntityCategories(plugin);
+    }
+
+    private void loadDimensions(ConfigurationSection dimensionsSection) {
+        // First register all dimensions
+        for (String dimensionName : dimensionsSection.getKeys(false)) {
+            String environmentName = dimensionsSection.getString(dimensionName + ".environment");
+            World.Environment environment;
+            try {
+                environment = World.Environment.valueOf(environmentName.toUpperCase(Locale.ENGLISH));
+            } catch (IllegalArgumentException error) {
+                Log.warnFromFile("config.yml", "Cannot load dimension due to invalid environment: ", environmentName, " - skipping...");
+                continue;
+            }
+
+            try {
+                Dimension.register(dimensionName, environment);
+            } catch (IllegalStateException ignored) {
+            }
+        }
+    }
+
+    private void loadDimensionConfigs(ConfigurationSection dimensionsSection) throws ManagerLoadException {
+        for (String dimensionName : dimensionsSection.getKeys(false)) {
+            ConfigurationSection dimensionSection = dimensionsSection.getConfigurationSection(dimensionName);
+
+            if (dimensionSection == null) {
+                Log.warnFromFile("config.yml", "Invalid dimension config section for ", dimensionName, " - skipping...");
+                continue;
+            }
+
+            Dimension dimension = Dimension.getByName(dimensionName);
+
+            String worldName = defaultWorldDimension == dimension ? islandWorldName :
+                    islandWorldName + "_" + dimensionName.toLowerCase(Locale.ENGLISH);
+
+            switch (dimension.getEnvironment()) {
+                case NORMAL:
+                    dimensionConfigs.put(dimension, new WorldsSection.NormalDimensionConfig(dimensionSection, dimension, worldName));
+                    break;
+                case NETHER:
+                    dimensionConfigs.put(dimension, new WorldsSection.NetherDimensionConfig(dimensionSection, dimension, worldName));
+                    break;
+                case THE_END:
+                    dimensionConfigs.put(dimension, new WorldsSection.EndDimensionConfig(dimensionSection, dimension, worldName));
+                    break;
+            }
+
+        }
+
+        // Check the default dimension is valid
+        SettingsManager.Worlds.DimensionConfig dimensionConfig = this.dimensionConfigs.get(this.defaultWorldDimension);
+        if (dimensionConfig == null || !dimensionConfig.isEnabled()) {
+            throw new ManagerLoadException("Cannot find a default islands world.", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+        }
     }
 
     private List<ClearAction> loadClearActions(List<String> clearActionsNames) {
@@ -696,6 +711,17 @@ public class SettingsContainer {
         return interactables;
     }
 
+    private SettingsManager.EntityCategories loadEntityCategories(SuperiorSkyblockPlugin plugin) {
+        File file = new File(plugin.getDataFolder(), "entity-categories.yml");
+
+        if (!file.exists())
+            plugin.saveResource("entity-categories.yml", false);
+
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+
+        return new EntityCategoriesSection(cfg);
+    }
+
     private KeySet loadSafeBlocks(SuperiorSkyblockPlugin plugin) {
         File file = new File(plugin.getDataFolder(), "safe_blocks.yml");
 
@@ -734,21 +760,6 @@ public class SettingsContainer {
             }
         });
         this.defaultGenerator.put(dimension, KeyMaps.unmodifiableKeyMap(defaultGenerator));
-    }
-
-    private static Map<String, KeySet> parseEntityCategories(ConfigurationSection section) {
-        Map<String, KeySet> entityCategories = new HashMap<>();
-
-        for (String categoryName : section.getKeys(false)) {
-            KeySet entityTypes = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE);
-            for (String entityType : section.getStringList(categoryName)) {
-                entityTypes.add(Keys.ofEntityType(entityType));
-            }
-            if (!entityTypes.isEmpty())
-                entityCategories.put(categoryName, KeySets.unmodifiableKeySet(entityTypes));
-        }
-
-        return entityCategories.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(entityCategories);
     }
 
     private static void loadListOrSection(YamlConfiguration config, String path, String parseName, BiConsumer<String, Integer> consumer) {

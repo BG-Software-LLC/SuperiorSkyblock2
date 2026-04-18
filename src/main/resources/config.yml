@@ -332,64 +332,83 @@ visitors-sign:
 # Settings related to the island worlds.
 worlds:
   # The default world that will be used.
-  # Use normal, nether or the_end.
-  # If nether or the_end are used but they are disabled below, they wi
+  # Use one of the dimensions from below.
+  # The dimension must be enabled or the server won't start.
   default-world: normal
   # Set the name of the islands world.
   world-name: SuperiorWorld
-  # Settings related to the normal world.
-  normal:
-    # Should the normal world be enabled?
-    enabled: true
-    # Should the normal be unlocked by default to islands?
-    unlock: true
-    # Should the schematics in this world will not be counted towards worth and level values?
-    schematic-offset: true
-    # The default biome for the world.
-    # If the biome is invalid, PLAINS will be set.
-    biome: PLAINS
-  # Settings related to the nether world.
-  nether:
-    # Should the nether world be enabled?
-    enabled: false
-    # Should the nether be unlocked by default to islands?
-    unlock: true
-    # Custom name for the nether world.
-    # When empty, the name will be "<island-world>_nether"
-    name: ''
-    # Should the schematics in this world will not be counted towards worth and level values?
-    schematic-offset: true
-    # The default biome for the world.
-    # If the biome is invalid, NETHER (or it's 1.16 equivalent) will be used.
-    biome: NETHER_WASTES
-  end:
-    # Should the end world be enabled?
-    enabled: false
-    # Should the end be unlocked by default to islands?
-    unlock: false
-    # Custom name for the end world.
-    # When empty, the name will be "<island-world>_the_end"
-    name: ''
-    # Should the schematics in this world will not be counted towards worth and level values?
-    schematic-offset: true
-    # The default biome for the world.
-    # If the biome is invalid, THE_END will be used.
-    biome: THE_END
-    # Settings related to dragon fights on the server.
-    dragon-fight:
-      # Whether dragon fights should be enabled.
-      # If enabled, each island will have it's own ender dragon to battle with.
-      enabled: false
-      # The offset of the end portal (where it should be spawning) from the middle of the island.
-      # The format is '<offset-x>, <offset-y>, <offset-z>' (may be negative).
-      # Having the offset going beyond the island-radius is an undefined behavior!
-      portal-offset: '0, 0, 0'
-
   # The difficulty of the island worlds.
   difficulty: EASY
-
   # Set the sea level height for island worlds.
   sea-level-height: 100
+  # Settings related to the dimensions of the plugin.
+  # You can create custom dimensions by adding them here.
+  dimensions:
+    # Settings related to the normal world.
+    normal:
+      # Should the normal world be enabled?
+      enabled: true
+      # Should the normal be unlocked by default to islands?
+      unlock: true
+      # Should the schematics in this world will not be counted towards worth and level values?
+      schematic-offset: true
+      # The environment of this world
+      environment: NORMAL
+      # The default biome for the world.
+      # If the biome is invalid, PLAINS will be set.
+      biome: PLAINS
+      # Configure the portal agents
+      portals:
+        NETHER: nether
+        ENDER: the_end
+    # Settings related to the nether world.
+    nether:
+      # Should the nether world be enabled?
+      enabled: false
+      # Should the nether be unlocked by default to islands?
+      unlock: true
+      # Custom name for the nether world.
+      # When empty, the name will be "<island-world>_nether"
+      name: ''
+      # Should the schematics in this world will not be counted towards worth and level values?
+      schematic-offset: true
+      # The environment of this world
+      environment: NETHER
+      # The default biome for the world.
+      # If the biome is invalid, NETHER (or it's 1.16 equivalent) will be used.
+      biome: NETHER_WASTES
+      # Configure the portal agents
+      portals:
+        NETHER: normal
+        ENDER: the_end
+    the_end:
+      # Should the end world be enabled?
+      enabled: false
+      # Should the end be unlocked by default to islands?
+      unlock: false
+      # Custom name for the end world.
+      # When empty, the name will be "<island-world>_the_end"
+      name: ''
+      # Should the schematics in this world will not be counted towards worth and level values?
+      schematic-offset: true
+      # The environment of this world
+      environment: THE_END
+      # The default biome for the world.
+      # If the biome is invalid, THE_END will be used.
+      biome: THE_END
+      # Configure the portal agents
+      portals:
+        NETHER: nether
+        ENDER: normal
+      # Settings related to dragon fights on the server.
+      dragon-fight:
+        # Whether dragon fights should be enabled.
+        # If enabled, each island will have it's own ender dragon to battle with.
+        enabled: false
+        # The offset of the end portal (where it should be spawning) from the middle of the island.
+        # The format is '<offset-x>, <offset-y>, <offset-z>' (may be negative).
+        # Having the offset going beyond the island-radius is an undefined behavior!
+        portal-offset: '0, 0, 0'
 
 # All settings related to the spawn island.
 spawn:
@@ -968,17 +987,3 @@ help-on-invalid-command: true
 # Should players receive a help instead of a `NO_COMMAND_PERMISSION` message
 # when using a command they don't have permission for?
 help-on-no-permission: false
-
-# Configure custom entity categories.
-# By default, there are two entity categories - ANIMALS and MONSTER
-# You can add your own custom categories in here, and configure which entities are part of the category.
-# Entities in the custom categories will have custom privileges and flags for damaging and spawning them.
-# You can add the custom privileges and island flags manually to the menus.
-# For example:
-#   entity-categories:
-#     VILLAGERS:
-#     - VILLAGER
-# The `VILLAGERS` category will have VILLAGER entities in it.
-# The privileges `VILLAGERS_SPAWN` and `VILLAGERS_DAMAGE` will be required by players, and the island flags
-# `SPAWNER_VILLAGERS_SPAWN` and `NATURAL_VILLAGERS_SPAWN` will be required to be enabled for the island.
-entity-categories: { }

@@ -25,7 +25,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
-import com.bgsoftware.superiorskyblock.core.LegacyMasks;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.database.DBColumn;
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsSerializer;
@@ -33,7 +32,6 @@ import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
@@ -161,7 +159,7 @@ public class IslandsDatabaseBridge {
 
     public static void saveUnlockedWorlds(Island island) {
         updateIslandValue(island, "unlocked_worlds",
-                LegacyMasks.convertUnlockedWorldsMask(island.getUnlockedWorlds()));
+                IslandsSerializer.serializeDimensions(island.getUnlockedWorlds()));
     }
 
     public static void savePlayerPermission(Island island, SuperiorPlayer superiorPlayer, IslandPrivilege privilege,
@@ -563,7 +561,7 @@ public class IslandsDatabaseBridge {
 
     public static void saveGeneratedSchematics(Island island) {
         updateIslandValue(island, "generated_schematics",
-                LegacyMasks.convertGeneratedSchematicsMask(island.getGeneratedSchematics()));
+                IslandsSerializer.serializeDimensions(island.getGeneratedSchematics()));
     }
 
     public static void saveDirtyChunks(DirtyChunksContainer dirtyChunksContainer) {
@@ -752,7 +750,7 @@ public class IslandsDatabaseBridge {
     public static void insertIsland(Island island, @Nullable List<ChunkPosition> dirtyChunks) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
             BlockPosition centerPosition = island.getCenterPosition();
-            WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, Dimensions.NORMAL);
+            WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, plugin.getSettings().getWorlds().getDefaultWorldDimension());
             try (ObjectsPools.Batch<DBColumn> pool = ObjectsPools.DB_COLUMN_BATCH.obtain()) {
                 databaseBridge.insertObject("islands",
                         pool.obtain().withNameAndValue("uuid", island.getUniqueId().toString()),
@@ -768,8 +766,8 @@ public class IslandsDatabaseBridge {
                         pool.obtain().withNameAndValue("ignored", island.isIgnored()),
                         pool.obtain().withNameAndValue("name", IslandNames.getNameForDatabase(island)),
                         pool.obtain().withNameAndValue("description", island.getDescription()),
-                        pool.obtain().withNameAndValue("generated_schematics", LegacyMasks.convertGeneratedSchematicsMask(island.getGeneratedSchematics())),
-                        pool.obtain().withNameAndValue("unlocked_worlds", LegacyMasks.convertUnlockedWorldsMask(island.getUnlockedWorlds())),
+                        pool.obtain().withNameAndValue("generated_schematics", IslandsSerializer.serializeDimensions(island.getGeneratedSchematics())),
+                        pool.obtain().withNameAndValue("unlocked_worlds", IslandsSerializer.serializeDimensions(island.getUnlockedWorlds())),
                         pool.obtain().withNameAndValue("last_time_updated", System.currentTimeMillis() / 1000L),
                         pool.obtain().withNameAndValue("dirty_chunks", dirtyChunks == null ? "" : IslandsSerializer.serializeDirtyChunkPositions(dirtyChunks)),
                         pool.obtain().withNameAndValue("block_counts", IslandsSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger())),

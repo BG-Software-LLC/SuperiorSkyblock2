@@ -424,7 +424,7 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().cacheSchematics;
     }
 
-    public Map<String, KeySet> getEntityCategories() {
+    public SettingsManager.EntityCategories getEntityCategoriesMap() {
         return getContainer().entityCategories;
     }
 
