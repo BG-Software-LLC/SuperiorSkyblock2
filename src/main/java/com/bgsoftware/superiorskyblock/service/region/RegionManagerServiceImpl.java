@@ -66,6 +66,10 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     @Nullable
     private static final Material SWEET_BERRY_BUSH = EnumHelper.getEnum(Material.class, "SWEET_BERRY_BUSH");
     @Nullable
+    private static final Material CAVE_VINES = EnumHelper.getEnum(Material.class, "CAVE_VINES");
+    @Nullable
+    private static final Material CAVE_VINES_PLANT = EnumHelper.getEnum(Material.class, "CAVE_VINES_PLANT");
+    @Nullable
     private static final Material VAULT = EnumHelper.getEnum(Material.class, "VAULT");
     @Nullable
     private static final Material TRIAL_KEY = EnumHelper.getEnum(Material.class, "TRIAL_KEY");
@@ -213,6 +217,10 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             } else if (blockType == SWEET_BERRY_BUSH && action == Action.RIGHT_CLICK_BLOCK &&
                     Materials.BONE_MEAL.toBukkitItem().isSimilar(usedItem) &&
                     ((org.bukkit.block.data.Ageable) plugin.getNMSWorld().getBlockData(block)).getAge() < 3) {
+                islandPrivilege = IslandPrivileges.FERTILIZE;
+            } else if ((blockType == CAVE_VINES || blockType == CAVE_VINES_PLANT) && action == Action.RIGHT_CLICK_BLOCK &&
+                    Materials.BONE_MEAL.toBukkitItem().isSimilar(usedItem) &&
+                    !plugin.getNMSWorld().hasBerries(block)) {
                 islandPrivilege = IslandPrivileges.FERTILIZE;
             } else if (stackedBlockAmount > 1) {
                 islandPrivilege = IslandPrivileges.BREAK;

@@ -51,6 +51,7 @@ import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.BubbleColumn;
+import org.bukkit.block.data.type.CaveVinesPlant;
 import org.bukkit.block.data.type.Sign;
 import org.bukkit.block.data.type.WallSign;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
@@ -233,6 +234,11 @@ public abstract class AbstractNMSWorld implements NMSWorld {
             return SignType.STANDING_SIGN;
         else
             return SignType.UNKNOWN;
+    }
+
+    @Override
+    public boolean hasBerries(org.bukkit.block.Block block) {
+        return ((CaveVinesPlant) block.getBlockData()).isBerries();
     }
 
     @Override

@@ -48,6 +48,10 @@ public interface NMSWorld {
 
     SignType getSignType(Object sign);
 
+    default boolean hasBerries(Block block) {
+        return false;
+    }
+
     PistonPushReaction getPistonReaction(Block block);
 
     int getDefaultAmount(Block block);
