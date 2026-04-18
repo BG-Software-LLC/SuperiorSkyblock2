@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -98,7 +99,7 @@ public class ProtectionListener extends AbstractGameEventListener {
         if (handleBrushUse(e)) return;
         if (handleMinecartPlace(e)) return;
         if (handleEntityInteract(e)) return;
-        handleBlockInteract(e, e.getArgs().player, e.getArgs().action, e.getArgs().clickedBlock, e.getArgs().usedItem);
+        handleBlockInteract(e, e.getArgs().player, e.getArgs().action, e.getArgs().clickedBlock, e.getArgs().usedHand, e.getArgs().usedItem);
     }
 
     private void onEntityInteractBlock(GameEvent<GameEventArgs.EntityInteractEvent> e) {
@@ -114,7 +115,7 @@ public class ProtectionListener extends AbstractGameEventListener {
         if (!(projectileSource instanceof Player))
             return;
 
-        if (handleBlockInteract(e, (Player) projectileSource, Action.PHYSICAL, clickedBlock, null)) {
+        if (handleBlockInteract(e, (Player) projectileSource, Action.PHYSICAL, clickedBlock, null, null)) {
             // We want to remove the projectile as well when it is not possible to interact
             entity.remove();
         }
@@ -243,15 +244,16 @@ public class ProtectionListener extends AbstractGameEventListener {
         return false;
     }
 
-    private boolean handleBlockInteract(GameEvent<?> e, Player player, Action action,
-                                        @Nullable Block clickedBlock, @Nullable ItemStack usedItem) {
+    private boolean handleBlockInteract(GameEvent<?> e, Player player, Action action, @Nullable Block clickedBlock,
+                                        @Nullable PlayerHand usedHand, @Nullable ItemStack usedItem) {
         if (clickedBlock == null)
             return false;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
         InteractionResult interactionResult = this.protectionManager.get().handleBlockInteract(
                 superiorPlayer, clickedBlock, action, usedItem);
-        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer,
+                usedItem != null || usedHand != PlayerHand.OFF_HAND)) {
             e.setCancelled();
             return true;
         }
