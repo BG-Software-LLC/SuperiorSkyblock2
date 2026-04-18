@@ -74,8 +74,8 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
                 Optional.ofNullable(settingsSection.getConfigurationSection(islandFlagName)).ifPresent(islandFlagSection -> {
                     if (islandFlagSection.getBoolean("display-menu", true)) {
                         islandFlags.add(loadIslandFlagInfo(islandFlagSection, islandFlagName, islandFlags.size()));
-                        detectedFlags.add(islandFlagName.toUpperCase(Locale.ENGLISH));
                     }
+                    detectedFlags.add(islandFlagName.toUpperCase(Locale.ENGLISH));
                 });
             }
         });

@@ -102,8 +102,8 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
                 Optional.ofNullable(permissionsSection.getConfigurationSection(islandPrivilegeName)).ifPresent(islandPrivilegeSection -> {
                     if (islandPrivilegeSection.getBoolean("display-menu", true)) {
                         islandPrivileges.add(loadIslandPrivilegeInfo(islandPrivilegeSection, islandPrivilegeName, islandPrivileges.size()));
-                        detectedPrivileges.add(islandPrivilegeName.toUpperCase(Locale.ENGLISH));
                     }
+                    detectedPrivileges.add(islandPrivilegeName.toUpperCase(Locale.ENGLISH));
                 });
             }
         });
