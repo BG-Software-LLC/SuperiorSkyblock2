@@ -2,12 +2,15 @@ package com.bgsoftware.superiorskyblock.world;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import org.bukkit.Material;
@@ -42,6 +45,17 @@ public class BukkitEntities {
     private static final EntityType NAUTILUS_TYPE = EnumHelper.getEnum(EntityType.class, "NAUTILUS");
     @Nullable
     private static final EntityType ZOMBIE_NAUTILUS_TYPE = EnumHelper.getEnum(EntityType.class, "ZOMBIE_NAUTILUS");
+
+    @Nullable
+    private static EntityCategory TAMEABLE_CATEGORY;
+
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, BukkitEntities::onSettingsUpdate);
+    }
+
+    private static void onSettingsUpdate() {
+        TAMEABLE_CATEGORY = plugin.getSettings().getEntityCategoriesMap().getCategoryByName("TAMEABLE");
+    }
 
     private BukkitEntities() {
 
@@ -158,6 +172,15 @@ public class BukkitEntities {
 
     public static boolean isNautilus(EntityType entityType) {
         return entityType == NAUTILUS_TYPE || entityType == ZOMBIE_NAUTILUS_TYPE;
+    }
+
+    public static List<EntityCategory> getCategories(Entity entity) {
+        List<EntityCategory> categories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(entity));
+        if (TAMEABLE_CATEGORY != null && isTameable(entity)) {
+            categories = new LinkedList<>(categories);
+            categories.add(TAMEABLE_CATEGORY);
+        }
+        return categories;
     }
 
 }

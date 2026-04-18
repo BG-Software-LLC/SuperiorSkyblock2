@@ -969,17 +969,3 @@ help-on-invalid-command: true
 # Should players receive a help instead of a `NO_COMMAND_PERMISSION` message
 # when using a command they don't have permission for?
 help-on-no-permission: false
-
-# Configure custom entity categories.
-# By default, there are two entity categories - ANIMALS and MONSTER
-# You can add your own custom categories in here, and configure which entities are part of the category.
-# Entities in the custom categories will have custom privileges and flags for damaging and spawning them.
-# You can add the custom privileges and island flags manually to the menus.
-# For example:
-#   entity-categories:
-#     VILLAGERS:
-#     - VILLAGER
-# The `VILLAGERS` category will have VILLAGER entities in it.
-# The privileges `VILLAGERS_SPAWN` and `VILLAGERS_DAMAGE` will be required by players, and the island flags
-# `SPAWNER_VILLAGERS_SPAWN` and `NATURAL_VILLAGERS_SPAWN` will be required to be enabled for the island.
-entity-categories: { }

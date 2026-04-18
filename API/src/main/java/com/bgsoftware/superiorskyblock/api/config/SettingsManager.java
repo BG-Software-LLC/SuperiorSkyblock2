@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.config;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -783,7 +784,13 @@ public interface SettingsManager {
      * Custom entity categories to be used by the plugin.
      * Config-path: entity-categories
      */
+    @Deprecated
     Map<String, KeySet> getEntityCategories();
+
+    /**
+     * Custom entity categories to be used by the plugin.
+     */
+    EntityCategories getEntityCategoriesMap();
 
     interface Database {
 
@@ -1430,6 +1437,30 @@ public interface SettingsManager {
          */
         @Nullable
         IslandPrivilege getRequiredPrivilege(Key key);
+
+    }
+
+    interface EntityCategories {
+
+        /**
+         * Get all the categories from the entity-categories file.
+         */
+        List<EntityCategory> getCategories();
+
+        /**
+         * Get the entity categories for a specific entity key.
+         *
+         * @param key The entity's key
+         */
+        List<EntityCategory> getCategories(Key key);
+
+        /**
+         * Get an entity category by its name
+         *
+         * @param name The name of the category.
+         */
+        @Nullable
+        EntityCategory getCategoryByName(String name);
 
     }
 

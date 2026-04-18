@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
@@ -23,7 +24,6 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
-import com.bgsoftware.superiorskyblock.world.entity.EntityCategory;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -49,6 +49,7 @@ import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
+import java.util.List;
 
 public class ProtectionListener extends AbstractGameEventListener {
 
@@ -430,19 +431,34 @@ public class ProtectionListener extends AbstractGameEventListener {
         if (!(inventoryHolder instanceof Vehicle))
             return;
 
-        IslandPrivilege islandPrivilege = BukkitEntities.isHorse((Vehicle) inventoryHolder) ? IslandPrivileges.HORSE_INTERACT :
-                BukkitEntities.isNautilus(((Vehicle) inventoryHolder).getType()) ? IslandPrivileges.NAUTILUS_INTERACT :
-                inventoryHolder instanceof Animals ? IslandPrivileges.ENTITY_RIDE : IslandPrivileges.MINECART_OPEN;
-
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().bukkitEvent.getPlayer());
-        InteractionResult interactionResult;
+
+        List<EntityCategory> entityCategories = BukkitEntities.getCategories((Entity) inventoryHolder);
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location minecartLocation = ((Vehicle) inventoryHolder).getLocation(wrapper.getHandle());
-            interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer,
+
+            if (!entityCategories.isEmpty()) {
+                InteractionResult interactionResult;
+                for (EntityCategory entityCategory : entityCategories) {
+                    if (entityCategory.getInteractPrivilege() != null) {
+                        interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer,
+                                minecartLocation, entityCategory.getInteractPrivilege());
+                        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
+                            e.setCancelled();
+                            return;
+                        }
+                    }
+                }
+            }
+
+            IslandPrivilege islandPrivilege = inventoryHolder instanceof Animals ? IslandPrivileges.ENTITY_RIDE : IslandPrivileges.MINECART_OPEN;
+            InteractionResult interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer,
                     minecartLocation, islandPrivilege);
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
+                e.setCancelled();
+            }
         }
-        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
-            e.setCancelled();
     }
 
     private void onPlayerCollideWithEntity(GameEvent<GameEventArgs.EntityCollisionEvent> e) {
@@ -491,27 +507,41 @@ public class ProtectionListener extends AbstractGameEventListener {
         BukkitEntities.getPlayerSource(entity).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(launcherPlayer -> {
             EntityType entityType = entity.getType();
 
-            IslandPrivilege islandPrivilege;
-            if (entity instanceof FishHook && !ServerVersion.isLegacy()) {
-                islandPrivilege = IslandPrivileges.FISH;
-            } else if (entityType == TRIDENT) {
-                islandPrivilege = IslandPrivileges.PICKUP_DROPS;
-            } else if (entity instanceof Egg) {
-                islandPrivilege = IslandPrivileges.ANIMAL_SPAWN;
-            } else if (entity instanceof EnderPearl) {
-                islandPrivilege = IslandPrivileges.ENDER_PEARL;
-            } else if (entityType == WIND_CHARGE) {
-                islandPrivilege = IslandPrivileges.WIND_CHARGE;
-            } else {
-                return;
-            }
-
             InteractionResult interactionResult;
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 Location entityLocation = entity.getLocation(wrapper.getHandle());
+
+                if (entity instanceof Egg) {
+                    List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(entity));
+                    for (EntityCategory entityCategory : entityCategories) {
+                        if (entityCategory.getSpawnPrivilege() != null) {
+                            interactionResult = this.protectionManager.get().handleCustomInteraction(launcherPlayer,
+                                    entityLocation, entityCategory.getSpawnPrivilege());
+                            if (ProtectionHelper.shouldPreventInteraction(interactionResult, launcherPlayer, true)) {
+                                e.setCancelled();
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                IslandPrivilege islandPrivilege;
+                if (entity instanceof FishHook && !ServerVersion.isLegacy()) {
+                    islandPrivilege = IslandPrivileges.FISH;
+                } else if (entityType == TRIDENT) {
+                    islandPrivilege = IslandPrivileges.PICKUP_DROPS;
+                } else if (entity instanceof EnderPearl) {
+                    islandPrivilege = IslandPrivileges.ENDER_PEARL;
+                } else if (entityType == WIND_CHARGE) {
+                    islandPrivilege = IslandPrivileges.WIND_CHARGE;
+                } else {
+                    return;
+                }
+
                 interactionResult = this.protectionManager.get().handleCustomInteraction(launcherPlayer,
                         entityLocation, islandPrivilege);
             }
+
             if (ProtectionHelper.shouldPreventInteraction(interactionResult, launcherPlayer, true))
                 e.setCancelled();
         });
@@ -531,13 +561,20 @@ public class ProtectionListener extends AbstractGameEventListener {
                     if (hitEntity == null)
                         return;
 
-                    EntityCategory entityCategory = EntityCategory.getEntityCategory(Keys.of(entity));
-                    if (entityCategory == null)
-                        return;
-
-                    location = hitEntity.getLocation(wrapper.getHandle());
-                    islandPrivilege = entityCategory.getDamagePrivilege();
                     hitBlock = null;
+                    location = hitEntity.getLocation(wrapper.getHandle());
+
+                    List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(entity));
+                    interactionResult = InteractionResult.SUCCESS;
+
+                    for (EntityCategory entityCategory : entityCategories) {
+                        if (entityCategory.getDamagePrivilege() != null) {
+                            interactionResult = this.protectionManager.get().handleCustomInteraction(
+                                    shooterPlayer, location, entityCategory.getDamagePrivilege());
+                            if (interactionResult != InteractionResult.SUCCESS)
+                                break;
+                        }
+                    }
                 } else {
                     hitBlock = e.getArgs().hitBlock;
                     Material hitBlockType = hitBlock == null ? null : hitBlock.getType();
@@ -549,13 +586,14 @@ public class ProtectionListener extends AbstractGameEventListener {
 
                     location = hitBlock.getLocation(wrapper.getHandle());
                     islandPrivilege = hitBlockType == TARGET ? requiredPrivilege : IslandPrivileges.BREAK;
+
+                    if (islandPrivilege == null)
+                        return;
+
+                    interactionResult = this.protectionManager.get().handleCustomInteraction(shooterPlayer, location, islandPrivilege);
                 }
-
-                if (islandPrivilege == null)
-                    return;
-
-                interactionResult = this.protectionManager.get().handleCustomInteraction(shooterPlayer, location, islandPrivilege);
             }
+
             if (ProtectionHelper.shouldPreventInteraction(interactionResult, shooterPlayer, true)) {
                 entity.remove();
                 if (hitBlock != null) {

@@ -112,7 +112,7 @@ public class SlimefunHook {
                 islandPrivilege = plugin.getSettings().getInteractablesMap().getRequiredPrivilege(ConstantKeys.CHEST);
                 break;
             default:
-                islandPrivilege = IslandPrivileges.INTERACT;
+                islandPrivilege = IslandPrivileges.BREAK;
                 break;
         }
 

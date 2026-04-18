@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.service.region;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandRestrictMoveEvent;
@@ -17,7 +18,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
@@ -32,22 +32,17 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
-import com.bgsoftware.superiorskyblock.world.entity.EntityCategory;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Animals;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Fish;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Villager;
@@ -58,6 +53,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.List;
 import java.util.Optional;
 
 public class RegionManagerServiceImpl implements RegionManagerService, IService {
@@ -192,6 +188,20 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 return InteractionResult.SUCCESS;
 
             EntityType spawnType = usedItem == null ? EntityType.UNKNOWN : BukkitItems.getEntityType(usedItem);
+
+            if (spawnType != EntityType.UNKNOWN) {
+                List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(spawnType));
+                for (EntityCategory entityCategory : entityCategories) {
+                    if (entityCategory.getSpawnPrivilege() != null) {
+                        InteractionResult interactionResult = handleInteractionInternal(superiorPlayer, blockLocation,
+                                entityCategory.getSpawnPrivilege(), 0, true, true);
+                        if (interactionResult != InteractionResult.SUCCESS)
+                            return interactionResult;
+                    }
+                }
+                return InteractionResult.SUCCESS;
+            }
+
             Material blockType = block.getType();
             Material usedItemType = usedItem == null ? null : usedItem.getType();
 
@@ -209,11 +219,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 islandPrivilege = IslandPrivileges.FERTILIZE;
             } else if (stackedBlockAmount > 1) {
                 islandPrivilege = IslandPrivileges.BREAK;
-            } else if (spawnType != EntityType.UNKNOWN) {
-                EntityCategory entityCategory = EntityCategory.getEntityCategory(Keys.of(spawnType));
-                if (entityCategory != null && entityCategory.getSpawnPrivilege() != null) {
-                    islandPrivilege = entityCategory.getSpawnPrivilege();
-                }
             }
 
             return handleInteractionInternal(superiorPlayer, blockLocation, islandPrivilege,
@@ -257,11 +262,12 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             EntityType entityType = entity.getType();
             Material usedItemType = usedItem == null ? Material.AIR : usedItem.getType();
 
-            IslandPrivilege islandPrivilege;
+            if (entity instanceof Villager || BukkitEntities.isHorse(entity) || BukkitEntities.isNautilus(entityType)) {
+                closeInventory = true;
+            }
 
-            if (entity instanceof ArmorStand) {
-                islandPrivilege = IslandPrivileges.INTERACT;
-            } else if (usedItem != null && entity instanceof Animals && plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) entity)) {
+            IslandPrivilege islandPrivilege = null;
+            if (usedItem != null && entity instanceof Animals && plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) entity)) {
                 islandPrivilege = IslandPrivileges.ANIMAL_BREED;
             } else if (usedItemType == Material.NAME_TAG) {
                 islandPrivilege = IslandPrivileges.NAME_ENTITY;
@@ -269,42 +275,41 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                     (entityType == HAPPY_GHAST_TYPE && Materials.isHarness(usedItemType)) ||
                     (usedItemType == Material.SHEARS && plugin.getNMSEntities().canShearSaddleFromEntity(entity))) {
                 islandPrivilege = IslandPrivileges.SADDLE_ENTITY;
-            } else if (entity instanceof Villager) {
-                islandPrivilege = IslandPrivileges.VILLAGER_TRADING;
-                closeInventory = true;
-            } else if (BukkitEntities.isHorse(entity)) {
-                islandPrivilege = IslandPrivileges.HORSE_INTERACT;
-                closeInventory = true;
-            } else if (BukkitEntities.isNautilus(entityType)) {
-                islandPrivilege = IslandPrivileges.NAUTILUS_INTERACT;
-                closeInventory = true;
-            } else if (entityType == COPPER_GOLEM_TYPE) {
-                islandPrivilege = IslandPrivileges.COPPER_GOLEM_INTERACT;
-            } else if (entityType == ALLAY_TYPE) {
-                islandPrivilege = IslandPrivileges.ALLAY_INTERACT;
             } else if (usedItemType == Material.FLINT_AND_STEEL && entity instanceof Creeper) {
                 islandPrivilege = IslandPrivileges.IGNITE_CREEPER;
-            } else if (usedItemType == Material.WATER_BUCKET && entityType == AXOLOTL_TYPE && ServerVersion.isAtLeast(ServerVersion.v1_17)) {
-                islandPrivilege = IslandPrivileges.PICKUP_AXOLOTL;
-            } else if (entity instanceof ItemFrame) {
-                islandPrivilege = IslandPrivileges.ITEM_FRAME;
-            } else if (entity instanceof Painting) {
-                islandPrivilege = IslandPrivileges.PAINTING;
-            } else if (entity instanceof Fish && !ServerVersion.isLegacy()) {
-                islandPrivilege = IslandPrivileges.PICKUP_FISH;
             } else if (usedItem != null && entity instanceof PoweredMinecart &&
                     plugin.getNMSEntities().isMinecartFuel(usedItem, (PoweredMinecart) entity)) {
                 islandPrivilege = IslandPrivileges.MINECART_OPEN;
             } else if (entity instanceof Sheep && Materials.isDye(usedItemType)) {
                 islandPrivilege = IslandPrivileges.DYE_SHEEP;
-            } else if (entityType == PARROT_TYPE && usedItemType == Material.COOKIE) {
-                islandPrivilege = BukkitEntities.isTameable(entity) ? IslandPrivileges.TAMED_ANIMAL_DAMAGE : IslandPrivileges.ANIMAL_DAMAGE;
-            } else {
-                return InteractionResult.SUCCESS;
             }
 
-            interactionResult = handleInteractionInternal(superiorPlayer, entityLocation, islandPrivilege,
-                    0, true, true);
+            if (islandPrivilege != null) {
+                interactionResult = handleInteractionInternal(superiorPlayer, entityLocation, islandPrivilege,
+                        0, true, true);
+            } else {
+                interactionResult = InteractionResult.SUCCESS;
+                List<EntityCategory> entityCategories = BukkitEntities.getCategories(entity);
+                if (entityType == PARROT_TYPE && usedItemType == Material.COOKIE) {
+                    for (EntityCategory entityCategory : entityCategories) {
+                        if (entityCategory.getDamagePrivilege() != null) {
+                            interactionResult = handleInteractionInternal(superiorPlayer, entityLocation,
+                                    entityCategory.getDamagePrivilege(), 0, true, true);
+                            if (interactionResult != InteractionResult.SUCCESS)
+                                break;
+                        }
+                    }
+                } else {
+                    for (EntityCategory entityCategory : entityCategories) {
+                        if (entityCategory.getInteractPrivilege() != null) {
+                            interactionResult = handleInteractionInternal(superiorPlayer, entityLocation,
+                                    entityCategory.getInteractPrivilege(), 0, true, true);
+                            if (interactionResult != InteractionResult.SUCCESS)
+                                break;
+                        }
+                    }
+                }
+            }
         }
 
         if (closeInventory && interactionResult != InteractionResult.SUCCESS) {
@@ -336,32 +341,27 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         if (!damagerSource.isPresent())
             return InteractionResult.SUCCESS;
 
-        InteractionResult interactionResult;
+        List<EntityCategory> entityCategories = BukkitEntities.getCategories(entity);
+        if (!entityCategories.isEmpty()) {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location entityLocation = entity.getLocation(wrapper.getHandle());
 
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location entityLocation = entity.getLocation(wrapper.getHandle());
-
-            IslandPrivilege islandPrivilege;
-            if (BukkitEntities.isTameable(entity)) {
-                islandPrivilege = IslandPrivileges.TAMED_ANIMAL_DAMAGE;
-            } else {
-                EntityCategory entityCategory = EntityCategory.getEntityCategory(Keys.of(entity));
-                if (entityCategory == null)
-                    return InteractionResult.SUCCESS;
-                islandPrivilege = entityCategory.getDamagePrivilege();
+                InteractionResult interactionResult;
+                for (EntityCategory entityCategory : entityCategories) {
+                    if (entityCategory.getDamagePrivilege() != null) {
+                        interactionResult = handleInteractionInternal(damagerSource.get(), entityLocation,
+                                entityCategory.getDamagePrivilege(), 0, true, false);
+                        if (interactionResult != InteractionResult.SUCCESS) {
+                            if (damager instanceof Arrow && entity.getFireTicks() > 0)
+                                entity.setFireTicks(0);
+                            return interactionResult;
+                        }
+                    }
+                }
             }
-
-            if (islandPrivilege == null)
-                return InteractionResult.SUCCESS;
-
-            interactionResult = handleInteractionInternal(damagerSource.get(), entityLocation, islandPrivilege,
-                    0, true, false);
         }
 
-        if (interactionResult != InteractionResult.SUCCESS && damager instanceof Arrow && entity.getFireTicks() > 0)
-            entity.setFireTicks(0);
-
-        return interactionResult;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -374,12 +374,24 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(vehicle.getWorld()))
             return InteractionResult.SUCCESS;
 
-        IslandPrivilege islandPrivilege = BukkitEntities.isHorse(vehicle) ? IslandPrivileges.HORSE_INTERACT :
-                BukkitEntities.isNautilus(vehicle.getType()) ? IslandPrivileges.NAUTILUS_INTERACT :
-                vehicle instanceof Animals ? IslandPrivileges.ENTITY_RIDE : IslandPrivileges.MINECART_ENTER;
+        List<EntityCategory> entityCategories = BukkitEntities.getCategories(vehicle);
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location entityLocation = vehicle.getLocation(wrapper.getHandle());
+
+            if (!entityCategories.isEmpty()) {
+                InteractionResult interactionResult;
+                for (EntityCategory entityCategory : entityCategories) {
+                    if (entityCategory.getInteractPrivilege() != null) {
+                        interactionResult = handleInteractionInternal(superiorPlayer, entityLocation,
+                                entityCategory.getInteractPrivilege(), 0, true, false);
+                        if (interactionResult != InteractionResult.SUCCESS)
+                            return interactionResult;
+                    }
+                }
+            }
+
+            IslandPrivilege islandPrivilege = vehicle instanceof Animals ? IslandPrivileges.ENTITY_RIDE : IslandPrivileges.MINECART_ENTER;
             return handleInteractionInternal(superiorPlayer, entityLocation, islandPrivilege,
                     0, true, false);
         }
