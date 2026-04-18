@@ -157,6 +157,7 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
             .put("POTTED_DEAD_BUSH", "FLOWER_POT")
             .put("POTTED_FERN", "FLOWER_POT")
             .put("POTTED_FLOWERING_AZALEA_BUSH", "FLOWER_POT")
+            .put("POTTED_GOLDEN_DANDELION", "GOLDEN_DANDELION")
             .put("POTTED_JUNGLE_SAPLING", "FLOWER_POT")
             .put("POTTED_LILY_OF_THE_VALLEY", "FLOWER_POT")
             .put("POTTED_MANGROVE_PROPAGULE", "FLOWER_POT")
