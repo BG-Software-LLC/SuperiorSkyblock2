@@ -854,12 +854,6 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public int getUnlockedWorldsFlag() {
-        return 0;
-    }
-
-    @Override
     public boolean hasPermission(CommandSender sender, IslandPrivilege islandPrivilege) {
         return sender instanceof ConsoleCommandSender || hasPermission(plugin.getPlayers().getSuperiorPlayer(sender), islandPrivilege);
     }
@@ -2061,12 +2055,6 @@ public class SpawnIsland implements Island {
     @Override
     public Collection<Dimension> getGeneratedSchematics() {
         return Collections.emptySet();
-    }
-
-    @Override
-    @Deprecated
-    public int getGeneratedSchematicsFlag() {
-        return 0;
     }
 
     @Override

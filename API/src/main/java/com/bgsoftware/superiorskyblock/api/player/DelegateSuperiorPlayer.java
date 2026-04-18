@@ -206,18 +206,6 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    @Deprecated
-    public void teleport(Island island, World.Environment environment) {
-        this.handle.teleport(island, environment);
-    }
-
-    @Override
-    @Deprecated
-    public void teleport(Island island, World.Environment environment, @Nullable Consumer<Boolean> teleportResult) {
-        this.handle.teleport(island, environment, teleportResult);
-    }
-
-    @Override
     public boolean isInsideIsland() {
         return this.handle.isInsideIsland();
     }

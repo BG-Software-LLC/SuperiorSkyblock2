@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
-import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -49,7 +48,7 @@ import java.util.Set;
 public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     private static final String[] IGNORED_SECTIONS = new String[]{
-            "config.yml", "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases",
+            "config.yml", "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "worlds.dimensions",
             "island-previews.locations", "default-values.block-limits", "default-values.entity-limits",
             "default-values.role-limits", "stacked-blocks.limits", "default-values.generator", "message-delays"
     };
@@ -711,7 +710,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         cfg.syncWithConfig(file, plugin.getResource("config.yml"), "config.yml",
-                "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "island-previews.locations");
+                "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "island-previews.locations", "worlds.dimensions");
 
         cfg.set(path, value);
 
@@ -743,6 +742,23 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     private void convertData(YamlConfiguration cfg) {
+        if (cfg.getConfigurationSection("worlds.dimensions") == null) {
+            cfg.set("worlds.dimensions.normal", cfg.getConfigurationSection("worlds.normal"));
+            cfg.set("worlds.dimensions.normal.environment", "NORMAL");
+            cfg.set("worlds.dimensions.normal.portals.NETHER", "nether");
+            cfg.set("worlds.dimensions.normal.portals.ENDER", "the_end");
+            cfg.set("worlds.normal", null);
+            cfg.set("worlds.dimensions.nether", cfg.getConfigurationSection("worlds.nether"));
+            cfg.set("worlds.dimensions.nether.environment", "NETHER");
+            cfg.set("worlds.dimensions.nether.portals.NETHER", "normal");
+            cfg.set("worlds.dimensions.nether.portals.ENDER", "the_end");
+            cfg.set("worlds.nether", null);
+            cfg.set("worlds.dimensions.the_end", cfg.getConfigurationSection("worlds.end"));
+            cfg.set("worlds.dimensions.the_end.environment", "THE_END");
+            cfg.set("worlds.dimensions.the_end.portals.NETHER", "nether");
+            cfg.set("worlds.dimensions.the_end.portals.ENDER", "normal");
+            cfg.set("worlds.end", null);
+        }
         if (cfg.get("island-level-formula") != null) {
             cfg.set("block-level-formula", cfg.getString("island-level-formula"));
             cfg.set("island-level-formula", null);

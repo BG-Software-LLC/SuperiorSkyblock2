@@ -46,7 +46,6 @@ import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.IslandWorldsPlayersStrategy;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
-import com.bgsoftware.superiorskyblock.core.LegacyMasks;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
@@ -104,7 +103,6 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import com.bgsoftware.superiorskyblock.world.GeneratorType;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
@@ -1454,32 +1452,32 @@ public class SIsland implements Island {
 
     @Override
     public boolean isNormalEnabled() {
-        return isDimensionEnabled(Dimensions.NORMAL);
+        return isDimensionEnabled(Dimension.getByName("NORMAL"));
     }
 
     @Override
     public void setNormalEnabled(boolean enabled) {
-        setDimensionEnabled(Dimensions.NORMAL, enabled);
+        setDimensionEnabled(Dimension.getByName("NORMAL"), enabled);
     }
 
     @Override
     public boolean isNetherEnabled() {
-        return isDimensionEnabled(Dimensions.NETHER);
+        return isDimensionEnabled(Dimension.getByName("NETHER"));
     }
 
     @Override
     public void setNetherEnabled(boolean enabled) {
-        setDimensionEnabled(Dimensions.NETHER, enabled);
+        setDimensionEnabled(Dimension.getByName("NETHER"), enabled);
     }
 
     @Override
     public boolean isEndEnabled() {
-        return isDimensionEnabled(Dimensions.THE_END);
+        return isDimensionEnabled(Dimension.getByName("THE_END"));
     }
 
     @Override
     public void setEndEnabled(boolean enabled) {
-        setDimensionEnabled(Dimensions.THE_END, enabled);
+        setDimensionEnabled(Dimension.getByName("THE_END"), enabled);
     }
 
     @Override
@@ -1504,12 +1502,6 @@ public class SIsland implements Island {
     public Set<Dimension> getUnlockedWorlds() {
         return Collections.unmodifiableSet(this.unlockedWorlds.readAndGet(unlockedWorlds ->
                 unlockedWorlds.collect(Dimension.values())));
-    }
-
-    @Override
-    @Deprecated
-    public int getUnlockedWorldsFlag() {
-        return this.unlockedWorlds.readAndGet(LegacyMasks::convertUnlockedWorldsMask);
     }
 
     /*
@@ -4441,12 +4433,6 @@ public class SIsland implements Island {
     public Set<Dimension> getGeneratedSchematics() {
         return Collections.unmodifiableSet(this.generatedSchematics.readAndGet(generatedSchematics ->
                 generatedSchematics.collect(Dimension.values())));
-    }
-
-    @Override
-    @Deprecated
-    public int getGeneratedSchematicsFlag() {
-        return this.generatedSchematics.readAndGet(LegacyMasks::convertGeneratedSchematicsMask);
     }
 
     @Override

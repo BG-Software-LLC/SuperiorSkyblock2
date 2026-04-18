@@ -37,6 +37,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class IslandsDeserializer {
 
@@ -310,6 +311,20 @@ public class IslandsDeserializer {
             BigInteger amount = new BigInteger(entityCountObject.get("amount").getAsString());
             builder.setEntityCount(entityKey, amount);
         });
+    }
+
+    public static void deserializeDimensionsList(String dimensions, Consumer<Dimension> consumer) {
+        if (Text.isBlank(dimensions))
+            return;
+
+        for (String dimensionName : dimensions.split(",")) {
+            try {
+                Dimension dimension = Dimension.getByName(dimensionName);
+                consumer.accept(dimension);
+            } catch (NullPointerException ignored) {
+
+            }
+        }
     }
 
     public static void deserializeBlockLimits(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {

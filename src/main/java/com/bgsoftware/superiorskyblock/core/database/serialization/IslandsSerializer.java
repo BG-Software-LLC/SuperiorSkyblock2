@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.database.serialization;
 
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.DirtyChunk;
 import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
@@ -11,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -73,6 +75,13 @@ public class IslandsSerializer {
         container.getDirtyChunks(dirtyChunk ->
                 serializeDirtyChunkPosition(dirtyChunksObject, dirtyChunk));
         return gson.toJson(dirtyChunksObject);
+    }
+
+    public static String serializeDimensions(Collection<Dimension> dimensions) {
+        StringBuilder serialized = new StringBuilder();
+        for (Dimension dimension : dimensions)
+            serialized.append(",").append(dimension.getName());
+        return serialized.length() == 0 ? serialized.toString() : serialized.substring(1);
     }
 
     private static void serializeDirtyChunkPosition(JsonObject dirtyChunksObject, ChunkPosition dirtyChunk) {

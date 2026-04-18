@@ -23,7 +23,6 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.service.IService;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
@@ -63,26 +62,32 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
 
     @Override
     public EntityPortalResult handlePlayerPortal(SuperiorPlayer superiorPlayer, Location portalLocation,
-                                                 PortalType portalType, Location unused,
+                                                 PortalType portalType, Location destinationLocation,
                                                  boolean checkImmunedPortalsStatus) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null.");
         Preconditions.checkNotNull(portalLocation, "portalLocation cannot be null.");
         Preconditions.checkNotNull(portalType, "portalType cannot be null.");
+        Preconditions.checkNotNull(destinationLocation, "destinationLocation cannot be null.");
         Preconditions.checkArgument(!(superiorPlayer instanceof SuperiorNPCPlayer), "superiorPlayer cannot be an NPC.");
         Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
+        Preconditions.checkArgument(destinationLocation.getWorld() != null, "destinationLocation's world cannot be null");
 
-        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, checkImmunedPortalsStatus, null);
+        Dimension destinationDimension = plugin.getGrid().getIslandsWorldDimension(destinationLocation.getWorld());
+        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, destinationDimension, checkImmunedPortalsStatus, null);
     }
 
     @Override
     public EntityPortalResult handleEntityPortal(Entity entity, Location portalLocation,
-                                                 PortalType portalType, Location unused) {
+                                                 PortalType portalType, Location destinationLocation) {
         Preconditions.checkNotNull(entity, "entity cannot be null.");
         Preconditions.checkNotNull(portalLocation, "portalLocation cannot be null.");
         Preconditions.checkNotNull(portalType, "portalType cannot be null.");
+        Preconditions.checkNotNull(destinationLocation, "destinationLocation cannot be null.");
         Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
+        Preconditions.checkArgument(destinationLocation.getWorld() != null, "destinationLocation's world cannot be null");
 
-        return handleEntityPortalInternal(entity, portalLocation, portalType, null);
+        Dimension destinationDimension = plugin.getGrid().getIslandsWorldDimension(destinationLocation.getWorld());
+        return handleEntityPortalInternal(entity, portalLocation, portalType, destinationDimension, null);
     }
 
     @Override
@@ -97,11 +102,33 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
         Preconditions.checkArgument(island.isInside(portalLocation), "portalLocation is not inside the island.");
 
-        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, checkImmunedPortalsStatus, island);
+        Dimension portalDimension = plugin.getGrid().getIslandsWorldDimension(portalLocation.getWorld());
+        Dimension destinationDimension = getDestinationDimension(portalDimension, portalType);
+        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, destinationDimension, checkImmunedPortalsStatus, island);
     }
 
     @Override
-    public EntityPortalResult handleEntityPortalFromIsland(Entity entity, Island island, Location portalLocation, PortalType portalType) {
+    public EntityPortalResult handlePlayerPortalFromIsland(SuperiorPlayer superiorPlayer, Island island,
+                                                           Location portalLocation, PortalType portalType,
+                                                           Location destinationLocation, boolean checkImmunedPortalsStatus) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null.");
+        Preconditions.checkNotNull(island, "island cannot be null.");
+        Preconditions.checkNotNull(portalLocation, "portalLocation cannot be null.");
+        Preconditions.checkNotNull(portalType, "portalType cannot be null.");
+        Preconditions.checkNotNull(destinationLocation, "destinationLocation cannot be null.");
+        Preconditions.checkArgument(!(superiorPlayer instanceof SuperiorNPCPlayer), "superiorPlayer cannot be an NPC.");
+        Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
+        Preconditions.checkArgument(island.isInside(portalLocation), "portalLocation is not inside the island.");
+        Preconditions.checkArgument(destinationLocation.getWorld() != null, "destinationLocation's world cannot be null");
+        Preconditions.checkArgument(island.isInside(destinationLocation), "destinationLocation is not inside the island.");
+
+        Dimension destinationDimension = plugin.getGrid().getIslandsWorldDimension(destinationLocation.getWorld());
+        return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, destinationDimension, checkImmunedPortalsStatus, island);
+    }
+
+    @Override
+    public EntityPortalResult handleEntityPortalFromIsland(Entity entity, Island island, Location portalLocation,
+                                                           PortalType portalType) {
         Preconditions.checkNotNull(entity, "entity cannot be null.");
         Preconditions.checkNotNull(island, "island cannot be null.");
         Preconditions.checkNotNull(portalLocation, "portalLocation cannot be null.");
@@ -110,12 +137,32 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
         Preconditions.checkArgument(island.isInside(portalLocation), "portalLocation is not inside the island.");
 
-        return handleEntityPortalInternal(entity, portalLocation, portalType, island);
+        Dimension portalDimension = plugin.getGrid().getIslandsWorldDimension(portalLocation.getWorld());
+        Dimension destinationDimension = getDestinationDimension(portalDimension, portalType);
+        return handleEntityPortalInternal(entity, portalLocation, portalType, destinationDimension, island);
+    }
+
+    @Override
+    public EntityPortalResult handleEntityPortalFromIsland(Entity entity, Island island, Location portalLocation,
+                                                           PortalType portalType, Location destinationLocation) {
+        Preconditions.checkNotNull(entity, "entity cannot be null.");
+        Preconditions.checkNotNull(island, "island cannot be null.");
+        Preconditions.checkNotNull(portalLocation, "portalLocation cannot be null.");
+        Preconditions.checkNotNull(portalType, "portalType cannot be null.");
+        Preconditions.checkNotNull(destinationLocation, "destinationLocation cannot be null.");
+        Preconditions.checkArgument(!(entity instanceof HumanEntity), "entity cannot be a Player.");
+        Preconditions.checkArgument(portalLocation.getWorld() != null, "portalLocation's world cannot be null");
+        Preconditions.checkArgument(island.isInside(portalLocation), "portalLocation is not inside the island.");
+        Preconditions.checkArgument(destinationLocation.getWorld() != null, "destinationLocation's world cannot be null");
+        Preconditions.checkArgument(island.isInside(destinationLocation), "destinationLocation is not inside the island.");
+
+        Dimension destinationDimension = plugin.getGrid().getIslandsWorldDimension(destinationLocation.getWorld());
+        return handleEntityPortalInternal(entity, portalLocation, portalType, destinationDimension, island);
     }
 
     private EntityPortalResult handlePlayerPortalInternal(SuperiorPlayer superiorPlayer, Location portalLocation,
-                                                          PortalType portalType, boolean checkImmunedPortalsStatus,
-                                                          @Nullable Island island) {
+                                                          PortalType portalType, Dimension destinationDimension,
+                                                          boolean checkImmunedPortalsStatus, @Nullable Island island) {
         if (island == null) {
             island = plugin.getGrid().getIslandAt(portalLocation);
 
@@ -127,21 +174,19 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
             return EntityPortalResult.PLAYER_IMMUNED_TO_PORTAL;
 
         EntityPortalResult portalResult = simulateEntityPortalFromIsland(superiorPlayer.asPlayer(), island,
-                portalLocation, portalType);
+                portalType, destinationDimension);
 
         if (portalResult == EntityPortalResult.WORLD_NOT_UNLOCKED) {
-            Dimension originalDestination = getTargetWorld(portalLocation, portalType);
-            Message.WORLD_NOT_UNLOCKED.send(superiorPlayer, Formatters.CAPITALIZED_FORMATTER.format(originalDestination.getName()));
+            Message.WORLD_NOT_UNLOCKED.send(superiorPlayer, Formatters.CAPITALIZED_FORMATTER.format(destinationDimension.getName()));
         } else if (portalResult == EntityPortalResult.DESTINATION_WORLD_DISABLED) {
-            Dimension originalDestination = getTargetWorld(portalLocation, portalType);
-            Message.WORLD_NOT_ENABLED.send(superiorPlayer, Formatters.CAPITALIZED_FORMATTER.format(originalDestination.getName()));
+            Message.WORLD_NOT_ENABLED.send(superiorPlayer, Formatters.CAPITALIZED_FORMATTER.format(destinationDimension.getName()));
         }
 
         return portalResult;
     }
 
-    private EntityPortalResult handleEntityPortalInternal(Entity entity, Location portalLocation,
-                                                          PortalType portalType, @Nullable Island island) {
+    private EntityPortalResult handleEntityPortalInternal(Entity entity, Location portalLocation, PortalType portalType,
+                                                          Dimension destinationDimension, @Nullable Island island) {
         if (island == null) {
             island = plugin.getGrid().getIslandAt(portalLocation);
 
@@ -149,23 +194,24 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                 return EntityPortalResult.PORTAL_NOT_IN_ISLAND;
         }
 
-        return simulateEntityPortalFromIsland(entity, island, portalLocation, portalType);
+        return simulateEntityPortalFromIsland(entity, island, portalType, destinationDimension);
     }
 
-    private EntityPortalResult simulateEntityPortalFromIsland(Entity entity, Island island, Location portalLocation,
-                                                              PortalType portalType) {
-        Dimension originalDestination = getTargetWorld(portalLocation, portalType);
-
-        SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(originalDestination);
-        if (dimensionConfig != null && !dimensionConfig.isEnabled()) {
-            return EntityPortalResult.DESTINATION_WORLD_DISABLED;
+    private EntityPortalResult simulateEntityPortalFromIsland(Entity entity, Island island, PortalType portalType,
+                                                              Dimension portalDestination) {
+        {
+            SettingsManager.Worlds.DimensionConfig destinationConfig = portalDestination == null ? null :
+                    plugin.getSettings().getWorlds().getDimensionConfig(portalDestination);
+            if (portalDestination == null || destinationConfig == null || !destinationConfig.isEnabled()) {
+                return EntityPortalResult.DESTINATION_WORLD_DISABLED;
+            }
         }
 
-        if (plugin.getGrid().getIslandsWorld(island, originalDestination) == null) {
+        if (plugin.getGrid().getIslandsWorld(island, portalDestination) == null) {
             return EntityPortalResult.DESTINATION_NOT_ISLAND_WORLD;
         }
 
-        if (!island.isDimensionEnabled(originalDestination)) {
+        if (!island.isDimensionEnabled(portalDestination)) {
             return EntityPortalResult.WORLD_NOT_UNLOCKED;
         }
 
@@ -174,14 +220,14 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
             if (generatingSchematicsIslands.contains(island.getUniqueId()))
                 return EntityPortalResult.SCHEMATIC_GENERATING_COOLDOWN;
 
-            String destinationEnvironmentName = originalDestination.getName().toLowerCase(Locale.ENGLISH);
+            String destinationDimensionName = portalDestination.getName().toLowerCase(Locale.ENGLISH);
             String islandSchematic = island.getSchematicName();
 
             Schematic originalSchematic = plugin.getSchematics().getSchematic(islandSchematic.isEmpty() ?
-                    plugin.getSchematics().getDefaultSchematic(originalDestination) :
-                    islandSchematic + "_" + destinationEnvironmentName);
+                    plugin.getSchematics().getDefaultSchematic(portalDestination) :
+                    islandSchematic + "_" + destinationDimensionName);
 
-            boolean schematicGenerated = island.wasSchematicGenerated(originalDestination);
+            boolean schematicGenerated = island.wasSchematicGenerated(portalDestination);
             SuperiorPlayer superiorPlayer = entity instanceof Player ? plugin.getPlayers().getSuperiorPlayer(entity) : null;
 
             Dimension destination;
@@ -190,7 +236,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
 
             if (superiorPlayer != null) {
                 PluginEvent<PluginEventArgs.IslandEnterPortal> event = PluginEventsFactory.callIslandEnterPortalEvent(
-                        island, superiorPlayer, portalType, originalDestination, schematicGenerated ? null : originalSchematic,
+                        island, superiorPlayer, portalType, portalDestination, schematicGenerated ? null : originalSchematic,
                         schematicGenerated);
 
                 if (event.isCancelled())
@@ -200,15 +246,15 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                 schematic = event.getArgs().schematic;
                 ignoreInvalidSchematic = event.getArgs().ignoreInvalidSchematic;
             } else {
-                destination = originalDestination;
+                destination = portalDestination;
                 schematic = schematicGenerated ? null : originalSchematic;
                 ignoreInvalidSchematic = schematicGenerated;
             }
 
             if (schematic == null && !ignoreInvalidSchematic) {
                 if (superiorPlayer != null) {
-                    String schematicName = islandSchematic + "_" + destinationEnvironmentName;
-                    Message.SCHEMATIC_NOT_ADDED.send(superiorPlayer, destinationEnvironmentName, schematicName);
+                    String schematicName = islandSchematic + "_" + destinationDimensionName;
+                    Message.SCHEMATIC_NOT_ADDED.send(superiorPlayer, destinationDimensionName, schematicName);
                 }
                 return EntityPortalResult.INVALID_SCHEMATIC;
             }
@@ -291,23 +337,10 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         return EntityPortalResult.SUCCEED;
     }
 
-    private static Dimension getTargetWorld(Location portalLocation, PortalType portalType) {
-        World.Environment portalEnvironment = portalLocation.getWorld().getEnvironment();
-        World.Environment environment;
-
-        switch (portalType) {
-            case ENDER:
-                environment = World.Environment.THE_END;
-                break;
-            case NETHER:
-                environment = World.Environment.NETHER;
-                break;
-            default:
-                environment = World.Environment.NORMAL;
-                break;
-        }
-
-        return environment == portalEnvironment ? Dimensions.NORMAL : Dimensions.fromEnvironment(environment);
+    private Dimension getDestinationDimension(Dimension dimension, PortalType portalType) {
+        SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(dimension);
+        Dimension destination = dimensionConfig == null ? null : dimensionConfig.getPortalDestination(portalType);
+        return destination == null ? plugin.getSettings().getWorlds().getDefaultWorldDimension() : destination;
     }
 
 }
