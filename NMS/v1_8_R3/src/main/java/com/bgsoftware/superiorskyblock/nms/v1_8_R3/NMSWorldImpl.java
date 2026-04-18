@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.island.signs.IslandSigns;
@@ -67,8 +68,16 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        try {
+            return getBlockKeyInternal(chunkSnapshot, x, y, z);
+        } catch (ArrayIndexOutOfBoundsException error) {
+            return ConstantKeys.AIR;
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private Key getBlockKeyInternal(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
         int blockId = chunkSnapshot.getBlockTypeId(x, y, z);
         int blockData = chunkSnapshot.getBlockData(x, y, z);
         int combinedId = blockId + (blockData << 12);
@@ -81,6 +90,23 @@ public class NMSWorldImpl implements NMSWorld {
         );
 
         return Keys.of(KeyBlocksCache.getBlockKey(Block.getByCombinedId(combinedId)), location);
+    }
+
+    @Override
+    public boolean canPlayerSuffocate(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        try {
+            return canPlayerSuffocateInternal(chunkSnapshot, x, y, z);
+        } catch (ArrayIndexOutOfBoundsException error) {
+            return true;
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private boolean canPlayerSuffocateInternal(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        int blockId = chunkSnapshot.getBlockTypeId(x, y, z);
+        int blockData = chunkSnapshot.getBlockData(x, y, z);
+        int combinedId = blockId + (blockData << 12);
+        return Block.getByCombinedId(combinedId).getBlock().w();
     }
 
     @Override

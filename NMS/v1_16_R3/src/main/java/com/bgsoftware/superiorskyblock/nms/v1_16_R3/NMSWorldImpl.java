@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.island.signs.IslandSigns;
@@ -29,6 +30,7 @@ import com.bgsoftware.superiorskyblock.world.SignType;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.destroystokyo.paper.antixray.ChunkPacketBlockController;
 import net.minecraft.server.v1_16_R3.Block;
+import net.minecraft.server.v1_16_R3.BlockAccessAir;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.BlockPropertySlabType;
 import net.minecraft.server.v1_16_R3.BlockStepAbstract;
@@ -79,7 +81,16 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        try {
+            return getBlockKeyInternal(chunkSnapshot, x, y, z);
+        } catch (ArrayIndexOutOfBoundsException error) {
+            return ConstantKeys.AIR;
+        }
+    }
+
+    private Key getBlockKeyInternal(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
         Block block = ((CraftBlockData) chunkSnapshot.getBlockData(x, y, z)).getState().getBlock();
+
         Location location = new Location(
                 Bukkit.getWorld(chunkSnapshot.getWorldName()),
                 (chunkSnapshot.getX() << 4) + x,
@@ -88,6 +99,20 @@ public class NMSWorldImpl implements NMSWorld {
         );
 
         return Keys.of(KeyBlocksCache.getBlockKey(block), location);
+    }
+
+    @Override
+    public boolean canPlayerSuffocate(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        try {
+            return canPlayerSuffocateInternal(chunkSnapshot, x, y, z);
+        } catch (ArrayIndexOutOfBoundsException error) {
+            return true;
+        }
+    }
+
+    private boolean canPlayerSuffocateInternal(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        IBlockData blockData = ((CraftBlockData) chunkSnapshot.getBlockData(x, y, z)).getState();
+        return !blockData.getCollisionShape(BlockAccessAir.INSTANCE, BlockPosition.ZERO).isEmpty();
     }
 
     @Override
