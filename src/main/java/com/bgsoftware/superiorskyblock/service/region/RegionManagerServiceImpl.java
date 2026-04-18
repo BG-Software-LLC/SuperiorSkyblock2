@@ -211,7 +211,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             } else if (action == Action.PHYSICAL && blockType == TURTLE_EGG) {
                 islandPrivilege = IslandPrivileges.BUILD;
             } else if (blockType == SWEET_BERRY_BUSH && action == Action.RIGHT_CLICK_BLOCK &&
-                    Materials.BONE_MEAL.toBukkitItem().isSimilar(usedItem)) {
+                    Materials.BONE_MEAL.toBukkitItem().isSimilar(usedItem) &&
+                    ((org.bukkit.block.data.Ageable) plugin.getNMSWorld().getBlockData(block)).getAge() < 3) {
                 islandPrivilege = IslandPrivileges.FERTILIZE;
             } else if (stackedBlockAmount > 1) {
                 islandPrivilege = IslandPrivileges.BREAK;
