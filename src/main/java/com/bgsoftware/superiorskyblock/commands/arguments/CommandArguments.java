@@ -315,12 +315,10 @@ public class CommandArguments {
         return islandWarp;
     }
 
-    public static Biome getBiome(CommandSender sender, String argument) {
-        Biome biome = null;
+    public static Biome getBiome(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
+        Biome biome = plugin.getNMSAlgorithms().getBiome(argument);
 
-        try {
-            biome = Biome.valueOf(argument.toUpperCase(Locale.ENGLISH));
-        } catch (Exception ex) {
+        if (biome == null) {
             Message.INVALID_BIOME.send(sender, argument);
         }
 

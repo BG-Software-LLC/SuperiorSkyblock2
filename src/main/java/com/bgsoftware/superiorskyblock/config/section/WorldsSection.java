@@ -16,7 +16,6 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.Locale;
 import java.util.Map;
 
 public class WorldsSection extends SettingsContainerHolder implements SettingsManager.Worlds {
@@ -85,7 +84,7 @@ public class WorldsSection extends SettingsContainerHolder implements SettingsMa
             this.isEnabled = section.getBoolean("enabled");
             this.isUnlocked = section.getBoolean("unlock");
             this.isSchematicOffset = section.getBoolean("schematic-offset");
-            this.biome = section.getString("biome").toUpperCase(Locale.ENGLISH);
+            this.biome = section.getString("biome");
             String name = section.getString("name");
             this.name = Text.isBlank(name) ? defaultName : name;
             this.portalAgents = loadPortalAgents(section.getConfigurationSection("portals"), dimension);

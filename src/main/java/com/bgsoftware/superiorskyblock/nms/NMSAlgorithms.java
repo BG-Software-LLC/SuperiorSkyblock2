@@ -82,6 +82,8 @@ public interface NMSAlgorithms {
 
     int getDataVersion();
 
+    Biome getBiome(String biomeName);
+
     default ClassProcessor getClassProcessor() {
         return null;
     }

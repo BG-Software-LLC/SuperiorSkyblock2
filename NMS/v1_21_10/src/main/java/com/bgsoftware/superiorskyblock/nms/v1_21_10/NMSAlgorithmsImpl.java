@@ -12,6 +12,8 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
+import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.inventory.ItemRarity;
@@ -24,7 +26,6 @@ import org.bukkit.inventory.meta.trim.TrimPattern;
 
 import java.lang.reflect.Modifier;
 import java.util.Locale;
-import java.util.Objects;
 
 public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_10.AbstractNMSAlgorithms {
 
@@ -54,8 +55,15 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_21
     @Override
     public void setTrim(ItemMeta itemMeta, String trimMaterial, String trimPattern) {
         if (itemMeta instanceof ArmorMeta armorMeta) {
-            TrimMaterial material = Objects.requireNonNull(Bukkit.getRegistry(TrimMaterial.class)).get(NamespacedKey.minecraft(trimMaterial));
-            TrimPattern pattern = Objects.requireNonNull(Bukkit.getRegistry(TrimPattern.class)).get(NamespacedKey.minecraft(trimPattern));
+            Registry<TrimMaterial> materialRegistry = Bukkit.getRegistry(TrimMaterial.class);
+            Registry<TrimPattern> patternRegistry = Bukkit.getRegistry(TrimPattern.class);
+
+            if (materialRegistry == null || patternRegistry == null) {
+                return;
+            }
+
+            TrimMaterial material = materialRegistry.get(NamespacedKey.minecraft(trimMaterial));
+            TrimPattern pattern = patternRegistry.get(NamespacedKey.minecraft(trimPattern));
 
             if (material == null)
                 throw new IllegalArgumentException("Couldn't convert " + trimMaterial.toUpperCase(Locale.ENGLISH) +
@@ -82,6 +90,26 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_21
     @Override
     public double getCurrentTps() {
         return (SERVER_RECENT_TPS.isValid() ? SERVER_RECENT_TPS.get(MinecraftServer.getServer()) : Bukkit.getTPS())[0];
+    }
+
+    @Override
+    public Biome getBiome(String biomeName) {
+        biomeName = biomeName.toLowerCase(Locale.ENGLISH);
+        if (!biomeName.contains(":")) {
+            biomeName = "minecraft:" + biomeName;
+        }
+
+        NamespacedKey key = NamespacedKey.fromString(biomeName);
+        if (key == null) {
+            return null;
+        }
+
+        Registry<Biome> registry = Bukkit.getRegistry(Biome.class);
+        if (registry == null) {
+            return null;
+        }
+
+        return registry.get(key);
     }
 
 }
