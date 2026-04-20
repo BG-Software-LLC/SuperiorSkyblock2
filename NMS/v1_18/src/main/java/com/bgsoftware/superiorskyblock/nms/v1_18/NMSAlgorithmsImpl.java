@@ -53,7 +53,6 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_18
         }
     }
 
-
     private static Enchantment initializeGlowEnchantment() {
         Enchantment glowEnchant;
 

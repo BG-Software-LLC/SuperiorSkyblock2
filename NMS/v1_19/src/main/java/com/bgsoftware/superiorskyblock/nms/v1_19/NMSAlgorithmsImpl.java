@@ -49,12 +49,10 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_19
 
     @Override
     public Biome getBiome(String biomeName) {
-        biomeName = biomeName.toLowerCase(Locale.ENGLISH);
-        if (!biomeName.contains(":")) {
-            biomeName = "minecraft:" + biomeName;
-        }
+        String normalized = biomeName.toLowerCase(Locale.ENGLISH);
 
-        NamespacedKey key = NamespacedKey.fromString(biomeName);
+        NamespacedKey key = biomeName.contains(":") ? NamespacedKey.fromString(normalized) :
+                NamespacedKey.minecraft(normalized);
         if (key == null) {
             return null;
         }
