@@ -77,7 +77,7 @@ public class CmdAdminAdd implements IAdminIslandCommand {
         if (!PluginEventsFactory.callIslandJoinEvent(island, targetPlayer, IslandJoinEvent.Cause.ADMIN))
             return;
 
-        IslandUtils.sendMessage(island, Message.JOIN_ANNOUNCEMENT, Collections.emptyList(), targetPlayer.getName());
+        IslandUtils.sendMessageToMembers(island, Message.JOIN_ANNOUNCEMENT, Collections.emptyList(), targetPlayer.getName());
 
         island.addMember(targetPlayer, SPlayerRole.defaultRole());
 

@@ -22,7 +22,7 @@ public class IslandNotifications {
         if (island == null)
             return;
 
-        IslandUtils.sendMessage(island, Message.PLAYER_QUIT_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
+        IslandUtils.sendMessageToMembers(island, Message.PLAYER_QUIT_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
 
         boolean anyOnline = island.getIslandMembers(true).stream().anyMatch(islandMember ->
                 islandMember != superiorPlayer && islandMember.isOnline());
@@ -40,7 +40,7 @@ public class IslandNotifications {
         if (island == null)
             return;
 
-        IslandUtils.sendMessage(island, Message.PLAYER_JOIN_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
+        IslandUtils.sendMessageToMembers(island, Message.PLAYER_JOIN_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
         island.updateLastTime();
         island.setCurrentlyActive(true);
 

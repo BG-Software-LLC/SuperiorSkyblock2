@@ -444,6 +444,23 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     void setBlocksStacker(boolean enabled);
 
     /**
+     * Check whether the local chat is enabled for the player.
+     */
+    boolean hasLocalChatEnabled();
+
+    /**
+     * Toggle the local chat for the player.
+     */
+    void toggleLocalChat();
+
+    /**
+     * Set whether the local chat is enabled for the player.
+     *
+     * @param enabled true to enable local chat.
+     */
+    void setLocalChat(boolean enabled);
+
+    /**
      * Check whether the schematic mode is enabled for the player.
      */
     boolean hasSchematicModeEnabled();
@@ -471,9 +488,9 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     void toggleTeamChat();
 
     /**
-     * Set whether the schematic mode is enabled for the player.
+     * Set whether the team chat is enabled for the player.
      *
-     * @param enabled true to enable schematic mode.
+     * @param enabled true to enable team chat;
      */
     void setTeamChat(boolean enabled);
 

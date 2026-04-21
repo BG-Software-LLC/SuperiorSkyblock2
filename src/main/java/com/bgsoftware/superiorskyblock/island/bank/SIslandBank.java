@@ -112,7 +112,7 @@ public class SIslandBank implements IslandBank {
 
             addTransaction(bankTransaction, true);
 
-            IslandUtils.sendMessage(island, Message.DEPOSIT_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(),
+            IslandUtils.sendMessageToMembers(island, Message.DEPOSIT_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(),
                     Formatters.NUMBER_FORMATTER.format(amount));
 
             plugin.getMenus().refreshBankLogs(island);
@@ -217,7 +217,7 @@ public class SIslandBank implements IslandBank {
 
             addTransaction(bankTransaction, true);
 
-            IslandUtils.sendMessage(island, Message.WITHDRAW_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(),
+            IslandUtils.sendMessageToMembers(island, Message.WITHDRAW_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(),
                     Formatters.NUMBER_FORMATTER.format(withdrawAmount));
 
             plugin.getMenus().refreshBankLogs(island);

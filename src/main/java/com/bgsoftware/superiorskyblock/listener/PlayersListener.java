@@ -188,7 +188,7 @@ public class PlayersListener extends AbstractGameEventListener {
         for (Island coopIsland : superiorPlayer.getCoopIslands()) {
             if (PluginEventsFactory.callIslandUncoopPlayerEvent(coopIsland, null, superiorPlayer, IslandUncoopPlayerEvent.UncoopReason.SERVER_LEAVE)) {
                 coopIsland.removeCoop(superiorPlayer);
-                IslandUtils.sendMessage(coopIsland, Message.UNCOOP_LEFT_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
+                IslandUtils.sendMessageToMembers(coopIsland, Message.UNCOOP_LEFT_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
             }
         }
 
@@ -395,9 +395,27 @@ public class PlayersListener extends AbstractGameEventListener {
 
     private void onPlayerChat(GameEvent<GameEventArgs.PlayerChatEvent> e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
-        Island island = superiorPlayer.getIsland();
 
-        if (superiorPlayer.hasTeamChatEnabled()) {
+        if (superiorPlayer.hasLocalChatEnabled()) {
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt((e.getArgs().player).getLocation(wrapper.getHandle()));
+            }
+
+            if (island == null || island.isSpawn()) {
+                if (!PluginEventsFactory.callPlayerToggleLocalChatEvent(superiorPlayer))
+                    return;
+
+                superiorPlayer.toggleLocalChat();
+                return;
+            }
+
+            e.setCancelled();
+
+            IslandUtils.handleIslandLocalChat(island, superiorPlayer, e.getArgs().message);
+        } else if (superiorPlayer.hasTeamChatEnabled()) {
+            Island island = superiorPlayer.getIsland();
+
             if (island == null) {
                 if (!PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
                     return;
@@ -408,11 +426,10 @@ public class PlayersListener extends AbstractGameEventListener {
 
             e.setCancelled();
 
-            String message = e.getArgs().message;
-
-            IslandUtils.handleIslandChat(island, superiorPlayer, message);
+            IslandUtils.handleIslandTeamChat(island, superiorPlayer, e.getArgs().message);
         } else if (e.getArgs().format != null) {
-            e.getArgs().format = Formatters.CHAT_FORMATTER.format(new ChatFormatter.ChatFormatArgs(e.getArgs().format, superiorPlayer, island));
+            e.getArgs().format = Formatters.CHAT_FORMATTER.format(
+                    new ChatFormatter.ChatFormatArgs(e.getArgs().format, superiorPlayer, superiorPlayer.getIsland()));
         }
     }
 

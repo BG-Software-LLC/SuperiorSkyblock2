@@ -4740,7 +4740,7 @@ public class SIsland implements Island {
             if (success) {
                 Message.TELEPORTED_TO_WARP.send(superiorPlayer);
                 if (superiorPlayer.isShownAsOnline()) {
-                    IslandUtils.sendMessage(this, Message.TELEPORTED_TO_WARP_ANNOUNCEMENT,
+                    IslandUtils.sendMessageToMembers(this, Message.TELEPORTED_TO_WARP_ANNOUNCEMENT,
                             Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName(), islandWarp.getName());
                 }
             }

@@ -89,7 +89,7 @@ public class CmdAdminSetLeader implements IAdminPlayerCommand {
 
         if (island.transferIsland(newLeader)) {
             Message.TRANSFER_ADMIN.send(sender, leader.getName(), newLeader.getName());
-            IslandUtils.sendMessage(island, Message.TRANSFER_BROADCAST, Collections.emptyList(), newLeader.getName());
+            IslandUtils.sendMessageToMembers(island, Message.TRANSFER_BROADCAST, Collections.emptyList(), newLeader.getName());
         }
     }
 

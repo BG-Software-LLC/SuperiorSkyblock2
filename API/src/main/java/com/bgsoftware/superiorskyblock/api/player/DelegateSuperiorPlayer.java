@@ -338,6 +338,21 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public boolean hasLocalChatEnabled() {
+        return this.handle.hasLocalChatEnabled();
+    }
+
+    @Override
+    public void toggleLocalChat() {
+        this.handle.toggleLocalChat();
+    }
+
+    @Override
+    public void setLocalChat(boolean enabled) {
+        this.handle.setLocalChat(enabled);
+    }
+
+    @Override
     public boolean hasSchematicModeEnabled() {
         return this.handle.hasSchematicModeEnabled();
     }

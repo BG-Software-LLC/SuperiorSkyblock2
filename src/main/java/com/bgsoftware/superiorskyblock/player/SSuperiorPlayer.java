@@ -50,15 +50,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.ref.WeakReference;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -98,6 +90,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private boolean blocksStackerEnabled = plugin.getSettings().isDefaultStackedBlocks();
     private boolean schematicModeEnabled = false;
     private boolean bypassModeEnabled = false;
+    private boolean localChatEnabled = false;
     private boolean teamChatEnabled = false;
     private boolean toggledPanel;
     private boolean islandFly;
@@ -701,6 +694,22 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void setBlocksStacker(boolean enabled) {
         Log.debug(Debug.SET_TOGGLED_STACKER, getName(), enabled);
         blocksStackerEnabled = enabled;
+    }
+
+    @Override
+    public boolean hasLocalChatEnabled() {
+        return localChatEnabled;
+    }
+
+    @Override
+    public void toggleLocalChat() {
+        setLocalChat(!localChatEnabled);
+    }
+
+    @Override
+    public void setLocalChat(boolean enabled) {
+        Log.debug(Debug.SET_LOCAL_CHAT, getName(), enabled);
+        localChatEnabled = enabled;
     }
 
     @Override

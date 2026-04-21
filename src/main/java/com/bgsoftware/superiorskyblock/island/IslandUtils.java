@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.SynchronizedTasks;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import org.bukkit.Bukkit;
@@ -180,16 +181,33 @@ public class IslandUtils {
         });
     }
 
-    public static void sendMessage(Island island, Message message, List<UUID> ignoredMembers, Object... args) {
+    public static void sendMessageToMembers(Island island, Message message, List<UUID> ignoredMembers, Object... args) {
         for (SuperiorPlayer islandMember : island.getIslandMembers(true)) {
             if (!ignoredMembers.contains(islandMember.getUniqueId()))
                 message.send(islandMember, args);
         }
     }
 
+    public static void sendMessageToAllPlayersInside(Island island, Message message, List<UUID> ignoredPlayers, Object... args) {
+        for (SuperiorPlayer superiorPlayer : island.getAllPlayersInside()) {
+            if (!ignoredPlayers.contains(superiorPlayer.getUniqueId()))
+                message.send(superiorPlayer, args);
+        }
+    }
+
     public static double getGeneratorPercentageDecimal(Island island, Key key, Dimension dimension) {
         int totalAmount = island.getGeneratorTotalAmount(dimension);
         return totalAmount == 0 ? 0 : (island.getGeneratorAmount(key, dimension) * 100D) / totalAmount;
+    }
+
+    public static PlayerRole getPlayerRole(Island island, SuperiorPlayer superiorPlayer) {
+        if (island.isMember(superiorPlayer)) {
+            return superiorPlayer.getPlayerRole();
+        } else if (island.isCoop(superiorPlayer)) {
+            return SPlayerRole.coopRole();
+        } else {
+            return SPlayerRole.guestRole();
+        }
     }
 
     public static boolean checkTransferRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
@@ -217,7 +235,7 @@ public class IslandUtils {
 
         island.transferIsland(target);
 
-        IslandUtils.sendMessage(island, Message.TRANSFER_BROADCAST, Collections.emptyList(), target.getName());
+        IslandUtils.sendMessageToMembers(island, Message.TRANSFER_BROADCAST, Collections.emptyList(), target.getName());
     }
 
     public static boolean checkKickRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
@@ -240,7 +258,7 @@ public class IslandUtils {
 
         island.removeMember(superiorPlayer, MemberRemoveReason.LEAVE);
 
-        IslandUtils.sendMessage(island, Message.LEAVE_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
+        IslandUtils.sendMessageToMembers(island, Message.LEAVE_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
 
         Message.LEFT_ISLAND.send(superiorPlayer);
     }
@@ -255,7 +273,7 @@ public class IslandUtils {
 
         island.removeMember(target, MemberRemoveReason.KICK);
 
-        IslandUtils.sendMessage(island, Message.KICK_ANNOUNCEMENT, Collections.emptyList(), target.getName(), callerName);
+        IslandUtils.sendMessageToMembers(island, Message.KICK_ANNOUNCEMENT, Collections.emptyList(), target.getName(), callerName);
 
         Message.GOT_KICKED.send(target, callerName);
     }
@@ -282,7 +300,7 @@ public class IslandUtils {
 
         island.banMember(target, caller);
 
-        IslandUtils.sendMessage(island, Message.BAN_ANNOUNCEMENT, Collections.emptyList(), target.getName(), caller.getName());
+        IslandUtils.sendMessageToMembers(island, Message.BAN_ANNOUNCEMENT, Collections.emptyList(), target.getName(), caller.getName());
 
         Message.GOT_BANNED.send(target, island.getOwner().getName());
     }
@@ -340,14 +358,14 @@ public class IslandUtils {
         return new SequentialListBuilder<Biome>().build(DEFAULT_WORLD_BIOMES.values());
     }
 
-    public static void handleIslandChat(Island island, SuperiorPlayer superiorPlayer, String message) {
-        PluginEvent<PluginEventArgs.IslandChat> event = PluginEventsFactory.callIslandChatEvent(island, superiorPlayer,
+    public static void handleIslandTeamChat(Island island, SuperiorPlayer superiorPlayer, String message) {
+        PluginEvent<PluginEventArgs.IslandTeamChat> event = PluginEventsFactory.callIslandTeamChatEvent(island, superiorPlayer,
                 superiorPlayer.hasPermissionWithoutOP("superior.chat.color") ? Formatters.COLOR_FORMATTER.format(message) : message);
 
         if (event.isCancelled())
             return;
 
-        IslandUtils.sendMessage(island, Message.TEAM_CHAT_FORMAT, Collections.emptyList(),
+        IslandUtils.sendMessageToMembers(island, Message.TEAM_CHAT_FORMAT, Collections.emptyList(),
                 superiorPlayer.getPlayerRole(), superiorPlayer.getName(), event.getArgs().message);
 
         Message.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole().getDisplayName(),
@@ -357,6 +375,27 @@ public class IslandUtils {
             SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(_onlinePlayer);
             if (onlinePlayer.hasAdminSpyEnabled())
                 Message.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole().getDisplayName(),
+                        superiorPlayer.getName(), event.getArgs().message);
+        }
+    }
+
+    public static void handleIslandLocalChat(Island island, SuperiorPlayer superiorPlayer, String message) {
+        PluginEvent<PluginEventArgs.IslandLocalChat> event = PluginEventsFactory.callIslandLocalChatEvent(island, superiorPlayer,
+                superiorPlayer.hasPermissionWithoutOP("superior.chat.color") ? Formatters.COLOR_FORMATTER.format(message) : message);
+
+        if (event.isCancelled())
+            return;
+
+        IslandUtils.sendMessageToAllPlayersInside(island, Message.LOCAL_CHAT_FORMAT, Collections.emptyList(),
+                getPlayerRole(island, superiorPlayer), superiorPlayer.getName(), event.getArgs().message);
+
+        Message.SPY_LOCAL_CHAT_FORMAT.send(Bukkit.getConsoleSender(), getPlayerRole(island, superiorPlayer).getDisplayName(),
+                superiorPlayer.getName(), event.getArgs().message);
+
+        for (Player _onlinePlayer : Bukkit.getOnlinePlayers()) {
+            SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(_onlinePlayer);
+            if (onlinePlayer.hasAdminSpyEnabled())
+                Message.SPY_LOCAL_CHAT_FORMAT.send(onlinePlayer, getPlayerRole(island, superiorPlayer).getDisplayName(),
                         superiorPlayer.getName(), event.getArgs().message);
         }
     }

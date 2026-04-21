@@ -6,12 +6,9 @@ import com.google.common.base.Preconditions;
 import org.bukkit.event.Cancellable;
 
 /**
- * IslandChatEvent is called when a player talks in island team chat.
- * @deprecated This event has been renamed to {@link IslandTeamChatEvent}
- * and will be removed in the future.
+ * IslandLocalChatEvent is called when a player talks in island local chat.
  */
-@Deprecated
-public class IslandChatEvent extends IslandEvent implements Cancellable {
+public class IslandLocalChatEvent extends IslandEvent implements Cancellable {
 
     private final SuperiorPlayer superiorPlayer;
     private String message;
@@ -20,11 +17,11 @@ public class IslandChatEvent extends IslandEvent implements Cancellable {
     /**
      * The constructor of the event.
      *
-     * @param island         The island of the player who sent the message.
+     * @param island         The island from which the message was sent.
      * @param superiorPlayer The player who sent the message.
      * @param message        The message that was sent.
      */
-    public IslandChatEvent(Island island, SuperiorPlayer superiorPlayer, String message) {
+    public IslandLocalChatEvent(Island island, SuperiorPlayer superiorPlayer, String message) {
         super(island);
         this.superiorPlayer = superiorPlayer;
         this.message = message;

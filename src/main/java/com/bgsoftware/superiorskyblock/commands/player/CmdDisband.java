@@ -75,7 +75,7 @@ public class CmdDisband implements IPermissibleCommand {
         if (plugin.getSettings().isDisbandConfirm()) {
             plugin.getMenus().openConfirmDisband(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
         } else if (PluginEventsFactory.callIslandDisbandEvent(island, superiorPlayer)) {
-            IslandUtils.sendMessage(island, Message.DISBAND_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
+            IslandUtils.sendMessageToMembers(island, Message.DISBAND_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
 
             Message.DISBANDED_ISLAND.send(superiorPlayer);
 

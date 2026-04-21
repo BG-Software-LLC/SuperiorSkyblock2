@@ -426,14 +426,6 @@ public class PluginEventsFactory {
         return !fireEvent(ISLAND_CHANGE_ROLE_PRIVILEGE_EVENT, islandChangeRolePrivilege).isCancelled();
     }
 
-    public static PluginEvent<IslandChat> callIslandChatEvent(Island island, SuperiorPlayer superiorPlayer, String message) {
-        IslandChat islandChat = new IslandChat();
-        islandChat.island = island;
-        islandChat.superiorPlayer = superiorPlayer;
-        islandChat.message = message;
-        return fireEvent(ISLAND_CHAT_EVENT, islandChat);
-    }
-
     public static void callIslandChunkResetEvent(Island island, ChunkPosition chunkPosition) {
         IslandChunkReset islandChunkReset = new IslandChunkReset();
         islandChunkReset.island = island;
@@ -688,6 +680,14 @@ public class PluginEventsFactory {
         return !fireEvent(ISLAND_LEAVE_PROTECTED_EVENT, islandLeaveProtected).isCancelled();
     }
 
+    public static PluginEvent<IslandLocalChat> callIslandLocalChatEvent(Island island, SuperiorPlayer superiorPlayer, String message) {
+        IslandLocalChat islandLocalChat = new IslandLocalChat();
+        islandLocalChat.island = island;
+        islandLocalChat.superiorPlayer = superiorPlayer;
+        islandLocalChat.message = message;
+        return fireEvent(ISLAND_LOCAL_CHAT_EVENT, islandLocalChat);
+    }
+
     public static boolean callIslandLockWorldEvent(Island island, CommandSender commandSender, Dimension dimension) {
         return callIslandLockWorldEvent(island, commandSenderToSuperiorPlayer(commandSender), dimension);
     }
@@ -895,6 +895,14 @@ public class PluginEventsFactory {
         islandSetVisitorHome.superiorPlayer = superiorPlayer;
         islandSetVisitorHome.islandVisitorHome = islandVisitorHome;
         return fireEvent(ISLAND_SET_VISITOR_HOME_EVENT, islandSetVisitorHome);
+    }
+
+    public static PluginEvent<IslandTeamChat> callIslandTeamChatEvent(Island island, SuperiorPlayer superiorPlayer, String message) {
+        IslandTeamChat islandTeamChat = new IslandTeamChat();
+        islandTeamChat.island = island;
+        islandTeamChat.superiorPlayer = superiorPlayer;
+        islandTeamChat.message = message;
+        return fireEvent(ISLAND_TEAM_CHAT_EVENT, islandTeamChat);
     }
 
     public static boolean callIslandTransferEvent(Island island, SuperiorPlayer previousOwner, SuperiorPlayer superiorPlayer) {
@@ -1108,6 +1116,12 @@ public class PluginEventsFactory {
         PlayerToggleFly playerToggleFly = new PlayerToggleFly();
         playerToggleFly.superiorPlayer = superiorPlayer;
         return !fireEvent(PLAYER_TOGGLE_FLY_EVENT, playerToggleFly).isCancelled();
+    }
+
+    public static boolean callPlayerToggleLocalChatEvent(SuperiorPlayer superiorPlayer) {
+        PlayerToggleLocalChat playerToggleLocalChat = new PlayerToggleLocalChat();
+        playerToggleLocalChat.superiorPlayer = superiorPlayer;
+        return !fireEvent(PLAYER_TOGGLE_LOCAL_CHAT_EVENT, playerToggleLocalChat).isCancelled();
     }
 
     public static boolean callPlayerTogglePanelEvent(SuperiorPlayer superiorPlayer) {

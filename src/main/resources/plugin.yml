@@ -101,6 +101,8 @@ permissions:
             description: Change your personal language.
           superior.island.leave:
             description: Leave your island.
+          superior.island.localchat:
+            description: Toggle local chat mode.
           superior.island.mission:
             description: Complete a mission.
           superior.island.missions:

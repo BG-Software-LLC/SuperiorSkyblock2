@@ -65,7 +65,7 @@ public class CmdAdminDisband implements IAdminIslandCommand {
         if (!PluginEventsFactory.callIslandDisbandEvent(island, targetPlayer))
             return;
 
-        IslandUtils.sendMessage(island, Message.DISBAND_ANNOUNCEMENT, Collections.emptyList(), sender.getName());
+        IslandUtils.sendMessageToMembers(island, Message.DISBAND_ANNOUNCEMENT, Collections.emptyList(), sender.getName());
 
         if (targetPlayer == null)
             Message.DISBANDED_ISLAND_OTHER_NAME.send(sender, island.getName());

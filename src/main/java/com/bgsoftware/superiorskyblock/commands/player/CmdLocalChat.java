@@ -15,26 +15,26 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdTeamChat implements ISuperiorCommand {
+public class CmdLocalChat implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
-        return Arrays.asList("teamchat", "tc");
+        return Arrays.asList("localchat", "lc");
     }
 
     @Override
     public String getPermission() {
-        return "superior.island.teamchat";
+        return "superior.island.localchat";
     }
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "teamchat [" + Message.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + "]";
+        return "localchat [" + Message.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + "]";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Message.COMMAND_DESCRIPTION_TEAM_CHAT.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_LOCAL_CHAT.getMessage(locale);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class CmdTeamChat implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        IslandArgument arguments = CommandArguments.getSenderIsland(plugin, sender);
+        IslandArgument arguments = CommandArguments.getIslandWhereStanding(plugin, sender);
 
         Island island = arguments.getIsland();
 
@@ -64,24 +64,24 @@ public class CmdTeamChat implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = arguments.getSuperiorPlayer();
 
         if (args.length == 1) {
-            if (!PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
+            if (!PluginEventsFactory.callPlayerToggleLocalChatEvent(superiorPlayer))
                 return;
 
-            if (superiorPlayer.hasTeamChatEnabled()) {
-                Message.TOGGLED_TEAM_CHAT_OFF.send(superiorPlayer);
+            if (superiorPlayer.hasLocalChatEnabled()) {
+                Message.TOGGLED_LOCAL_CHAT_OFF.send(superiorPlayer);
             } else {
-                if (superiorPlayer.hasLocalChatEnabled()) {
-                    superiorPlayer.toggleLocalChat();
-                    Message.TOGGLED_LOCAL_CHAT_OFF.send(superiorPlayer);
+                if (superiorPlayer.hasTeamChatEnabled()) {
+                    superiorPlayer.toggleTeamChat();
+                    Message.TOGGLED_TEAM_CHAT_OFF.send(superiorPlayer);
                 }
 
-                Message.TOGGLED_TEAM_CHAT_ON.send(superiorPlayer);
+                Message.TOGGLED_LOCAL_CHAT_ON.send(superiorPlayer);
             }
 
-            superiorPlayer.toggleTeamChat();
+            superiorPlayer.toggleLocalChat();
         } else {
             String message = CommandArguments.buildLongString(args, 1, false);
-            IslandUtils.handleIslandTeamChat(island, superiorPlayer, message);
+            IslandUtils.handleIslandLocalChat(island, superiorPlayer, message);
         }
     }
 

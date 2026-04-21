@@ -250,12 +250,6 @@ public class PluginEventArgs {
 
     }
 
-    public static class IslandChat extends IslandDoActionArgs {
-
-        public String message;
-
-    }
-
     public static class IslandChunkReset extends PluginEventArgs {
 
         public Island island;
@@ -406,6 +400,12 @@ public class PluginEventArgs {
 
     }
 
+    public static class IslandLocalChat extends IslandDoActionArgs {
+
+        public String message;
+
+    }
+
     public static class IslandLockWorld extends IslandDoActionArgs {
 
         public Dimension dimension;
@@ -513,6 +513,12 @@ public class PluginEventArgs {
     public static class IslandSetVisitorHome extends IslandDoActionArgs {
 
         public Location islandVisitorHome;
+
+    }
+
+    public static class IslandTeamChat extends IslandDoActionArgs {
+
+        public String message;
 
     }
 
@@ -651,6 +657,10 @@ public class PluginEventArgs {
     }
 
     public static class PlayerToggleFly extends PlayerDoActionArgs {
+
+    }
+
+    public static class PlayerToggleLocalChat extends PlayerDoActionArgs {
 
     }
 

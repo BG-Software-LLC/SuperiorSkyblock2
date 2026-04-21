@@ -358,6 +358,21 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
     }
 
     @Override
+    public boolean hasLocalChatEnabled() {
+        return false;
+    }
+
+    @Override
+    public void toggleLocalChat() {
+        // Do nothing.
+    }
+
+    @Override
+    public void setLocalChat(boolean enabled) {
+        // Do nothing.
+    }
+
+    @Override
     public boolean hasSchematicModeEnabled() {
         return false;
     }

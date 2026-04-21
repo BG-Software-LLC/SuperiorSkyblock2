@@ -85,7 +85,7 @@ public class CmdAdminShow implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        Island island = args.length == 2 ? CommandArguments.getIslandWhereStanding(plugin, sender).getIsland() :
+        Island island = args.length == 2 ? CommandArguments.getIslandWhereStandingOrSenderIsland(plugin, sender).getIsland() :
                 CommandArguments.getIsland(plugin, sender, args[2]).getIsland();
 
         if (island == null)
