@@ -64,7 +64,7 @@ public class CmdAdminSetBiome implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Biome biome = CommandArguments.getBiome(sender, args[3]);
+        Biome biome = CommandArguments.getBiome(plugin, sender, args[3]);
 
         if (biome == null)
             return;

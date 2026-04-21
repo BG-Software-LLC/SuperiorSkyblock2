@@ -6,15 +6,22 @@ import com.bgsoftware.superiorskyblock.nms.v1_20_3.algorithms.SpigotGlowEnchantm
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
+import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_20_R3.CraftRegistry;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftChatMessage;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ArmorMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.trim.ArmorTrim;
+import org.bukkit.inventory.meta.trim.TrimMaterial;
+import org.bukkit.inventory.meta.trim.TrimPattern;
 
+import java.util.Locale;
 import java.util.Map;
 
 public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_20_3.AbstractNMSAlgorithms {
@@ -27,6 +34,31 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_20
     @Override
     public String parseSignLine(String original) {
         return Component.Serializer.toJson(CraftChatMessage.fromString(original)[0]);
+    }
+
+    @Override
+    public void setTrim(ItemMeta itemMeta, String trimMaterial, String trimPattern) {
+        if (itemMeta instanceof ArmorMeta armorMeta) {
+            Registry<TrimMaterial> materialRegistry = Bukkit.getRegistry(TrimMaterial.class);
+            Registry<TrimPattern> patternRegistry = Bukkit.getRegistry(TrimPattern.class);
+
+            if (materialRegistry == null || patternRegistry == null) {
+                return;
+            }
+
+            TrimMaterial material = materialRegistry.get(NamespacedKey.minecraft(trimMaterial));
+            TrimPattern pattern = patternRegistry.get(NamespacedKey.minecraft(trimPattern));
+
+            if (material == null)
+                throw new IllegalArgumentException("Couldn't convert " + trimMaterial.toUpperCase(Locale.ENGLISH) +
+                        " into trim material, skipping...");
+            if (pattern == null)
+                throw new IllegalArgumentException("Couldn't convert " + trimPattern.toUpperCase(Locale.ENGLISH) +
+                        " into trim pattern, skipping...");
+
+            ArmorTrim armorTrim = new ArmorTrim(material, pattern);
+            armorMeta.setTrim(armorTrim);
+        }
     }
 
     @Override
@@ -47,6 +79,21 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_20
             //noinspection removal
             return MinecraftServer.getServer().recentTps[0];
         }
+    }
+
+    @Override
+    public Biome getBiome(String biomeName) {
+        NamespacedKey key = NamespacedKey.fromString(biomeName.toLowerCase(Locale.ENGLISH));
+        if (key == null) {
+            return null;
+        }
+
+        Registry<Biome> registry = Bukkit.getRegistry(Biome.class);
+        if (registry == null) {
+            return null;
+        }
+
+        return registry.get(key);
     }
 
     private static Enchantment initializeGlowEnchantment() {

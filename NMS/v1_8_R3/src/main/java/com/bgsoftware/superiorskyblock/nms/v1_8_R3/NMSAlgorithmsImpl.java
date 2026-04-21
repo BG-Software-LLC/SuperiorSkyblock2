@@ -21,6 +21,7 @@ import net.minecraft.server.v1_8_R3.World;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Biome;
 import org.bukkit.block.BlockState;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
@@ -39,6 +40,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
 import java.lang.reflect.Field;
+import java.util.Locale;
 import java.util.Optional;
 
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
@@ -185,6 +187,14 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         return -1;
     }
 
+    @Override
+    public Biome getBiome(String biomeName) {
+        try {
+            return Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
     private static Enchantment initializeGlowEnchantment() {
         int enchantId = 100;
         while (Enchantment.getById(enchantId) != null)

@@ -69,7 +69,7 @@ public class IslandUtils {
     static {
         for (Dimension dimension : Dimension.values()) {
             Biome biome = Optional.ofNullable(plugin.getSettings().getWorlds().getDimensionConfig(dimension))
-                    .map(config -> EnumHelper.getEnum(Biome.class, config.getBiome()))
+                    .map(config -> plugin.getNMSAlgorithms().getBiome(config.getBiome()))
                     .orElseGet(() -> getDefaultBiomeForEnvironment(dimension.getEnvironment()));
             DEFAULT_WORLD_BIOMES.put(dimension, biome);
         }
