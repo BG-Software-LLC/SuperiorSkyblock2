@@ -39,7 +39,7 @@ public class DisbandButton extends AbstractMenuViewButton<IslandMenuView> {
         Island targetIsland = menuView.getIsland();
 
         if (getTemplate().disbandIsland && PluginEventsFactory.callIslandDisbandEvent(targetIsland, inventoryViewer)) {
-            IslandUtils.sendMessageToMembers(targetIsland, Message.DISBAND_ANNOUNCEMENT, Collections.emptyList(), inventoryViewer.getName());
+            IslandUtils.sendMessage(targetIsland, Message.DISBAND_ANNOUNCEMENT, Collections.emptyList(), inventoryViewer.getName());
 
             Message.DISBANDED_ISLAND.send(inventoryViewer);
 

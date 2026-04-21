@@ -81,7 +81,7 @@ public class CmdUncoop implements IPermissibleCommand {
 
         island.removeCoop(targetPlayer);
 
-        IslandUtils.sendMessageToMembers(island, Message.UNCOOP_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(), targetPlayer.getName());
+        IslandUtils.sendMessage(island, Message.UNCOOP_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(), targetPlayer.getName());
 
         if (island.getName().isEmpty())
             Message.LEFT_ISLAND_COOP.send(targetPlayer, superiorPlayer.getName());

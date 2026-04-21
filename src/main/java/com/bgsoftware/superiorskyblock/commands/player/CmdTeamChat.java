@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -67,21 +68,20 @@ public class CmdTeamChat implements ISuperiorCommand {
             if (!PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
                 return;
 
-            if (superiorPlayer.hasTeamChatEnabled()) {
+            if (superiorPlayer.hasChatState(ChatStates.TEAM_CHAT)) {
+                superiorPlayer.setChatState(ChatStates.GLOBAL);
                 Message.TOGGLED_TEAM_CHAT_OFF.send(superiorPlayer);
             } else {
-                if (superiorPlayer.hasLocalChatEnabled()) {
-                    superiorPlayer.toggleLocalChat();
+                if (superiorPlayer.hasChatState(ChatStates.LOCAL_CHAT)) {
                     Message.TOGGLED_LOCAL_CHAT_OFF.send(superiorPlayer);
                 }
 
+                superiorPlayer.setChatState(ChatStates.TEAM_CHAT);
                 Message.TOGGLED_TEAM_CHAT_ON.send(superiorPlayer);
             }
-
-            superiorPlayer.toggleTeamChat();
         } else {
             String message = CommandArguments.buildLongString(args, 1, false);
-            IslandUtils.handleIslandTeamChat(island, superiorPlayer, message);
+            IslandUtils.handleIslandChat(island, superiorPlayer, message);
         }
     }
 

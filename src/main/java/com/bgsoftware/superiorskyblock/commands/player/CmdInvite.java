@@ -102,7 +102,7 @@ public class CmdInvite implements IPermissibleCommand {
             Message.GOT_INVITE.send(targetPlayer, superiorPlayer.getName());
         }
 
-        IslandUtils.sendMessageToMembers(island, announcementMessage, Collections.emptyList(), superiorPlayer.getName(), targetPlayer.getName());
+        IslandUtils.sendMessage(island, announcementMessage, Collections.emptyList(), superiorPlayer.getName(), targetPlayer.getName());
     }
 
     @Override

@@ -80,7 +80,7 @@ public class CmdPardon implements IPermissibleCommand {
 
         island.unbanMember(targetPlayer);
 
-        IslandUtils.sendMessageToMembers(island, Message.UNBAN_ANNOUNCEMENT, Collections.emptyList(), targetPlayer.getName(), superiorPlayer.getName());
+        IslandUtils.sendMessage(island, Message.UNBAN_ANNOUNCEMENT, Collections.emptyList(), targetPlayer.getName(), superiorPlayer.getName());
 
         Message.GOT_UNBANNED.send(targetPlayer, island.getOwner().getName());
     }

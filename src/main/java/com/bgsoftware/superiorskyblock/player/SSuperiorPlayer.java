@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -36,6 +37,7 @@ import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.bgsoftware.superiorskyblock.player.cache.PlayerCacheImpl;
+import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import com.bgsoftware.superiorskyblock.player.permissions.PlayerPermissionsStore;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -52,12 +54,14 @@ import org.bukkit.scheduler.BukkitTask;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -98,11 +102,11 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private boolean blocksStackerEnabled = plugin.getSettings().isDefaultStackedBlocks();
     private boolean schematicModeEnabled = false;
     private boolean bypassModeEnabled = false;
-    private boolean localChatEnabled = false;
-    private boolean teamChatEnabled = false;
     private boolean toggledPanel;
     private boolean islandFly;
-    private boolean adminSpyEnabled = false;
+
+    private ChatState chatState = ChatStates.GLOBAL;
+    private final Set<ChatState> spiedChatStates = new HashSet<>();
 
     private SBlockPosition schematicPos1 = null;
     private SBlockPosition schematicPos2 = null;
@@ -111,7 +115,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private long lastTimeStatus;
 
     private BukkitTask teleportTask = null;
-    private EnumSet<PlayerStatus> playerStatuses = EnumSet.noneOf(PlayerStatus.class);
+    private final EnumSet<PlayerStatus> playerStatuses = EnumSet.noneOf(PlayerStatus.class);
 
     public SSuperiorPlayer(SuperiorPlayerBuilderImpl builder) {
         this.uuid = builder.uuid;
@@ -705,19 +709,34 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public boolean hasLocalChatEnabled() {
-        return localChatEnabled;
+    public ChatState getChatState() {
+        return this.chatState;
     }
 
     @Override
-    public void toggleLocalChat() {
-        setLocalChat(!localChatEnabled);
+    public boolean hasChatState(ChatState chatState) {
+        return this.chatState == chatState;
     }
 
     @Override
-    public void setLocalChat(boolean enabled) {
-        Log.debug(Debug.SET_LOCAL_CHAT, getName(), enabled);
-        localChatEnabled = enabled;
+    public void setChatState(ChatState chatState) {
+        Log.debug(Debug.SET_CHAT_STATE, getName(), chatState);
+        this.chatState = chatState;
+    }
+
+    @Override
+    public void addSpiedChatState(ChatState chatState) {
+        this.spiedChatStates.add(chatState);
+    }
+
+    @Override
+    public void removeSpiedChatState(ChatState chatState) {
+        this.spiedChatStates.remove(chatState);
+    }
+
+    @Override
+    public Set<ChatState> getSpiedChatStates() {
+        return Collections.unmodifiableSet(spiedChatStates);
     }
 
     @Override
@@ -737,19 +756,29 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    @Deprecated
     public boolean hasTeamChatEnabled() {
-        return teamChatEnabled;
+        return getChatState() == ChatStates.TEAM_CHAT;
     }
 
     @Override
+    @Deprecated
     public void toggleTeamChat() {
-        setTeamChat(!teamChatEnabled);
+        if (getChatState() == ChatStates.TEAM_CHAT) {
+            setChatState(ChatStates.GLOBAL);
+        } else {
+            setChatState(ChatStates.TEAM_CHAT);
+        }
     }
 
     @Override
+    @Deprecated
     public void setTeamChat(boolean enabled) {
-        Log.debug(Debug.SET_TEAM_CHAT, getName(), enabled);
-        teamChatEnabled = enabled;
+        if (enabled) {
+            setChatState(ChatStates.TEAM_CHAT);
+        } else {
+            setChatState(ChatStates.GLOBAL);
+        }
     }
 
     @Override
@@ -821,19 +850,29 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    @Deprecated
     public boolean hasAdminSpyEnabled() {
-        return adminSpyEnabled;
+        return getSpiedChatStates().contains(ChatStates.TEAM_CHAT);
     }
 
     @Override
+    @Deprecated
     public void toggleAdminSpy() {
-        setAdminSpy(!adminSpyEnabled);
+        if (getSpiedChatStates().contains(ChatStates.TEAM_CHAT)) {
+            removeSpiedChatState(ChatStates.TEAM_CHAT);
+        } else {
+            addSpiedChatState(ChatStates.TEAM_CHAT);
+        }
     }
 
     @Override
+    @Deprecated
     public void setAdminSpy(boolean enabled) {
-        Log.debug(Debug.SET_ADMIN_SPY, getName(), enabled);
-        adminSpyEnabled = enabled;
+        if (enabled) {
+            addSpiedChatState(ChatStates.TEAM_CHAT);
+        } else {
+            removeSpiedChatState(ChatStates.TEAM_CHAT);
+        }
     }
 
     @Override
@@ -1000,10 +1039,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         this.blocksStackerEnabled |= otherPlayer.hasBlocksStackerEnabled();
         this.schematicModeEnabled |= otherPlayer.hasSchematicModeEnabled();
         this.bypassModeEnabled |= otherPlayer.hasBypassModeEnabled();
-        this.teamChatEnabled |= otherPlayer.hasTeamChatEnabled();
         this.toggledPanel |= otherPlayer.hasToggledPanel();
         this.islandFly |= otherPlayer.hasToggledPanel();
-        this.adminSpyEnabled |= otherPlayer.hasAdminSpyEnabled();
         this.disbands = otherPlayer.getDisbands();
         this.borderColor = otherPlayer.getBorderColor();
         this.lastTimeStatus = otherPlayer.getLastTimeStatus();

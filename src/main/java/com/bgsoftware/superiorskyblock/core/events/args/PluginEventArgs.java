@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.player.container.PlayersContainer;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
@@ -200,6 +201,12 @@ public class PluginEventArgs {
 
     }
 
+    public static class IslandChangeRolePrivilege extends IslandDoActionArgs {
+
+        public PlayerRole playerRole;
+
+    }
+
     public static class IslandChangeSpawnerRates extends IslandDoActionArgs {
 
         public double spawnerRates;
@@ -244,9 +251,10 @@ public class PluginEventArgs {
 
     }
 
-    public static class IslandChangeRolePrivilege extends IslandDoActionArgs {
+    public static class IslandChat extends IslandDoActionArgs {
 
-        public PlayerRole playerRole;
+        public String message;
+        public ChatState chatState;
 
     }
 
@@ -400,12 +408,6 @@ public class PluginEventArgs {
 
     }
 
-    public static class IslandLocalChat extends IslandDoActionArgs {
-
-        public String message;
-
-    }
-
     public static class IslandLockWorld extends IslandDoActionArgs {
 
         public Dimension dimension;
@@ -513,12 +515,6 @@ public class PluginEventArgs {
     public static class IslandSetVisitorHome extends IslandDoActionArgs {
 
         public Location islandVisitorHome;
-
-    }
-
-    public static class IslandTeamChat extends IslandDoActionArgs {
-
-        public String message;
 
     }
 

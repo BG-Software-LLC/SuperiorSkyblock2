@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -24,6 +25,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -338,18 +340,33 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public boolean hasLocalChatEnabled() {
-        return this.handle.hasLocalChatEnabled();
+    public ChatState getChatState() {
+        return this.handle.getChatState();
     }
 
     @Override
-    public void toggleLocalChat() {
-        this.handle.toggleLocalChat();
+    public boolean hasChatState(ChatState chatState) {
+        return this.handle.hasChatState(chatState);
     }
 
     @Override
-    public void setLocalChat(boolean enabled) {
-        this.handle.setLocalChat(enabled);
+    public void setChatState(ChatState chatState) {
+        this.handle.setChatState(chatState);
+    }
+
+    @Override
+    public void addSpiedChatState(ChatState chatState) {
+        this.handle.addSpiedChatState(chatState);
+    }
+
+    @Override
+    public void removeSpiedChatState(ChatState chatState) {
+        this.handle.removeSpiedChatState(chatState);
+    }
+
+    @Override
+    public Set<ChatState> getSpiedChatStates() {
+        return this.handle.getSpiedChatStates();
     }
 
     @Override
@@ -368,16 +385,19 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    @Deprecated
     public boolean hasTeamChatEnabled() {
         return this.handle.hasTeamChatEnabled();
     }
 
     @Override
+    @Deprecated
     public void toggleTeamChat() {
         this.handle.toggleTeamChat();
     }
 
     @Override
+    @Deprecated
     public void setTeamChat(boolean enabled) {
         this.handle.setTeamChat(enabled);
     }
@@ -423,16 +443,19 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    @Deprecated
     public boolean hasAdminSpyEnabled() {
         return this.handle.hasAdminSpyEnabled();
     }
 
     @Override
+    @Deprecated
     public void toggleAdminSpy() {
         this.handle.toggleAdminSpy();
     }
 
     @Override
+    @Deprecated
     public void setAdminSpy(boolean enabled) {
         this.handle.setAdminSpy(enabled);
     }

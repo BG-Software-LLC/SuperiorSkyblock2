@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -25,6 +26,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -360,6 +362,44 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     List<Island> getCoopIslands();
 
     /**
+     * Get the ChatState of the player;
+     */
+    ChatState getChatState();
+
+    /**
+     * Check whether the player has this ChatState.
+     *
+     * @param chatState The ChatState to check.
+     */
+    boolean hasChatState(ChatState chatState);
+
+    /**
+     * Set the ChatState of the player.
+     */
+    void setChatState(ChatState chatState);
+
+    /**
+     * Add ChatState to the spied chats of the player.
+     *
+     * @param chatState The ChatState to add.
+     */
+    void addSpiedChatState(ChatState chatState);
+
+    /**
+     * Remove ChatState from the spied chats of the player.
+     *
+     * @param chatState The ChatState to remove.
+     */
+    void removeSpiedChatState(ChatState chatState);
+
+    /**
+     * Get the spied chats of the player.
+     *
+     * @return All ChatStates that the player is spying on.
+     */
+    Set<ChatState> getSpiedChatStates();
+
+    /**
      * Get the role of the player.
      */
     PlayerRole getPlayerRole();
@@ -444,23 +484,6 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     void setBlocksStacker(boolean enabled);
 
     /**
-     * Check whether the local chat is enabled for the player.
-     */
-    boolean hasLocalChatEnabled();
-
-    /**
-     * Toggle the local chat for the player.
-     */
-    void toggleLocalChat();
-
-    /**
-     * Set whether the local chat is enabled for the player.
-     *
-     * @param enabled true to enable local chat.
-     */
-    void setLocalChat(boolean enabled);
-
-    /**
      * Check whether the schematic mode is enabled for the player.
      */
     boolean hasSchematicModeEnabled();
@@ -479,19 +502,25 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
 
     /**
      * Check whether the team chat is enabled for the player.
+     * @deprecated See {@link #getChatState()}
      */
+    @Deprecated
     boolean hasTeamChatEnabled();
 
     /**
      * Toggle the team chat for the player.
+     * @deprecated See {@link #setChatState(ChatState)}
      */
+    @Deprecated
     void toggleTeamChat();
 
     /**
      * Set whether the team chat is enabled for the player.
      *
      * @param enabled true to enable team chat;
+     * @deprecated See {@link #setChatState(ChatState)}
      */
+    @Deprecated
     void setTeamChat(boolean enabled);
 
     /**
@@ -540,19 +569,27 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
 
     /**
      * Check whether the player has admin spy mode enabled.
+     *
+     * @deprecated See {@link #getSpiedChatStates()}
      */
+    @Deprecated
     boolean hasAdminSpyEnabled();
 
     /**
      * Toggle admin spy mode.
+     *
+     * @deprecated See {@link #addSpiedChatState(ChatState)} {@link #removeSpiedChatState(ChatState)}
      */
+    @Deprecated
     void toggleAdminSpy();
 
     /**
      * Set whether the player has admin spy mode enabled.
      *
      * @param enabled true to enable admin spy mode.
+     * @deprecated See {@link #addSpiedChatState(ChatState)} {@link #removeSpiedChatState(ChatState)}
      */
+    @Deprecated
     void setAdminSpy(boolean enabled);
 
     /**

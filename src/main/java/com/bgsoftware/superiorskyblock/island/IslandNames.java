@@ -76,7 +76,7 @@ public class IslandNames {
             for (Player player : Bukkit.getOnlinePlayers())
                 message.send(player, args);
         else
-            IslandUtils.sendMessageToMembers(island, message, Collections.emptyList(), args);
+            IslandUtils.sendMessage(island, message, Collections.emptyList(), args);
     }
 
     public static String getNameForDatabase(Island island) {

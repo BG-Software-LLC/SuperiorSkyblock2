@@ -29,6 +29,7 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
+import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.player.permissions.PlayerPermissionsStore;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
@@ -188,7 +189,7 @@ public class PlayersListener extends AbstractGameEventListener {
         for (Island coopIsland : superiorPlayer.getCoopIslands()) {
             if (PluginEventsFactory.callIslandUncoopPlayerEvent(coopIsland, null, superiorPlayer, IslandUncoopPlayerEvent.UncoopReason.SERVER_LEAVE)) {
                 coopIsland.removeCoop(superiorPlayer);
-                IslandUtils.sendMessageToMembers(coopIsland, Message.UNCOOP_LEFT_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
+                IslandUtils.sendMessage(coopIsland, Message.UNCOOP_LEFT_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
             }
         }
 
@@ -396,7 +397,7 @@ public class PlayersListener extends AbstractGameEventListener {
     private void onPlayerChat(GameEvent<GameEventArgs.PlayerChatEvent> e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
 
-        if (superiorPlayer.hasLocalChatEnabled()) {
+        if (superiorPlayer.hasChatState(ChatStates.LOCAL_CHAT)) {
             Island island;
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 island = plugin.getGrid().getIslandAt((e.getArgs().player).getLocation(wrapper.getHandle()));
@@ -406,27 +407,27 @@ public class PlayersListener extends AbstractGameEventListener {
                 if (!PluginEventsFactory.callPlayerToggleLocalChatEvent(superiorPlayer))
                     return;
 
-                superiorPlayer.toggleLocalChat();
+                superiorPlayer.setChatState(ChatStates.GLOBAL);
                 return;
             }
 
             e.setCancelled();
 
-            IslandUtils.handleIslandLocalChat(island, superiorPlayer, e.getArgs().message);
-        } else if (superiorPlayer.hasTeamChatEnabled()) {
+            IslandUtils.handleIslandChat(island, superiorPlayer, e.getArgs().message);
+        } else if (superiorPlayer.hasChatState(ChatStates.TEAM_CHAT)) {
             Island island = superiorPlayer.getIsland();
 
             if (island == null) {
                 if (!PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
                     return;
 
-                superiorPlayer.toggleTeamChat();
+                superiorPlayer.setChatState(ChatStates.GLOBAL);
                 return;
             }
 
             e.setCancelled();
 
-            IslandUtils.handleIslandTeamChat(island, superiorPlayer, e.getArgs().message);
+            IslandUtils.handleIslandChat(island, superiorPlayer, e.getArgs().message);
         } else if (e.getArgs().format != null) {
             e.getArgs().format = Formatters.CHAT_FORMATTER.format(
                     new ChatFormatter.ChatFormatArgs(e.getArgs().format, superiorPlayer, superiorPlayer.getIsland()));

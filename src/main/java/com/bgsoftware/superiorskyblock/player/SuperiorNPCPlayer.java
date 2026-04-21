@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -19,6 +20,7 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPool;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.persistence.EmptyPersistentDataContainer;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -26,11 +28,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable {
@@ -288,6 +286,36 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
     }
 
     @Override
+    public ChatState getChatState() {
+        return ChatStates.GLOBAL;
+    }
+
+    @Override
+    public boolean hasChatState(ChatState chatState) {
+        return false;
+    }
+
+    @Override
+    public void setChatState(ChatState chatState) {
+        // Do nothing.
+    }
+
+    @Override
+    public void addSpiedChatState(ChatState chatState) {
+        // Do nothing.
+    }
+
+    @Override
+    public void removeSpiedChatState(ChatState chatState) {
+        // Do nothing.
+    }
+
+    @Override
+    public Set<ChatState> getSpiedChatStates() {
+        return Collections.emptySet();
+    }
+
+    @Override
     public PlayerRole getPlayerRole() {
         return SPlayerRole.guestRole();
     }
@@ -354,21 +382,6 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
 
     @Override
     public void setBlocksStacker(boolean enabled) {
-        // Do nothing.
-    }
-
-    @Override
-    public boolean hasLocalChatEnabled() {
-        return false;
-    }
-
-    @Override
-    public void toggleLocalChat() {
-        // Do nothing.
-    }
-
-    @Override
-    public void setLocalChat(boolean enabled) {
         // Do nothing.
     }
 

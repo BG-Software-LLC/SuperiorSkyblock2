@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
@@ -426,6 +427,15 @@ public class PluginEventsFactory {
         return !fireEvent(ISLAND_CHANGE_ROLE_PRIVILEGE_EVENT, islandChangeRolePrivilege).isCancelled();
     }
 
+    public static PluginEvent<IslandChat> callIslandChatEvent(Island island, SuperiorPlayer superiorPlayer, String message, ChatState chatState) {
+        IslandChat islandChat = new IslandChat();
+        islandChat.island = island;
+        islandChat.superiorPlayer = superiorPlayer;
+        islandChat.message = message;
+        islandChat.chatState = chatState;
+        return fireEvent(ISLAND_CHAT_EVENT, islandChat);
+    }
+
     public static void callIslandChunkResetEvent(Island island, ChunkPosition chunkPosition) {
         IslandChunkReset islandChunkReset = new IslandChunkReset();
         islandChunkReset.island = island;
@@ -680,14 +690,6 @@ public class PluginEventsFactory {
         return !fireEvent(ISLAND_LEAVE_PROTECTED_EVENT, islandLeaveProtected).isCancelled();
     }
 
-    public static PluginEvent<IslandLocalChat> callIslandLocalChatEvent(Island island, SuperiorPlayer superiorPlayer, String message) {
-        IslandLocalChat islandLocalChat = new IslandLocalChat();
-        islandLocalChat.island = island;
-        islandLocalChat.superiorPlayer = superiorPlayer;
-        islandLocalChat.message = message;
-        return fireEvent(ISLAND_LOCAL_CHAT_EVENT, islandLocalChat);
-    }
-
     public static boolean callIslandLockWorldEvent(Island island, CommandSender commandSender, Dimension dimension) {
         return callIslandLockWorldEvent(island, commandSenderToSuperiorPlayer(commandSender), dimension);
     }
@@ -873,11 +875,6 @@ public class PluginEventsFactory {
         fireEvent(ISLAND_SCHEMATIC_PASTE_EVENT, islandSchematicPaste);
     }
 
-    public static PluginEvent<IslandSetHome> callIslandSetHomeEvent(Island island, CommandSender commandSender,
-                                                                    Location islandHome, IslandSetHomeEvent.Reason reason) {
-        return callIslandSetHomeEvent(island, commandSenderToSuperiorPlayer(commandSender), islandHome, reason);
-    }
-
     public static PluginEvent<IslandSetHome> callIslandSetHomeEvent(Island island, @Nullable SuperiorPlayer superiorPlayer,
                                                                     Location islandHome, IslandSetHomeEvent.Reason reason) {
         IslandSetHome islandRenameWarp = new IslandSetHome();
@@ -895,14 +892,6 @@ public class PluginEventsFactory {
         islandSetVisitorHome.superiorPlayer = superiorPlayer;
         islandSetVisitorHome.islandVisitorHome = islandVisitorHome;
         return fireEvent(ISLAND_SET_VISITOR_HOME_EVENT, islandSetVisitorHome);
-    }
-
-    public static PluginEvent<IslandTeamChat> callIslandTeamChatEvent(Island island, SuperiorPlayer superiorPlayer, String message) {
-        IslandTeamChat islandTeamChat = new IslandTeamChat();
-        islandTeamChat.island = island;
-        islandTeamChat.superiorPlayer = superiorPlayer;
-        islandTeamChat.message = message;
-        return fireEvent(ISLAND_TEAM_CHAT_EVENT, islandTeamChat);
     }
 
     public static boolean callIslandTransferEvent(Island island, SuperiorPlayer previousOwner, SuperiorPlayer superiorPlayer) {

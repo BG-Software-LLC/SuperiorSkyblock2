@@ -101,7 +101,7 @@ public class CmdCoop implements IPermissibleCommand {
 
         island.addCoop(targetPlayer);
 
-        IslandUtils.sendMessageToMembers(island, Message.COOP_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(), targetPlayer.getName());
+        IslandUtils.sendMessage(island, Message.COOP_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(), targetPlayer.getName());
 
         if (island.getName().isEmpty())
             Message.JOINED_ISLAND_AS_COOP.send(targetPlayer, superiorPlayer.getName());
