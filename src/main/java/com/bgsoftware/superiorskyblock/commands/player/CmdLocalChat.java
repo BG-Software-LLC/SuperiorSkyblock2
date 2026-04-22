@@ -78,12 +78,12 @@ public class CmdLocalChat implements ISuperiorCommand {
                     Message.TOGGLED_TEAM_CHAT_OFF.send(superiorPlayer);
                 }
 
-                superiorPlayer.setChatState(ChatStates.LOCAL_CHAT);
                 Message.TOGGLED_LOCAL_CHAT_ON.send(superiorPlayer);
             } else {
-                superiorPlayer.setChatState(ChatStates.GLOBAL);
                 Message.TOGGLED_LOCAL_CHAT_OFF.send(superiorPlayer);
             }
+
+            superiorPlayer.setChatState(newChatState);
         } else {
             String message = CommandArguments.buildLongString(args, 1, false);
             IslandUtils.handleIslandChat(island, superiorPlayer, message);

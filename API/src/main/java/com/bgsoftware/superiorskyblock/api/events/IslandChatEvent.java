@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions;
 import org.bukkit.event.Cancellable;
 
 /**
- * IslandChatEvent is called when a player talks in island chat.
+ * IslandChatEvent is called when a player talks in islands chat.
  */
 public class IslandChatEvent extends IslandEvent implements Cancellable {
 

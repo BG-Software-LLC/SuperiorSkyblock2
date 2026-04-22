@@ -1008,6 +1008,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         this.bypassModeEnabled |= otherPlayer.hasBypassModeEnabled();
         this.toggledPanel |= otherPlayer.hasToggledPanel();
         this.islandFly |= otherPlayer.hasToggledPanel();
+        this.adminSpyEnabled |= otherPlayer.hasAdminSpyEnabled();
+        this.chatState = otherPlayer.getChatState();
         this.disbands = otherPlayer.getDisbands();
         this.borderColor = otherPlayer.getBorderColor();
         this.lastTimeStatus = otherPlayer.getLastTimeStatus();

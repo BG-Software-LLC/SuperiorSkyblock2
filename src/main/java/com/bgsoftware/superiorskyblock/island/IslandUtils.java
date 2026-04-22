@@ -387,7 +387,7 @@ public class IslandUtils {
         for (Player player : Bukkit.getOnlinePlayers()) {
             SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
             if (onlinePlayer.hasAdminSpyEnabled()) {
-                Message.SPY_LOCAL_CHAT_FORMAT.send(onlinePlayer, playerRoleName, superiorPlayerName, formattedMessage);
+                spyChatFormat.send(onlinePlayer, playerRoleName, superiorPlayerName, formattedMessage);
             }
         }
     }
