@@ -159,6 +159,7 @@ COMMAND_ARGUMENT_AMOUNT: miktar
 COMMAND_ARGUMENT_BIOME: biyom
 COMMAND_ARGUMENT_BORDER_COLOR: sınır-rengi
 COMMAND_ARGUMENT_COMMAND: komut...
+COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EFFECT: iksir-efekti
 COMMAND_ARGUMENT_EMAIL: e-posta
@@ -171,6 +172,7 @@ COMMAND_ARGUMENT_LIMIT: limit
 COMMAND_ARGUMENT_MATERIAL: materyal
 COMMAND_ARGUMENT_MENU: menü-adı
 COMMAND_ARGUMENT_MESSAGE: mesaj...
+COMMAND_ARGUMENT_MISSION_CATEGORY: 'mission-category'
 COMMAND_ARGUMENT_MISSION_NAME: görev-adı
 COMMAND_ARGUMENT_MODULE_NAME: modül-adı
 COMMAND_ARGUMENT_MULTIPLIER: çarpan
@@ -200,6 +202,7 @@ COMMAND_COOLDOWN_FORMAT: '&c&lHata | &7Komutu sadece {0} içinde kullanabilirsin
 COMMAND_DESCRIPTION_ACCEPT: Bir oyuncudan gelen daveti kabul et.
 COMMAND_DESCRIPTION_ADMIN: Yönetici komutlarını kullan.
 COMMAND_DESCRIPTION_ADMIN_ADD: Bir adaya kullanıcı ekle.
+COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT: 'Increase the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: Başka bir oyuncunun adası için blok limitini
   artır.
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: Bir oyuncuya bonus ekle.
@@ -263,7 +266,7 @@ COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Bir ada için bir dünyayı sıfırla.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Eklenti için şematikler oluştur.
-COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Bir adaya banka limiti belirle.
+COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Bir adanın biyomunu ayarla.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: Belirli bir konumdaki blok miktarını ayarla.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Başka bir oyuncunun adası için blok limiti
@@ -460,9 +463,10 @@ INVALID_AMOUNT: '&c&lHata | &7Geçersiz miktar {0}.'
 INVALID_BIOME: '&c&lHata | &7Geçersiz biyom {0}.'
 INVALID_BLOCK: '&c&lHata | &7Geçersiz blok konumu {0}.'
 INVALID_BORDER_COLOR: '&c&lHata | &7Geçersiz sınır rengi {0}.'
+INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lHata | &7Geçersiz efekt {0}.'
 INVALID_ENTITY: '&c&lHata | &7Geçersiz varlık {0}.'
-INVALID_ENVIRONMENT: '&c&lHata | &7Geçersiz dünya {0}.'
+INVALID_ENVIRONMENT: '&c&lError | &7Invalid dimension {0}.'
 INVALID_INTERVAL: '&c&lHata | &7Geçersiz aralık {0}.'
 INVALID_ISLAND: '&c&lHata | &7Bir adan yok.'
 INVALID_ISLAND_LOCATION: '&c&lHata | &7Konumunda bir ada bulunmuyor.'
@@ -477,6 +481,7 @@ INVALID_MATERIAL: '&c&lHata | &7Geçersiz materyal {0}.'
 INVALID_MATERIAL_DATA: '&c&lHata | &7Geçersiz materyal-veri {0}.'
 INVALID_MENU: '&c&lError | &7Invalid menu {0}.'
 INVALID_MISSION: '&c&lHata | &7Geçersiz görev {0}.'
+INVALID_MISSION_CATEGORY: '&c&lError | &7Invalid mission category {0}.'
 INVALID_MODULE: '&c&lHata | &7Geçersiz modül {0}.'
 INVALID_MULTIPLIER: '&c&lHata | &7Geçersiz çarpan {0}.'
 INVALID_PAGE: '&c&lHata | &7Geçersiz sayfa {0}.'
@@ -520,6 +525,7 @@ ISLAND_CLOSED: '&e&lAda | &7Ada başarıyla halka kapatıldı.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lHata | &7Zaten devam eden bir ada oluşturma görevin
   var.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&lAda | &7İsteğiniz işleniyor...'
+ISLAND_DESCRIPTION_NONE: None
 ISLAND_FLY_DISABLED: '&e&lUçuş | &7Ada uçuşu otomatik olarak &ckapatıldı&7.'
 ISLAND_FLY_ENABLED: '&e&lUçuş | &7Ada uçuşu otomatik olarak &aaçıldı&7.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lAda | &7&oDağıtılan bir adanın içindeydin, bu
@@ -826,6 +832,7 @@ SCHEMATIC_SAVED: '&e&lŞematikler | &7Şematik başarıyla kaydedildi!'
 SELF_ROLE_CHANGE: '&c&lHata | &7Kendi rolünü değiştiremezsin.'
 SET_UPGRADE_LEVEL: '&e&lYükseltmeler | &7{1}''in adası için {0} seviyesi başarıyla
   güncellendi.'
+SET_UPGRADE_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of {0} for all islands.'
 SET_UPGRADE_LEVEL_NAME: '&e&lYükseltmeler | &7{1} adası için {0} seviyesi başarıyla
   güncellendi.'
 SET_WARP: '&e&lAda | &7{0} konumunda yeni bir ışınlanma noktası başarıyla oluşturuldu.'

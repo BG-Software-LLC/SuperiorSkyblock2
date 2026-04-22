@@ -9,9 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -77,15 +75,8 @@ public class CmdTeamChat implements ISuperiorCommand {
 
             superiorPlayer.toggleTeamChat();
         } else {
-            String message = CommandArguments.buildLongString(args, 1, superiorPlayer.hasPermissionWithoutOP("superior.chat.color"));
-            IslandUtils.sendMessage(island, Message.TEAM_CHAT_FORMAT, Collections.emptyList(), superiorPlayer.getPlayerRole(),
-                    superiorPlayer.getName(), message);
-            Message.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), message);
-            for (Player _onlinePlayer : Bukkit.getOnlinePlayers()) {
-                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(_onlinePlayer);
-                if (onlinePlayer.hasAdminSpyEnabled())
-                    Message.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole(), superiorPlayer.getName(), message);
-            }
+            String message = CommandArguments.buildLongString(args, 1, false);
+            IslandUtils.handleIslandChat(island, superiorPlayer, message);
         }
     }
 

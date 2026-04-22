@@ -127,9 +127,14 @@ public class IslandOutsideListener extends AbstractGameEventListener {
     private void handlePlayerMoveOutsideIslandTeleport(SuperiorPlayer superiorPlayer, Location from, boolean forceTeleport) {
         Island fromIsland = plugin.getGrid().getIslandAt(from);
 
+        Player player = superiorPlayer.asPlayer();
+
         // We don't teleport in case we're inside the island, we just cancel the event.
-        if (!forceTeleport && fromIsland != null && fromIsland.isInsideRange(from))
+        // However, if the player is in vehicle, we want to eject him and teleport.
+        if (!forceTeleport && fromIsland != null && fromIsland.isInsideRange(from) && !player.isInsideVehicle())
             return;
+
+        player.eject();
 
         if (fromIsland != null) {
             superiorPlayer.teleport(fromIsland, result -> {

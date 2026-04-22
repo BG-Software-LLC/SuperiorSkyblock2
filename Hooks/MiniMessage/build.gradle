@@ -15,7 +15,7 @@ dependencies {
     compileOnly("net.kyori:adventure-text-serializer-plain:4.19.0")
     compileOnly "org.spigotmc:v1_16_R3-Tuinity:latest"
     compileOnly project(":API")
-    compileOnly rootProject
+    compileOnly project(":")
 }
 
 if (project.hasProperty('hook.compile_minimessage') &&

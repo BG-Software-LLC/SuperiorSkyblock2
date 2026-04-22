@@ -146,22 +146,37 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     boolean isShownAsOnline();
 
     /**
-     * Check whether or not the player has a permission.
-     * When the player is offline, false will be returned.
+     * Check whether the player has a permission.
+     *
+     * @param permission The permission to check.
+     * @return When the player is offline, false will be returned.
      */
     boolean hasPermission(String permission);
 
     /**
-     * Check whether or not the player has a permission without having op.
-     * When the player is offline, false will be returned.
+     * Check whether the player has a permission without having op.
+     *
+     * @param permission The permission to check.
+     * @return When the player is offline, false may be returned.
      */
     boolean hasPermissionWithoutOP(String permission);
 
     /**
-     * Check whether or not the player has a permission on his island.
+     * Check whether the player has a permission on his island.
+     *
+     * @param permission The {@link IslandPrivilege} to check.
+     * @return Whether the player has the permission on his island.
      * When the player doesn't have an island, false will be returned.
      */
     boolean hasPermission(IslandPrivilege permission);
+
+    /**
+     * Check whether the player has the bypass permission for the provided {@link IslandPrivilege}.
+     *
+     * @param permission The {@link IslandPrivilege} to check.
+     * @return Whether the player has the bypass permission. If the player is offline, false may be returned.
+     */
+    boolean hasBypassPermission(IslandPrivilege permission);
 
     /**
      * Check whether or not this player can hit another player.
@@ -251,27 +266,6 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * @param teleportResult Consumer that will be ran when task is finished.
      */
     void teleport(Island island, Dimension dimension, @Nullable Consumer<Boolean> teleportResult);
-
-    /**
-     * Teleport the player to an island.
-     *
-     * @param island      The island to teleport the player to.
-     * @param environment The environment to teleport the player to.
-     * @deprecated See {@link #teleport(Island, Dimension)}
-     */
-    @Deprecated
-    void teleport(Island island, World.Environment environment);
-
-    /**
-     * Teleport the player to an island.
-     *
-     * @param island         The island to teleport the player to.
-     * @param environment    The environment to teleport the player to.
-     * @param teleportResult Consumer that will be ran when task is finished.
-     * @deprecated See {@link #teleport(Island, Dimension, Consumer)}
-     */
-    @Deprecated
-    void teleport(Island island, World.Environment environment, @Nullable Consumer<Boolean> teleportResult);
 
     /**
      * Check whether or not the player is inside their island.

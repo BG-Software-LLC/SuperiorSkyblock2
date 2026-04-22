@@ -22,6 +22,8 @@ public interface NMSWorld {
 
     Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z);
 
+    boolean canPlayerSuffocate(ChunkSnapshot chunkSnapshot, int x, int y, int z);
+
     void listenSpawner(Location location, IntFunction<Integer> delayChangeCallback);
 
     default void replaceTrialBlockPlayerDetector(Island island, Location location) {
@@ -48,6 +50,10 @@ public interface NMSWorld {
 
     SignType getSignType(Object sign);
 
+    default boolean hasBerries(Block block) {
+        return false;
+    }
+
     PistonPushReaction getPistonReaction(Block block);
 
     int getDefaultAmount(Block block);
@@ -67,6 +73,10 @@ public interface NMSWorld {
     int getMinHeight(World world);
 
     void removeAntiXray(World world);
+
+    void setOceanLevel(World world);
+
+    void listenBlockStateChanges(World world);
 
     IslandsGenerator createGenerator(Dimension dimension);
 

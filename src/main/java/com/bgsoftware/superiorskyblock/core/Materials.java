@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core;
 
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -119,6 +120,14 @@ public enum Materials {
         return hasTag(material, Tag.BED);
     }
 
+    public static boolean isHoe(Material material) {
+        return hasTag(material, Tag.HOE);
+    }
+
+    public static boolean isShelf(Material material) {
+        return hasTag(material, Tag.SHELF);
+    }
+
     public static Set<Material> getBlocksNonLegacy() {
         return Collections.unmodifiableSet(BLOCK_NON_LEGACY_MATERIALS);
     }
@@ -158,11 +167,10 @@ public enum Materials {
                 materialTags.add(Tag.RAIL);
             if (materialName.contains("MINECART"))
                 materialTags.add(Tag.MINECART);
-            if (material == Material.CHEST || material == Material.ENDER_CHEST ||
-                    material == Material.TRAPPED_CHEST || materialName.contains("SHULKER_BOX") ||
-                    materialName.equals("BARREL"))
+            if (material == Material.CHEST || materialName.endsWith("_CHEST") ||
+                    materialName.contains("SHULKER_BOX") || materialName.equals("BARREL"))
                 materialTags.add(Tag.CHEST);
-            if (materialName.contains("BOAT"))
+            if (materialName.contains("BOAT") || materialName.contains("_RAFT"))
                 materialTags.add(Tag.BOAT);
             if (materialName.contains("LAVA"))
                 materialTags.add(Tag.LAVA);
@@ -178,14 +186,15 @@ public enum Materials {
                 materialTags.add(Tag.HARNESS);
             if (materialName.contains("BED"))
                 materialTags.add(Tag.BED);
+            if (materialName.contains("_HOE"))
+                materialTags.add(Tag.HOE);
+            if (materialName.contains("_SHELF"))
+                materialTags.add(Tag.SHELF);
 
             if (!materialTags.isEmpty())
                 enumMap.put(material, materialTags);
         }
 
-        Arrays.stream(Material.values()).forEach(material -> {
-
-        });
         return enumMap;
     }
 
@@ -214,7 +223,9 @@ public enum Materials {
         SPAWN_EGG,
         CARPET,
         BED,
-        HARNESS
+        HARNESS,
+        HOE,
+        SHELF
 
     }
 

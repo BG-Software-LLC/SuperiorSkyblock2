@@ -7,16 +7,22 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
+import com.bgsoftware.superiorskyblock.tag.NumberTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
+import com.bgsoftware.superiorskyblock.tag.Tag;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.inventory.InventoryType;
 
 import java.util.Collections;
+import java.util.Map;
 
 public class SchematicBlock {
 
     private static final ListTag EMPTY_LIST_TAG = ListTag.of(Collections.emptyList());
+    private static final Gson GSON = new Gson();
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -147,11 +153,25 @@ public class SchematicBlock {
             if (i < plugin.getSettings().getDefaultSign().size()) {
                 line = plugin.getSettings().getDefaultSign().get(i);
             } else {
-                line = ((StringTag) messages.getValue().get(realIndex)).getValue();
+                Tag<?> tag = messages.getValue().get(realIndex);
+                if (tag instanceof CompoundTag) {
+                    JsonObject jsonObject = new JsonObject();
+                    for (Map.Entry<String, Tag<?>> entry : ((CompoundTag) tag).entrySet()) {
+                        Tag<?> valueTag = entry.getValue();
+                        if (valueTag instanceof NumberTag) {
+                            // Booleans are parsed as NumberTag
+                            jsonObject.addProperty(entry.getKey(), ((NumberTag<?>) valueTag).getValue().intValue() == 1);
+                        } else {
+                            jsonObject.addProperty(entry.getKey(), String.valueOf(valueTag.getValue()));
+                        }
+                    }
+                    line = GSON.toJson(jsonObject);
+                } else {
+                    line = ((StringTag) tag).getValue();
+                }
             }
 
-            line = line.replace("{player}", island.getOwner().getName())
-                    .replace("{island}", island.getName().isEmpty() ? island.getOwner().getName() : island.getName());
+            line = parseSignPlaceholders(island, line);
 
             newMessages.addTag(StringTag.of(line));
         }
@@ -178,10 +198,8 @@ public class SchematicBlock {
             }
 
             if (line != null) {
-                tileEntityData.setString((isDefaultSignLine ? "SSB.Text" : "Text") + i, line
-                        .replace("{player}", island.getOwner().getName())
-                        .replace("{island}", island.getName().isEmpty() ? island.getOwner().getName() : island.getName())
-                );
+                tileEntityData.setString((isDefaultSignLine ? "SSB.Text" : "Text") + i,
+                        parseSignPlaceholders(island, line));
             }
         }
 
@@ -189,16 +207,21 @@ public class SchematicBlock {
             tileEntityData.setByte("SSB.HasSignLines", (byte) 1);
     }
 
+    private static String parseSignPlaceholders(Island island, String val) {
+        return val.replace("{player}", island.getOwner().getName())
+                .replace("{island}", island.getName().isEmpty() ? island.getOwner().getName() : island.getName());
+    }
+
     public SchematicBlock setLocation(Location newBlockLoc) {
         return new SchematicBlock(newBlockLoc, this.blockId, this.extra);
     }
 
     private static boolean isSignId(String id) {
-        return id.equals("Sign") || id.equals("minecraft:sign");
+        return id.equals("Sign") || id.equals("minecraft:sign") || id.equals("minecraft:hanging_sign");
     }
 
     private static boolean isChestId(String id) {
-        return id.equals("Chest") || id.equals("minecraft:chest");
+        return id.equals("Chest") || id.equals("minecraft:chest") || id.equals("minecraft:trapped_chest");
     }
 
     public static class Extra {

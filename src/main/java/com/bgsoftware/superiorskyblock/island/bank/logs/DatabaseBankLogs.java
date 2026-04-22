@@ -49,7 +49,13 @@ public class DatabaseBankLogs implements IBankLogs {
     @Override
     public int getLastTransactionPosition() {
         if (lastTransactionPosition == -1) {
-            lastTransactionPosition = getTransactions().size();
+            lastTransactionPosition = 0;
+            for (BankTransaction transaction : getTransactions()) {
+                int position = transaction.getPosition();
+                if (position > lastTransactionPosition) {
+                    lastTransactionPosition = position;
+                }
+            }
         }
 
         return lastTransactionPosition++;

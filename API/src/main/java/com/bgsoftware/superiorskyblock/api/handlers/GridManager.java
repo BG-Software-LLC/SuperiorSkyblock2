@@ -296,17 +296,6 @@ public interface GridManager extends IDatabaseBridgeHolder {
     Dimension getIslandsWorldDimension(World world);
 
     /**
-     * Get the world of an island by the environment.
-     * If the environment is not the normal and that environment is disabled in config, null will be returned.
-     *
-     * @param environment The world environment.
-     * @param island      The island to check.
-     */
-    @Deprecated
-    @Nullable
-    World getIslandsWorld(Island island, World.Environment environment);
-
-    /**
      * Get the {@link WorldInfo} of the world of an island by the dimension.
      * The world might not be loaded at the time of calling this method.
      *
@@ -316,18 +305,6 @@ public interface GridManager extends IDatabaseBridgeHolder {
      */
     @Nullable
     WorldInfo getIslandsWorldInfo(Island island, Dimension dimension);
-
-    /**
-     * Get the {@link WorldInfo} of the world of an island by the environment.
-     * The world might not be loaded at the time of calling this method.
-     *
-     * @param island      The island to check.
-     * @param environment The world environment.
-     * @return The world info for the given environment, or null if this environment is not enabled.
-     */
-    @Nullable
-    @Deprecated
-    WorldInfo getIslandsWorldInfo(Island island, World.Environment environment);
 
     /**
      * Get the {@link WorldInfo} of the world of an island by its name.

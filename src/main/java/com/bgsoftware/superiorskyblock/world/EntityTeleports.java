@@ -213,9 +213,9 @@ public class EntityTeleports {
                         // returned block and the block below it.
                         Location safeSpot;
                         if (WorldBlocks.isSafeBlock(chunkSnapshot, x, y, z)) {
-                            safeSpot = new Location(islandsWorld, worldX, y + 1, worldZ);
-                        } else if (y - 1 >= worldMinLimit && WorldBlocks.isSafeBlock(chunkSnapshot, x, y - 1, z)) {
                             safeSpot = new Location(islandsWorld, worldX, y, worldZ);
+                        } else if (WorldBlocks.isSafeBlock(chunkSnapshot, x, y - 1, z)) {
+                            safeSpot = new Location(islandsWorld, worldX, y - 1, worldZ);
                         } else {
                             continue;
                         }

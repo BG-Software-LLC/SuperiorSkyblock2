@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.external.spawners;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -25,17 +26,13 @@ public class SpawnersProvider_RoseStacker implements SpawnersProvider_AutoDetect
 
     private static final ReflectMethod<EntityType> GET_STACKED_ITEM_ENTITY_TYPE =
             new ReflectMethod<>(StackerUtils.class, "getStackedItemEntityType", ItemStack.class);
-    private static boolean registered = false;
 
     private final SuperiorSkyblockPlugin plugin;
 
     public SpawnersProvider_RoseStacker(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
-            registered = true;
-            Log.info("Using RoseStacker as a spawners provider.");
-        }
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
+        Log.info("Using RoseStacker as a spawners provider.");
     }
 
     @Override
@@ -68,7 +65,17 @@ public class SpawnersProvider_RoseStacker implements SpawnersProvider_AutoDetect
             Location location = e.getStack().getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
             if (island != null) {
-                island.handleBlockPlace(Keys.of(e.getStack().getBlock()), e.getIncreaseAmount());
+                Key blockKey = Keys.of(e.getStack().getBlock());
+
+                int increaseAmount = e.getStack().getStackSize() + e.getIncreaseAmount() > e.getStack().getStackSettings().getMaxStackSize() ?
+                        e.getStack().getStackSettings().getMaxStackSize() - e.getStack().getStackSize() : e.getIncreaseAmount();
+                int newBlocksCount = e.isNew() ? Math.max(1, increaseAmount - 1) : increaseAmount;
+
+                if (island.hasReachedBlockLimit(blockKey, newBlocksCount)) {
+                    e.setCancelled(true);
+                } else {
+                    island.handleBlockPlace(blockKey, newBlocksCount);
+                }
             }
         }
 

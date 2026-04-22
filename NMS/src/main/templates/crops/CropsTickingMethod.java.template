@@ -72,9 +72,8 @@ public abstract class CropsTickingMethod {
             LevelChunkSection[] sections = levelChunk.getSections();
 
             int minSection = NMSUtilsVersioned.getMinSection(serverLevel);
-            ChunkPos chunkPos = levelChunk.getPos();
-            int chunkOffsetX = chunkPos.x << 4;
-            int chunkOffsetZ = chunkPos.z << 4;
+            int chunkOffsetX = levelChunk.locX << 4;
+            int chunkOffsetZ = levelChunk.locZ << 4;
 
             ${SERVER_LEVEL_RANDOM_TYPE} simpleRandom = SERVER_LEVEL_SIMPLE_RANDOM.get(serverLevel);
 
@@ -129,9 +128,8 @@ public abstract class CropsTickingMethod {
             LevelChunkSection[] sections = levelChunk.getSections();
             ServerLevel serverLevel = levelChunk.level;
 
-            ChunkPos chunkPos = levelChunk.getPos();
-            int chunkOffsetX = chunkPos.x << 4;
-            int chunkOffsetZ = chunkPos.z << 4;
+            int chunkOffsetX = levelChunk.locX << 4;
+            int chunkOffsetZ = levelChunk.locZ << 4;
 
             for (int sectionIndex = 0; sectionIndex < sections.length; ++sectionIndex) {
                 LevelChunkSection levelChunkSection = sections[sectionIndex];

@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.service.portals.EntityPortalResult;
@@ -138,11 +140,22 @@ public class PortalsListener extends AbstractGameEventListener {
             return;
         }
 
+        Island island = plugin.getGrid().getIslandAt(e.getArgs().from);
+        if (island == null)
+            return;
+
         PortalType portalType = (e.getArgs().cause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ?
                 PortalType.NETHER : PortalType.ENDER;
 
-        EntityPortalResult portalResult = this.portalsManager.get().handlePlayerPortal(
-                superiorPlayer, e.getArgs().from, portalType, e.getArgs().to, true);
+        Location toLocation = calculateDestination(island, e.getArgs().from, portalType);
+
+        EntityPortalResult portalResult;
+        if (toLocation == null) {
+            portalResult = EntityPortalResult.DESTINATION_WORLD_DISABLED;
+        } else {
+            portalResult = this.portalsManager.get().handlePlayerPortalFromIsland(
+                    superiorPlayer, island, e.getArgs().from, portalType, toLocation, true);
+        }
 
         handleEntityPortalResult(portalResult, e);
     }
@@ -154,14 +167,37 @@ public class PortalsListener extends AbstractGameEventListener {
         if (to == null || to.getWorld() == null || from == null || from.getWorld() == null)
             return;
 
+        Island island = plugin.getGrid().getIslandAt(e.getArgs().from);
+        if (island == null)
+            return;
+
         Entity entity = e.getArgs().entity;
 
         PortalType portalType = (e.getArgs().cause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ?
                 PortalType.NETHER : PortalType.ENDER;
 
-        EntityPortalResult portalResult = this.portalsManager.get().handleEntityPortal(entity, from, portalType, to);
+        Location toLocation = calculateDestination(island, e.getArgs().from, portalType);
+
+        EntityPortalResult portalResult;
+        if (toLocation == null) {
+            portalResult = EntityPortalResult.DESTINATION_WORLD_DISABLED;
+        } else {
+            portalResult = this.portalsManager.get().handleEntityPortalFromIsland(
+                    entity, island, from, portalType, toLocation);
+        }
 
         handleEntityPortalResult(portalResult, e);
+    }
+
+    @Nullable
+    private Location calculateDestination(Island island, Location fromLocation, PortalType portalType) {
+        Dimension portalDimension = plugin.getGrid().getIslandsWorldDimension(fromLocation.getWorld());
+        SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(portalDimension);
+        Dimension portalDestination = dimensionConfig == null ? null : dimensionConfig.getPortalDestination(portalType);
+        if (portalDestination == null)
+            return null;
+        SettingsManager.Worlds.DimensionConfig destinationConfig = plugin.getSettings().getWorlds().getDimensionConfig(portalDestination);
+        return !destinationConfig.isEnabled() ? null : island.getCenter(portalDestination);
     }
 
     private void handleEntityPortalResult(EntityPortalResult portalResult, GameEvent<GameEventArgs.EntityPortalEvent> event) {

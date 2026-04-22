@@ -28,7 +28,6 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.service.IService;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -69,9 +68,9 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern FLAG_PLACEHOLDER_PATTERN = Pattern.compile("flag_(.+)");
     private static final Pattern GENERATOR_AMOUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_generator_amount_(.+)");
     private static final Pattern GENERATOR_PERCENTAGE_PLACEHOLDER_PATTERN = Pattern.compile("island_generator_percentage_(.+)");
-    private static final Pattern GENERATOR_NORMAL_PLACEHOLDER_PATTERN = Pattern.compile("normal_(.+)");
-    private static final Pattern GENERATOR_NETHER_PLACEHOLDER_PATTERN = Pattern.compile("nether_(.+)");
-    private static final Pattern GENERATOR_END_PLACEHOLDER_PATTERN = Pattern.compile("end_(.+)");
+    private static final Pattern WORLD_UNLOCKED_PLACEHOLDER_PATTERN = Pattern.compile("island_world_unlocked_(.+)");
+    private static final Pattern WORLD_ENABLED_PLACEHOLDER_PATTERN = Pattern.compile("island_world_enabled_(.+)");
+    private static final Pattern WORLD_GENERATED_PLACEHOLDER_PATTERN = Pattern.compile("island_world_generated_(.+)");
     private static final Pattern MEMBER_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
     private static final Pattern MISSIONS_COMPLETED_PATTERN = Pattern.compile("missions_completed_(.+)");
     private static final Pattern MISSION_STATUS_PATTERN = Pattern.compile("mission_status_(.+)");
@@ -217,8 +216,6 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.getDiscord())
                     .put("drops_multiplier", (island, superiorPlayer) ->
                             island.getMobDropsMultiplier() + "")
-                    .put("end_unlocked", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.isEndEnabled(), superiorPlayer.getUserLocale()))
                     .put("exists", (island, superiorPlayer) ->
                             Formatters.BOOLEAN_FORMATTER.format(island != null, superiorPlayer.getUserLocale()))
                     .put("home", (island, superiorPlayer) -> {
@@ -253,15 +250,13 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.getIslandLevel().toString())
                     .put("locked", (island, superiorPlayer) ->
                             Formatters.BOOLEAN_FORMATTER.format(island.isLocked(), superiorPlayer.getUserLocale()))
+                    .put("missions_completed", (island, superiorPlayer) ->
+                            island.getCompletedMissions().size() + "")
                     .put("name", (island, superiorPlayer) -> island.getName())
                     .put("name_formatted", (island, superiorPlayer) -> island.getFormattedName())
                     .put("name_leader", (island, superiorPlayer) ->
                             island.getName().isEmpty() ? island.getOwner().getName() : island.getName())
                     .put("name_stripped", (island, superiorPlayer) -> island.getStrippedName())
-                    .put("nether_unlocked", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.isNetherEnabled(), superiorPlayer.getUserLocale()))
-                    .put("normal_unlocked", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.isNormalEnabled(), superiorPlayer.getUserLocale()))
                     .put("paypal", (island, superiorPlayer) ->
                             island.hasPermission(superiorPlayer, IslandPrivileges.PAYPAL_SHOW) ? island.getPaypal() : "None")
                     .put("paypal_all", (island, superiorPlayer) ->
@@ -606,6 +601,21 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return handleGeneratorPercentagesPlaceholder(island, matcher.group(1));
             }
 
+            if ((matcher = WORLD_UNLOCKED_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                boolean unlockedWorld = island.getUnlockedWorlds().contains(Dimension.getByName(matcher.group(1)));
+                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(unlockedWorld, superiorPlayer.getUserLocale()));
+            }
+
+            if ((matcher = WORLD_ENABLED_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                boolean enabledWorld = island.isDimensionEnabled(Dimension.getByName(matcher.group(1)));
+                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(enabledWorld, superiorPlayer.getUserLocale()));
+            }
+
+            if ((matcher = WORLD_GENERATED_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                boolean generatedWorld = island.getGeneratedSchematics().contains(Dimension.getByName(matcher.group(1)));
+                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(generatedWorld, superiorPlayer.getUserLocale()));
+            }
+
             if ((matcher = MISSIONS_COMPLETED_PATTERN.matcher(subPlaceholder)).matches()) {
                 String categoryName = matcher.group(1);
                 return Optional.of(island.getCompletedMissions().stream().filter(mission ->
@@ -741,41 +751,37 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     }
 
     private static Optional<String> handleGeneratorAmountsPlaceholder(@Nullable Island island, String placeholder) {
-        Matcher matcher;
-        Dimension dimension = null;
+        String[] placeholderSections = placeholder.split("_");
 
-        if ((matcher = GENERATOR_NORMAL_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            dimension = Dimensions.NORMAL;
-        } else if ((matcher = GENERATOR_NETHER_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            dimension = Dimensions.NETHER;
-        } else if ((matcher = GENERATOR_END_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            dimension = Dimensions.THE_END;
-        }
-
-        if (dimension == null)
+        if (placeholderSections.length <= 1)
             return Optional.empty();
 
-        String keyName = matcher.group(1);
+        Dimension dimension;
+        try {
+            dimension = Dimension.getByName(placeholderSections[0]);
+        } catch (NullPointerException error) {
+            return Optional.empty();
+        }
+
+        String keyName = String.join("_", placeholderSections).substring(placeholderSections[0].length() + 1);
 
         return Optional.of(island.getGeneratorAmount(Keys.ofMaterialAndData(keyName), dimension) + "");
     }
 
     private static Optional<String> handleGeneratorPercentagesPlaceholder(@Nullable Island island, String placeholder) {
-        Matcher matcher;
-        Dimension dimension = null;
+        String[] placeholderSections = placeholder.split("_");
 
-        if ((matcher = GENERATOR_NORMAL_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            dimension = Dimensions.NORMAL;
-        } else if ((matcher = GENERATOR_NETHER_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            dimension = Dimensions.NETHER;
-        } else if ((matcher = GENERATOR_END_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            dimension = Dimensions.THE_END;
-        }
-
-        if (dimension == null)
+        if (placeholderSections.length <= 1)
             return Optional.empty();
 
-        String keyName = matcher.group(1);
+        Dimension dimension;
+        try {
+            dimension = Dimension.getByName(placeholderSections[0]);
+        } catch (NullPointerException error) {
+            return Optional.empty();
+        }
+
+        String keyName = String.join("_", placeholderSections).substring(placeholderSections[0].length() + 1);
 
         return Optional.of(IslandUtils.getGeneratorPercentageDecimal(island, Keys.ofMaterialAndData(keyName), dimension) + "");
     }

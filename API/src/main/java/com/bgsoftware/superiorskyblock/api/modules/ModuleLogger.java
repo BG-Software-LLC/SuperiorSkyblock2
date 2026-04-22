@@ -55,7 +55,7 @@ public class ModuleLogger extends Logger {
         } else {
             LogRecord logRecord = new LogRecord(Level.INFO, message);
             for (Handler handler : getHandlers()) {
-                if (handler instanceof FileHandler) {
+                if (handler instanceof ModuleFileHandler) {
                     handler.publish(logRecord);
                 }
             }
@@ -67,6 +67,13 @@ public class ModuleLogger extends Logger {
         PrintWriter pw = new PrintWriter(buffer);
         error.printStackTrace(pw);
         super.severe(buffer.toString());
+    }
+
+    /**
+     * Custom interface to distinguish between logger handlers and the module's custom file handler.
+     */
+    public interface ModuleFileHandler {
+
     }
 
 }

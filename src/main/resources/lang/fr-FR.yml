@@ -115,6 +115,7 @@ COMMAND_ARGUMENT_AMOUNT: quantité
 COMMAND_ARGUMENT_BIOME: biome
 COMMAND_ARGUMENT_BORDER_COLOR: 'border-color'
 COMMAND_ARGUMENT_COMMAND: 'commande...'
+COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: discord
 COMMAND_ARGUMENT_EFFECT: effet-de-potion
 COMMAND_ARGUMENT_EMAIL: email
@@ -131,6 +132,7 @@ COMMAND_ARGUMENT_LIMIT: limite
 COMMAND_ARGUMENT_MATERIAL: matériau
 COMMAND_ARGUMENT_MENU: nom-du-menu
 COMMAND_ARGUMENT_MESSAGE: message
+COMMAND_ARGUMENT_MISSION_CATEGORY: 'mission-category'
 COMMAND_ARGUMENT_MISSION_NAME: nom-de-la-mission
 COMMAND_ARGUMENT_MODULE_NAME: 'nom-du-module'
 COMMAND_ARGUMENT_MULTIPLIER: multiplicateur
@@ -158,6 +160,7 @@ COMMAND_DESCRIPTION_ADMIN_DEL_WARP: Delete a warp for an island.
 COMMAND_DESCRIPTION_ACCEPT: Accepter l'invitation d'un joueur.
 COMMAND_DESCRIPTION_ADMIN: Utiliser les commandes admin.
 COMMAND_DESCRIPTION_ADMIN_ADD: Ajouter un joueur comme membre d'une île.
+COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT: 'Increase the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: Augmenter la limite de blocs pour l'île du joueur spécifié.
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: Attribuer un bonus au joueur spécifié.
 COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT: Augmenter la limite de coopérateurs pour l'île du joueur spécifié.
@@ -208,7 +211,7 @@ COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Réinitialiser l'île d'un monde précis pour l'île spécifiée.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Créer des schematics pour le plugin.
-COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Définir la limite bancaire d'une île.
+COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Définir le biome de l'île spécifiée.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: Définir la quantité de blocs sur une position spécifique.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Définir une limite de blocs pour l'île d'un joueur.
@@ -376,10 +379,11 @@ INVALID_AMOUNT: '&c&lErreur | &7Nombre invalide {0}.'
 INVALID_BIOME: '&c&lErreur | &7Biome invalide {0}.'
 INVALID_BLOCK: '&c&lErreur | &7Emplacement {0} du bloc invalide.'
 INVALID_BORDER_COLOR: '&c&lError | &7Invalid border color {0}.'
+INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lErreur | &7Effet invalide {0}.'
 INVALID_ENTITY: '&c&lErreur | &7Entité invalide {0}.'
+INVALID_ENVIRONMENT: '&c&lError | &7Invalid dimension {0}.'
 INVALID_SCHEMATIC: '&c&lErreur | &7Il n''existe aucun schematic portant le nom {0}.'
-INVALID_ENVIRONMENT: '&c&lErreur | &7Monde invalide {0}.'
 INVALID_INTERVAL: '&c&lErreur | &7Interval invalide {0}.'
 INVALID_ISLAND: '&c&lErreur | &7Vous n''avez pas d''île.'
 INVALID_ISLAND_LOCATION: '&c&lErreur | &7Il n''y a pas d''île sur votre position.'
@@ -394,6 +398,7 @@ INVALID_MATERIAL: '&c&lErreur | &7Matériau invalide: {0}.'
 INVALID_MATERIAL_DATA: '&c&lErreur | &7Donnée de matériau {0} invalide.'
 INVALID_MENU: '&c&lError | &7Invalid menu {0}.'
 INVALID_MISSION: '&c&lErreur | &7Mission {0} invalide.'
+INVALID_MISSION_CATEGORY: '&c&lError | &7Invalid mission category {0}.'
 INVALID_MODULE: '&c&lErreur | &7Module {0} invalide.'
 INVALID_MULTIPLIER: '&c&lErreur | &7Multiplicateur invalide: {0}.'
 INVALID_PAGE: '&c&lErreur | &7Page {0} invalide.'
@@ -434,6 +439,7 @@ ISLAND_BEING_CALCULATED: '&c&lErreur | &7Vous ne pouvez pas interagir avec des b
 ISLAND_CLOSED: '&e&lIle | &7L''île est désormais fermée au public.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lErreur | &7Votre île est déjà en cours de création.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&lIle | &7Requête en cours de traitement...'
+ISLAND_DESCRIPTION_NONE: None
 ISLAND_FLY_DISABLED: '&e&lVol | &7Le mode vol de l''île a été &cdésactivé &7automatiquement.'
 ISLAND_FLY_ENABLED: '&e&lVol | &7Le mode vol de l''île &aactivé &7automatiquement.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lIle | &7&oVous vous trouviez sur une île ayant été supprimée, vous avez donc été téléporté(e) au spawn...'
@@ -699,6 +705,7 @@ SCHEMATIC_RIGHT_SELECT: '&e&lSchémas | &7Position #1 séléctionnée ({0})'
 SCHEMATIC_SAVED: '&e&lSchémas | &7Schematic sauvegardé !'
 SELF_ROLE_CHANGE: '&c&lErreur | &7Vous ne pouvez pas changer votre propre rôle.'
 SET_UPGRADE_LEVEL: '&e&lAméliorations | &7Niveau de {0} augmenté sur l''île de {1}.'
+SET_UPGRADE_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of {0} for all islands.'
 SET_UPGRADE_LEVEL_NAME: '&e&lAméliorations | &7Niveau de {0} augmenté sur {1}.'
 SET_WARP: '&e&lIle | &7Nouveau warp crée au coordonnées {0}.'
 SET_WARP_OUTSIDE: '&c&lErreur | &7Vous ne pouvez pas définir de warps hors de votre île.'

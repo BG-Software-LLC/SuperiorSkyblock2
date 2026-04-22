@@ -33,6 +33,17 @@ public class PagedMenuLayoutImpl<V extends MenuView<V, ?>, E> extends AbstractMe
         super(title, inventoryType, buttons);
         this.customLayoutOrder = layoutOrder;
         this.objectsPerPageCount = layoutOrder == null ? countPagedButtons(buttons) : layoutOrder.getObjectsPerPageCount();
+        if (this.customLayoutOrder != null) {
+            // Update button indexes with the custom layout order
+            PagedLayoutOrder.MenuButtonsIterator<V> buttonsIterator = this.customLayoutOrder.createIterator(this.buttons);
+            int buttonIndex = 0;
+            while (buttonsIterator.hasNext()) {
+                MenuTemplateButton<V> templateButton = buttonsIterator.next();
+
+                if (templateButton instanceof PagedMenuTemplateButton)
+                    ((PagedMenuTemplateButton<V, ?>) templateButton).setButtonIndex(buttonIndex++);
+            }
+        }
     }
 
     @Override

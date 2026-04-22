@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.api.hooks.VanishProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.ISkinsListener;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.IWorldLoadListener;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IWorldsListener;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -49,6 +50,7 @@ import com.bgsoftware.superiorskyblock.external.spawners.SpawnersProvider_Defaul
 import com.bgsoftware.superiorskyblock.external.stackedblocks.StackedBlocksProvider_AutoDetect;
 import com.bgsoftware.superiorskyblock.external.stackedblocks.StackedBlocksProvider_Default;
 import com.bgsoftware.superiorskyblock.external.vanish.VanishProvider_Default;
+import com.bgsoftware.superiorskyblock.external.worlds.DefaultWorldLoadListener;
 import com.bgsoftware.superiorskyblock.external.worlds.WorldsProvider_Default;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import com.google.common.base.Preconditions;
@@ -79,7 +81,6 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private List<Runnable> pricesLoadCallbacks = new LinkedList<>();
     private SpawnersProvider spawnersProvider = new SpawnersProvider_Default();
     private StackedBlocksProvider stackedBlocksProvider = new StackedBlocksProvider_Default();
-    private List<EntitiesProvider> entitiesProviders = new LinkedList<>();
     private EconomyProvider economyProvider = new EconomyProvider_Default();
     private EconomyProvider bankEconomyProvider = new EconomyProvider_Default();
     private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
@@ -87,6 +88,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private VanishProvider vanishProvider = new VanishProvider_Default();
     private AsyncProvider asyncProvider = new AsyncProvider_Default();
     private WorldsProvider worldsProvider;
+    private boolean isCustomWorldsProvider;
     private ChunksProvider chunksProvider = new ChunksProvider_Default();
     private MenusProvider menusProvider;
     private boolean listenToSpawnerChanges = true;
@@ -102,10 +104,13 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private final List<IStackedBlocksListener> stackedBlocksListeners = new LinkedList<>();
     private final List<IWorldsListener> worldsListeners = new LinkedList<>();
     private final List<ICustomBlocksProvider> customBlocksProviders = new LinkedList<>();
+    private final List<EntitiesProvider> entitiesProviders = new LinkedList<>();
+
+    private final IWorldLoadListener DEFAULT_WORLD_LOAD_LISTENER = new DefaultWorldLoadListener(plugin);
 
     public ProvidersManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
-        this.worldsProvider = new WorldsProvider_Default(plugin);
+        setWorldsProviderInternal(new WorldsProvider_Default(plugin));
         this.menusProvider = new MenusProvider_Default(plugin);
     }
 
@@ -184,8 +189,18 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     @Override
     public void setWorldsProvider(WorldsProvider worldsProvider) {
         Preconditions.checkNotNull(worldsProvider, "worldsProvider parameter cannot be null.");
-        this.worldsProvider = worldsProvider;
+        setWorldsProviderInternal(worldsProvider);
         PluginEventsFactory.callWorldsProviderUpdateEvent();
+    }
+
+    private void setWorldsProviderInternal(WorldsProvider worldsProvider) {
+        this.worldsProvider = worldsProvider;
+        this.isCustomWorldsProvider = !(worldsProvider instanceof WorldsProvider_Default);
+        try {
+            this.worldsProvider.addWorldLoadListener(DEFAULT_WORLD_LOAD_LISTENER);
+        } catch (UnsupportedOperationException ignored) {
+            // Ignore UnsupportedOperationException
+        }
     }
 
     @Override
@@ -416,7 +431,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     }
 
     public boolean hasCustomWorldsSupport() {
-        return !(worldsProvider instanceof WorldsProvider_Default);
+        return this.isCustomWorldsProvider;
     }
 
     public boolean isAFK(Player player) {
@@ -470,6 +485,9 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
         if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder"))
             registerHook("ItemsAdderHook");
+
+        if (canRegisterHook("Plan"))
+            registerHook("PlanHook");
 
         if (Bukkit.getPluginManager().isPluginEnabled("CraftEngine"))
             // We load the hook with an extra delay to let CraftEngine load its data first

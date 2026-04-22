@@ -11,7 +11,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -61,9 +60,8 @@ public class ChunkReaderImpl implements ChunkReader {
         this.serverLevel = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
         LevelChunk levelChunk = this.serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
 
-        ChunkPos chunkPos = levelChunk.getPos();
-        this.x = chunkPos.x;
-        this.z = chunkPos.z;
+        this.x = levelChunk.locX;
+        this.z = levelChunk.locZ;
 
         LevelChunkSection[] levelChunkSections = levelChunk.getSections();
         this.blockids = new PalettedContainer[levelChunkSections.length];
@@ -150,12 +148,9 @@ public class ChunkReaderImpl implements ChunkReader {
     public CompoundTag readBlockStates(int x, int y, int z) {
         BlockState blockState = getBlockState(x, y, z);
 
-        if (blockState.getValues().isEmpty())
-            return null;
-
         CompoundTag compoundTag = CompoundTag.of();
 
-        blockState.getValues().forEach((property, value) -> {
+        boolean processedAny = NMSUtilsVersioned.forEachProperty(blockState, (property, value) -> {
             String name = PropertiesMapper.getPropertyName(property);
 
             if (property instanceof BooleanProperty) {
@@ -167,7 +162,7 @@ public class ChunkReaderImpl implements ChunkReader {
             }
         });
 
-        return compoundTag;
+        return processedAny ? compoundTag : null;
     }
 
     @Override

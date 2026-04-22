@@ -45,14 +45,12 @@ import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.algorithm.DefaultPlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.schematic.options.SchematicOptionsBuilderImpl;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
-import org.bukkit.World;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -202,12 +200,6 @@ public class FactoriesManagerImpl implements FactoriesManager {
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null");
         return new WorldInfoImpl(worldName, dimension);
-    }
-
-    @Override
-    @Deprecated
-    public WorldInfo createWorldInfo(String worldName, World.Environment environment) {
-        return createWorldInfo(worldName, Dimensions.fromEnvironment(environment));
     }
 
     @Override

@@ -75,6 +75,39 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  allay_interact:
+    display-menu: true
+    permission-enabled:
+      type: ALLAY_SPAWN_EGG
+      name: '&6Allay Interact'
+      lore:
+        - '&7Access to interact with allays inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: ALLAY_SPAWN_EGG
+      name: '&6Allay Interact'
+      lore:
+        - '&7Access to interact with allays inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: ALLAY_SPAWN_EGG
+      name: '&6Allay Interact'
+      lore:
+        - '&7Access to interact with allays inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   animal_breed:
     display-menu: true
     permission-enabled:
@@ -535,6 +568,39 @@ permissions:
       name: '&6Coop Member'
       lore:
         - '&7Access to add a player as a co-op member.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  copper_golem_interact:
+    display-menu: true
+    permission-enabled:
+      type: COPPER_GOLEM_STATUE
+      name: '&6Copper Golem Interact'
+      lore:
+        - '&7Access to take items from copper golems.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: COPPER_GOLEM_STATUE
+      name: '&6Copper Golem Interact'
+      lore:
+        - '&7Access to take items from copper golems.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: COPPER_GOLEM_STATUE
+      name: '&6Copper Golem Interact'
+      lore:
+        - '&7Access to take items from copper golems.'
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'
@@ -1493,6 +1559,39 @@ permissions:
       name: '&6Monster Spawn'
       lore:
         - '&7Access to spawn monsters inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  nautilus_interact:
+    display-menu: true
+    permission-enabled:
+      type: NAUTILUS_SHELL
+      name: '&6Nautilus Interact'
+      lore:
+        - '&7Access to interact with nautiluses inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: NAUTILUS_SHELL
+      name: '&6Nautilus Interact'
+      lore:
+        - '&7Access to interact with nautiluses inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: NAUTILUS_SHELL
+      name: '&6Nautilus Interact'
+      lore:
+        - '&7Access to interact with nautiluses inside the island.'
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'

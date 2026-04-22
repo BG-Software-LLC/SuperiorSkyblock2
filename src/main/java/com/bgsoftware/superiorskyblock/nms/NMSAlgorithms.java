@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.io.ClassProcessor;
+import com.bgsoftware.superiorskyblock.listener.BukkitEventsListener;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -81,6 +82,8 @@ public interface NMSAlgorithms {
 
     int getDataVersion();
 
+    Biome getBiome(String biomeName);
+
     default ClassProcessor getClassProcessor() {
         return null;
     }
@@ -95,6 +98,10 @@ public interface NMSAlgorithms {
 
     default EnumBridge<Biome> getBiomeBridge() {
         return BIOME_ENUM_BRIDGE;
+    }
+
+    default BukkitEventsListener.GameEventCreator getGenericGameCreator() {
+        throw new UnsupportedOperationException("Not supported in this version");
     }
 
     interface EnumBridge<T> {

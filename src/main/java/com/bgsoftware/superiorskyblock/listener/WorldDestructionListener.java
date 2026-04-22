@@ -56,15 +56,16 @@ public class WorldDestructionListener extends AbstractGameEventListener {
     }
 
     public void onPistonExtend(GameEvent<GameEventArgs.PistonExtendEvent> e) {
-        Block block = e.getArgs().block;
+        Block pistonBlock = e.getArgs().block;
 
         // We care about destruction of island worlds only
-        if (!plugin.getGrid().isIslandsWorld(block.getWorld())) {
+        if (!plugin.getGrid().isIslandsWorld(pistonBlock.getWorld())) {
             return;
         }
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventMultiDestruction(block.getLocation(wrapper.getHandle()), e.getArgs().blocks, null))
+            if (preventMultiDestruction(pistonBlock.getLocation(wrapper.getHandle()), e.getArgs().blocks,
+                    block -> block.getRelative(e.getArgs().direction)))
                 e.setCancelled();
         }
     }

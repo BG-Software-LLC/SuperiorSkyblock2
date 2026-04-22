@@ -5,12 +5,11 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.crops.CropsTickingBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.crops.CropsTickingMethod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -43,10 +42,11 @@ public class CropsBlockEntity extends BlockEntity {
     }
 
     public static void create(Island island, LevelChunk levelChunk) {
-        ChunkPos chunkPos = levelChunk.getPos();
-        long chunkPair = chunkPos.toLong();
-        tickingChunks.computeIfAbsent(chunkPair, p -> {
-            BlockPos blockPos = new BlockPos(chunkPos.x << 4, 1, chunkPos.z << 4);
+        int chunkX = levelChunk.locX;
+        int chunkZ = levelChunk.locZ;
+        long packedPos = NMSUtils.getChunkPackedPos(chunkX, chunkZ);
+        tickingChunks.computeIfAbsent(packedPos, p -> {
+            BlockPos blockPos = new BlockPos(chunkX << 4, 1, chunkZ << 4);
             return new CropsBlockEntity(island, levelChunk, blockPos);
         });
     }
@@ -90,7 +90,7 @@ public class CropsBlockEntity extends BlockEntity {
 
         currentTick = 0;
 
-        int worldRandomTick = serverLevel.getGameRules().getInt(GameRules.RULE_RANDOMTICKING);
+        int worldRandomTick = serverLevel.getGameRules().${GET_RANDOM_TICK_SPEED_METHOD};
         int chunkRandomTickSpeed = (int) (worldRandomTick * this.cachedCropGrowthMultiplier * plugin.getSettings().getCropsInterval());
         if (chunkRandomTickSpeed > 0)
             CropsTickingMethod.tick(levelChunk, chunkRandomTickSpeed);

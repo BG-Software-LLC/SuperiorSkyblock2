@@ -15,7 +15,7 @@ dependencies {
     compileOnly "com.nexomc:Nexo:0.9"
     compileOnly "org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT"
     compileOnly project(":API")
-    compileOnly rootProject
+    compileOnly project(":")
 }
 
 if (project.hasProperty('hook.compile_nexo') &&

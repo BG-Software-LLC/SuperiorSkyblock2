@@ -14,15 +14,12 @@ public class IslandPrivileges {
 
     public static final IslandPrivilege ALL = register("ALL");
     public static final IslandPrivilege ANIMAL_BREED = register("ANIMAL_BREED");
-    public static final IslandPrivilege ANIMAL_DAMAGE = register("ANIMAL_DAMAGE");
     public static final IslandPrivilege ANIMAL_SHEAR = register("ANIMAL_SHEAR");
-    public static final IslandPrivilege ANIMAL_SPAWN = register("ANIMAL_SPAWN");
     public static final IslandPrivilege BAN_MEMBER = register("BAN_MEMBER", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege BREAK = register("BREAK");
     public static final IslandPrivilege BRUSH = register("BRUSH", ServerVersion.isAtLeast(ServerVersion.v1_20));
     public static final IslandPrivilege BUILD = register("BUILD");
     public static final IslandPrivilege CHANGE_NAME = register("CHANGE_NAME", IslandPrivilege.Type.COMMAND);
-    public static final IslandPrivilege CHEST_ACCESS = register("CHEST_ACCESS");
     public static final IslandPrivilege CHORUS_FRUIT = register("CHORUS_FRUIT", ServerVersion.isAtLeast(ServerVersion.v1_9));
     public static final IslandPrivilege CLOSE_BYPASS = register("CLOSE_BYPASS");
     public static final IslandPrivilege CLOSE_ISLAND = register("CLOSE_ISLAND", IslandPrivilege.Type.COMMAND);
@@ -38,35 +35,23 @@ public class IslandPrivileges {
     public static final IslandPrivilege ENTITY_RIDE = register("ENTITY_RIDE");
     public static final IslandPrivilege EXPEL_BYPASS = register("EXPEL_BYPASS");
     public static final IslandPrivilege EXPEL_PLAYERS = register("EXPEL_PLAYERS", IslandPrivilege.Type.COMMAND);
-    public static final IslandPrivilege FARM_TRAMPING = register("FARM_TRAMPING");
     public static final IslandPrivilege FERTILIZE = register("FERTILIZE");
     public static final IslandPrivilege FISH = register("FISH");
     public static final IslandPrivilege FLY = register("FLY");
-    public static final IslandPrivilege HORSE_INTERACT = register("HORSE_INTERACT");
     public static final IslandPrivilege IGNITE_CREEPER = register("IGNITE_CREEPER");
-    public static final IslandPrivilege INTERACT = register("INTERACT");
     public static final IslandPrivilege INVITE_MEMBER = register("INVITE_MEMBER", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege ISLAND_CHEST = register("ISLAND_CHEST", IslandPrivilege.Type.COMMAND);
-    public static final IslandPrivilege ITEM_FRAME = register("ITEM_FRAME");
     public static final IslandPrivilege KICK_MEMBER = register("KICK_MEMBER", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege LEASH = register("LEASH");
-    public static final IslandPrivilege MINECART_DAMAGE = register("MINECART_DAMAGE");
     public static final IslandPrivilege MINECART_ENTER = register("MINECART_ENTER");
     public static final IslandPrivilege MINECART_OPEN = register("MINECART_OPEN");
     public static final IslandPrivilege MINECART_PLACE = register("MINECART_PLACE");
     public static final IslandPrivilege MONSTER_DAMAGE = register("MONSTER_DAMAGE");
-    public static final IslandPrivilege MONSTER_SPAWN = register("MONSTER_SPAWN");
     public static final IslandPrivilege NAME_ENTITY = register("NAME_ENTITY");
     public static final IslandPrivilege OPEN_ISLAND = register("OPEN_ISLAND", IslandPrivilege.Type.COMMAND);
-    public static final IslandPrivilege PAINTING = register("PAINTING");
     public static final IslandPrivilege PAYPAL_SHOW = register("PAYPAL_SHOW");
-    @Nullable
-    public static final IslandPrivilege PICKUP_AXOLOTL = register("PICKUP_AXOLOTL", ServerVersion.isAtLeast(ServerVersion.v1_17));
     public static final IslandPrivilege PICKUP_DROPS = register("PICKUP_DROPS");
     @Nullable
-    public static final IslandPrivilege PICKUP_FISH = register("PICKUP_FISH", !ServerVersion.isLegacy());
-    @Nullable
-    public static final IslandPrivilege PICKUP_LECTERN_BOOK = register("PICKUP_LECTERN_BOOK", ServerVersion.isAtLeast(ServerVersion.v1_14));
     public static final IslandPrivilege PROMOTE_MEMBERS = register("PROMOTE_MEMBERS", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege RANKUP = register("RANKUP", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege RATINGS_SHOW = register("RATINGS_SHOW", IslandPrivilege.Type.COMMAND);
@@ -81,13 +66,9 @@ public class IslandPrivileges {
     public static final IslandPrivilege SET_ROLE = register("SET_ROLE", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege SET_SETTINGS = register("SET_SETTINGS", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege SET_WARP = register("SET_WARP", IslandPrivilege.Type.COMMAND);
-    public static final IslandPrivilege SIGN_INTERACT = register("SIGN_INTERACT");
     public static final IslandPrivilege SPAWNER_BREAK = register("SPAWNER_BREAK");
-    public static final IslandPrivilege TAMED_ANIMAL_DAMAGE = register("TAMED_ANIMAL_DAMAGE");
     @Nullable
-    public static final IslandPrivilege TURTLE_EGG_TRAMPING = register("TURTLE_EGG_TRAMPING", !ServerVersion.isLegacy());
     public static final IslandPrivilege UNCOOP_MEMBER = register("UNCOOP_MEMBER", IslandPrivilege.Type.COMMAND);
-    public static final IslandPrivilege USE = register("USE");
     public static final IslandPrivilege VALUABLE_BREAK = register("VALUABLE_BREAK");
     public static final IslandPrivilege VILLAGER_TRADING = register("VILLAGER_TRADING");
     public static final IslandPrivilege WIND_CHARGE = register("WIND_CHARGE", ServerVersion.isAtLeast(ServerVersion.v1_21));

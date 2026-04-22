@@ -123,6 +123,7 @@ COMMAND_ARGUMENT_AMOUNT: תומכ
 COMMAND_ARGUMENT_BIOME: 'biome'
 COMMAND_ARGUMENT_BORDER_COLOR: 'border-color'
 COMMAND_ARGUMENT_COMMAND: 'command...'
+COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: '...דרוקסיד'
 COMMAND_ARGUMENT_EFFECT: 'potion-effect'
 COMMAND_ARGUMENT_EMAIL: ליימיא
@@ -135,6 +136,7 @@ COMMAND_ARGUMENT_LIMIT: הלבגמ
 COMMAND_ARGUMENT_MATERIAL: רמוח
 COMMAND_ARGUMENT_MENU: 'menu-name'
 COMMAND_ARGUMENT_MESSAGE: '...העדוה'
+COMMAND_ARGUMENT_MISSION_CATEGORY: 'mission-category'
 COMMAND_ARGUMENT_MISSION_NAME: המישמה םש
 COMMAND_ARGUMENT_MODULE_NAME: 'module-name'
 COMMAND_ARGUMENT_MULTIPLIER: סונוב
@@ -165,6 +167,7 @@ COMMAND_DESCRIPTION_ACCEPT: םינקחשמ יאל הנמזה רשאל.
 COMMAND_DESCRIPTION_ADMIN: .ןימדאה תודוקפב שמתשהל.
 COMMAND_DESCRIPTION_ADMIN_BONUS: יאל סונוב תתל.
 COMMAND_DESCRIPTION_ADMIN_ADD: 'Add a user to an island.'
+COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT: 'Increase the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: 'Increase block limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: 'Add a bonus to a player.'
 COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT: 'Increase coop players limit for another player''s island.'
@@ -213,7 +216,7 @@ COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Reset a world for an island.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: ןיגאלפל שדח הנבמ רוציל.
-COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set a bank limit to an island.'
+COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 'Set the biome of an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: 'Set the block amount in a specific location.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: רחא ןקחש לש יאל םיקולב לש הלבגה תונשל.
@@ -392,9 +395,10 @@ INVALID_AMOUNT: '&c&lהאיגש | &7{0} תיקוח אל תומכ.'
 INVALID_BIOME: '&c&lError | &7Invalid biome {0}.'
 INVALID_BLOCK: '&c&lError | &7Invalid block location {0}.'
 INVALID_BORDER_COLOR: '&c&lError | &7Invalid border color {0}.'
+INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lError | &7Invalid effect {0}.'
 INVALID_ENTITY: '&c&lError | &7Invalid entity {0}.'
-INVALID_ENVIRONMENT: '&c&lהאיגש | &7םייק אל {0} םלועה.'
+INVALID_ENVIRONMENT: '&c&lError | &7Invalid dimension {0}.'
 INVALID_INTERVAL: '&c&lError | &7Invalid interval {0}.'
 INVALID_ISLAND: '&c&lהאיגש | &7יא ךל ןיא.'
 INVALID_ISLAND_LOCATION: '&c&lהאיגש | &7ךלש םוקימב יא ןיא.'
@@ -409,6 +413,7 @@ INVALID_MATERIAL: '&c&lהאיגש | &7{0} תיקוח אל רמוח.'
 INVALID_MATERIAL_DATA: '&c&lError | &7Invalid material-data {0}.'
 INVALID_MENU: '&c&lError | &7Invalid menu {0}.'
 INVALID_MISSION: '&c&lהאיגש | &7{0} תיקוח אל המישמ.'
+INVALID_MISSION_CATEGORY: '&c&lError | &7Invalid mission category {0}.'
 INVALID_MODULE: '&c&lError | &7Invalid module {0}.'
 INVALID_MULTIPLIER: '&c&lהאיגש | &7{0} יקוח אל סונוב.'
 INVALID_PAGE: '&c&lError | &7Invalid page {0}.'
@@ -450,6 +455,7 @@ ISLAND_BEING_CALCULATED: '&c&lהאיגש | &7שדחמ בשוחמ יאהש ןמז
 ISLAND_CLOSED: '&e&lיא | &7החלצהב רוביצל רגסנ יאה.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lError | &7You have an already ongoing island creation task.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&lיא | &7ךתשקב תא דבעמ...'
+ISLAND_DESCRIPTION_NONE: None
 ISLAND_FLY_DISABLED: '&e&lהפועת | &7יטמוטוא הפועת בצמ &cקספוה&7.'
 ISLAND_FLY_ENABLED: '&e&lהפועת | &7יטמוטוא הפועת בצמ &aלעפוה&7.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lיא | &7&oןואפסה לא תרגוש ןכל ,קחמנש יא ךותב
@@ -719,6 +725,7 @@ SCHEMATIC_RIGHT_SELECT: '&e&lםינבמ רצוי | &7הנושאר הדוקנ ת�
 SCHEMATIC_SAVED: '&e&lםינבמ רצוי | &7החלצהב רמשנ הנבמה!'
 SELF_ROLE_CHANGE: '&c&lהאיגש | &7ךמצע לש הגרדה תא תונשל לוכי אל התא.'
 SET_UPGRADE_LEVEL: '&e&lםיגורדש | &7החלצהב התנוש {1} לש יאב {0} גורדשה לש המרה.'
+SET_UPGRADE_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of {0} for all islands.'
 SET_UPGRADE_LEVEL_NAME: '&e&lםיגורדש | &7החלצהב התנוש {1} יאב {0} גורדשה לש המרה.'
 SET_WARP: '&e&lיא | &7{0} ב החלצהב שדח םוקימ תרצי.'
 SET_WARP_OUTSIDE: '&c&lהאיגש | &7ךלש יאל ץוחמ םימוקימ רוציל לוכי אל התא.'

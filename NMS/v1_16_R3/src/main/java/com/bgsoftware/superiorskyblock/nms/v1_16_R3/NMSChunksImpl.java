@@ -261,8 +261,9 @@ public class NMSChunksImpl implements NMSChunks {
                     byte yPosition = sectionCompound.getByte("Y");
                     if (sectionCompound.hasKeyOfType("Palette", 9) && sectionCompound.hasKeyOfType("BlockStates", 12)) {
                         //noinspection deprecation
-                        chunkSections[i] = new ChunkSection(yPosition << 4);
-                        chunkSections[i].getBlocks().a(sectionCompound.getList("Palette", 10), sectionCompound.getLongArray("BlockStates"));
+                        ChunkSection chunkSection = chunkSections[i] = new ChunkSection(yPosition << 4);
+                        chunkSection.getBlocks().a(sectionCompound.getList("Palette", 10), sectionCompound.getLongArray("BlockStates"));
+                        chunkSection.recalcBlockCounts();
                     }
                 }
 

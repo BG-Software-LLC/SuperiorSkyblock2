@@ -24,6 +24,8 @@ public class MissionData {
     private final boolean islandMission;
     private final boolean disbandReset;
     private final boolean leaveReset;
+    private final boolean resetAfterFinish;
+    private final int resetAmount;
     @Nullable
     private final TemplateItem notCompleted;
     @Nullable
@@ -32,7 +34,6 @@ public class MissionData {
     private final TemplateItem locked;
     @Nullable
     private final TemplateItem completed;
-    private final int resetAmount;
 
     MissionData(Mission<?> mission, String missionCategoryName, ConfigurationSection section) {
         this.index = currentIndex++;
@@ -42,6 +43,7 @@ public class MissionData {
         this.disbandReset = section.getBoolean("disband-reset", false);
         this.leaveReset = section.getBoolean("leave-reset", false);
         this.resetAmount = section.getInt("reset-amount", 1);
+        this.resetAfterFinish = section.getBoolean("reset-after-finish", true);
 
         if (section.isConfigurationSection("rewards.items")) {
             for (String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
@@ -98,6 +100,10 @@ public class MissionData {
 
     public int getResetAmount() {
         return resetAmount;
+    }
+
+    public boolean isResetAfterFinish() {
+        return resetAfterFinish;
     }
 
     public boolean hasLocked() {

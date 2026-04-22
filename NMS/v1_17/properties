@@ -6,3 +6,7 @@ REGISTRY_CLASS=net.minecraft.core.Registry
 CHUNK_STATUS_CLASS=net.minecraft.world.level.chunk.ChunkStatus
 SERVER_LEVEL_RANDOM_TYPE=java.util.Random
 STAR_LIGHT_INTERFACE_CLASS=ca.spottedleaf.starlight.light.StarLightInterface
+ABSTRACT_MINECART_SUBPACKAGE=vehicle
+GET_RANDOM_TICK_SPEED_METHOD=getInt(net.minecraft.world.level.GameRules.RULE_RANDOMTICKING)
+END_DRAGON_FIGHT_CLASS=EndDragonFight
+SPIKE_FEATURE_CLASS=SpikeFeature

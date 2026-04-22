@@ -51,11 +51,11 @@ public class Dimension implements Enumerable {
     public static Dimension getByName(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
 
-        Dimension islandPrivilege = dimensions.get(name.toUpperCase(Locale.ENGLISH));
+        Dimension dimension = dimensions.get(name.toUpperCase(Locale.ENGLISH));
 
-        Preconditions.checkNotNull(islandPrivilege, "Couldn't find a Dimension with the name " + name + ".");
+        Preconditions.checkNotNull(dimension, "Couldn't find a Dimension with the name " + name + ".");
 
-        return islandPrivilege;
+        return dimension;
     }
 
     /**

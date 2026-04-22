@@ -2,24 +2,25 @@ package com.bgsoftware.superiorskyblock.world;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import org.bukkit.Material;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Donkey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mule;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -41,7 +42,20 @@ public class BukkitEntities {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final Synchronized<Int2ObjectMapView<List<ItemStack>>> entityContent = Synchronized.of(CollectionsFactory.createInt2ObjectArrayMap());
     @Nullable
-    private static final EntityType CAMEL_TYPE = EnumHelper.getEnum(EntityType.class, "CAMEL");
+    private static final EntityType NAUTILUS_TYPE = EnumHelper.getEnum(EntityType.class, "NAUTILUS");
+    @Nullable
+    private static final EntityType ZOMBIE_NAUTILUS_TYPE = EnumHelper.getEnum(EntityType.class, "ZOMBIE_NAUTILUS");
+
+    @Nullable
+    private static EntityCategory TAMEABLE_CATEGORY;
+
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, BukkitEntities::onSettingsUpdate);
+    }
+
+    private static void onSettingsUpdate() {
+        TAMEABLE_CATEGORY = plugin.getSettings().getEntityCategoriesMap().getCategoryByName("TAMEABLE");
+    }
 
     private BukkitEntities() {
 
@@ -153,8 +167,20 @@ public class BukkitEntities {
     }
 
     public static boolean isHorse(Entity entity) {
-        return entity instanceof Horse || entity.getType() == CAMEL_TYPE ||
-                (ServerVersion.isAtLeast(ServerVersion.v1_11) && (entity instanceof Mule || entity instanceof Donkey));
+        return entity instanceof Horse || (ServerVersion.isAtLeast(ServerVersion.v1_11) && entity instanceof org.bukkit.entity.AbstractHorse);
+    }
+
+    public static boolean isNautilus(EntityType entityType) {
+        return entityType == NAUTILUS_TYPE || entityType == ZOMBIE_NAUTILUS_TYPE;
+    }
+
+    public static List<EntityCategory> getCategories(Entity entity) {
+        List<EntityCategory> categories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(entity));
+        if (TAMEABLE_CATEGORY != null && isTameable(entity)) {
+            categories = new LinkedList<>(categories);
+            categories.add(TAMEABLE_CATEGORY);
+        }
+        return categories;
     }
 
 }

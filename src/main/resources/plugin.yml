@@ -187,6 +187,8 @@ permissions:
             description: Use the admin commands.
           superior.admin.add:
             description: Add a user to an island.
+          superior.admin.addbanklimit:
+            description: Increase the bank limit for another player's island.
           superior.admin.addblocklimit:
             description: Increase block limit for another player's island.
           superior.admin.addbonus:
@@ -282,7 +284,7 @@ permissions:
           superior.admin.schematic:
             description: Create schematics for the plugin.
           superior.admin.setbanklimit:
-            description: Set a bank limit to an island.
+            description: Set the bank limit for another player's island.
           superior.admin.setbiome:
             description: Set the biome of an island.
           superior.admin.setblockamount:

@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.menu.MenuIslandCreationConfig;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
-import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.IslandCreationButton;
 import org.bukkit.block.Biome;
 
@@ -37,7 +36,7 @@ public class MenuConfig {
             this.schematic = schematic;
             this.template = template;
             Biome biome = template == null ? null : template.getBiome();
-            this.biome = biome == null ? EnumHelper.getEnum(Biome.class, plugin.getSettings().getWorlds().getDimensionConfig(
+            this.biome = biome == null ? plugin.getNMSAlgorithms().getBiome(plugin.getSettings().getWorlds().getDimensionConfig(
                     plugin.getSettings().getWorlds().getDefaultWorldDimension()).getBiome()) : biome;
         }
 

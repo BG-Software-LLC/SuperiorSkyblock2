@@ -1,0 +1,12 @@
+NMS_VERSION=v26_1
+CRAFTBUKKIT_PACKAGE=org.bukkit.craftbukkit
+COMMON_NMS_PACKAGE=com.bgsoftware.superiorskyblock.nms.v1_20_3
+PAPER_CHUNK_BLOCK_CONTROLLER_CLASS=io.papermc.paper.antixray.ChunkPacketBlockController
+REGISTRY_CLASS=net.minecraft.core.registries.BuiltInRegistries
+CHUNK_STATUS_CLASS=net.minecraft.world.level.chunk.status.ChunkStatus
+SERVER_LEVEL_RANDOM_TYPE=net.minecraft.util.RandomSource
+STAR_LIGHT_INTERFACE_CLASS=ca.spottedleaf.moonrise.patches.starlight.light.StarLightInterface
+ABSTRACT_MINECART_SUBPACKAGE=vehicle.minecart
+GET_RANDOM_TICK_SPEED_METHOD=get(net.minecraft.world.level.gamerules.GameRules.RANDOM_TICK_SPEED)
+END_DRAGON_FIGHT_CLASS=EnderDragonFight
+SPIKE_FEATURE_CLASS=EndSpikeFeature

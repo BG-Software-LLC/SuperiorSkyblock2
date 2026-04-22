@@ -101,6 +101,7 @@ public class MenuBankLogs extends AbstractPagedMenu<MenuBankLogs.View, IslandVie
 
         public void setFilteredPlayer(UUID filteredPlayer) {
             this.filteredPlayer = filteredPlayer == null ? CONSOLE_UUID : filteredPlayer;
+            this.setCurrentPage(1);
         }
 
         @Override

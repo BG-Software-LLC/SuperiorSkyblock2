@@ -71,15 +71,16 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
 
                 {
                     String biomeName = itemSection.getString("biome");
-                    if(biomeName != null) {
-                        try {
-                            Biome biome = Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
-                            buttonBuilder.setBiome(biome);
-                        } catch (IllegalArgumentException error) {
+                    if (biomeName != null) {
+                        Biome biome = plugin.getNMSAlgorithms().getBiome(biomeName);
+
+                        if (biome == null) {
                             Log.warnFromFile("island-creation.yml", "Invalid biome name for item ",
                                     itemSectionName, ": ", biomeName);
                             continue;
                         }
+
+                        buttonBuilder.setBiome(biome);
                     }
                 }
 

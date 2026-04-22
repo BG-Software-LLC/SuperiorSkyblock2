@@ -71,7 +71,7 @@ public class SuperiorSkyblockAPI {
      * Everytime a change is made to the API, the version of it changes.
      */
     public static int getAPIVersion() {
-        return 15;
+        return 16;
     }
 
     /*
@@ -177,17 +177,6 @@ public class SuperiorSkyblockAPI {
      */
     public static Island getSpawnIsland() {
         return plugin.getGrid().getSpawnIsland();
-    }
-
-    /**
-     * Get the world of an island by the world's environment.
-     *
-     * @deprecated See {@link #getIslandsWorld(Island, Dimension)}
-     */
-    @Nullable
-    @Deprecated
-    public static World getIslandsWorld(Island island, World.Environment environment) {
-        return plugin.getGrid().getIslandsWorld(island, environment);
     }
 
     /**

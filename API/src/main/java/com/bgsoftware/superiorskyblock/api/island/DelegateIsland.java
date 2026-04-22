@@ -630,31 +630,37 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public boolean isNormalEnabled() {
         return this.handle.isNormalEnabled();
     }
 
     @Override
+    @Deprecated
     public void setNormalEnabled(boolean enabled) {
         this.handle.setNormalEnabled(enabled);
     }
 
     @Override
+    @Deprecated
     public boolean isNetherEnabled() {
         return this.handle.isNetherEnabled();
     }
 
     @Override
+    @Deprecated
     public void setNetherEnabled(boolean enabled) {
         this.handle.setNetherEnabled(enabled);
     }
 
     @Override
+    @Deprecated
     public boolean isEndEnabled() {
         return this.handle.isEndEnabled();
     }
 
     @Override
+    @Deprecated
     public void setEndEnabled(boolean enabled) {
         this.handle.setEndEnabled(enabled);
     }
@@ -672,12 +678,6 @@ public class DelegateIsland implements Island {
     @Override
     public Collection<Dimension> getUnlockedWorlds() {
         return this.handle.getUnlockedWorlds();
-    }
-
-    @Override
-    @Deprecated
-    public int getUnlockedWorldsFlag() {
-        return this.handle.getUnlockedWorldsFlag();
     }
 
     @Override
@@ -1908,12 +1908,6 @@ public class DelegateIsland implements Island {
     @Override
     public void setSchematicGenerate(Dimension dimension, boolean generated) {
         this.handle.setSchematicGenerate(dimension, generated);
-    }
-
-    @Override
-    @Deprecated
-    public int getGeneratedSchematicsFlag() {
-        return this.handle.getGeneratedSchematicsFlag();
     }
 
     @Override

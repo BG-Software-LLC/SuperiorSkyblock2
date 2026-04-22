@@ -1,9 +1,10 @@
 package com.bgsoftware.superiorskyblock.api.config;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
-import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -13,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.PortalType;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.potion.PotionEffectType;
@@ -78,9 +80,9 @@ public interface SettingsManager {
     StackedBlocks getStackedBlocks();
 
     /**
-     * The island worth to island level conversion formula.
-     * The formula contains a placeholder: `{}`, which is replaced with the island worth.
-     * Config path: island-level-formula
+     * The formula used to calculate a block's level when it has a worth defined but no level specified.
+     * The formula can contain a placeholder: `{}`, which is replaced with the block worth.
+     * Config path: block-level-formula
      */
     String getIslandLevelFormula();
 
@@ -176,8 +178,16 @@ public interface SettingsManager {
 
     /**
      * Get all the interactable blocks.
+     *
+     * @deprecated See {@link #getInteractablesMap}
      */
+    @Deprecated
     List<String> getInteractables();
+
+    /**
+     * Get all the interactable blocks and their interact privilege.
+     */
+    Interactables getInteractablesMap();
 
     /**
      * Get all the safe blocks.
@@ -751,6 +761,20 @@ public interface SettingsManager {
     int getCommandsPerPage();
 
     /**
+     * Whether players should receive a help instead of a `INVALID_COMMAND` message
+     * when using a command that doesn't exist or not.
+     * Config-path: help-on-invalid-command
+     */
+    boolean isHelpOnInvalidCommand();
+
+    /**
+     * Whether players should receive a help instead of a `NO_COMMAND_PERMISSION` message
+     * when using a command they don't have permission for or not.
+     * Config-path: help-on-no-permission
+     */
+    boolean isHelpOnNoPermission();
+
+    /**
      * Whether the plugin should cache schematics for faster placement of schematics.
      * Config-path: cache-schematics
      */
@@ -760,7 +784,13 @@ public interface SettingsManager {
      * Custom entity categories to be used by the plugin.
      * Config-path: entity-categories
      */
+    @Deprecated
     Map<String, KeySet> getEntityCategories();
+
+    /**
+     * Custom entity categories to be used by the plugin.
+     */
+    EntityCategories getEntityCategoriesMap();
 
     interface Database {
 
@@ -1046,6 +1076,12 @@ public interface SettingsManager {
          */
         String getInactive();
 
+        /**
+         * The format in which the island description lines will be saved.
+         * Config-path: visitors-sign.description-line-format
+         */
+        String getDescriptionLineFormat();
+
     }
 
     interface Worlds {
@@ -1079,19 +1115,28 @@ public interface SettingsManager {
         /**
          * All settings related to the overworld world.
          * Config-path: worlds.normal
+         *
+         * @deprecated See {@link #getDimensionConfig(Dimension)}
          */
+        @Deprecated
         Normal getNormal();
 
         /**
          * All settings related to the nether world.
          * Config-path: worlds.nether
+         *
+         * @deprecated See {@link #getDimensionConfig(Dimension)}
          */
+        @Deprecated
         Nether getNether();
 
         /**
          * All settings related to the end world.
          * Config-path: worlds.end
+         *
+         * @deprecated See {@link #getDimensionConfig(Dimension)}
          */
+        @Deprecated
         End getEnd();
 
         /**
@@ -1107,36 +1152,53 @@ public interface SettingsManager {
          */
         String getDifficulty();
 
+        /**
+         * The sea level of island worlds.
+         * Config path: worlds.sea-level-height
+         */
+        int getSeaLevelHeight();
+
         interface DimensionConfig {
 
             /**
              * Whether this dimension is enabled or not.
-             * Config-path: worlds.<dimension>.enabled
+             * Config-path: worlds.dimensions.<dimension>.enabled
              */
             boolean isEnabled();
 
             /**
              * Whether this dimension is unlocked by default or not.
-             * Config-path: worlds.<dimension>.unlock
+             * Config-path: worlds.dimensions.<dimension>.unlock
              */
             boolean isUnlocked();
 
             /**
              * Whether the schematic for this dimension should be offset or not.
-             * Config-path: worlds.<dimension>.schematic-offset
+             * Config-path: worlds.dimensions.<dimension>.schematic-offset
              */
             boolean isSchematicOffset();
 
             /**
              * Get the default biome for this dimension.
+             * Config-path: worlds.dimensions.<dimension>.biome
              */
             String getBiome();
 
             /**
              * Get the world's name for this dimension.
-             * Config-path: worlds.<dimension>.name
+             * Config-path: worlds.dimensions.<dimension>.name
              */
             String getName();
+
+            /**
+             * Get the destination of a specific portal type {@link PortalType}
+             * Config-path: worlds.dimensions.<dimension>.portals
+             *
+             * @param portalType The portal type to get
+             * @return The destination of that portal type, or null if doesn't exist.
+             */
+            @Nullable
+            Dimension getPortalDestination(PortalType portalType);
 
         }
 
@@ -1272,6 +1334,12 @@ public interface SettingsManager {
          */
         boolean isPreventPlayerNames();
 
+        /**
+         * Whether the name change announcement should be sent to all players or not.
+         * Config-path: island-names.announce-change-to-all
+         */
+        boolean isAnnounceChangeToAll();
+
     }
 
     interface AFKIntegrations {
@@ -1348,6 +1416,51 @@ public interface SettingsManager {
          * Config-path: island-previews.locations
          */
         Map<String, Location> getLocations();
+
+    }
+
+    interface Interactables {
+
+        /**
+         * Get all the interactables from the interactables file.
+         */
+        Set<Key> getInteractables();
+
+        /**
+         * Get all the interactables for a specific {@link IslandPrivilege}
+         */
+        @Nullable
+        Set<Key> getInteractables(IslandPrivilege islandPrivilege);
+
+        /**
+         * Get the required {@link IslandPrivilege} for a specific key.
+         */
+        @Nullable
+        IslandPrivilege getRequiredPrivilege(Key key);
+
+    }
+
+    interface EntityCategories {
+
+        /**
+         * Get all the categories from the entity-categories file.
+         */
+        List<EntityCategory> getCategories();
+
+        /**
+         * Get the entity categories for a specific entity key.
+         *
+         * @param key The entity's key
+         */
+        List<EntityCategory> getCategories(Key key);
+
+        /**
+         * Get an entity category by its name
+         *
+         * @param name The name of the category.
+         */
+        @Nullable
+        EntityCategory getCategoryByName(String name);
 
     }
 

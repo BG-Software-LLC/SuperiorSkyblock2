@@ -213,10 +213,6 @@ public class GameEventArgs implements IEventArgs {
 
     }
 
-    public static class BlockDestroyEvent extends BlockEvent {
-
-    }
-
     public static class EntityDeathEvent extends EntityEvent {
 
     }
@@ -386,6 +382,26 @@ public class GameEventArgs implements IEventArgs {
     }
 
     public static class BlockPhysicsEvent extends BlockEvent {
+
+    }
+
+    public static class BlockUpdateShapeEvent extends BlockEvent {
+
+        public BlockState oldState;
+
+    }
+
+    public static class GenericGameEvent extends WorldEvent {
+
+        public String gameEvent;
+        public Location location;
+
+    }
+
+    public static class EntityInteractEvent extends EntityEvent {
+
+        @Nullable
+        public Block block;
 
     }
 

@@ -170,6 +170,11 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
     }
 
     @Override
+    public boolean hasBypassPermission(IslandPrivilege islandPrivilege) {
+        return false;
+    }
+
+    @Override
     public HitActionResult canHit(SuperiorPlayer other) {
         return HitActionResult.NOT_ONLINE;
     }
@@ -218,19 +223,6 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
 
     @Override
     public void teleport(Island unused, @Nullable Consumer<Boolean> teleportResult) {
-        if (teleportResult != null)
-            teleportResult.accept(false);
-    }
-
-    @Override
-    @Deprecated
-    public void teleport(Island island, World.Environment environment) {
-        // Do nothing.
-    }
-
-    @Override
-    @Deprecated
-    public void teleport(Island unused, World.Environment unused2, @Nullable Consumer<Boolean> teleportResult) {
         if (teleportResult != null)
             teleportResult.accept(false);
     }

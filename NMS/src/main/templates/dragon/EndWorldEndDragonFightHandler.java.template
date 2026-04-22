@@ -4,25 +4,24 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.island.cache.IslandCacheKey;
 import com.bgsoftware.superiorskyblock.island.cache.IslandCacheKeys;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.IslandEndDragonFight;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.dimension.end.EndDragonFight;
+import net.minecraft.world.level.dimension.end.${END_DRAGON_FIGHT_CLASS};
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class EndWorldEndDragonFightHandler extends EndDragonFight {
+public class EndWorldEndDragonFightHandler {
 
     private static final IslandCacheKey<IslandEndDragonFight> CACHE_KEY = IslandCacheKeys.register("DRAGON_FIGHT", IslandEndDragonFight.class);
 
     private final List<IslandEndDragonFight> worldDragonFightsList = new LinkedList<>();
 
-    public EndWorldEndDragonFightHandler(ServerLevel serverLevel) {
-        super(serverLevel, serverLevel.getSeed(), serverLevel.serverLevelData.endDragonFightData());
+    EndWorldEndDragonFightHandler() {
     }
 
-    @Override
     public void tick() {
-        this.worldDragonFightsList.forEach(EndDragonFight::tick);
+        this.worldDragonFightsList.forEach(IslandEndDragonFight::tick);
     }
 
     public void addDragonFight(IslandCache islandCache, IslandEndDragonFight endDragonFight) {

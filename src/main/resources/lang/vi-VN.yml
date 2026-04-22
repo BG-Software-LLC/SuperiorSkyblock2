@@ -140,6 +140,7 @@ COMMAND_ARGUMENT_AMOUNT: so-luong
 COMMAND_ARGUMENT_BIOME: quan-xa
 COMMAND_ARGUMENT_BORDER_COLOR: 'border-color'
 COMMAND_ARGUMENT_COMMAND: lenh...
+COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EFFECT: hieu-ung-thuoc
 COMMAND_ARGUMENT_EMAIL: email
@@ -152,6 +153,7 @@ COMMAND_ARGUMENT_LIMIT: gioi-han
 COMMAND_ARGUMENT_MATERIAL: vat-lieu
 COMMAND_ARGUMENT_MENU: ten-giao-dien
 COMMAND_ARGUMENT_MESSAGE: tin-nhan...
+COMMAND_ARGUMENT_MISSION_CATEGORY: 'mission-category'
 COMMAND_ARGUMENT_MISSION_NAME: ten-nhiem-vu
 COMMAND_ARGUMENT_MODULE_NAME: ten-module
 COMMAND_ARGUMENT_MULTIPLIER: he-so
@@ -182,6 +184,7 @@ COMMAND_DESCRIPTION_ACCEPT: Chấp nhận lời mời từ người chơi.
 COMMAND_DESCRIPTION_ADMIN: Sử dụng các lệnh của admin.
 COMMAND_DESCRIPTION_ADMIN_BONUS: Cấp tiền thưởng cho người chơi.
 COMMAND_DESCRIPTION_ADMIN_ADD: Thêm người vào đảo.
+COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT: 'Increase the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: 'Tăng giới hạn khối cho đảo của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: 'Thêm thưởng cho người chơi.'
 COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT: 'Tăng giới hạn thành viên đảo co-op của người chơi khác.'
@@ -234,7 +237,7 @@ COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Tái tạo lại thế giới cho một hòn đảo.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Tạo các schematic cho plugin.
-COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Đặt mức giới hạn ngân hàng cho một hòn đảo.'
+COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Đặt quần xã cho đảo.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: 'Đặt số lượng khối ở một vị trí cụ thể.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Đặt giới hạn khối cho đảo của người chơi
@@ -428,9 +431,10 @@ INVALID_AMOUNT: '&c&lLỗi | &7Số lượng không hợp lệ {0}.'
 INVALID_BIOME: '&c&lLỗi | &7Quần xã không chính xác {0}.'
 INVALID_BLOCK: '&c&lLỗi | &7Vị trí khối không hợp lệ {0}.'
 INVALID_BORDER_COLOR: '&c&lError | &7Invalid border color {0}.'
+INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lLỗi | &7Hiệu ứng không hợp lệ {0}.'
 INVALID_ENTITY: '&c&lLỗi | &7Vật thể không chính xác {0}.'
-INVALID_ENVIRONMENT: '&c&lLỗi | &7Thế giới {0} không hợp lệ.'
+INVALID_ENVIRONMENT: '&c&lError | &7Invalid dimension {0}.'
 INVALID_INTERVAL: '&c&lLỗi | &7Thời gian nghỉ không hợp lệ {0}.'
 INVALID_ISLAND: '&c&lLỗi | &7Bạn không có một hòn đảo.'
 INVALID_ISLAND_LOCATION: '&c&lLỗi | &7Không có đảo nào ở vị trí của bạn.'
@@ -445,6 +449,7 @@ INVALID_MATERIAL: '&c&lLỗi | &7Vật liệu không hợp lệ {0}.'
 INVALID_MATERIAL_DATA: '&c&lLỗi | &7Dữ liệu-vật liệu không hợp lệ {0}.'
 INVALID_MENU: '&c&lLỗi | &7Menu không hợp lệ {0}.'
 INVALID_MISSION: '&c&lLỗi | &7Nhiệm vụ không hợp lệ {0}.'
+INVALID_MISSION_CATEGORY: '&c&lError | &7Invalid mission category {0}.'
 INVALID_MODULE: '&c&lLỗi | &7Module không hợp lệ {0}.'
 INVALID_MULTIPLIER: '&c&lLỗi | &7Hệ số không hợp lệ {0}.'
 INVALID_PAGE: '&c&lLỗi | &7Trang không hợp lệ {0}.'
@@ -488,6 +493,7 @@ ISLAND_BEING_CALCULATED: '&c&lLỗi | &7Bạn không thể tương tác với c�
 ISLAND_CLOSED: '&e&lĐảo | &7Thành công đóng cửa đảo cho công cộng.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lLỗi | &7Bạn đã có một nhiệm vụ tạo đảo đang diễn ra.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&lĐảo | &7Đang xử lý yêu cầu của bạn...'
+ISLAND_DESCRIPTION_NONE: None
 ISLAND_FLY_DISABLED: '&e&lBay | &7Bay trong đảo đã tự động &cvô hiệu hóad&7.'
 ISLAND_FLY_ENABLED: '&e&lBay | &7Bay trong đảo đã tự động &akích hoạt&7.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lĐảo | &7&oBạn đã ở trong một hòn đảo đã
@@ -782,6 +788,7 @@ SCHEMATIC_SAVED: '&e&lSchematics | &7Lưu thành công schematic!'
 SELF_ROLE_CHANGE: '&c&lLỗi | &7Bạn không thể thay đổi vai trò của chính mình.'
 SET_UPGRADE_LEVEL: '&e&lNâng Cấp | &7Nâng cấp thành công cấp độ của {0} cho đảo của
   {1}.'
+SET_UPGRADE_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of {0} for all islands.'
 SET_UPGRADE_LEVEL_NAME: '&e&lNâng Cấp | &7Thay đổi thành công cấp độ {0} cho đảo {1}.'
 SET_WARP: '&e&lĐảo | &7Tạo thành công một khu vực mới tại {0}.'
 SET_WARP_OUTSIDE: '&c&lLỗi | &7Bạn không thể đặt khu vực bên ngoài hòn đảo của bạn.'

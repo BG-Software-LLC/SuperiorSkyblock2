@@ -28,9 +28,6 @@ import java.util.List;
 
 public class UpgradeTypeMobDrops implements IUpgradeType {
 
-    private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddMobDrops(),
-            new CmdAdminSetMobDrops());
-
     private final SuperiorSkyblockPlugin plugin;
     private final boolean isWildStackerInstalled;
 
@@ -46,7 +43,7 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
 
     @Override
     public List<ISuperiorCommand> getCommands() {
-        return commands;
+        return Arrays.asList(new CmdAdminAddMobDrops(), new CmdAdminSetMobDrops());
     }
 
     private static boolean canDupeDropsForEntity(Entity entity) {

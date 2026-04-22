@@ -167,6 +167,7 @@ COMMAND_ARGUMENT_AMOUNT: Betrag
 COMMAND_ARGUMENT_BIOME: biom
 COMMAND_ARGUMENT_BORDER_COLOR: 'border-color'
 COMMAND_ARGUMENT_COMMAND: Befehl...
+COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: Discord...
 COMMAND_ARGUMENT_EFFECT: Trank-Effekt
 COMMAND_ARGUMENT_EMAIL: E-Mail
@@ -179,6 +180,7 @@ COMMAND_ARGUMENT_LIMIT: limit
 COMMAND_ARGUMENT_MATERIAL: Material
 COMMAND_ARGUMENT_MENU: Menüname
 COMMAND_ARGUMENT_MESSAGE: Nachricht...
+COMMAND_ARGUMENT_MISSION_CATEGORY: 'mission-category'
 COMMAND_ARGUMENT_MISSION_NAME: mission-name
 COMMAND_ARGUMENT_MODULE_NAME: Modulname
 COMMAND_ARGUMENT_MULTIPLIER: Multiplikator
@@ -208,6 +210,7 @@ COMMAND_COOLDOWN_FORMAT: '&c&lError | &7Du darfst den Befehl nur in {0} verwende
 COMMAND_DESCRIPTION_ACCEPT: Eine Einladung von einem Spieler annehmen.
 COMMAND_DESCRIPTION_ADMIN: Verwende die Admin-Befehle.
 COMMAND_DESCRIPTION_ADMIN_ADD: Einen Benutzer zu einer Insel hinzufügen.
+COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT: 'Increase the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: Blocklimit für die Insel eines anderen
   Spielers erhöhen.
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: Einem Spieler einen Bonus hinzufügen.
@@ -273,7 +276,7 @@ COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Setze eine Welt für eine Insel zurück.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Schaltpläne für das Plugin erstellen.
-COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Banklimit für eine Insel festlegen.
+COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Lege das Biom einer Insel fest.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: Blockierungsbetrag an einem bestimmten
   Ort festlegen.
@@ -486,9 +489,10 @@ INVALID_AMOUNT: '&c&lError | &7Ungültiger Betrag {0}.'
 INVALID_BIOME: '&c&lError | &7Ungültiges Biom {0}.'
 INVALID_BLOCK: '&c&lError | &7Ungültige Blockposition {0}.'
 INVALID_BORDER_COLOR: '&c&lError | &7Invalid border color {0}.'
+INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lError | &7Ungültige Wirkung {0}.'
 INVALID_ENTITY: '&c&lError | &7Ungültige Entität {0}.'
-INVALID_ENVIRONMENT: '&c&lError | &7Ungültige Welt {0}.'
+INVALID_ENVIRONMENT: '&c&lError | &7Invalid dimension {0}.'
 INVALID_INTERVAL: '&c&lError | &7Invalid interval {0}.'
 INVALID_ISLAND: '&c&lError | &7Du hast keine Insel.'
 INVALID_ISLAND_LOCATION: '&c&lError | &7An deinem Standort gibt es keine Insel.'
@@ -503,6 +507,7 @@ INVALID_MATERIAL: '&c&lError | &7Ungültiges Material {0}.'
 INVALID_MATERIAL_DATA: '&c&lError | &7Ungültige Materialdaten {0}.'
 INVALID_MENU: '&c&lError | &7Invalid menu {0}.'
 INVALID_MISSION: '&c&lError | &7Ungültige Mission {0}.'
+INVALID_MISSION_CATEGORY: '&c&lError | &7Invalid mission category {0}.'
 INVALID_MODULE: '&c&lError | &7Ungültiges Modul {0}.'
 INVALID_MULTIPLIER: '&c&lError | &7Ungültiger Multiplikator {0}.'
 INVALID_PAGE: '&c&lError | &7Ungültige Seite {0}.'
@@ -549,6 +554,7 @@ ISLAND_BEING_CALCULATED: '&c&lError | &7Du kannst nicht mit Blöcken interagiere
 ISLAND_CLOSED: '&e&lInsel | &7Die Insel wurde erfolgreich für die Öffentlichkeit geschlossen.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lError | &7Du hast eine bereits laufende Inselerstellungsaufgabe.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&lInsel | &7Deine Anfrage wird bearbeitet...'
+ISLAND_DESCRIPTION_NONE: None
 ISLAND_FLY_DISABLED: '&e&lFly | &7Inselflug wurde automatisch &cdeaktiviert&7.'
 ISLAND_FLY_ENABLED: '&e&lFly | &7Inselflug wurde automatisch &aktiviert&7.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lInsel | &7&oDu warst auf einer Insel, die aufgelöst
@@ -880,6 +886,7 @@ SCHEMATIC_SAVED: '&e&lSchematics | &7Schaltplan erfolgreich gespeichert!'
 SELF_ROLE_CHANGE: '&c&lError | &7Du kannst deine Rolle nicht ändern.'
 SET_UPGRADE_LEVEL: '&e&lUpgrades | &7Die Ebene von {0} für die Insel von {1} wurde
   erfolgreich aktualisiert.'
+SET_UPGRADE_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of {0} for all islands.'
 SET_UPGRADE_LEVEL_NAME: '&e&lUpgrades | &7Die Ebene von {0} für {1} wurde erfolgreich
   aktualisiert.'
 SET_WARP: '&e&lInsel | &7Erzeugt erfolgreich einen neuen Warp am {0}.'

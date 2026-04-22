@@ -18,9 +18,6 @@ import java.util.List;
 
 public class UpgradeTypeCropGrowth implements IUpgradeType {
 
-    private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddCropGrowth(),
-            new CmdAdminSetCropGrowth());
-
     private final SuperiorSkyblockPlugin plugin;
 
     public UpgradeTypeCropGrowth(SuperiorSkyblockPlugin plugin) {
@@ -34,7 +31,7 @@ public class UpgradeTypeCropGrowth implements IUpgradeType {
 
     @Override
     public List<ISuperiorCommand> getCommands() {
-        return commands;
+        return Arrays.asList(new CmdAdminAddCropGrowth(), new CmdAdminSetCropGrowth());
     }
 
     private class CropGrowthListener implements Listener {

@@ -42,4 +42,9 @@ public class IslandNamesSection extends SettingsContainerHolder implements Setti
         return getContainer().islandNamesPreventPlayerNames;
     }
 
+    @Override
+    public boolean isAnnounceChangeToAll() {
+        return getContainer().islandNamesAnnounceChangeToAll;
+    }
+
 }

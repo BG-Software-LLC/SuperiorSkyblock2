@@ -118,6 +118,7 @@ COMMAND_ARGUMENT_AMOUNT: quantità
 COMMAND_ARGUMENT_BIOME: bioma
 COMMAND_ARGUMENT_BORDER_COLOR: 'colore-bordo'
 COMMAND_ARGUMENT_COMMAND: 'comando...'
+COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EFFECT: effetto-pozione
 COMMAND_ARGUMENT_EMAIL: email
@@ -130,6 +131,7 @@ COMMAND_ARGUMENT_LIMIT: limite
 COMMAND_ARGUMENT_MATERIAL: materiale
 COMMAND_ARGUMENT_MENU: nome-menu
 COMMAND_ARGUMENT_MESSAGE: messagio...
+COMMAND_ARGUMENT_MISSION_CATEGORY: 'mission-category'
 COMMAND_ARGUMENT_MISSION_NAME: nome-missione
 COMMAND_ARGUMENT_MODULE_NAME: 'nome-modulo'
 COMMAND_ARGUMENT_MULTIPLIER: moltiplicatore
@@ -159,6 +161,7 @@ COMMAND_COOLDOWN_FORMAT: '&c&lErrore | &7È possibile utilizzare questo comando 
 COMMAND_DESCRIPTION_ACCEPT: Accetta un invito da un giocatore.
 COMMAND_DESCRIPTION_ADMIN: Utilizzare i comandi di amministrazione.
 COMMAND_DESCRIPTION_ADMIN_ADD: Aggiungi un utente a un'isola.
+COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT: 'Increase the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: Aumenta il limite di blocchi per l'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: Aggiungi un bonus a un giocatore.
 COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT: Aumenta il limite dei giocatori coop per l'isola di un altro giocatore.
@@ -208,7 +211,7 @@ COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Rimuovi tutte le valutazioni fornite d
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Ripristina il mondo su un''isole.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Crea una schematica per il plugin.
-COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Imposta un limite di banca per un'isola.
+COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Imposta il bioma di un'isola.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: Imposta la quantità di un blocco in una posizione specifica.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Imposta il limite di un blocco per l'isola di un giocatore.
@@ -380,9 +383,10 @@ INVALID_AMOUNT: '&c&lErrore | &7Importo invalido {0}.'
 INVALID_BIOME: '&c&lErrore | &7Bioma invalido {0}.'
 INVALID_BLOCK: '&c&lErrore| &7Posizione del blocco invalida {0}.'
 INVALID_BORDER_COLOR: '&c&lError | &7Colore del bordo non valido: {0}'
+INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lErrore| &7Effetto invalido {0}.'
 INVALID_ENTITY: '&c&lErrore | &7Entità invalida {0}.'
-INVALID_ENVIRONMENT: '&c&lErrore | &7Mondo invalido {0}.'
+INVALID_ENVIRONMENT: '&c&lError | &7Invalid dimension {0}.'
 INVALID_INTERVAL: '&c&lError | &7Intervallo non valido: {0}'
 INVALID_ISLAND: '&c&lErrore | &7Non hai un''isola.'
 INVALID_ISLAND_LOCATION: '&c&lErrore | &7Non c''è un isola nella tua posizione.'
@@ -397,6 +401,7 @@ INVALID_MATERIAL: '&c&lErrore | &7Materiale non valido {0}.'
 INVALID_MATERIAL_DATA: '&c&lErrore | &7Il material-data non è corretto {0}.'
 INVALID_MENU: '&c&lError | &7Invalid menu {0}.'
 INVALID_MISSION: '&c&lErrore | &7La missione {0} non è corretta.'
+INVALID_MISSION_CATEGORY: '&c&lError | &7Invalid mission category {0}.'
 INVALID_MODULE: '&c&lError | &7Modulo non valido: {0}'
 INVALID_MULTIPLIER: '&c&lErrore | &7Il moltiplicatore {0} non è corretto.'
 INVALID_PAGE: '&c&lErrore | &7La pagina {0} non è corretta.'
@@ -438,6 +443,7 @@ ISLAND_BEING_CALCULATED: '&c&lErrore | &7Non è possibile interagire con i blocc
 ISLAND_CLOSED: '&e&lIsola | &7Chiusa con successo l''isola al pubblico.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lErrore | &7Hai un''attività di creazione dell''isola già in corso.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&lIsola | &7Elaborazione della richiesta...'
+ISLAND_DESCRIPTION_NONE: None
 ISLAND_FLY_DISABLED: '&e&lFly | &7La modalità volo dell''isola è stata  &cdisattivata&7 automaticamente.'
 ISLAND_FLY_ENABLED: '&e&lFly | &7La modalità volo dell''isola è stata  &aattivata&7 automaticamente.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lIsola | &7&oSei stato all''interno di un''isola che è stata sciolta, quindi sei stato teletrasportato allo spawn...'
@@ -705,6 +711,7 @@ SCHEMATIC_RIGHT_SELECT: '&e&lSchematics | &7Posizione selezionata #1 ({0})'
 SCHEMATIC_SAVED: '&e&lSchematics | &7Schematica salvata con successo!'
 SELF_ROLE_CHANGE: '&c&lErrore | &7Non puoi cambiare il tuo ruolo.'
 SET_UPGRADE_LEVEL: '&e&lAggiornamenti | &7Aggiornato con successo il livello di {0} per l''isola di {1}.'
+SET_UPGRADE_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of {0} for all islands.'
 SET_UPGRADE_LEVEL_NAME: '&e&lAggiornamenti | &7Aggiornato con successo il livello di {0} per {1}.'
 SET_WARP: '&e&lIsola | &7Creato con successo un nuovo warp a {0}.'
 SET_WARP_OUTSIDE: '&c&lErrore | &7Non puoi impostare warp fuori dalla tua isola.'

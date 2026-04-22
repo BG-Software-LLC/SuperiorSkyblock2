@@ -218,9 +218,10 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.Abs
                     byte yPosition = sectionCompound.getByte("Y");
                     if (sectionCompound.contains("Palette", 9) && sectionCompound.contains("BlockStates", 12)) {
                         //noinspection deprecation
-                        levelChunkSections[i] = new LevelChunkSection(yPosition);
-                        levelChunkSections[i].getStates().read(sectionCompound.getList("Palette", 10),
+                        LevelChunkSection levelChunkSection = levelChunkSections[i] = new LevelChunkSection(yPosition);
+                        levelChunkSection.getStates().read(sectionCompound.getList("Palette", 10),
                                 sectionCompound.getLongArray("BlockStates"));
+                        levelChunkSection.recalcBlockCounts();
                     }
                 }
 

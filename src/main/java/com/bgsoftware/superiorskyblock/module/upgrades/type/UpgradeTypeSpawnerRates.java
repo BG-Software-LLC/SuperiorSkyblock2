@@ -22,9 +22,6 @@ import java.util.List;
 
 public class UpgradeTypeSpawnerRates implements IUpgradeType {
 
-    private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddSpawnerRates(),
-            new CmdAdminSetSpawnerRates());
-
     private final SuperiorSkyblockPlugin plugin;
 
     public UpgradeTypeSpawnerRates(SuperiorSkyblockPlugin plugin) {
@@ -38,7 +35,7 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
 
     @Override
     public List<ISuperiorCommand> getCommands() {
-        return commands;
+        return Arrays.asList(new CmdAdminAddSpawnerRates(), new CmdAdminSetSpawnerRates());
     }
 
     public void handleSpawnerPlace(Block block) {
