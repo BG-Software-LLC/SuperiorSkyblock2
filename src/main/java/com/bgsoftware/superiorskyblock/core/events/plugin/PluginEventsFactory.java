@@ -427,12 +427,11 @@ public class PluginEventsFactory {
         return !fireEvent(ISLAND_CHANGE_ROLE_PRIVILEGE_EVENT, islandChangeRolePrivilege).isCancelled();
     }
 
-    public static PluginEvent<IslandChat> callIslandChatEvent(Island island, SuperiorPlayer superiorPlayer, String message, ChatState chatState) {
+    public static PluginEvent<IslandChat> callIslandChatEvent(Island island, SuperiorPlayer superiorPlayer, String message) {
         IslandChat islandChat = new IslandChat();
         islandChat.island = island;
         islandChat.superiorPlayer = superiorPlayer;
         islandChat.message = message;
-        islandChat.chatState = chatState;
         return fireEvent(ISLAND_CHAT_EVENT, islandChat);
     }
 
@@ -1039,6 +1038,13 @@ public class PluginEventsFactory {
         return !fireEvent(PLAYER_CHANGE_BORDER_COLOR_EVENT, playerChangeBorderColor).isCancelled();
     }
 
+    public static boolean callPlayerChangeChatStateEvent(SuperiorPlayer superiorPlayer, ChatState chatState) {
+        PlayerChangeChatState playerChangeChatState = new PlayerChangeChatState();
+        playerChangeChatState.superiorPlayer = superiorPlayer;
+        playerChangeChatState.newChatState = chatState;
+        return !fireEvent(PLAYER_CHANGE_CHAT_STATE_EVENT, playerChangeChatState).isCancelled();
+    }
+
     public static boolean callPlayerChangeLanguageEvent(SuperiorPlayer superiorPlayer, Locale language) {
         PlayerChangeLanguage playerChangeLanguage = new PlayerChangeLanguage();
         playerChangeLanguage.superiorPlayer = superiorPlayer;
@@ -1105,12 +1111,6 @@ public class PluginEventsFactory {
         PlayerToggleFly playerToggleFly = new PlayerToggleFly();
         playerToggleFly.superiorPlayer = superiorPlayer;
         return !fireEvent(PLAYER_TOGGLE_FLY_EVENT, playerToggleFly).isCancelled();
-    }
-
-    public static boolean callPlayerToggleLocalChatEvent(SuperiorPlayer superiorPlayer) {
-        PlayerToggleLocalChat playerToggleLocalChat = new PlayerToggleLocalChat();
-        playerToggleLocalChat.superiorPlayer = superiorPlayer;
-        return !fireEvent(PLAYER_TOGGLE_LOCAL_CHAT_EVENT, playerToggleLocalChat).isCancelled();
     }
 
     public static boolean callPlayerTogglePanelEvent(SuperiorPlayer superiorPlayer) {

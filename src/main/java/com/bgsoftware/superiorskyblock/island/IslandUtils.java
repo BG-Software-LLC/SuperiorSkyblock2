@@ -357,7 +357,7 @@ public class IslandUtils {
         ChatState chatState = superiorPlayer.getChatState();
 
         PluginEvent<PluginEventArgs.IslandChat> event = PluginEventsFactory.callIslandChatEvent(island, superiorPlayer,
-                superiorPlayer.hasPermissionWithoutOP("superior.chat.color") ? Formatters.COLOR_FORMATTER.format(message) : message, chatState);
+                superiorPlayer.hasPermissionWithoutOP("superior.chat.color") ? Formatters.COLOR_FORMATTER.format(message) : message);
 
         if (event.isCancelled() || (chatState != ChatStates.LOCAL_CHAT && chatState != ChatStates.TEAM_CHAT)) {
             return;
@@ -386,7 +386,7 @@ public class IslandUtils {
         //TODO Collect somewhere spies instead of using Bukkit.getOnlinePlayers() always...
         for (Player player : Bukkit.getOnlinePlayers()) {
             SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-            if (onlinePlayer.getSpiedChatStates().contains(chatState)) {
+            if (onlinePlayer.hasAdminSpyEnabled()) {
                 Message.SPY_LOCAL_CHAT_FORMAT.send(onlinePlayer, playerRoleName, superiorPlayerName, formattedMessage);
             }
         }

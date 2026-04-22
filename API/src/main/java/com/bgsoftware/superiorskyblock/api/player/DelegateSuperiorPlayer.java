@@ -345,28 +345,8 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public boolean hasChatState(ChatState chatState) {
-        return this.handle.hasChatState(chatState);
-    }
-
-    @Override
     public void setChatState(ChatState chatState) {
         this.handle.setChatState(chatState);
-    }
-
-    @Override
-    public void addSpiedChatState(ChatState chatState) {
-        this.handle.addSpiedChatState(chatState);
-    }
-
-    @Override
-    public void removeSpiedChatState(ChatState chatState) {
-        this.handle.removeSpiedChatState(chatState);
-    }
-
-    @Override
-    public Set<ChatState> getSpiedChatStates() {
-        return this.handle.getSpiedChatStates();
     }
 
     @Override

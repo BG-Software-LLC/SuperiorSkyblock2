@@ -366,38 +366,11 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      */
     ChatState getChatState();
 
-    /**
-     * Check whether the player has this ChatState.
-     *
-     * @param chatState The ChatState to check.
-     */
-    boolean hasChatState(ChatState chatState);
 
     /**
      * Set the ChatState of the player.
      */
     void setChatState(ChatState chatState);
-
-    /**
-     * Add ChatState to the spied chats of the player.
-     *
-     * @param chatState The ChatState to add.
-     */
-    void addSpiedChatState(ChatState chatState);
-
-    /**
-     * Remove ChatState from the spied chats of the player.
-     *
-     * @param chatState The ChatState to remove.
-     */
-    void removeSpiedChatState(ChatState chatState);
-
-    /**
-     * Get the spied chats of the player.
-     *
-     * @return All ChatStates that the player is spying on.
-     */
-    Set<ChatState> getSpiedChatStates();
 
     /**
      * Get the role of the player.
@@ -569,27 +542,19 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
 
     /**
      * Check whether the player has admin spy mode enabled.
-     *
-     * @deprecated See {@link #getSpiedChatStates()}
      */
-    @Deprecated
     boolean hasAdminSpyEnabled();
 
     /**
      * Toggle admin spy mode.
-     *
-     * @deprecated See {@link #addSpiedChatState(ChatState)} {@link #removeSpiedChatState(ChatState)}
      */
-    @Deprecated
     void toggleAdminSpy();
 
     /**
      * Set whether the player has admin spy mode enabled.
      *
      * @param enabled true to enable admin spy mode.
-     * @deprecated See {@link #addSpiedChatState(ChatState)} {@link #removeSpiedChatState(ChatState)}
      */
-    @Deprecated
     void setAdminSpy(boolean enabled);
 
     /**

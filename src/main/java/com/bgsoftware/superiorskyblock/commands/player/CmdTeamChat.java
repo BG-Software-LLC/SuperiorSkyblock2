@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
@@ -65,19 +66,25 @@ public class CmdTeamChat implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = arguments.getSuperiorPlayer();
 
         if (args.length == 1) {
-            if (!PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
+            ChatState oldChatState = superiorPlayer.getChatState();
+            ChatState newChatState = oldChatState == ChatStates.TEAM_CHAT ?
+                    ChatStates.GLOBAL : ChatStates.TEAM_CHAT;
+
+            //TODO What to do with it? Call two events, because the second one is deprecated, so should still works?
+            if (!PluginEventsFactory.callPlayerChangeChatStateEvent(superiorPlayer, newChatState) ||
+                    !PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
                 return;
 
-            if (superiorPlayer.hasChatState(ChatStates.TEAM_CHAT)) {
-                superiorPlayer.setChatState(ChatStates.GLOBAL);
-                Message.TOGGLED_TEAM_CHAT_OFF.send(superiorPlayer);
-            } else {
-                if (superiorPlayer.hasChatState(ChatStates.LOCAL_CHAT)) {
+            if (newChatState == ChatStates.TEAM_CHAT) {
+                if (oldChatState == ChatStates.LOCAL_CHAT) {
                     Message.TOGGLED_LOCAL_CHAT_OFF.send(superiorPlayer);
                 }
 
                 superiorPlayer.setChatState(ChatStates.TEAM_CHAT);
                 Message.TOGGLED_TEAM_CHAT_ON.send(superiorPlayer);
+            } else {
+                superiorPlayer.setChatState(ChatStates.GLOBAL);
+                Message.TOGGLED_TEAM_CHAT_OFF.send(superiorPlayer);
             }
         } else {
             String message = CommandArguments.buildLongString(args, 1, false);

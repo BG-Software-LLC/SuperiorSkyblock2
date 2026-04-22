@@ -291,28 +291,8 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
     }
 
     @Override
-    public boolean hasChatState(ChatState chatState) {
-        return false;
-    }
-
-    @Override
     public void setChatState(ChatState chatState) {
         // Do nothing.
-    }
-
-    @Override
-    public void addSpiedChatState(ChatState chatState) {
-        // Do nothing.
-    }
-
-    @Override
-    public void removeSpiedChatState(ChatState chatState) {
-        // Do nothing.
-    }
-
-    @Override
-    public Set<ChatState> getSpiedChatStates() {
-        return Collections.emptySet();
     }
 
     @Override

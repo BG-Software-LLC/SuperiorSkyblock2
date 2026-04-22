@@ -397,14 +397,14 @@ public class PlayersListener extends AbstractGameEventListener {
     private void onPlayerChat(GameEvent<GameEventArgs.PlayerChatEvent> e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
 
-        if (superiorPlayer.hasChatState(ChatStates.LOCAL_CHAT)) {
+        if (superiorPlayer.getChatState() == ChatStates.LOCAL_CHAT) {
             Island island;
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 island = plugin.getGrid().getIslandAt((e.getArgs().player).getLocation(wrapper.getHandle()));
             }
 
             if (island == null || island.isSpawn()) {
-                if (!PluginEventsFactory.callPlayerToggleLocalChatEvent(superiorPlayer))
+                if (!PluginEventsFactory.callPlayerChangeChatStateEvent(superiorPlayer, ChatStates.GLOBAL))
                     return;
 
                 superiorPlayer.setChatState(ChatStates.GLOBAL);
@@ -414,11 +414,13 @@ public class PlayersListener extends AbstractGameEventListener {
             e.setCancelled();
 
             IslandUtils.handleIslandChat(island, superiorPlayer, e.getArgs().message);
-        } else if (superiorPlayer.hasChatState(ChatStates.TEAM_CHAT)) {
+        } else if (superiorPlayer.getChatState() == ChatStates.TEAM_CHAT) {
             Island island = superiorPlayer.getIsland();
 
             if (island == null) {
-                if (!PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
+                //TODO What to do with it? Call two events, because the second one is deprecated, so should still works?
+                if (!PluginEventsFactory.callPlayerChangeChatStateEvent(superiorPlayer, ChatStates.GLOBAL) ||
+                        !PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
                     return;
 
                 superiorPlayer.setChatState(ChatStates.GLOBAL);

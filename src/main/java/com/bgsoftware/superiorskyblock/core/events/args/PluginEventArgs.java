@@ -254,7 +254,6 @@ public class PluginEventArgs {
     public static class IslandChat extends IslandDoActionArgs {
 
         public String message;
-        public ChatState chatState;
 
     }
 
@@ -603,6 +602,12 @@ public class PluginEventArgs {
 
     }
 
+    public static class PlayerChangeChatState extends PlayerDoActionArgs {
+
+        public ChatState newChatState;
+
+    }
+
     public static class PlayerChangeLanguage extends PlayerDoActionArgs {
 
         public Locale language;
@@ -653,10 +658,6 @@ public class PluginEventArgs {
     }
 
     public static class PlayerToggleFly extends PlayerDoActionArgs {
-
-    }
-
-    public static class PlayerToggleLocalChat extends PlayerDoActionArgs {
 
     }
 

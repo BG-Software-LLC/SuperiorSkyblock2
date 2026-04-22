@@ -54,14 +54,12 @@ import org.bukkit.scheduler.BukkitTask;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -104,9 +102,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private boolean bypassModeEnabled = false;
     private boolean toggledPanel;
     private boolean islandFly;
-
+    private boolean adminSpyEnabled = false;
     private ChatState chatState = ChatStates.GLOBAL;
-    private final Set<ChatState> spiedChatStates = new HashSet<>();
 
     private SBlockPosition schematicPos1 = null;
     private SBlockPosition schematicPos2 = null;
@@ -714,29 +711,9 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public boolean hasChatState(ChatState chatState) {
-        return this.chatState == chatState;
-    }
-
-    @Override
     public void setChatState(ChatState chatState) {
         Log.debug(Debug.SET_CHAT_STATE, getName(), chatState);
         this.chatState = chatState;
-    }
-
-    @Override
-    public void addSpiedChatState(ChatState chatState) {
-        this.spiedChatStates.add(chatState);
-    }
-
-    @Override
-    public void removeSpiedChatState(ChatState chatState) {
-        this.spiedChatStates.remove(chatState);
-    }
-
-    @Override
-    public Set<ChatState> getSpiedChatStates() {
-        return Collections.unmodifiableSet(spiedChatStates);
     }
 
     @Override
@@ -850,29 +827,19 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    @Deprecated
     public boolean hasAdminSpyEnabled() {
-        return getSpiedChatStates().contains(ChatStates.TEAM_CHAT);
+        return adminSpyEnabled;
     }
 
     @Override
-    @Deprecated
     public void toggleAdminSpy() {
-        if (getSpiedChatStates().contains(ChatStates.TEAM_CHAT)) {
-            removeSpiedChatState(ChatStates.TEAM_CHAT);
-        } else {
-            addSpiedChatState(ChatStates.TEAM_CHAT);
-        }
+        setAdminSpy(!adminSpyEnabled);
     }
 
     @Override
-    @Deprecated
     public void setAdminSpy(boolean enabled) {
-        if (enabled) {
-            addSpiedChatState(ChatStates.TEAM_CHAT);
-        } else {
-            removeSpiedChatState(ChatStates.TEAM_CHAT);
-        }
+        Log.debug(Debug.SET_ADMIN_SPY, getName(), enabled);
+        adminSpyEnabled = enabled;
     }
 
     @Override
