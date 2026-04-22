@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -148,8 +149,13 @@ public class PortalsListener extends AbstractGameEventListener {
 
         Location toLocation = calculateDestination(island, e.getArgs().from, e.getArgs().to, portalType);
 
-        EntityPortalResult portalResult = this.portalsManager.get().handlePlayerPortalFromIsland(
-                superiorPlayer, island, e.getArgs().from, portalType, toLocation, true);
+        EntityPortalResult portalResult;
+        if (toLocation == null) {
+            portalResult = EntityPortalResult.DESTINATION_WORLD_DISABLED;
+        } else {
+            portalResult = this.portalsManager.get().handlePlayerPortalFromIsland(
+                    superiorPlayer, island, e.getArgs().from, portalType, toLocation, true);
+        }
 
         handleEntityPortalResult(portalResult, e);
     }
@@ -172,17 +178,24 @@ public class PortalsListener extends AbstractGameEventListener {
 
         Location toLocation = calculateDestination(island, e.getArgs().from, e.getArgs().to, portalType);
 
-        EntityPortalResult portalResult = this.portalsManager.get().handleEntityPortalFromIsland(
-                entity, island, from, portalType, toLocation);
+        EntityPortalResult portalResult;
+        if (toLocation == null) {
+            portalResult = EntityPortalResult.DESTINATION_WORLD_DISABLED;
+        } else {
+            portalResult = this.portalsManager.get().handleEntityPortalFromIsland(
+                    entity, island, from, portalType, toLocation);
+        }
 
         handleEntityPortalResult(portalResult, e);
     }
 
+    @Nullable
     private Location calculateDestination(Island island, Location fromLocation, Location toLocation, PortalType portalType) {
         Dimension portalDimension = plugin.getGrid().getIslandsWorldDimension(fromLocation.getWorld());
         SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(portalDimension);
         Dimension portalDestination = dimensionConfig == null ? null : dimensionConfig.getPortalDestination(portalType);
-        return portalDestination == null ? toLocation : island.getCenter(portalDestination);
+        SettingsManager.Worlds.DimensionConfig destinationConfig = plugin.getSettings().getWorlds().getDimensionConfig(portalDestination);
+        return portalDestination == null || !destinationConfig.isEnabled() ? null : island.getCenter(portalDestination);
     }
 
     private void handleEntityPortalResult(EntityPortalResult portalResult, GameEvent<GameEventArgs.EntityPortalEvent> event) {
