@@ -147,7 +147,7 @@ public class PortalsListener extends AbstractGameEventListener {
         PortalType portalType = (e.getArgs().cause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ?
                 PortalType.NETHER : PortalType.ENDER;
 
-        Location toLocation = calculateDestination(island, e.getArgs().from, e.getArgs().to, portalType);
+        Location toLocation = calculateDestination(island, e.getArgs().from, portalType);
 
         EntityPortalResult portalResult;
         if (toLocation == null) {
@@ -176,7 +176,7 @@ public class PortalsListener extends AbstractGameEventListener {
         PortalType portalType = (e.getArgs().cause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ?
                 PortalType.NETHER : PortalType.ENDER;
 
-        Location toLocation = calculateDestination(island, e.getArgs().from, e.getArgs().to, portalType);
+        Location toLocation = calculateDestination(island, e.getArgs().from, portalType);
 
         EntityPortalResult portalResult;
         if (toLocation == null) {
@@ -190,12 +190,14 @@ public class PortalsListener extends AbstractGameEventListener {
     }
 
     @Nullable
-    private Location calculateDestination(Island island, Location fromLocation, Location toLocation, PortalType portalType) {
+    private Location calculateDestination(Island island, Location fromLocation, PortalType portalType) {
         Dimension portalDimension = plugin.getGrid().getIslandsWorldDimension(fromLocation.getWorld());
         SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(portalDimension);
         Dimension portalDestination = dimensionConfig == null ? null : dimensionConfig.getPortalDestination(portalType);
+        if (portalDestination == null)
+            return null;
         SettingsManager.Worlds.DimensionConfig destinationConfig = plugin.getSettings().getWorlds().getDimensionConfig(portalDestination);
-        return portalDestination == null || !destinationConfig.isEnabled() ? null : island.getCenter(portalDestination);
+        return !destinationConfig.isEnabled() ? null : island.getCenter(portalDestination);
     }
 
     private void handleEntityPortalResult(EntityPortalResult portalResult, GameEvent<GameEventArgs.EntityPortalEvent> event) {
