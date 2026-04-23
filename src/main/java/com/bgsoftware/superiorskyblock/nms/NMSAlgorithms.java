@@ -67,6 +67,8 @@ public interface NMSAlgorithms {
 
     void setTrim(ItemMeta itemMeta, String trimMaterial, String trimPattern) throws IllegalArgumentException;
 
+    void setHideTooltip(ItemMeta itemMeta);
+
     void addPotion(PotionMeta potionMeta, PotionEffect potionEffect);
 
     String getMinecraftKey(ItemStack itemStack);
