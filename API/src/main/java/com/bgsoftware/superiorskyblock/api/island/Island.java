@@ -1257,7 +1257,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Change the biome of the island's area.
-     * @deprecated See {@link #setBiome(Biome, Dimension)}
+     * @deprecated See {@link #setBiome(Dimension, Biome)}
      */
     @Deprecated
     void setBiome(Biome biome);
@@ -1266,27 +1266,27 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Change the biome of the island's area.
      *
      * @param updateBlocks Whether the blocks get updated or not.
-     * @deprecated See {@link #setBiome(Biome, Dimension, boolean)}
+     * @deprecated See {@link #setBiome(Dimension, Biome, int)}
      */
     @Deprecated
     void setBiome(Biome biome, boolean updateBlocks);
 
     /**
      * Change the island biome in the dimension.
-     * 
-     * @param biome     New biome to set.
+     *
      * @param dimension The dimension to change the biome in.
+     * @param biome     New biome to set.
      */
-    void setBiome(Biome biome, Dimension dimension);
+    void setBiome(Dimension dimension, Biome biome);
 
     /**
      * Change the island biome in the dimension.
      *
-     * @param biome        New biome to set.
-     * @param dimension    The dimension to change the biome in.
-     * @param updateBlocks Whether the blocks get updated or not.
+     * @param dimension The dimension to change the biome in.
+     * @param biome     New biome to set.
+     * @param flags     See {@link IslandBiomeFlags}
      */
-    void setBiome(Biome biome, Dimension dimension, boolean updateBlocks);
+    void setBiome(Dimension dimension, Biome biome, @IslandBiomeFlags int flags);
 
     /**
      * Check whether the island is locked to visitors.

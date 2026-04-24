@@ -880,13 +880,13 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public void setBiome(Biome biome, Dimension dimension) {
-        this.handle.setBiome(biome, dimension);
+    public void setBiome(Dimension dimension, Biome biome) {
+        this.handle.setBiome(dimension, biome);
     }
 
     @Override
-    public void setBiome(Biome biome, Dimension dimension, boolean updateBlocks) {
-        this.handle.setBiome(biome, dimension, updateBlocks);
+    public void setBiome(Dimension dimension, Biome biome, @IslandBiomeFlags int flags) {
+        this.handle.setBiome(dimension, biome, flags);
     }
 
     @Override

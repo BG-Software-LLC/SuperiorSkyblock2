@@ -126,7 +126,7 @@ public class PluginEventsFactory {
         return fireEvent(ISLAND_BANK_WITHDRAW_EVENT, islandBankWithdraw);
     }
 
-    public static PluginEvent<IslandBiomeChange> callIslandBiomeChangeEvent(Island island, SuperiorPlayer superiorPlayer, Biome biome, Dimension dimension) {
+    public static PluginEvent<IslandBiomeChange> callIslandBiomeChangeEvent(Island island, SuperiorPlayer superiorPlayer, Dimension dimension, Biome biome) {
         IslandBiomeChange islandBiomeChange = new IslandBiomeChange();
         islandBiomeChange.island = island;
         islandBiomeChange.superiorPlayer = superiorPlayer;

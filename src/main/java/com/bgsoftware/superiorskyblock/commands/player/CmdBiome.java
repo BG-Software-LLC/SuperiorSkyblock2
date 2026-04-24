@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.superiorskyblock.api.enums.DimensionSelectionMode;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
@@ -33,8 +34,7 @@ public class CmdBiome implements IPermissibleCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        if (Menus.MENU_BIOMES.getDimensionSelectionMode().equals("ARGUMENT") ||
-                Menus.MENU_BIOMES.getDimensionSelectionMode().equals("BOTH"))
+        if (isMode(DimensionSelectionMode.ARGUMENT) || isMode(DimensionSelectionMode.AUTO))
             return "biome [" + Message.COMMAND_ARGUMENT_DIMENSION.getMessage(locale) + "]";
         else
             return "biome";
@@ -52,8 +52,7 @@ public class CmdBiome implements IPermissibleCommand {
 
     @Override
     public int getMaxArgs() {
-        return (Menus.MENU_BIOMES.getDimensionSelectionMode().equals("ARGUMENT") ||
-                Menus.MENU_BIOMES.getDimensionSelectionMode().equals("BOTH")) ? 2 : 1;
+        return (isMode(DimensionSelectionMode.ARGUMENT) || isMode(DimensionSelectionMode.AUTO)) ? 2 : 1;
     }
 
     @Override
@@ -82,8 +81,7 @@ public class CmdBiome implements IPermissibleCommand {
         } else {
             World world = superiorPlayer.asPlayer().getWorld();
 
-            if ((Menus.MENU_BIOMES.getDimensionSelectionMode().equals("LOCATION") ||
-                    Menus.MENU_BIOMES.getDimensionSelectionMode().equals("BOTH")) &&
+            if ((isMode(DimensionSelectionMode.LOCATION) || isMode(DimensionSelectionMode.AUTO)) &&
                     plugin.getProviders().getWorldsProvider().isIslandsWorld(world)) {
                 dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(world);
             } else {
@@ -114,11 +112,14 @@ public class CmdBiome implements IPermissibleCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        if (args.length == 2 && (Menus.MENU_BIOMES.getDimensionSelectionMode().equals("ARGUMENT") ||
-                Menus.MENU_BIOMES.getDimensionSelectionMode().equals("BOTH")))
+        if (args.length == 2 && (isMode(DimensionSelectionMode.ARGUMENT) || isMode(DimensionSelectionMode.AUTO)))
             return CommandTabCompletes.getDimensions(plugin, args[1]);
         else
             return Collections.emptyList();
+    }
+
+    private boolean isMode(DimensionSelectionMode dimensionSelectionMode) {
+        return Menus.MENU_BIOMES.getDimensionSelectionMode() == dimensionSelectionMode;
     }
 
 }

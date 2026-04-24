@@ -40,7 +40,7 @@ public class BiomePagedObjectButton extends AbstractPagedMenuButton<MenuBiomes.V
         }
 
         PluginEvent<PluginEventArgs.IslandBiomeChange> event = PluginEventsFactory.callIslandBiomeChangeEvent(
-                menuView.getIsland(), inventoryViewer, pagedObject.getBiome(), menuView.getDimension());
+                menuView.getIsland(), inventoryViewer, menuView.getDimension(), pagedObject.getBiome());
 
         if (event.isCancelled()) {
             GameSoundImpl.playSound(player, pagedObject.getNoAccessSound());
@@ -52,7 +52,7 @@ public class BiomePagedObjectButton extends AbstractPagedMenuButton<MenuBiomes.V
         pagedObject.getAccessCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                 command.replace("%player%", inventoryViewer.getName())));
 
-        menuView.getIsland().setBiome(event.getArgs().biome, menuView.getDimension());
+        menuView.getIsland().setBiome(menuView.getDimension(), event.getArgs().biome);
         Message.CHANGED_BIOME.send(inventoryViewer,
                 Formatters.CAPITALIZED_FORMATTER.format(event.getArgs().biome.name()),
                 Formatters.CAPITALIZED_FORMATTER.format(menuView.getDimension().getName()));

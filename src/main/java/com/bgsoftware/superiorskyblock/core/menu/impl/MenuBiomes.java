@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.menu.impl;
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.DimensionSelectionMode;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
@@ -42,9 +43,10 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
 
     private final List<BiomeInfo> biomes;
     private final boolean currentBiomeGlow;
-    private final String dimensionSelectionMode;
+    private final DimensionSelectionMode dimensionSelectionMode;
 
-    private MenuBiomes(MenuParseResult<View> parseResult, List<BiomeInfo> islandFlags, boolean currentBiomeGlow, String dimensionSelectionMode) {
+    private MenuBiomes(MenuParseResult<View> parseResult, List<BiomeInfo> islandFlags,
+                       boolean currentBiomeGlow, DimensionSelectionMode dimensionSelectionMode) {
         super(MenuIdentifiers.MENU_BIOMES, parseResult, false);
         this.biomes = islandFlags;
         this.currentBiomeGlow = currentBiomeGlow;
@@ -55,7 +57,7 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
         return currentBiomeGlow;
     }
 
-    public String getDimensionSelectionMode() {
+    public DimensionSelectionMode getDimensionSelectionMode() {
         return dimensionSelectionMode;
     }
 
@@ -77,7 +79,13 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
         YamlConfiguration cfg = menuParseResult.getConfig();
 
         boolean shouldCurrentBiomeGlow = cfg.getBoolean("current-biome-glow", false);
-        String dimensionSelectionMode = cfg.getString("dimension-selection-mode", "NONE");
+        DimensionSelectionMode dimensionSelectionMode;
+
+        try {
+            dimensionSelectionMode = DimensionSelectionMode.valueOf(cfg.getString("dimension-selection-mode", "NONE"));
+        } catch (IllegalArgumentException e) {
+            dimensionSelectionMode = DimensionSelectionMode.DEFAULT;
+        }
 
         List<BiomeInfo> biomes = new LinkedList<>();
         Optional.ofNullable(cfg.getConfigurationSection("biomes")).ifPresent(biomesSection -> {
@@ -368,8 +376,8 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
             }
 
             cfg.set("pattern", newPattern);
-            cfg.set("slots", newChar);
-            cfg.set("dimension-selection-mode", "NONE");
+            cfg.set("slots", String.valueOf(newChar));
+            cfg.set("dimension-selection-mode", "DEFAULT");
         }
 
         return true;

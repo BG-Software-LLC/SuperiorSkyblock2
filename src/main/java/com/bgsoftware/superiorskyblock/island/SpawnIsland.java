@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBiomeFlags;
 import com.bgsoftware.superiorskyblock.api.island.IslandBlockFlags;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
@@ -1055,12 +1056,12 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public void setBiome(Biome biome, Dimension dimension) {
+    public void setBiome(Dimension dimension, Biome biome) {
         // Do nothing.
     }
 
     @Override
-    public void setBiome(Biome biome, Dimension dimension, boolean updateBlocks) {
+    public void setBiome(Dimension dimension, Biome biome, @IslandBiomeFlags int flags) {
         // Do nothing.
     }
 

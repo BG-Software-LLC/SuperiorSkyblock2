@@ -113,7 +113,7 @@ public class MenusProvider_Default implements MenusProvider {
     @Override
     @Deprecated
     public void openBiomes(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
-        openBiomes(targetPlayer, previousMenu, targetIsland, plugin.getSettings().getWorlds().getDefaultWorldDimension());
+        throw new UnsupportedOperationException("This method is no longer supported.");
     }
 
     @Override

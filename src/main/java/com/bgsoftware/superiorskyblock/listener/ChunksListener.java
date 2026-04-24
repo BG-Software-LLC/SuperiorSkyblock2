@@ -115,7 +115,7 @@ public class ChunksListener extends AbstractGameEventListener {
 
     private void handleIslandChunkLoad(Island island, Chunk chunk, ChunkPosition chunkPosition, boolean isNewChunk) {
         World world = chunk.getWorld();
-        Dimension dimension = WorldInfo.of(world).getDimension();
+        Dimension dimension = plugin.getGrid().getIslandsWorldDimension(world);
 
         if (isNewChunk) {
             Biome biome = island.getBiome(dimension);
@@ -151,7 +151,7 @@ public class ChunksListener extends AbstractGameEventListener {
 
         if (chunk.getX() == (islandCenter.getX() >> 4) && chunk.getZ() == (islandCenter.getZ() >> 4)) {
             Block chunkBlock = chunk.getBlock(0, 100, 0);
-            island.setBiome(world.getBiome(chunkBlock.getX(), chunkBlock.getZ()), dimension, false);
+            island.setBiome(dimension, world.getBiome(chunkBlock.getX(), chunkBlock.getZ()), 0);
 
             if (entityLimitsEnabled)
                 recalculateEntities.set(true);

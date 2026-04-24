@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBiomeFlags;
 import com.bgsoftware.superiorskyblock.api.island.IslandBlockFlags;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
@@ -246,7 +247,7 @@ public class SIsland implements Island {
     private final AtomicReference<BigDecimal> bonusLevel = new AtomicReference<>(BigDecimal.ZERO);
     private final Map<MissionReference, Counter> completedMissions = new ConcurrentHashMap<>();
     private final Synchronized<IslandChest[]> islandChests = Synchronized.of(createDefaultIslandChests());
-    private final Synchronized<Map<Dimension, CompletableFuture<Biome>>> biomeGetterTasks = Synchronized.of(new HashMap<>());
+    private final Synchronized<EnumerateMap<Dimension, CompletableFuture<Biome>>> biomeGetterTasks = Synchronized.of(new EnumerateMap<>(Dimension.values()));
     private final Synchronized<EnumerateSet<Dimension>> generatedSchematics = Synchronized.of(new EnumerateSet<>(Dimension.values()));
     private final Synchronized<EnumerateSet<Dimension>> unlockedWorlds = Synchronized.of(new EnumerateSet<>(Dimension.values()));
     @Nullable
@@ -274,7 +275,7 @@ public class SIsland implements Island {
     private volatile String formattedName;
     private volatile String strippedName;
     private volatile String description;
-    private final Map<Dimension, Biome> biomes = new ConcurrentHashMap<>();
+    private final EnumerateMap<Dimension, Biome> biomes = new EnumerateMap<>(Dimension.values());
 
     public SIsland(IslandBuilderImpl builder) {
         this.uuid = builder.uuid;
@@ -1981,13 +1982,13 @@ public class SIsland implements Island {
 
     @Override
     public Biome getBiome(Dimension dimension) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
         Biome biome = biomes.get(dimension);
 
         if (biome == null) {
-            biomeGetterTasks.set(tasksMap -> {
-                tasksMap.compute(dimension, (k, currentTask)
-                        -> getBiomeAsyncTask(currentTask, dimension));
-                return tasksMap;
+            biomeGetterTasks.write(tasksMap -> {
+                tasksMap.computeIfAbsent(dimension, dim -> getBiomeAsyncTask(dimension));
             });
 
             return IslandUtils.getDefaultWorldBiome(dimension);
@@ -1996,11 +1997,7 @@ public class SIsland implements Island {
         return biome;
     }
 
-    private CompletableFuture<Biome> getBiomeAsyncTask(CompletableFuture<Biome> currentTask, Dimension dimension) {
-        if (currentTask != null) {
-            return currentTask;
-        }
-
+    private CompletableFuture<Biome> getBiomeAsyncTask(Dimension dimension) {
         BlockPosition centerBlockPosition = getCenterPosition();
         CompletableFuture<Biome> newTask = new CompletableFuture<>();
 
@@ -2023,9 +2020,8 @@ public class SIsland implements Island {
                         } else {
                             this.biomes.put(dimension, biome);
 
-                            biomeGetterTasks.set(tasksMap -> {
+                            biomeGetterTasks.write(tasksMap -> {
                                 tasksMap.remove(dimension);
-                                return tasksMap;
                             });
 
                             newTask.complete(biome);
@@ -2044,20 +2040,21 @@ public class SIsland implements Island {
 
     @Override
     public void setBiome(Biome biome, boolean updateBlocks) {
-        setBiome(biome, plugin.getSettings().getWorlds().getDefaultWorldDimension(), updateBlocks);
+        setBiome(plugin.getSettings().getWorlds().getDefaultWorldDimension(), biome,
+                IslandBiomeFlags.UPDATE_BLOCKS | IslandBiomeFlags.UPDATE_ALL_DIMENSIONS);
     }
 
     @Override
-    public void setBiome(Biome biome, Dimension dimension) {
-        setBiome(biome, dimension, true);
+    public void setBiome(Dimension dimension, Biome biome) {
+        setBiome(dimension, biome, IslandBiomeFlags.UPDATE_BLOCKS);
     }
 
     @Override
-    public void setBiome(Biome biome, Dimension dimension, boolean updateBlocks) {
+    public void setBiome(Dimension dimension, Biome biome, int flags) {
         Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
-        Log.debug(Debug.SET_BIOME, owner.getName(), biome, dimension, updateBlocks);
+        Log.debug(Debug.SET_BIOME, owner.getName(), biome, dimension);
 
         Biome currentBiome = this.biomes.get(dimension);
         if (currentBiome != null) {
@@ -2066,29 +2063,37 @@ public class SIsland implements Island {
 
         this.biomes.put(dimension, biome);
 
-        if (!updateBlocks) {
+        if ((flags & IslandBiomeFlags.UPDATE_BLOCKS) == 0) {
             return;
         }
 
-        IslandWorlds.accessIslandWorldAsync(this, dimension, false, result -> {
-            result.ifLeft(world -> {
-                WorldInfo worldInfo = WorldInfo.of(world);
-                List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, 0);
+        boolean updateAllDimensions = (flags & IslandBiomeFlags.UPDATE_ALL_DIMENSIONS) != 0;
 
-                List<Player> playersToUpdate;
-                try (IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(this)) {
-                    playersToUpdate = strategy.getPlayers(worldInfo);
-                }
+        if (updateAllDimensions) {
+            IslandWorlds.accessIslandWorldsAsync(this, false, result -> {
+                result.ifLeft(world -> {
+                    WorldInfo worldInfo = WorldInfo.of(world);
+                    Dimension worldDimension = worldInfo.getDimension();
+                    Biome worldBiome = worldDimension == dimension ? biome : getBiome(worldDimension);
 
-                plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
+                    setBiome(worldInfo, worldBiome);
+                });
             });
-        });
+        } else {
+            IslandWorlds.accessIslandWorldAsync(this, dimension, false, result -> {
+                result.ifLeft(world -> {
+                    WorldInfo worldInfo = WorldInfo.of(world);
+
+                    setBiome(worldInfo, biome);
+                });
+            });
+        }
 
         try (IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(this)) {
             for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
                 WorldInfo worldInfo = WorldInfo.of(registeredWorld);
 
-                if (worldInfo.getDimension() == dimension) {
+                if (updateAllDimensions || worldInfo.getDimension() == dimension) {
                     List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, 0);
                     List<Player> playersToUpdate = strategy.getPlayers(worldInfo);
 
@@ -2096,6 +2101,17 @@ public class SIsland implements Island {
                 }
             }
         }
+    }
+
+    private void setBiome(WorldInfo worldInfo, Biome biome) {
+        List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, 0);
+
+        List<Player> playersToUpdate;
+        try (IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(this)) {
+            playersToUpdate = strategy.getPlayers(worldInfo);
+        }
+
+        plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
     }
 
     @Override
