@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -27,9 +28,12 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Tameable;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -64,6 +68,36 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
     public EntityCategoriesSection(YamlConfiguration cfg) {
         this.nameToCategory = loadInternal(cfg);
         this.entityToCategory = convertEntityToCategoryInternal(this.nameToCategory.values());
+    }
+
+    public static void removeInvalidEntityKeys(YamlConfiguration cfg, File file) {
+        boolean removed = false;
+        for (String categoryName : cfg.getKeys(false)) {
+            if (!categoryName.equals("TAMEABLE") && !categoryName.equals("ANIMAL") && !categoryName.equals("MONSTER")) {
+                List<String> entities = cfg.getStringList(categoryName + ".entities");
+                Iterator<String> iterator = entities.iterator();
+                while (iterator.hasNext()) {
+                    EntityType entityType = EnumHelper.getEnum(EntityType.class, iterator.next());
+                    if (entityType == null) {
+                        iterator.remove();
+                        removed = true;
+                    }
+                }
+                if (entities.isEmpty()) {
+                    cfg.set(categoryName, null);
+                } else {
+                    cfg.set(categoryName + ".entities", entities);
+                }
+            }
+        }
+
+        if (removed) {
+            try {
+                cfg.save(file);
+            } catch (IOException ignored) {
+            }
+        }
+
     }
 
     private static Map<String, EntityCategory> loadInternal(YamlConfiguration cfg) {
