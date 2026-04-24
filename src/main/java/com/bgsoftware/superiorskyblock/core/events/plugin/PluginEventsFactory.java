@@ -130,8 +130,8 @@ public class PluginEventsFactory {
         IslandBiomeChange islandBiomeChange = new IslandBiomeChange();
         islandBiomeChange.island = island;
         islandBiomeChange.superiorPlayer = superiorPlayer;
-        islandBiomeChange.biome = biome;
         islandBiomeChange.dimension = dimension;
+        islandBiomeChange.biome = biome;
         return fireEvent(ISLAND_BIOME_CHANGE_EVENT, islandBiomeChange);
     }
 

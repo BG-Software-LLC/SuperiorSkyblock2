@@ -92,8 +92,8 @@ public class PluginEventArgs {
 
     public static class IslandBiomeChange extends IslandDoActionArgs {
 
-        public Biome biome;
         public Dimension dimension;
+        public Biome biome;
 
     }
 

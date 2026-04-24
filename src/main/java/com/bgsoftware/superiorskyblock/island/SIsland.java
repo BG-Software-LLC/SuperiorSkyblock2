@@ -2051,8 +2051,8 @@ public class SIsland implements Island {
 
     @Override
     public void setBiome(Dimension dimension, Biome biome, int flags) {
-        Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+        Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
 
         Log.debug(Debug.SET_BIOME, owner.getName(), biome, dimension);
 

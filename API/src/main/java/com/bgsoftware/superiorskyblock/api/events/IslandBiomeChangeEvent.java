@@ -22,8 +22,8 @@ public class IslandBiomeChangeEvent extends IslandEvent implements Cancellable {
      *
      * @param superiorPlayer The player who changed the biome of the island.
      * @param island         The island object that was changed.
-     * @param biome          The new biome of the island.
      * @param dimension      The dimension in which biome was changed.
+     * @param biome          The new biome of the island.
      */
     public IslandBiomeChangeEvent(SuperiorPlayer superiorPlayer, Island island, Dimension dimension, Biome biome) {
         super(island);
