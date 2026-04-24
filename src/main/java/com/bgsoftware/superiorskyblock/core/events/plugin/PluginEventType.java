@@ -312,7 +312,7 @@ public abstract class PluginEventType<Args extends PluginEventArgs> extends Even
     public static final PluginEventType<IslandBiomeChange> ISLAND_BIOME_CHANGE_EVENT = new PluginEventType<IslandBiomeChange>(IslandBiomeChangeEvent.class) {
         @Override
         public Event createBukkitEvent(IslandBiomeChange args) {
-            return new IslandBiomeChangeEvent(args.superiorPlayer, args.island, args.biome);
+            return new IslandBiomeChangeEvent(args.superiorPlayer, args.island, args.biome, args.dimension);
         }
 
         @Override

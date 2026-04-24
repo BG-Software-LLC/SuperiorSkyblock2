@@ -59,11 +59,10 @@ CHANGED_BANK_LIMIT_ALL: '&e&lYükseltmeler | &7Tüm adaların banka limiti başa
   güncellendi.'
 CHANGED_BANK_LIMIT_NAME: '&e&lYükseltmeler | &7{0} adasının banka limiti başarıyla
   güncellendi.'
-CHANGED_BIOME: '&e&lAda | &7Biyom başarıyla {0} olarak değiştirildi. Değişiklikleri
-  görmek için sunucuya tekrar bağlanman gerekebilir.'
-CHANGED_BIOME_ALL: '&e&lAda | &7Tüm adalar için biyom başarıyla {0} olarak değiştirildi.'
-CHANGED_BIOME_NAME: '&e&lAda | &7{1} adası için biyom başarıyla {0} olarak değiştirildi.'
-CHANGED_BIOME_OTHER: '&e&lAda | &7{1}''in adası için biyom başarıyla {0} olarak değiştirildi.'
+CHANGED_BIOME: '&e&lIsland | &7Successfully changed biome to {0} in {1} dimension.'
+CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} in {1} dimension for all the islands.'
+CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for the island {1}.'
+CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for {1}''s island.'
 CHANGED_BLOCK_AMOUNT: '&e&lBloklar | &7{0} konumundaki blok miktarı başarıyla {1}
   olarak değiştirildi.'
 CHANGED_BLOCK_LIMIT: '&e&lYükseltmeler | &7{0} Bloğunun {1}''in adası için limiti
@@ -959,4 +958,5 @@ WITHDRAW_ERROR: '&c&lHata | &7{0}.'
 WITHDRAWN_MONEY: '&e&lBanka | &7{1}''in ada bankasından ${0} çektin!'
 WITHDRAWN_MONEY_NAME: '&e&lBanka | &7{1} adasının bankasından ${0} çektin!'
 WORLD_NOT_ENABLED: '&e&lWorlds | &7The {0} world is not enabled on the server.'
+WORLD_NOT_GENERATED: '&e&lWorlds | &7The {0} world is not generated yet!'
 WORLD_NOT_UNLOCKED: '&e&lDünyalar | &7{0} dünyası henüz kilitli değil!'

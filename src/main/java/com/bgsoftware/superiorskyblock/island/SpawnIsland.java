@@ -1040,12 +1040,27 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public Biome getBiome(Dimension dimension) {
+        return biome;
+    }
+
+    @Override
     public void setBiome(Biome biome) {
         // Do nothing.
     }
 
     @Override
     public void setBiome(Biome biome, boolean updateBlocks) {
+        // Do nothing.
+    }
+
+    @Override
+    public void setBiome(Biome biome, Dimension dimension) {
+        // Do nothing.
+    }
+
+    @Override
+    public void setBiome(Biome biome, Dimension dimension, boolean updateBlocks) {
         // Do nothing.
     }
 

@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.menu.MenuIslandCreationConfig;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
 public interface MenusProvider {
@@ -45,8 +46,21 @@ public interface MenusProvider {
      * @param targetPlayer The player to open the menu for.
      * @param previousMenu The previous menu that was opened, if exists.
      * @param targetIsland The island to change biomes for.
+     * @deprecated See {@link #openBiomes(SuperiorPlayer, ISuperiorMenu, Island, Dimension)}
      */
+    @Deprecated
     void openBiomes(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland);
+
+    /**
+     * Open the biomes-menu.
+     * Used to display and choose biomes for the island.
+     *
+     * @param targetPlayer The player to open the menu for.
+     * @param previousMenu The previous menu that was opened, if exists.
+     * @param targetIsland The island to change biomes for.
+     * @param dimension    The dimension to change biomes for.
+     */
+    void openBiomes(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland, Dimension dimension);
 
     /**
      * Open the border-color menu.

@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
@@ -63,8 +64,14 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     }
 
     @Override
+    @Deprecated
     public void openBiomes(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
-        plugin.getProviders().getMenusProvider().openBiomes(targetPlayer, previousMenu, targetIsland);
+        openBiomes(targetPlayer, previousMenu, targetIsland, plugin.getSettings().getWorlds().getDefaultWorldDimension());
+    }
+
+    @Override
+    public void openBiomes(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland, Dimension dimension) {
+        plugin.getProviders().getMenusProvider().openBiomes(targetPlayer, previousMenu, targetIsland, dimension);
     }
 
     @Override

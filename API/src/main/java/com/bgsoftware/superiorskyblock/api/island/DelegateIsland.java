@@ -858,18 +858,35 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public Biome getBiome() {
         return this.handle.getBiome();
     }
 
+    public Biome getBiome(Dimension dimension) {
+        return this.handle.getBiome(dimension);
+    }
+
     @Override
+    @Deprecated
     public void setBiome(Biome biome) {
         this.handle.setBiome(biome);
     }
 
     @Override
+    @Deprecated
     public void setBiome(Biome biome, boolean updateBlocks) {
         this.handle.setBiome(biome, updateBlocks);
+    }
+
+    @Override
+    public void setBiome(Biome biome, Dimension dimension) {
+        this.handle.setBiome(biome, dimension);
+    }
+
+    @Override
+    public void setBiome(Biome biome, Dimension dimension, boolean updateBlocks) {
+        this.handle.setBiome(biome, dimension, updateBlocks);
     }
 
     @Override

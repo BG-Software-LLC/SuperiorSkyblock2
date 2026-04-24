@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
 import java.util.Map;
@@ -50,8 +51,21 @@ public interface MenusManager {
      * @param targetPlayer The player to open the menu for.
      * @param previousMenu The previous menu that was opened, if exists.
      * @param targetIsland The island to change biomes for.
+     * @deprecated See {@link #openBiomes(SuperiorPlayer, ISuperiorMenu, Island, Dimension)}
      */
+    @Deprecated
     void openBiomes(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland);
+
+    /**
+     * Open the biomes-menu.
+     * Used to display and choose biomes for the island.
+     *
+     * @param targetPlayer The player to open the menu for.
+     * @param previousMenu The previous menu that was opened, if exists.
+     * @param targetIsland The island to change biomes for.
+     * @param dimension    The dimension to change biomes for.
+     */
+    void openBiomes(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland, Dimension dimension);
 
     /**
      * Open the island biomes menu for a player.
