@@ -2045,38 +2045,6 @@ public class SIsland implements Island {
     @Override
     public void setBiome(Biome biome, boolean updateBlocks) {
         setBiome(biome, plugin.getSettings().getWorlds().getDefaultWorldDimension(), updateBlocks);
-        /*Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
-
-        Log.debug(Debug.SET_BIOME, owner.getName(), biome, updateBlocks);
-
-        this.biome = biome;
-
-        if (!updateBlocks)
-            return;
-
-
-        IslandWorlds.accessIslandWorldsAsync(this, false, result -> {
-            result.ifLeft(world -> {
-                WorldInfo worldInfo = WorldInfo.of(world);
-                Biome worldBiome = plugin.getSettings().getWorlds().getDefaultWorldDimension() == worldInfo.getDimension() ?
-                        biome : IslandUtils.getDefaultWorldBiome(worldInfo.getDimension());
-                List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, 0);
-                List<Player> playersToUpdate;
-                try (IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(this)) {
-                    playersToUpdate = strategy.getPlayers(worldInfo);
-                }
-                plugin.getNMSChunks().setBiome(chunkPositions, worldBiome, playersToUpdate);
-            });
-        });
-
-        try (IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(this)) {
-            for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
-                WorldInfo worldInfo = WorldInfo.of(registeredWorld);
-                List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, 0);
-                List<Player> playersToUpdate = strategy.getPlayers(worldInfo);
-                plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
-            }
-        }*/
     }
 
     @Override
