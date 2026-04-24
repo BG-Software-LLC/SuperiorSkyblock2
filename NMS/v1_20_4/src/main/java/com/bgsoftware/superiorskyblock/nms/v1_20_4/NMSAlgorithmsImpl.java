@@ -51,6 +51,11 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_20
     }
 
     @Override
+    public void setHideTooltip(ItemMeta itemMeta) {
+        itemMeta.setHideTooltip(true);
+    }
+
+    @Override
     public String getMinecraftKey(ItemStack itemStack) {
         return BuiltInRegistries.ITEM.getKey(CraftItemStack.asNMSCopy(itemStack).getItem()).toString();
     }
