@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.service.portals.EntityPortalResult;
 import com.bgsoftware.superiorskyblock.api.service.portals.PortalsManagerService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Either;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
@@ -147,14 +148,14 @@ public class PortalsListener extends AbstractGameEventListener {
         PortalType portalType = (e.getArgs().cause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ?
                 PortalType.NETHER : PortalType.ENDER;
 
-        Location toLocation = calculateDestination(island, e.getArgs().from, portalType);
+        Either<Location, EntityPortalResult> destinationResult = calculateDestination(island, e.getArgs().from, portalType);
 
         EntityPortalResult portalResult;
-        if (toLocation == null) {
-            portalResult = EntityPortalResult.DESTINATION_WORLD_DISABLED;
-        } else {
+        if (destinationResult.getLeft() != null) {
             portalResult = this.portalsManager.get().handlePlayerPortalFromIsland(
-                    superiorPlayer, island, e.getArgs().from, portalType, toLocation, true);
+                    superiorPlayer, island, e.getArgs().from, portalType, destinationResult.getLeft(), true);
+        } else {
+            portalResult = destinationResult.getRight();
         }
 
         handleEntityPortalResult(portalResult, e);
@@ -176,28 +177,31 @@ public class PortalsListener extends AbstractGameEventListener {
         PortalType portalType = (e.getArgs().cause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ?
                 PortalType.NETHER : PortalType.ENDER;
 
-        Location toLocation = calculateDestination(island, e.getArgs().from, portalType);
+        Either<Location, EntityPortalResult> destinationResult = calculateDestination(island, e.getArgs().from, portalType);
 
         EntityPortalResult portalResult;
-        if (toLocation == null) {
-            portalResult = EntityPortalResult.DESTINATION_WORLD_DISABLED;
-        } else {
+        if (destinationResult.getLeft() != null) {
             portalResult = this.portalsManager.get().handleEntityPortalFromIsland(
-                    entity, island, from, portalType, toLocation);
+                    entity, island, from, portalType, destinationResult.getLeft());
+        } else {
+            portalResult = destinationResult.getRight();
         }
 
         handleEntityPortalResult(portalResult, e);
     }
 
     @Nullable
-    private Location calculateDestination(Island island, Location fromLocation, PortalType portalType) {
+    private Either<Location, EntityPortalResult> calculateDestination(Island island, Location fromLocation, PortalType portalType) {
         Dimension portalDimension = plugin.getGrid().getIslandsWorldDimension(fromLocation.getWorld());
+        if (portalDimension == null)
+            return Either.right(EntityPortalResult.PORTAL_NOT_IN_ISLAND);
         SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(portalDimension);
         Dimension portalDestination = dimensionConfig == null ? null : dimensionConfig.getPortalDestination(portalType);
         if (portalDestination == null)
-            return null;
+            return Either.right(EntityPortalResult.DESTINATION_NOT_ISLAND_WORLD);
         SettingsManager.Worlds.DimensionConfig destinationConfig = plugin.getSettings().getWorlds().getDimensionConfig(portalDestination);
-        return !destinationConfig.isEnabled() ? null : island.getCenter(portalDestination);
+        return !destinationConfig.isEnabled() ? Either.right(EntityPortalResult.DESTINATION_WORLD_DISABLED) :
+                Either.left(island.getCenter(portalDestination));
     }
 
     private void handleEntityPortalResult(EntityPortalResult portalResult, GameEvent<GameEventArgs.EntityPortalEvent> event) {
