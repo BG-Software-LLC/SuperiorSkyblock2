@@ -50,7 +50,7 @@ public class PortalsListener extends AbstractGameEventListener {
     }
 
     private void registerListeners() {
-        registerCallback(GameEventType.ENTITY_PORTAL_EVENT, GameEventPriority.MONITOR, this::onEntityPortal);
+        registerCallback(GameEventType.ENTITY_PORTAL_EVENT, GameEventPriority.HIGHEST, this::onEntityPortal);
         registerCallback(GameEventType.ENTITY_ENTER_PORTAL_EVENT, GameEventPriority.HIGHEST, this::onEntityEnterPortal);
     }
 
@@ -68,17 +68,20 @@ public class PortalsListener extends AbstractGameEventListener {
 
         Entity entity = e.getArgs().entity;
 
+        Location portalLocation = e.getArgs().portalLocation;
+
+        World world = portalLocation.getWorld();
+
         Island island;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             island = plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()));
         }
 
-        if (island == null)
+        if (island == null) {
+            if (plugin.getGrid().isIslandsWorld(world))
+                e.setCancelled();
             return;
-
-        Location portalLocation = e.getArgs().portalLocation;
-
-        World world = portalLocation.getWorld();
+        }
 
         // Simulate end portal
         if (world.getEnvironment() == World.Environment.THE_END) {
@@ -145,8 +148,11 @@ public class PortalsListener extends AbstractGameEventListener {
         }
 
         Island island = plugin.getGrid().getIslandAt(e.getArgs().from);
-        if (island == null)
+        if (island == null) {
+            if (plugin.getGrid().isIslandsWorld(e.getArgs().from.getWorld()))
+                e.setCancelled();
             return;
+        }
 
         PortalType portalType = (e.getArgs().cause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ?
                 PortalType.NETHER : PortalType.ENDER;
