@@ -11,22 +11,15 @@ import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.world.entity.BuiltinEntityCategory;
 import com.bgsoftware.superiorskyblock.world.entity.EntityCategoryImpl;
 import com.google.common.base.Preconditions;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Ambient;
-import org.bukkit.entity.Creature;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Flying;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Slime;
-import org.bukkit.entity.Tameable;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,19 +33,6 @@ import java.util.Locale;
 import java.util.Map;
 
 public class EntityCategoriesSection implements SettingsManager.EntityCategories {
-
-    @Nullable
-    private static final Class<?> HOGLIN_CLASS = getEntityTypeClass("org.bukkit.entity.Hoglin");
-    @Nullable
-    private static final Class<?> SKELETON_HORSE_CLASS = getEntityTypeClass("org.bukkit.entity.SkeletonHorse");
-    @Nullable
-    private static final Class<?> ZOMBIE_HORSE_CLASS = getEntityTypeClass("org.bukkit.entity.ZombieHorse");
-    @Nullable
-    private static final Class<?> ZOMBIE_NAUTILUS_CLASS = getEntityTypeClass("org.bukkit.entity.ZombieNautilus");
-
-    private static final KeySet TAMEABLE_ENTITY_KEYS = createTameableEntityKeys();
-    private static final KeySet ANIMAL_ENTITY_KEYS = createAnimalEntityKeys();
-    private static final KeySet MONSTER_ENTITY_KEYS = createMonsterEntityKeys();
 
     private final Map<String, EntityCategory> nameToCategory;
     private final KeyMap<List<EntityCategory>> entityToCategory;
@@ -73,7 +53,7 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
     public static void removeInvalidEntityKeys(YamlConfiguration cfg, File file) {
         boolean removed = false;
         for (String categoryName : cfg.getKeys(false)) {
-            if (!categoryName.equals("TAMEABLE") && !categoryName.equals("ANIMAL") && !categoryName.equals("MONSTER")) {
+            if (EnumHelper.getEnum(BuiltinEntityCategory.class, categoryName) == null) {
                 List<String> entities = cfg.getStringList(categoryName + ".entities");
                 Iterator<String> iterator = entities.iterator();
                 while (iterator.hasNext()) {
@@ -102,6 +82,7 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
 
     private static Map<String, EntityCategory> loadInternal(YamlConfiguration cfg) {
         Map<String, EntityCategory> entityCategories = new HashMap<>();
+
         for (String categoryName : cfg.getKeys(false)) {
             String key = categoryName.toLowerCase(Locale.ENGLISH);
 
@@ -112,16 +93,11 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
 
             ConfigurationSection section = cfg.getConfigurationSection(categoryName);
 
-            KeySet entities;
-            if (categoryName.equalsIgnoreCase("TAMEABLE")) {
-                entities = TAMEABLE_ENTITY_KEYS;
-            } else if (categoryName.equalsIgnoreCase("ANIMAL")) {
-                entities = ANIMAL_ENTITY_KEYS;
-            } else if (categoryName.equalsIgnoreCase("MONSTER")) {
-                entities = MONSTER_ENTITY_KEYS;
-            } else {
-                entities = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE, section.getStringList("entities"));
-            }
+            BuiltinEntityCategory builtinEntityCategory = EnumHelper.getEnum(BuiltinEntityCategory.class,
+                    categoryName.toUpperCase(Locale.ENGLISH));
+
+            KeySet entities = builtinEntityCategory != null ? builtinEntityCategory.getEntities() :
+                    KeySets.createHashSet(KeyIndicator.ENTITY_TYPE, section.getStringList("entities"));
 
             IslandPrivilege spawnPrivilege = getOrRegisterPrivilege(section.getString("actions.SPAWN"));
             IslandPrivilege damagePrivilege = getOrRegisterPrivilege(section.getString("actions.DAMAGE"));
@@ -132,7 +108,17 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
             entityCategories.put(key, new EntityCategoryImpl(categoryName, entities, spawnPrivilege, damagePrivilege,
                     interactPrivilege, spawnerSpawnFlag, naturalSpawnFlag));
         }
-        return entityCategories.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(entityCategories);
+
+        // Add rest of built-in entity categories
+        for (BuiltinEntityCategory builtinEntityCategory : BuiltinEntityCategory.values()) {
+            if (!entityCategories.containsKey(builtinEntityCategory.name())) {
+                entityCategories.put(builtinEntityCategory.name(), new EntityCategoryImpl(builtinEntityCategory.name(),
+                        builtinEntityCategory.getEntities(), null, null,
+                        null, null, null));
+            }
+        }
+
+        return Collections.unmodifiableMap(entityCategories);
     }
 
     private static KeyMap<List<EntityCategory>> convertEntityToCategoryInternal(Collection<EntityCategory> entityCategories) {
@@ -168,46 +154,6 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
         return this.nameToCategory.get(name.toLowerCase(Locale.ENGLISH));
     }
 
-    private static KeySet createTameableEntityKeys() {
-        KeySet tameableEntities = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE);
-        for (EntityType entityType : EntityType.values()) {
-            if (entityType.getEntityClass() != null && Tameable.class.isAssignableFrom(entityType.getEntityClass())) {
-                tameableEntities.add(Keys.of(entityType));
-            }
-        }
-        return tameableEntities;
-    }
-
-    private static KeySet createAnimalEntityKeys() {
-        KeySet animalEntities = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE);
-        for (EntityType entityType : EntityType.values()) {
-            Class<? extends Entity> entityClass = entityType.getEntityClass();
-            if (entityClass != null && !isMonsterType(entityClass) &&
-                    (Creature.class.isAssignableFrom(entityClass) || Ambient.class.isAssignableFrom(entityClass))) {
-                animalEntities.add(Keys.of(entityType));
-            }
-        }
-        return animalEntities;
-    }
-
-    private static boolean isMonsterType(Class<? extends Entity> entityClass) {
-        return Monster.class.isAssignableFrom(entityClass) ||
-                Slime.class.isAssignableFrom(entityClass) || Flying.class.isAssignableFrom(entityClass) ||
-                entityClass == HOGLIN_CLASS || entityClass == SKELETON_HORSE_CLASS ||
-                entityClass == ZOMBIE_HORSE_CLASS || entityClass == ZOMBIE_NAUTILUS_CLASS;
-    }
-
-    private static KeySet createMonsterEntityKeys() {
-        KeySet monsterEntities = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE);
-        for (EntityType entityType : EntityType.values()) {
-            Class<? extends Entity> entityClass = entityType.getEntityClass();
-            if (entityClass != null && isMonsterType(entityClass)) {
-                monsterEntities.add(Keys.of(entityType));
-            }
-        }
-        return monsterEntities;
-    }
-
     @Nullable
     private static IslandPrivilege getOrRegisterPrivilege(@Nullable String name) {
         if (name == null)
@@ -231,15 +177,6 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
         } catch (NullPointerException error) {
             IslandFlag.register(name);
             return IslandFlag.getByName(name);
-        }
-    }
-
-    @Nullable
-    private static Class<?> getEntityTypeClass(String clazz) {
-        try {
-            return Class.forName(clazz);
-        } catch (ClassNotFoundException error) {
-            return null;
         }
     }
 

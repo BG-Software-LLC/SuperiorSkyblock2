@@ -9,10 +9,9 @@ import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
+import com.bgsoftware.superiorskyblock.world.entity.BuiltinEntityCategory;
 import org.bukkit.Material;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.ArmorStand;
@@ -45,17 +44,6 @@ public class BukkitEntities {
     private static final EntityType NAUTILUS_TYPE = EnumHelper.getEnum(EntityType.class, "NAUTILUS");
     @Nullable
     private static final EntityType ZOMBIE_NAUTILUS_TYPE = EnumHelper.getEnum(EntityType.class, "ZOMBIE_NAUTILUS");
-
-    @Nullable
-    private static EntityCategory TAMEABLE_CATEGORY;
-
-    public static void registerListeners(PluginEventsDispatcher dispatcher) {
-        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, BukkitEntities::onSettingsUpdate);
-    }
-
-    private static void onSettingsUpdate() {
-        TAMEABLE_CATEGORY = plugin.getSettings().getEntityCategoriesMap().getCategoryByName("TAMEABLE");
-    }
 
     private BukkitEntities() {
 
@@ -176,9 +164,9 @@ public class BukkitEntities {
 
     public static List<EntityCategory> getCategories(Entity entity) {
         List<EntityCategory> categories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(entity));
-        if (TAMEABLE_CATEGORY != null && isTameable(entity)) {
+        if (isTameable(entity)) {
             categories = new LinkedList<>(categories);
-            categories.add(TAMEABLE_CATEGORY);
+            categories.add(BuiltinEntityCategory.TAMEABLE.getEntityCategory());
         }
         return categories;
     }
