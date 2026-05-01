@@ -44,6 +44,10 @@ allprojects {
             throw new GradleException("Found debug messages: " + filesWithDebug)
     }
 
+    shadowJar {
+        relocate 'com.bgsoftware.common', 'com.bgsoftware.superiorskyblock.libs.com.bgsoftware.common'
+    }
+
     build {
         dependsOn checkDebug
         dependsOn shadowJar
@@ -63,7 +67,7 @@ dependencies {
     implementation 'com.bgsoftware.common.executors:Executors:b3'
     implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:b11:all@jar'
     implementation 'com.bgsoftware.common.dependencies:DependenciesManager:b2'
-    implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b18'
+    implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b19'
     implementation 'com.bgsoftware.common.databasebridge:DatabaseBridge:b2'
 
     implementation 'org.bstats:bstats-bukkit:3.0.0'
@@ -88,7 +92,6 @@ subprojects.each { evaluationDependsOn(it.path) }
 
 shadowJar {
     relocate 'org.bstats', 'com.bgsoftware.superiorskyblock.libs.org.bstats'
-    relocate 'com.bgsoftware.common', 'com.bgsoftware.superiorskyblock.libs.com.bgsoftware.common'
 
     archiveClassifier.set('')
 
@@ -105,11 +108,24 @@ shadowJar {
             try {
                 def reobfTask = sub.tasks.named('reobfJar')
                 dependsOn(reobfTask)
-                from(reobfTask.flatMap { it.outputJar }.map { zipTree(it) }) {
+                from(reobfTask.map { it.outputJar }) {
                     exclude 'META-INF/MANIFEST.MF', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+                    rename { sub.name }
+                    into("nms")
                 }
+                return;
             } catch (Exception ignored) {
-                from sub.sourceSets.main.output
+            }
+        }
+
+        if (sub.path.startsWith(':NMS:v')) {
+            def shadowJarTask = sub.tasks.named("shadowJar")
+            dependsOn(shadowJarTask)
+
+            from(shadowJarTask.map { it.archiveFile }) {
+                exclude 'META-INF/MANIFEST.MF', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+                rename { sub.name }
+                into("nms")
             }
         } else {
             from sub.sourceSets.main.output
