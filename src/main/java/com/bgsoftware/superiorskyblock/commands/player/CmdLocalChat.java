@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.IslandChat;
 import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import org.bukkit.command.CommandSender;
 
@@ -86,7 +86,7 @@ public class CmdLocalChat implements ISuperiorCommand {
             superiorPlayer.setChatState(newChatState);
         } else {
             String message = CommandArguments.buildLongString(args, 1, false);
-            IslandUtils.handleIslandChat(island, superiorPlayer, message);
+            IslandChat.handleIslandChat(island, superiorPlayer, message);
         }
     }
 

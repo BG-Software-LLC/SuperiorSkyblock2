@@ -31,6 +31,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.island.IslandChat;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
@@ -840,6 +841,12 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void setAdminSpy(boolean enabled) {
         Log.debug(Debug.SET_ADMIN_SPY, getName(), enabled);
         adminSpyEnabled = enabled;
+
+        if (enabled) {
+            IslandChat.addSpy(this);
+        } else {
+            IslandChat.removeSpy(this);
+        }
     }
 
     @Override

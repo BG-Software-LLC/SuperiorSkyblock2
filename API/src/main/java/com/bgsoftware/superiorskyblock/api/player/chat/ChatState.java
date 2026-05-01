@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public abstract class ChatState implements Enumerable {
+public class ChatState implements Enumerable {
 
     private static final Map<String, ChatState> chatStates = new HashMap<>();
     private static int ordinalCounter = 0;
@@ -35,13 +35,6 @@ public abstract class ChatState implements Enumerable {
     public final String getName() {
         return name;
     }
-
-    /**
-     * Get the target players for the player.
-     *
-     * @param superiorPlayer The player to get the target players for.
-     */
-    public abstract List<SuperiorPlayer> getTargetPlayers(SuperiorPlayer superiorPlayer);
 
     @Override
     public String toString() {

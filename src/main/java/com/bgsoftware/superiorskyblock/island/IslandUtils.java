@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
@@ -18,23 +17,18 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.SynchronizedTasks;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
-import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
@@ -351,45 +345,6 @@ public class IslandUtils {
 
     public static List<Biome> getDefaultWorldBiomes() {
         return new SequentialListBuilder<Biome>().build(DEFAULT_WORLD_BIOMES.values());
-    }
-
-    public static void handleIslandChat(Island island, SuperiorPlayer superiorPlayer, String message) {
-        ChatState chatState = superiorPlayer.getChatState();
-
-        PluginEvent<PluginEventArgs.IslandChat> event = PluginEventsFactory.callIslandChatEvent(island, superiorPlayer,
-                superiorPlayer.hasPermissionWithoutOP("superior.chat.color") ? Formatters.COLOR_FORMATTER.format(message) : message);
-
-        if (event.isCancelled() || (chatState != ChatStates.LOCAL_CHAT && chatState != ChatStates.TEAM_CHAT)) {
-            return;
-        }
-
-        Message chatFormat;
-        Message spyChatFormat;
-        if (chatState == ChatStates.LOCAL_CHAT) {
-            chatFormat = Message.LOCAL_CHAT_FORMAT;
-            spyChatFormat = Message.SPY_LOCAL_CHAT_FORMAT;
-        } else {
-            chatFormat = Message.TEAM_CHAT_FORMAT;
-            spyChatFormat = Message.SPY_TEAM_CHAT_FORMAT;
-        }
-
-        String playerRoleName = getPlayerRole(island, superiorPlayer).getDisplayName();
-        String superiorPlayerName = superiorPlayer.getName();
-        String formattedMessage = event.getArgs().message;
-
-        for (SuperiorPlayer targetPlayer : chatState.getTargetPlayers(superiorPlayer)) {
-            chatFormat.send(targetPlayer, playerRoleName, superiorPlayerName, formattedMessage);
-        }
-
-        spyChatFormat.send(Bukkit.getConsoleSender(), playerRoleName, superiorPlayerName, formattedMessage);
-
-        //TODO Collect somewhere spies instead of using Bukkit.getOnlinePlayers() always...
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-            if (onlinePlayer.hasAdminSpyEnabled()) {
-                spyChatFormat.send(onlinePlayer, playerRoleName, superiorPlayerName, formattedMessage);
-            }
-        }
     }
 
 }

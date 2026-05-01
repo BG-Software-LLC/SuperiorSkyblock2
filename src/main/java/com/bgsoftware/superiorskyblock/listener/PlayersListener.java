@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.core.formatting.impl.ChatFormatter;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.IslandChat;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
 import com.bgsoftware.superiorskyblock.island.notifications.IslandNotifications;
@@ -413,12 +414,11 @@ public class PlayersListener extends AbstractGameEventListener {
 
             e.setCancelled();
 
-            IslandUtils.handleIslandChat(island, superiorPlayer, e.getArgs().message);
+            IslandChat.handleIslandChat(island, superiorPlayer, e.getArgs().message);
         } else if (superiorPlayer.getChatState() == ChatStates.TEAM_CHAT) {
             Island island = superiorPlayer.getIsland();
 
             if (island == null) {
-                //TODO What to do with it? Call two events, because the second one is deprecated, so should still works?
                 if (!PluginEventsFactory.callPlayerChangeChatStateEvent(superiorPlayer, ChatStates.GLOBAL) ||
                         !PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
                     return;
@@ -429,7 +429,7 @@ public class PlayersListener extends AbstractGameEventListener {
 
             e.setCancelled();
 
-            IslandUtils.handleIslandChat(island, superiorPlayer, e.getArgs().message);
+            IslandChat.handleIslandChat(island, superiorPlayer, e.getArgs().message);
         } else if (e.getArgs().format != null) {
             e.getArgs().format = Formatters.CHAT_FORMATTER.format(
                     new ChatFormatter.ChatFormatArgs(e.getArgs().format, superiorPlayer, superiorPlayer.getIsland()));

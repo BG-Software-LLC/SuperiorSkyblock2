@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.IslandChat;
 import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import org.bukkit.command.CommandSender;
 
@@ -70,7 +70,6 @@ public class CmdTeamChat implements ISuperiorCommand {
             ChatState newChatState = oldChatState == ChatStates.TEAM_CHAT ?
                     ChatStates.GLOBAL : ChatStates.TEAM_CHAT;
 
-            //TODO What to do with it? Call two events, because the second one is deprecated, so should still works?
             if (!PluginEventsFactory.callPlayerChangeChatStateEvent(superiorPlayer, newChatState) ||
                     !PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
                 return;
@@ -88,7 +87,7 @@ public class CmdTeamChat implements ISuperiorCommand {
             superiorPlayer.setChatState(newChatState);
         } else {
             String message = CommandArguments.buildLongString(args, 1, false);
-            IslandUtils.handleIslandChat(island, superiorPlayer, message);
+            IslandChat.handleIslandChat(island, superiorPlayer, message);
         }
     }
 
