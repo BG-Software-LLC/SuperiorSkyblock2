@@ -111,12 +111,6 @@ public class MenusProvider_Default implements MenusProvider {
     }
 
     @Override
-    @Deprecated
-    public void openBiomes(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
-        throw new UnsupportedOperationException("This method is no longer supported.");
-    }
-
-    @Override
     public void openBiomes(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland, Dimension dimension) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");

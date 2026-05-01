@@ -863,6 +863,7 @@ public class DelegateIsland implements Island {
         return this.handle.getBiome();
     }
 
+    @Override
     public Biome getBiome(Dimension dimension) {
         return this.handle.getBiome(dimension);
     }
