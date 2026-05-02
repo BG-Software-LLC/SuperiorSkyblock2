@@ -1984,17 +1984,20 @@ public class SIsland implements Island {
     public Biome getBiome(Dimension dimension) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
-        IslandBiome islandBiome = islandBiomes.readAndGet(map -> map.get(dimension));
+        Biome biome = islandBiomes.readAndGet(map -> {
+            IslandBiome islandBiome = map.get(dimension);
+            return (islandBiome != null) ? islandBiome.getBiome() : null;
+        });
 
-        if (islandBiome != null && islandBiome.getBiome() != null) {
-            return islandBiome.getBiome();
+        if (biome != null) {
+            return biome;
         }
 
         islandBiomes.write(map -> {
-            IslandBiome biome = map.computeIfAbsent(dimension, d -> new IslandBiome());
+            IslandBiome islandBiome = map.computeIfAbsent(dimension, d -> new IslandBiome());
 
-            if (biome.getTask() == null) {
-                biome.setTask(getBiomeAsyncTask(dimension, biome));
+            if (islandBiome.getTask() == null) {
+                islandBiome.setTask(getBiomeAsyncTask(dimension, islandBiome));
             }
         });
 

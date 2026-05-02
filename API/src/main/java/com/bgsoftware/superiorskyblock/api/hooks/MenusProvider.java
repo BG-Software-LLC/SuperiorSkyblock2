@@ -49,7 +49,7 @@ public interface MenusProvider {
      * @deprecated See {@link #openBiomes(SuperiorPlayer, ISuperiorMenu, Island, Dimension)}
      */
     @Deprecated
-    default void openBiomes(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) throws UnsupportedOperationException {
+    default void openBiomes(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         throw new UnsupportedOperationException("openBiomes is not supported");
     };
 
