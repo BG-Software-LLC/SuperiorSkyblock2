@@ -364,8 +364,11 @@ GLOBAL_TITLE_SENT_NAME: '&e&l岛屿 | &7成功将标题消息发送至岛屿 {0}
 GOT_BANNED: '&e&l岛屿 | &7你已被玩家 {0} 的岛屿封禁.'
 GOT_DEMOTED: '&e&l岛屿 | &7你在你的岛屿中被降职为 {0} 角色.'
 GOT_EXPELLED: '&e&l岛屿 | &7&o你已被岛屿 {0} 开除.'
-GOT_INVITE: '&e&l岛屿 | &7{0} 邀请了你至他的岛屿.'
-GOT_INVITE_TOOLTIP: '&7点击该消息来同意请求.'
+GOT_INVITE:
+  0:
+    text: '&e&l岛屿 | &7{0} 邀请了你至他的岛屿.'
+    tooltip: '&7点击该消息来同意请求.'
+    command: '/is accept {0}'
 GOT_KICKED: '&e&l岛屿 | &7你被玩家 {0} 踢出了岛屿.'
 GOT_PROMOTED: '&e&l岛屿 | &7你在你的岛屿中被升职为 {0} 角色.'
 GOT_REVOKED: '&e&l岛屿 | &7{0} 撤回了对你的邀请.'

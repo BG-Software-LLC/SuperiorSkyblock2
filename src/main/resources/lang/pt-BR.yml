@@ -364,8 +364,11 @@ GLOBAL_TITLE_SENT_NAME: '&e&lIlha | &7Título enviado com sucesso para os membro
 GOT_BANNED: '&e&lIlha | &7Você foi BANIDO da ilha de {0}.'
 GOT_DEMOTED: '&e&lIlha | &7Você foi rebaixado para {0} na sua ilha.'
 GOT_EXPELLED: '&e&lIlha | &7&oVocê foi expulso da ilha por {0}.'
-GOT_INVITE: '&e&lIlha | &7{0} convidou você para a ilha dele.'
-GOT_INVITE_TOOLTIP: '&7Clique na mensagem para aceitar o convite.'
+GOT_INVITE:
+  0:
+    text: '&e&lIlha | &7{0} convidou você para a ilha dele.'
+    tooltip: '&7Clique na mensagem para aceitar o convite.'
+    command: '/is accept {0}'
 GOT_KICKED: '&e&lIlha | &7Você foi expulso da sua ilha por {0}.'
 GOT_PROMOTED: '&e&lIlha | &7Você foi promovido para {0} na sua ilha.'
 GOT_REVOKED: '&e&lIlha | &7{0} revogou seu convite para a ilha dele.'

@@ -379,8 +379,11 @@ GLOBAL_TITLE_SENT_NAME: '&e&lIsland | &7Successfully sent to the island members 
 GOT_BANNED: '&e&lיא | &7רמוע לש יאה ןמ תקחרוה.'
 GOT_DEMOTED: '&e&lיא | &7ךלש יאב {0} תגרדל הגרדב תדרי.'
 GOT_EXPELLED: '&e&lיא | &7{0} ידי לע יאה ןמ תשרוג.'
-GOT_INVITE: '&e&lיא | &7ולש יאה לא ךתוא ןימזה {0}.'
-GOT_INVITE_TOOLTIP: '&7הנמזהה תא רשאל תנמ לע העדוהה לע ץחל.'
+GOT_INVITE:
+  0:
+    text: '&e&lיא | &7ולש יאה לא ךתוא ןימזה {0}.'
+    tooltip: '&7הנמזהה תא רשאל תנמ לע העדוהה לע ץחל.'
+    command: '/is accept {0}'
 GOT_KICKED: '&e&lיא | &7{0} ידי לע ךלש יאה ןמ תפעוה.'
 GOT_PROMOTED: '&e&lיא | &7ךלש יאב {0} תגרדל הגרדב תלעוה.'
 GOT_REVOKED: '&e&lיא | &7ולש יאל ךלש הנמזהה תא לטיב {0}.'

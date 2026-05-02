@@ -413,8 +413,11 @@ GLOBAL_TITLE_SENT_NAME: '&e&lĐảo | &7Gửi title cho thành viên đảo {0} 
 GOT_BANNED: '&e&lĐảo | &7Bạn đã bị &cCẤM&7 khỏi đảo của {0}.'
 GOT_DEMOTED: '&e&lĐảo | &7Bạn đã bị hạ cấp xuống thành {0} trong đảo của bạn.'
 GOT_EXPELLED: '&e&lĐảo | &7&oBạn đã bị trục xuất khỏi đảo bởi {0}...'
-GOT_INVITE: '&e&lĐảo | &7{0} mời bạn đến đảo của họ.'
-GOT_INVITE_TOOLTIP: '&7Nhấp vào tin nhắn để chấp nhận lời mời.'
+GOT_INVITE:
+  0:
+    text: '&e&lĐảo | &7{0} mời bạn đến đảo của họ.'
+    tooltip: '&7Nhấp vào tin nhắn để chấp nhận lời mời.'
+    command: '/is accept {0}'
 GOT_KICKED: '&e&lĐảo | &7Bạn đã bị kick khỏi đảo của bạn bởi {0}.'
 GOT_PROMOTED: '&e&lĐảo | &7Bạn đã được thăng chức {0} trong đảo của bạn.'
 GOT_REVOKED: '&e&lĐảo | &7{0} đã thu hồi lời mời bạn đến đảo của họ.'

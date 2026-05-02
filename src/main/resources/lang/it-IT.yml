@@ -368,8 +368,11 @@ GLOBAL_TITLE_SENT_NAME: '&e&lIsola | &7Il titolo è stato inviato con successo a
 GOT_BANNED: '&e&lIsola | &7Sei stato bannato dall''isola di {0}.'
 GOT_DEMOTED: '&e&lIsola | &7Sei stato retrocesso a {0} nella tua isola.'
 GOT_EXPELLED: '&e&lIsola | &7&o{0} ti ha espulso dall''isola.'
-GOT_INVITE: '&e&lIsola | &7{0} ti ha invitato nella sua isola.'
-GOT_INVITE_TOOLTIP: '&7Clicca il messaggio per accettare l''invito.'
+GOT_INVITE:
+  0:
+    text: '&e&lIsola | &7{0} ti ha invitato nella sua isola.'
+    tooltip: '&7Clicca il messaggio per accettare l''invito.'
+    command: '/is accept {0}'
 GOT_KICKED: '&e&lIsola | &7{0} ti ha cacciato dall''isola.'
 GOT_PROMOTED: '&e&lIsola | &7Sei stato promosso a {0} nella tua isola.'
 GOT_REVOKED: '&e&lIsola | &7{0} ha revocato il suo invito.'

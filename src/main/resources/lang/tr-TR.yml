@@ -448,8 +448,11 @@ GLOBAL_TITLE_SENT_NAME: '&e&lAda | &7{0} adasının üyelerine başlık başarı
 GOT_BANNED: '&e&lAda | &7{0}''ın adasından YASAKLANDIN.'
 GOT_DEMOTED: '&e&lAda | &7Adanda {0} olarak rütbe düşürüldün.'
 GOT_EXPELLED: '&e&lAda | &7&o{0} tarafından adadan kovuldun.'
-GOT_INVITE: '&e&lAda | &7{0} seni adasına davet etti.'
-GOT_INVITE_TOOLTIP: '&7Daveti kabul etmek için mesaja tıkla.'
+GOT_INVITE:
+  0:
+    text: '&e&lAda | &7{0} seni adasına davet etti.'
+    tooltip: '&7Daveti kabul etmek için mesaja tıkla.'
+    command: '/is accept {0}'
 GOT_KICKED: '&e&lAda | &7{0} tarafından adandan atıldın.'
 GOT_PROMOTED: '&e&lAda | &7Adanda {0} olarak rütbe yükseltildin.'
 GOT_REVOKED: '&e&lAda | &7{0} adasına olan davetini geri çekti.'

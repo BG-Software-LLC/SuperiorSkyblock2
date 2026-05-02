@@ -364,8 +364,11 @@ GLOBAL_TITLE_SENT_NAME: '&e&lWyspa | &7Pomyslnie wyslano do czlonków wyspy {0} 
 GOT_BANNED: '&e&lWyspa | &7Zostales ZABRONIONY z wyspy uzytkownika {0}.'
 GOT_DEMOTED: '&e&lWyspa | &7Zostales zdegradowany do {0} na swojej wyspie.'
 GOT_EXPELLED: '&e&lWyspa | &7&oZostales wydalony z wyspy przez {0}.'
-GOT_INVITE: '&e&lWyspa | &7{0} zaprosil cie na swoja wyspe.'
-GOT_INVITE_TOOLTIP: '&7Kliknij wiadomosc, aby zaakceptowac zaproszenie.'
+GOT_INVITE:
+  0:
+    text: '&e&lWyspa | &7{0} zaprosil cie na swoja wyspe.'
+    tooltip: '&7Kliknij wiadomosc, aby zaakceptowac zaproszenie.'
+    command: '/is accept {0}'
 GOT_KICKED: '&e&lWyspa | &7Zostales wyrzucony z wyspy przez {0}.'
 GOT_PROMOTED: '&e&lWyspa | &7Zostales awansowany na {0} na swojej wyspie.'
 GOT_REVOKED: '&e&lWyspa | &7{0} odwolal Twoje zaproszenie na swoja wyspe.'
