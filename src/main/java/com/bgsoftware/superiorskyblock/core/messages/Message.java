@@ -22,7 +22,6 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -1004,7 +1003,7 @@ public enum Message {
         }
     }
 
-    private static boolean convertData(YamlConfiguration cfg) {
+    private static boolean convertData(CommentedConfiguration cfg) {
         if (cfg.isString("GOT_INVITE_TOOLTIP")) {
             cfg.set("GOT_INVITE.0.text", cfg.getString("GOT_INVITE"));
             cfg.set("GOT_INVITE.0.tooltip", cfg.getString("GOT_INVITE_TOOLTIP"));
