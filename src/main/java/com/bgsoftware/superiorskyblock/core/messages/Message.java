@@ -812,7 +812,6 @@ public enum Message {
     };
 
     private static final String[] IGNORED_SECTIONS = new String[]{"lang/en-US.yml", "GOT_INVITE"};
-
     private static final Object[] EMPTY_ARGS = new Object[0];
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -834,18 +833,13 @@ public enum Message {
     }
 
     Message(boolean isCustom) {
-        this(null, isCustom, 0L, null);
+        this.defaultMessage = null;
+        this.isCustom = isCustom;
     }
 
     Message(String defaultMessage) {
-        this(defaultMessage, false, 0L, null);
-    }
-
-    Message(String defaultMessage, boolean isCustom, long delay, @Nullable TimeUnit delayUnit) {
         this.defaultMessage = defaultMessage;
-        this.isCustom = isCustom;
-        if (delay > 0 && delayUnit != null)
-            delayedMessages = AutoRemovalCollection.newHashSet(delay, delayUnit);
+        this.isCustom = false;
     }
 
     public static void reload() {
@@ -929,9 +923,9 @@ public enum Message {
     }
 
     public boolean isEmpty(Locale locale) {
-        IMessageComponent messageContainer = getComponent(locale);
-        return messageContainer == null || messageContainer.getType() == IMessageComponent.Type.EMPTY ||
-                messageContainer.getMessage().isEmpty();
+        IMessageComponent messageComponent = getComponent(locale);
+        return messageComponent == null || messageComponent.getType() == IMessageComponent.Type.EMPTY ||
+                messageComponent.getMessage(EMPTY_ARGS).isEmpty();
     }
 
     @Nullable
