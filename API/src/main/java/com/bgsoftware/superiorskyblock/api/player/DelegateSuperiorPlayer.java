@@ -422,19 +422,16 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    @Deprecated
     public boolean hasAdminSpyEnabled() {
         return this.handle.hasAdminSpyEnabled();
     }
 
     @Override
-    @Deprecated
     public void toggleAdminSpy() {
         this.handle.toggleAdminSpy();
     }
 
     @Override
-    @Deprecated
     public void setAdminSpy(boolean enabled) {
         this.handle.setAdminSpy(enabled);
     }
