@@ -1,12 +1,10 @@
 package com.bgsoftware.superiorskyblock.api.player.chat;
 
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.google.common.base.Preconditions;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -18,7 +16,7 @@ public class ChatState implements Enumerable {
     private final String name;
     private final int ordinal;
 
-    protected ChatState(String name) {
+    private ChatState(String name) {
         Preconditions.checkArgument(!chatStates.containsKey(name), "name already exists.");
         this.name = name.toUpperCase(Locale.ENGLISH);
         this.ordinal = ordinalCounter++;
@@ -66,16 +64,16 @@ public class ChatState implements Enumerable {
     /**
      * Register a new chat state.
      *
-     * @param chatState The chat state to register.
+     * @param name The name for the chat state.
      */
-    public static void register(ChatState chatState) {
-        Preconditions.checkNotNull(chatState, "chatState parameter cannot be null.");
+    public static void register(String name) {
+        Preconditions.checkNotNull(name, "chatState parameter cannot be null.");
 
-        String name = chatState.getName().toUpperCase(Locale.ENGLISH);
+        name = name.toUpperCase(Locale.ENGLISH);
 
         Preconditions.checkState(!chatStates.containsKey(name), "ChatState with the name " + name + " already exists.");
 
-        chatStates.put(name, chatState);
+        chatStates.put(name, new ChatState(name));
     }
 
 }
