@@ -8,22 +8,14 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.TextReplacementConfig;
-import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MiniMessageHook {
 
@@ -48,7 +40,7 @@ public class MiniMessageHook {
         public Optional<IMessageComponent> parse(String content) {
             try {
                 Component component = MINI_MESSAGE.deserialize(Formatters.COLOR_FORMATTER.format(content));
-                return Optional.of(new MiniMessageComponent(component));
+                return Optional.of(new MiniMessageComponent(component, content));
             } catch (ParsingException error) {
                 return Optional.empty();
             }
@@ -68,9 +60,9 @@ public class MiniMessageHook {
         private final Component component;
         private final MessageContent content;
 
-        MiniMessageComponent(Component component) {
+        MiniMessageComponent(Component component, String content) {
             this.component = component;
-            this.content = findTextComponentContent(component);
+            this.content = MessageContent.parse(content);
         }
 
         @Override
@@ -90,69 +82,18 @@ public class MiniMessageHook {
 
         @Override
         public void sendMessage(CommandSender sender, Object... args) {
-            sender.sendMessage(Translator.translate(this.component, args));
-        }
+            if (args.length == 0) {
+                sender.sendMessage(this.component);
+            } else {
+                Player player = sender instanceof Player ? (Player) sender : null;
 
-        private static MessageContent findTextComponentContent(Component component) {
-            if (component instanceof TextComponent textComponent)
-                return MessageContent.parse(textComponent.content());
-
-            for (Component children : component.children()) {
-                MessageContent childrenContent = findTextComponentContent(children);
-                if (childrenContent != MessageContent.EMPTY)
-                    return childrenContent;
+                this.content.getContent(player, args).ifPresent(message -> {
+                    Component finalComponent = MINI_MESSAGE.deserialize(Formatters.COLOR_FORMATTER.format(message));
+                    sender.sendMessage(finalComponent);
+                });
             }
-
-
-            return MessageContent.EMPTY;
         }
 
-    }
-
-    private static class Translator {
-        private static final Pattern ARG_PATTERN = Pattern.compile("\\{[0-9]+}");
-
-        static Component translate(Component input, Object... args) {
-            Component output = input;
-            if (args.length != 0) {
-                output = output.replaceText(TextReplacementConfig.builder()
-                        .match(ARG_PATTERN)
-                        .replacement((result, builder) -> doReplacement(result, args))
-                        .build());
-                output = translateClickEvent(output, args);
-            }
-            return translateChildren(output, args);
-        }
-
-        private static Component translateChildren(Component input, Object... args) {
-            List<Component> children = new LinkedList<>();
-            for (Component component : input.children()) {
-                Component output = translate(component, args);
-                children.add(translateChildren(output, args));
-            }
-            return input.children(children);
-        }
-
-        private static Component translateClickEvent(Component input, Object... args) {
-            ClickEvent event = input.clickEvent();
-            if (event == null) return input;
-
-            String value = event.value();
-            Matcher matcher = ARG_PATTERN.matcher(value);
-
-            String result = matcher.replaceAll(match -> doTextReplacement(match, args));
-            return input.clickEvent(ClickEvent.clickEvent(event.action(), result));
-        }
-
-        private static Component doReplacement(MatchResult match, Object... args) {
-            String group = match.group();
-            int index = Integer.parseInt(group.substring(1, group.length() - 1));
-            return Component.text(index < args.length ? MessageContent.getArgumentString(args[index]) : group);
-        }
-
-        private static String doTextReplacement(MatchResult match, Object... args) {
-            return PlainTextComponentSerializer.plainText().serialize(doReplacement(match, args));
-        }
     }
 
 }

@@ -32,7 +32,7 @@ BANK_WITHDRAW_CUSTOM: '&e&lBanka | &7Çekmek istediğin miktarı yaz:'
 BANK_WITHDRAW_COMPLETED: Para Çekme Tamamlandı
 BANNED_FROM_ISLAND: '&c&lHata | &7Bu adadan yasaklandın.'
 BLOCK_COUNT_CHECK: '&e&lAda | &7Bu adada x{0} {1} bulunuyor.'
-BLOCK_COUNTS_CHECK: |
+BLOCK_COUNTS_CHECK: |-
   &e&lAda | &7Bu adada aşağıdaki bloklar bulunuyor:
   &7{0}
 BLOCK_COUNTS_CHECK_EMPTY: '&e&lAda | &7Bu adada takip edilen blok bulunmuyor.'
@@ -472,7 +472,7 @@ INVALID_ISLAND: '&c&lHata | &7Bir adan yok.'
 INVALID_ISLAND_LOCATION: '&c&lHata | &7Konumunda bir ada bulunmuyor.'
 INVALID_ISLAND_OTHER: '&c&lHata | &7{0}''ın bir adası yok.'
 INVALID_ISLAND_OTHER_NAME: '&c&lHata | &7{0} adında bir ada bulunmuyor.'
-INVALID_ISLAND_PERMISSION: |
+INVALID_ISLAND_PERMISSION: |-
   &c&lHata | &7Ada izni {0} bulunamadı.
   &c&lHata | &7Ada İzinleri: {1}
 INVALID_LEVEL: '&c&lHata | &7Geçersiz seviye {0}.'
@@ -487,22 +487,22 @@ INVALID_MULTIPLIER: '&c&lHata | &7Geçersiz çarpan {0}.'
 INVALID_PAGE: '&c&lHata | &7Geçersiz sayfa {0}.'
 INVALID_PERCENTAGE: '&c&lHata | &7Yüzde 0 ile 100 arasında olmalıdır.'
 INVALID_PLAYER: '&c&lHata | &7{0} adında bir oyuncu bulunamadı.'
-INVALID_RATE: |
+INVALID_RATE: |-
   &c&lHata | &7{0} adında bir değerlendirme bulunamadı.
   &c&lHata | &7Ada Değerlendirmeleri: {1}
 INVALID_ROWS: '&c&lHata | &7Geçersiz satır sayısı: {0}'
-INVALID_ROLE: |
+INVALID_ROLE: |-
   &c&lHata | &7Ada rolü {0} bulunamadı.
   &c&lHata | &7Ada Rolleri: {1}
 INVALID_SCHEMATIC: '&c&lHata | &7{0} adında bir şematik bulunamadı.'
-INVALID_SETTINGS: |
+INVALID_SETTINGS: |-
   &c&lHata | &7Ada ayarları {0} bulunamadı.
   &c&lHata | &7Ada Ayarları: {1}
 INVALID_SIZE: '&c&lHata | &7Geçersiz boyut {0}.'
 INVALID_SLOT: '&c&lHata | &7Geçersiz yuva {0}.'
 INVALID_TITLE: '&c&lHata | &7Geçersiz başlık girildi.'
 INVALID_TOGGLE_MODE: '&c&lHata | &7{0} açılamaz/kapatılamaz.'
-INVALID_UPGRADE: |
+INVALID_UPGRADE: |-
   &c&lHata | &7{0} adında bir yükseltme bulunamadı.
   &c&lHata | &7Yükseltmeler: {1}
 INVALID_VISIT_LOCATION: '&c&lHata | &7Bu adanın ziyaretçi konumu yok.'
@@ -537,33 +537,33 @@ ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Komutlar Listesi [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Sonraki sayfa için /is help {0} kullan.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lAda | &7Banka Limiti: {0}'
-ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
+ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |-
   &e&lAda | &7Blok Limitleri:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lAda | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_COOP_LIMIT: '&e&lAda | &7co-op Limiti: {0}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lAda | &7Bitki Çarpanı: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lAda | &7Düşürme Çarpanı: {0}'
-ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |
+ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |-
   &e&lAda | &7Ada Efektleri:
   {0}
 ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE: '&e&lAda | &7  {0}: {1}'
-ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |-
   &e&lAda | &7Varlık Limitleri:
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lAda | &7  {0}: {1}'
-ISLAND_INFO_ADMIN_GENERATOR_RATES: |
+ISLAND_INFO_ADMIN_GENERATOR_RATES: |-
   &e&lAda | &7Jeneratör Oranları ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lAda | &7  {0}: %{1} ({2})'
-ISLAND_INFO_ADMIN_ROLE_LIMITS: |
+ISLAND_INFO_ADMIN_ROLE_LIMITS: |-
   &e&lAda | &7Rol Limitleri:
   {0}
 ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lAda | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_SIZE: '&e&lAda | &7Sınır Boyutu: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lAda | &7Spawner Çarpanı: {0}'
 ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lAda | &7Takım Limiti: {0}'
-ISLAND_INFO_ADMIN_UPGRADES: |
+ISLAND_INFO_ADMIN_UPGRADES: |-
   &e&lAda | &7Yükseltmeler:
   {0}
 ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lAda | &7  {0}: {1}'
@@ -593,7 +593,7 @@ ISLAND_INFO_RATE_TWO_COLOR: '&6'
 ISLAND_INFO_RATE_THREE_COLOR: '&e'
 ISLAND_INFO_RATE_FOUR_COLOR: '&a'
 ISLAND_INFO_RATE_FIVE_COLOR: '&2'
-ISLAND_INFO_ROLES: |
+ISLAND_INFO_ROLES: |-
   &e&lAda | &7{0}lar:
   {1}
 ISLAND_INFO_VISITORS_COUNT: '&e&lAda | &7Ziyaretçi Sayısı: {0} ({1} unique visitors)'
@@ -608,7 +608,7 @@ ISLAND_PREVIEW_CANCEL: '&e&lÖnizleme | &7Önizleme modunu iptal ettin.'
 ISLAND_PREVIEW_CONFIRM_TEXT: 'ONAYLA'
 ISLAND_PREVIEW_CANCEL_TEXT: 'İPTAL ET'
 ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
-ISLAND_PREVIEW_START: |
+ISLAND_PREVIEW_START: |-
   &e&lÖnizleme | &7{0} şematiği için önizleme modunu başlattın.
   &e&lÖnizleme | &7Yeni bir ada oluşturmak için &a&lONAYLA &7yaz, veya önizleme modunu iptal etmek için &c&lİPTAL ET &7yaz.
   &e&lÖnizleme | &7Ada alanından ayrılamazsın, aksi takdirde önizleme modu otomatik olarak iptal edilir.
@@ -673,7 +673,7 @@ MISSION_STATUS_COMPLETE_ALL: '&e&lGörev | &7{0} için tüm görevlerin durumu t
 MISSION_STATUS_RESET: '&e&lGörev | &7{1} için {0} görevinin durumu sıfırlandı.'
 MISSION_STATUS_RESET_ALL: '&e&lGörev | &7{0} için tüm görevlerin durumu sıfırlandı.'
 MODULE_ALREADY_INITIALIZED: '&e&lModül | &7Bu modül zaten yüklü.'
-MODULE_INFO: |
+MODULE_INFO: |-
   &e&lModül | &7{0} geliştiren: {1}
   &e&lModül | &7&m--------------------
   &e&lModül | &7{2}
@@ -824,7 +824,7 @@ SCHEMATIC_LEFT_SELECT: '&e&lŞematikler | &7Konum #2 ({0}) seçildi.'
 SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
 SCHEMATIC_NOT_READY: '&c&lHata | &7İki konum seçmedin.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lŞematikler | &7İsteğiniz işleniyor...'
-SCHEMATIC_READY_TO_CREATE: |
+SCHEMATIC_READY_TO_CREATE: |-
   &e&lŞematikler | &7İki konum seçtin. Yeni bir şematik oluşturmak için /is admin schematic <adı> komutunu çalıştır.
   &e&lŞematikler | &7Komutu çalıştırırken ışınlanma konumunda durduğundan emin ol.
 SCHEMATIC_RIGHT_SELECT: '&e&lŞematikler | &7Konum #1 ({0}) seçildi.'
@@ -911,7 +911,7 @@ UPGRADE_COOLDOWN_FORMAT: '&c&lHata | &7Sadece {0} içinde tekrar yükseltme yapa
 VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lHata | &7Bu komutu başka adalarda kullanamazsın.'
 WARP_ALREADY_EXIST: '&c&lHata | &7Bu adla bir ışınlanma noktası zaten var.'
-WARP_CATEGORY_ICON_NEW_LORE: |
+WARP_CATEGORY_ICON_NEW_LORE: |-
   &e&lIşınlanmalar | &7Yeni bir açıklama gir (İptal etmek için "-cancel" yaz):
   &e&lIşınlanmalar | &7Satırları "\n" kullanarak ayırabilirsin.
 WARP_CATEGORY_ICON_NEW_NAME: '&e&lIşınlanmalar | &7Bir ad gir (İptal etmek için "-cancel"
@@ -934,7 +934,7 @@ WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lHata | &7Bu ad zaten başka bir kategor
   alınmış.'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lIşınlanmalar | &7Kategori adı başarıyla {0} olarak
   değiştirildi.'
-WARP_ICON_NEW_LORE: |
+WARP_ICON_NEW_LORE: |-
   &e&lIşınlanmalar | &7Yeni bir açıklama gir (İptal etmek için "-cancel" yaz):
   &e&lIşınlanmalar | &7Satırları "\n" kullanarak ayırabilirsin.
 WARP_ICON_NEW_NAME: '&e&lIşınlanmalar | &7Bir ad gir (İptal etmek için "-cancel" yaz):'
