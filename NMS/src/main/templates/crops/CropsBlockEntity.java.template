@@ -3,11 +3,8 @@ package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.crops;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
-import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.NMSUtils;
-import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.crops.CropsTickingBlockEntity;
-import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.crops.CropsTickingMethod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -23,7 +20,7 @@ public class CropsBlockEntity extends BlockEntity {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final Long2ObjectMapView<CropsBlockEntity> tickingChunks = CollectionsFactory.createLong2ObjectHashMap();
+    private static final Chunk2ObjectMap<CropsBlockEntity> tickingChunks = new Chunk2ObjectMap<>();
 
     private final WeakReference<Island> island;
     private final WeakReference<LevelChunk> chunk;
@@ -41,18 +38,18 @@ public class CropsBlockEntity extends BlockEntity {
         this.cachedCropGrowthMultiplier = island.getCropGrowthMultiplier() - 1;
     }
 
-    public static void create(Island island, LevelChunk levelChunk) {
+    public static void create(Island island, String worldName, LevelChunk levelChunk) {
         int chunkX = levelChunk.locX;
         int chunkZ = levelChunk.locZ;
         long packedPos = NMSUtils.getChunkPackedPos(chunkX, chunkZ);
-        tickingChunks.computeIfAbsent(packedPos, p -> {
+        tickingChunks.computeIfAbsent(worldName, packedPos, () -> {
             BlockPos blockPos = new BlockPos(chunkX << 4, 1, chunkZ << 4);
             return new CropsBlockEntity(island, levelChunk, blockPos);
         });
     }
 
-    public static CropsBlockEntity remove(long chunkPos) {
-        return tickingChunks.remove(chunkPos);
+    public static CropsBlockEntity remove(String worldName, long chunkPos) {
+        return tickingChunks.remove(worldName, chunkPos);
     }
 
     public static void forEachChunk(List<ChunkPosition> chunkPositions, Consumer<CropsBlockEntity> cropsBlockEntityConsumer) {
@@ -69,6 +66,11 @@ public class CropsBlockEntity extends BlockEntity {
 
     public boolean isValidBlockState(BlockState state) {
         return true;
+    }
+
+    private net.minecraft.world.level.ChunkPos getPos() {
+        LevelChunk levelChunk = this.chunk.get();
+        return levelChunk == null ? null : levelChunk.getPos();
     }
 
     public void remove() {
