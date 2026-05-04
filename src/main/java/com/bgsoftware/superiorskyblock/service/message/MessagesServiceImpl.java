@@ -79,7 +79,13 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
         Optional<IMessageComponent> parse(YamlConfiguration config, String path);
 
-        Optional<IMessageComponent> parse(String raw);
+        Optional<IMessageComponent> parseActionBar(String text);
+
+        Optional<IMessageComponent> parseBossBar(String message, String color, String overlay, int ticks);
+
+        Optional<IMessageComponent> parseRawMessage(String raw);
+
+        Optional<IMessageComponent> parseTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut);
 
     }
 
@@ -94,7 +100,7 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
         @Override
         public boolean addBossBar(@Nullable String message, BossBar.Color color, int ticks) {
-            return addMessageComponent(BossBarComponent.of(message, color, ticks));
+            return addMessageComponent(BossBarComponent.of(message, color, BossBar.Style.SOLID, ticks));
         }
 
         @Override
