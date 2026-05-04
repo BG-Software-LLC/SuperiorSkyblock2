@@ -798,7 +798,7 @@ public enum Message {
             }
 
             for (MessagesServiceImpl.CustomComponentParser parser : messagesService.get().getCustomComponentParsers()) {
-                Optional<IMessageComponent> component = parser.parse(message);
+                Optional<IMessageComponent> component = parser.parseRawMessage(message);
                 if (component.isPresent()) {
                     component.get().sendMessage(sender);
                     return;

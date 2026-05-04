@@ -106,7 +106,7 @@ public class MultipleComponents implements IMessageComponent {
                     String text = section.getString(key + ".text");
 
                     for (MessagesServiceImpl.CustomComponentParser parser : customComponentParsers) {
-                        Optional<IMessageComponent> res = parser.parse(text);
+                        Optional<IMessageComponent> res = parser.parseRawMessage(text);
                         if (res.isPresent()) {
                             messageComponents.add(res.get());
                             break;
