@@ -150,7 +150,7 @@ public class BukkitEntities {
         return false;
     }
 
-    public static boolean isTameable(Entity entity) {
+    public static boolean isTamed(Entity entity) {
         return entity instanceof Tameable && ((Tameable) entity).isTamed();
     }
 
@@ -164,10 +164,12 @@ public class BukkitEntities {
 
     public static List<EntityCategory> getCategories(Entity entity) {
         List<EntityCategory> categories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(entity));
-        if (isTameable(entity)) {
+
+        if (!isTamed(entity) ) {
             categories = new LinkedList<>(categories);
-            categories.add(BuiltinEntityCategory.TAMEABLE.getEntityCategory());
+            categories.remove(BuiltinEntityCategory.TAMEABLE.getEntityCategory());
         }
+
         return categories;
     }
 

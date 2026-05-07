@@ -149,6 +149,7 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
     }
 
     @Override
+    @Nullable
     public EntityCategory getCategoryByName(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null");
         return this.nameToCategory.get(name.toLowerCase(Locale.ENGLISH));

@@ -12,8 +12,8 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.config.section.BlockCategoriesSection;
 import com.bgsoftware.superiorskyblock.config.section.EntityCategoriesSection;
-import com.bgsoftware.superiorskyblock.config.section.InteractablesSection;
 import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
@@ -56,7 +56,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -139,7 +138,6 @@ public class SettingsContainer {
     public final Set<String> worldPermissions;
     public final boolean voidTeleportMembers;
     public final boolean voidTeleportVisitors;
-    public final SettingsManager.Interactables interactables;
     public final KeySet safeBlocks;
     public final boolean visitorsDamage;
     public final boolean coopDamage;
@@ -244,6 +242,7 @@ public class SettingsContainer {
     public final boolean helpOnInvalidCommand;
     public final boolean cacheSchematics;
     public final SettingsManager.EntityCategories entityCategories;
+    public final SettingsManager.BlockCategories blockCategories;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws ManagerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
@@ -378,7 +377,6 @@ public class SettingsContainer {
                 .stream().map(str -> str.toUpperCase(Locale.ENGLISH)).collect(Collectors.toSet())));
         voidTeleportMembers = config.getBoolean("void-teleport.members", true);
         voidTeleportVisitors = config.getBoolean("void-teleport.visitors", true);
-        interactables = loadInteractables(plugin);
         safeBlocks = loadSafeBlocks(plugin);
         visitorsDamage = config.getBoolean("visitors-damage", false);
         coopDamage = config.getBoolean("coop-damage", true);
@@ -596,6 +594,7 @@ public class SettingsContainer {
         helpOnNoPermission = config.getBoolean("help-on-no-permission", false);
         cacheSchematics = config.getBoolean("cache-schematics", true);
         entityCategories = loadEntityCategories(plugin);
+        blockCategories = loadBlockCategories(plugin);
     }
 
     private void loadDimensions(ConfigurationSection dimensionsSection) {
@@ -664,41 +663,6 @@ public class SettingsContainer {
         return Collections.unmodifiableList(clearActions);
     }
 
-    private SettingsManager.Interactables loadInteractables(SuperiorSkyblockPlugin plugin) {
-        File file = new File(plugin.getDataFolder(), "interactables.yml");
-
-        if (!file.exists())
-            plugin.saveResource("interactables.yml", false);
-
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-
-        InteractablesSection interactables = new InteractablesSection(plugin, cfg);
-
-        // Warn about interactables that the default file contains but the current
-        // file does not.
-        Set<String> localInteractables = new HashSet<>();
-        for (Key key : interactables.getInteractables()) {
-            localInteractables.add(key.toString());
-        }
-
-        YamlConfiguration defaultInteractablesConfig = CommentedConfiguration.loadConfiguration(plugin.getResource("interactables.yml"));
-        for (String block : defaultInteractablesConfig.getStringList("interactables")) {
-            if (!localInteractables.contains(block)) {
-                Log.warn("Potentially missing interactable block ", block);
-            }
-        }
-
-        if (interactables.isLegacy()) {
-            try {
-                interactables.saveToFile(file);
-            } catch (IOException error) {
-                Log.errorFromFile(error, "interactables.yml", "Failed to save interactables:");
-            }
-        }
-
-        return interactables;
-    }
-
     private SettingsManager.EntityCategories loadEntityCategories(SuperiorSkyblockPlugin plugin) {
         File file = new File(plugin.getDataFolder(), "entity-categories.yml");
 
@@ -716,6 +680,25 @@ public class SettingsContainer {
         }
 
         return new EntityCategoriesSection(cfg);
+    }
+
+    private SettingsManager.BlockCategories loadBlockCategories(SuperiorSkyblockPlugin plugin) {
+        File file = new File(plugin.getDataFolder(), "block-categories.yml");
+
+        boolean removeInvalidBlockKeys = false;
+
+        if (!file.exists()) {
+            plugin.saveResource("block-categories.yml", false);
+            removeInvalidBlockKeys = true;
+        }
+
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+
+        if (removeInvalidBlockKeys) {
+            BlockCategoriesSection.removeInvalidBlocks(cfg, file);
+        }
+
+        return new BlockCategoriesSection(cfg);
     }
 
     private KeySet loadSafeBlocks(SuperiorSkyblockPlugin plugin) {
@@ -758,6 +741,7 @@ public class SettingsContainer {
         this.defaultGenerator.put(dimension, KeyMaps.unmodifiableKeyMap(defaultGenerator));
     }
 
+    @SuppressWarnings("unchecked")
     private static void loadListOrSection(YamlConfiguration config, String path, String parseName, BiConsumer<String, Integer> consumer) {
         Object value = config.get(path);
         if (value == null)

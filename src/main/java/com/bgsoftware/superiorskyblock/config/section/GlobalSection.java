@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
@@ -82,10 +81,6 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public List<String> getSignWarp() {
         return getContainer().signWarp;
-    }
-
-    public SettingsManager.Interactables getInteractablesMap() {
-        return getContainer().interactables;
     }
 
     public Collection<Key> getSafeBlocks() {
@@ -430,6 +425,10 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public SettingsManager.EntityCategories getEntityCategoriesMap() {
         return getContainer().entityCategories;
+    }
+
+    public SettingsManager.BlockCategories getBlockCategoriesMap() {
+        return getContainer().blockCategories;
     }
 
 }

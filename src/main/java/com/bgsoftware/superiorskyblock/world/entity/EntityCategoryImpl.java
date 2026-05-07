@@ -5,10 +5,7 @@ import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
-import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
-
-import java.util.HashSet;
 
 public class EntityCategoryImpl implements EntityCategory {
 

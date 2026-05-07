@@ -847,10 +847,6 @@ command-aliases:
     - 'Aliase1'
     - 'Aliase2'
 
-# A list of valuable blocks.
-# These blocks require the "VALUABLE_BREAK" permission in order to break them.
-valuable-blocks: [ ]
-
 # Settings related to the island previews.
 island-previews:
   # The game mode that will be set for the player when they enter preview mode.
