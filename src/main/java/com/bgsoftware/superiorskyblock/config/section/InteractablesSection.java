@@ -123,10 +123,8 @@ public class InteractablesSection extends SettingsContainerHolder implements Set
     @Nullable
     public IslandPrivilege getRequiredPrivilege(Key key) {
         for (BlockCategory blockCategory : getContainer().blockCategories.getCategories()) {
-            if (blockCategory.getInteractPrivilege() != null) {
-                if (blockCategory.getBlocks().contains(key)) {
-                    return blockCategory.getInteractPrivilege();
-                }
+            if (blockCategory.getInteractPrivilege() != null && blockCategory.getBlocks().contains(key)) {
+                return blockCategory.getInteractPrivilege();
             }
         }
 

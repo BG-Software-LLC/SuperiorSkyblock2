@@ -937,22 +937,4 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         return MoveResult.SUCCESS;
     }
 
-    private InteractionResult handleBlockInteractionInternal(SuperiorPlayer superiorPlayer, Location location,
-                                                             List<BlockCategory> blockCategories, Function<BlockCategory, IslandPrivilege> function) {
-        for (BlockCategory blockCategory : blockCategories) {
-            IslandPrivilege islandPrivilege = function.apply(blockCategory);
-
-            if (islandPrivilege != null) {
-                InteractionResult interactionResult = handleInteractionInternal(superiorPlayer, location,
-                        islandPrivilege, 0, true, true);
-
-                if (interactionResult != InteractionResult.SUCCESS) {
-                    return interactionResult;
-                }
-            }
-        }
-
-        return InteractionResult.SUCCESS;
-    }
-
 }

@@ -1002,6 +1002,10 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
         CommentedConfiguration commentedCfg = CommentedConfiguration.loadConfiguration(file);
 
+        if (commentedCfg.getKeys(false).size() != 1 || !commentedCfg.isList("interactables")) {
+            return;
+        }
+
         InteractablesSection.convertInteractables(commentedCfg);
 
         try {
