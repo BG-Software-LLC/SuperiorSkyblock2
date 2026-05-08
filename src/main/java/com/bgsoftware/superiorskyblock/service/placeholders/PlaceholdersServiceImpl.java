@@ -80,10 +80,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern ROLE_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_role_limit_(.+)");
     private static final Pattern UPGRADE_PLACEHOLDER_PATTERN = Pattern.compile("island_upgrade_(.+)");
     private static final Pattern TOP_PLACEHOLDER_PATTERN = Pattern.compile("island_top_(.+)");
-    private static final Pattern TOP_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("worth_(.+)");
-    private static final Pattern TOP_LEVEL_PLACEHOLDER_PATTERN = Pattern.compile("level_(.+)");
-    private static final Pattern TOP_RATING_PLACEHOLDER_PATTERN = Pattern.compile("rating_(.+)");
-    private static final Pattern TOP_PLAYERS_PLACEHOLDER_PATTERN = Pattern.compile("players_(.+)");
+    private static final Pattern TOP_TYPE_PLACEHOLDER_PATTERN = Pattern.compile("(.+)_(.+)");
     private static final Pattern TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN = Pattern.compile("value_format_(.+)");
     private static final Pattern TOP_VALUE_RAW_PLACEHOLDER_PATTERN = Pattern.compile("value_raw_(.+)");
     private static final Pattern TOP_VALUE_PLACEHOLDER_PATTERN = Pattern.compile("value_(.+)");
@@ -826,26 +823,15 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static Optional<String> handleTopIslandsPlaceholder(@Nullable Island island,
                                                                 @Nullable SuperiorPlayer superiorPlayer,
                                                                 String subPlaceholder) {
-        Matcher matcher;
-        SortingType sortingType;
+        Matcher matcher = TOP_TYPE_PLACEHOLDER_PATTERN.matcher(subPlaceholder);
+        if (!matcher.matches())
+            return Optional.empty();
 
-        if ((matcher = TOP_WORTH_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-            sortingType = SortingTypes.BY_WORTH;
-        } else if ((matcher = TOP_LEVEL_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-            sortingType = SortingTypes.BY_LEVEL;
-        } else if ((matcher = TOP_RATING_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-            sortingType = SortingTypes.BY_RATING;
-        } else if ((matcher = TOP_PLAYERS_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-            sortingType = SortingTypes.BY_PLAYERS;
-        } else {
-            String sortingTypeName = subPlaceholder.split("_")[0];
-            sortingType = SortingType.getByName(sortingTypeName);
-        }
-
+        SortingType sortingType = SortingType.getByName(matcher.group(1).toUpperCase(Locale.ENGLISH));
         if (sortingType == null)
             return Optional.empty();
 
-        String placeholderValue = matcher.group(1);
+        String placeholderValue = matcher.group(2);
 
         if (placeholderValue.equals("position"))
             return island == null ? Optional.empty() : Optional.of((plugin.getGrid().getIslandPosition(island, sortingType) + 1) + "");
