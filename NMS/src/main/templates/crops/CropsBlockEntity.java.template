@@ -58,7 +58,7 @@ public class CropsBlockEntity extends BlockEntity {
 
         chunkPositions.forEach(chunkPosition -> {
             long chunkKey = chunkPosition.asPair();
-            CropsBlockEntity cropsBlockEntity = tickingChunks.get(chunkKey);
+            CropsBlockEntity cropsBlockEntity = tickingChunks.get(chunkPosition.getWorldName(), chunkKey);
             if (cropsBlockEntity != null)
                 cropsBlockEntityConsumer.accept(cropsBlockEntity);
         });
