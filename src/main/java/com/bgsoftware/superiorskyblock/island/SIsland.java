@@ -3204,7 +3204,7 @@ public class SIsland implements Island {
 
         //Checking for the specific provided key.
         if (blockLimit >= 0) {
-            return getBlockCountAsBigInteger(key).add(BigInteger.valueOf(amount))
+            return getExactBlockCountAsBigInteger(key).add(BigInteger.valueOf(amount))
                     .compareTo(BigInteger.valueOf(blockLimit)) > 0;
         }
 
