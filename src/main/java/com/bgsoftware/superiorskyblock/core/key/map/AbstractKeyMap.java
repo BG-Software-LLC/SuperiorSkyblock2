@@ -19,6 +19,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 public class AbstractKeyMap<K extends Key, V> extends AbstractMap<Key, V> implements KeyMap<V> {
@@ -236,6 +237,20 @@ public class AbstractKeyMap<K extends Key, V> extends AbstractMap<Key, V> implem
     public V getOrDefault(Object key, V defaultValue) {
         V value = get(key);
         return value == null ? defaultValue : value;
+    }
+
+    @Override
+    public V merge(Key key, @NotNull V value, @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
+        Objects.requireNonNull(remappingFunction);
+        Objects.requireNonNull(value);
+        V oldValue = getRaw(key, null);
+        V newValue = (oldValue == null) ? value : remappingFunction.apply(oldValue, value);
+        if (newValue == null) {
+            remove(key);
+        } else {
+            put(key, newValue);
+        }
+        return newValue;
     }
 
     @Override
