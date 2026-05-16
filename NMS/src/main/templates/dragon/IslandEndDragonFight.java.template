@@ -76,7 +76,7 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
 
     public IslandEndDragonFight(Island island, ServerLevel serverLevel, BlockPos islandBlockPos,
                                 @Nullable IslandEntityEnderDragon islandEntityEnderDragon) {
-        super(serverLevel);
+        super(serverLevel, islandBlockPos);
 
         this.island = island;
         this.islandBlockPos = islandBlockPos;
