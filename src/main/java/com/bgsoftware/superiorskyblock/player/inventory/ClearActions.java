@@ -4,10 +4,11 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.player.OfflinePlayerData;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
@@ -103,9 +104,9 @@ public class ClearActions {
             clearActions.forEach(clearAction -> clearAction.doClear(onlinePlayer));
 
             if (offlinePlayerData != null) {
-                World world = plugin.getGrid().getIslandsWorld(islandToTeleport, plugin.getSettings().getWorlds().getDefaultWorldDimension());
-                if (islandToTeleport != null && world != null)
-                    offlinePlayerData.setLocation(islandToTeleport.getCenter(plugin.getSettings().getWorlds().getDefaultWorldDimension()));
+                WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(islandToTeleport, plugin.getSettings().getWorlds().getDefaultWorldDimension());
+                if (islandToTeleport != null && worldInfo != null && Bukkit.getWorld(worldInfo.getName()) != null)
+                    offlinePlayerData.setLocation(islandToTeleport.getCenter(worldInfo.getDimension()));
                 offlinePlayerData.applyChanges();
             } else if (islandToTeleport != null) {
                 superiorPlayer.teleport(islandToTeleport);
