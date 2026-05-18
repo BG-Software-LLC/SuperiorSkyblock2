@@ -35,6 +35,8 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -80,7 +82,6 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern ROLE_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_role_limit_(.+)");
     private static final Pattern UPGRADE_PLACEHOLDER_PATTERN = Pattern.compile("island_upgrade_(.+)");
     private static final Pattern TOP_PLACEHOLDER_PATTERN = Pattern.compile("island_top_(.+)");
-    private static final Pattern TOP_TYPE_PLACEHOLDER_PATTERN = Pattern.compile("(.+)_(.+)");
     private static final Pattern TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN = Pattern.compile("value_format_(.+)");
     private static final Pattern TOP_VALUE_RAW_PLACEHOLDER_PATTERN = Pattern.compile("value_raw_(.+)");
     private static final Pattern TOP_VALUE_PLACEHOLDER_PATTERN = Pattern.compile("value_(.+)");
@@ -823,20 +824,35 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static Optional<String> handleTopIslandsPlaceholder(@Nullable Island island,
                                                                 @Nullable SuperiorPlayer superiorPlayer,
                                                                 String subPlaceholder) {
-        Matcher matcher = TOP_TYPE_PLACEHOLDER_PATTERN.matcher(subPlaceholder);
-        if (!matcher.matches())
-            return Optional.empty();
+        // Replaces greedy regex split "(.+)_(.+)" which broke "level_value_1"
+        // by taking "level_value" as the type. Iterates registered SortingType
+        // names longest-first; longest matching prefix wins. Handles custom
+        // types with underscores. Regression: SS2 commit efbdfcea6 (PR #2888).
+        String subPlaceholderLower = subPlaceholder.toLowerCase(Locale.ENGLISH);
 
-        SortingType sortingType = SortingType.getByName(matcher.group(1).toUpperCase(Locale.ENGLISH));
+        List<SortingType> orderedTypes = new ArrayList<>(SortingType.values());
+        orderedTypes.sort(Comparator.comparingInt((SortingType st) -> st.getName().length()).reversed());
+
+        SortingType sortingType = null;
+        String placeholderValue = null;
+
+        for (SortingType candidate : orderedTypes) {
+            String candidateName = candidate.getName().toLowerCase(Locale.ENGLISH);
+            if (subPlaceholderLower.startsWith(candidateName + "_")) {
+                sortingType = candidate;
+                placeholderValue = subPlaceholder.substring(candidateName.length() + 1);
+                break;
+            }
+        }
+
         if (sortingType == null)
             return Optional.empty();
-
-        String placeholderValue = matcher.group(2);
 
         if (placeholderValue.equals("position"))
             return island == null ? Optional.empty() : Optional.of((plugin.getGrid().getIslandPosition(island, sortingType) + 1) + "");
 
         Function<Island, String> getValueFunction;
+        Matcher matcher;
 
         if ((matcher = TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
             getValueFunction = Optional.ofNullable(TOP_VALUE_FORMAT_FUNCTIONS.get(sortingType)).map(function ->
