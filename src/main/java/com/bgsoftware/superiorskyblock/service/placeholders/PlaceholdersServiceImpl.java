@@ -80,7 +80,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern ROLE_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_role_limit_(.+)");
     private static final Pattern UPGRADE_PLACEHOLDER_PATTERN = Pattern.compile("island_upgrade_(.+)");
     private static final Pattern TOP_PLACEHOLDER_PATTERN = Pattern.compile("island_top_(.+)");
-    private static final Pattern TOP_TYPE_PLACEHOLDER_PATTERN = Pattern.compile("(.+)_(.+)");
+    private static final Pattern TOP_TYPE_PLACEHOLDER_PATTERN = Pattern.compile("(.+?)_(.+)");
     private static final Pattern TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN = Pattern.compile("value_format_(.+)");
     private static final Pattern TOP_VALUE_RAW_PLACEHOLDER_PATTERN = Pattern.compile("value_raw_(.+)");
     private static final Pattern TOP_VALUE_PLACEHOLDER_PATTERN = Pattern.compile("value_(.+)");
