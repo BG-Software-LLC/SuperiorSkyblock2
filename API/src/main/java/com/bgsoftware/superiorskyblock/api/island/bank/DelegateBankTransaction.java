@@ -50,4 +50,14 @@ public class DelegateBankTransaction implements BankTransaction {
         return this.handle.getAmount();
     }
 
+    @Override
+    public int hashCode() {
+        return this.handle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.handle.equals(o);
+    }
+
 }

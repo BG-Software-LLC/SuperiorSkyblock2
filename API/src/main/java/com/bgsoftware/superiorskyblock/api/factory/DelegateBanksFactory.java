@@ -16,4 +16,13 @@ public class DelegateBanksFactory implements BanksFactory {
         return this.handle.createIslandBank(island, original);
     }
 
+    @Override
+    public int hashCode() {
+        return this.handle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.handle.equals(o);
+    }
 }

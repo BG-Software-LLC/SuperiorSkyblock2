@@ -60,4 +60,14 @@ public class DelegateWarpCategory implements WarpCategory {
         this.handle.setIcon(icon);
     }
 
+    @Override
+    public int hashCode() {
+        return this.handle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.handle.equals(o);
+    }
+
 }
