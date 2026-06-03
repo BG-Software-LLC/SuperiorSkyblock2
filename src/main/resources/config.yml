@@ -370,6 +370,9 @@ worlds:
       # Custom name for the nether world.
       # When empty, the name will be "<island-world>_nether"
       name: ''
+      # Should the nether world use the void generator? This can be useful to prevent
+      # players from escaping the nether world by building up.
+      use-void-generator: true
       # Should the schematics in this world will not be counted towards worth and level values?
       schematic-offset: true
       # The environment of this world

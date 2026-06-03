@@ -180,11 +180,17 @@ public class WorldsProvider_Default implements WorldsProvider {
                     "- Your level-name property in server.properties is set to " + worldName + ".");
         }
 
-        World world = WorldCreator.name(worldName)
-                .type(WorldType.FLAT)
-                .environment(dimension.getEnvironment())
-                .generator(WorldGenerator.getWorldGenerator(dimension))
-                .createWorld();
+        SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(dimension);
+        boolean useVoidGenerator = dimensionConfig == null || dimensionConfig.isUseVoidGenerator();
+
+        WorldCreator worldCreator = WorldCreator.name(worldName)
+                .environment(dimension.getEnvironment());
+
+        if (useVoidGenerator) {
+            worldCreator.type(WorldType.FLAT).generator(WorldGenerator.getWorldGenerator(dimension));
+        }
+
+        World world = worldCreator.createWorld();
 
         world.setDifficulty(difficulty);
         islandWorlds.put(dimension, world);
