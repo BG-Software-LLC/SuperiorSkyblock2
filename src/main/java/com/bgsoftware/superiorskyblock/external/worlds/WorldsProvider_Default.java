@@ -174,23 +174,23 @@ public class WorldsProvider_Default implements WorldsProvider {
     }
 
     private World loadWorld(String worldName, Difficulty difficulty, Dimension dimension) {
-        if (Bukkit.getWorld(worldName) != null) {
-            throw new RuntimeException("The world " + worldName + " is already loaded. This can occur by one of the following reasons:\n" +
-                    "- Another plugin loaded it manually before SuperiorSkyblock.\n" +
-                    "- Your level-name property in server.properties is set to " + worldName + ".");
+        World world = Bukkit.getWorld(worldName);
+        
+        if (world != null) {
+            plugin.getLogger().warning("The world " + worldName + " is already loaded! SuperiorSkyblock will hook into it. Ensure this is not your main survival world!");
+        } else {
+            SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(dimension);
+            boolean useVoidGenerator = dimensionConfig == null || dimensionConfig.isUseVoidGenerator();
+
+            WorldCreator worldCreator = WorldCreator.name(worldName)
+                    .environment(dimension.getEnvironment());
+
+            if (useVoidGenerator) {
+                worldCreator.type(WorldType.FLAT).generator(WorldGenerator.getWorldGenerator(dimension));
+            }
+
+            world = worldCreator.createWorld();
         }
-
-        SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(dimension);
-        boolean useVoidGenerator = dimensionConfig == null || dimensionConfig.isUseVoidGenerator();
-
-        WorldCreator worldCreator = WorldCreator.name(worldName)
-                .environment(dimension.getEnvironment());
-
-        if (useVoidGenerator) {
-            worldCreator.type(WorldType.FLAT).generator(WorldGenerator.getWorldGenerator(dimension));
-        }
-
-        World world = worldCreator.createWorld();
 
         world.setDifficulty(difficulty);
         islandWorlds.put(dimension, world);
