@@ -131,7 +131,9 @@ public class CommandArguments {
         if (island == null)
             Message.INVALID_ISLAND.send(sender);
 
-        return new IslandArgument(island, superiorPlayer);
+        SuperiorPlayer targetPlayer = island.equals(superiorPlayer.getIsland()) ? superiorPlayer : island.getOwner();
+
+        return new IslandArgument(island, targetPlayer);
     }
 
     public static Mission<?> getMission(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument) {
