@@ -567,11 +567,31 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             listenToSpawnerChanges = false;
         } else if (canRegisterHook("RoseStacker") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("RoseStacker"))) {
-            spawnersProvider = createInstance("spawners.SpawnersProvider_RoseStacker");
+            String version = Bukkit.getPluginManager().getPlugin("RoseStacker").getDescription().getVersion();
+            if (isRoseStackerSpawningApiAvailable(version)) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_RoseStacker1_5");
+            } else {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_RoseStacker");
+            }
             listenToSpawnerChanges = false;
         }
 
         spawnersProvider.ifPresent(this::setSpawnersProvider);
+    }
+
+    // RoseStacker 1.5+ exposes the spawning API (PreStackedSpawnerSpawnEvent) that the
+    // RoseStacker1_5 module uses to enforce the spawner-spawning island flag. Older versions
+    // lack it (and run on Java 8), so they use the legacy SpawnersProvider_RoseStacker instead.
+    private static boolean isRoseStackerSpawningApiAvailable(String version) {
+        try {
+            String[] parts = version.split("\\.");
+            int major = Integer.parseInt(parts[0].replaceAll("\\D.*", ""));
+            int minor = parts.length > 1 ? Integer.parseInt(parts[1].replaceAll("\\D.*", "")) : 0;
+            return major > 1 || (major == 1 && minor >= 5);
+        } catch (NumberFormatException error) {
+            // Unknown version format; fall back to the legacy provider to stay safe.
+            return false;
+        }
     }
 
     private void registerStackedBlocksProvider() {
