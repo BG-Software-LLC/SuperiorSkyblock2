@@ -1,7 +1,13 @@
-group 'Hooks:FastAsyncWorldEdit'
+group 'Hooks:FastAsyncWorldEdit7'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.enginehub.org/repo/' }
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+}
 
 dependencies {
-    compileOnly 'com.boydti:FastAsyncWorldEdit:1.13.135'
+    compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.0-SNAPSHOT'
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
     compileOnly rootProject
