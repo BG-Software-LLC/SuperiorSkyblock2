@@ -4,17 +4,15 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParseException;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 import com.bgsoftware.superiorskyblock.core.io.IOUtils;
-import com.bgsoftware.superiorskyblock.world.schematic.impl.WorldEditSchematic;
+import com.bgsoftware.superiorskyblock.world.schematic.impl.WorldEditSchematic7;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.DataInputStream;
-import java.io.IOException;
-import java.util.zip.GZIPOutputStream;
 
 public class FAWESchematicParser7 implements SchematicParser {
 
@@ -24,39 +22,31 @@ public class FAWESchematicParser7 implements SchematicParser {
 
     @Override
     public Schematic parseSchematic(DataInputStream inputStream, String schematicName) throws SchematicParseException {
-        try {
-            byte[] bytes = IOUtils.toByteArray(inputStream);
+            File pluginFolder = com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin.getPlugin().getDataFolder();
+            File schemFile = new File(pluginFolder, "schematics/" + schematicName + ".schem");
+            File schematicFile = new File(pluginFolder, "schematics/" + schematicName + ".schematic");
             
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try (GZIPOutputStream gzipOut = new GZIPOutputStream(baos)) {
-                gzipOut.write(bytes);
-            }
-            byte[] gzippedBytes = baos.toByteArray();
-
-            ClipboardFormat spongeFormat = ClipboardFormats.findByAlias("schem");
-            if (spongeFormat != null) {
-                try (DataInputStream stream = new DataInputStream(new ByteArrayInputStream(gzippedBytes));
-                     ClipboardReader reader = spongeFormat.getReader(stream)) {
-                    Clipboard clipboard = reader.read();
-                    return new WorldEditSchematic(schematicName, clipboard);
-                } catch (Throwable ignored) {
-                }
+            File targetFile = null;
+            if (schemFile.exists()) {
+                targetFile = schemFile;
+            } else if (schematicFile.exists()) {
+                targetFile = schematicFile;
             }
 
-            ClipboardFormat legacyFormat = ClipboardFormats.findByAlias("schematic");
-            if (legacyFormat != null) {
-                try (DataInputStream stream = new DataInputStream(new ByteArrayInputStream(gzippedBytes));
-                     ClipboardReader reader = legacyFormat.getReader(stream)) {
-                    Clipboard clipboard = reader.read();
-                    return new WorldEditSchematic(schematicName, clipboard);
-                } catch (Throwable ignored) {
+            if (targetFile != null) {
+                ClipboardFormat format = ClipboardFormats.findByFile(targetFile);
+                if (format != null) {
+                    try (FileInputStream fis = new FileInputStream(targetFile);
+                         ClipboardReader reader = format.getReader(fis)) {
+                        Clipboard clipboard = reader.read();
+                        return new WorldEditSchematic7(schematicName, clipboard);
+                    } catch (Throwable error) {
+                        error.printStackTrace();
+                    }
                 }
             }
             
             throw new SchematicParseException(schematicName + " is not a valid WorldEdit schematic.");
-        } catch (Throwable error) {
-            throw new SchematicParseException(schematicName + " is not a valid WorldEdit schematic.");
-        }
     }
 
 }

@@ -26,11 +26,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class WorldEditSchematic extends BaseSchematic implements Schematic {
+public class WorldEditSchematic7 extends BaseSchematic implements Schematic {
 
     private final Clipboard clipboard;
 
-    public WorldEditSchematic(String name, Clipboard clipboard) {
+    public WorldEditSchematic7(String name, Clipboard clipboard) {
         super(name);
         this.clipboard = clipboard;
         readBlocks();
