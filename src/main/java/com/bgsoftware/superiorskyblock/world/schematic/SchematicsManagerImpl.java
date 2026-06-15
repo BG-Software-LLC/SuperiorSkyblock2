@@ -187,11 +187,21 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
     private void loadDefaultSchematicParsers() {
         if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit") || Bukkit.getPluginManager().isPluginEnabled("WorldEdit")) {
+            boolean loaded = false;
             try {
                 Class.forName("com.sk89q.worldedit.math.BlockVector3");
-                SchematicParser schematicParser = (SchematicParser) Class.forName("com.bgsoftware.superiorskyblock.world.schematic.parser.FAWESchematicParser").newInstance();
+                SchematicParser schematicParser = (SchematicParser) Class.forName("com.bgsoftware.superiorskyblock.world.schematic.parser.FAWESchematicParser7").newInstance();
                 this.schematicsContainer.addSchematicParser(schematicParser);
+                loaded = true;
             } catch (Throwable ignored) {
+            }
+            
+            if (!loaded) {
+                try {
+                    SchematicParser schematicParser = (SchematicParser) Class.forName("com.bgsoftware.superiorskyblock.world.schematic.parser.FAWESchematicParser").newInstance();
+                    this.schematicsContainer.addSchematicParser(schematicParser);
+                } catch (Throwable ignored) {
+                }
             }
         }
     }

@@ -1,23 +1,24 @@
 package com.bgsoftware.superiorskyblock.world.schematic.impl;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
+import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.math.transform.Transform;
+import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockState;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -27,11 +28,40 @@ import java.util.function.Consumer;
 
 public class WorldEditSchematic extends BaseSchematic implements Schematic {
 
-    private final Clipboard clipboard;
+    private static ReflectMethod<Object> AT;
+    private static ReflectMethod<EditSession> PASTE;
 
-    public WorldEditSchematic(String name, Clipboard clipboard) {
+    private static final ReflectMethod<Object> GET_BLOCK_TYPE = new ReflectMethod<>(BaseBlock.class, "getBlockType");
+    private static final ReflectMethod<Integer> GET_INTERNAL_ID = new ReflectMethod<>(BaseBlock.class, "getInternalId");
+    private static ReflectMethod<Material> ADAPT;
+
+    private static final ReflectMethod<Integer> GET_ID = new ReflectMethod<>(BaseBlock.class, "getId");
+    private static final ReflectMethod<Integer> GET_DATA = new ReflectMethod<>(BaseBlock.class, "getData");
+
+    private final com.boydti.fawe.object.schematic.Schematic schematic;
+
+    static {
+        try {
+            Class<?> blockVectorClass = Class.forName("com.sk89q.worldedit.math.BlockVector3");
+            AT = new ReflectMethod<>(blockVectorClass, "at", int.class, int.class, int.class);
+            PASTE = new ReflectMethod<>(com.boydti.fawe.object.schematic.Schematic.class,
+                    "paste", World.class, blockVectorClass, boolean.class, boolean.class, Transform.class);
+        } catch (ClassNotFoundException ignored) {
+
+        }
+        
+        try {
+            Class<?> bukkitAdapterClass = Class.forName("com.sk89q.worldedit.bukkit.BukkitAdapter");
+            Class<?> blockTypesClass = Class.forName("com.sk89q.worldedit.world.block.BlockTypes");
+            ADAPT = new ReflectMethod<>(bukkitAdapterClass, "adapt", blockTypesClass);
+        } catch (ClassNotFoundException ignored) {
+
+        }
+    }
+
+    public WorldEditSchematic(String name, com.boydti.fawe.object.schematic.Schematic schematic) {
         super(name);
-        this.clipboard = clipboard;
+        this.schematic = schematic;
         readBlocks();
     }
 
@@ -42,35 +72,34 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
 
     @Override
     public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
-        Log.debug(Debug.PASTE_SCHEMATIC, this.name, island.getOwner().getName(), location);
+        try {
+            Log.debug(Debug.PASTE_SCHEMATIC, this.name, island.getOwner().getName(), location);
 
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(location.getWorld()))) {
-            Operation operation = new ClipboardHolder(clipboard)
-                    .createPaste(editSession)
-                    .to(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()))
-                    .ignoreAirBlocks(true)
-                    .build();
+            Object _point = AT.invoke(null, location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            EditSession editSession = PASTE.invoke(schematic, new BukkitWorld(location.getWorld()), _point, false, true, null);
 
-            Operations.complete(operation);
-
-            // FAWE intercepts EditSession internally, so when Operations.complete finishes, 
-            // the operation might have been dispatched async. But we can invoke the callback directly.
-            Log.debugResult(Debug.PASTE_SCHEMATIC, "Task Finished", "");
-            
-            island.handleBlocksPlace(cachedCounts);
-            PluginEventsFactory.callIslandSchematicPasteEvent(island, null, name, location);
-            
-            if (callback != null) {
-                callback.run();
+            if (editSession == null) {
+                Vector point = new Vector(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+                editSession = schematic.paste(new BukkitWorld(location.getWorld()), point, true, true, null);
             }
-        } catch (WorldEditException ex) {
-            if (onFailure != null) {
-                onFailure.accept(ex);
-            }
+
+            editSession.addNotifyTask(() -> {
+                Log.debugResult(Debug.PASTE_SCHEMATIC, "Task Finished", "");
+
+                try {
+                    island.handleBlocksPlace(cachedCounts);
+
+                    PluginEventsFactory.callIslandSchematicPasteEvent(island, null, name, location);
+
+                    callback.run();
+                } catch (Throwable ex) {
+                    if (onFailure != null)
+                        onFailure.accept(ex);
+                }
+            });
         } catch (Throwable ex) {
-            if (onFailure != null) {
+            if (onFailure != null)
                 onFailure.accept(ex);
-            }
         }
     }
 
@@ -90,16 +119,52 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
     }
 
     private void readBlocks() {
-        for (BlockVector3 pos : clipboard.getRegion()) {
-            try {
-                com.sk89q.worldedit.world.block.BlockState blockState = clipboard.getBlock(pos);
-                Material material = BukkitAdapter.adapt(blockState.getBlockType());
-                
-                // For modern versions, data is usually 0 as BlockState handles properties
-                Key key = Keys.of(material, (byte) 0);
-                cachedCounts.put(key, cachedCounts.getRaw(key, 0) + 1);
-            } catch (Exception ignored) {
-            }
+        BlockArrayClipboard clipboard = (BlockArrayClipboard) schematic.getClipboard();
+
+        assert clipboard != null;
+
+        try {
+            clipboard.IMP.forEach(new BlockReader() {
+                @Override
+                public void run(int x, int y, int z, BaseBlock block) {
+                    readBlock(block);
+                }
+            }, false);
+        } catch (Throwable ex) {
+            clipboard.IMP.forEach(new FaweClipboard.BlockReader() {
+                @Override
+                public void run(int x, int y, int z, BlockState block) {
+                    readBlock(block);
+                }
+            }, false);
         }
     }
+
+    private void readBlock(Object baseBlock) {
+        Key key;
+
+        if (ADAPT != null && ADAPT.isValid() && GET_BLOCK_TYPE.isValid() && GET_INTERNAL_ID.isValid()) {
+            Material material = ADAPT.invoke(null, GET_BLOCK_TYPE.invoke(baseBlock));
+            int data = GET_INTERNAL_ID.invokeWithDef(baseBlock, 0);
+            key = Keys.of(material, (byte) data);
+        } else {
+            int id = GET_ID.invoke(baseBlock);
+            int data = GET_DATA.invoke(baseBlock);
+            //noinspection deprecation
+            key = Keys.of(Material.getMaterial(id), (byte) data);
+        }
+
+        cachedCounts.put(key, cachedCounts.getRaw(key, 0) + 1);
+    }
+
+    private static abstract class BlockReader extends FaweClipboard.BlockReader {
+
+        public abstract void run(int x, int y, int z, BaseBlock block);
+
+        public void run(int x, int y, int z, BlockState block) {
+            // Do nothing.
+        }
+
+    }
+
 }
