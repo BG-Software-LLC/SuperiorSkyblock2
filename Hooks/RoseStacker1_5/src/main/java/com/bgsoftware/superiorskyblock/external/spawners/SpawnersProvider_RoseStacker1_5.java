@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.external.spawners;
 
-import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -16,7 +15,6 @@ import dev.rosewood.rosestacker.event.SpawnerStackEvent;
 import dev.rosewood.rosestacker.event.SpawnerUnstackEvent;
 import dev.rosewood.rosestacker.stack.StackedSpawner;
 import dev.rosewood.rosestacker.utils.ItemUtils;
-import dev.rosewood.rosestacker.utils.StackerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -28,9 +26,6 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
 public class SpawnersProvider_RoseStacker1_5 implements SpawnersProvider_AutoDetect {
-
-    private static final ReflectMethod<EntityType> GET_STACKED_ITEM_ENTITY_TYPE =
-            new ReflectMethod<>(StackerUtils.class, "getStackedItemEntityType", ItemStack.class);
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -57,8 +52,7 @@ public class SpawnersProvider_RoseStacker1_5 implements SpawnersProvider_AutoDet
     @Override
     public String getSpawnerType(ItemStack itemStack) {
         Preconditions.checkNotNull(itemStack, "itemStack parameter cannot be null.");
-        EntityType entityType = GET_STACKED_ITEM_ENTITY_TYPE.isValid() ?
-                GET_STACKED_ITEM_ENTITY_TYPE.invoke(null, itemStack) : ItemUtils.getStackedItemEntityType(itemStack);
+        EntityType entityType = ItemUtils.getStackedItemEntityType(itemStack);
         return entityType == null ? null : entityType.name();
     }
 
@@ -93,14 +87,6 @@ public class SpawnersProvider_RoseStacker1_5 implements SpawnersProvider_AutoDet
             }
         }
 
-        // RoseStacker spawns mobs through a custom NMS path and, by default
-        // (bypass-region-spawning-rules: true), does not fire a Bukkit CreatureSpawnEvent.
-        // It also merges spawns directly into nearby stacks without spawning a new entity.
-        // Both cases bypass SuperiorSkyblock's CreatureSpawnEvent-based spawner-spawning flag.
-        // PreStackedSpawnerSpawnEvent is cancellable and gates every spawn path, so we enforce
-        // the spawner-spawning island flag here instead.
-        // Note: this event may be fired asynchronously (spawn-async: true), so we only read
-        // thread-safe data (cached spawner tile, grid lookup, island settings).
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onStackedSpawnerSpawn(PreStackedSpawnerSpawnEvent e) {
             StackedSpawner stackedSpawner = e.getStack();

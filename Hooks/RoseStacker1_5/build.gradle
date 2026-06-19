@@ -1,8 +1,5 @@
 group 'Hooks:RoseStacker1_5'
 
-// RoseStacker 1.5+ is compiled for Java 17 and exposes the spawning API
-// (PreStackedSpawnerSpawnEvent, StackedSpawnerTile#getSpawnedType) that older
-// versions lack, so this module is built with a Java 17 toolchain.
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
@@ -16,7 +13,7 @@ dependencies {
     compileOnly project(":")
 }
 
-if (project.hasProperty('hook.compile_rosestacker1_5') &&
-        !Boolean.valueOf(project.findProperty("hook.compile_rosestacker1_5").toString())) {
+if (project.hasProperty('hook.compile_rosestacker') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_rosestacker").toString())) {
     project.tasks.all { task -> task.enabled = false }
 }
