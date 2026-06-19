@@ -567,7 +567,11 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             listenToSpawnerChanges = false;
         } else if (canRegisterHook("RoseStacker") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("RoseStacker"))) {
-            spawnersProvider = createInstance("spawners.SpawnersProvider_RoseStacker");
+            if (hasRoseStackerPreSpawnEventSupport()) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_RoseStacker1_5");
+            } else {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_RoseStacker");
+            }
             listenToSpawnerChanges = false;
         }
 
@@ -734,6 +738,15 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         try {
             Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
             return ServerVersion.isAtLeast(ServerVersion.v1_18);
+        } catch (ClassNotFoundException error) {
+            return false;
+        }
+    }
+
+    private static boolean hasRoseStackerPreSpawnEventSupport() {
+        try {
+            Class.forName("dev.rosewood.rosestacker.event.PreStackedSpawnerSpawnEvent");
+            return true;
         } catch (ClassNotFoundException error) {
             return false;
         }
