@@ -28,6 +28,11 @@ BAN_ANNOUNCEMENT: '&e&lIsola | &7{0} è stato bannato dall''isola di {1}.'
 BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lErrore | &7Puoi bannare solo i giocatori aventi un ruolo inferiore al tuo.'
 BANK_DEPOSIT_CUSTOM: '&e&lBanca | &7Digita l''importo che desideri depositare:'
 BANK_DEPOSIT_COMPLETED: Deposito completato
+BANK_INTEREST_STATUS_BANK_LIMIT_REACHED: 'Bank limit reached'
+BANK_INTEREST_STATUS_DISABLED: 'Disabled'
+BANK_INTEREST_STATUS_READY: 'Ready'
+BANK_INTEREST_STATUS_WAITING: 'Waiting'
+BANK_INTEREST_STATUS_WAITING_OWNER_ACTIVE: 'Waiting for the island owner to become active'
 BANK_LIMIT_EXCEED: '&c&lErrore| &7Hai superato il limite della tua banca.'
 BANK_WITHDRAW_CUSTOM: '&e&lBanca | &7Digita l''importo che desideri prelevare:'
 BANK_WITHDRAW_COMPLETED: Ritiro completato

@@ -27,6 +27,11 @@ BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lHata | &7Sadece senden daha düşük ada rolü
   oyuncuları yasaklayabilirsin.'
 BANK_DEPOSIT_CUSTOM: '&e&lBanka | &7Yatırmak istediğin miktarı yaz:'
 BANK_DEPOSIT_COMPLETED: Para Yatırma Tamamlandı
+BANK_INTEREST_STATUS_BANK_LIMIT_REACHED: 'Bank limit reached'
+BANK_INTEREST_STATUS_DISABLED: 'Disabled'
+BANK_INTEREST_STATUS_READY: 'Ready'
+BANK_INTEREST_STATUS_WAITING: 'Waiting'
+BANK_INTEREST_STATUS_WAITING_OWNER_ACTIVE: 'Waiting for the island owner to become active'
 BANK_LIMIT_EXCEED: '&c&lHata | &7Banka limitini aştın.'
 BANK_WITHDRAW_CUSTOM: '&e&lBanka | &7Çekmek istediğin miktarı yaz:'
 BANK_WITHDRAW_COMPLETED: Para Çekme Tamamlandı

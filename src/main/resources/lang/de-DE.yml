@@ -30,6 +30,11 @@ BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lFehler | &7Du kannst nur Spieler mit einer nie
   Inselrolle als deiner bannen.'
 BANK_DEPOSIT_CUSTOM: '&e&lBank | &7Gebe den Betrag ein, den du einzahlen möchtest:'
 BANK_DEPOSIT_COMPLETED: Einzahlung abgeschlossen
+BANK_INTEREST_STATUS_BANK_LIMIT_REACHED: 'Bank limit reached'
+BANK_INTEREST_STATUS_DISABLED: 'Disabled'
+BANK_INTEREST_STATUS_READY: 'Ready'
+BANK_INTEREST_STATUS_WAITING: 'Waiting'
+BANK_INTEREST_STATUS_WAITING_OWNER_ACTIVE: 'Waiting for the island owner to become active'
 BANK_LIMIT_EXCEED: '&c&lError | &7Du hast dein Banklimit überschritten.'
 BANK_WITHDRAW_CUSTOM: '&e&lBank | &7Gebe den Betrag ein, den du abheben möchtest:'
 BANK_WITHDRAW_COMPLETED: Auszahlung abgeschlossen

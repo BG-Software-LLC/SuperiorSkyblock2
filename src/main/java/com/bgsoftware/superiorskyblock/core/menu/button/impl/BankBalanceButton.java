@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButt
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.impl.IslandMenuView;
+import com.bgsoftware.superiorskyblock.island.bank.BankInterestStatus;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -35,6 +36,7 @@ public class BankBalanceButton extends AbstractMenuViewButton<IslandMenuView> {
                 .replaceAll("{5}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getBankLimit(), inventoryViewer.getUserLocale()))
                 .replaceAll("{6}", Formatters.DATE_FORMATTER.format(new Date(island.getLastInterestTime() * 1000L)))
                 .replaceAll("{7}", Formatters.DATE_FORMATTER.format(new Date(System.currentTimeMillis() + island.getNextInterest() * 1000L)))
+                .replaceAll("{8}", BankInterestStatus.getStatus(island, inventoryViewer))
                 .build();
     }
 

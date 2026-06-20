@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.bank.BankInterestStatus;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
@@ -146,6 +147,8 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             Formatters.TIME_FORMATTER.format(Duration.ofSeconds(island.getLastInterestTime()), superiorPlayer.getUserLocale()))
                     .put("bank_next_interest", (island, superiorPlayer) ->
                             Formatters.TIME_FORMATTER.format(Duration.ofSeconds(island.getNextInterest()), superiorPlayer.getUserLocale()))
+                    .put("bank_interest_status", (island, superiorPlayer) ->
+                            BankInterestStatus.getStatus(island, superiorPlayer))
                     .put("bans_count", (island, superiorPlayer) ->
                             island.getBannedPlayers().size() + "")
                     .put("bans_list", (island, superiorPlayer) -> {
