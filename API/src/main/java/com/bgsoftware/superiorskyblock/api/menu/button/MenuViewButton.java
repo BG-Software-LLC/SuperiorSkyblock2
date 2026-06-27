@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.menu.button;
 
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton.MenuViewButtonCreator;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -29,11 +30,20 @@ public interface MenuViewButton<V extends MenuView<V, ?>> {
     ItemStack createViewItem();
 
     /**
-     * Method callback when clicking this button.
-     * The event passed as an argument is already cancelled.
+     * Method callback when clicking this button from an inventory menu.
      *
      * @param clickEvent The click event.
+     * @deprecated Use {@link #onButtonClick(ButtonClickContext)} instead.
      */
+    @Deprecated
     void onButtonClick(InventoryClickEvent clickEvent);
+
+
+    /**
+     * Method callback when clicking this button, from either an inventory menu or a Dialog UI.
+     *
+     * @param context The click context, either a {@link InventoryButtonClickContext} or a {@link DialogButtonClickContext}.
+     */
+    void onButtonClick(ButtonClickContext<V> context);
 
 }

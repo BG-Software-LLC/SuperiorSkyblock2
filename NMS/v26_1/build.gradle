@@ -16,6 +16,7 @@ dependencies {
     paperweight.paperDevBundle("26.1.1.build.+")
     compileOnly project(":NMS:Spigot-1_20_3")
     compileOnly project(":NMS:Paper-1_20_3")
+    compileOnly project(":NMS:Paper-Dialog")
     compileOnly project(":API")
     compileOnly project(":")
 }

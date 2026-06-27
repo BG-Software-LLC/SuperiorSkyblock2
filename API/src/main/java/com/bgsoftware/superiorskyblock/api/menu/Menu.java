@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.menu;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuViewButton;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
@@ -79,14 +80,27 @@ public interface Menu<V extends MenuView<V, A>, A extends ViewArgs> {
 
     /**
      * Callback method for when a player clicks on a button in a view of this menu.
-     * This method should do necessary checks, and finally call {@link MenuViewButton#onButtonClick(InventoryClickEvent)}
-     * on the button that was clicked (can be retrieved by using {@link InventoryClickEvent#getRawSlot()} as a slot
+     * This method should do necessary checks, and finally call {@link MenuViewButton#onButtonClick(ButtonClickContext)}}
+     * on the button that was clicked (can be retrieved by using {@link ButtonClickContext#getClickedButton()} as a slot
      * passed to {@link MenuLayout#getButton(int)})
      *
      * @param clickEvent The event associated with the click.
      * @param menuView   The menu view that was clicked.
+     * @deprecated See {@link #onClick(ButtonClickContext, MenuView)}
      */
+    @Deprecated
     void onClick(InventoryClickEvent clickEvent, V menuView);
+
+    /**
+     * Callback method for when a player clicks on a button in a view of this menu.
+     * This method should do necessary checks, and finally call {@link MenuViewButton#onButtonClick(ButtonClickContext)}
+     * on the button that was clicked (can be retrieved by using {@link ButtonClickContext#getClickedButton()} as a slot
+     * passed to {@link MenuLayout#getButton(int)})
+     *
+     * @param context  The event associated with the click.
+     * @param menuView The menu view that was clicked.
+     */
+    void onClick(ButtonClickContext<V> context, V menuView);
 
     /**
      * Callback method for when a player closes a view of this menu.
@@ -96,6 +110,16 @@ public interface Menu<V extends MenuView<V, A>, A extends ViewArgs> {
      * @param closeEvent The associated event.
      * @param menuView   The menu view that was closed.
      */
+    @Deprecated
     void onClose(InventoryCloseEvent closeEvent, V menuView);
+
+    /**
+     * Callback method for when a player closes a view of this menu.
+     * The method has no limits on what can be done inside it, and it depends on your custom {@link V} implementation
+     * of what to do inside it.
+     *
+     * @param menuView   The menu view that was closed.
+     */
+    void onClose(V menuView);
 
 }

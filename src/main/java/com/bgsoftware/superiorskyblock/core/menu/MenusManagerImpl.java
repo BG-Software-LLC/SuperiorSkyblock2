@@ -15,7 +15,17 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.MenuCommands;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogBodyElement;
+import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButton;
+import com.bgsoftware.superiorskyblock.api.menu.dialog.input.MenuTemplateInputBoolean;
+import com.bgsoftware.superiorskyblock.api.menu.dialog.input.MenuTemplateInputNumberRange;
+import com.bgsoftware.superiorskyblock.api.menu.dialog.input.MenuTemplateInputSingleOption;
+import com.bgsoftware.superiorskyblock.api.menu.dialog.input.MenuTemplateInputText;
+import com.bgsoftware.superiorskyblock.api.menu.layout.DialogMenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.layout.InventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.layout.PagedDialogMenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.layout.PagedInventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.parser.MenuParser;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
@@ -24,14 +34,21 @@ import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogButtonImpl;
+import com.bgsoftware.superiorskyblock.core.menu.dialog.body.DialogBodyItem;
+import com.bgsoftware.superiorskyblock.core.menu.dialog.body.DialogBodyText;
+import com.bgsoftware.superiorskyblock.core.menu.layout.PagedDialogMenuLayoutImpl;
+import com.bgsoftware.superiorskyblock.core.menu.layout.PagedInventoryMenuLayoutImpl;
+import com.bgsoftware.superiorskyblock.core.menu.layout.RegularDialogMenuLayoutImpl;
+import com.bgsoftware.superiorskyblock.core.menu.layout.RegularInventoryMenuLayoutImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuCustom;
-import com.bgsoftware.superiorskyblock.core.menu.layout.PagedMenuLayoutImpl;
-import com.bgsoftware.superiorskyblock.core.menu.layout.RegularMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.google.common.base.Preconditions;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -544,13 +561,35 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     }
 
     @Override
+    @Deprecated
     public <V extends MenuView<V, ?>> MenuLayout.Builder<V> createPatternBuilder() {
-        return RegularMenuLayoutImpl.newBuilder();
+        return createInventoryLayoutBuilder();
     }
 
     @Override
+    public <V extends MenuView<V, ?>> InventoryMenuLayout.Builder<V> createInventoryLayoutBuilder() {
+        return new RegularInventoryMenuLayoutImpl.Builder<>();
+    }
+
+    @Override
+    public <V extends MenuView<V, ?>> DialogMenuLayout.Builder<V> createDialogLayoutBuilder() {
+        return new RegularDialogMenuLayoutImpl.Builder<>();
+    }
+
+    @Override
+    @Deprecated
     public <V extends PagedMenuView<V, ?, E>, E> PagedMenuLayout.Builder<V, E> createPagedPatternBuilder() {
-        return PagedMenuLayoutImpl.newBuilder();
+        return createInventoryPagedLayoutBuilder();
+    }
+
+    @Override
+    public <V extends PagedMenuView<V, ?, E>, E> PagedInventoryMenuLayout.Builder<V, E> createInventoryPagedLayoutBuilder() {
+        return new PagedInventoryMenuLayoutImpl.Builder<>();
+    }
+
+    @Override
+    public <V extends PagedMenuView<V, ?, E>, E> PagedDialogMenuLayout.Builder<V, E> createDialogPagedLayoutBuilder() {
+        return new PagedDialogMenuLayoutImpl.Builder<V, E>();
     }
 
     @Override
@@ -563,6 +602,41 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     public <V extends MenuView<V, ?>, E> PagedMenuTemplateButton.Builder<V, E> createPagedButtonBuilder(
             Class<?> viewButtonType, PagedMenuTemplateButton.PagedMenuViewButtonCreator<V, E> viewButtonCreator) {
         return PagedMenuTemplateButtonImpl.newBuilder(viewButtonType, viewButtonCreator);
+    }
+
+    @Override
+    public <V extends MenuView<V, ?>> MenuTemplateInputBoolean.Builder<V> createInputBooleanBuilder() {
+        return null;
+    }
+
+    @Override
+    public <V extends MenuView<V, ?>> MenuTemplateInputNumberRange.Builder<V> createInputNumberRangeBuilder() {
+        return null;
+    }
+
+    @Override
+    public <V extends MenuView<V, ?>> MenuTemplateInputSingleOption.Builder<V> createInputSingleOptionBuilder() {
+        return null;
+    }
+
+    @Override
+    public <V extends MenuView<V, ?>> MenuTemplateInputText.Builder<V> createInputTextBuilder() {
+        return null;
+    }
+
+    @Override
+    public DialogBodyElement createDialogBodyTextElement(String text) {
+        return new DialogBodyText(text);
+    }
+
+    @Override
+    public DialogBodyElement createDialogBodyItemElement(ItemStack itemStack, DialogBodyElement.ItemConfig itemConfig) {
+        return new DialogBodyItem(new TemplateItem(new ItemBuilder(itemStack)), itemConfig);
+    }
+
+    @Override
+    public DialogButton.Builder createDialogButtonBuilder() {
+        return new DialogButtonImpl.Builder();
     }
 
     @Override

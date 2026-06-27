@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.menu.button.click.ButtonClickContextImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
@@ -25,8 +26,10 @@ public class MenusListener extends AbstractGameEventListener {
 
         registerCallback(GameEventType.INVENTORY_CLICK_EVENT, GameEventPriority.MONITOR, false, this::onInventoryClickDupePatch);
         registerCallback(GameEventType.INVENTORY_CLOSE_EVENT, GameEventPriority.MONITOR, false, this::onInventoryCloseDupePatch);
-        registerCallback(GameEventType.INVENTORY_CLICK_EVENT, GameEventPriority.NORMAL, this::onMenuClick);
-        registerCallback(GameEventType.INVENTORY_CLOSE_EVENT, GameEventPriority.NORMAL, this::onMenuClose);
+        registerCallback(GameEventType.INVENTORY_CLICK_EVENT, GameEventPriority.NORMAL, this::onInventoryMenuClick);
+        registerCallback(GameEventType.INVENTORY_CLOSE_EVENT, GameEventPriority.NORMAL, this::onInventoryMenuClose);
+        registerCallback(GameEventType.DIALOG_CLICK_EVENT, GameEventPriority.NORMAL, this::onDialogMenuClick);
+        registerCallback(GameEventType.DIALOG_CLOSE_EVENT, GameEventPriority.NORMAL, this::onDialogMenuClose);
     }
 
     /*
@@ -61,7 +64,7 @@ public class MenusListener extends AbstractGameEventListener {
 
     /* MENU INTERACTIONS HANDLING */
 
-    private void onMenuClick(GameEvent<GameEventArgs.InventoryClickEvent> e) {
+    private void onInventoryMenuClick(GameEvent<GameEventArgs.InventoryClickEvent> e) {
         InventoryView inventoryView = e.getArgs().bukkitEvent.getView();
         Inventory clickedInventory = e.getArgs().bukkitEvent.getClickedInventory();
 
@@ -77,23 +80,37 @@ public class MenusListener extends AbstractGameEventListener {
 
             if (clickedInventory.equals(topInventory)) {
                 MenuView menuView = (MenuView) inventoryHolder;
-                menuView.getMenu().onClick(e.getArgs().bukkitEvent, menuView);
+                try (ButtonClickContextImpl ctx = ButtonClickContextImpl.obtain(menuView, e.getArgs().bukkitEvent)) {
+                    menuView.getMenu().onClick(ctx, menuView);
+                }
             }
         } else if (inventoryHolder instanceof StackedBlocksDepositMenu) {
             ((StackedBlocksDepositMenu) inventoryHolder).onInteract(e.getArgs().bukkitEvent);
         }
     }
 
-    private void onMenuClose(GameEvent<GameEventArgs.InventoryCloseEvent> e) {
+    private void onInventoryMenuClose(GameEvent<GameEventArgs.InventoryCloseEvent> e) {
         Inventory topInventory = e.getArgs().bukkitEvent.getView().getTopInventory();
         InventoryHolder inventoryHolder = topInventory == null ? null : topInventory.getHolder();
 
         if (inventoryHolder instanceof MenuView) {
             MenuView menuView = (MenuView) inventoryHolder;
-            menuView.getMenu().onClose(e.getArgs().bukkitEvent, menuView);
+            menuView.getMenu().onClose(menuView);
         } else if (inventoryHolder instanceof StackedBlocksDepositMenu) {
             ((StackedBlocksDepositMenu) inventoryHolder).onClose(e.getArgs().bukkitEvent);
         }
+    }
+
+    private void onDialogMenuClick(GameEvent<GameEventArgs.DialogClickEvent> e) {
+        MenuView menuView = e.getArgs().dialog.getMenuView();
+        try (ButtonClickContextImpl<?, GameEventArgs.DialogClickEvent> ctx = ButtonClickContextImpl.obtain(menuView, e.getArgs())) {
+            menuView.getMenu().onClick(ctx, menuView);
+        }
+    }
+
+    private void onDialogMenuClose(GameEvent<GameEventArgs.DialogCloseEvent> e) {
+        MenuView menuView = e.getArgs().dialog.getMenuView();
+        menuView.getMenu().onClose(menuView);
     }
 
 }

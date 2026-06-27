@@ -1,9 +1,10 @@
 package com.bgsoftware.superiorskyblock.core.messages.component;
 
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ActionBarComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.BossBarComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
@@ -41,7 +42,7 @@ public class MultipleComponents implements IMessageComponent {
                         section.getInt(key + ".fade-out")
                 ));
             } else if (key.equals("sound")) {
-                messageComponents.add(SoundComponent.of(MenuParserImpl.getInstance().getSound(section.getConfigurationSection("sound"))));
+                messageComponents.add(SoundComponent.of(MenuParserUtils.getSound(section.getConfigurationSection("sound"))));
             } else if (key.equals("bossbar")) {
                 BossBar.Color color;
 

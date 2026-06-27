@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.api.menu.layout;
 
-import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
@@ -20,9 +19,11 @@ public interface PagedMenuLayout<V extends MenuView<V, ?>> extends MenuLayout<V>
 
     /**
      * Create a new {@link Builder} object for a new {@link PagedMenuLayout}.
+     *
+     * @deprecated See {@link PagedInventoryMenuLayout} and {@link PagedDialogMenuLayout}
      */
     static <V extends PagedMenuView<V, ?, E>, E> Builder<V, E> newBuilder() {
-        return SuperiorSkyblockAPI.getMenus().createPagedPatternBuilder();
+        return PagedInventoryMenuLayout.newBuilder();
     }
 
     interface Builder<V extends MenuView<V, ?>, E> extends MenuLayout.Builder<V> {

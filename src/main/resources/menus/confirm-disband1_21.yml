@@ -1,0 +1,32 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&l&cConfirm Disband'
+previous-menu: true
+type: DIALOG
+
+dialog-type: CONFIRMATION
+
+confirm: '@'
+cancel: '^'
+
+body:
+- type: plain_message
+  text: 'Are you sure you want to delete your island? This action cannot be undone!'
+- type: item
+  description: '&7Your island will be permanently deleted.'
+  show-decorations: false
+  show-tooltip: false
+  item:
+    type: GRASS_BLOCK
+    name: '&cYour Island'
+
+buttons:
+  '@':
+    label: '&aConfirm'
+  '^':
+    label: '&cCancel'

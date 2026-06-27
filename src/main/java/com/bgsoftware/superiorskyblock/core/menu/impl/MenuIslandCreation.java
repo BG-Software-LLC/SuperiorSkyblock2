@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
@@ -8,12 +10,11 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.IslandCreationButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
@@ -26,7 +27,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Locale;
 
 public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, MenuIslandCreation.Args> {
 
@@ -49,7 +49,7 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
             return null;
         }
 
-        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        MenuSlotsMap menuSlotsMap = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
         MenuLayout.Builder<View> patternBuilder = menuParseResult.getLayoutBuilder();
 
@@ -104,8 +104,8 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
 
                 ConfigurationSection soundSection = cfg.getConfigurationSection("sounds." + itemSectionName);
                 if (soundSection != null) {
-                    buttonBuilder.setAccessSound(MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("access")));
-                    buttonBuilder.setNoAccessSound(MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("no-access")));
+                    buttonBuilder.setAccessSound(MenuParserUtils.getSound(soundSection.getConfigurationSection("access")));
+                    buttonBuilder.setNoAccessSound(MenuParserUtils.getSound(soundSection.getConfigurationSection("no-access")));
                 }
 
                 ConfigurationSection commandSection = cfg.getConfigurationSection("commands." + itemSectionName);
@@ -119,12 +119,12 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
                 if (itemSection.isString("spawn-offset"))
                     buttonBuilder.setSpawnOffset(Serializers.OFFSET_SPACED_SERIALIZER.deserialize(itemSection.getString("spawn-offset")));
 
-                buttonBuilder.setAccessItem(MenuParserImpl.getInstance().getItemStack("menus/island-creation.yml",
+                buttonBuilder.setAccessItem(MenuParserUtils.getItemStack("menus/island-creation.yml",
                         itemSection.getConfigurationSection("access")));
-                buttonBuilder.setNoAccessItem(MenuParserImpl.getInstance().getItemStack("menus/island-creation.yml",
+                buttonBuilder.setNoAccessItem(MenuParserUtils.getItemStack("menus/island-creation.yml",
                         itemSection.getConfigurationSection("no-access")));
 
-                patternBuilder.mapButtons(menuPatternSlots.getSlots(itemSectionName), buttonBuilder);
+                patternBuilder.mapButtons(menuSlotsMap.getSlots(itemSectionName), buttonBuilder);
             }
         }
 
