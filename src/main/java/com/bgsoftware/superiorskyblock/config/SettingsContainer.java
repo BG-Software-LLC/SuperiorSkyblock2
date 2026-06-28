@@ -702,10 +702,18 @@ public class SettingsContainer {
     private SettingsManager.EntityCategories loadEntityCategories(SuperiorSkyblockPlugin plugin) {
         File file = new File(plugin.getDataFolder(), "entity-categories.yml");
 
-        if (!file.exists())
+        boolean removeInvalidEntityKeys = false;
+
+        if (!file.exists()) {
             plugin.saveResource("entity-categories.yml", false);
+            removeInvalidEntityKeys = true;
+        }
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+
+        if (removeInvalidEntityKeys) {
+            EntityCategoriesSection.removeInvalidEntityKeys(cfg, file);
+        }
 
         return new EntityCategoriesSection(cfg);
     }

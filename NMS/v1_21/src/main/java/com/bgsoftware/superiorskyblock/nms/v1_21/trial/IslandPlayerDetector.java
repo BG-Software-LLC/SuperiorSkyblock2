@@ -1,14 +1,11 @@
 package com.bgsoftware.superiorskyblock.nms.v1_21.trial;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.nms.player_detector.IslandPlayerDetectorHelper;
+import com.bgsoftware.superiorskyblock.world.entity.BuiltinEntityCategory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.trialspawner.PlayerDetector;
@@ -28,11 +25,11 @@ public class IslandPlayerDetector implements PlayerDetector {
     private final Supplier<IslandPrivilege> requiredPrivilege;
 
     public static IslandPlayerDetector trialVaultPlayerDetector(Island island, PlayerDetector original) {
-        return new IslandPlayerDetector(island, original, IslandPlayerDetectorHelper.getTrialVaultIslandPrivilege());
+        return new IslandPlayerDetector(island, original, () -> IslandPrivileges.CONFIG_VAULT_INTERACT);
     }
 
     public static IslandPlayerDetector trialSpawnerPlayerDetector(Island island, PlayerDetector original) {
-        return new IslandPlayerDetector(island, original, () -> IslandPrivileges.MONSTER_DAMAGE);
+        return new IslandPlayerDetector(island, original, () -> BuiltinEntityCategory.MONSTER.getEntityCategory().getDamagePrivilege());
     }
 
     private IslandPlayerDetector(Island island, PlayerDetector original, Supplier<IslandPrivilege> requiredPrivilege) {

@@ -207,6 +207,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
+    public void setHideTooltip(ItemMeta itemMeta) {
+        // Doesn't exist
+    }
+
+    @Override
     public void addPotion(PotionMeta potionMeta, PotionEffect potionEffect) {
         if (!potionMeta.hasCustomEffects())
             potionMeta.setColor(potionEffect.getType().getColor());
