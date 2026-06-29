@@ -19,13 +19,8 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -390,36 +385,7 @@ public enum Message {
     GOT_BANNED,
     GOT_DEMOTED,
     GOT_EXPELLED,
-    GOT_INVITE {
-        @Override
-        public void send(CommandSender sender, Locale locale, Object... args) {
-            if (!(sender instanceof Player)) {
-                super.send(sender, locale, args);
-            } else {
-                String message = getMessage(locale);
-
-                if (message == null)
-                    return;
-
-                BaseComponent[] baseComponents = TextComponent.fromLegacyText(message);
-                if (!GOT_INVITE_TOOLTIP.isEmpty(locale)) {
-                    for (BaseComponent baseComponent : baseComponents)
-                        baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(GOT_INVITE_TOOLTIP.getMessage(locale))}));
-                }
-
-                for (BaseComponent baseComponent : baseComponents)
-                    baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.getCommands().getLabel() + " accept " + args[0]));
-
-                IMessageComponent messageComponent = ComplexMessageComponent.of(baseComponents);
-                if (messageComponent != null) {
-                    PluginEvent<PluginEventArgs.SendMessage> event = PluginEventsFactory.callSendMessageEvent(sender, name(), messageComponent, args);
-                    if (!event.isCancelled())
-                        event.getArgs().messageComponent.sendMessage(sender, args);
-                }
-            }
-        }
-    },
-    GOT_INVITE_TOOLTIP,
+    GOT_INVITE,
     GOT_KICKED,
     GOT_PROMOTED,
     GOT_REVOKED,
@@ -832,7 +798,7 @@ public enum Message {
             }
 
             for (MessagesServiceImpl.CustomComponentParser parser : messagesService.get().getCustomComponentParsers()) {
-                Optional<IMessageComponent> component = parser.parse(message);
+                Optional<IMessageComponent> component = parser.parseRawMessage(message);
                 if (component.isPresent()) {
                     component.get().sendMessage(sender);
                     return;
@@ -844,6 +810,7 @@ public enum Message {
 
     };
 
+    private static final String[] IGNORED_SECTIONS = new String[]{"lang/en-US.yml", "GOT_INVITE"};
     private static final Object[] EMPTY_ARGS = new Object[0];
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -865,18 +832,13 @@ public enum Message {
     }
 
     Message(boolean isCustom) {
-        this(null, isCustom, 0L, null);
+        this.defaultMessage = null;
+        this.isCustom = isCustom;
     }
 
     Message(String defaultMessage) {
-        this(defaultMessage, false, 0L, null);
-    }
-
-    Message(String defaultMessage, boolean isCustom, long delay, @Nullable TimeUnit delayUnit) {
         this.defaultMessage = defaultMessage;
-        this.isCustom = isCustom;
-        if (delay > 0 && delayUnit != null)
-            delayedMessages = AutoRemovalCollection.newHashSet(delay, delayUnit);
+        this.isCustom = false;
     }
 
     public static void reload() {
@@ -924,8 +886,18 @@ public enum Message {
 
             CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(langFile);
 
+            // Additional saving, because we are not adding a new message, we are only changing the format of the old one,
+            // so cfg.syncWithConfig() will not detect it and will not save the file.
+            if (convertData(cfg)) {
+                try {
+                    cfg.save(langFile);
+                } catch (Exception error) {
+                    Log.error(error, "An unexpected error occurred while saving lang file ", langFile.getName(), ":");
+                }
+            }
+
             try (InputStream langResourceStream = plugin.getResource("lang/" + langFile.getName())) {
-                cfg.syncWithConfig(langFile, langResourceStream == null ? plugin.getResource("lang/en-US.yml") : langResourceStream, "lang/en-US.yml");
+                cfg.syncWithConfig(langFile, langResourceStream == null ? plugin.getResource("lang/en-US.yml") : langResourceStream, IGNORED_SECTIONS);
             } catch (Exception error) {
                 Log.error(error, "An unexpected error occurred while saving lang file ", langFile.getName(), ":");
             }
@@ -950,9 +922,9 @@ public enum Message {
     }
 
     public boolean isEmpty(Locale locale) {
-        IMessageComponent messageContainer = getComponent(locale);
-        return messageContainer == null || messageContainer.getType() == IMessageComponent.Type.EMPTY ||
-                messageContainer.getMessage().isEmpty();
+        IMessageComponent messageComponent = getComponent(locale);
+        return messageComponent == null || messageComponent.getType() == IMessageComponent.Type.EMPTY ||
+                messageComponent.getMessage(EMPTY_ARGS).isEmpty();
     }
 
     @Nullable
@@ -1029,6 +1001,20 @@ public enum Message {
             dest.getParentFile().mkdirs();
             file.renameTo(dest);
         }
+    }
+
+    private static boolean convertData(CommentedConfiguration cfg) {
+        if (cfg.isString("GOT_INVITE_TOOLTIP")) {
+            cfg.set("GOT_INVITE.0.text", cfg.getString("GOT_INVITE"));
+            cfg.set("GOT_INVITE.0.tooltip", cfg.getString("GOT_INVITE_TOOLTIP"));
+            cfg.set("GOT_INVITE.0.command", "/is accept {0}");
+
+            cfg.set("GOT_INVITE_TOOLTIP", null);
+
+            return true;
+        }
+
+        return false;
     }
 
     public static void registerListeners(PluginEventsDispatcher dispatcher) {

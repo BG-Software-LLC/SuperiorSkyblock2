@@ -127,6 +127,10 @@ public class CmdValue implements ISuperiorCommand {
             }
         }
 
+        if (stringBuilder.length() > 0 && stringBuilder.charAt(stringBuilder.length() - 1) == '\n') {
+            stringBuilder.setLength(stringBuilder.length() - 1);
+        }
+
         Message.CUSTOM.send(superiorPlayer, stringBuilder.toString(), false);
     }
 
