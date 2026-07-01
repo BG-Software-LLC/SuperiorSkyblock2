@@ -35,7 +35,7 @@ BANK_WITHDRAW_CUSTOM: '&e&l银行 | &7输入你需要取出的货币数量:'
 BANK_WITHDRAW_COMPLETED: '取出成功'
 BANNED_FROM_ISLAND: '&c&l错误 | &7你已被该岛屿封禁.'
 BLOCK_COUNT_CHECK: '&e&l岛屿 | &7该岛屿有 {0} 个 {1}.'
-BLOCK_COUNTS_CHECK: |
+BLOCK_COUNTS_CHECK: |-
   &e&l岛屿 | &7该岛屿包含下列方块:
   &7{0}
 BLOCK_COUNTS_CHECK_EMPTY: '&e&l岛屿 | &7该岛屿中不包含任何在追踪列表内的方块.'
@@ -369,8 +369,11 @@ GLOBAL_TITLE_SENT_NAME: '&e&l岛屿 | &7成功将标题消息发送至岛屿 {0}
 GOT_BANNED: '&e&l岛屿 | &7你已被玩家 {0} 的岛屿封禁.'
 GOT_DEMOTED: '&e&l岛屿 | &7你在你的岛屿中被降职为 {0} 角色.'
 GOT_EXPELLED: '&e&l岛屿 | &7&o你已被岛屿 {0} 开除.'
-GOT_INVITE: '&e&l岛屿 | &7{0} 邀请了你至他的岛屿.'
-GOT_INVITE_TOOLTIP: '&7点击该消息来同意请求.'
+GOT_INVITE:
+  0:
+    text: '&e&l岛屿 | &7{0} 邀请了你至他的岛屿.'
+    tooltip: '&7点击该消息来同意请求.'
+    command: '/is accept {0}'
 GOT_KICKED: '&e&l岛屿 | &7你被玩家 {0} 踢出了岛屿.'
 GOT_PROMOTED: '&e&l岛屿 | &7你在你的岛屿中被升职为 {0} 角色.'
 GOT_REVOKED: '&e&l岛屿 | &7{0} 撤回了对你的邀请.'
@@ -393,7 +396,7 @@ INVALID_ISLAND: '&c&l错误 | &7你没有岛屿.'
 INVALID_ISLAND_LOCATION: '&c&l错误 | &7你当前位置没有岛屿.'
 INVALID_ISLAND_OTHER: '&c&l错误 | &7{0} 没有岛屿.'
 INVALID_ISLAND_OTHER_NAME: '&c&l错误 | &7找不到名称为 {0} 的岛屿.'
-INVALID_ISLAND_PERMISSION: |
+INVALID_ISLAND_PERMISSION: |-
   &c&l错误 | &7找不到岛屿权限 {0}.
   &c&l错误 | &7岛屿权限: {1}
 INVALID_LEVEL: '&c&l错误 | &7无效等级 {0}.'
@@ -408,22 +411,22 @@ INVALID_MULTIPLIER: '&c&l错误 | &7无效翻倍 {0}.'
 INVALID_PAGE: '&c&l错误 | &7无效页码 {0}.'
 INVALID_PERCENTAGE: '&c&l错误 | &7百分比数值必须介于 0 和 100.'
 INVALID_PLAYER: '&c&l错误 | &7找不到名为 {0} 的玩家'
-INVALID_RATE: |
+INVALID_RATE: |-
   &c&l错误 | &7找不到名为 {0} 的评分.
   &c&l错误 | &7岛屿评分: {1}
 INVALID_ROWS: '&c&l错误 | &7无效行数: {0}'
-INVALID_ROLE: |
+INVALID_ROLE: |-
   &c&l错误 | &7找不到名为 {0} 的角色.
   &c&l错误 | &7岛屿角色: {1}
 INVALID_SCHEMATIC: '&c&l错误 | &7找不到名为 {0} 的结构文件.'
-INVALID_SETTINGS: |
+INVALID_SETTINGS: |-
   &c&l错误 | &7找不到名为 {0} 的岛屿设置.
   &c&l错误 | &7岛屿设置: {1}
 INVALID_SIZE: '&c&l错误 | &7无效大小 {0}.'
 INVALID_SLOT: '&c&l错误 | &7无效位置 {0}.'
 INVALID_TITLE: '&c&l错误 | &7输入的标题信息无效.'
 INVALID_TOGGLE_MODE: '&c&l错误 | &7不能切换模式 {0}.'
-INVALID_UPGRADE: |
+INVALID_UPGRADE: |-
   &c&l错误 | &7找不到名为 {0} 的可升级功能.
   &c&l错误 | &7可升级功能: {1}
 INVALID_VISIT_LOCATION: '&c&l错误 | &7该岛屿没有访客传送位置.'
@@ -454,33 +457,33 @@ ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7命令列表 [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7使用 /is help {0} 来翻到下一页.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&l岛屿 | &7银行限制: {0}'
-ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
+ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |-
   &e&l岛屿 | &7方块限制:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&l岛屿 | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_COOP_LIMIT: '&e&l岛屿 | &7合作成员数量限制: {0}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&l岛屿 | &7作物生长速率: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&l岛屿 | &7掉落物翻倍: {0}'
-ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |
+ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |-
   &e&l岛屿 | &7岛屿效果:
   {0}
 ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE: '&e&l岛屿 | &7  {0}: {1}'
-ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |-
   &e&l岛屿 | &7实体限制:
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&l岛屿 | &7  {0}: {1}'
-ISLAND_INFO_ADMIN_GENERATOR_RATES: |
+ISLAND_INFO_ADMIN_GENERATOR_RATES: |-
   &e&l岛屿 | &7刷怪比率 ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&l岛屿 | &7  {0}: {1}% ({2})'
-ISLAND_INFO_ADMIN_ROLE_LIMITS: |
+ISLAND_INFO_ADMIN_ROLE_LIMITS: |-
   &e&l岛屿 | &7角色限制:
   {0}
 ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&l岛屿 | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_SIZE: '&e&l岛屿 | &7边界大小: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&l岛屿 | &7刷怪笼生成倍率: {0}'
 ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&l岛屿 | &7团队限制: {0}'
-ISLAND_INFO_ADMIN_UPGRADES: |
+ISLAND_INFO_ADMIN_UPGRADES: |-
   &e&l岛屿 | &7功能升级:
   {0}
 ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&l岛屿 | &7  {0}: {1}'
@@ -509,7 +512,7 @@ ISLAND_INFO_RATE_TWO_COLOR: '&6'
 ISLAND_INFO_RATE_THREE_COLOR: '&e'
 ISLAND_INFO_RATE_FOUR_COLOR: '&a'
 ISLAND_INFO_RATE_FIVE_COLOR: '&2'
-ISLAND_INFO_ROLES: |
+ISLAND_INFO_ROLES: |-
   &e&l岛屿 | &7{0}s:
   {1}
 ISLAND_INFO_VISITORS_COUNT: '&e&l岛屿 | &7访客数量: {0} ({1} 位独立访客)'
@@ -523,7 +526,7 @@ ISLAND_PREVIEW_CANCEL: '&e&l结构 | &7你退出了预览模式.'
 ISLAND_PREVIEW_CONFIRM_TEXT: '确认'
 ISLAND_PREVIEW_CANCEL_TEXT: '取消'
 ISLAND_PREVIEW_SET: '&e&l预览 | &7成功将结构 {0} 的预览位置设置为 {1}.'
-ISLAND_PREVIEW_START: |
+ISLAND_PREVIEW_START: |-
   &e&l结构 | &7你正在预览结构 {0}.
   &e&l结构 | &7输入 &a&lCONFIRM &7来创建一个新岛屿, 或 &c&lCANCEL &7取消预览模式.
   &e&l结构 | &7你不能离开该岛屿的区域, 否则将会自动退出岛屿预览.
@@ -577,7 +580,7 @@ MISSION_STATUS_COMPLETE_ALL: '&e&l任务 | &7成功修改了玩家 {0} 的所有
 MISSION_STATUS_RESET: '&e&l任务 | &7成功将玩家 {1} 的任务 {0} 状态重置.'
 MISSION_STATUS_RESET_ALL: '&e&l任务 | &7成功将玩家 {0} 的所有任务状态重置.'
 MODULE_ALREADY_INITIALIZED: '&e&l模块 | &7该模块已载入.'
-MODULE_INFO: |
+MODULE_INFO: |-
   &e&l模块 | &7{0} 作者 {1}
   &e&l模块 | &7&m--------------------
   &e&l模块 | &7{2}
@@ -704,7 +707,7 @@ SCHEMATIC_LEFT_SELECT: '&e&l结构 | &7已选中 #2 位点 ({0})'
 SCHEMATIC_NOT_ADDED: '&c&l错误 | &7服务器尚未添加 {0} 的结构文件. 请联系管理员解决此问题. {0} 结构文件的格式为 "{1}".'
 SCHEMATIC_NOT_READY: '&c&l错误 | &7你尚未选中两点.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&l结构 | &7正在处理你的请求...'
-SCHEMATIC_READY_TO_CREATE: |
+SCHEMATIC_READY_TO_CREATE: |-
   &e&l结构 | &7你已选择两个点. 输入命令 /is admin schematic <名称> 可创建一个新的结构.
   &e&l结构 | &7确保你输入命令时站在了你所需设置的传送点.
 SCHEMATIC_RIGHT_SELECT: '&e&l结构 | &7已选中 #1 位点 ({0})'
@@ -781,7 +784,7 @@ UPGRADE_COOLDOWN_FORMAT: '&c&l错误 | &7你只能在 {0} 之后才可继续进�
 VAULT_NOT_INSTALLED: '&c&l错误 | &7服务器未安装 Vault 插件, 交易功能已禁用.'
 VISITOR_BLOCK_COMMAND: '&c&l错误 | &7你不能对其他岛屿使用该命令.'
 WARP_ALREADY_EXIST: '&c&l错误 | &7已存在同名传送点.'
-WARP_CATEGORY_ICON_NEW_LORE: |
+WARP_CATEGORY_ICON_NEW_LORE: |-
   &e&l传送 | &7输入一行新的描述 (输入 "-cancel" 取消本次操作):
   &e&l传送 | &7可使用符号 "\n" 进行换行.
 WARP_CATEGORY_ICON_NEW_NAME: '&e&l传送 | &7输入新的分类图标名称 (输入 "-cancel" 取消本次操作):'
@@ -795,7 +798,7 @@ WARP_CATEGORY_SLOT_SUCCESS: '&e&l传送 | &7成功将该分类的位置转移至
 WARP_CATEGORY_RENAME: '&e&l传送 | &7输入新的名称 (输入 "-cancel" 取消本次操作):'
 WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&l错误 | &7已存在名称相同的分类名称.'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&l传送 | &7成功将分类重命名为 {0}.'
-WARP_ICON_NEW_LORE: |
+WARP_ICON_NEW_LORE: |-
   &e&l传送 | &7输入一行新的描述 (输入 "-cancel" 取消本次操作):
   &e&l传送 | &7可使用符号 "\n" 进行换行.
 WARP_ICON_NEW_NAME: '&e&l传送 | &7输入新的名称 (输入 "-cancel" 取消本次操作):'

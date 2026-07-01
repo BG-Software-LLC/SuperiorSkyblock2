@@ -369,8 +369,11 @@ GLOBAL_TITLE_SENT_NAME: '&e&lWyspa | &7Pomyslnie wyslano do czlonków wyspy {0} 
 GOT_BANNED: '&e&lWyspa | &7Zostales ZABRONIONY z wyspy uzytkownika {0}.'
 GOT_DEMOTED: '&e&lWyspa | &7Zostales zdegradowany do {0} na swojej wyspie.'
 GOT_EXPELLED: '&e&lWyspa | &7&oZostales wydalony z wyspy przez {0}.'
-GOT_INVITE: '&e&lWyspa | &7{0} zaprosil cie na swoja wyspe.'
-GOT_INVITE_TOOLTIP: '&7Kliknij wiadomosc, aby zaakceptowac zaproszenie.'
+GOT_INVITE:
+  0:
+    text: '&e&lWyspa | &7{0} zaprosil cie na swoja wyspe.'
+    tooltip: '&7Kliknij wiadomosc, aby zaakceptowac zaproszenie.'
+    command: '/is accept {0}'
 GOT_KICKED: '&e&lWyspa | &7Zostales wyrzucony z wyspy przez {0}.'
 GOT_PROMOTED: '&e&lWyspa | &7Zostales awansowany na {0} na swojej wyspie.'
 GOT_REVOKED: '&e&lWyspa | &7{0} odwolal Twoje zaproszenie na swoja wyspe.'
@@ -393,7 +396,7 @@ INVALID_ISLAND: '&c&lBlad | &7Nie masz wyspy.'
 INVALID_ISLAND_LOCATION: '&c&lBlad | &7W Twojej lokalizacji nie ma wyspy.'
 INVALID_ISLAND_OTHER: '&c&lBlad | &7{0} nie ma wyspy.'
 INVALID_ISLAND_OTHER_NAME: '&c&lBlad | &7Nie ma wyspy o nazwie {0}.'
-INVALID_ISLAND_PERMISSION: |
+INVALID_ISLAND_PERMISSION: |-
   &c&lBlad | &7Nie mozna znalezc uprawnienia wyspy {0}.
   &c&lBlad | &7Uprawnienia na wyspie: {1}
 INVALID_LEVEL: '&c&lBlad | &7Nieprawidlowy poziom {0}.'
@@ -408,22 +411,22 @@ INVALID_MULTIPLIER: '&c&lBlad | &7Nieprawidlowy mnoznik {0}.'
 INVALID_PAGE: '&c&lBlad | &7Nieprawidlowa strona {0}.'
 INVALID_PERCENTAGE: '&c&lBlad | &7Procent musi zawierac sie w przedziale od 0 do 100.'
 INVALID_PLAYER: '&c&lBlad | &7Nie mozna znalezc gracza o nazwie {0}'
-INVALID_RATE: |
+INVALID_RATE: |-
   &c&lBlad | &7Nie udalo sie znalezc oceny o nazwie {0}.
   &c&lBlad | &7Oceny wysp: {1}
 INVALID_ROWS: '&c&lBlad | &7Nieprawidlowa liczba wierszy: {0}'
-INVALID_ROLE: |
+INVALID_ROLE: |-
   &c&lBlad | &7Nie mozna znalezc roli wyspy {0}.
   &c&lBlad | &7Role na wyspie: {1}
 INVALID_SCHEMATIC: '&c&lBlad | &7Nie mozna znalezc schematu o nazwie {0}.'
-INVALID_SETTINGS: |
+INVALID_SETTINGS: |-
   &c&lBlad | &7Nie mozna znalezc ustawień wyspy {0}.
   &c&lBlad | &7Ustawienia wyspy: {1}
 INVALID_SIZE: '&c&lBlad | &7Nieprawidlowy rozmiar {0}.'
 INVALID_SLOT: '&c&lBlad | &7Nieprawidlowy przedzial {0}.'
 INVALID_TITLE: '&c&lBlad | &7Wprowadzono nieprawidlowy tytul.'
 INVALID_TOGGLE_MODE: '&c&lBlad | &7Nie mozna przelaczyc {0}.'
-INVALID_UPGRADE: |
+INVALID_UPGRADE: |-
   &c&lBlad | &7Nie mozna znalezc uaktualnienia o nazwie {0}.
   &c&lBlad | &7Aktualizacje: {1}
 INVALID_VISIT_LOCATION: '&c&lBlad | &7Ta wyspa nie ma lokalizacji odwiedzajacych.'
@@ -454,33 +457,33 @@ ISLAND_HELP_HEADER: '&e&lSkyblock &7Lista poleceń [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSkyblock &7Uzyj /is help {0} na nastepnej stronie.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lWyspa | &7Limit banku: {0}'
-ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
+ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |-
   &e&lWyspa | &7 Limity bloków:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lWyspa | &7 {0}: {1}'
 ISLAND_INFO_ADMIN_COOP_LIMIT: '&e&lWyspa | &7Limit wspólpracy: {0}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lWyspa | &7Mnoznik upraw: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lWyspa | &7Mnoznik zrzutów: {0}'
-ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |
+ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |-
   &e&lWyspa | &7Efekty wyspy:
   {0}
 ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE: '&e&lWyspa | &7 {0}: {1}'
-ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |-
   &e&lWyspa | &7 Limity jednostek:
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lWyspa | &7 {0}: {1}'
-ISLAND_INFO_ADMIN_GENERATOR_RATES: |
+ISLAND_INFO_ADMIN_GENERATOR_RATES: |-
   &e&lWyspa | &7Ceny generatora ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lWyspa | &7 {0}: {1}% ({2})'
-ISLAND_INFO_ADMIN_ROLE_LIMITS: |
+ISLAND_INFO_ADMIN_ROLE_LIMITS: |-
   &e&lWyspa | &7 Limity ról:
   {0}
 ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lWyspa | &7 {0}: {1}'
 ISLAND_INFO_ADMIN_SIZE: '&e&lWyspa | &7Rozmiar obramowania: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lWyspa | &7Mnoznik spawnerów: {0}'
 ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lWyspa | &7Limit zespolu: {0}'
-ISLAND_INFO_ADMIN_UPGRADES: |
+ISLAND_INFO_ADMIN_UPGRADES: |-
   &e&lWyspa | &7Aktualizacje:
   {0}
 ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lWyspa | &7 {0}: {1}'
@@ -509,7 +512,7 @@ ISLAND_INFO_RATE_TWO_COLOR: '&6'
 ISLAND_INFO_RATE_THREE_COLOR: '&e'
 ISLAND_INFO_RATE_FOUR_COLOR: '&a'
 ISLAND_INFO_RATE_FIVE_COLOR: '&2'
-ISLAND_INFO_ROLES: |
+ISLAND_INFO_ROLES: |-
   &e&lWyspa | &7{0}s:
   {1}
 ISLAND_INFO_VISITORS_COUNT: '&e&lWyspa | &7Odwiedzajacy: {0} ({1} unikalnych odwiedzajacych)'
@@ -523,7 +526,7 @@ ISLAND_PREVIEW_CANCEL: '&e&lPodglad | &7Anulowales tryb podgladu.'
 ISLAND_PREVIEW_CONFIRM_TEXT: 'POTWIERDZ'
 ISLAND_PREVIEW_CANCEL_TEXT: 'ANULUJ'
 ISLAND_PREVIEW_SET: '&e&lPodglad | &7Pomyslnie zaktualizowano lokalizacje podgladu dla schematu {0} na {1}.'
-ISLAND_PREVIEW_START: |
+ISLAND_PREVIEW_START: |-
   &e&lPodglad | &7Wlaczyles tryb podgladu dla schematu {0}.
   &e&lPodglad | &7Wpisz &a&lPOTWIERDZ &7by stworzyc nowa wyspe, lub &c&lANULUJ &7by wylaczyc tryb podladu.
   &e&lPodglad | &7Nie mozesz opuscic terenu wyspy, w przeciwnym razie tryb podgladowy zostanie anulowany.
@@ -577,7 +580,7 @@ MISSION_STATUS_COMPLETE_ALL: '&e&lMisja | &7Zmieniono status wszystkich misji na
 MISSION_STATUS_RESET: '&e&lMisja | &7Zresetuj status misji {0} dla {1}.'
 MISSION_STATUS_RESET_ALL: '&e&lMisja | &7Zresetuj status wszystkich misji dla {0}.'
 MODULE_ALREADY_INITIALIZED: '&e&lModul | &7Ten modul jest juz zaladowany.'
-MODULE_INFO: |
+MODULE_INFO: |-
   &e&lModul | &7{0} przez {1}
   &e&lModul | &7&m--------------------
   &e&lModul | &7{2}
@@ -701,7 +704,7 @@ SCHEMATIC_LEFT_SELECT: '&e&lSchematy | &7Wybrana pozycja #2 ({0})'
 SCHEMATIC_NOT_ADDED: '&c&lBlad | &7Serwer nie dodal schematu {0}. Skontaktuj sie z administratorem, aby rozwiazac problem. Format dla schematu {0} to "{1}".'
 SCHEMATIC_NOT_READY: '&c&lBlad | &7Nie wybrales dwóch pozycji.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lSchematy | &7Przetwarzanie zadania...'
-SCHEMATIC_READY_TO_CREATE: |
+SCHEMATIC_READY_TO_CREATE: |-
   &e&lSchematy | &7Wybrales dwie pozycje. Uruchom /is admin schematic <name>, aby utworzyc nowy schemat.
   &e&lSchematy | &7Upewnij sie, ze stoisz w miejscu teleportacji podczas wykonywania polecenia.
 SCHEMATIC_RIGHT_SELECT: '&e&lSchematy | &7Wybrana pozycja nr 1 ({0})'
@@ -778,7 +781,7 @@ UPGRADE_COOLDOWN_FORMAT: '&c&lBlad | &7Mozesz uaktualnic ponownie dopiero za {0}
 VAULT_NOT_INSTALLED: '&c&lBlad | &7Na serwerze nie ma zainstalowanego pluginu Vault, wiec transakcje sa wylaczone.'
 VISITOR_BLOCK_COMMAND: '&c&lBlad | &7Nie mozesz uzyc tego polecenia na innych wyspach.'
 WARP_ALREADY_EXIST: '&c&lBlad | &7Istnieje juz warp o tej nazwie.'
-WARP_CATEGORY_ICON_NEW_LORE: |
+WARP_CATEGORY_ICON_NEW_LORE: |-
   &e&lWarpy | &7Wprowadz nowa wiedze (wpisz -cancel", aby anulowac):
   &e&lWarpy | &7Mozesz oddzielic wiersze, uzywajac '\n.'
 WARP_CATEGORY_ICON_NEW_NAME: '&e&lWarpy | &7Wpisz nazwe (wpisz "-cancel", aby anulowac):'
@@ -792,7 +795,7 @@ WARP_CATEGORY_SLOT_SUCCESS: '&e&lWarpy | &7Pomyslnie zmieniono miejsce kategorii
 WARP_CATEGORY_RENAME: '&e&lWarpy | &7Wprowadz nowa nazwe (wpisz "-cancel", aby anulowac):'
 WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lBlad | &7Ta nazwa jest juz zajeta przez inna kategorie.'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lWarpy | &7Pomyslnie zmieniono nazwe kategorii na {0}.'
-WARP_ICON_NEW_LORE: |
+WARP_ICON_NEW_LORE: |-
   &e&lWarpy | &7Wprowadz nowa wiedze (wpisz "-cancel", aby anulowac):
   &e&lWarpy | &7Mozesz oddzielic wiersze, uzywajac '\n.'
 WARP_ICON_NEW_NAME: '&e&lWarpy | &7Wpisz nazwe (wpisz "-cancel", aby anulowac):'
