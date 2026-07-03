@@ -29,6 +29,12 @@ public class Placeholders {
     public static String parseKeyPlaceholders(Map<KeyRequirements, Integer> requirements,
                                               DataTracker<Key, KeyRequirements> dataTracker,
                                               String line, boolean isMaterial) {
+        return parseKeyPlaceholders(requirements, dataTracker::getCount, line, isMaterial);
+    }
+
+    public static String parseKeyPlaceholders(Map<KeyRequirements, Integer> requirements,
+                                              GetCountFunction<Key> getCountFunction,
+                                              String line, boolean isMaterial) {
         Function<String, Key> creationMethod;
 
         if (isMaterial) {
@@ -61,7 +67,7 @@ public class Placeholders {
                 int totalCount = 0;
 
                 for (Key requirementKey : requirementsKey) {
-                    totalCount += dataTracker.getCount(requirementKey);
+                    totalCount += getCountFunction.getCount(requirementKey);
                 }
 
                 return totalCount;
@@ -70,6 +76,10 @@ public class Placeholders {
     }
 
     public static String parsePlaceholders(Map<Requirements, Integer> requirements, DataTracker<String, Requirements> dataTracker, String line) {
+        return parsePlaceholders(requirements, dataTracker::getCount, line);
+    }
+
+    public static String parsePlaceholders(Map<Requirements, Integer> requirements, GetCountFunction<String> getCountFunction, String line) {
         return parsePlaceholders(line, new PlaceholdersFunctions<Requirements>() {
             @Override
             public Requirements getRequirementFromKey(String key) {
@@ -91,7 +101,7 @@ public class Placeholders {
                 int totalCount = 0;
 
                 for (String requirementKey : requirementsKey) {
-                    totalCount += dataTracker.getCount(requirementKey);
+                    totalCount += getCountFunction.getCount(requirementKey);
                 }
 
                 return totalCount;
@@ -134,6 +144,12 @@ public class Placeholders {
         public abstract Optional<Integer> lookupRequirement(E requirement);
 
         public abstract int getCountForRequirement(E requirement);
+
+    }
+
+    public interface GetCountFunction<K> {
+
+        int getCount(K key);
 
     }
 
