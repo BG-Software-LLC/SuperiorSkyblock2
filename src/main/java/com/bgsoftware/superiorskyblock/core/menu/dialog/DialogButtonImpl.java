@@ -10,18 +10,24 @@ import java.util.EnumMap;
 public class DialogButtonImpl implements DialogButton {
 
     private final String label;
+    private final int width;
     @Nullable
     private final DialogButtonAction action;
 
-    public DialogButtonImpl(String label, DialogButtonAction action) {
+    public DialogButtonImpl(String label, int width, DialogButtonAction action) {
         this.label = label;
+        this.width = width;
         this.action = action;
     }
-
 
     @Override
     public String getLabel() {
         return this.label;
+    }
+
+    @Override
+    public int getWidth() {
+        return this.width;
     }
 
     @Nullable
@@ -63,11 +69,18 @@ public class DialogButtonImpl implements DialogButton {
     public static class Builder implements DialogButton.Builder {
 
         private String label;
+        private int width = 150;
         private DialogButtonAction action;
 
         @Override
         public Builder setLabel(String label) {
             this.label = label;
+            return this;
+        }
+
+        @Override
+        public Builder setWidth(int width) {
+            this.width = width;
             return this;
         }
 
@@ -80,7 +93,7 @@ public class DialogButtonImpl implements DialogButton {
 
         @Override
         public DialogButton build() {
-            return new DialogButtonImpl(this.label, this.action);
+            return new DialogButtonImpl(this.label, this.width, this.action);
         }
     }
 

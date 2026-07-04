@@ -130,22 +130,22 @@ public abstract class AbstractNMSDialogsImpl implements NMSDialogs {
 
     private static List<DialogBody> buildBodies(DialogMenuLayout<?> menuLayout) {
         List<DialogBody> bodies = new LinkedList<>();
-        for (DialogBodyElement bodyElement : menuLayout.getBodyElements()) {
-            if (bodyElement instanceof DialogBodyText) {
-                bodies.add(DialogBody.plainMessage(Component.text(((DialogBodyText) bodyElement).getText())));
-            } else if (bodyElement instanceof DialogBodyItem) {
-                ItemStack itemStack = ((DialogBodyItem) bodyElement).getItem().build();
-                ItemDialogBody.Builder builder = DialogBody.item(itemStack)
-                        .showDecorations(((DialogBodyItem) bodyElement).isShowDecorations())
-                        .showTooltip(((DialogBodyItem) bodyElement).isShowTooltip());
-                String description = ((DialogBodyItem) bodyElement).getDescription();
-                if (description != null)
-                    builder.description(DialogBody.plainMessage(Component.text(description)));
-                bodies.add(builder.build());
-            } else {
-                throw new IllegalStateException("bodyElement: " + bodyElement);
-            }
-        }
+//        for (DialogBodyElement bodyElement : menuLayout.getBodyElements()) {
+//            if (bodyElement instanceof DialogBodyText) {
+//                bodies.add(DialogBody.plainMessage(Component.text(((DialogBodyText) bodyElement).getText())));
+//            } else if (bodyElement instanceof DialogBodyItem) {
+//                ItemStack itemStack = ((DialogBodyItem) bodyElement).getItem().build();
+//                ItemDialogBody.Builder builder = DialogBody.item(itemStack)
+//                        .showDecorations(((DialogBodyItem) bodyElement).isShowDecorations())
+//                        .showTooltip(((DialogBodyItem) bodyElement).isShowTooltip());
+//                String description = ((DialogBodyItem) bodyElement).getDescription();
+//                if (description != null)
+//                    builder.description(DialogBody.plainMessage(Component.text(description)));
+//                bodies.add(builder.build());
+//            } else {
+//                throw new IllegalStateException("bodyElement: " + bodyElement);
+//            }
+//        }
         return bodies;
     }
 

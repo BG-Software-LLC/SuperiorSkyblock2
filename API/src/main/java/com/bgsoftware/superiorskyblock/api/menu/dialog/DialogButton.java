@@ -7,6 +7,8 @@ public interface DialogButton {
 
     String getLabel();
 
+    int getWidth();
+
     @Nullable
     DialogButtonAction getAction();
 
@@ -17,6 +19,8 @@ public interface DialogButton {
     interface Builder {
 
         Builder setLabel(@Nullable String label);
+
+        Builder setWidth(int width);
 
         Builder setAction(DialogButtonAction.Type type, @Nullable String data);
 

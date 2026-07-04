@@ -625,12 +625,12 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     }
 
     @Override
-    public DialogBodyElement createDialogBodyTextElement(String text) {
-        return new DialogBodyText(text);
+    public DialogBodyElement createDialogBodyTextElement(String text, @Nullable DialogBodyElement.TextConfig textConfig) {
+        return new DialogBodyText(text, textConfig);
     }
 
     @Override
-    public DialogBodyElement createDialogBodyItemElement(ItemStack itemStack, DialogBodyElement.ItemConfig itemConfig) {
+    public DialogBodyElement createDialogBodyItemElement(ItemStack itemStack, @Nullable DialogBodyElement.ItemConfig itemConfig) {
         return new DialogBodyItem(new TemplateItem(new ItemBuilder(itemStack)), itemConfig);
     }
 

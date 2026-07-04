@@ -148,7 +148,7 @@ public interface MenusManager {
      * @param targetPlayer The player to open the menu for.
      * @param previousMenu The previous menu that was opened, if exists.
      * @param targetIsland The island to ban the player from.
-     * @param newOwner The player that will be banned.
+     * @param newOwner     The player that will be banned.
      */
     void openConfirmTransfer(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland, SuperiorPlayer newOwner);
 
@@ -876,6 +876,7 @@ public interface MenusManager {
 
     /**
      * Create a new pattern builder for building a menu.
+     *
      * @deprecated See {@link InventoryMenuLayout} and {@link DialogMenuLayout}
      */
     @Deprecated
@@ -893,6 +894,7 @@ public interface MenusManager {
 
     /**
      * Create a new pattern builder for building a paged-based menu.
+     *
      * @deprecated See {@link InventoryMenuLayout} and {@link DialogMenuLayout}
      */
     @Deprecated
@@ -943,9 +945,10 @@ public interface MenusManager {
     /**
      * Creates a new text-based {@link DialogBodyElement}.
      *
-     * @param text The content of the body element.
+     * @param text       The content of the body element.
+     * @param textConfig Extra configuration for the body text element.
      */
-    DialogBodyElement createDialogBodyTextElement(String text);
+    DialogBodyElement createDialogBodyTextElement(String text, @Nullable DialogBodyElement.TextConfig textConfig);
 
     /**
      * Creates a new item-based {@link DialogBodyElement}.

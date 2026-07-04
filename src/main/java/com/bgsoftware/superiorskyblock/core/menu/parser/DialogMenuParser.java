@@ -84,7 +84,7 @@ public class DialogMenuParser {
 
     private static Optional<DialogBodyElement> readDialogBodyElement(String callerName, Object entry) {
         if (entry instanceof String) {
-            return Optional.of(DialogBodyElement.fromText(Formatters.COLOR_FORMATTER.format((String) entry)));
+            return Optional.of(DialogBodyElement.fromText(Formatters.COLOR_FORMATTER.format((String) entry), null));
         } else if (entry instanceof Map) {
             MemoryConfiguration section = convertMapToConfigSection((Map<String, ?>) entry);
             if (section.isConfigurationSection("item")) {
@@ -94,12 +94,15 @@ public class DialogMenuParser {
                     return Optional.empty();
                 }
                 return Optional.of(new DialogBodyItem(templateItem, new DialogBodyElement.ItemConfig()
-                        .setDescription(Formatters.COLOR_FORMATTER.format(section.getString("description")))
+                        .setDescription(readDialogBodyElement(callerName, section.get("description")).orElse(null))
                         .setShowDecorations(section.getBoolean("show-decorations", true))
                         .setShowTooltip(section.getBoolean("show-tooltip", true))
+                        .setWidth(section.getInt("width", 16))
+                        .setHeight(section.getInt("height", 16))
                 ));
             } else {
-                return Optional.of(DialogBodyElement.fromText(Formatters.COLOR_FORMATTER.format(section.getString("text"))));
+                return Optional.of(DialogBodyElement.fromText(Formatters.COLOR_FORMATTER.format(section.getString("text")),
+                        new DialogBodyElement.TextConfig().setWidth(section.getInt("width", 200))));
             }
         } else {
             Log.warnFromFile(callerName, "Invalid dialog body entry: ", entry, " - skipping...");
