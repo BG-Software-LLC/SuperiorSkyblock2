@@ -27,7 +27,6 @@ import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvide
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
-import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.Location;
@@ -43,7 +42,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -404,11 +402,11 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.getWorth().toString())
                     // Deprecated Island Placeholders
                     .put("end_unlocked", legacyPlaceholder("superior_island_end_unlocked", "superior_island_world_unlocked_the_end", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.isEndEnabled(), superiorPlayer.getUserLocale())))
+                            Formatters.BOOLEAN_FORMATTER.format(island.isDimensionEnabled(Dimension.getByName("THE_END")), superiorPlayer.getUserLocale())))
                     .put("nether_unlocked", legacyPlaceholder("superior_island_nether_unlocked", "superior_island_world_unlocked_nether", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.isNetherEnabled(), superiorPlayer.getUserLocale())))
+                            Formatters.BOOLEAN_FORMATTER.format(island.isDimensionEnabled(Dimension.getByName("NETHER")), superiorPlayer.getUserLocale())))
                     .put("normal_unlocked", legacyPlaceholder("superior_island_normal_unlocked", "superior_island_world_unlocked_normal", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.isNormalEnabled(), superiorPlayer.getUserLocale())))
+                            Formatters.BOOLEAN_FORMATTER.format(island.isDimensionEnabled(Dimension.getByName("NORMAL")), superiorPlayer.getUserLocale())))
                     .put("hoppers_limit", legacyPlaceholder("superior_island_hoppers_limit", "superior_island_block_limit_hopper", (island, superiorPlayer) ->
                             island.getBlockLimit(ConstantKeys.HOPPER) + ""))
                     .put("x", legacyPlaceholder("superior_island_x", "superior_island_center_x", (island, superiorPlayer) ->
@@ -440,34 +438,6 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             plugin.getGrid().getTotalWorth().toBigInteger().toString())
                     .put("total_worth_raw", (island, superiorPlayer) ->
                             plugin.getGrid().getTotalWorth().toString())
-                    .build();
-
-    private static final Map<SortingType, BiFunction<Island, SuperiorPlayer, String>> TOP_VALUE_FORMAT_FUNCTIONS =
-            new ImmutableMap.Builder<SortingType, BiFunction<Island, SuperiorPlayer, String>>()
-                    .put(SortingTypes.BY_WORTH, (targetIsland, superiorPlayer) ->
-                            Formatters.FANCY_NUMBER_FORMATTER.format(targetIsland.getWorth(), superiorPlayer.getUserLocale()))
-                    .put(SortingTypes.BY_LEVEL, (targetIsland, superiorPlayer) ->
-                            Formatters.FANCY_NUMBER_FORMATTER.format(targetIsland.getIslandLevel(), superiorPlayer.getUserLocale()))
-                    .put(SortingTypes.BY_RATING, (targetIsland, superiorPlayer) ->
-                            Formatters.NUMBER_FORMATTER.format(targetIsland.getTotalRating()))
-                    .put(SortingTypes.BY_PLAYERS, (targetIsland, superiorPlayer) ->
-                            Formatters.NUMBER_FORMATTER.format(targetIsland.getAllPlayersInside().size()))
-                    .build();
-
-    private static final Map<SortingType, Function<Island, String>> TOP_VALUE_RAW_FUNCTIONS =
-            new ImmutableMap.Builder<SortingType, Function<Island, String>>()
-                    .put(SortingTypes.BY_WORTH, targetIsland -> targetIsland.getWorth().toString())
-                    .put(SortingTypes.BY_LEVEL, targetIsland -> targetIsland.getIslandLevel().toString())
-                    .put(SortingTypes.BY_RATING, targetIsland -> targetIsland.getTotalRating() + "")
-                    .put(SortingTypes.BY_PLAYERS, targetIsland -> targetIsland.getAllPlayersInside().size() + "")
-                    .build();
-
-    private static final Map<SortingType, Function<Island, String>> TOP_VALUE_FUNCTIONS =
-            new ImmutableMap.Builder<SortingType, Function<Island, String>>()
-                    .put(SortingTypes.BY_WORTH, targetIsland -> Formatters.NUMBER_FORMATTER.format(targetIsland.getWorth()))
-                    .put(SortingTypes.BY_LEVEL, targetIsland -> Formatters.NUMBER_FORMATTER.format(targetIsland.getIslandLevel()))
-                    .put(SortingTypes.BY_RATING, targetIsland -> Formatters.NUMBER_FORMATTER.format(targetIsland.getTotalRating()))
-                    .put(SortingTypes.BY_PLAYERS, targetIsland -> Formatters.NUMBER_FORMATTER.format(targetIsland.getAllPlayersInside().size()))
                     .build();
 
     private final Map<String, IslandPlaceholderParser> CUSTOM_ISLAND_PARSERS = new HashMap<>();
@@ -843,29 +813,31 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
         if (placeholderValue.equals("position"))
             return island == null ? Optional.empty() : Optional.of((plugin.getGrid().getIslandPosition(island, sortingType) + 1) + "");
 
-        Function<Island, String> getValueFunction;
+        Function<Island, String> valueFunction;
 
         if ((matcher = TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
-            getValueFunction = Optional.ofNullable(TOP_VALUE_FORMAT_FUNCTIONS.get(sortingType)).map(function ->
-                    (Function<Island, String>) targetIsland -> function.apply(targetIsland, superiorPlayer)).orElse(null);
+            valueFunction = targetIsland -> sortingType.getValue(targetIsland)
+                    .map(value -> Formatters.FANCY_NUMBER_FORMATTER.format(value, superiorPlayer.getUserLocale()))
+                    .orElse(null);
         } else if ((matcher = TOP_VALUE_RAW_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
-            getValueFunction = TOP_VALUE_RAW_FUNCTIONS.get(sortingType);
+            valueFunction = targetIsland -> sortingType.getValue(targetIsland)
+                    .map(String::valueOf)
+                    .orElse(null);
         } else if ((matcher = TOP_VALUE_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
-            getValueFunction = TOP_VALUE_FUNCTIONS.get(sortingType);
+            valueFunction = targetIsland -> sortingType.getValue(targetIsland)
+                    .map(Formatters.NUMBER_FORMATTER::format)
+                    .orElse(null);
         } else if ((matcher = TOP_LEADER_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
-            getValueFunction = targetIsland -> targetIsland.getOwner().getName();
+            valueFunction = targetIsland -> targetIsland.getOwner().getName();
         } else if ((matcher = TOP_CUSTOM_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
             String customPlaceholder = matcher.group(2);
-            getValueFunction = targetIsland -> parsePlaceholdersForIsland(targetIsland, superiorPlayer,
+            valueFunction = targetIsland -> parsePlaceholdersForIsland(targetIsland, superiorPlayer,
                     "superior_island_" + customPlaceholder,
                     customPlaceholder).orElse(null);
         } else {
-            getValueFunction = targetIsland -> targetIsland.getName().isEmpty() ?
+            valueFunction = targetIsland -> targetIsland.getName().isEmpty() ?
                     targetIsland.getOwner().getName() : targetIsland.getName();
         }
-
-        if (getValueFunction == null)
-            return Optional.empty();
 
         int targetPosition;
 
@@ -877,7 +849,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
 
         Island targetIsland = plugin.getGrid().getIsland(targetPosition - 1, sortingType);
 
-        return Optional.ofNullable(targetIsland).map(getValueFunction);
+        return Optional.ofNullable(targetIsland).map(valueFunction);
     }
 
     private static WorldInfo getDefaultWorldInfo(Island island) {

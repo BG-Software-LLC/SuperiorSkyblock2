@@ -7,13 +7,14 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 
 import java.util.Comparator;
+import java.util.function.Function;
 
 public class SortingTypes {
 
-    public static final SortingType BY_WORTH = register("WORTH", SortingComparators.WORTH_COMPARATOR, false);
-    public static final SortingType BY_LEVEL = register("LEVEL", SortingComparators.LEVEL_COMPARATOR, false);
-    public static final SortingType BY_RATING = register("RATING", SortingComparators.RATING_COMPARATOR, false);
-    public static final SortingType BY_PLAYERS = register("PLAYERS", SortingComparators.PLAYERS_COMPARATOR, false);
+    public static final SortingType BY_WORTH = register("WORTH", SortingComparators.WORTH_COMPARATOR, Island::getWorth);
+    public static final SortingType BY_LEVEL = register("LEVEL", SortingComparators.LEVEL_COMPARATOR, Island::getIslandLevel);
+    public static final SortingType BY_RATING = register("RATING", SortingComparators.RATING_COMPARATOR, Island::getTotalRating);
+    public static final SortingType BY_PLAYERS = register("PLAYERS", SortingComparators.PLAYERS_COMPARATOR, island -> island.getAllPlayersInside().size());
 
     private static volatile SortingType ISLAND_TOP_SORTING;
     private static volatile SortingType GLOBAL_WARPS_SORTING;
@@ -27,8 +28,8 @@ public class SortingTypes {
         registerListeners(plugin.getPluginEventsDispatcher());
     }
 
-    private static SortingType register(String name, Comparator<Island> comparator, boolean handleEqualsIslands) {
-        SortingType.register(name, comparator, handleEqualsIslands);
+    private static SortingType register(String name, Comparator<Island> comparator, Function<Island, Number> valueProvider) {
+        SortingType.register(name, comparator, valueProvider, false);
         return SortingType.getByName(name);
     }
 
@@ -55,5 +56,5 @@ public class SortingTypes {
     private static SortingType resolveByName(String name) {
         return SortingType.getByName(name);
     }
-}
 
+}
