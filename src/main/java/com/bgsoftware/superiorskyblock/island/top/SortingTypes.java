@@ -11,10 +11,10 @@ import java.util.function.Function;
 
 public class SortingTypes {
 
-    public static final SortingType BY_WORTH = register("WORTH", SortingComparators.WORTH_COMPARATOR, Island::getWorth);
-    public static final SortingType BY_LEVEL = register("LEVEL", SortingComparators.LEVEL_COMPARATOR, Island::getIslandLevel);
-    public static final SortingType BY_RATING = register("RATING", SortingComparators.RATING_COMPARATOR, Island::getTotalRating);
-    public static final SortingType BY_PLAYERS = register("PLAYERS", SortingComparators.PLAYERS_COMPARATOR, island -> island.getAllPlayersInside().size());
+    public static final SortingType BY_WORTH = register("WORTH", Island::getWorth, SortingComparators.WORTH_COMPARATOR);
+    public static final SortingType BY_LEVEL = register("LEVEL", Island::getIslandLevel, SortingComparators.LEVEL_COMPARATOR);
+    public static final SortingType BY_RATING = register("RATING", Island::getTotalRating, SortingComparators.RATING_COMPARATOR);
+    public static final SortingType BY_PLAYERS = register("PLAYERS", island -> island.getAllPlayersInside().size(), SortingComparators.PLAYERS_COMPARATOR);
 
     private static volatile SortingType ISLAND_TOP_SORTING;
     private static volatile SortingType GLOBAL_WARPS_SORTING;
@@ -28,8 +28,8 @@ public class SortingTypes {
         registerListeners(plugin.getPluginEventsDispatcher());
     }
 
-    private static SortingType register(String name, Comparator<Island> comparator, Function<Island, Number> valueProvider) {
-        SortingType.register(name, comparator, valueProvider, false);
+    private static SortingType register(String name, Function<Island, Number> valueProvider, Comparator<Island> comparator) {
+        SortingType.register(name, valueProvider, comparator, false);
         return SortingType.getByName(name);
     }
 
