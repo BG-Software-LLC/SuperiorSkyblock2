@@ -28,8 +28,8 @@ public class SortingTypes {
         registerListeners(plugin.getPluginEventsDispatcher());
     }
 
-    private static SortingType register(String name, Function<Island, Number> valueProvider, Comparator<Island> comparator) {
-        SortingType.register(name, valueProvider, comparator, false);
+    private static SortingType register(String name, Function<Island, Number> valueFunction, Comparator<Island> comparator) {
+        SortingType.register(name, valueFunction, comparator, false);
         return SortingType.getByName(name);
     }
 
