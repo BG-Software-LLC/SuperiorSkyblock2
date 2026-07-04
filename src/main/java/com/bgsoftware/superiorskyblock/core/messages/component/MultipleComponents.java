@@ -1,10 +1,9 @@
 package com.bgsoftware.superiorskyblock.core.messages.component;
 
-import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ActionBarComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.BossBarComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
@@ -29,65 +28,115 @@ public class MultipleComponents implements IMessageComponent {
     public static IMessageComponent parseSection(ConfigurationSection section, List<MessagesServiceImpl.CustomComponentParser> customComponentParsers) {
         List<IMessageComponent> messageComponents = new LinkedList<>();
 
-        keysLoop:
         for (String key : section.getKeys(false)) {
-            if (key.equals("action-bar")) {
-                messageComponents.add(ActionBarComponent.of(Formatters.COLOR_FORMATTER.format(section.getString(key + ".text"))));
-            } else if (key.equals("title")) {
-                messageComponents.add(TitleComponent.of(
-                        Formatters.COLOR_FORMATTER.format(section.getString(key + ".title")),
-                        Formatters.COLOR_FORMATTER.format(section.getString(key + ".sub-title")),
-                        section.getInt(key + ".fade-in"),
-                        section.getInt(key + ".duration"),
-                        section.getInt(key + ".fade-out")
-                ));
-            } else if (key.equals("sound")) {
-                messageComponents.add(SoundComponent.of(MenuParserUtils.getSound(section.getConfigurationSection("sound"))));
-            } else if (key.equals("bossbar")) {
-                BossBar.Color color;
+            switch (key) {
+                case "action-bar": {
+                    String text = section.getString(key + ".text");
+                    boolean parsed = false;
 
-                try {
-                    color = BossBar.Color.valueOf(section.getString(key + ".color").toUpperCase());
-                } catch (Exception error) {
-                    color = BossBar.Color.PINK;
-                }
-
-                messageComponents.add(BossBarComponent.of(
-                        Formatters.COLOR_FORMATTER.format(section.getString(key + ".message")),
-                        color, section.getInt(key + ".ticks")));
-            } else {
-                String text = section.getString(key + ".text");
-
-                for (MessagesServiceImpl.CustomComponentParser parser : customComponentParsers) {
-                    Optional<IMessageComponent> res = parser.parse(text);
-                    if (res.isPresent()) {
-                        messageComponents.add(res.get());
-                        continue keysLoop;
+                    for (MessagesServiceImpl.CustomComponentParser parser : customComponentParsers) {
+                        Optional<IMessageComponent> res = parser.parseActionBar(text);
+                        if (res.isPresent()) {
+                            messageComponents.add(res.get());
+                            parsed = true;
+                            break;
+                        }
                     }
+
+                    if (!parsed) {
+                        messageComponents.add(ActionBarComponent.of(Formatters.COLOR_FORMATTER.format(text)));
+                    }
+                    break;
                 }
+                case "bossbar": {
+                    String message = section.getString(key + ".message");
+                    String color = section.getString(key + ".color", "PINK").toUpperCase();
+                    String overlay = section.getString(key + ".overlay", "PROGRESS").toUpperCase();
+                    int ticks = section.getInt(key + ".ticks");
+                    boolean parsed = false;
 
-                BaseComponent[] baseComponents = TextComponent.fromLegacyText(Formatters.COLOR_FORMATTER.format(text));
+                    for (MessagesServiceImpl.CustomComponentParser parser : customComponentParsers) {
+                        Optional<IMessageComponent> res = parser.parseBossBar(message, color, overlay, ticks);
+                        if (res.isPresent()) {
+                            messageComponents.add(res.get());
+                            parsed = true;
+                            break;
+                        }
+                    }
 
-                String toolTipMessage = section.getString(key + ".tooltip");
-                if (toolTipMessage != null) {
-                    for (BaseComponent baseComponent : baseComponents)
-                        baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                                new BaseComponent[]{new TextComponent(Formatters.COLOR_FORMATTER.format(toolTipMessage))}));
+                    if (!parsed) {
+                        BossBar.Color bossBarColor;
+                        try {
+                            bossBarColor = BossBar.Color.valueOf(color);
+                        } catch (Exception error) {
+                            bossBarColor = BossBar.Color.PINK;
+                        }
+
+                        messageComponents.add(BossBarComponent.of(Formatters.COLOR_FORMATTER.format(message), bossBarColor, BossBar.Style.SOLID, ticks));
+                    }
+                    break;
                 }
+                case "sound":
+                    messageComponents.add(SoundComponent.of(MenuParserUtils.getSound(section.getConfigurationSection("sound"))));
+                    break;
+                case "title": {
+                    String title = section.getString(key + ".title");
+                    String subtitle = section.getString(key + ".sub-title");
+                    int fadeIn = section.getInt(key + ".fade-in");
+                    int duration = section.getInt(key + ".duration");
+                    int fadeOut = section.getInt(key + ".fade-out");
+                    boolean parsed = false;
 
-                String commandMessage = section.getString(key + ".command");
-                if (commandMessage != null) {
-                    for (BaseComponent baseComponent : baseComponents)
-                        baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandMessage));
+                    for (MessagesServiceImpl.CustomComponentParser parser : customComponentParsers) {
+                        Optional<IMessageComponent> res = parser.parseTitle(title, subtitle, fadeIn, duration, fadeOut);
+                        if (res.isPresent()) {
+                            messageComponents.add(res.get());
+                            parsed = true;
+                            break;
+                        }
+                    }
+
+                    if (!parsed) {
+                        messageComponents.add(TitleComponent.of(Formatters.COLOR_FORMATTER.format(title),
+                                Formatters.COLOR_FORMATTER.format(subtitle), fadeIn, duration, fadeOut));
+                    }
+                    break;
                 }
+                default: {
+                    String text = section.getString(key + ".text");
 
-                String suggestMessage = section.getString(key + ".suggest");
-                if (suggestMessage != null) {
-                    for (BaseComponent baseComponent : baseComponents)
-                        baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggestMessage));
+                    for (MessagesServiceImpl.CustomComponentParser parser : customComponentParsers) {
+                        Optional<IMessageComponent> res = parser.parseRawMessage(text);
+                        if (res.isPresent()) {
+                            messageComponents.add(res.get());
+                            break;
+                        }
+                    }
+
+                    BaseComponent[] baseComponents = TextComponent.fromLegacyText(Formatters.COLOR_FORMATTER.format(text));
+
+                    String tooltip = section.getString(key + ".tooltip");
+                    if (tooltip != null) {
+                        for (BaseComponent baseComponent : baseComponents)
+                            baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                    new BaseComponent[]{new TextComponent(Formatters.COLOR_FORMATTER.format(tooltip))}));
+                    }
+
+                    String command = section.getString(key + ".command");
+                    if (command != null) {
+                        for (BaseComponent baseComponent : baseComponents)
+                            baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
+                    }
+
+                    String suggest = section.getString(key + ".suggest");
+                    if (suggest != null) {
+                        for (BaseComponent baseComponent : baseComponents)
+                            baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggest));
+                    }
+
+                    messageComponents.add(ComplexMessageComponent.of(baseComponents));
+                    break;
                 }
-
-                messageComponents.add(ComplexMessageComponent.of(baseComponents));
             }
         }
 
