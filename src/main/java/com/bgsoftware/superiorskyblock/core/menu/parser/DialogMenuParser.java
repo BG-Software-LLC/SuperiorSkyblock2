@@ -64,18 +64,6 @@ public class DialogMenuParser {
             }
         }
 
-//        if (cfg.isConfigurationSection("inputs")) {
-//            int slot = 0;
-//            for (String key : cfg.getConfigurationSection("inputs").getKeys(false)) {
-//                char inputId = key.charAt(0);
-//
-//                ConfigurationSection inputSection = cfg.getConfigurationSection("inputs." + key);
-//
-//                String label = Formatters.COLOR_FORMATTER.format(inputSection.getString("label", key));
-//
-//            }
-//        }
-
         return menuSlotsMap;
     }
 
@@ -106,7 +94,7 @@ public class DialogMenuParser {
                     return Optional.empty();
                 }
                 return Optional.of(new DialogBodyItem(templateItem, new DialogBodyElement.ItemConfig()
-                        .setDescription(section.getString("description"))
+                        .setDescription(Formatters.COLOR_FORMATTER.format(section.getString("description")))
                         .setShowDecorations(section.getBoolean("show-decorations", true))
                         .setShowTooltip(section.getBoolean("show-tooltip", true))
                 ));
