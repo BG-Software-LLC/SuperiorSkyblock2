@@ -5,7 +5,7 @@
 ##                                                  ##
 ######################################################
 
-title: '&c&lConfirm Disband'
+title: '&c&lConfirm Transfer'
 previous-menu: true
 type: DIALOG
 
@@ -15,10 +15,12 @@ confirm: '@'
 cancel: '^'
 
 body:
+  - type: plain_message
+    text: ''
   - type: item
     description: |
-      Are you sure you want to delete your island?
-      &cThis action cannot be undone!
+      Are you sure you want to transfer your island?
+      &cYou will completely lose the ownership of your island!
     show-decorations: false
     show-tooltip: false
     item:
