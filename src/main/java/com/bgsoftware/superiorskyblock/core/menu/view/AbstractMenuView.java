@@ -174,7 +174,7 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
         this.backedMenu.ifLeft(inventory -> {
             player.openInventory(inventory);
         }).ifRight(dialog -> {
-            plugin.getNMSDialogs().openDialog(inventoryViewer, dialog);
+            plugin.getNMSDialogs().ifPresent(nmsDialogs -> nmsDialogs.openDialog(inventoryViewer, dialog));
         });
 
         if (closed) {

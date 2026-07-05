@@ -63,7 +63,8 @@ public class MenuCommandsImpl implements MenuCommands {
             DialogWrapper<?> dialog = ((AbstractMenuView<?, ?>) menuView).getDialog();
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getPlayer());
             runCommandInternal(menuView, command, context.getPlayer(), Bukkit.getConsoleSender(),
-                    menuView::closeView, () -> plugin.getNMSDialogs().closeDialog(superiorPlayer, dialog));
+                    menuView::closeView, () -> plugin.getNMSDialogs().ifPresent(nmsDialogs ->
+                            nmsDialogs.closeDialog(superiorPlayer, dialog)));
         }
     }
 

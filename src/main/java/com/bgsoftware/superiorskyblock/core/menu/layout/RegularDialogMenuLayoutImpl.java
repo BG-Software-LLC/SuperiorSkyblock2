@@ -60,7 +60,9 @@ public class RegularDialogMenuLayoutImpl<V extends MenuView<V, ?>> extends Abstr
     }
 
     public DialogWrapper<V> buildDialog(V menuView) {
-        return plugin.getNMSDialogs().createDialog(menuView);
+        return plugin.getNMSDialogs()
+                .map(nmsDialogs -> nmsDialogs.createDialog(menuView))
+                .orElseThrow(() -> new UnsupportedOperationException("Dialogs are not supported"));
     }
 
     protected static abstract class AbstractBuilder<V extends MenuView<V, ?>, B extends AbstractBuilder<V, B>> extends AbstractMenuLayout.AbstractBuilder<V, B> {

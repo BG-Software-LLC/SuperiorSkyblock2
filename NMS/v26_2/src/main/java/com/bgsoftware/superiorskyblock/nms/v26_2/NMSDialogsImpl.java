@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
+import net.md_5.bungee.api.event.CustomClickEvent;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.ClickEvent;
@@ -36,10 +37,12 @@ import net.minecraft.server.dialog.action.StaticAction;
 import net.minecraft.server.dialog.body.DialogBody;
 import net.minecraft.server.dialog.body.ItemBody;
 import net.minecraft.server.dialog.body.PlainMessage;
-import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.world.item.ItemStackTemplate;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 import java.net.URI;
@@ -49,12 +52,26 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class NMSDialogsImpl implements NMSDialogs {
+public class NMSDialogsImpl implements NMSDialogs {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final Identifier DIALOG_CLICK_CALLBACK_KEY =
             Identifier.fromNamespaceAndPath("superiorskyblock", "dialog_click_callback");
+
+    public NMSDialogsImpl() {
+        try {
+            plugin.getServer().getPluginManager().registerEvents(new Listener() {
+                @EventHandler
+                public void g(CustomClickEvent event) {
+                    Bukkit.broadcastMessage("CustomClickEvent");
+                    new Exception().printStackTrace();
+                }
+            }, plugin);
+        } catch (Throwable error) {
+            error.printStackTrace();
+        }
+    }
 
     @Override
     public boolean isSupported() {
