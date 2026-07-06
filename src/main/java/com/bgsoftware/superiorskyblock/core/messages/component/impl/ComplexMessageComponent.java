@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.messages.component.impl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -18,6 +19,35 @@ public class ComplexMessageComponent implements IMessageComponent {
 
     private final IWrappedComponent[] components;
     private final MessageContent content;
+
+    public static IMessageComponent of(@Nullable String text, @Nullable String command, @Nullable String suggest, @Nullable String tooltip) {
+        if (Text.isBlank(text)) {
+            return EmptyMessageComponent.getInstance();
+        }
+
+        BaseComponent[] baseComponents = TextComponent.fromLegacyText(text);
+
+        if (tooltip != null) {
+            for (BaseComponent baseComponent : baseComponents) {
+                baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                        new BaseComponent[]{new TextComponent(Formatters.COLOR_FORMATTER.format(tooltip))}));
+            }
+        }
+
+        if (command != null) {
+            for (BaseComponent baseComponent : baseComponents) {
+                baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
+            }
+        }
+
+        if (suggest != null) {
+            for (BaseComponent baseComponent : baseComponents) {
+                baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggest));
+            }
+        }
+
+        return new ComplexMessageComponent(baseComponents);
+    }
 
     public static IMessageComponent of(@Nullable BaseComponent[] baseComponents) {
         if (baseComponents == null || baseComponents.length == 0)

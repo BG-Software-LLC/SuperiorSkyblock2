@@ -117,7 +117,7 @@ public class MessageContent {
     private static class StaticPart implements IPart {
 
         private final String content;
-        private boolean parsePlaceholders;
+        private final boolean parsePlaceholders;
 
         StaticPart(String content) {
             this.content = content;

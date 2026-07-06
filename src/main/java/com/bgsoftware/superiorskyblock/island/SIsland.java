@@ -2171,17 +2171,8 @@ public class SIsland implements Island {
         Log.debug(Debug.SEND_TITLE, owner.getName(), title, subtitle, fadeIn, duration, fadeOut, Arrays.toString(ignoredMembers));
 
         forEachIslandMember(ignoredMembers, true, islandMember -> {
-            String playerTitle = title;
-            String playerSubtitle = subtitle;
-
-            Player player = islandMember.asPlayer();
-
-            if (!Text.isBlank(playerTitle))
-                playerTitle = placeholdersService.get().parsePlaceholders(player, playerTitle);
-            if (!Text.isBlank(playerSubtitle))
-                playerSubtitle = placeholdersService.get().parsePlaceholders(player, playerSubtitle);
-
-            plugin.getNMSPlayers().sendTitle(player, playerTitle, playerSubtitle, fadeIn, duration, fadeOut);
+            plugin.getProviders().getMessagesProvider().createTitleComponent(title, subtitle,
+                    fadeIn, duration, fadeOut).sendMessage(islandMember.asPlayer());
         });
     }
 

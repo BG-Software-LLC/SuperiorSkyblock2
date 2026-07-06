@@ -1,51 +1,32 @@
 package com.bgsoftware.superiorskyblock.core.messages.component;
 
-import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
-import com.bgsoftware.superiorskyblock.core.messages.component.impl.ActionBarComponent;
-import com.bgsoftware.superiorskyblock.core.messages.component.impl.BossBarComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.SoundComponent;
-import com.bgsoftware.superiorskyblock.core.messages.component.impl.TitleComponent;
-import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
 public class MultipleComponents implements IMessageComponent {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private final List<IMessageComponent> messageComponents;
 
-    public static IMessageComponent parseSection(ConfigurationSection section, List<MessagesServiceImpl.CustomComponentParser> customComponentParsers) {
+    public static IMessageComponent parseSection(ConfigurationSection section) {
         List<IMessageComponent> messageComponents = new LinkedList<>();
 
         for (String key : section.getKeys(false)) {
             switch (key) {
                 case "action-bar": {
                     String text = section.getString(key + ".text");
-                    boolean parsed = false;
 
-                    for (MessagesServiceImpl.CustomComponentParser parser : customComponentParsers) {
-                        Optional<IMessageComponent> res = parser.parseActionBar(text);
-                        if (res.isPresent()) {
-                            messageComponents.add(res.get());
-                            parsed = true;
-                            break;
-                        }
-                    }
-
-                    if (!parsed) {
-                        messageComponents.add(ActionBarComponent.of(Formatters.COLOR_FORMATTER.format(text)));
-                    }
+                    messageComponents.add(plugin.getProviders().getMessagesProvider().createActionBarComponent(text));
                     break;
                 }
                 case "bossbar": {
@@ -53,27 +34,8 @@ public class MultipleComponents implements IMessageComponent {
                     String color = section.getString(key + ".color", "PINK").toUpperCase();
                     String overlay = section.getString(key + ".overlay", "PROGRESS").toUpperCase();
                     int ticks = section.getInt(key + ".ticks");
-                    boolean parsed = false;
 
-                    for (MessagesServiceImpl.CustomComponentParser parser : customComponentParsers) {
-                        Optional<IMessageComponent> res = parser.parseBossBar(message, color, overlay, ticks);
-                        if (res.isPresent()) {
-                            messageComponents.add(res.get());
-                            parsed = true;
-                            break;
-                        }
-                    }
-
-                    if (!parsed) {
-                        BossBar.Color bossBarColor;
-                        try {
-                            bossBarColor = BossBar.Color.valueOf(color);
-                        } catch (Exception error) {
-                            bossBarColor = BossBar.Color.PINK;
-                        }
-
-                        messageComponents.add(BossBarComponent.of(Formatters.COLOR_FORMATTER.format(message), bossBarColor, BossBar.Style.SOLID, ticks));
-                    }
+                    messageComponents.add(plugin.getProviders().getMessagesProvider().createBossBarComponent(message, color, overlay, ticks));
                     break;
                 }
                 case "sound":
@@ -85,56 +47,22 @@ public class MultipleComponents implements IMessageComponent {
                     int fadeIn = section.getInt(key + ".fade-in");
                     int duration = section.getInt(key + ".duration");
                     int fadeOut = section.getInt(key + ".fade-out");
-                    boolean parsed = false;
 
-                    for (MessagesServiceImpl.CustomComponentParser parser : customComponentParsers) {
-                        Optional<IMessageComponent> res = parser.parseTitle(title, subtitle, fadeIn, duration, fadeOut);
-                        if (res.isPresent()) {
-                            messageComponents.add(res.get());
-                            parsed = true;
-                            break;
-                        }
-                    }
-
-                    if (!parsed) {
-                        messageComponents.add(TitleComponent.of(Formatters.COLOR_FORMATTER.format(title),
-                                Formatters.COLOR_FORMATTER.format(subtitle), fadeIn, duration, fadeOut));
-                    }
+                    messageComponents.add(plugin.getProviders().getMessagesProvider().createTitleComponent(title, subtitle, fadeIn, duration, fadeOut));
                     break;
                 }
                 default: {
                     String text = section.getString(key + ".text");
-
-                    for (MessagesServiceImpl.CustomComponentParser parser : customComponentParsers) {
-                        Optional<IMessageComponent> res = parser.parseRawMessage(text);
-                        if (res.isPresent()) {
-                            messageComponents.add(res.get());
-                            break;
-                        }
-                    }
-
-                    BaseComponent[] baseComponents = TextComponent.fromLegacyText(Formatters.COLOR_FORMATTER.format(text));
-
-                    String tooltip = section.getString(key + ".tooltip");
-                    if (tooltip != null) {
-                        for (BaseComponent baseComponent : baseComponents)
-                            baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                                    new BaseComponent[]{new TextComponent(Formatters.COLOR_FORMATTER.format(tooltip))}));
-                    }
-
                     String command = section.getString(key + ".command");
-                    if (command != null) {
-                        for (BaseComponent baseComponent : baseComponents)
-                            baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
-                    }
-
                     String suggest = section.getString(key + ".suggest");
-                    if (suggest != null) {
-                        for (BaseComponent baseComponent : baseComponents)
-                            baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggest));
+                    String tooltip = section.getString(key + ".tooltip");
+
+                    if (command != null || suggest != null || tooltip != null) {
+                        messageComponents.add(ComplexMessageComponent.of(Formatters.COLOR_FORMATTER.format(text), command, suggest, tooltip));
+                    } else {
+                        messageComponents.add(plugin.getProviders().getMessagesProvider().createRawMessageComponent(text));
                     }
 
-                    messageComponents.add(ComplexMessageComponent.of(baseComponents));
                     break;
                 }
             }

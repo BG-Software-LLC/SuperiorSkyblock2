@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.service.message;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.messages.component.MultipleComponents;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ActionBarComponent;
@@ -25,14 +25,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 public class MessagesServiceImpl implements MessagesService, IService {
 
-    private final List<CustomComponentParser> customComponentParsers = new LinkedList<>();
+    private final SuperiorSkyblockPlugin plugin;
 
-    public MessagesServiceImpl() {
-
+    public MessagesServiceImpl(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
     }
 
     @Override
@@ -44,14 +43,9 @@ public class MessagesServiceImpl implements MessagesService, IService {
     @Override
     public IMessageComponent parseComponent(YamlConfiguration config, String path) {
         if (config.isConfigurationSection(path)) {
-            return MultipleComponents.parseSection(config.getConfigurationSection(path), this.customComponentParsers);
+            return MultipleComponents.parseSection(config.getConfigurationSection(path));
         } else {
-            for (CustomComponentParser parser : this.customComponentParsers) {
-                Optional<IMessageComponent> res = parser.parse(config, path);
-                if (res.isPresent())
-                    return res.get();
-            }
-            return RawMessageComponent.of(Formatters.COLOR_FORMATTER.format(config.getString(path, "")));
+            return plugin.getProviders().getMessagesProvider().createRawMessageComponent(config.getString(path));
         }
     }
 
@@ -65,28 +59,6 @@ public class MessagesServiceImpl implements MessagesService, IService {
     @Override
     public Builder newBuilder() {
         return new BuilderImpl();
-    }
-
-    public void registerCustomComponentParser(CustomComponentParser parser) {
-        this.customComponentParsers.add(parser);
-    }
-
-    public List<CustomComponentParser> getCustomComponentParsers() {
-        return customComponentParsers;
-    }
-
-    public interface CustomComponentParser {
-
-        Optional<IMessageComponent> parse(YamlConfiguration config, String path);
-
-        Optional<IMessageComponent> parseActionBar(String text);
-
-        Optional<IMessageComponent> parseBossBar(String message, String color, String overlay, int ticks);
-
-        Optional<IMessageComponent> parseRawMessage(String raw);
-
-        Optional<IMessageComponent> parseTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut);
-
     }
 
     private static class BuilderImpl implements Builder {

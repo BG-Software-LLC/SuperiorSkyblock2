@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

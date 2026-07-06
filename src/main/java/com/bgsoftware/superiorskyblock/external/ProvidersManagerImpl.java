@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.hooks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.MenusProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.MessagesProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.PermissionsProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.PricesProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
@@ -41,6 +42,7 @@ import com.bgsoftware.superiorskyblock.external.blocks.ICustomBlocksProvider;
 import com.bgsoftware.superiorskyblock.external.chunks.ChunksProvider_Default;
 import com.bgsoftware.superiorskyblock.external.economy.EconomyProvider_Default;
 import com.bgsoftware.superiorskyblock.external.menus.MenusProvider_Default;
+import com.bgsoftware.superiorskyblock.external.messages.MessagesProvider_Default;
 import com.bgsoftware.superiorskyblock.external.permissions.PermissionsProvider_Default;
 import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.external.prices.PricesProvider_Default;
@@ -83,6 +85,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private StackedBlocksProvider stackedBlocksProvider = new StackedBlocksProvider_Default();
     private EconomyProvider economyProvider = new EconomyProvider_Default();
     private EconomyProvider bankEconomyProvider = new EconomyProvider_Default();
+    private MessagesProvider messagesProvider = new MessagesProvider_Default();
     private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
     private PricesProvider pricesProvider = new PricesProvider_Default();
     private VanishProvider vanishProvider = new VanishProvider_Default();
@@ -121,6 +124,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             registerSpawnersProvider();
             registerStackedBlocksProvider();
             registerEntitiesProvider();
+            registerMessagesProvider();
             registerPermissionsProvider();
             registerPricesProvider();
             registerVanishProvider();
@@ -130,8 +134,6 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             registerPlaceholdersProvider();
             registerChunksProvider();
         });
-
-        registerMessageProviders();
 
         // We try to forcefully load prices after a second the server has enabled.
         BukkitExecutor.sync(this::forcePricesLoad, 60L);
@@ -245,6 +247,16 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     public void setMenusProvider(MenusProvider menusProvider) {
         Preconditions.checkNotNull(menusProvider, "menusProvider parameter cannot be null.");
         this.menusProvider = menusProvider;
+    }
+
+    @Override
+    public MessagesProvider getMessagesProvider() {
+        return messagesProvider;
+    }
+
+    @Override
+    public void setMessagesProvider(MessagesProvider messagesProvider) {
+        this.messagesProvider = messagesProvider;
     }
 
     @Override
@@ -511,12 +523,6 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
     }
 
-    private void registerMessageProviders() {
-        if (isHookEnabled("MiniMessage") && hasMiniMessageSupport()) {
-            registerHook("MiniMessageHook");
-        }
-    }
-
     private void registerSpawnersProvider() {
         if (!(spawnersProvider instanceof SpawnersProvider_AutoDetect))
             return;
@@ -613,6 +619,16 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             Optional<EntitiesProvider> entitiesProvider = createInstance("entities.EntitiesProvider_RoseStacker");
             entitiesProvider.ifPresent(this::addEntitiesProvider);
         }
+    }
+
+    private void registerMessagesProvider() {
+        Optional<MessagesProvider> messagesProvider = Optional.empty();
+
+        if (isHookEnabled("MiniMessage") && hasMiniMessageSupport()) {
+            messagesProvider = createInstance("messages.MessagesProvider_MiniMessage");
+        }
+
+        messagesProvider.ifPresent(this::setMessagesProvider);
     }
 
     private void registerPermissionsProvider() {

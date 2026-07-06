@@ -29,7 +29,6 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -797,15 +796,7 @@ public enum Message {
                 message = Formatters.COLOR_FORMATTER.format(message);
             }
 
-            for (MessagesServiceImpl.CustomComponentParser parser : messagesService.get().getCustomComponentParsers()) {
-                Optional<IMessageComponent> component = parser.parseRawMessage(message);
-                if (component.isPresent()) {
-                    component.get().sendMessage(sender);
-                    return;
-                }
-            }
-
-            sender.sendMessage(message);
+            plugin.getProviders().getMessagesProvider().createRawMessageComponent(message).sendMessage(sender);
         }
 
     };
