@@ -36,9 +36,7 @@ public class ChangeSortingTypeButton extends AbstractMenuViewButton<MenuTopIslan
                 menuView.getSortingType() != getTemplate().sortingType)
             return buttonItem;
 
-        return new ItemBuilder(buttonItem)
-                .makeItemGlow()
-                .build();
+        return new ItemBuilder(buttonItem).makeItemGlow().build();
     }
 
     @Override

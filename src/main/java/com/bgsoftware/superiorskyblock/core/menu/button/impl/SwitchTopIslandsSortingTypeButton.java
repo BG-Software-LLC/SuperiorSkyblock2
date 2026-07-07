@@ -4,6 +4,8 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
+import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
@@ -31,8 +33,32 @@ public class SwitchTopIslandsSortingTypeButton extends AbstractMenuViewButton<Me
 
     @Override
     public ItemStack createViewItem() {
-        TemplateItem buttonItem = getTemplate().items.get(menuView.getSortingType());
-        return buttonItem.build(menuView.getInventoryViewer());
+        SortingButtonData data = getTemplate().buttons.get(menuView.getSortingType());
+
+        TemplateItem buttonItem = data.getTemplateItem();
+        ItemBuilder itemBuilder = buttonItem.getBuilder();
+
+        if (itemBuilder == null) {
+            return null;
+        }
+
+        itemBuilder.replaceAll("{1}", data.getDisplayName());
+
+        if (!Menus.MENU_TOP_ISLANDS.getSelectedSortingType().isEmpty() && !Menus.MENU_TOP_ISLANDS.getUnselectedSortingType().isEmpty()) {
+            List<String> sortingTypes = new ArrayList<>();
+
+            getTemplate().buttons.forEach((sortingType, buttonData) -> {
+                if (sortingType == menuView.getSortingType()) {
+                    sortingTypes.add(Menus.MENU_TOP_ISLANDS.getSelectedSortingType().replace("{0}", buttonData.getDisplayName()));
+                } else {
+                    sortingTypes.add(Menus.MENU_TOP_ISLANDS.getUnselectedSortingType().replace("{0}", buttonData.getDisplayName()));
+                }
+            });
+
+            itemBuilder.replaceLoreWithLines("{0}", sortingTypes);
+        }
+
+        return itemBuilder.build(menuView.getInventoryViewer());
     }
 
     @Override
@@ -55,39 +81,60 @@ public class SwitchTopIslandsSortingTypeButton extends AbstractMenuViewButton<Me
 
         boolean notSortedAlready = menuView.setSortingType(sortingType);
 
-        if (notSortedAlready)
+        if (notSortedAlready) {
             plugin.getGrid().sortIslands(sortingType, menuView::refreshView);
-        else
+        } else {
             menuView.refreshView();
+        }
     }
 
     public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<MenuTopIslands.View> {
 
-        private final Map<SortingType, TemplateItem> items = new LinkedHashMap<>();
+        private final LinkedHashMap<SortingType, SortingButtonData> buttons = new LinkedHashMap<>();
 
-        public Builder addItem(SortingType sortingType, TemplateItem templateItem) {
-            this.items.put(sortingType, templateItem);
+        public Builder addItem(SortingType sortingType, String displayName, TemplateItem templateItem) {
+            this.buttons.put(sortingType, new SortingButtonData(displayName, templateItem));
             return this;
         }
 
         @Override
         public MenuTemplateButton<MenuTopIslands.View> build() {
-            return new Template(clickSound, commands, requiredPermission, lackPermissionSound, items);
+            return new Template(clickSound, commands, requiredPermission, lackPermissionSound, buttons);
         }
 
     }
 
     public static class Template extends MenuTemplateButtonImpl<MenuTopIslands.View> {
 
-        private final Map<SortingType, TemplateItem> items;
+        private final Map<SortingType, SortingButtonData> buttons;
         private final List<SortingType> order;
 
         Template(@Nullable GameSound clickSound, @Nullable List<String> commands, @Nullable String requiredPermission,
-                 @Nullable GameSound lackPermissionSound, Map<SortingType, TemplateItem> items) {
+                 @Nullable GameSound lackPermissionSound, Map<SortingType, SortingButtonData> buttons) {
             super(null, clickSound, commands, requiredPermission, lackPermissionSound,
                     SwitchTopIslandsSortingTypeButton.class, SwitchTopIslandsSortingTypeButton::new);
-            this.items = Objects.requireNonNull(items, "items cannot be null");
-            this.order = new ArrayList<>(items.keySet());
+            this.buttons = Objects.requireNonNull(buttons, "buttons cannot be null");
+            this.order = new ArrayList<>(buttons.keySet());
+        }
+
+    }
+
+    private static class SortingButtonData {
+
+        private final String displayName;
+        private final TemplateItem templateItem;
+
+        public SortingButtonData(String displayName, TemplateItem templateItem) {
+            this.displayName = displayName;
+            this.templateItem = templateItem;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        public TemplateItem getTemplateItem() {
+            return templateItem;
         }
 
     }

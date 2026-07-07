@@ -21,8 +21,12 @@ previous-page: '!'
 current-page: '-'
 next-page: '+'
 
-sort-islands: '%'
 player-island: '$'
+sort-islands: '%'
+
+messages:
+  selected-sorting-type: '&8 - &a{0}'
+  unselected-sorting-type: '&8 - &7{0}'
 
 items:
   '#':
@@ -51,36 +55,51 @@ items:
       name: '&cInvalid Island'
   '%':
     WORTH:
+      display-name: 'Worth'
       type: DIAMOND
-      name: '&6Switch Sorting'
+      name: '&6Switch Sorting Type'
       lore:
         - '&7Switch top islands sorting type.'
-        - '&7Currently sorted by &aWorth&7.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
     LEVEL:
+      display-name: 'Level'
       type: GOLD_INGOT
-      name: '&6Switch Sorting'
+      name: '&6Switch Sorting Type'
       lore:
         - '&7Switch top islands sorting type.'
-        - '&7Currently sorted by &aLevel&7.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
     RATING:
+      display-name: 'Rating'
       type: NETHER_STAR
-      name: '&6Switch Sorting'
+      name: '&6Switch Sorting Type'
       lore:
         - '&7Switch top islands sorting type.'
-        - '&7Currently sorted by &aRating&7.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
     PLAYERS:
+      display-name: 'Players'
       type: SKULL_ITEM
       data: 3
-      name: '&6Switch Sorting'
+      name: '&6Switch Sorting Type'
       lore:
         - '&7Switch top islands sorting type.'
-        - '&7Currently sorted by &aPlayers&7.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
     BANK:
+      display-name: 'Bank'
       type: EMERALD
-      name: '&6Switch Sorting'
+      name: '&6Switch Sorting Type'
       lore:
         - '&7Switch top islands sorting type.'
-        - '&7Currently sorted by &aBank&7.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
   '!':
     type: PAPER
     name: '{0}Previous Page'
@@ -99,6 +118,10 @@ items:
 
 sounds:
   '@':
+    type: ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '%':
     type: ORB_PICKUP
     volume: 0.2
     pitch: 0.2

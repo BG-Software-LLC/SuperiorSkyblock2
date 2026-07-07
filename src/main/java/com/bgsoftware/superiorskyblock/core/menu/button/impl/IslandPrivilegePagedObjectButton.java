@@ -159,8 +159,8 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
 
         @Override
         public ItemStack modifyViewItem(ItemStack buttonItem, IslandPrivilegePagedObjectButton button) {
-            ItemBuilder permissionItem = button.pagedObject.getRoleIslandPrivilegeItem();
-            if (permissionItem == null)
+            ItemBuilder itemBuilder = button.pagedObject.getRoleIslandPrivilegeItem();
+            if (itemBuilder == null)
                 return new ItemStack(Material.AIR);
 
             IslandPrivilege islandPrivilege = button.pagedObject.getIslandPrivilege();
@@ -169,12 +169,12 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
             PlayerRole requiredRole = islandPrivilege == null ? null : island.getRequiredPlayerRole(islandPrivilege);
             IslandPrivilege.Type islandPrivilegeType = islandPrivilege == null ? null : islandPrivilege.getType();
 
-            permissionItem.replaceAll("{}", requiredRole == null ? "" : requiredRole.toString());
+            itemBuilder.replaceAll("{}", requiredRole == null ? "" : requiredRole.toString());
 
             if (!Menus.MENU_ISLAND_PRIVILEGES.getNoRolePermission().isEmpty() &&
                     !Menus.MENU_ISLAND_PRIVILEGES.getExactRolePermission().isEmpty() &&
                     !Menus.MENU_ISLAND_PRIVILEGES.getHigherRolePermission().isEmpty()) {
-                List<String> roleString = new ArrayList<>();
+                List<String> roles = new ArrayList<>();
 
                 int roleWeight = requiredRole == null ? Integer.MAX_VALUE : requiredRole.getWeight();
 
@@ -184,35 +184,18 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
                         continue;
 
                     if (i < roleWeight) {
-                        roleString.add(Menus.MENU_ISLAND_PRIVILEGES.getNoRolePermission().replace("{}", currentRole + ""));
+                        roles.add(Menus.MENU_ISLAND_PRIVILEGES.getNoRolePermission().replace("{}", currentRole + ""));
                     } else if (i == roleWeight) {
-                        roleString.add(Menus.MENU_ISLAND_PRIVILEGES.getExactRolePermission().replace("{}", currentRole + ""));
+                        roles.add(Menus.MENU_ISLAND_PRIVILEGES.getExactRolePermission().replace("{}", currentRole + ""));
                     } else {
-                        roleString.add(Menus.MENU_ISLAND_PRIVILEGES.getHigherRolePermission().replace("{}", currentRole + ""));
+                        roles.add(Menus.MENU_ISLAND_PRIVILEGES.getHigherRolePermission().replace("{}", currentRole + ""));
                     }
                 }
 
-                ItemMeta itemMeta = permissionItem.getItemMeta();
-
-                if (itemMeta != null) {
-                    List<String> lore = itemMeta.getLore();
-
-                    for (int i = 0; i < lore.size(); i++) {
-                        String line = lore.get(i);
-                        if (line.equals("{0}")) {
-                            lore.set(i, roleString.get(0));
-                            for (int j = 1; j < roleString.size(); j++) {
-                                lore.add(i + j, roleString.get(j));
-                            }
-                            i += roleString.size();
-                        }
-                    }
-
-                    permissionItem.withLore(lore);
-                }
+                itemBuilder.replaceLoreWithLines("{0}", roles);
             }
 
-            return permissionItem.build(button.menuView.getInventoryViewer());
+            return itemBuilder.build(button.menuView.getInventoryViewer());
         }
 
     }

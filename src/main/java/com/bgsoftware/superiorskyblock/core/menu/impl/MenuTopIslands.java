@@ -27,23 +27,33 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuTopIslands.Args, Island> {
 
     private final boolean sortGlowWhenSelected;
+    private final String selectedSortingType;
+    private final String unselectedSortingType;
 
-    private MenuTopIslands(MenuParseResult<View> parseResult, boolean sortGlowWhenSelected) {
+    private MenuTopIslands(MenuParseResult<View> parseResult, boolean sortGlowWhenSelected,
+                           String selectedSortingType, String unselectedSortingType) {
         super(MenuIdentifiers.MENU_TOP_ISLANDS, parseResult, false);
         this.sortGlowWhenSelected = sortGlowWhenSelected;
+        this.selectedSortingType = selectedSortingType;
+        this.unselectedSortingType = unselectedSortingType;
     }
 
     public boolean isSortGlowWhenSelected() {
         return sortGlowWhenSelected;
+    }
+
+    public String getSelectedSortingType() {
+        return selectedSortingType;
+    }
+
+    public String getUnselectedSortingType() {
+        return unselectedSortingType;
     }
 
     @Override
@@ -83,6 +93,8 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
 
         boolean sortGlowWhenSelected = cfg.getBoolean("sort-glow-when-selected", false);
         String sort = cfg.getString("sort-islands", null);
+        String selectedSortingType = cfg.getString("messages.selected-sorting-type");
+        String unselectedSortingType = cfg.getString("messages.unselected-sorting-type");
 
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "worth-sort", menuPatternSlots),
                 new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_WORTH));
@@ -106,7 +118,7 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
                 if (sort != null && sort.equals(itemSectionName)) {
                     SwitchTopIslandsSortingTypeButton.Builder button = new SwitchTopIslandsSortingTypeButton.Builder();
 
-                    for (String sortSectionName : cfg.getConfigurationSection("items." + itemSectionName).getKeys(false)) {
+                    for (String sortSectionName : itemSection.getKeys(false)) {
                         ConfigurationSection sortSection = cfg.getConfigurationSection("items." + itemSectionName + "." + sortSectionName);
 
                         SortingType sortingType = SortingType.getByName(sortSectionName);
@@ -116,7 +128,9 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
                             continue;
                         }
 
-                        button.addItem(sortingType, MenuParserImpl.getInstance().getItemStack("menus/top-islands.yml", sortSection));
+                        String displayName = sortSection.getString("display-name", sortingType.getName());
+
+                        button.addItem(sortingType, displayName, MenuParserImpl.getInstance().getItemStack("menus/top-islands.yml", sortSection));
                     }
 
                     patternBuilder.mapButtons(menuPatternSlots.getSlots(itemSectionName), button);
@@ -171,7 +185,7 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
         }
 
 
-        return new MenuTopIslands(menuParseResult, sortGlowWhenSelected);
+        return new MenuTopIslands(menuParseResult, sortGlowWhenSelected, selectedSortingType, unselectedSortingType);
     }
 
     public static class Args implements ViewArgs {
