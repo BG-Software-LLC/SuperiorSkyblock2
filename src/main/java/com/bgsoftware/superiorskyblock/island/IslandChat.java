@@ -11,12 +11,12 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import org.bukkit.Bukkit;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class IslandChat {
 
-    private static final Set<SuperiorPlayer> spies = new HashSet<>();
+    private static final Set<SuperiorPlayer> spies = new LinkedHashSet<>();
 
     private IslandChat() {
 
