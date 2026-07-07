@@ -383,6 +383,7 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
         return true;
     }
 
+    @Nullable
     private static Dimension getDimensionSafe(String dimensionName) {
         try {
             return Dimension.getByName(dimensionName);

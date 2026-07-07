@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.hooks;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -50,7 +51,7 @@ public interface MenusProvider {
      */
     @Deprecated
     default void openBiomes(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
-        throw new UnsupportedOperationException("openBiomes is not supported");
+        openBiomes(targetPlayer, previousMenu, targetIsland, SuperiorSkyblockAPI.getSettings().getWorlds().getDefaultWorldDimension());
     };
 
     /**

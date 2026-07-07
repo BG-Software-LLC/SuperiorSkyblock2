@@ -71,9 +71,6 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern FLAG_PLACEHOLDER_PATTERN = Pattern.compile("flag_(.+)");
     private static final Pattern GENERATOR_AMOUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_generator_amount_(.+)");
     private static final Pattern GENERATOR_PERCENTAGE_PLACEHOLDER_PATTERN = Pattern.compile("island_generator_percentage_(.+)");
-    private static final Pattern WORLD_UNLOCKED_PLACEHOLDER_PATTERN = Pattern.compile("island_world_unlocked_(.+)");
-    private static final Pattern WORLD_ENABLED_PLACEHOLDER_PATTERN = Pattern.compile("island_world_enabled_(.+)");
-    private static final Pattern WORLD_GENERATED_PLACEHOLDER_PATTERN = Pattern.compile("island_world_generated_(.+)");
     private static final Pattern MEMBER_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
     private static final Pattern MISSIONS_COMPLETED_PATTERN = Pattern.compile("missions_completed_(.+)");
     private static final Pattern MISSION_STATUS_PATTERN = Pattern.compile("mission_status_(.+)");
