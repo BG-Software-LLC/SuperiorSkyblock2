@@ -366,6 +366,10 @@ public class MenuParserImpl implements MenuParser {
             itemBuilder.setUnbreakable();
         }
 
+        if (section.getBoolean("hideTooltip", false)) {
+            itemBuilder.setHideTooltip();
+        }
+
         if (section.isConfigurationSection("effects")) {
             ConfigurationSection effectsSection = section.getConfigurationSection("effects");
             for (String effectName : effectsSection.getKeys(false)) {

@@ -34,7 +34,7 @@ BANK_WITHDRAW_CUSTOM: '&e&lNgân Hàng | &7Nhập số lượng tiền bạn mu�
 BANK_WITHDRAW_COMPLETED: 'Rút tiền thành công'
 BANNED_FROM_ISLAND: '&c&lLỗi | &7Bạn đã bị cấm trong hòn đảo này.'
 BLOCK_COUNT_CHECK: '&e&lĐảo | &7Đảo này có x{0} {1}.'
-BLOCK_COUNTS_CHECK: |
+BLOCK_COUNTS_CHECK: |-
   &e&lĐảo | &7Hòn đảo này có các khối sau:
   &7{0}
 BLOCK_COUNTS_CHECK_EMPTY: '&e&lĐảo | &7Đảo này không có khối được theo dõi.'
@@ -412,8 +412,11 @@ GLOBAL_TITLE_SENT_NAME: '&e&lĐảo | &7Gửi title cho thành viên đảo {0} 
 GOT_BANNED: '&e&lĐảo | &7Bạn đã bị &cCẤM&7 khỏi đảo của {0}.'
 GOT_DEMOTED: '&e&lĐảo | &7Bạn đã bị hạ cấp xuống thành {0} trong đảo của bạn.'
 GOT_EXPELLED: '&e&lĐảo | &7&oBạn đã bị trục xuất khỏi đảo bởi {0}...'
-GOT_INVITE: '&e&lĐảo | &7{0} mời bạn đến đảo của họ.'
-GOT_INVITE_TOOLTIP: '&7Nhấp vào tin nhắn để chấp nhận lời mời.'
+GOT_INVITE:
+  0:
+    text: '&e&lĐảo | &7{0} mời bạn đến đảo của họ.'
+    tooltip: '&7Nhấp vào tin nhắn để chấp nhận lời mời.'
+    command: '/is accept {0}'
 GOT_KICKED: '&e&lĐảo | &7Bạn đã bị kick khỏi đảo của bạn bởi {0}.'
 GOT_PROMOTED: '&e&lĐảo | &7Bạn đã được thăng chức {0} trong đảo của bạn.'
 GOT_REVOKED: '&e&lĐảo | &7{0} đã thu hồi lời mời bạn đến đảo của họ.'
@@ -439,7 +442,7 @@ INVALID_ISLAND: '&c&lLỗi | &7Bạn không có một hòn đảo.'
 INVALID_ISLAND_LOCATION: '&c&lLỗi | &7Không có đảo nào ở vị trí của bạn.'
 INVALID_ISLAND_OTHER: '&c&lLỗi | &7{0} không có đảo.'
 INVALID_ISLAND_OTHER_NAME: '&c&lLỗi | &7Không có đảo nào với tên {0}.'
-INVALID_ISLAND_PERMISSION: |
+INVALID_ISLAND_PERMISSION: |-
   &c&lLỗi | &7Không thể tìm thấy quyền của đảo {0}.
   &c&lLỗi | &7Quyền của đảo: {1}
 INVALID_LEVEL: '&c&lLỗi | &7Cấp độ không hợp lệ {0}.'
@@ -454,22 +457,22 @@ INVALID_MULTIPLIER: '&c&lLỗi | &7Hệ số không hợp lệ {0}.'
 INVALID_PAGE: '&c&lLỗi | &7Trang không hợp lệ {0}.'
 INVALID_PERCENTAGE: '&c&lLỗi | &7Tỷ lệ phần trăm phải nằm trong khoảng từ 0 đến 100.'
 INVALID_PLAYER: '&c&lLỗi | &7Không thể tìm thấy người chơi tên {0}'
-INVALID_RATE: |
+INVALID_RATE: |-
   &c&lLỗi | &7Không thể tìm thấy một đánh giá với tên {0}.
   &c&lLỗi | &7Các đánh giá đảo: {1}
 INVALID_ROWS: '&c&lLỗi | &7Số lượng dòng không hợp lệ: {0}'
-INVALID_ROLE: |
+INVALID_ROLE: |-
   &c&lLỗi | &7Không thể tìm thấy vai trò đảo {0}.
   &c&lLỗi | &7Các vai trò của đảo: {1}
 INVALID_SCHEMATIC: '&c&lLỗi | &7không thể tìm thấy schematic với tên {0}.'
-INVALID_SETTINGS: |
+INVALID_SETTINGS: |-
   &c&lLỗi | &7Không thể tìm thấy cài đặt đảo {0}.
   &c&lLỗi | &7Các điều chỉnh đảo: {1}
 INVALID_SIZE: '&c&lLỗi | &7Kích thước không hợp lệ {0}.'
 INVALID_SLOT: '&c&lLỗi | &7Vị trí không hợp lệ {0}.'
 INVALID_TITLE: '&c&lLỗi | &7Đã nhập title không hợp lệ.'
 INVALID_TOGGLE_MODE: '&c&lLỗi | &7Không thể chuyển đổi {0}.'
-INVALID_UPGRADE: |
+INVALID_UPGRADE: |-
   &c&lLỗi | &7Không thể tìm thấy bản nâng cấp được gọi là {0}.
   &c&lLỗi | &7Nâng cấp: {1}
 INVALID_VISIT_LOCATION: '&c&lLỗi | &7Hòn đảo này không có vị trí du khách.'
@@ -504,33 +507,33 @@ ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Danh sách lệnh [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Dùng /is help {0} cho trang tiếp theo.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lĐảo | &7Giới Hạn Ngân Hàng: {0}'
-ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
+ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |-
   &e&lĐảo | &7Giới Hạn Các Khối:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lĐảo | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_COOP_LIMIT: '&e&lĐảo | &7Giới Hạn Co-op: {0}'
-ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |
+ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |-
   &e&lĐảo | &7Các hiệu ứng đảo:
   {0}
 ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE: '&e&lĐảo | &7  {0}: {1}'
-ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |-
   &e&lĐảo | &7Giới hạn các vật thể:
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lĐảo | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lĐảo | &7Cây trồng đa cấp: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lĐảo | &7Drops đa cấp: {0}'
-ISLAND_INFO_ADMIN_GENERATOR_RATES: |
+ISLAND_INFO_ADMIN_GENERATOR_RATES: |-
   &e&lĐảo | &7Tỉ lệ máy tạo quặng ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lĐảo | &7  {0}: {1}% ({2})'
-ISLAND_INFO_ADMIN_ROLE_LIMITS: |
+ISLAND_INFO_ADMIN_ROLE_LIMITS: |-
   &e&lĐảo | &7Giới Hạn Vai Trò:
   {0}
 ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lĐảo | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_SIZE: '&e&lĐảo | &7Kích thước đảo: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lĐảo | &7Hệ số lồng sinh sản: {0}'
 ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lĐảo | &7Giới hạn thành viên: {0}'
-ISLAND_INFO_ADMIN_UPGRADES: |
+ISLAND_INFO_ADMIN_UPGRADES: |-
   &e&lĐảo | &7Các Nâng Cấp:
   {0}
 ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lĐảo | &7  {0}: {1}'
@@ -559,7 +562,7 @@ ISLAND_INFO_RATE_TWO_COLOR: '&6'
 ISLAND_INFO_RATE_THREE_COLOR: '&e'
 ISLAND_INFO_RATE_FOUR_COLOR: '&a'
 ISLAND_INFO_RATE_FIVE_COLOR: '&2'
-ISLAND_INFO_ROLES: |
+ISLAND_INFO_ROLES: |-
   &e&lĐảo | &7{0}s:
   {1}
 ISLAND_INFO_VISITORS_COUNT: '&e&lĐảo | &7Số lượt khách: {0} ({1} unique visitors)'
@@ -573,7 +576,7 @@ ISLAND_PREVIEW_CANCEL: '&e&lXem Trước | &7Bạn đã hủy chế độ xem tr
 ISLAND_PREVIEW_CONFIRM_TEXT: 'DONG-Y'
 ISLAND_PREVIEW_CANCEL_TEXT: 'HUY-BO'
 ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
-ISLAND_PREVIEW_START: |
+ISLAND_PREVIEW_START: |-
   &e&lXem Trước | &7Bạn đã bắt đầu chế độ xem trước schematic {0}.
   &e&lXem Trước | &7Nhập &a&lDONG-Y &7để tạo đảo mới, hoặc &c&lHUY-BO &7để dừng chế độ xem trước.
   &e&lXem Trước | &7Bạn không thể rời khỏi khu vực của hòn đảo, nếu không chế độ xem trước sẽ tự động bị hủy.
@@ -635,7 +638,7 @@ MISSION_STATUS_COMPLETE_ALL: '&e&lNhiệm Vụ | &7Đã thay đổi trạng thá
 MISSION_STATUS_RESET: '&e&lNhiệm Vụ | &7Đặt lại trạng thái của nhiệm vụ {0} cho {1}.'
 MISSION_STATUS_RESET_ALL: '&e&lNhiệm Vụ | &7Đặt lại tất cả các nhiệm vụ cho {0}.'
 MODULE_ALREADY_INITIALIZED: '&e&lModule | &7Module đã đước tải sẵn trước đó.'
-MODULE_INFO: |
+MODULE_INFO: |-
   &e&lModule | &7{0} bởi {1}
   &e&lModule | &7&m--------------------
   &e&lModule | &7{2}
@@ -779,7 +782,7 @@ SCHEMATIC_LEFT_SELECT: '&e&lSchematics | &7Đã chọn vị trí #2 ({0})'
 SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
 SCHEMATIC_NOT_READY: '&c&lLỗi | &7Bạn chưa chọn hai vị trí.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lSchematics | &7Đang xử lý yêu cầu của bạn...'
-SCHEMATIC_READY_TO_CREATE: |
+SCHEMATIC_READY_TO_CREATE: |-
   &e&lSchematics | &7Bạn đã chọn hai vị trí. Xài /is admin schematic <tên> để tạo schematic mới.
   &e&lSchematics | &7Hãy chắc chắn rằng bạn đứng ở vị trí dịch chuyển khi thực hiện lệnh.
 SCHEMATIC_RIGHT_SELECT: '&e&lSchematics | &7Đã chọn vị trí #1 ({0})'
@@ -870,7 +873,7 @@ UPGRADE_COOLDOWN_FORMAT: '&c&lLỗi | &77Bạn có thể nâng cấp lại trong
 VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lLỗi | &7Bạn không thể sử dụng lệnh này trên đảo khác.'
 WARP_ALREADY_EXIST: '&c&lLỗi | &7Đã có một khu vực đã được đặt với tên này.'
-WARP_CATEGORY_ICON_NEW_LORE: |
+WARP_CATEGORY_ICON_NEW_LORE: |-
   &e&lKhu Vực | &7Hãy nhập mô tả mới (Nhập "-cancel" để hủy):
   &e&lKhu Vực | &7Bạn có thể xuống dòng bằng cách thêm chữ "\n".
 WARP_CATEGORY_ICON_NEW_NAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'
@@ -884,7 +887,7 @@ WARP_CATEGORY_SLOT_SUCCESS: '&e&lKhu Vực | &7Thành công thay đổi danh m�
 WARP_CATEGORY_RENAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'
 WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lLỗi | &7Tên này đã được dùng bởi một danh mục khu vực khác.'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lKhu Vực | &7Thành công đổi tên danh mục thành {0}.'
-WARP_ICON_NEW_LORE: |
+WARP_ICON_NEW_LORE: |-
   &e&lKhu Vực | &7Hãy nhập mô tả mới (Nhập "-cancel" để hủy):
   &e&lKhu Vực | &7Bạn có thể xuống dòng bằng cách thêm chữ "\n".
 WARP_ICON_NEW_NAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'

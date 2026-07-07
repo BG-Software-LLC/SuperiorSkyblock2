@@ -1959,6 +1959,16 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int hashCode() {
+        return this.handle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.handle.equals(o);
+    }
+
+    @Override
     public int compareTo(Island o) {
         return this.handle.compareTo(o);
     }

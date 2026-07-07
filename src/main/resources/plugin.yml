@@ -213,10 +213,14 @@ permissions:
             description: Increase members limit for another player's island.
           superior.admin.addwarpslimit:
             description: Increase the warps limit of an island.
+          superior.admin.ban.bypass:
+            description: Bypass island ban when entering an island.
           superior.admin.bonus:
             description: Grant a bonus to a player.
           superior.admin.bypass:
             description: Toggle bypass mode.
+          superior.admin.bypass.cooldowns:
+            description: Bypass command cooldowns.
           superior.admin.bypass.warmup:
             description: Bypass teleport warmup
           superior.admin.chest:
@@ -225,8 +229,14 @@ permissions:
             description: Clear generator rates for a specific island.
           superior.admin.close:
             description: Close an island to the public.
+          superior.admin.cmdall:
+            description: Force all players or island members to execute a command.
           superior.admin.count:
             description: Check a block count on a specific island.
+          superior.admin.data:
+            description: Get, set or remove custom data for a player or island.
+          superior.admin.debug:
+            description: Toggle debug mode for the plugin.
           superior.admin.delwarp:
             description: Delete a warp for an island.
           superior.admin.demote:
@@ -341,10 +351,16 @@ permissions:
             description: Toggle chat spy mode.
           superior.admin.stats:
             description: Show stats about the plugin.
+          superior.admin.syncbonus:
+            description: Sync the bonus worth and level of an island.
           superior.admin.syncupgrades:
             description: Sync upgrade values for an island.
           superior.admin.teleport:
             description: Teleport to other islands.
+          superior.admin.title:
+            description: Send a title message to a player.
+          superior.admin.titleall:
+            description: Send a title message to all island members.
           superior.admin.unignore:
             description: Unignore an island from top islands.
           superior.admin.withdraw:

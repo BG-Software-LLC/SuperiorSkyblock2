@@ -776,9 +776,6 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
             cfg.set("block-level-formula", cfg.getString("island-level-formula"));
             cfg.set("island-level-formula", null);
         }
-        if (!cfg.isConfigurationSection("entity-categories")) {
-            cfg.createSection("entity-categories");
-        }
         if (cfg.get("protected-message-delay") instanceof Number) {
             long delay = cfg.getLong("protected-message-delay") * 50;
             cfg.set("message-delays.ISLAND_PROTECTED", delay);

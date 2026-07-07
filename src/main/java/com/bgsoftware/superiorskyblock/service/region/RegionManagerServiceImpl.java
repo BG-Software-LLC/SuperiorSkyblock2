@@ -187,7 +187,12 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             if (!isInteractableItem && stackedBlockAmount <= 1 && islandPrivilege == null)
                 return InteractionResult.SUCCESS;
 
-            EntityType spawnType = usedItem == null ? EntityType.UNKNOWN : BukkitItems.getEntityType(usedItem);
+            Material blockType = block.getType();
+            Material usedItemType = usedItem == null ? null : usedItem.getType();
+
+            EntityType spawnType = usedItem == null ? EntityType.UNKNOWN :
+                    Materials.isMinecart(usedItemType) && Materials.isRail(blockType) ? EntityType.MINECART :
+                    Materials.isBoat(blockType) ? EntityType.BOAT : BukkitItems.getEntityType(usedItem);
 
             if (spawnType != EntityType.UNKNOWN) {
                 List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(spawnType));
@@ -202,12 +207,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 return InteractionResult.SUCCESS;
             }
 
-            Material blockType = block.getType();
-            Material usedItemType = usedItem == null ? null : usedItem.getType();
-
-            if (usedItem != null && Materials.isMinecart(usedItemType) ? Materials.isRail(blockType) : Materials.isBoat(blockType)) {
-                islandPrivilege = IslandPrivileges.MINECART_PLACE;
-            } else if (usedItem != null && blockType == VAULT && usedItemType != TRIAL_KEY && usedItemType != OMINOUS_TRIAL_KEY) {
+            if (usedItem != null && blockType == VAULT && usedItemType != TRIAL_KEY && usedItemType != OMINOUS_TRIAL_KEY) {
                 return InteractionResult.SUCCESS;
             } else if (action == Action.PHYSICAL && blockType == FARMLAND || blockType == ROOTED_DIRT ||
                     (usedItem != null && Materials.isHoe(usedItemType))) {

@@ -3264,7 +3264,7 @@ public class SIsland implements Island {
 
         //Checking for the specific provided key.
         if (blockLimit >= 0) {
-            return getBlockCountAsBigInteger(key).add(BigInteger.valueOf(amount))
+            return getExactBlockCountAsBigInteger(key).add(BigInteger.valueOf(amount))
                     .compareTo(BigInteger.valueOf(blockLimit)) > 0;
         }
 
@@ -5092,37 +5092,32 @@ public class SIsland implements Island {
             return bankLimit;
         });
 
-        blockLimits.entrySet().stream()
-                .filter(entry -> overrideCustom || entry.getValue().isSynced())
-                .forEach(entry -> entry.setValue(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE)));
+        clearSyncedMapEntries(blockLimits, overrideCustom);
 
-        entityLimits.entrySet().stream()
-                .filter(entry -> overrideCustom || entry.getValue().isSynced())
-                .forEach(entry -> entry.setValue(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE)));
+        clearSyncedMapEntries(entityLimits, overrideCustom);
 
         cobbleGeneratorValues.write(cobbleGeneratorValues -> {
-            cobbleGeneratorValues.values().forEach(cobbleGeneratorValue -> {
-                cobbleGeneratorValue.entrySet().stream()
-                        .filter(entry -> overrideCustom || entry.getValue().isSynced())
-                        .forEach(entry -> entry.setValue(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE)));
-            });
+            cobbleGeneratorValues.values().forEach(cobbleGeneratorValue ->
+                    clearSyncedMapEntries(cobbleGeneratorValue, overrideCustom));
         });
 
-        islandEffects.entrySet().stream()
-                .filter(entry -> overrideCustom || entry.getValue().isSynced())
-                .forEach(entry -> entry.setValue(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE)));
+        clearSyncedMapEntries(islandEffects, overrideCustom);
 
         roleLimits.write(roleLimits -> {
             Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimits.entryIterator();
             while (iterator.hasNext()) {
                 Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
                 if (overrideCustom || entry.getValue().isSynced())
-                    entry.setValue(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+                    iterator.remove();
             }
         });
 
         if (overrideCustom)
             IslandsDatabaseBridge.clearIslandSettings(this);
+    }
+
+    private static void clearSyncedMapEntries(Map<?, IntValue> map, boolean overrideCustom) {
+        map.entrySet().removeIf(entry -> overrideCustom || entry.getValue().isSynced());
     }
 
     private void syncUpgrade(SUpgradeLevel upgradeLevel, boolean overrideCustom) {

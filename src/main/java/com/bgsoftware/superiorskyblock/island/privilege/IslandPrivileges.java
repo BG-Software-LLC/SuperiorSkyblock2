@@ -2,9 +2,14 @@ package com.bgsoftware.superiorskyblock.island.privilege;
 
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 
 import java.util.Comparator;
 import java.util.Locale;
@@ -12,6 +17,7 @@ import java.util.Objects;
 
 public class IslandPrivileges {
 
+    // Builtin privileges
     public static final IslandPrivilege ALL = register("ALL");
     public static final IslandPrivilege ANIMAL_BREED = register("ANIMAL_BREED");
     public static final IslandPrivilege ANIMAL_SHEAR = register("ANIMAL_SHEAR");
@@ -45,8 +51,6 @@ public class IslandPrivileges {
     public static final IslandPrivilege LEASH = register("LEASH");
     public static final IslandPrivilege MINECART_ENTER = register("MINECART_ENTER");
     public static final IslandPrivilege MINECART_OPEN = register("MINECART_OPEN");
-    public static final IslandPrivilege MINECART_PLACE = register("MINECART_PLACE");
-    public static final IslandPrivilege MONSTER_DAMAGE = register("MONSTER_DAMAGE");
     public static final IslandPrivilege NAME_ENTITY = register("NAME_ENTITY");
     public static final IslandPrivilege OPEN_ISLAND = register("OPEN_ISLAND", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege PAYPAL_SHOW = register("PAYPAL_SHOW");
@@ -74,6 +78,10 @@ public class IslandPrivileges {
     public static final IslandPrivilege WIND_CHARGE = register("WIND_CHARGE", ServerVersion.isAtLeast(ServerVersion.v1_21));
     public static final IslandPrivilege WITHDRAW_MONEY = register("WITHDRAW_MONEY", IslandPrivilege.Type.COMMAND);
 
+    // Privileges from configurations
+    @Nullable
+    public static IslandPrivilege CONFIG_VAULT_INTERACT;
+
     private static String ALL_PRIVILEGE_NAMES;
     private static int KNOWN_PRIVILEGES_COUNT;
 
@@ -83,6 +91,18 @@ public class IslandPrivileges {
 
     public static void registerPrivileges() {
         // Do nothing, only trigger all the register calls
+    }
+
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, IslandPrivileges::onSettingsUpdate);
+    }
+
+    private static void onSettingsUpdate() {
+        CONFIG_VAULT_INTERACT = null;
+
+        SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+        Key vaultKey = Keys.ofMaterialAndData("VAULT");
+        CONFIG_VAULT_INTERACT = plugin.getSettings().getInteractablesMap().getRequiredPrivilege(vaultKey);
     }
 
     public static String getPrivilegesNames() {

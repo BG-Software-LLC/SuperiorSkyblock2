@@ -94,8 +94,6 @@ public class ChunksListener extends AbstractGameEventListener {
 
         if (!plugin.getNMSChunks().isChunkEmpty(chunk))
             island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
-
-        Arrays.stream(chunk.getEntities()).forEach(this.worldRecordService.get()::recordEntityDespawn);
     }
 
     private void handleChunkLoad(Chunk chunk, boolean isNewChunk) {
