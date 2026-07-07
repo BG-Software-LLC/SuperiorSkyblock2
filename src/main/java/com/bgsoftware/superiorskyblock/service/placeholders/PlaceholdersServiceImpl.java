@@ -29,7 +29,6 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.service.IService;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;

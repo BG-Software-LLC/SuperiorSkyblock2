@@ -27,7 +27,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuTopIslands.Args, Island> {
