@@ -2,7 +2,10 @@ package com.bgsoftware.superiorskyblock.service.bossbar;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
+import com.bgsoftware.superiorskyblock.core.FoliaUtil;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -22,6 +25,7 @@ public class BossBarTask extends BukkitRunnable {
     private final BossBar bossBar;
     private final double progressToRemovePerTick;
     private boolean reachedEndTask = false;
+    private ScheduledTask foliaTask;
 
     public static BossBarTask create(BossBar bossBar, double ticksToRun) {
         return ticksToRun <= 0 ? EMPTY_TASK : new BossBarTask(bossBar, ticksToRun);
@@ -31,7 +35,12 @@ public class BossBarTask extends BukkitRunnable {
         this.bossBar = bossBar;
         this.progressToRemovePerTick = this.bossBar.getProgress() / ticksToRun;
         if (progressToRemovePerTick > 0) {
-            runTaskTimer(plugin, 1L, 1L);
+            if (FoliaUtil.isFolia()) {
+                foliaTask = Bukkit.getServer().getGlobalRegionScheduler()
+                        .runAtFixedRate(plugin, t -> run(), 1L, 1L);
+            } else {
+                runTaskTimer(plugin, 1L, 1L);
+            }
         }
     }
 
@@ -48,7 +57,14 @@ public class BossBarTask extends BukkitRunnable {
     @Override
     public synchronized void cancel() throws IllegalStateException {
         this.bossBar.removeAll();
-        super.cancel();
+        if (FoliaUtil.isFolia()) {
+            if (foliaTask != null) {
+                foliaTask.cancel();
+                foliaTask = null;
+            }
+        } else {
+            super.cancel();
+        }
     }
 
     public void registerTask(Player player) {
