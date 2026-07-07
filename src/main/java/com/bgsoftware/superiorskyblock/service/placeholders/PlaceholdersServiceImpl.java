@@ -146,17 +146,8 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             Formatters.TIME_FORMATTER.format(Duration.ofSeconds(island.getNextInterest()), superiorPlayer.getUserLocale()))
                     .put("bans_count", (island, superiorPlayer) ->
                             island.getBannedPlayers().size() + "")
-                    .put("bans_list", (island, superiorPlayer) -> {
-                        StringBuilder teamBuilder = new StringBuilder();
-                        List<SuperiorPlayer> players = island.getBannedPlayers();
-                        if (players.isEmpty()) {
-                            return "";
-                        }
-                        for (SuperiorPlayer player : players) {
-                            teamBuilder.append(", ").append(player.getName());
-                        }
-                        return teamBuilder.substring(2);
-                    })
+                    .put("bans_list", (island, superiorPlayer) ->
+                            Formatters.COMMA_FORMATTER.format(island.getBannedPlayers().stream().map(SuperiorPlayer::getName)))
                     .put("biome", (island, superiorPlayer) ->
                             Formatters.CAPITALIZED_FORMATTER.format(island.getBiome().name()))
                     .put("bonus_level", (island, superiorPlayer) ->
@@ -187,17 +178,8 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.getChestSize() + "")
                     .put("coop_limit", (island, superiorPlayer) ->
                             island.getCoopLimit() + "")
-                    .put("coop_list", (island, superiorPlayer) -> {
-                        StringBuilder teamBuilder = new StringBuilder();
-                        List<SuperiorPlayer> players = island.getCoopPlayers();
-                        if (players.isEmpty()) {
-                            return "";
-                        }
-                        for (SuperiorPlayer player : players) {
-                            teamBuilder.append(", ").append(player.getName());
-                        }
-                        return teamBuilder.substring(2);
-                    })
+                    .put("coop_list", (island, superiorPlayer) ->
+                            Formatters.COMMA_FORMATTER.format(island.getCoopPlayers().stream().map(SuperiorPlayer::getName)))
                     .put("coop_size", (island, superiorPlayer) ->
                             island.getCoopPlayers().size() + "")
                     .put("creation_time", (island, superiorPlayer) ->
@@ -259,17 +241,8 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.getPaypal())
                     .put("players_count", (island, superiorPlayer) ->
                             island.getAllPlayersInside().size() + "")
-                    .put("players_list", (island, superiorPlayer) -> {
-                        StringBuilder teamBuilder = new StringBuilder();
-                        List<SuperiorPlayer> players = island.getAllPlayersInside();
-                        if (players.isEmpty()) {
-                            return "";
-                        }
-                        for (SuperiorPlayer player : players) {
-                            teamBuilder.append(", ").append(player.getName());
-                        }
-                        return teamBuilder.substring(2);
-                    })
+                    .put("players_list", (island, superiorPlayer) ->
+                            Formatters.COMMA_FORMATTER.format(island.getAllPlayersInside().stream().map(SuperiorPlayer::getName)))
                     .put("radius", (island, superiorPlayer) ->
                             island.getIslandSize() + "")
                     .put("rating", (island, superiorPlayer) ->
@@ -333,49 +306,22 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.getSpawnerRatesMultiplier() + "")
                     .put("team_limit", (island, superiorPlayer) ->
                             island.getTeamLimit() + "")
-                    .put("team_list", (island, superiorPlayer) -> {
-                        StringBuilder teamBuilder = new StringBuilder();
-                        List<SuperiorPlayer> players = island.getIslandMembers(true);
-                        if (players.isEmpty()) {
-                            return "";
-                        }
-                        for (SuperiorPlayer player : players) {
-                            teamBuilder.append(", ").append(player.getName());
-                        }
-                        return teamBuilder.substring(2);
-                    })
+                    .put("team_list", (island, superiorPlayer) ->
+                            Formatters.COMMA_FORMATTER.format(island.getIslandMembers(true).stream().map(SuperiorPlayer::getName)))
                     .put("team_size", (island, superiorPlayer) ->
                             island.getIslandMembers(true).size() + "")
                     .put("team_size_online", (island, superiorPlayer) ->
                             island.getIslandMembers(true).stream().filter(SuperiorPlayer::isShownAsOnline).count() + "")
                     .put("unique_visitors_count", (island, superiorPlayer) ->
                             island.getUniqueVisitors().size() + "")
-                    .put("unique_visitors_list", (island, superiorPlayer) -> {
-                        StringBuilder teamBuilder = new StringBuilder();
-                        List<SuperiorPlayer> players = island.getUniqueVisitors();
-                        if (players.isEmpty()) {
-                            return "";
-                        }
-                        for (SuperiorPlayer player : players) {
-                            teamBuilder.append(", ").append(player.getName());
-                        }
-                        return teamBuilder.substring(2);
-                    })
+                    .put("unique_visitors_list", (island, superiorPlayer) ->
+                            Formatters.COMMA_FORMATTER.format(island.getUniqueVisitors().stream().map(SuperiorPlayer::getName)))
                     .put("uuid", (island, superiorPlayer) ->
                             island.getUniqueId() + "")
                     .put("visitors_count", (island, superiorPlayer) ->
                             island.getIslandVisitors(false).size() + "")
-                    .put("visitors_list", (island, superiorPlayer) -> {
-                        StringBuilder teamBuilder = new StringBuilder();
-                        List<SuperiorPlayer> players = island.getIslandVisitors();
-                        if (players.isEmpty()) {
-                            return "";
-                        }
-                        for (SuperiorPlayer player : players) {
-                            teamBuilder.append(", ").append(player.getName());
-                        }
-                        return teamBuilder.substring(2);
-                    })
+                    .put("visitors_list", (island, superiorPlayer) ->
+                            Formatters.COMMA_FORMATTER.format(island.getIslandVisitors().stream().map(SuperiorPlayer::getName)))
                     .put("visitors_location", (island, superiorPlayer) -> {
                         WorldInfo worldInfo = getDefaultWorldInfo(island);
                         return Formatters.LOCATION_FORMATTER.format(island.getVisitorsPosition(null /*unused*/).toLocation(worldInfo));
