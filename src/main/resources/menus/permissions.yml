@@ -1363,6 +1363,39 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  minecart_place:
+    display-menu: true
+    permission-enabled:
+      type: MINECART
+      name: '&6Minecart Place'
+      lore:
+        - '&7Access to place minecarts inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: MINECART
+      name: '&6Minecart Place'
+      lore:
+        - '&7Access to place minecarts inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: MINECART
+      name: '&6Minecart Place'
+      lore:
+        - '&7Access to place minecarts inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: ANVIL_LAND
+        volume: 0.2
+        pitch: 0.2
+
   monster_damage:
     display-menu: true
     permission-enabled:

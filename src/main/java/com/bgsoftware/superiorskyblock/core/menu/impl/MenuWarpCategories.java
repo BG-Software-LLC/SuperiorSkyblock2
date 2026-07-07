@@ -79,7 +79,8 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
                        Menu<View, IslandViewArgs> menu, IslandViewArgs args) {
             super(inventoryViewer, previousMenuView, menu);
             this.island = args.getIsland();
-            this.hasManagePerms = island.hasPermission(inventoryViewer, IslandPrivileges.SET_WARP);
+            this.hasManagePerms = island.isMember(inventoryViewer) &&
+                    island.hasPermission(inventoryViewer, IslandPrivileges.SET_WARP);
         }
 
         @Override

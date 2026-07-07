@@ -25,4 +25,9 @@ public class VisitorsSignSection extends SettingsContainerHolder implements Sett
         return getContainer().visitorsSignInactive;
     }
 
+    @Override
+    public String getDescriptionLineFormat() {
+        return getContainer().visitorsSignDescriptionLineFormat;
+    }
+
 }

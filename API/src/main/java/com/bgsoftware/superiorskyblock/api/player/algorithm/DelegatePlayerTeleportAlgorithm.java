@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.api.player.algorithm;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.concurrent.CompletableFuture;
@@ -27,14 +26,18 @@ public class DelegatePlayerTeleportAlgorithm implements PlayerTeleportAlgorithm 
     }
 
     @Override
-    @Deprecated
-    public CompletableFuture<Boolean> teleport(Player player, Island island, World.Environment environment) {
-        return this.handle.teleport(player, island, environment);
+    public CompletableFuture<Boolean> teleport(Player player, Island island, Dimension dimension) {
+        return this.handle.teleport(player, island, dimension);
     }
 
     @Override
-    public CompletableFuture<Boolean> teleport(Player player, Island island, Dimension dimension) {
-        return this.handle.teleport(player, island, dimension);
+    public int hashCode() {
+        return this.handle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.handle.equals(o);
     }
 
 }

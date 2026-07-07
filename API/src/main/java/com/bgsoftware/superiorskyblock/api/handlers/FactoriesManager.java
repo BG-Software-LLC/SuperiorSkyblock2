@@ -195,15 +195,6 @@ public interface FactoriesManager {
     WorldInfo createWorldInfo(String worldName, Dimension dimension);
 
     /**
-     * Create a new world info.
-     *
-     * @param worldName   The name of the world.
-     * @param environment The environment of the world.
-     */
-    @Deprecated
-    WorldInfo createWorldInfo(String worldName, World.Environment environment);
-
-    /**
      * Create a new game sound instance.
      *
      * @param sound  The sound to play.

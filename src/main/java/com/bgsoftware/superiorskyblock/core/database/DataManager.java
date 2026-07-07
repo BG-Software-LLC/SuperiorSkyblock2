@@ -4,12 +4,10 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.LegacyMasks;
 import com.bgsoftware.superiorskyblock.core.Manager;
-import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
+import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.core.database.loader.DatabaseLoader;
@@ -136,13 +134,19 @@ public class DataManager extends Manager {
                 return;
             }
 
-            plugin.getPlayers().getPlayersContainer().addPlayer(databaseCache.computeIfAbsentInfo(uuid.get(), SuperiorPlayer::newBuilder)
+            DatabaseCache.Record<SuperiorPlayer.Builder> playerRecord =
+                    databaseCache.computeIfAbsentInfo(uuid.get(), SuperiorPlayer::newBuilder);
+
+            playerRecord.get()
                     .setUniqueId(uuid.get())
                     .setName(databaseResult.getString("last_used_name").orElse("null"))
                     .setDisbands(databaseResult.getInt("disbands").orElse(0))
                     .setTextureValue(databaseResult.getString("last_used_skin").orElse(""))
-                    .setLastTimeUpdated(databaseResult.getLong("last_time_updated").orElse(System.currentTimeMillis() / 1000))
-                    .build());
+                    .setLastTimeUpdated(databaseResult.getLong("last_time_updated").orElse(System.currentTimeMillis() / 1000));
+
+            checkCorruptedPlayerRecord(playerRecord);
+
+            plugin.getPlayers().getPlayersContainer().addPlayer(playerRecord.get().build());
 
             playersCount.incrementAndGet();
         });
@@ -150,6 +154,18 @@ public class DataManager extends Manager {
         long endTime = System.currentTimeMillis();
 
         Log.info("Finished loading " + playersCount.get() + " players (Took " + (endTime - startTime) + "ms)");
+    }
+
+    private void checkCorruptedPlayerRecord(DatabaseCache.Record<SuperiorPlayer.Builder> playerRecord) {
+        if (playerRecord.getRecordedTables().contains("players_settings"))
+            return;
+
+        // We create a temporary SuperiorPlayer for inserting the corrupted record
+        SuperiorPlayer superiorPlayer = playerRecord.get().build();
+
+        Log.warn("The player " + superiorPlayer.getUniqueId() + " does not have a players_settings record - fixing it...");
+
+        PlayersDatabaseBridge.insertPlayerSettings(superiorPlayer);
     }
 
     private void loadIslands() {
@@ -212,7 +228,10 @@ public class DataManager extends Manager {
                 return;
             }
 
-            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new)
+            DatabaseCache.Record<Island.Builder> islandRecord =
+                    databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+
+            Island.Builder builder = islandRecord.get()
                     .setOwner(owner)
                     .setUniqueId(uuid.get())
                     .setCenter(center.get())
@@ -228,16 +247,13 @@ public class DataManager extends Manager {
                     .setDescription(databaseResult.getString("description").orElse(""))
                     .setLastTimeUpdated(databaseResult.getLong("last_time_updated").orElse(System.currentTimeMillis() / 1000L));
 
+            databaseResult.getString("generated_schematics").ifPresent(generatedSchematics -> {
+                IslandsDeserializer.deserializeDimensionsList(generatedSchematics, builder::setGeneratedSchematic);
+            });
 
-            EnumerateSet<Dimension> generatedSchematics = LegacyMasks.convertGeneratedSchematicsMask(
-                    databaseResult.getInt("generated_schematics").orElse(0));
-            EnumerateSet<Dimension> unlockedWorlds = LegacyMasks.convertUnlockedWorldsMask(
-                    databaseResult.getInt("unlocked_worlds").orElse(0));
-
-            for (Dimension dimension : Dimension.values()) {
-                if (generatedSchematics.contains(dimension)) builder.setGeneratedSchematic(dimension);
-                if (unlockedWorlds.contains(dimension)) builder.setUnlockedWorld(dimension);
-            }
+            databaseResult.getString("unlocked_worlds").ifPresent(unlockedWorlds -> {
+                IslandsDeserializer.deserializeDimensionsList(unlockedWorlds, builder::setUnlockedWorld);
+            });
 
             databaseResult.getString("dirty_chunks").ifPresent(dirtyChunks -> {
                 IslandsDeserializer.deserializeDirtyChunks(builder, dirtyChunks);
@@ -251,6 +267,8 @@ public class DataManager extends Manager {
                 IslandsDeserializer.deserializeEntityCounts(builder, entityCounts);
             });
 
+            checkCorruptedIslandRecord(islandRecord);
+
             plugin.getGrid().getIslandsContainer().addIsland(builder.build());
 
             islandsCount.incrementAndGet();
@@ -259,6 +277,27 @@ public class DataManager extends Manager {
         long endTime = System.currentTimeMillis();
 
         Log.info("Finished loading " + islandsCount.get() + " islands (Took " + (endTime - startTime) + "ms)");
+    }
+
+    private void checkCorruptedIslandRecord(DatabaseCache.Record<Island.Builder> islandRecord) {
+        boolean hasIslandsBanks = islandRecord.getRecordedTables().contains("islands_banks");
+        boolean hasIslandsSettings = islandRecord.getRecordedTables().contains("islands_settings");
+
+        if (hasIslandsBanks && hasIslandsSettings)
+            return;
+
+        // We create a temporary Island for inserting the corrupted record
+        Island island = islandRecord.get().build();
+
+        if (!hasIslandsBanks) {
+            Log.warn("The island " + island.getUniqueId() + " does not have a islands_banks record - fixing it...");
+            IslandsDatabaseBridge.insertIslandBanks(island);
+        }
+
+        if (!hasIslandsSettings) {
+            Log.warn("The island " + island.getUniqueId() + " does not have a islands_settings record - fixing it...");
+            IslandsDatabaseBridge.insertIslandSettings(island);
+        }
     }
 
 

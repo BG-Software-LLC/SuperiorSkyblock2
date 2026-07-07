@@ -941,32 +941,50 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Is the normal world enabled for the island?
+     *
+     * @deprecated See {@link #isDimensionEnabled(Dimension)}
      */
+    @Deprecated
     boolean isNormalEnabled();
 
     /**
      * Enable/disable the normal world for the island.
+     *
+     * @deprecated See {@link #setDimensionEnabled(Dimension, boolean)}
      */
+    @Deprecated
     void setNormalEnabled(boolean enabled);
 
     /**
      * Is the nether world enabled for the island?
+     *
+     * @deprecated See {@link #isDimensionEnabled(Dimension)}
      */
+    @Deprecated
     boolean isNetherEnabled();
 
     /**
      * Enable/disable the nether world for the island.
+     *
+     * @deprecated See {@link #setDimensionEnabled(Dimension, boolean)}
      */
+    @Deprecated
     void setNetherEnabled(boolean enabled);
 
     /**
      * Is the end world enabled for the island?
+     *
+     * @deprecated See {@link #isDimensionEnabled(Dimension)}
      */
+    @Deprecated
     boolean isEndEnabled();
 
     /**
      * Enable/disable the end world for the island.
+     *
+     * @deprecated See {@link #setDimensionEnabled(Dimension, boolean)}
      */
+    @Deprecated
     void setEndEnabled(boolean enabled);
 
     /**
@@ -988,14 +1006,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get the unlocked worlds.
      */
     Collection<Dimension> getUnlockedWorlds();
-
-    /**
-     * Get the unlocked worlds flag.
-     *
-     * @deprecated See {@link #getUnlockedWorlds()}
-     */
-    @Deprecated
-    int getUnlockedWorldsFlag();
 
     /*
      *  Permissions related methods
@@ -2736,14 +2746,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     Collection<Dimension> getGeneratedSchematics();
 
     /**
-     * Get the generated schematics flag.
-     *
-     * @deprecated See {@link #getGeneratedSchematics()}
-     */
-    @Deprecated
-    int getGeneratedSchematicsFlag();
-
-    /**
      * Get the schematic that was used to create the island.
      */
     String getSchematicName();
@@ -2847,23 +2849,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
         Builder setGeneratedSchematic(Dimension dimension);
 
-        @Deprecated
-        Builder setGeneratedSchematics(int generatedSchematicsMask);
-
         Set<Dimension> getGeneratedSchematics();
-
-        @Deprecated
-        int getGeneratedSchematicsMask();
 
         Builder setUnlockedWorld(Dimension dimension);
 
-        @Deprecated
-        Builder setUnlockedWorlds(int unlockedWorldsMask);
-
         Set<Dimension> getUnlockedWorlds();
-
-        @Deprecated
-        int getUnlockedWorldsMask();
 
         Builder setLastTimeUpdated(long lastTimeUpdated);
 

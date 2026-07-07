@@ -35,9 +35,14 @@ public class CraftEngineHook {
     private static final KeyMap<ItemStack> CUSTOM_ITEM_CACHE = collectCustomItemsCache();
     private static final KeyMap<CustomBlock> CUSTOM_ITEM_TO_BLOCK_CACHE = collectCustomItemToBlocksCache();
 
+    private static boolean registered = false;
+
     public static void register(SuperiorSkyblockPlugin plugin) {
-        plugin.getBlockValues().registerKeyParser(new CraftEngineKeyParser(), collectCustomKeys());
         plugin.getServer().getPluginManager().registerEvents(new ListenerImpl(), plugin);
+        if (!registered) {
+            registered = true;
+            plugin.getBlockValues().registerKeyParser(new CraftEngineKeyParser(), collectCustomKeys());
+        }
     }
 
     private static KeySet collectCustomItemKeys() {

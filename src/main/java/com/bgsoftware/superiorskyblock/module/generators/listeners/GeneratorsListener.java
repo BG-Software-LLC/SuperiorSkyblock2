@@ -54,7 +54,7 @@ public class GeneratorsListener implements Listener {
 
             Dimension dimension;
             if (BuiltinModules.GENERATORS.getConfiguration().isMatchGeneratorWorld()) {
-                dimension = Dimensions.NETHER;
+                dimension = Dimensions.fromEnvironment(World.Environment.NETHER);
             } else {
                 World blockWorld = blockLocation.getWorld();
                 dimension = Optional.ofNullable(plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(blockWorld))
@@ -98,7 +98,7 @@ public class GeneratorsListener implements Listener {
 
             Dimension dimension;
             if (BuiltinModules.GENERATORS.getConfiguration().isMatchGeneratorWorld()) {
-                dimension = generatorType == GeneratorType.BASALT ? Dimensions.NETHER : Dimensions.NORMAL;
+                dimension = Dimensions.fromEnvironment(generatorType == GeneratorType.BASALT ? World.Environment.NETHER : World.Environment.NORMAL);
             } else {
                 dimension = Optional.ofNullable(plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(blockWorld))
                         .orElseGet(() -> Dimensions.fromEnvironment(blockWorld.getEnvironment()));

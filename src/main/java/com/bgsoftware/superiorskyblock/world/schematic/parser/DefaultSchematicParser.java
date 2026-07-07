@@ -14,14 +14,14 @@ import com.google.common.hash.Hashing;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultSchematicParser implements SchematicParser {
 
     private static final DefaultSchematicParser INSTANCE = new DefaultSchematicParser();
 
-    private static final Map<String, SuperiorSchematic> HASHED_SCHEMATIC = new HashMap<>();
+    private static final Map<String, SuperiorSchematic> HASHED_SCHEMATIC = new ConcurrentHashMap<>();
 
     public static DefaultSchematicParser getInstance() {
         return INSTANCE;

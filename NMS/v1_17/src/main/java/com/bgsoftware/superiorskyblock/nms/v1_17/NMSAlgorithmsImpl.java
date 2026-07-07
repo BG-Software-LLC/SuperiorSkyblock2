@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.nms.algorithms.SpigotGlowEnchantment;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
 import org.bukkit.enchantments.Enchantment;
@@ -12,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Field;
+import java.util.Locale;
 
 public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.AbstractNMSAlgorithms {
 
@@ -39,6 +41,15 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_17
         } catch (Throwable error) {
             //noinspection removal
             return MinecraftServer.getServer().recentTps[0];
+        }
+    }
+
+    @Override
+    public Biome getBiome(String biomeName) {
+        try {
+            return Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
+        } catch (IllegalArgumentException e) {
+            return null;
         }
     }
 

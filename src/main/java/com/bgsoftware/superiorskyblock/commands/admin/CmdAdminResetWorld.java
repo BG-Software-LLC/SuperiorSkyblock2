@@ -7,11 +7,13 @@ import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
+import com.bgsoftware.superiorskyblock.core.IslandWorldsPlayersStrategy;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -116,16 +118,12 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
     private static void resetChunksInternal(Island island, World world, Dimension dimension) {
         boolean isDefaultDimension = dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension();
 
-        // Sending the players that are in that world to the main island.
-        // If the world that will be reset is the normal world, they will be teleported to spawn.
-        for (SuperiorPlayer superiorPlayer : island.getAllPlayersInside()) {
-            assert superiorPlayer.getWorld() != null;
-            if (superiorPlayer.getWorld().equals(world)) {
-                if (isDefaultDimension) {
-                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-                } else {
-                    superiorPlayer.teleport(island);
-                }
+        try(IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(island)) {
+            // Sending the players that are in that world to the main island.
+            // If the world that will be reset is the normal world, they will be teleported to spawn.
+            Island teleportIsland = isDefaultDimension ? plugin.getGrid().getSpawnIsland() : island;
+            for (SuperiorPlayer superiorPlayer : strategy.getSuperiorPlayers(WorldInfo.of(world))) {
+                superiorPlayer.teleport(teleportIsland);
             }
         }
 

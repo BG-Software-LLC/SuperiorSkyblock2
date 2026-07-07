@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
@@ -48,6 +49,9 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class UpgradeTypeEntityLimits implements IUpgradeType {
+
+    @Nullable
+    private static final Material GOLDEN_DANDELION_TYPE = EnumHelper.getEnum(Material.class, "GOLDEN_DANDELION");
 
     private final Map<EntityType, SpawningPlayerData> entityBreederPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
     private final Map<Location, SpawningPlayerData> vehiclesOwners = AutoRemovalMap.newMap(2, TimeUnit.SECONDS, Location2ObjectMap::new);
@@ -292,7 +296,8 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             PlayerHand usedHand = BukkitItems.getHand(e);
             ItemStack usedItem = BukkitItems.getHandItem(e.getPlayer(), usedHand);
 
-            if (usedItem == null || !plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) e.getRightClicked()))
+            if (usedItem == null || (usedItem.getType() != GOLDEN_DANDELION_TYPE &&
+                    !plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) e.getRightClicked())))
                 return;
 
             // We want to calculate the amount of items consumed by breeding this animal.

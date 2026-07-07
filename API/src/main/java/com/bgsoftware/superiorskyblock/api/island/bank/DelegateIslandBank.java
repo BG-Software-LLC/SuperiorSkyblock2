@@ -70,4 +70,14 @@ public class DelegateIslandBank implements IslandBank {
         this.handle.loadTransaction(bankTransaction);
     }
 
+    @Override
+    public int hashCode() {
+        return this.handle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.handle.equals(o);
+    }
+
 }

@@ -61,6 +61,8 @@ public class CmdWarp implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+
         Island targetIsland = null;
         String targetWarpName = null;
 
@@ -71,9 +73,14 @@ public class CmdWarp implements ISuperiorCommand {
                 break;
             }
             case 2: {
-                IslandArgument arguments = CommandArguments.getSenderIsland(plugin, sender);
-                targetIsland = arguments.getIsland();
-                targetWarpName = args[1];
+                if (superiorPlayer.hasIsland()) {
+                    IslandArgument arguments = CommandArguments.getSenderIsland(plugin, sender);
+                    targetIsland = arguments.getIsland();
+                    targetWarpName = args[1];
+                } else {
+                    IslandArgument arguments = CommandArguments.getIsland(plugin, sender, args[1]);
+                    targetIsland = arguments.getIsland();
+                }
                 break;
             }
             case 3: {
@@ -86,8 +93,6 @@ public class CmdWarp implements ISuperiorCommand {
 
         if (targetIsland == null)
             return;
-
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
         IslandWarp islandWarp = targetWarpName == null ? null : targetIsland.getWarp(targetWarpName);
 

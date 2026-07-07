@@ -149,6 +149,11 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public boolean hasBypassPermission(IslandPrivilege permission) {
+        return this.handle.hasBypassPermission(permission);
+    }
+
+    @Override
     public HitActionResult canHit(SuperiorPlayer otherPlayer) {
         return this.handle.canHit(otherPlayer);
     }
@@ -198,18 +203,6 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void teleport(Island island, Dimension dimension, Consumer<Boolean> teleportResult) {
         this.handle.teleport(island, dimension, teleportResult);
-    }
-
-    @Override
-    @Deprecated
-    public void teleport(Island island, World.Environment environment) {
-        this.handle.teleport(island, environment);
-    }
-
-    @Override
-    @Deprecated
-    public void teleport(Island island, World.Environment environment, @Nullable Consumer<Boolean> teleportResult) {
-        this.handle.teleport(island, environment, teleportResult);
     }
 
     @Override
@@ -590,6 +583,16 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void savePersistentDataContainer() {
         this.handle.savePersistentDataContainer();
+    }
+
+    @Override
+    public int hashCode() {
+        return this.handle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.handle.equals(o);
     }
 
 }

@@ -46,7 +46,6 @@ import com.bgsoftware.superiorskyblock.island.preview.IslandPreviews;
 import com.bgsoftware.superiorskyblock.island.preview.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.purge.IslandsPurger;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import com.google.common.base.Preconditions;
@@ -565,7 +564,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         if (spawnIsland != null && spawnIsland.isInside(location))
             return spawnIsland;
 
-        return isIslandsWorld(world) ? this.islandsContainer.getIslandAt(location) : null;
+        return this.islandsContainer.getIslandAt(location);
     }
 
     @Override
@@ -733,12 +732,6 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     @Override
-    @Deprecated
-    public World getIslandsWorld(Island island, World.Environment environment) {
-        return getIslandsWorld(island, Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
     public WorldInfo getIslandsWorldInfo(Island island, Dimension dimension) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
@@ -759,12 +752,6 @@ public class GridManagerImpl extends Manager implements GridManager {
         return world == null ? null : WorldInfo.of(world);
     }
 
-    @Override
-    @Deprecated
-    public WorldInfo getIslandsWorldInfo(Island island, World.Environment environment) {
-        return getIslandsWorldInfo(island, Dimensions.fromEnvironment(environment));
-    }
-
     @Nullable
     @Override
     public WorldInfo getIslandsWorldInfo(Island island, String worldName) {
@@ -775,7 +762,7 @@ public class GridManagerImpl extends Manager implements GridManager {
             if (island instanceof SpawnIsland)
                 return ((SpawnIsland) island).getSpawnWorldInfo();
 
-            return WorldInfo.of(island.getIslandHome(Dimensions.NORMAL).getWorld());
+            return WorldInfo.of(island.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorldDimension()).getWorld());
         }
 
         WorldsProvider worldsProvider = plugin.getProviders().getWorldsProvider();

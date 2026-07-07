@@ -66,11 +66,9 @@ public class MenuBiomes extends AbstractMenu<IslandMenuView, IslandViewArgs> {
                     continue;
 
                 String biomeName = itemSection.getString("biome");
-                Biome biome;
+                Biome biome = plugin.getNMSAlgorithms().getBiome(biomeName);;
 
-                try {
-                    biome = Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
-                } catch (IllegalArgumentException error) {
+                if (biome == null) {
                     Log.warnFromFile("biomes.yml", "Biome '", biomeName, "' is not valid, skipping...");
                     continue;
                 }

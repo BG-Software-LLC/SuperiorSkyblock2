@@ -10,7 +10,9 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.island.signs.IslandSigns;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
@@ -18,6 +20,7 @@ import com.bgsoftware.superiorskyblock.nms.algorithms.NMSCachedBlock;
 import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.spawners.TileEntityMobSpawnerNotifier;
+import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.BlockTickListServerTracker;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.ChunkReaderImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.WorldEditSessionImpl;
@@ -27,6 +30,7 @@ import com.bgsoftware.superiorskyblock.world.SignType;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.destroystokyo.paper.antixray.ChunkPacketBlockController;
 import net.minecraft.server.v1_16_R3.Block;
+import net.minecraft.server.v1_16_R3.BlockAccessAir;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.BlockPropertySlabType;
 import net.minecraft.server.v1_16_R3.BlockStepAbstract;
@@ -67,6 +71,8 @@ public class NMSWorldImpl implements NMSWorld {
     private static final ReflectField<Object> CHUNK_PACKET_BLOCK_CONTROLLER = new ReflectField<>(World.class,
             Object.class, "chunkPacketBlockController").removeFinal();
 
+    private static boolean alreadyWarned = false;
+
     private final SuperiorSkyblockPlugin plugin;
 
     public NMSWorldImpl(SuperiorSkyblockPlugin plugin) {
@@ -75,7 +81,16 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        try {
+            return getBlockKeyInternal(chunkSnapshot, x, y, z);
+        } catch (ArrayIndexOutOfBoundsException error) {
+            return ConstantKeys.AIR;
+        }
+    }
+
+    private Key getBlockKeyInternal(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
         Block block = ((CraftBlockData) chunkSnapshot.getBlockData(x, y, z)).getState().getBlock();
+
         Location location = new Location(
                 Bukkit.getWorld(chunkSnapshot.getWorldName()),
                 (chunkSnapshot.getX() << 4) + x,
@@ -84,6 +99,20 @@ public class NMSWorldImpl implements NMSWorld {
         );
 
         return Keys.of(KeyBlocksCache.getBlockKey(block), location);
+    }
+
+    @Override
+    public boolean canPlayerSuffocate(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        try {
+            return canPlayerSuffocateInternal(chunkSnapshot, x, y, z);
+        } catch (ArrayIndexOutOfBoundsException error) {
+            return true;
+        }
+    }
+
+    private boolean canPlayerSuffocateInternal(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        IBlockData blockData = ((CraftBlockData) chunkSnapshot.getBlockData(x, y, z)).getState();
+        return !blockData.getCollisionShape(BlockAccessAir.INSTANCE, BlockPosition.ZERO).isEmpty();
     }
 
     @Override
@@ -319,6 +348,11 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
+    public void setOceanLevel(org.bukkit.World world) {
+        // Not possible in this version, it is hardcoded 63
+    }
+
+    @Override
     public IslandsGenerator createGenerator(Dimension dimension) {
         return new IslandsGeneratorImpl(dimension);
     }
@@ -336,6 +370,16 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public ChunkReader createChunkReader(Chunk chunk) {
         return new ChunkReaderImpl(chunk);
+    }
+
+    @Override
+    public void listenBlockStateChanges(org.bukkit.World world) {
+        WorldServer worldServer = ((CraftWorld) world).getHandle();
+        BlockTickListServerTracker.listenForTicks(worldServer);
+        if (!alreadyWarned) {
+            Log.warn("This version is old and you may experience issues with block changes detection");
+            alreadyWarned = true;
+        }
     }
 
 }

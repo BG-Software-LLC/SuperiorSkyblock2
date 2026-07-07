@@ -1,0 +1,12 @@
+group 'Missions:BlocksMissions'
+
+dependencies {
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+
+    compileOnly "com.bgsoftware:WildStackerAPI:3.6.3"
+    compileOnly "com.bgsoftware:WildToolsAPI:2.11.4"
+}
+
+shadowJar {
+    relocate 'com.bgsoftware.superiorskyblock.missions.common', 'com.bgsoftware.superiorskyblock.missions.blocks'
+}

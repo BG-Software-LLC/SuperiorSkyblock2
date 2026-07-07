@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.nms.v1_21_9.utils.TickingBlockList;
 import com.google.common.base.Suppliers;
 import com.google.gson.JsonParseException;
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.Holder;
@@ -26,6 +25,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ClientInformation;
@@ -42,8 +42,10 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -68,6 +70,7 @@ import net.minecraft.world.ticks.ProtoChunkTicks;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBiome;
+import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
@@ -84,6 +87,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.BiConsumer;
 
 public class NMSUtilsVersioned {
 
@@ -152,7 +156,7 @@ public class NMSUtilsVersioned {
                         int chunkZ = chunkPosition.getZ();
                         MoonriseRegionFileIO.RegionDataController.ReadData readData =
                                 regionDataController.readData(chunkX, chunkZ);
-                        if(readData != null) {
+                        if (readData != null) {
                             CompoundTag entityData = switch (readData.result()) {
                                 case HAS_DATA -> regionDataController.finishRead(chunkX, chunkZ, readData);
                                 case SYNC_READ -> readData.syncRead();
@@ -310,7 +314,7 @@ public class NMSUtilsVersioned {
         return gameProfile.properties();
     }
 
-    public static String getPropertyValue(Property property) {
+    public static String getPropertyValue(com.mojang.authlib.properties.Property property) {
         return property.value();
     }
 
@@ -350,6 +354,21 @@ public class NMSUtilsVersioned {
                 null,
                 null
         ).createForBiomes();
+    }
+
+    public static Optional<CompoundTag> loadPlayerData(ServerPlayer serverPlayer) {
+        try (ProblemReporter.ScopedCollector scopedCollector = new ProblemReporter.ScopedCollector(serverPlayer.problemPath(), LOGGER)) {
+            return MinecraftServer.getServer().getPlayerList().loadPlayerData(serverPlayer.nameAndId())
+                    .map(playerData -> {
+                        ValueInput valueInput = TagValueInput.create(scopedCollector, serverPlayer.registryAccess(), playerData);
+                        serverPlayer.load(valueInput);
+                        return playerData;
+                    });
+        }
+    }
+
+    public static long getCompoundTagLong(net.minecraft.nbt.CompoundTag compoundTag, String key, long def) {
+        return compoundTag.getLongOr(key, def);
     }
 
     private static void applySignTextLines(CompoundTag blockEntityCompound, String key) {
@@ -403,6 +422,22 @@ public class NMSUtilsVersioned {
             SignText.DIRECT_CODEC.encodeStart(NbtOps.INSTANCE, signText).result()
                     .ifPresent(frontTextNBT -> blockEntityCompound.put("front_text", frontTextNBT));
         }
+    }
+
+    public static BlockState getBlockState(org.bukkit.block.Block block) {
+        return ((CraftBlock) block).getNMS();
+    }
+
+    public static boolean forEachProperty(BlockState blockState, BiConsumer<Property<?>, Comparable<?>> consumer) {
+        if (blockState.getValues().isEmpty())
+            return false;
+
+        blockState.getValues().forEach(consumer);
+        return true;
+    }
+
+    public static ResourceLocation getBlockEntityTypeKey(BlockEntityType<?> type) {
+        return BlockEntityType.getKey(type);
     }
 
     private NMSUtilsVersioned() {

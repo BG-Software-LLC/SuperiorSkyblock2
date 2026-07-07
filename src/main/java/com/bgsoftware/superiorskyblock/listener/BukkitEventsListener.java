@@ -52,6 +52,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
@@ -107,10 +108,6 @@ public class BukkitEventsListener implements Listener {
             ProjectileHitEvent.class, "getHitEntity");
     private static final ReflectMethod<Block> PROJECTILE_HIT_EVENT_TARGET_BLOCK = new ReflectMethod<>(
             ProjectileHitEvent.class, "getHitBlock");
-    @Nullable
-    private static final EntityType WIND_CHARGE = EnumHelper.getEnum(EntityType.class, "WIND_CHARGE");
-    @Nullable
-    private static final EntityType BREEZE_WIND_CHARGE = EnumHelper.getEnum(EntityType.class, "BREEZE_WIND_CHARGE");
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -150,6 +147,7 @@ public class BukkitEventsListener implements Listener {
         createEventListener(GameEventType.ENTITY_DAMAGE_EVENT, VehicleDamageEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_ENTER_PORTAL_EVENT, EntityPortalEnterEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_EXPLODE_EVENT, EntityExplodeEvent.class, this::createGameEvent);
+        createEventListener(GameEventType.ENTITY_INTERACT_EVENT, EntityInteractEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_MOVE_EVENT, PlayerMoveEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_MOVE_EVENT, VehicleMoveEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_PORTAL_EVENT, EntityPortalEvent.class, this::createGameEvent);
@@ -200,12 +198,6 @@ public class BukkitEventsListener implements Listener {
         }
 
         try {
-            Class.forName("com.destroystokyo.paper.event.block.BlockDestroyEvent");
-            createEventListener(GameEventType.BLOCK_DESTROY_EVENT, com.destroystokyo.paper.event.block.BlockDestroyEvent.class, new BlockDestroyEventFunction());
-        } catch (ClassNotFoundException ignored) {
-        }
-
-        try {
             Class.forName("com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent");
             createEventListener(GameEventType.ENTITY_DEATH_EVENT, com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent.class, new EntityRemoveFromWorldEventFunction());
         } catch (ClassNotFoundException ignored) {
@@ -240,6 +232,13 @@ public class BukkitEventsListener implements Listener {
         try {
             Class.forName("org.bukkit.event.raid.RaidTriggerEvent");
             createEventListener(GameEventType.RAID_TRIGGER_EVENT, org.bukkit.event.raid.RaidTriggerEvent.class, new RaidTriggerEventFunctions());
+        } catch (Exception ignored) {
+        }
+
+
+        try {
+            Class genericGameEventClass = Class.forName("org.bukkit.event.world.GenericGameEvent");
+            createEventListener(GameEventType.GENERIC_GAME_EVENT, genericGameEventClass, plugin.getNMSAlgorithms().getGenericGameCreator());
         } catch (Exception ignored) {
         }
     }
@@ -470,7 +469,14 @@ public class BukkitEventsListener implements Listener {
         GameEventArgs.EntityExplodeEvent entityExplodeEvent = new GameEventArgs.EntityExplodeEvent();
         entityExplodeEvent.entity = e.getEntity();
         entityExplodeEvent.blocks = e.blockList();
-        entityExplodeEvent.isSoftExplosion = e.getEntityType() == WIND_CHARGE || e.getEntityType() == BREEZE_WIND_CHARGE;
+        entityExplodeEvent.isSoftExplosion = plugin.getNMSAlgorithms().isSoftExplosion(e);
+        return eventType.createEvent(entityExplodeEvent);
+    }
+
+    private GameEvent<GameEventArgs.EntityInteractEvent> createGameEvent(GameEventType<GameEventArgs.EntityInteractEvent> eventType, GameEventPriority priority, EntityInteractEvent e) {
+        GameEventArgs.EntityInteractEvent entityExplodeEvent = new GameEventArgs.EntityInteractEvent();
+        entityExplodeEvent.entity = e.getEntity();
+        entityExplodeEvent.block = e.getBlock();
         return eventType.createEvent(entityExplodeEvent);
     }
 
@@ -865,7 +871,7 @@ public class BukkitEventsListener implements Listener {
         return itemStack;
     }
 
-    private interface GameEventCreator<Args extends IEventArgs, E extends Event> {
+    public interface GameEventCreator<Args extends IEventArgs, E extends Event> {
 
         @Nullable
         GameEvent<Args> execute(GameEventType<Args> eventType, GameEventPriority priority, E e);
@@ -890,19 +896,6 @@ public class BukkitEventsListener implements Listener {
             spongeAbsorbEvent.block = e.getBlock();
             spongeAbsorbEvent.blocks = e.getBlocks();
             return eventType.createEvent(spongeAbsorbEvent);
-        }
-    }
-
-    private static class BlockDestroyEventFunction implements GameEventCreator<GameEventArgs.BlockDestroyEvent, com.destroystokyo.paper.event.block.BlockDestroyEvent> {
-
-        @Override
-        public GameEvent<GameEventArgs.BlockDestroyEvent> execute(GameEventType<GameEventArgs.BlockDestroyEvent> eventType, GameEventPriority priority, com.destroystokyo.paper.event.block.BlockDestroyEvent e) {
-            if (e.getNewState().getMaterial() != Material.AIR)
-                return null;
-
-            GameEventArgs.BlockDestroyEvent blockDestroyEvent = new GameEventArgs.BlockDestroyEvent();
-            blockDestroyEvent.block = e.getBlock();
-            return eventType.createEvent(blockDestroyEvent);
         }
     }
 

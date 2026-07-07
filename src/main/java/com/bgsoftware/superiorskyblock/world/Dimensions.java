@@ -1,43 +1,34 @@
 package com.bgsoftware.superiorskyblock.world;
 
-import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import org.bukkit.World;
 
-import java.util.Objects;
+import java.util.EnumMap;
 
 public class Dimensions {
 
-    public static final Dimension NORMAL = register("NORMAL", World.Environment.NORMAL);
-    public static final Dimension NETHER = register("NETHER", World.Environment.NETHER);
-    public static final Dimension THE_END = register("THE_END", World.Environment.THE_END);
+    private static final EnumMap<World.Environment, Dimension> ENVIRONMENT_TO_DIMENSION = new EnumMap<>(World.Environment.class);
 
-    public static void registerDimensions() {
-        // Do nothing, only trigger all the register calls
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, Dimensions::onSettingsUpdate);
+    }
+
+    private static void onSettingsUpdate() {
+        ENVIRONMENT_TO_DIMENSION.clear();
+
+        for (Dimension dimension : Dimension.values()) {
+            Dimension currentDimension = ENVIRONMENT_TO_DIMENSION.get(dimension.getEnvironment());
+            if (currentDimension == null || dimension.ordinal() < currentDimension.ordinal())
+                ENVIRONMENT_TO_DIMENSION.put(dimension.getEnvironment(), dimension);
+        }
     }
 
     @Nullable
-    public static Dimension fromEnvironment(@Nullable World.Environment environment) {
-        if (environment == null)
-            return null;
-
-        switch (environment) {
-            case NORMAL:
-                return NORMAL;
-            case NETHER:
-                return NETHER;
-            case THE_END:
-                return THE_END;
-        }
-
-        return Dimension.getByName(environment.name());
-    }
-
-    @NotNull
-    private static Dimension register(String name, World.Environment environment) {
-        Dimension.register(name, environment);
-        return Objects.requireNonNull(Dimension.getByName(name));
+    public static Dimension fromEnvironment(World.Environment environment) {
+        return ENVIRONMENT_TO_DIMENSION.get(environment);
     }
 
     private Dimensions() {

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.io.ClassProcessor;
+import com.bgsoftware.superiorskyblock.listener.BukkitEventsListener;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -11,6 +12,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Minecart;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -66,6 +68,8 @@ public interface NMSAlgorithms {
 
     void setTrim(ItemMeta itemMeta, String trimMaterial, String trimPattern) throws IllegalArgumentException;
 
+    void setHideTooltip(ItemMeta itemMeta);
+
     void addPotion(PotionMeta potionMeta, PotionEffect potionEffect);
 
     String getMinecraftKey(ItemStack itemStack);
@@ -81,6 +85,8 @@ public interface NMSAlgorithms {
 
     int getDataVersion();
 
+    Biome getBiome(String biomeName);
+
     default ClassProcessor getClassProcessor() {
         return null;
     }
@@ -95,6 +101,14 @@ public interface NMSAlgorithms {
 
     default EnumBridge<Biome> getBiomeBridge() {
         return BIOME_ENUM_BRIDGE;
+    }
+
+    default BukkitEventsListener.GameEventCreator getGenericGameCreator() {
+        throw new UnsupportedOperationException("Not supported in this version");
+    }
+
+    default boolean isSoftExplosion(EntityExplodeEvent e) {
+        return false;
     }
 
     interface EnumBridge<T> {

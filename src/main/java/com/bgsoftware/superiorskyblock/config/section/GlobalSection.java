@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
@@ -33,6 +34,10 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public int getIslandHeight() {
         return getContainer().islandsHeight;
+    }
+
+    public int getSeaLevelHeight() {
+        return getContainer().seaLevelHeight;
     }
 
     public boolean isWorldBorders() {
@@ -79,7 +84,7 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().signWarp;
     }
 
-    public List<String> getInteractables() {
+    public SettingsManager.Interactables getInteractablesMap() {
         return getContainer().interactables;
     }
 
@@ -411,11 +416,19 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().commandsPerPage;
     }
 
+    public boolean isHelpOnInvalidCommand() {
+        return getContainer().helpOnInvalidCommand;
+    }
+
+    public boolean isHelpOnNoPermission() {
+        return getContainer().helpOnNoPermission;
+    }
+
     public boolean isCacheSchematics() {
         return getContainer().cacheSchematics;
     }
 
-    public Map<String, KeySet> getEntityCategories() {
+    public SettingsManager.EntityCategories getEntityCategoriesMap() {
         return getContainer().entityCategories;
     }
 

@@ -1,12 +1,13 @@
 package com.bgsoftware.superiorskyblock.player.inventory;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
-import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.player.OfflinePlayerData;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
-import com.bgsoftware.superiorskyblock.world.EntityTeleports;
-import org.bukkit.Location;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -82,7 +83,12 @@ public class ClearActions {
         // Do nothing, only trigger all the register calls
     }
 
-    public static void runClearActions(OfflinePlayer offlinePlayer, boolean teleportToSpawn, Collection<ClearAction> clearActions) {
+    public static void runClearActions(SuperiorPlayer superiorPlayer, Collection<ClearAction> clearActions,
+                                       @Nullable Island islandToTeleport) {
+        if (clearActions.isEmpty() && islandToTeleport == null)
+            return;
+
+        OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
         OfflinePlayerData offlinePlayerData;
         Player onlinePlayer;
 
@@ -97,13 +103,13 @@ public class ClearActions {
         try {
             clearActions.forEach(clearAction -> clearAction.doClear(onlinePlayer));
 
-            Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter(Dimensions.NORMAL);
             if (offlinePlayerData != null) {
-                if (teleportToSpawn)
-                    offlinePlayerData.setLocation(spawnLocation);
+                WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(islandToTeleport, plugin.getSettings().getWorlds().getDefaultWorldDimension());
+                if (islandToTeleport != null && worldInfo != null && Bukkit.getWorld(worldInfo.getName()) != null)
+                    offlinePlayerData.setLocation(islandToTeleport.getCenter(worldInfo.getDimension()));
                 offlinePlayerData.applyChanges();
-            } else if (teleportToSpawn) {
-                EntityTeleports.teleport(onlinePlayer, spawnLocation);
+            } else if (islandToTeleport != null) {
+                superiorPlayer.teleport(islandToTeleport);
             }
         } finally {
             if (offlinePlayerData != null)

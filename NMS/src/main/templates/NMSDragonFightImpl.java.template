@@ -5,17 +5,18 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
-import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.EndWorldEndDragonFightHandler;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.EndDragonFightWrapper;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.IslandEndDragonFight;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.IslandEntityEnderDragon;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.SpikesCache;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import com.google.common.cache.LoadingCache;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
-import net.minecraft.world.level.dimension.end.EndDragonFight;
-import net.minecraft.world.level.levelgen.feature.SpikeFeature;
+import net.minecraft.world.level.dimension.end.${END_DRAGON_FIGHT_CLASS};
+import net.minecraft.world.level.levelgen.feature.${SPIKE_FEATURE_CLASS};
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -33,23 +34,23 @@ public class NMSDragonFightImpl implements NMSDragonFight {
             EntityType.class, EntityType.EntityFactory.class, Modifier.PRIVATE | Modifier.FINAL, 1)
             .removeFinal();
 
-    private static final ReflectField<EndDragonFight> WORLD_DRAGON_BATTLE = new ReflectField<>(
-            ServerLevel.class, EndDragonFight.class, Modifier.PRIVATE, 1);
+    private static final ReflectField<${END_DRAGON_FIGHT_CLASS}> WORLD_DRAGON_BATTLE = new ReflectField<>(
+            ServerLevel.class, ${END_DRAGON_FIGHT_CLASS}.class, Modifier.PRIVATE, 1);
 
-    private static final ReflectField<LoadingCache<Long, List<SpikeFeature.EndSpike>>> SPIKE_CACHE = new ReflectField<LoadingCache<Long, List<SpikeFeature.EndSpike>>>(
-            SpikeFeature.class, LoadingCache.class, Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL, 1)
+    private static final ReflectField<LoadingCache<Long, List<${SPIKE_FEATURE_CLASS}.EndSpike>>> SPIKE_CACHE = new ReflectField<LoadingCache<Long, List<${SPIKE_FEATURE_CLASS}.EndSpike>>>(
+            ${SPIKE_FEATURE_CLASS}.class, LoadingCache.class, Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL, 1)
             .removeFinal();
 
     private static boolean firstWorldPreparation = true;
 
     static {
-        ENTITY_TYPES_BUILDER.set(EntityType.ENDER_DRAGON, (EntityType.EntityFactory<EnderDragon>) IslandEntityEnderDragon::fromEntityTypes);
+        ENTITY_TYPES_BUILDER.set(${ENTITY_TYPE_VALUES_CLASS}.ENDER_DRAGON, (EntityType.EntityFactory<EnderDragon>) IslandEntityEnderDragon::fromEntityTypes);
     }
 
     @Override
     public void prepareEndWorld(World bukkitWorld) {
         ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
-        WORLD_DRAGON_BATTLE.set(serverLevel, new EndWorldEndDragonFightHandler(serverLevel));
+        WORLD_DRAGON_BATTLE.set(serverLevel, new EndDragonFightWrapper(serverLevel, BlockPos.ZERO));
 
         if (firstWorldPreparation) {
             firstWorldPreparation = false;
@@ -67,10 +68,10 @@ public class NMSDragonFightImpl implements NMSDragonFight {
 
         ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
 
-        if (!(NMSUtilsVersioned.getEndDragonFight(serverLevel) instanceof EndWorldEndDragonFightHandler dragonFightHandler))
+        if (!(NMSUtilsVersioned.getEndDragonFight(serverLevel) instanceof EndDragonFightWrapper dragonFight))
             return null;
 
-        IslandEndDragonFight enderDragonBattle = dragonFightHandler.getDragonFight(island.getCache());
+        IslandEndDragonFight enderDragonBattle = dragonFight.HANDLER.getDragonFight(island.getCache());
         return enderDragonBattle == null ? null : enderDragonBattle.getEnderDragon().getBukkitEntity();
     }
 
@@ -83,10 +84,10 @@ public class NMSDragonFightImpl implements NMSDragonFight {
 
         ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
 
-        if (!(NMSUtilsVersioned.getEndDragonFight(serverLevel) instanceof EndWorldEndDragonFightHandler dragonFightHandler))
+        if (!(NMSUtilsVersioned.getEndDragonFight(serverLevel) instanceof EndDragonFightWrapper dragonFight))
             return;
 
-        dragonFightHandler.addDragonFight(island.getCache(), new IslandEndDragonFight(island, serverLevel, location));
+        dragonFight.HANDLER.addDragonFight(island.getCache(), new IslandEndDragonFight(island, serverLevel, location));
     }
 
     @Override
@@ -98,10 +99,10 @@ public class NMSDragonFightImpl implements NMSDragonFight {
 
         ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
 
-        if (!(NMSUtilsVersioned.getEndDragonFight(serverLevel) instanceof EndWorldEndDragonFightHandler dragonFightHandler))
+        if (!(NMSUtilsVersioned.getEndDragonFight(serverLevel) instanceof EndDragonFightWrapper dragonFight))
             return;
 
-        EndDragonFight endDragonFight = dragonFightHandler.removeDragonFight(island.getCache());
+        ${END_DRAGON_FIGHT_CLASS} endDragonFight = dragonFight.HANDLER.removeDragonFight(island.getCache());
 
         if (endDragonFight instanceof IslandEndDragonFight islandEndDragonFight) {
             islandEndDragonFight.removeBattlePlayers();

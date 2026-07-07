@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -28,7 +29,10 @@ public class CmdBank implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "bank [logs]";
+        if (BuiltinModules.BANK.getConfiguration().isBankLogs())
+            return "bank [logs]";
+        else
+            return "bank";
     }
 
     @Override
@@ -43,7 +47,7 @@ public class CmdBank implements ISuperiorCommand {
 
     @Override
     public int getMaxArgs() {
-        return 2;
+        return BuiltinModules.BANK.getConfiguration().isBankLogs() ? 2 : 1;
     }
 
     @Override
@@ -62,7 +66,8 @@ public class CmdBank implements ISuperiorCommand {
 
         SuperiorPlayer superiorPlayer = arguments.getSuperiorPlayer();
 
-        if (args.length == 2 && args[1].equalsIgnoreCase("logs")) {
+        if (args.length == 2 && args[1].equalsIgnoreCase("logs") &&
+                BuiltinModules.BANK.getConfiguration().isBankLogs()) {
             plugin.getMenus().openBankLogs(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
         } else {
             plugin.getMenus().openIslandBank(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island);
@@ -71,7 +76,8 @@ public class CmdBank implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length != 2 ? Collections.emptyList() : CommandTabCompletes.getCustomComplete(args[1], "logs");
+        return args.length != 2 || !BuiltinModules.BANK.getConfiguration().isBankLogs()
+                ? Collections.emptyList() : CommandTabCompletes.getCustomComplete(args[1], "logs");
     }
 
 }

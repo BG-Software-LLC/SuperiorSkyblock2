@@ -18,7 +18,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacket;
 import net.minecraft.network.protocol.game.ClientboundLightUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
@@ -78,7 +77,6 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.Abs
                 Arrays.fill(biomes, biome);
                 levelChunk.setUnsaved(true);
 
-                ClientboundForgetLevelChunkPacket forgetLevelChunkPacket = new ClientboundForgetLevelChunkPacket(chunkPos.x, chunkPos.z);
                 //noinspection deprecation
                 ClientboundLevelChunkPacket levelChunkPacket = new ClientboundLevelChunkPacket(levelChunk);
                 ClientboundLightUpdatePacket lightUpdatePacket = new ClientboundLightUpdatePacket(chunkPos,
@@ -86,7 +84,6 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.Abs
 
                 playersToUpdate.forEach(player -> {
                     ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-                    serverPlayer.connection.send(forgetLevelChunkPacket);
                     serverPlayer.connection.send(lightUpdatePacket);
                     serverPlayer.connection.send(levelChunkPacket);
                 });
@@ -218,9 +215,10 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.Abs
                     byte yPosition = sectionCompound.getByte("Y");
                     if (sectionCompound.contains("Palette", 9) && sectionCompound.contains("BlockStates", 12)) {
                         //noinspection deprecation
-                        levelChunkSections[i] = new LevelChunkSection(yPosition);
-                        levelChunkSections[i].getStates().read(sectionCompound.getList("Palette", 10),
+                        LevelChunkSection levelChunkSection = levelChunkSections[i] = new LevelChunkSection(yPosition);
+                        levelChunkSection.getStates().read(sectionCompound.getList("Palette", 10),
                                 sectionCompound.getLongArray("BlockStates"));
+                        levelChunkSection.recalcBlockCounts();
                     }
                 }
 

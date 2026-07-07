@@ -18,17 +18,12 @@ import org.bukkit.inventory.ItemStack;
 
 public class SpawnersProvider_CandcSilkSpawners implements SpawnersProvider_AutoDetect {
 
-    private static boolean registered = false;
-
     private final SuperiorSkyblockPlugin plugin;
 
     public SpawnersProvider_CandcSilkSpawners(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
-            registered = true;
-            Log.info("Using SilkSpawners as a spawners provider.");
-        }
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
+        Log.info("Using SilkSpawners as a spawners provider.");
     }
 
     @Override

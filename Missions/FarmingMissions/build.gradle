@@ -1,0 +1,9 @@
+group 'Missions:FarmingMissions'
+
+dependencies {
+    compileOnly "org.spigotmc:v1_16_R3:latest"
+}
+
+shadowJar {
+    relocate 'com.bgsoftware.superiorskyblock.missions.common', 'com.bgsoftware.superiorskyblock.missions.farming'
+}

@@ -5,7 +5,7 @@ dependencies {
     compileOnly project(":NMS:Spigot")
     compileOnly project(":NMS:Paper")
     compileOnly project(":API")
-    compileOnly rootProject
+    compileOnly project(":")
 }
 
 if (project.hasProperty('nms.compile_v1_16') && !Boolean.valueOf(project.findProperty("nms.compile_v1_16").toString())) {
