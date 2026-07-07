@@ -221,6 +221,12 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder setHideTooltip() {
+        if (itemMeta != null)
+            plugin.getNMSAlgorithms().setHideTooltip(itemMeta);
+        return this;
+    }
+
     public ItemBuilder withPotionEffect(PotionEffect potionEffect) {
         if (itemMeta instanceof PotionMeta)
             plugin.getNMSAlgorithms().addPotion((PotionMeta) itemMeta, potionEffect);

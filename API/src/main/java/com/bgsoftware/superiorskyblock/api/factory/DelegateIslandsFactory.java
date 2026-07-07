@@ -57,4 +57,14 @@ public class DelegateIslandsFactory implements IslandsFactory {
         return this.handle.createPersistentDataContainer(island, original);
     }
 
+    @Override
+    public int hashCode() {
+        return this.handle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.handle.equals(o);
+    }
+
 }

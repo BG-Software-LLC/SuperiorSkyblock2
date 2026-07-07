@@ -120,12 +120,18 @@ public class CommandArguments {
             return IslandArgument.EMPTY;
         }
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
+        SuperiorPlayer superiorPlayer;
         Island island;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Island locationIsland = plugin.getGrid().getIslandAt(((Player) sender).getLocation(wrapper.getHandle()));
-            island = locationIsland == null || locationIsland.isSpawn() ? superiorPlayer.getIsland() : locationIsland;
+            if (locationIsland == null || locationIsland.isSpawn()) {
+                superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+                island = superiorPlayer.getIsland();
+            } else {
+                island = locationIsland;
+                superiorPlayer = island.getOwner();
+            }
         }
 
         if (island == null)

@@ -13,8 +13,9 @@ public class EndDragonFightWrapper extends EnderDragonFight {
 
     public final EndWorldEndDragonFightHandler HANDLER = new EndWorldEndDragonFightHandler();
 
-    public EndDragonFightWrapper(ServerLevel serverLevel) {
+    public EndDragonFightWrapper(ServerLevel serverLevel, BlockPos islandPos) {
         super(true, false, false, Optional.empty(), 0, Optional.empty(), Optional.empty(), new ObjectArrayList(), List.of());
+        init(serverLevel, serverLevel.getSeed(), islandPos);
     }
 
     @Override

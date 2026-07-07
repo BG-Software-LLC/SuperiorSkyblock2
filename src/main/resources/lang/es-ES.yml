@@ -30,7 +30,7 @@ BANK_WITHDRAW_CUSTOM: '&e&lBanco | &7Escriba la cantidad que desea retirar:'
 BANK_WITHDRAW_COMPLETED: 'Retiro completado'
 BANNED_FROM_ISLAND: '&c&lError | &7Estás prohibido en esta isla.'
 BLOCK_COUNT_CHECK: '&e&lIsla | &7Esta isla tiene x{0} {1}.'
-BLOCK_COUNTS_CHECK: |
+BLOCK_COUNTS_CHECK: |-
   &e&lIsla | &7Esta isla tiene los siguientes bloques:
   &7{0}
 BLOCK_COUNTS_CHECK_EMPTY: '&e&lIsla | &7Esta isla no tiene bloques comprobados.'
@@ -365,8 +365,11 @@ GLOBAL_TITLE_SENT_NAME: '&e&lIsland | &7Successfully sent to the island members 
 GOT_BANNED: '&e&lIsla | &7Fuiste PROHIBIDO de la isla de {0}.'
 GOT_DEMOTED: '&e&lIsla | &7Fuiste degradado a {0} en tu isla.'
 GOT_EXPELLED: '&e&lIsla | &7&o{0} te expulsó de la isla.'
-GOT_INVITE: '&e&lIsla | &7{0} te invitó a su isla.'
-GOT_INVITE_TOOLTIP: '&7Haga click en el mensaje para aceptar la invitación.'
+GOT_INVITE:
+  0:
+    text: '&e&lIsla | &7{0} te invitó a su isla.'
+    tooltip: '&7Haga click en el mensaje para aceptar la invitación.'
+    command: '/is accept {0}'
 GOT_KICKED: '&e&lIsla | &7{0} te echó de tu isla.'
 GOT_PROMOTED: '&e&lIsla | &7Te ascendieron a {0} en tu isla.'
 GOT_REVOKED: '&e&lIsla | &7{0} revocó su invitación a su isla.'
@@ -389,7 +392,7 @@ INVALID_ISLAND: '&c&lError | &7No tienes una isla.'
 INVALID_ISLAND_LOCATION: '&c&lError | &7No hay ninguna isla en tu ubicación.'
 INVALID_ISLAND_OTHER: '&c&lError | &7{0} no tiene una isla.'
 INVALID_ISLAND_OTHER_NAME: '&c&lError | &7No hay ninguna isla con el nombre {0}.'
-INVALID_ISLAND_PERMISSION: |
+INVALID_ISLAND_PERMISSION: |-
   &c&lError | &7No se pudo encontrar el permiso de la isla {0}.
   &c&lError | &7Permisos de la isla: {1}
 INVALID_LEVEL: '&c&lError | &7Nivel {0} no válido.'
@@ -404,22 +407,22 @@ INVALID_MULTIPLIER: '&c&lError | &7Multiplicador no válido {0}.'
 INVALID_PAGE: '&c&lError | &7Página no válida {0}.'
 INVALID_PERCENTAGE: '&c&lError | &7El porcentaje debe estar entre 0 y 100.'
 INVALID_PLAYER: '&c&lError | &7No se puede encontrar un jugador llamado {0}'
-INVALID_RATE: |
+INVALID_RATE: |-
   &c&lError | &7No pudimos encontrar un rating {0}.
   &c&lError | &7Rating de la isla: {1}
 INVALID_ROWS: '&c&lError | &7Cantidad de filas no válida: {0}'
-INVALID_ROLE: |
+INVALID_ROLE: |-
   &c&lError | &7No se pudo encontrar el rol {0}.
   &c&lError | &7Roles de la isla: {1}
 INVALID_SCHEMATIC: '&c&lError | &7No se pudo encontrar una esquematica/schematic con el nombre {0}.'
-INVALID_SETTINGS: |
+INVALID_SETTINGS: |-
   &c&lError | &7No se pudo encontrar la configuración de la isla {0}.
   &c&lError | &7Configuración de la isla: {1}
 INVALID_SIZE: '&c&lError | &7Tamaño no válido {0}.'
 INVALID_SLOT: '&c&lError | &7Invalid slot {0}.'
 INVALID_TITLE: '&c&lError | &7Invalid title entered.'
 INVALID_TOGGLE_MODE: '&c&lError | &7No se puede alternar {0}.'
-INVALID_UPGRADE: |
+INVALID_UPGRADE: |-
   &c&lError | &7No se pudo encontrar una mejora llamada {0}.
   &c&lError | &7Mejoras: {1}
 INVALID_VISIT_LOCATION: '&c&lError | &7Esta isla no tiene ubicación para visitantes.'
@@ -450,33 +453,33 @@ ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Lista de comandos [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSkyblock &7Usa /is help {0} para la siguiente pagina.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lIsla | &7Límite bancario: {0}'
-ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
+ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |-
   &e&lIsla | &7Límites de bloques:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lIsla | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_COOP_LIMIT: '&e&lIsla | &7Límite de juegadores coop: {0}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lIsla | &7Multiplicador de cultivos: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lIsla | &7Multiplicador de drops: {0}'
-ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |
+ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |-
   &e&lIsla | &7Efectos de la isla:
   {0}
 ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE: '&e&lIsla | &7  {0}: {1}'
-ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |-
   &e&lIsla | &7Límites de entidades:
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lIsla | &7  {0}: {1}'
-ISLAND_INFO_ADMIN_GENERATOR_RATES: |
+ISLAND_INFO_ADMIN_GENERATOR_RATES: |-
   &e&lIsla | &7Tasas de generación ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lIsla | &7  {0}: {1}% ({2})'
-ISLAND_INFO_ADMIN_ROLE_LIMITS: |
+ISLAND_INFO_ADMIN_ROLE_LIMITS: |-
   &e&lIsland | &7Role Limits:
   {0}
 ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_SIZE: '&e&lIsla | &7Tamaño del borde: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lIsla | &7Multiplicador de Spawners: {0}'
 ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lIsla | &7Límite de equipo: {0}'
-ISLAND_INFO_ADMIN_UPGRADES: |
+ISLAND_INFO_ADMIN_UPGRADES: |-
   &e&lIsla | &7Mejoras:
   {0}
 ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lIsla | &7  {0}: {1}'
@@ -505,7 +508,7 @@ ISLAND_INFO_RATE_TWO_COLOR: '&6'
 ISLAND_INFO_RATE_THREE_COLOR: '&e'
 ISLAND_INFO_RATE_FOUR_COLOR: '&a'
 ISLAND_INFO_RATE_FIVE_COLOR: '&2'
-ISLAND_INFO_ROLES: |
+ISLAND_INFO_ROLES: |-
   &e&lIsla | &7{0}s:
   {1}
 ISLAND_INFO_VISITORS_COUNT: '&e&lIsla | &7Número de visitantes: {0} ({1} unique visitors)'
@@ -519,7 +522,7 @@ ISLAND_PREVIEW_CANCEL: '&e&lVista Previa | &7Cancelaste el modo de vista previa.
 ISLAND_PREVIEW_CONFIRM_TEXT: 'CONFIRM'
 ISLAND_PREVIEW_CANCEL_TEXT: 'CANCELAR'
 ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
-ISLAND_PREVIEW_START: |
+ISLAND_PREVIEW_START: |-
   &e&lVista Previa | &7Ha iniciado el modo de vista previa de la esquematica/schematic {0}...
   &e&lVista Previa | &7Type &a&lCONFIRM &7para crear una nueva isla, o &c&lCANCELAR &7para cancelar el modo de vista previa.
   &e&lVista Previa | &7No puede salir del área de la isla, de lo contrario el modo de vista previa se cancelará automáticamente.
@@ -574,7 +577,7 @@ MISSION_STATUS_COMPLETE_ALL: '&e&lMisiones | &7Se cambió el estado de todas las
 MISSION_STATUS_RESET: '&e&lMisiones | &7Se restablecio el estado de la misión {0} para {1}.'
 MISSION_STATUS_RESET_ALL: '&e&lMisiones | &7Se restableció el estado de todas misiones para {0}.'
 MODULE_ALREADY_INITIALIZED: '&e&lModule | &7This module is already loaded.'
-MODULE_INFO: |
+MODULE_INFO: |-
   &e&lModule | &7{0} by {1}
   &e&lModule | &7&m--------------------
   &e&lModule | &7{2}
@@ -698,7 +701,7 @@ SCHEMATIC_LEFT_SELECT: '&e&lSchematics | &7Posición seleccionada #2 ({0})'
 SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
 SCHEMATIC_NOT_READY: '&c&lError | &7No ha seleccionado dos posiciones.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lSchematics | &7Procesando su solicitud...'
-SCHEMATIC_READY_TO_CREATE: |
+SCHEMATIC_READY_TO_CREATE: |-
   &e&lSchematics | &7Ha seleccionado dos posiciones. Ejecute /is admin schematic <nombre> para crear una nueva Schematic/Esquematica.
   &e&lSchematics | &7Asegúrese de estar parado en la ubicación de teletransportación al ejecutar el comando.
 SCHEMATIC_RIGHT_SELECT: '&e&lSchematics | &7Posición seleccionada #1 ({0})'
@@ -778,7 +781,7 @@ UPGRADE_COOLDOWN_FORMAT: '&c&lError | &7You may only upgrade again in {0}.'
 VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lError | &7No puedes usar ese comando en otras islas.'
 WARP_ALREADY_EXIST: '&c&lError | &7Ya existe un warp con este nombre.'
-WARP_CATEGORY_ICON_NEW_LORE: |
+WARP_CATEGORY_ICON_NEW_LORE: |-
   &e&lWarps | &7Enter a new lore (Type "-cancel" to cancel):
   &e&lWarps | &7You can separate lines by using "\n".
 WARP_CATEGORY_ICON_NEW_NAME: '&e&lWarps | &7Enter a name (Type "-cancel" to cancel):'
@@ -792,7 +795,7 @@ WARP_CATEGORY_SLOT_SUCCESS: '&e&lWarps | &7Successfully changed the category''s 
 WARP_CATEGORY_RENAME: '&e&lWarps | &7Enter a new name (Type "-cancel" to cancel):'
 WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lError | &7This name is already taken by another category.'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lWarps | &7Successfully renamed the category to {0}.'
-WARP_ICON_NEW_LORE: |
+WARP_ICON_NEW_LORE: |-
   &e&lWarps | &7Enter a new lore (Type "-cancel" to cancel):
   &e&lWarps | &7You can separate lines by using "\n".
 WARP_ICON_NEW_NAME: '&e&lWarps | &7Enter a name (Type "-cancel" to cancel):'

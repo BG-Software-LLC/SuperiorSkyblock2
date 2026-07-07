@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
@@ -80,10 +81,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern ROLE_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_role_limit_(.+)");
     private static final Pattern UPGRADE_PLACEHOLDER_PATTERN = Pattern.compile("island_upgrade_(.+)");
     private static final Pattern TOP_PLACEHOLDER_PATTERN = Pattern.compile("island_top_(.+)");
-    private static final Pattern TOP_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("worth_(.+)");
-    private static final Pattern TOP_LEVEL_PLACEHOLDER_PATTERN = Pattern.compile("level_(.+)");
-    private static final Pattern TOP_RATING_PLACEHOLDER_PATTERN = Pattern.compile("rating_(.+)");
-    private static final Pattern TOP_PLAYERS_PLACEHOLDER_PATTERN = Pattern.compile("players_(.+)");
+    private static final Pattern TOP_TYPE_PLACEHOLDER_PATTERN = Pattern.compile("(.+?)_(.+)");
     private static final Pattern TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN = Pattern.compile("value_format_(.+)");
     private static final Pattern TOP_VALUE_RAW_PLACEHOLDER_PATTERN = Pattern.compile("value_raw_(.+)");
     private static final Pattern TOP_VALUE_PLACEHOLDER_PATTERN = Pattern.compile("value_(.+)");
@@ -404,15 +402,21 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.getWorth().toBigInteger().toString())
                     .put("worth_raw", (island, superiorPlayer) ->
                             island.getWorth().toString())
-                    // Renamed Island Placeholders
-                    .put("hoppers_limit", (island, superiorPlayer) ->
-                            island.getBlockLimit(ConstantKeys.HOPPER) + "")
-                    .put("x", (island, superiorPlayer) ->
-                            island.getCenterPosition().getX() + "")
-                    .put("y", (island, superiorPlayer) ->
-                            island.getCenterPosition().getY() + "")
-                    .put("z", (island, superiorPlayer) ->
-                            island.getCenterPosition().getZ() + "")
+                    // Deprecated Island Placeholders
+                    .put("end_unlocked", legacyPlaceholder("superior_island_end_unlocked", "superior_island_world_unlocked_the_end", (island, superiorPlayer) ->
+                            Formatters.BOOLEAN_FORMATTER.format(island.isEndEnabled(), superiorPlayer.getUserLocale())))
+                    .put("nether_unlocked", legacyPlaceholder("superior_island_nether_unlocked", "superior_island_world_unlocked_nether", (island, superiorPlayer) ->
+                            Formatters.BOOLEAN_FORMATTER.format(island.isNetherEnabled(), superiorPlayer.getUserLocale())))
+                    .put("normal_unlocked", legacyPlaceholder("superior_island_normal_unlocked", "superior_island_world_unlocked_normal", (island, superiorPlayer) ->
+                            Formatters.BOOLEAN_FORMATTER.format(island.isNormalEnabled(), superiorPlayer.getUserLocale())))
+                    .put("hoppers_limit", legacyPlaceholder("superior_island_hoppers_limit", "superior_island_block_limit_hopper", (island, superiorPlayer) ->
+                            island.getBlockLimit(ConstantKeys.HOPPER) + ""))
+                    .put("x", legacyPlaceholder("superior_island_x", "superior_island_center_x", (island, superiorPlayer) ->
+                            island.getCenterPosition().getX() + ""))
+                    .put("y", legacyPlaceholder("superior_island_y", "superior_island_center_y", (island, superiorPlayer) ->
+                            island.getCenterPosition().getY() + ""))
+                    .put("z", legacyPlaceholder("superior_island_z", "superior_island_center_z", (island, superiorPlayer) ->
+                            island.getCenterPosition().getZ() + ""))
                     // Global Placeholders
                     .put("total_count", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(plugin.getGrid().getIslands().size()))
@@ -826,26 +830,15 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static Optional<String> handleTopIslandsPlaceholder(@Nullable Island island,
                                                                 @Nullable SuperiorPlayer superiorPlayer,
                                                                 String subPlaceholder) {
-        Matcher matcher;
-        SortingType sortingType;
+        Matcher matcher = TOP_TYPE_PLACEHOLDER_PATTERN.matcher(subPlaceholder);
+        if (!matcher.matches())
+            return Optional.empty();
 
-        if ((matcher = TOP_WORTH_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-            sortingType = SortingTypes.BY_WORTH;
-        } else if ((matcher = TOP_LEVEL_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-            sortingType = SortingTypes.BY_LEVEL;
-        } else if ((matcher = TOP_RATING_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-            sortingType = SortingTypes.BY_RATING;
-        } else if ((matcher = TOP_PLAYERS_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-            sortingType = SortingTypes.BY_PLAYERS;
-        } else {
-            String sortingTypeName = subPlaceholder.split("_")[0];
-            sortingType = SortingType.getByName(sortingTypeName);
-        }
-
+        SortingType sortingType = SortingType.getByName(matcher.group(1).toUpperCase(Locale.ENGLISH));
         if (sortingType == null)
             return Optional.empty();
 
-        String placeholderValue = matcher.group(1);
+        String placeholderValue = matcher.group(2);
 
         if (placeholderValue.equals("position"))
             return island == null ? Optional.empty() : Optional.of((plugin.getGrid().getIslandPosition(island, sortingType) + 1) + "");
@@ -893,6 +886,35 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
 
     private static Dimension getDefaultWorldDimension() {
         return plugin.getSettings().getWorlds().getDefaultWorldDimension();
+    }
+
+    private static IslandPlaceholderParser legacyPlaceholder(String placeholder, String correctPlaceholder, IslandPlaceholderParser placeholderParser) {
+        return new LegacyIslandPlaceholderParser(placeholder, correctPlaceholder, placeholderParser);
+    }
+
+    private static class LegacyIslandPlaceholderParser implements IslandPlaceholderParser {
+
+        private final String placeholder;
+        private final String correctPlaceholder;
+        private final IslandPlaceholderParser originalPlaceholderParser;
+        private boolean promptDeprecated = true;
+
+        LegacyIslandPlaceholderParser(String placeholder, String correctPlaceholder, IslandPlaceholderParser originalPlaceholderParser) {
+            this.placeholder = placeholder;
+            this.correctPlaceholder = correctPlaceholder;
+            this.originalPlaceholderParser = originalPlaceholderParser;
+        }
+
+        @Override
+        public String apply(Island island, SuperiorPlayer superiorPlayer) {
+            if (this.promptDeprecated) {
+                this.promptDeprecated = false;
+                Log.error(new Throwable(), "Deprecated placeholder was used: " + this.placeholder + ". Use this one instead: " + this.correctPlaceholder);
+            }
+
+            return this.originalPlaceholderParser.apply(island, superiorPlayer);
+        }
+
     }
 
 }

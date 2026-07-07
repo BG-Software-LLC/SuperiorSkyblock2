@@ -472,8 +472,11 @@ GLOBAL_TITLE_SENT_NAME: '&e&lInsel | &7Der Titel wurde erfolgreich an die Inselm
 GOT_BANNED: '&e&lInsel | &7Du wurdest von {0}´s Insel GEBANNT.'
 GOT_DEMOTED: '&e&lIsland | &7Du wurdest auf dieser Insel zu einem {0} degradiert.'
 GOT_EXPELLED: '&e&lIsland | &7&oDu wurdest von {0} von der Insel vertrieben.'
-GOT_INVITE: '&e&lInsel | &7{0} hat dich auf seine Insel eingeladen.'
-GOT_INVITE_TOOLTIP: '&7Klicke auf die Nachricht, um die Einladung anzunehmen.'
+GOT_INVITE:
+  0:
+    text: '&e&lInsel | &7{0} hat dich auf seine Insel eingeladen.'
+    tooltip: '&7Klicke auf die Nachricht, um die Einladung anzunehmen.'
+    command: '/is accept {0}'
 GOT_KICKED: '&e&lInsel | &7Du wurdest von {0} von seiner Insel geworfen.'
 GOT_PROMOTED: '&e&lInsel | &7Du wurdest auf seiner Insel zu einem {0} befördert.'
 GOT_REVOKED: '&e&lInsel | &7{0} hat deine Einladung zu dieser Insel widerrufen.'
@@ -639,7 +642,7 @@ ISLAND_PREVIEW_CANCEL: '&e&lVorschau | &7Du hast den Vorschaumodus abgebrochen.'
 ISLAND_PREVIEW_CONFIRM_TEXT: 'BESTÄTIGEN'
 ISLAND_PREVIEW_CANCEL_TEXT: 'ABBRECHEN'
 ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
-ISLAND_PREVIEW_START: |
+ISLAND_PREVIEW_START: |-
   &e&lVorschau | &7Du hast den Vorschaumodus für den Schaltplan {0} gestartet.
   &e&lVorschau | &7Gebe &a&lBESTÄTIGEN &7 ein, um eine neue Insel zu erstellen, oder &c&lABBRECHEN &7, um den Vorschaumodus abzubrechen.
   &e&lVorschau | &7Du kannst das Inselgebiet nicht verlassen, sonst wird der Vorschaumodus automatisch abgebrochen.
@@ -880,7 +883,7 @@ SCHEMATIC_LEFT_SELECT: '&e&lSchematics | &7Ausgewählte Position #2 ({0})'
 SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
 SCHEMATIC_NOT_READY: '&c&lError | &7Du hast keine zwei Stellen ausgewählt.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lSchematics | &7Deine Anfrage wird bearbeitet...'
-SCHEMATIC_READY_TO_CREATE: |
+SCHEMATIC_READY_TO_CREATE: |-
   &e&lSchematics | &7You have selected two positions. Run /is admin schematic <name> to create a new schematic.
   &e&lSchematics | &7Make sure you stand at the teleportion location when executing the command.
 SCHEMATIC_RIGHT_SELECT: '&e&lSchematics | &7Ausgewählte Position Nr. 1 ({0})'
@@ -1005,7 +1008,7 @@ WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lFehler | &7Dieser Name wird bereits von
   anderen Kategorie verwendet.'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lWarps | &7Die Kategorie wurde erfolgreich in {0}
   umbenannt.'
-WARP_ICON_NEW_LORE: |
+WARP_ICON_NEW_LORE: |-
   &e&lWarps | &7Gebe eine neue Beschreibung ein (Gebe "-cancel" ein, um abzubrechen):
   &e&lWarps | &7Du kannst Zeilen mit "\n" trennen.
 WARP_ICON_NEW_NAME: '&e&lWarps | &7Gebe einen Namen ein (gebe "-cancel" ein, um abzubrechen):'

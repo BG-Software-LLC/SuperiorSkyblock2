@@ -47,6 +47,7 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
             ${END_DRAGON_FIGHT_CLASS}.class, boolean.class, Modifier.PRIVATE, 3);
     private static final ReflectField<Boolean> WAS_DRAGON_KILLED = new ReflectField<>(
             ${END_DRAGON_FIGHT_CLASS}.class, boolean.class, Modifier.PRIVATE, 1);
+    private static final ReflectField<UUID> DRAGON_UUID = initializeDragonUUIDField();
 
     private static final ReflectField<Integer> TICKS_SINCE_LAST_PLAYER_SCAN = new ReflectField<>(
             ${END_DRAGON_FIGHT_CLASS}.class, int.class, Modifier.PRIVATE, 4);
@@ -76,7 +77,7 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
 
     public IslandEndDragonFight(Island island, ServerLevel serverLevel, BlockPos islandBlockPos,
                                 @Nullable IslandEntityEnderDragon islandEntityEnderDragon) {
-        super(serverLevel);
+        super(serverLevel, islandBlockPos);
 
         this.island = island;
         this.islandBlockPos = islandBlockPos;
@@ -203,7 +204,8 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
 
         NMSUtilsVersioned.addEntity(this.serverLevel, entityEnderDragon, CreatureSpawnEvent.SpawnReason.NATURAL);
 
-        this.dragonUUID = entityEnderDragon.getUUID();
+        DRAGON_UUID.set(this, entityEnderDragon.getUUID());
+
         this.resetSpikeCrystals();
 
         return entityEnderDragon;
@@ -221,6 +223,16 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
         }
 
         return dragonBattleField;
+    }
+
+    private static ReflectField<UUID> initializeDragonUUIDField() {
+        ReflectField<UUID> dragonUUIDField = new ReflectField<>(${END_DRAGON_FIGHT_CLASS}.class, UUID.class, Modifier.PRIVATE, 1);
+
+        if(!dragonUUIDField.isValid()) {
+            dragonUUIDField = new ReflectField<>(${END_DRAGON_FIGHT_CLASS}.class, UUID.class, Modifier.PUBLIC, 1);
+        }
+
+        return dragonUUIDField;
     }
 
 }

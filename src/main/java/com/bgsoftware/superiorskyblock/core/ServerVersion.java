@@ -22,6 +22,7 @@ public enum ServerVersion {
     v1_20(120),
     v1_21(121),
     v26_1(261),
+    v26_2(262),
 
     UNKONWN(-1);
 

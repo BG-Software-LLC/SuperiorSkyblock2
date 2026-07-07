@@ -151,6 +151,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
+    public void setHideTooltip(ItemMeta itemMeta) {
+        // Doesn't exist
+    }
+
+    @Override
     public void addPotion(PotionMeta potionMeta, PotionEffect potionEffect) {
         potionMeta.addCustomEffect(potionEffect, true);
     }

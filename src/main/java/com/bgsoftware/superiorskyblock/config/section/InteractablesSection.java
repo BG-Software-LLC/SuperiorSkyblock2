@@ -49,6 +49,10 @@ public class InteractablesSection implements SettingsManager.Interactables {
     @Nullable
     private static final Material SWEET_BERRY_BUSH = EnumHelper.getEnum(Material.class, "SWEET_BERRY_BUSH");
     @Nullable
+    private static final Material CAVE_VINES = EnumHelper.getEnum(Material.class, "CAVE_VINES");
+    @Nullable
+    private static final Material CAVE_VINES_PLANT = EnumHelper.getEnum(Material.class, "CAVE_VINES_PLANT");
+    @Nullable
     private static final Material LECTERN = EnumHelper.getEnum(Material.class, "LECTERN");
     @Nullable
     private static final Material VAULT = EnumHelper.getEnum(Material.class, "VAULT");
@@ -165,7 +169,8 @@ public class InteractablesSection implements SettingsManager.Interactables {
                     islandPrivilege = PRIVILEGE_SIGN_INTERACT.get();
                 } else if (material == Materials.SPAWNER.toBukkitType()) {
                     islandPrivilege = PRIVILEGE_SPAWNER_BREAK.get();
-                } else if (material == FARMLAND || material == ROOTED_DIRT || material == SWEET_BERRY_BUSH) {
+                } else if (material == FARMLAND || material == ROOTED_DIRT || material == SWEET_BERRY_BUSH ||
+                        material == CAVE_VINES || material == CAVE_VINES_PLANT) {
                     islandPrivilege = PRIVILEGE_FARM_TRAMPING.get();
                 } else if (material == TURTLE_EGG) {
                     islandPrivilege = PRIVILEGE_TURTLE_EGG_TRAMPING.get();
