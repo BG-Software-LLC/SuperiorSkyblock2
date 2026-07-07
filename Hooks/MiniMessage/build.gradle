@@ -2,7 +2,7 @@ group 'Hooks:MiniMessage'
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
@@ -22,3 +22,4 @@ if (project.hasProperty('hook.compile_minimessage') &&
         !Boolean.valueOf(project.findProperty("hook.compile_minimessage").toString())) {
     project.tasks.all { task -> task.enabled = false }
 }
+

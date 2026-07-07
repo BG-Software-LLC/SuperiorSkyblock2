@@ -4,8 +4,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.core.FoliaUtil;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
-import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -25,7 +23,7 @@ public class BossBarTask extends BukkitRunnable {
     private final BossBar bossBar;
     private final double progressToRemovePerTick;
     private boolean reachedEndTask = false;
-    private ScheduledTask foliaTask;
+    private Object foliaTask; // holds ScheduledTask as Object to avoid compile-time Folia dependency
 
     public static BossBarTask create(BossBar bossBar, double ticksToRun) {
         return ticksToRun <= 0 ? EMPTY_TASK : new BossBarTask(bossBar, ticksToRun);
@@ -36,8 +34,7 @@ public class BossBarTask extends BukkitRunnable {
         this.progressToRemovePerTick = this.bossBar.getProgress() / ticksToRun;
         if (progressToRemovePerTick > 0) {
             if (FoliaUtil.isFolia()) {
-                foliaTask = Bukkit.getServer().getGlobalRegionScheduler()
-                        .runAtFixedRate(plugin, t -> run(), 1L, 1L);
+                foliaTask = FoliaUtil.runGlobalTimer(plugin, t -> run(), 1L, 1L);
             } else {
                 runTaskTimer(plugin, 1L, 1L);
             }
@@ -59,7 +56,7 @@ public class BossBarTask extends BukkitRunnable {
         this.bossBar.removeAll();
         if (FoliaUtil.isFolia()) {
             if (foliaTask != null) {
-                foliaTask.cancel();
+                FoliaUtil.cancelTask(foliaTask);
                 foliaTask = null;
             }
         } else {

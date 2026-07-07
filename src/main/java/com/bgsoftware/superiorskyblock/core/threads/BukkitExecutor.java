@@ -9,8 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -22,7 +20,8 @@ public class BukkitExecutor {
     private static SuperiorSkyblockPlugin plugin;
     private static State state = State.RUNNING;
 
-    private static final AtomicLong ACTIVE_TASKS_COUNT = new AtomicLong(0);
+    private static final java.util.concurrent.atomic.AtomicLong ACTIVE_TASKS_COUNT =
+            new java.util.concurrent.atomic.AtomicLong(0);
 
     private BukkitExecutor() {
 
@@ -42,8 +41,8 @@ public class BukkitExecutor {
                 runnable.run();
                 return null;
             }
-            return new FoliaUtil.TaskAdapter(
-                    Bukkit.getServer().getGlobalRegionScheduler().run(plugin, t -> runnable.run()));
+            FoliaUtil.runGlobalSync(plugin, runnable);
+            return null;
         }
 
         if (state != State.PREPARE_SHUTDOWN && !Bukkit.isPrimaryThread()) {
@@ -64,8 +63,8 @@ public class BukkitExecutor {
                 runnable.run();
                 return null;
             }
-            return new FoliaUtil.TaskAdapter(
-                    Bukkit.getServer().getAsyncScheduler().runNow(plugin, t -> runnable.run()));
+            FoliaUtil.runAsync(plugin, runnable);
+            return null;
         }
 
         if (state != State.PREPARE_SHUTDOWN && Bukkit.isPrimaryThread()) {
@@ -91,11 +90,11 @@ public class BukkitExecutor {
 
         if (FoliaUtil.isFolia()) {
             if (delay <= 0) {
-                return new FoliaUtil.TaskAdapter(
-                        Bukkit.getServer().getGlobalRegionScheduler().run(plugin, t -> runnable.run()));
+                FoliaUtil.runGlobalSync(plugin, runnable);
+            } else {
+                FoliaUtil.runGlobalDelayed(plugin, runnable, delay);
             }
-            return new FoliaUtil.TaskAdapter(
-                    Bukkit.getServer().getGlobalRegionScheduler().runDelayed(plugin, t -> runnable.run(), delay));
+            return null;
         }
 
         return Bukkit.getScheduler().runTaskLater(plugin, runnable, delay);
@@ -111,8 +110,8 @@ public class BukkitExecutor {
         }
 
         if (FoliaUtil.isFolia()) {
-            return new FoliaUtil.TaskAdapter(
-                    Bukkit.getServer().getAsyncScheduler().runNow(plugin, t -> runnable.run()));
+            FoliaUtil.runAsync(plugin, runnable);
+            return null;
         }
 
         return Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
@@ -128,9 +127,8 @@ public class BukkitExecutor {
         }
 
         if (FoliaUtil.isFolia()) {
-            return new FoliaUtil.TaskAdapter(
-                    Bukkit.getServer().getAsyncScheduler().runDelayed(
-                            plugin, t -> runnable.run(), delay * 50L, TimeUnit.MILLISECONDS));
+            FoliaUtil.runAsyncDelayed(plugin, runnable, delay * 50L);
+            return null;
         }
 
         return Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, delay);
@@ -141,8 +139,7 @@ public class BukkitExecutor {
             return;
 
         if (FoliaUtil.isFolia()) {
-            Bukkit.getServer().getAsyncScheduler().runAtFixedRate(
-                    plugin, t -> runnable.run(), delay * 50L, delay * 50L, TimeUnit.MILLISECONDS);
+            FoliaUtil.runAsyncTimer(plugin, t -> runnable.run(), delay * 50L, delay * 50L);
         } else {
             Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, delay, delay);
         }
@@ -153,7 +150,7 @@ public class BukkitExecutor {
             return;
 
         if (FoliaUtil.isFolia()) {
-            Bukkit.getServer().getGlobalRegionScheduler().runAtFixedRate(plugin, t -> runnable.run(), delay, delay);
+            FoliaUtil.runGlobalTimer(plugin, t -> runnable.run(), delay, delay);
         } else {
             Bukkit.getScheduler().runTaskTimer(plugin, runnable, delay, delay);
         }
@@ -189,8 +186,7 @@ public class BukkitExecutor {
         state = State.SHUTDOWN;
 
         if (FoliaUtil.isFolia()) {
-            Bukkit.getServer().getGlobalRegionScheduler().cancelTasks(plugin);
-            Bukkit.getServer().getAsyncScheduler().cancelTasks(plugin);
+            FoliaUtil.cancelAllTasks(plugin);
         } else {
             Bukkit.getScheduler().cancelTasks(plugin);
         }

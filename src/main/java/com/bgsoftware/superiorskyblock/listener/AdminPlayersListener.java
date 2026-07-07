@@ -34,10 +34,9 @@ public class AdminPlayersListener extends AbstractGameEventListener {
         // Notifies me when a server uses one of my plugins.
         if (player.getUniqueId().equals(DEVELOPER_UUID)) {
             if (FoliaUtil.isFolia()) {
-                Bukkit.getServer().getGlobalRegionScheduler().runDelayed(plugin,
-                        t -> Message.CUSTOM.send(player,
-                                "&8[&fSuperiorSeries&8] &7This server is using SuperiorSkyblock2 v" +
-                                        plugin.getDescription().getVersion() + buildName, true), 5L);
+                FoliaUtil.runGlobalDelayed(plugin, () -> Message.CUSTOM.send(player,
+                        "&8[&fSuperiorSeries&8] &7This server is using SuperiorSkyblock2 v" +
+                                plugin.getDescription().getVersion() + buildName, true), 5L);
             } else {
                 Bukkit.getScheduler().runTaskLater(plugin, () -> Message.CUSTOM.send(player,
                         "&8[&fSuperiorSeries&8] &7This server is using SuperiorSkyblock2 v" +
@@ -48,8 +47,8 @@ public class AdminPlayersListener extends AbstractGameEventListener {
         // Notifies operators about new updates
         if (player.isOp() && plugin.getUpdater().isOutdated()) {
             if (FoliaUtil.isFolia()) {
-                Bukkit.getServer().getGlobalRegionScheduler().runDelayed(plugin,
-                        t -> player.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "SuperiorSkyblock2" +
+                FoliaUtil.runGlobalDelayed(plugin, () ->
+                        player.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "SuperiorSkyblock2" +
                                 ChatColor.GRAY + " A new version is available (v" +
                                 plugin.getUpdater().getLatestVersion() + ")!"), 20L);
             } else {
