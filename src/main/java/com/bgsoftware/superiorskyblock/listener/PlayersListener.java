@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.ChatFormatter;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
@@ -216,6 +217,11 @@ public class PlayersListener extends AbstractGameEventListener {
 
         // Remove all player chat-listeners
         PlayerChat.remove(player);
+
+        // Destroy current opened dialog
+        DialogWrapper<?> dialog = DialogWrapper.getByPlayer(player.getUniqueId());
+        if (dialog != null)
+            dialog.onCloseDialog();
     }
 
     private void onPlayerGameModeChange(GameEvent<GameEventArgs.PlayerGamemodeChangeEvent> e) {

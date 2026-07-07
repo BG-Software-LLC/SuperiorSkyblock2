@@ -66,7 +66,11 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
     public void closeView() {
         inventoryViewer.runIfOnline(player -> {
             previousMove = false;
-            player.closeInventory();
+            this.backedMenu.ifRight(dialog -> {
+                plugin.getNMSDialogs().get().closeDialog(inventoryViewer, dialog);
+            }).ifLeft(inventory -> {
+                player.closeInventory();
+            });
         });
     }
 

@@ -110,6 +110,7 @@ public class MenusListener extends AbstractGameEventListener {
 
     private void onDialogMenuClose(GameEvent<GameEventArgs.DialogCloseEvent> e) {
         MenuView menuView = e.getArgs().dialog.getMenuView();
+        e.getArgs().dialog.onCloseDialog();
         menuView.getMenu().onClose(menuView);
     }
 
