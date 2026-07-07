@@ -1,4 +1,5 @@
-package com.bgsoftware.superiorskyblock.nms.v26_1;
+//<generate-if:DIALOGS_SUPPORT>
+package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION};
 
 import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectField;
@@ -17,6 +18,7 @@ import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogWrapper;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.body.DialogBodyItem;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.body.DialogBodyText;
 import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
@@ -29,7 +31,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.ClientboundClearDialogPacket;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.dialog.ActionButton;
 import net.minecraft.server.dialog.CommonButtonData;
 import net.minecraft.server.dialog.CommonDialogData;
@@ -43,12 +44,11 @@ import net.minecraft.server.dialog.action.StaticAction;
 import net.minecraft.server.dialog.body.DialogBody;
 import net.minecraft.server.dialog.body.ItemBody;
 import net.minecraft.server.dialog.body.PlainMessage;
-import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.ItemStack;
 import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import ${CRAFTBUKKIT_PACKAGE}.entity.CraftPlayer;
+import ${CRAFTBUKKIT_PACKAGE}.inventory.CraftItemStack;
 import org.bukkit.event.Event;
-import org.bukkit.inventory.ItemStack;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -72,8 +72,8 @@ public class NMSDialogsImpl implements NMSDialogs {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final Identifier DIALOG_CLICK_CALLBACK_KEY =
-            Identifier.fromNamespaceAndPath("superiorskyblock", "dialog_click_callback");
+    private static final ${IDENTIFIER_CLASS} DIALOG_CLICK_CALLBACK_KEY =
+            ${IDENTIFIER_CLASS}.fromNamespaceAndPath("superiorskyblock", "dialog_click_callback");
 
     @Override
     public boolean isSupported() {
@@ -105,9 +105,9 @@ public class NMSDialogsImpl implements NMSDialogs {
 
         CommonDialogData dialogData = new CommonDialogData(
                 Component.literal(menuLayout.getTitle()),
-                Optional.empty(), // TODO
+                Optional.empty(), // Not implementing external titles for now (shown in dialogs of type list)
                 menuLayout.isCloseWithEscapeAllowed(),
-                false, // TODO
+                false, // Pause is not relevant in multiplayer
                 DialogAction.CLOSE,
                 buildBodies(menuLayout),
                 Collections.emptyList()
@@ -163,7 +163,7 @@ public class NMSDialogsImpl implements NMSDialogs {
         }
     }
 
-    private static List<DialogBody> buildBodies(DialogMenuLayout<?> menuLayout) {
+    private List<DialogBody> buildBodies(DialogMenuLayout<?> menuLayout) {
         List<DialogBody> bodies = new LinkedList<>();
         for (DialogBodyElement bodyElement : menuLayout.getBodyElements()) {
             if (bodyElement instanceof DialogBodyText) {
@@ -177,22 +177,22 @@ public class NMSDialogsImpl implements NMSDialogs {
         return bodies;
     }
 
-    private static PlainMessage getPlainMessage(DialogBodyElement dialogBodyElement) {
+    private PlainMessage getPlainMessage(DialogBodyElement dialogBodyElement) {
         return (PlainMessage) ((DialogBodyText) dialogBodyElement).getNMSHandle(dialogBodyText ->
                 new PlainMessage(Component.literal(dialogBodyText.getText()), dialogBodyText.getWidth()));
     }
 
-    private static ItemBody getItemBody(DialogBodyElement dialogBodyElement) {
+    private ItemBody getItemBody(DialogBodyElement dialogBodyElement) {
         return (ItemBody) ((DialogBodyItem) dialogBodyElement).getNMSHandle(dialogBodyItem -> {
-            ItemStack itemStack = dialogBodyItem.getItem().build();
-            ItemStackTemplate itemStackTemplate = ItemStackTemplate.fromNonEmptyStack(CraftItemStack.asNMSCopy(itemStack));
-            Optional<PlainMessage> description = Optional.ofNullable(dialogBodyItem.getDescription()).map(NMSDialogsImpl::getPlainMessage);
-            return new ItemBody(itemStackTemplate, description, dialogBodyItem.isShowDecorations(),
-                    dialogBodyItem.isShowTooltip(), dialogBodyItem.getWidth(), dialogBodyItem.getHeight());
+            org.bukkit.inventory.ItemStack itemStack = dialogBodyItem.getItem().build();
+            Optional<PlainMessage> description = Optional.ofNullable(dialogBodyItem.getDescription()).map(this::getPlainMessage);
+            return new ItemBody(NMSUtilsVersioned.getItemBodyItemParameter(CraftItemStack.asNMSCopy(itemStack)),
+                    description, dialogBodyItem.isShowDecorations(), dialogBodyItem.isShowTooltip(),
+                    dialogBodyItem.getWidth(), dialogBodyItem.getHeight());
         });
     }
 
-    private static Dialog buildDialog(DialogMenuType menuType, CommonDialogData dialogData, List<ActionButton> buttons) {
+    private Dialog buildDialog(DialogMenuType menuType, CommonDialogData dialogData, List<ActionButton> buttons) {
         switch (menuType) {
             case CONFIRMATION:
                 if (buttons.size() >= 2)
@@ -208,7 +208,7 @@ public class NMSDialogsImpl implements NMSDialogs {
         return new MultiActionDialog(dialogData, buttons, Optional.empty(), 1);
     }
 
-    private static void fireDialogOpenEvent(SuperiorPlayer superiorPlayer, DialogWrapper<?> dialog) {
+    private void fireDialogOpenEvent(SuperiorPlayer superiorPlayer, DialogWrapper<?> dialog) {
         GameEventArgs.DialogOpenEvent dialogOpenEvent = new GameEventArgs.DialogOpenEvent();
         dialogOpenEvent.superiorPlayer = superiorPlayer;
         dialogOpenEvent.dialog = dialog;
@@ -216,7 +216,7 @@ public class NMSDialogsImpl implements NMSDialogs {
         plugin.getGameEventsDispatcher().onGameEvent(gameEvent, GameEventPriority.NORMAL);
     }
 
-    private static void fireDialogCloseEvent(SuperiorPlayer superiorPlayer, DialogWrapper<?> dialog) {
+    private void fireDialogCloseEvent(SuperiorPlayer superiorPlayer, DialogWrapper<?> dialog) {
         GameEventArgs.DialogCloseEvent dialogCloseEvent = new GameEventArgs.DialogCloseEvent();
         dialogCloseEvent.superiorPlayer = superiorPlayer;
         dialogCloseEvent.dialog = dialog;

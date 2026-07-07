@@ -16,9 +16,6 @@ dependencies {
     paperweight.paperDevBundle("26.2.build.+")
     compileOnly project(":NMS:Spigot-1_20_3")
     compileOnly project(":NMS:Paper-1_20_3")
-    compileOnly project(":NMS:Paper-Dialog")
-    compileOnly("net.md-5:bungeecord-api:1.21-R0.4")
-    compileOnly("net.md-5:bungeecord-event:1.21-R0.4")
     compileOnly project(":API")
     compileOnly project(":")
 }
