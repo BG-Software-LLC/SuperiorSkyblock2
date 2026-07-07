@@ -402,11 +402,11 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.getWorth().toString())
                     // Deprecated Island Placeholders
                     .put("end_unlocked", legacyPlaceholder("superior_island_end_unlocked", "superior_island_world_unlocked_the_end", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.isDimensionEnabled(Dimension.getByName("THE_END")), superiorPlayer.getUserLocale())))
+                            Formatters.BOOLEAN_FORMATTER.format(island.isEndEnabled(), superiorPlayer.getUserLocale())))
                     .put("nether_unlocked", legacyPlaceholder("superior_island_nether_unlocked", "superior_island_world_unlocked_nether", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.isDimensionEnabled(Dimension.getByName("NETHER")), superiorPlayer.getUserLocale())))
+                            Formatters.BOOLEAN_FORMATTER.format(island.isNetherEnabled(), superiorPlayer.getUserLocale())))
                     .put("normal_unlocked", legacyPlaceholder("superior_island_normal_unlocked", "superior_island_world_unlocked_normal", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.isDimensionEnabled(Dimension.getByName("NORMAL")), superiorPlayer.getUserLocale())))
+                            Formatters.BOOLEAN_FORMATTER.format(island.isNormalEnabled(), superiorPlayer.getUserLocale())))
                     .put("hoppers_limit", legacyPlaceholder("superior_island_hoppers_limit", "superior_island_block_limit_hopper", (island, superiorPlayer) ->
                             island.getBlockLimit(ConstantKeys.HOPPER) + ""))
                     .put("x", legacyPlaceholder("superior_island_x", "superior_island_center_x", (island, superiorPlayer) ->
