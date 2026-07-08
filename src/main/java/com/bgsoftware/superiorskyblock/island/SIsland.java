@@ -5310,6 +5310,7 @@ public class SIsland implements Island {
 
     public static void registerListeners(PluginEventsDispatcher dispatcher) {
         dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, SIsland::onSettingsUpdate);
+        IslandFlag.addRegistrationListener(SIsland::onIslandFlagRegister);
     }
 
     private static void onSettingsUpdate() {
@@ -5320,6 +5321,11 @@ public class SIsland implements Island {
             } catch (Throwable ignored) {
             }
         });
+    }
+
+    private static void onIslandFlagRegister(IslandFlag islandFlag) {
+        if (DEFAULT_FLAGS_CACHE != null && plugin.getSettings().getDefaultSettings().contains(islandFlag.getName()))
+            DEFAULT_FLAGS_CACHE.add(islandFlag);
     }
 
     private static WorldPosition adjustPositionToCenterOfBlock(@Nullable WorldPosition worldPosition) {

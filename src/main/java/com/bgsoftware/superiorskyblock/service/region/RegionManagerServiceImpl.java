@@ -95,6 +95,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
     public static void registerListeners(PluginEventsDispatcher dispatcher) {
         dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, RegionManagerServiceImpl::onSettingsUpdate);
+        IslandPrivilege.addRegistrationListener(RegionManagerServiceImpl::onIslandPrivilegeRegister);
     }
 
     private static void onSettingsUpdate() {
@@ -106,6 +107,12 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             } catch (Throwable ignored) {
             }
         });
+    }
+
+    private static void onIslandPrivilegeRegister(IslandPrivilege islandPrivilege) {
+        SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+        if (WORLD_PERMISSIONS_CACHE != null && plugin.getSettings().getWorldPermissions().contains(islandPrivilege.getName()))
+            WORLD_PERMISSIONS_CACHE.add(islandPrivilege);
     }
 
     @Override
