@@ -1,20 +1,18 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.superiorskyblock.api.events.IslandFlagRegisterEvent;
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
+import org.bukkit.Bukkit;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class IslandFlag implements Enumerable {
 
     private static final Map<String, IslandFlag> islandFlags = new HashMap<>();
-    private static final List<Consumer<IslandFlag>> registrationListeners = new ArrayList<>();
     private static int ordinalCounter = 0;
 
     private final String name;
@@ -66,17 +64,7 @@ public class IslandFlag implements Enumerable {
 
         IslandFlag islandFlag = new IslandFlag(name);
         islandFlags.put(name, islandFlag);
-        new ArrayList<>(registrationListeners).forEach(listener -> listener.accept(islandFlag));
-    }
-
-    /**
-     * Listen for island flag registrations.
-     *
-     * @param listener The listener to register.
-     */
-    public static void addRegistrationListener(Consumer<IslandFlag> listener) {
-        Preconditions.checkNotNull(listener, "listener parameter cannot be null.");
-        registrationListeners.add(listener);
+        Bukkit.getPluginManager().callEvent(new IslandFlagRegisterEvent(islandFlag));
     }
 
     /**

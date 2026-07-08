@@ -1,20 +1,18 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.superiorskyblock.api.events.IslandPrivilegeRegisterEvent;
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
+import org.bukkit.Bukkit;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class IslandPrivilege implements Enumerable {
 
     private static final Map<String, IslandPrivilege> islandPrivileges = new HashMap<>();
-    private static final List<Consumer<IslandPrivilege>> registrationListeners = new ArrayList<>();
     private static int ordinalCounter = 0;
 
     private final String name;
@@ -98,17 +96,7 @@ public class IslandPrivilege implements Enumerable {
 
         IslandPrivilege islandPrivilege = new IslandPrivilege(name, type);
         islandPrivileges.put(name, islandPrivilege);
-        new ArrayList<>(registrationListeners).forEach(listener -> listener.accept(islandPrivilege));
-    }
-
-    /**
-     * Listen for island privilege registrations.
-     *
-     * @param listener The listener to register.
-     */
-    public static void addRegistrationListener(Consumer<IslandPrivilege> listener) {
-        Preconditions.checkNotNull(listener, "listener parameter cannot be null.");
-        registrationListeners.add(listener);
+        Bukkit.getPluginManager().callEvent(new IslandPrivilegeRegisterEvent(islandPrivilege));
     }
 
     /**

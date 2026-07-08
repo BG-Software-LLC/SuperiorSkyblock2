@@ -26,6 +26,7 @@ public class BukkitListeners {
         new EntityTrackingListener(this.plugin);
         new FeaturesListener(this.plugin);
         new IslandFlagsListener(this.plugin);
+        new IslandSettingsRegistrationListener(this.plugin);
         new IslandWorldEventsListener(this.plugin);
         new MenusListener(this.plugin);
         new PlayersListener(this.plugin);

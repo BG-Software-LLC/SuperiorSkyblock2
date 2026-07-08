@@ -105,8 +105,6 @@ public class SpawnIsland implements Island {
 
     public static void registerListeners(PluginEventsDispatcher dispatcher) {
         dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, SpawnIsland::onSettingsUpdate);
-        IslandFlag.addRegistrationListener(SpawnIsland::onIslandFlagRegister);
-        IslandPrivilege.addRegistrationListener(SpawnIsland::onIslandPrivilegeRegister);
     }
 
     private static void onSettingsUpdate() {
@@ -127,12 +125,12 @@ public class SpawnIsland implements Island {
         });
     }
 
-    private static void onIslandFlagRegister(IslandFlag islandFlag) {
+    public static void onIslandFlagRegister(IslandFlag islandFlag) {
         if (DEFAULT_SPAWN_FLAGS_CACHE != null && plugin.getSettings().getSpawn().getSettings().contains(islandFlag.getName()))
             DEFAULT_SPAWN_FLAGS_CACHE.add(islandFlag);
     }
 
-    private static void onIslandPrivilegeRegister(IslandPrivilege islandPrivilege) {
+    public static void onIslandPrivilegeRegister(IslandPrivilege islandPrivilege) {
         if (DEFAULT_SPAWN_PRIVILEGES_CACHE != null && plugin.getSettings().getSpawn().getPermissions().contains(islandPrivilege.getName()))
             DEFAULT_SPAWN_PRIVILEGES_CACHE.add(islandPrivilege);
     }
