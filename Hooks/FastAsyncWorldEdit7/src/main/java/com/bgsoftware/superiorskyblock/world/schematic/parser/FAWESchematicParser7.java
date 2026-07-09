@@ -16,10 +16,6 @@ import java.io.DataInputStream;
 
 public class FAWESchematicParser7 implements SchematicParser {
 
-    public FAWESchematicParser7() {
-
-    }
-
     @Override
     public Schematic parseSchematic(DataInputStream inputStream, String schematicName) throws SchematicParseException {
             File pluginFolder = com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin.getPlugin().getDataFolder();
