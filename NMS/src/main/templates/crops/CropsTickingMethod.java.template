@@ -68,7 +68,7 @@ public abstract class CropsTickingMethod {
 
         @Override
         protected void doTick(LevelChunk levelChunk, int tickSpeed) {
-            ServerLevel serverLevel = levelChunk.level;
+            ServerLevel serverLevel = (ServerLevel) levelChunk.getLevel();
             LevelChunkSection[] sections = levelChunk.getSections();
 
             int minSection = NMSUtilsVersioned.getMinSection(serverLevel);
@@ -90,7 +90,7 @@ public abstract class CropsTickingMethod {
                     continue;
                 }
 
-                PalettedContainer<BlockState> states = levelChunkSection.states;
+                PalettedContainer<BlockState> states = levelChunkSection.getStates();
 
                 int offsetY = (sectionIndex + minSection) << 4;
 
@@ -126,7 +126,7 @@ public abstract class CropsTickingMethod {
         @Override
         protected void doTick(LevelChunk levelChunk, int tickSpeed) {
             LevelChunkSection[] sections = levelChunk.getSections();
-            ServerLevel serverLevel = levelChunk.level;
+            ServerLevel serverLevel = (ServerLevel) levelChunk.getLevel();
 
             int chunkOffsetX = levelChunk.locX << 4;
             int chunkOffsetZ = levelChunk.locZ << 4;

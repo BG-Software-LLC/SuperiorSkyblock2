@@ -40,4 +40,14 @@ public interface BossBar {
 
     }
 
+    enum Style {
+
+        SOLID,
+        SEGMENTED_6,
+        SEGMENTED_10,
+        SEGMENTED_12,
+        SEGMENTED_20
+
+    }
+
 }

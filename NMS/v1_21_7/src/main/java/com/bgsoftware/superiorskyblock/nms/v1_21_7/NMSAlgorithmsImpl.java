@@ -10,11 +10,13 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
+import org.bukkit.ExplosionResult;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemRarity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ArmorMeta;
@@ -100,16 +102,26 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_21
     @Override
     public Biome getBiome(String biomeName) {
         NamespacedKey key = NamespacedKey.fromString(biomeName.toLowerCase(Locale.ENGLISH));
-        if (key == null) {
-            return null;
+        if (key != null) {
+            Registry<Biome> registry = Bukkit.getRegistry(Biome.class);
+            if (registry != null) {
+                Biome biome = registry.get(key);
+                if (biome != null) {
+                    return biome;
+                }
+            }
         }
 
-        Registry<Biome> registry = Bukkit.getRegistry(Biome.class);
-        if (registry == null) {
+        try {
+            return Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
+        } catch (IllegalArgumentException e) {
             return null;
         }
+    }
 
-        return registry.get(key);
+    @Override
+    public boolean isSoftExplosion(EntityExplodeEvent e) {
+        return e.getExplosionResult() == ExplosionResult.TRIGGER_BLOCK;
     }
 
 }

@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import org.bukkit.OfflinePlayer;
 
@@ -82,7 +83,11 @@ public class MessageContent {
         StringBuilder content = new StringBuilder();
         for (IPart part : contentParts) {
             if (part instanceof StaticPart) {
-                content.append(((StaticPart) part).content);
+                String partContent = ((StaticPart) part).content;
+                if (((StaticPart) part).parsePlaceholders) {
+                    partContent = placeholdersService.get().parsePlaceholders(offlinePlayer, partContent);
+                }
+                content.append(partContent);
             } else {
                 int argumentIndex = ((ArgumentPart) part).argumentIndex;
                 if (argumentIndex >= 0 && argumentIndex < arguments.length) {
@@ -96,7 +101,7 @@ public class MessageContent {
         if (content.length() == 0)
             return Optional.empty();
 
-        return Optional.of(placeholdersService.get().parsePlaceholders(offlinePlayer, content.toString()));
+        return Optional.of(content.toString());
     }
 
     public static String getArgumentString(Object argument) {
@@ -112,9 +117,31 @@ public class MessageContent {
     private static class StaticPart implements IPart {
 
         private final String content;
+        private boolean parsePlaceholders;
 
         StaticPart(String content) {
             this.content = content;
+            this.parsePlaceholders = checkForPlaceholders(content);
+        }
+
+        private static boolean checkForPlaceholders(String value) {
+            if (Text.isBlank(value))
+                return false;
+
+            int openBracket = value.indexOf('{');
+            if (openBracket >= 0) {
+                // Open bracket was found, let's find close bracket
+                int closeBracket = value.indexOf('}', openBracket);
+                if (closeBracket >= 0)
+                    return true;
+            }
+
+            // Look for two %
+            int firstPercentage = value.indexOf('%');
+            if (firstPercentage < 0)
+                return false;
+
+            return value.indexOf('%', firstPercentage) >= 0;
         }
 
     }

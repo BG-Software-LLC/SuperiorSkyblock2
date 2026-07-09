@@ -292,7 +292,7 @@ public abstract class AbstractNMSChunks implements NMSChunks {
     }
 
     protected void removeEntities(LevelChunk levelChunk) {
-        ServerLevel serverLevel = levelChunk.level;
+        ServerLevel serverLevel = (ServerLevel) levelChunk.getLevel();
 
         int chunkWorldCoordX = levelChunk.locX << 4;
         int chunkWorldCoordZ = levelChunk.locZ << 4;

@@ -44,7 +44,7 @@ public class NMSDragonFightImpl implements NMSDragonFight {
     private static boolean firstWorldPreparation = true;
 
     static {
-        ENTITY_TYPES_BUILDER.set(EntityType.ENDER_DRAGON, (EntityType.EntityFactory<EnderDragon>) IslandEntityEnderDragon::fromEntityTypes);
+        ENTITY_TYPES_BUILDER.set(${ENTITY_TYPE_VALUES_CLASS}.ENDER_DRAGON, (EntityType.EntityFactory<EnderDragon>) IslandEntityEnderDragon::fromEntityTypes);
     }
 
     @Override

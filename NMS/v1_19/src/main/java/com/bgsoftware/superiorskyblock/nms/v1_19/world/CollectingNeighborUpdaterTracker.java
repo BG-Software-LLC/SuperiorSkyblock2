@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.redstone.CollectingNeighborUpdater;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlockState;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlockStates;
 
 public class CollectingNeighborUpdaterTracker extends CollectingNeighborUpdater {
@@ -34,7 +35,8 @@ public class CollectingNeighborUpdaterTracker extends CollectingNeighborUpdater 
             // Block was changed, let's call an update
             GameEventArgs.BlockUpdateShapeEvent blockUpdateShapeEvent = new GameEventArgs.BlockUpdateShapeEvent();
             blockUpdateShapeEvent.block = CraftBlock.at(this.level, pos);
-            blockUpdateShapeEvent.oldState = CraftBlockStates.getUnplacedBlockState(this.level, pos, oldState);
+            blockUpdateShapeEvent.oldState = CraftBlockStates.getBlockState(pos, oldState, null);
+            ((CraftBlockState) blockUpdateShapeEvent.oldState).setWorldHandle(this.level);
             GameEvent<GameEventArgs.BlockUpdateShapeEvent> gameEvent = GameEventType.BLOCK_UPDATE_SHAPE_EVENT.createEvent(blockUpdateShapeEvent);
             plugin.getGameEventsDispatcher().onGameEvent(gameEvent, GameEventPriority.MONITOR);
         }

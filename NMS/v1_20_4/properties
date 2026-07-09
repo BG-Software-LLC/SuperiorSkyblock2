@@ -10,3 +10,5 @@ ABSTRACT_MINECART_SUBPACKAGE=vehicle
 GET_RANDOM_TICK_SPEED_METHOD=getInt(net.minecraft.world.level.GameRules.RULE_RANDOMTICKING)
 END_DRAGON_FIGHT_CLASS=EndDragonFight
 SPIKE_FEATURE_CLASS=SpikeFeature
+ENTITY_TYPE_VALUES_CLASS=net.minecraft.world.entity.EntityType
+BLOCK_ENTITY_TYPE_VALUES_CLASS=net.minecraft.world.level.block.entity.BlockEntityType

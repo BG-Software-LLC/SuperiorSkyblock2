@@ -140,6 +140,10 @@ public class CmdShow implements ISuperiorCommand {
         if (!Message.ISLAND_INFO_FOOTER.isEmpty(locale))
             infoMessage.append(Message.ISLAND_INFO_FOOTER.getMessage(locale));
 
+        if (infoMessage.length() > 0 && infoMessage.charAt(infoMessage.length() - 1) == '\n') {
+            infoMessage.setLength(infoMessage.length() - 1);
+        }
+
         Message.CUSTOM.send(sender, infoMessage.toString(), false);
     }
 

@@ -338,15 +338,12 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
         } else {
             // We want to add the data to the next missions as well
             Object playerMissionProgress = mission.get(superiorPlayer);
-            for (Mission otherMission : mission.getMissionCategory().getMissions()) {
-                if (otherMission.getRequiredMissions().contains(mission.getName()) &&
+            for (Mission<?> otherMission : mission.getMissionCategory().getMissions()) {
+                if (otherMission.getClass() == mission.getClass() &&
+                        otherMission.getRequiredMissions().contains(mission.getName()) &&
                         canCompleteNoProgress(superiorPlayer, otherMission)) {
-                    try {
-                        otherMission.insertData(superiorPlayer, playerMissionProgress);
-                    } catch (ClassCastException error) {
-                        // We use raw parameterized values, therefore cast-errors can occur.
-                        // In this case, we'll just ignore these.
-                    }
+                    //noinspection rawtypes,unchecked
+                    ((Mission) otherMission).insertData(superiorPlayer, playerMissionProgress);
                 }
             }
         }

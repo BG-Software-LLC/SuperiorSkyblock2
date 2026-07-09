@@ -351,6 +351,7 @@ public class AbstractKeyMap<K extends Key, V> extends AbstractMap<Key, V> implem
         @Override
         public void remove() {
             this.currIterator.remove();
+            --AbstractKeyMap.this.size;
         }
 
     }
