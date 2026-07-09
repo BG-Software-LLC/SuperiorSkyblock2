@@ -939,20 +939,20 @@ public class PluginEventsFactory {
                                                                     Upgrade upgrade, UpgradeLevel currentLevel,
                                                                     UpgradeLevel nextLevel, IslandUpgradeEvent.Cause upgradeCause) {
         return callIslandUpgradeEvent(island, superiorPlayer, upgrade, nextLevel, currentLevel.getCommands(),
-                upgradeCause, currentLevel.getCost());
+                upgradeCause, currentLevel.getCosts());
     }
 
     public static PluginEvent<IslandUpgrade> callIslandUpgradeEvent(Island island, CommandSender commandSender,
                                                                     Upgrade upgrade, UpgradeLevel nextLevel,
                                                                     IslandUpgradeEvent.Cause upgradeCause) {
         return callIslandUpgradeEvent(island, commandSenderToSuperiorPlayer(commandSender), upgrade, nextLevel,
-                Collections.emptyList(), upgradeCause, null);
+                Collections.emptyList(), upgradeCause, Collections.emptyList());
     }
 
     public static PluginEvent<IslandUpgrade> callIslandUpgradeEvent(Island island, @Nullable SuperiorPlayer superiorPlayer,
                                                                     Upgrade upgrade, UpgradeLevel nextLevel,
                                                                     List<String> commands, IslandUpgradeEvent.Cause upgradeCause,
-                                                                    @Nullable UpgradeCost upgradeCost) {
+                                                                    List<UpgradeCost> upgradeCosts) {
         IslandUpgrade islandUpgrade = new IslandUpgrade();
         islandUpgrade.island = island;
         islandUpgrade.superiorPlayer = superiorPlayer;
@@ -960,7 +960,7 @@ public class PluginEventsFactory {
         islandUpgrade.nextLevel = nextLevel;
         islandUpgrade.commands = commands;
         islandUpgrade.upgradeCause = upgradeCause;
-        islandUpgrade.upgradeCost = upgradeCost;
+        islandUpgrade.upgradeCosts = upgradeCosts;
         return fireEvent(ISLAND_UPGRADE_EVENT, islandUpgrade);
     }
 

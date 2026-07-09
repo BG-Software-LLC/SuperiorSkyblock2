@@ -50,11 +50,11 @@ public class UpgradeButton extends AbstractMenuViewButton<IslandMenuView> {
 
         UpgradeLevel nextUpgradeLevel = upgrade.getUpgradeLevel(upgradeLevel.getLevel() + 1);
 
-        UpgradeCost levelCost = upgradeLevel.getCost();
+        UpgradeCost levelCost = upgradeLevel.getCosts().get(0);
         String permission = nextUpgradeLevel == null ? "" : nextUpgradeLevel.getPermission();
         String requirements = nextUpgradeLevel == null ? "" : nextUpgradeLevel.checkRequirements(inventoryViewer);
 
-        boolean nextLevel = levelCost.hasEnoughBalance(inventoryViewer) &&
+        boolean nextLevel = upgradeLevel.getCosts().stream().allMatch(upgradeCost -> upgradeCost.hasEnoughBalance(inventoryViewer)) &&
                 (permission.isEmpty() || inventoryViewer.hasPermission(permission)) && requirements.isEmpty();
 
         TemplateItem buttonItem = nextLevel ? itemData.hasNextLevel : itemData.noNextLevel;

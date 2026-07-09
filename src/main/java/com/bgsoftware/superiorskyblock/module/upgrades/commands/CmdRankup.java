@@ -121,17 +121,17 @@ public class CmdRankup implements IPermissibleCommand {
                 PluginEvent<PluginEventArgs.IslandUpgrade> event = PluginEventsFactory.callIslandUpgradeEvent(
                         island, superiorPlayer, upgrade, currentLevel, nextLevel, IslandUpgradeEvent.Cause.PLAYER_RANKUP);
 
-                UpgradeCost upgradeCost = event.getArgs().upgradeCost;
+                List<UpgradeCost> upgradeCosts = event.getArgs().upgradeCosts;
 
                 if (event.isCancelled()) {
                     hasNextLevel = false;
 
-                } else if (!upgradeCost.hasEnoughBalance(superiorPlayer)) {
+                } else if (!upgradeCosts.stream().allMatch(upgradeCost -> upgradeCost.hasEnoughBalance(superiorPlayer))) {
                     Message.NOT_ENOUGH_MONEY_TO_UPGRADE.send(superiorPlayer);
                     hasNextLevel = false;
 
                 } else {
-                    upgradeCost.withdrawCost(superiorPlayer);
+                    upgradeCosts.forEach(upgradeCost -> upgradeCost.withdrawCost(superiorPlayer));
 
                     for (String command : event.getArgs().commands) {
                         String parsedCommand = placeholdersService.get().parsePlaceholders(superiorPlayer.asOfflinePlayer(), command

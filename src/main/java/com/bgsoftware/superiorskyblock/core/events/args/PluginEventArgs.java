@@ -547,7 +547,7 @@ public class PluginEventArgs {
         public UpgradeLevel nextLevel;
         public List<String> commands;
         public IslandUpgradeEvent.Cause upgradeCause;
-        public UpgradeCost upgradeCost;
+        public List<UpgradeCost> upgradeCosts;
 
     }
 

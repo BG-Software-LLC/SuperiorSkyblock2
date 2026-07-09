@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
@@ -23,15 +22,23 @@ public interface UpgradeLevel {
     /**
      * Get the price required to upgrade to the next level.
      *
-     * @deprecated See getCost()
+     * @deprecated See {@link #getCosts()}
      */
     @Deprecated
     double getPrice();
 
     /**
      * Get the price required to upgrade to the next level.
+     *
+     * @deprecated See {@link #getCosts()}
      */
+    @Deprecated
     UpgradeCost getCost();
+
+    /**
+     * Get all the prices required to upgrade to the next level.
+     */
+    List<UpgradeCost> getCosts();
 
     /**
      * Get all commands that will be executed when upgrading to the next level.

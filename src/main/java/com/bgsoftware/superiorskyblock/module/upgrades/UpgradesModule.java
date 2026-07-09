@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.island.upgrade.SUpgrade;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.island.upgrade.UpgradeRequirement;
 import com.bgsoftware.superiorskyblock.island.upgrade.container.IslandUpgrades;
+import com.bgsoftware.superiorskyblock.island.upgrade.cost.EmptyUpgradeCost;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
 import com.bgsoftware.superiorskyblock.module.IModuleConfiguration;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRankup;
@@ -45,6 +46,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
@@ -234,25 +236,15 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
                                              String sectionName, ConfigurationSection levelSection) {
         int level = Integer.parseInt(sectionName);
 
-        String priceType = levelSection.getString("price-type", "money");
-        UpgradeCostLoader costLoader = plugin.getUpgrades().getUpgradeCostLoader(priceType);
-
-        if (costLoader == null) {
-            this.logger().w("Upgrade by name " + upgrade.getName() + " (level " + level + ") has invalid price-type. Skipping...");
-            return;
-        }
-
-        UpgradeCost upgradeCost;
-
-        try {
-            upgradeCost = costLoader.loadCost(levelSection);
-        } catch (UpgradeCostLoadException error) {
-            this.logger().e("Upgrade by name " + upgrade.getName() + " (level " + level + ") failed to initialize:", error);
+        List<UpgradeCost> upgradeCosts = loadUpgradeCosts(plugin, upgrade, level, levelSection);
+        if (upgradeCosts.isEmpty()) {
+            this.logger().w("Upgrade by name " + upgrade.getName() + " (level " + level + ") has no price. Skipping...");
             return;
         }
 
         List<String> commands = levelSection.getStringList("commands");
         String permission = levelSection.getString("permission", "");
+
         Set<UpgradeRequirement> requirements = new HashSet<>();
         for (String line : levelSection.getStringList("required-checks")) {
             String[] sections = line.split(";");
@@ -319,12 +311,61 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
             }
         }
 
-        SUpgradeLevel upgradeLevel = new SUpgradeLevel(level, upgradeCost, commands, permission, requirements,
+        SUpgradeLevel upgradeLevel = new SUpgradeLevel(level, upgradeCosts, commands, permission, requirements,
                 cropGrowth, spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize,
                 Value.syncedFixed(blockLimits), Value.syncedFixed(entityLimits), Value.syncedFixed(generatorRates),
                 Value.syncedFixed(islandEffects), bankLimit, Value.syncedFixed(rolesLimits));
 
         upgrade.addUpgradeLevel(level, upgradeLevel);
+    }
+
+    private List<UpgradeCost> loadUpgradeCosts(SuperiorSkyblockPlugin plugin, SUpgrade upgrade,
+                                               int level, ConfigurationSection levelSection) {
+        if (levelSection.isConfigurationSection("prices")) {
+            List<UpgradeCost> upgradeCosts = new ArrayList<>();
+
+            for (String name : levelSection.getConfigurationSection("prices").getKeys(false)) {
+                ConfigurationSection priceSection = levelSection.getConfigurationSection("prices." + name);
+
+                UpgradeCost upgradeCost = loadUpgradeCost(plugin, upgrade, level, priceSection);
+
+                if (!(upgradeCost instanceof EmptyUpgradeCost)) {
+                    upgradeCosts.add(upgradeCost);
+                }
+            }
+
+            return upgradeCosts;
+        } else {
+            UpgradeCost upgradeCost = loadUpgradeCost(plugin, upgrade, level, levelSection);
+
+            if (!(upgradeCost instanceof EmptyUpgradeCost)) {
+                return Collections.singletonList(upgradeCost);
+            } else {
+                return Collections.emptyList();
+            }
+        }
+    }
+
+    private UpgradeCost loadUpgradeCost(SuperiorSkyblockPlugin plugin, SUpgrade upgrade,
+                                        int level, ConfigurationSection priceSection) {
+        String priceType = priceSection.getString("price-type", "money");
+        UpgradeCostLoader costLoader = plugin.getUpgrades().getUpgradeCostLoader(priceType);
+
+        if (costLoader == null) {
+            this.logger().w("Upgrade by name " + upgrade.getName() + " (level " + level + ") has invalid price-type. Skipping...");
+            return EmptyUpgradeCost.getInstance();
+        }
+
+        UpgradeCost upgradeCost;
+
+        try {
+            upgradeCost = costLoader.loadCost(priceSection);
+        } catch (UpgradeCostLoadException error) {
+            this.logger().e("Upgrade by name " + upgrade.getName() + " (level " + level + ") failed to initialize:", error);
+            return EmptyUpgradeCost.getInstance();
+        }
+
+        return upgradeCost;
     }
 
     private static OptionalDouble readDouble(ConfigurationSection section, String key) {
