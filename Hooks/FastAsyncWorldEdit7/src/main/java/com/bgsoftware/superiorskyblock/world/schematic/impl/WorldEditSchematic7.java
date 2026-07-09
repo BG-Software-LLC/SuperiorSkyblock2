@@ -22,6 +22,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -29,6 +30,7 @@ import java.util.function.Consumer;
 public class WorldEditSchematic7 extends BaseSchematic implements Schematic {
 
     private final Clipboard clipboard;
+    private List<ChunkPosition> affectedChunks = Collections.emptyList();
 
     public WorldEditSchematic7(String name, Clipboard clipboard) {
         super(name);
@@ -44,6 +46,24 @@ public class WorldEditSchematic7 extends BaseSchematic implements Schematic {
     @Override
     public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
         Log.debug(Debug.PASTE_SCHEMATIC, this.name, island.getOwner().getName(), location);
+
+        BlockVector3 min = clipboard.getMinimumPoint();
+        BlockVector3 max = clipboard.getMaximumPoint();
+        BlockVector3 origin = clipboard.getOrigin();
+
+        int targetMinX = location.getBlockX() + (min.getX() - origin.getX());
+        int targetMinZ = location.getBlockZ() + (min.getZ() - origin.getZ());
+        int targetMaxX = location.getBlockX() + (max.getX() - origin.getX());
+        int targetMaxZ = location.getBlockZ() + (max.getZ() - origin.getZ());
+
+        List<ChunkPosition> affected = new ArrayList<>();
+        org.bukkit.World world = location.getWorld();
+        for (int x = targetMinX >> 4; x <= targetMaxX >> 4; x++) {
+            for (int z = targetMinZ >> 4; z <= targetMaxZ >> 4; z++) {
+                affected.add(ChunkPosition.of(world, x, z, false));
+            }
+        }
+        this.affectedChunks = affected;
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(location.getWorld()))) {
             Operation operation = new ClipboardHolder(clipboard)
@@ -80,7 +100,7 @@ public class WorldEditSchematic7 extends BaseSchematic implements Schematic {
 
     @Override
     public List<ChunkPosition> getAffectedChunks() {
-        return Collections.emptyList();
+        return this.affectedChunks;
     }
 
     @Override

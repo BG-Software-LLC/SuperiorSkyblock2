@@ -16,12 +16,14 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -39,6 +41,7 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
     private static final ReflectMethod<Integer> GET_DATA = new ReflectMethod<>(BaseBlock.class, "getData");
 
     private final com.boydti.fawe.object.schematic.Schematic schematic;
+    private List<ChunkPosition> affectedChunks = Collections.emptyList();
 
     static {
         try {
@@ -75,6 +78,27 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
         try {
             Log.debug(Debug.PASTE_SCHEMATIC, this.name, island.getOwner().getName(), location);
 
+            Clipboard clipboard = schematic.getClipboard();
+            if (clipboard != null) {
+                Vector min = clipboard.getMinimumPoint();
+                Vector max = clipboard.getMaximumPoint();
+                Vector origin = clipboard.getOrigin();
+
+                int targetMinX = location.getBlockX() + (min.getBlockX() - origin.getBlockX());
+                int targetMinZ = location.getBlockZ() + (min.getBlockZ() - origin.getBlockZ());
+                int targetMaxX = location.getBlockX() + (max.getBlockX() - origin.getBlockX());
+                int targetMaxZ = location.getBlockZ() + (max.getBlockZ() - origin.getBlockZ());
+
+                List<ChunkPosition> affected = new ArrayList<>();
+                org.bukkit.World world = location.getWorld();
+                for (int x = targetMinX >> 4; x <= targetMaxX >> 4; x++) {
+                    for (int z = targetMinZ >> 4; z <= targetMaxZ >> 4; z++) {
+                        affected.add(ChunkPosition.of(world, x, z, false));
+                    }
+                }
+                this.affectedChunks = affected;
+            }
+
             Object _point = AT.invoke(null, location.getBlockX(), location.getBlockY(), location.getBlockZ());
             EditSession editSession = PASTE.invoke(schematic, new BukkitWorld(location.getWorld()), _point, false, true, null);
 
@@ -110,7 +134,7 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
 
     @Override
     public List<ChunkPosition> getAffectedChunks() {
-        return Collections.emptyList();
+        return this.affectedChunks;
     }
 
     @Override
