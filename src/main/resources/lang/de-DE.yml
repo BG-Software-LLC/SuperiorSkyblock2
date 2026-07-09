@@ -353,6 +353,7 @@ COMMAND_DESCRIPTION_INVITE: Lade einen Spieler auf Ihre Insel ein.
 COMMAND_DESCRIPTION_KICK: Kick einen Spieler von deiner Insel.
 COMMAND_DESCRIPTION_LANG: Ändere deine persönliche Sprache.
 COMMAND_DESCRIPTION_LEAVE: Verlasse deine Insel.
+COMMAND_DESCRIPTION_LOCAL_CHAT: 'Toggle local chat mode.'
 COMMAND_DESCRIPTION_MEMBERS: Öffne das Mitgliedermenü.
 COMMAND_DESCRIPTION_MISSION: Beende eine Mission.
 COMMAND_DESCRIPTION_MISSIONS: Öffne das Missionsmenü.
@@ -693,6 +694,7 @@ LEFT_ISLAND_COOP: '&e&lInsel | &7Du bist kein Koop-Mitglied mehr auf der Insel v
   {0}.'
 LEFT_ISLAND_COOP_NAME: '&e&lInsel | &7Du bist kein Genossenschaftsmitglied der Insel
   {0} mehr.'
+LOCAL_CHAT_FORMAT: '&6[{0}] {1}&f: &7{2}'
 LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now locked for all islands!'
 LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now locked for the island {1}!'
 LOCK_WORLD_ANNOUNCEMENT: '&e&lWorlds | &7The world {0} is now locked for {1}''s island!'
@@ -911,6 +913,7 @@ SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin 
 SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Erfolgreich teleportiert {0} zum Spawn.'
 SPAWN_SET_SUCCESS: '&e&lSpawn | &7Der Spawn-Speicherort wurde erfolgreich auf {0}
   aktualisiert.'
+SPY_LOCAL_CHAT_FORMAT: '&7[Spy] &6[{0}] {1}&f: &7{2}'
 SPY_TEAM_CHAT_FORMAT: '&7[Spion] &e[{0}] {1}&f: &7{2}'
 SYNC_UPGRADES: '&e&lUpgrades | &7Alle Upgrade-Werte der Insel von {0} wurden erfolgreich
   synchronisiert.'
@@ -938,6 +941,8 @@ TOGGLED_FLY_OFF: '&e&lFly | &7Inselflug umgeschaltet &cOFF&7.'
 TOGGLED_FLY_ON: '&e&lFly | &7Inselflug umgeschaltet &aON&7.'
 TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
 TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
+TOGGLED_LOCAL_CHAT_OFF: '&e&lChat | &7Toggling local chat &cOFF&7.'
+TOGGLED_LOCAL_CHAT_ON: '&e&lChat | &7Toggling local chat &aON&7.'
 TOGGLED_SCHEMATIC_OFF: '&e&lSchematics | &7Schematicsmodus &cOFF&7 umschalten.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lSchaltpläne | &7Schematicsmodus umschalten &aON&7.

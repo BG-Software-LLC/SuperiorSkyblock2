@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
@@ -873,11 +874,6 @@ public class PluginEventsFactory {
         fireEvent(ISLAND_SCHEMATIC_PASTE_EVENT, islandSchematicPaste);
     }
 
-    public static PluginEvent<IslandSetHome> callIslandSetHomeEvent(Island island, CommandSender commandSender,
-                                                                    Location islandHome, IslandSetHomeEvent.Reason reason) {
-        return callIslandSetHomeEvent(island, commandSenderToSuperiorPlayer(commandSender), islandHome, reason);
-    }
-
     public static PluginEvent<IslandSetHome> callIslandSetHomeEvent(Island island, @Nullable SuperiorPlayer superiorPlayer,
                                                                     Location islandHome, IslandSetHomeEvent.Reason reason) {
         IslandSetHome islandRenameWarp = new IslandSetHome();
@@ -1040,6 +1036,13 @@ public class PluginEventsFactory {
         playerChangeBorderColor.superiorPlayer = superiorPlayer;
         playerChangeBorderColor.borderColor = borderColor;
         return !fireEvent(PLAYER_CHANGE_BORDER_COLOR_EVENT, playerChangeBorderColor).isCancelled();
+    }
+
+    public static boolean callPlayerChangeChatStateEvent(SuperiorPlayer superiorPlayer, ChatState chatState) {
+        PlayerChangeChatState playerChangeChatState = new PlayerChangeChatState();
+        playerChangeChatState.superiorPlayer = superiorPlayer;
+        playerChangeChatState.newChatState = chatState;
+        return !fireEvent(PLAYER_CHANGE_CHAT_STATE_EVENT, playerChangeChatState).isCancelled();
     }
 
     public static boolean callPlayerChangeLanguageEvent(SuperiorPlayer superiorPlayer, Locale language) {

@@ -17,21 +17,18 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.SynchronizedTasks;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
@@ -192,6 +189,16 @@ public class IslandUtils {
         return totalAmount == 0 ? 0 : (island.getGeneratorAmount(key, dimension) * 100D) / totalAmount;
     }
 
+    public static PlayerRole getPlayerRole(Island island, SuperiorPlayer superiorPlayer) {
+        if (island.isMember(superiorPlayer)) {
+            return superiorPlayer.getPlayerRole();
+        } else if (island.isCoop(superiorPlayer)) {
+            return SPlayerRole.coopRole();
+        } else {
+            return SPlayerRole.guestRole();
+        }
+    }
+
     public static boolean checkTransferRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
         if (!superiorPlayer.getPlayerRole().isLastRole()) {
             Message.NO_TRANSFER_PERMISSION.send(superiorPlayer);
@@ -338,27 +345,6 @@ public class IslandUtils {
 
     public static List<Biome> getDefaultWorldBiomes() {
         return new SequentialListBuilder<Biome>().build(DEFAULT_WORLD_BIOMES.values());
-    }
-
-    public static void handleIslandChat(Island island, SuperiorPlayer superiorPlayer, String message) {
-        PluginEvent<PluginEventArgs.IslandChat> event = PluginEventsFactory.callIslandChatEvent(island, superiorPlayer,
-                superiorPlayer.hasPermissionWithoutOP("superior.chat.color") ? Formatters.COLOR_FORMATTER.format(message) : message);
-
-        if (event.isCancelled())
-            return;
-
-        IslandUtils.sendMessage(island, Message.TEAM_CHAT_FORMAT, Collections.emptyList(),
-                superiorPlayer.getPlayerRole(), superiorPlayer.getName(), event.getArgs().message);
-
-        Message.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole().getDisplayName(),
-                superiorPlayer.getName(), event.getArgs().message);
-
-        for (Player _onlinePlayer : Bukkit.getOnlinePlayers()) {
-            SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(_onlinePlayer);
-            if (onlinePlayer.hasAdminSpyEnabled())
-                Message.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole().getDisplayName(),
-                        superiorPlayer.getName(), event.getArgs().message);
-        }
     }
 
 }

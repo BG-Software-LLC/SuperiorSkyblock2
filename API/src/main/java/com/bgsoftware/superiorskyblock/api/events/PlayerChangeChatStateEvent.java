@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
@@ -7,33 +8,45 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * PlayerToggleTeamChatEvent is called when a player toggles his team chat.
- * @deprecated See {@link PlayerChangeChatStateEvent}
+ * PlayerChangeChatStateEvent is called when a player has his chat state changed.
  */
-@Deprecated
-public class PlayerToggleTeamChatEvent extends Event implements Cancellable {
+public class PlayerChangeChatStateEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
     private final SuperiorPlayer superiorPlayer;
+    private final ChatState newChatState;
 
     private boolean cancelled = false;
 
     /**
      * The constructor of the event.
      *
-     * @param superiorPlayer The player that toggled the team chat.
+     * @param superiorPlayer The player that had his chat state changed.
+     * @param newChatState   The new chat state of the player.
      */
-    public PlayerToggleTeamChatEvent(SuperiorPlayer superiorPlayer) {
+    public PlayerChangeChatStateEvent(SuperiorPlayer superiorPlayer, ChatState newChatState) {
         super(!Bukkit.isPrimaryThread());
         this.superiorPlayer = superiorPlayer;
+        this.newChatState = newChatState;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     /**
-     * Get the player that toggled the team chat.
+     * Get the player that had his chat state changed.
      */
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
+    }
+
+    /**
+     * Get the new chat state of the player.
+     */
+    public ChatState getNewChatState() {
+        return newChatState;
     }
 
     @Override
@@ -48,10 +61,6 @@ public class PlayerToggleTeamChatEvent extends Event implements Cancellable {
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 
