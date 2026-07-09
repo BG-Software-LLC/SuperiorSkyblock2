@@ -18,7 +18,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
+import com.bgsoftware.superiorskyblock.core.collections.UnparsedEnumerateSet;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
@@ -85,7 +85,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     private static final Material GOLDEN_DANDELION_TYPE = EnumHelper.getEnum(Material.class, "GOLDEN_DANDELION");
 
     private static final int MAX_PICKUP_DISTANCE = 1;
-    private static EnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
+    private static UnparsedEnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -99,19 +99,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
     private static void onSettingsUpdate() {
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-        WORLD_PERMISSIONS_CACHE = new EnumerateSet<>(IslandPrivilege.values());
-        plugin.getSettings().getWorldPermissions().forEach(islandPrivilageName -> {
-            try {
-                WORLD_PERMISSIONS_CACHE.add(IslandPrivilege.getByName(islandPrivilageName));
-            } catch (Throwable ignored) {
-            }
-        });
-    }
-
-    public static void onIslandPrivilegeRegister(IslandPrivilege islandPrivilege) {
-        SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-        if (WORLD_PERMISSIONS_CACHE != null && plugin.getSettings().getWorldPermissions().contains(islandPrivilege.getName()))
-            WORLD_PERMISSIONS_CACHE.add(islandPrivilege);
+        WORLD_PERMISSIONS_CACHE = new UnparsedEnumerateSet<>(IslandPrivilege.values(), IslandPrivilege::getByName, IslandPrivilege::getName);
+        plugin.getSettings().getWorldPermissions().forEach(WORLD_PERMISSIONS_CACHE::addName);
     }
 
     @Override

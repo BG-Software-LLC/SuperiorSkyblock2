@@ -1,9 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
-import com.bgsoftware.superiorskyblock.api.events.IslandPrivilegeRegisterEvent;
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
-import org.bukkit.Bukkit;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -96,7 +94,6 @@ public class IslandPrivilege implements Enumerable {
 
         IslandPrivilege islandPrivilege = new IslandPrivilege(name, type);
         islandPrivileges.put(name, islandPrivilege);
-        Bukkit.getPluginManager().callEvent(new IslandPrivilegeRegisterEvent(islandPrivilege));
     }
 
     /**

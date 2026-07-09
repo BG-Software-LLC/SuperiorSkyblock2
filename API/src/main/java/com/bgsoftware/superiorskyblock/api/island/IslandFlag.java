@@ -1,9 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
-import com.bgsoftware.superiorskyblock.api.events.IslandFlagRegisterEvent;
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
-import org.bukkit.Bukkit;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -64,7 +62,6 @@ public class IslandFlag implements Enumerable {
 
         IslandFlag islandFlag = new IslandFlag(name);
         islandFlags.put(name, islandFlag);
-        Bukkit.getPluginManager().callEvent(new IslandFlagRegisterEvent(islandFlag));
     }
 
     /**
