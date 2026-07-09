@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.ticks.LevelTicks;
 import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlockState;
 import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlockStates;
 
 import java.util.List;
@@ -55,7 +56,8 @@ public class BlockLevelTicksTracker extends LevelTicks<Block> {
                 // Block was changed, let's call an update
                 GameEventArgs.BlockUpdateShapeEvent blockUpdateShapeEvent = new GameEventArgs.BlockUpdateShapeEvent();
                 blockUpdateShapeEvent.block = CraftBlock.at(this.serverLevel, blockPos);
-                blockUpdateShapeEvent.oldState = CraftBlockStates.getUnplacedBlockState(this.serverLevel, blockPos, oldState);
+                blockUpdateShapeEvent.oldState = CraftBlockStates.getBlockState(blockPos, oldState, null);
+                ((CraftBlockState) blockUpdateShapeEvent.oldState).setWorldHandle(this.serverLevel);
                 GameEvent<GameEventArgs.BlockUpdateShapeEvent> gameEvent = GameEventType.BLOCK_UPDATE_SHAPE_EVENT.createEvent(blockUpdateShapeEvent);
                 plugin.getGameEventsDispatcher().onGameEvent(gameEvent, GameEventPriority.MONITOR);
             }

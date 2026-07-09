@@ -489,9 +489,15 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         if (canRegisterHook("Plan"))
             registerHook("PlanHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("CraftEngine"))
+        if (Bukkit.getPluginManager().isPluginEnabled("CraftEngine")) {
             // We load the hook with an extra delay to let CraftEngine load its data first
-            BukkitExecutor.sync(() -> registerHook("CraftEngineHook"), 5L);
+            Plugin plugin = Bukkit.getPluginManager().getPlugin("CraftEngine");
+            if (plugin.getDescription().getVersion().startsWith("0.0.")) {
+                BukkitExecutor.sync(() -> registerHook("CraftEngineHook"), 5L);
+            } else {
+                BukkitExecutor.sync(() -> registerHook("CraftEngineHook26"), 5L);
+            }
+        }
 
         if (canRegisterHook("SmoothTimber"))
             registerHook("SmoothTimberHook");
@@ -567,7 +573,11 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             listenToSpawnerChanges = false;
         } else if (canRegisterHook("RoseStacker") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("RoseStacker"))) {
-            spawnersProvider = createInstance("spawners.SpawnersProvider_RoseStacker");
+            if (hasRoseStackerPreSpawnEventSupport()) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_RoseStacker1_5");
+            } else {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_RoseStacker");
+            }
             listenToSpawnerChanges = false;
         }
 
@@ -734,6 +744,15 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         try {
             Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
             return ServerVersion.isAtLeast(ServerVersion.v1_18);
+        } catch (ClassNotFoundException error) {
+            return false;
+        }
+    }
+
+    private static boolean hasRoseStackerPreSpawnEventSupport() {
+        try {
+            Class.forName("dev.rosewood.rosestacker.event.PreStackedSpawnerSpawnEvent");
+            return true;
         } catch (ClassNotFoundException error) {
             return false;
         }

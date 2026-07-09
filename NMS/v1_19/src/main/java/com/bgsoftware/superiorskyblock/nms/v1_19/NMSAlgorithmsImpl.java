@@ -50,16 +50,21 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_19
     @Override
     public Biome getBiome(String biomeName) {
         NamespacedKey key = NamespacedKey.fromString(biomeName.toLowerCase(Locale.ENGLISH));
-        if (key == null) {
-            return null;
+        if (key != null) {
+            Registry<Biome> registry = Bukkit.getRegistry(Biome.class);
+            if (registry != null) {
+                Biome biome = registry.get(key);
+                if (biome != null) {
+                    return biome;
+                }
+            }
         }
 
-        Registry<Biome> registry = Bukkit.getRegistry(Biome.class);
-        if (registry == null) {
+        try {
+            return Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
+        } catch (IllegalArgumentException e) {
             return null;
         }
-
-        return registry.get(key);
     }
 
     private static Enchantment initializeGlowEnchantment() {
