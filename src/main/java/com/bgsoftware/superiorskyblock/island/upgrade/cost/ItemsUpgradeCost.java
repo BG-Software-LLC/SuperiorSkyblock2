@@ -11,11 +11,11 @@ import org.bukkit.inventory.PlayerInventory;
 
 import java.math.BigDecimal;
 
-public class ItemUpgradeCost extends UpgradeCostAbstract {
+public class ItemsUpgradeCost extends UpgradeCostAbstract {
 
     private final KeySet keySet;
 
-    public ItemUpgradeCost(BigDecimal cost, KeySet keySet) {
+    public ItemsUpgradeCost(BigDecimal cost, KeySet keySet) {
         super(cost, "item");
         this.keySet = keySet;
     }
@@ -56,7 +56,7 @@ public class ItemUpgradeCost extends UpgradeCostAbstract {
 
     @Override
     public UpgradeCost clone(BigDecimal cost) {
-        return new ItemUpgradeCost(cost, keySet);
+        return new ItemsUpgradeCost(cost, keySet);
     }
 
 }

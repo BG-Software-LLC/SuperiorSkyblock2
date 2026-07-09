@@ -6,12 +6,12 @@ import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadExceptio
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
-import com.bgsoftware.superiorskyblock.island.upgrade.cost.ItemUpgradeCost;
+import com.bgsoftware.superiorskyblock.island.upgrade.cost.ItemsUpgradeCost;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.math.BigDecimal;
 
-public class ItemUpgradeCostLoader implements UpgradeCostLoader {
+public class ItemsUpgradeCostLoader implements UpgradeCostLoader {
 
     @Override
     public UpgradeCost loadCost(ConfigurationSection upgradeSection) throws UpgradeCostLoadException {
@@ -28,7 +28,7 @@ public class ItemUpgradeCostLoader implements UpgradeCostLoader {
             throw new UpgradeCostLoadException("The field 'types' cannot be empty.");
         }
 
-        return new ItemUpgradeCost(
+        return new ItemsUpgradeCost(
                 BigDecimal.valueOf(upgradeSection.getDouble("amount")),
                 keySet
         );
