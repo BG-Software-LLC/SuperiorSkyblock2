@@ -172,7 +172,7 @@ public class ItemBuilder {
 
         List<String> currentLore = itemMeta.getLore();
 
-        List<String> loreList = new ArrayList<>(currentLore.size());
+        List<String> loreList = new LinkedList<>();
         boolean isEmpty = lines.isEmpty() || lines.stream().allMatch(String::isEmpty);
 
         for (String line : currentLore) {

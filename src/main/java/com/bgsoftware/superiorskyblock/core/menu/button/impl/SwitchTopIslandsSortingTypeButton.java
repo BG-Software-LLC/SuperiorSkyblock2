@@ -14,11 +14,7 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.MenuTopIslands;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class SwitchTopIslandsSortingTypeButton extends AbstractMenuViewButton<MenuTopIslands.View> {
 
@@ -45,7 +41,7 @@ public class SwitchTopIslandsSortingTypeButton extends AbstractMenuViewButton<Me
         itemBuilder.replaceAll("{1}", data.getDisplayName());
 
         if (!Menus.MENU_TOP_ISLANDS.getSelectedSortingType().isEmpty() && !Menus.MENU_TOP_ISLANDS.getUnselectedSortingType().isEmpty()) {
-            List<String> sortingTypes = new ArrayList<>();
+            List<String> sortingTypes = new LinkedList<>();
 
             getTemplate().buttons.forEach((sortingType, buttonData) -> {
                 if (sortingType == menuView.getSortingType()) {
@@ -90,7 +86,7 @@ public class SwitchTopIslandsSortingTypeButton extends AbstractMenuViewButton<Me
 
     public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<MenuTopIslands.View> {
 
-        private final LinkedHashMap<SortingType, SortingButtonData> buttons = new LinkedHashMap<>();
+        private final Map<SortingType, SortingButtonData> buttons = new LinkedHashMap<>();
 
         public Builder addItem(SortingType sortingType, String displayName, TemplateItem templateItem) {
             this.buttons.put(sortingType, new SortingButtonData(displayName, templateItem));

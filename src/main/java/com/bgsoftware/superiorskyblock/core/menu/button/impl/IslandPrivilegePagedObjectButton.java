@@ -26,6 +26,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<MenuIslandPrivileges.View, MenuIslandPrivileges.IslandPrivilegeInfo> {
@@ -174,7 +175,7 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
             if (!Menus.MENU_ISLAND_PRIVILEGES.getNoRolePermission().isEmpty() &&
                     !Menus.MENU_ISLAND_PRIVILEGES.getExactRolePermission().isEmpty() &&
                     !Menus.MENU_ISLAND_PRIVILEGES.getHigherRolePermission().isEmpty()) {
-                List<String> roles = new ArrayList<>();
+                List<String> roles = new LinkedList<>();
 
                 int roleWeight = requiredRole == null ? Integer.MAX_VALUE : requiredRole.getWeight();
 
