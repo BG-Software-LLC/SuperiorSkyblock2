@@ -183,6 +183,7 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
     /**
      * Get the upgrade costs that are used.
      */
+    @Nullable
     public List<UpgradeCost> getUpgradeCosts() {
         return upgradeCosts;
     }
@@ -203,7 +204,7 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
      * 
      * @param upgradeCosts The new upgrade costs.
      */
-    public void setUpgradeCosts(List<UpgradeCost> upgradeCosts) {
+    public void setUpgradeCosts(@Nullable List<UpgradeCost> upgradeCosts) {
         this.upgradeCosts = upgradeCosts == null || upgradeCosts.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(new LinkedList<>(upgradeCosts));
     }
 
