@@ -25,14 +25,6 @@ public interface UpgradeLevel {
      * @deprecated See {@link #getCosts()}
      */
     @Deprecated
-    double getPrice();
-
-    /**
-     * Get the price required to upgrade to the next level.
-     *
-     * @deprecated See {@link #getCosts()}
-     */
-    @Deprecated
     UpgradeCost getCost();
 
     /**

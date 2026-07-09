@@ -1,15 +1,15 @@
 package com.bgsoftware.superiorskyblock.island.upgrade.loaders;
 
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.island.upgrade.cost.ItemUpgradeCost;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.math.BigDecimal;
-import java.util.Locale;
 
 public class ItemUpgradeCostLoader implements UpgradeCostLoader {
 
@@ -22,10 +22,7 @@ public class ItemUpgradeCostLoader implements UpgradeCostLoader {
             throw new UpgradeCostLoadException("The field 'types' is missing from the section.");
         }
 
-        KeySet keySet = KeySet.createKeySet();
-        for (String type : upgradeSection.getStringList("types")) {
-            keySet.add(Key.ofMaterialAndData(type.toUpperCase(Locale.ENGLISH)));
-        }
+        KeySet keySet = KeySets.createHashSet(KeyIndicator.MATERIAL, upgradeSection.getStringList("types"));
 
         if (keySet.isEmpty()) {
             throw new UpgradeCostLoadException("The field 'types' cannot be empty.");

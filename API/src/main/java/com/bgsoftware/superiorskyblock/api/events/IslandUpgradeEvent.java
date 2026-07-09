@@ -26,6 +26,7 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
     private final UpgradeLevel upgradeLevel;
     private final List<String> commands;
     private final Cause cause;
+    @Nullable
     private List<UpgradeCost> upgradeCosts;
     private boolean cancelled = false;
 
@@ -114,14 +115,14 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
      */
     public IslandUpgradeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Upgrade upgrade,
                               UpgradeLevel upgradeLevel, List<String> commands, Cause cause,
-                              List<UpgradeCost> upgradeCosts) {
+                              @Nullable List<UpgradeCost> upgradeCosts) {
         super(island);
         this.superiorPlayer = superiorPlayer;
         this.upgrade = Preconditions.checkNotNull(upgrade, "upgrade cannot be null");
         this.upgradeLevel = Preconditions.checkNotNull(upgradeLevel, "upgradeLevel cannot be null");
         this.commands = new LinkedList<>(Preconditions.checkNotNull(commands, "commands cannot be null"));
         this.cause = Preconditions.checkNotNull(cause, "cause cannot be null");
-        this.upgradeCosts = new LinkedList<>(Preconditions.checkNotNull(upgradeCosts, "upgradeCosts cannot be null"));
+        this.upgradeCosts = upgradeCosts == null || upgradeCosts.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(new LinkedList<>(upgradeCosts));
     }
 
     /**
@@ -183,7 +184,7 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
      * Get the upgrade costs that are used.
      */
     public List<UpgradeCost> getUpgradeCosts() {
-        return Collections.unmodifiableList(upgradeCosts);
+        return upgradeCosts;
     }
 
     /**
@@ -203,27 +204,7 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
      * @param upgradeCosts The new upgrade costs.
      */
     public void setUpgradeCosts(List<UpgradeCost> upgradeCosts) {
-        this.upgradeCosts = upgradeCosts;
-    }
-
-    /**
-     * Get the amount that will be withdrawn.
-     *
-     * @deprecated See {@link #getUpgradeCosts()}
-     */
-    @Deprecated
-    public double getAmountToWithdraw() {
-        return getCost().doubleValue();
-    }
-
-    /**
-     * Set the amount that will be withdrawn.
-     *
-     * @deprecated See {@link #setUpgradeCosts(List)}
-     */
-    @Deprecated
-    public void setAmountToWithdraw(double amountToWithdraw) {
-        setCost(BigDecimal.valueOf(amountToWithdraw));
+        this.upgradeCosts = upgradeCosts == null || upgradeCosts.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(new LinkedList<>(upgradeCosts));
     }
 
     /**

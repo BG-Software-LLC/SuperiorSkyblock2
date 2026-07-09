@@ -322,7 +322,7 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
     private List<UpgradeCost> loadUpgradeCosts(SuperiorSkyblockPlugin plugin, SUpgrade upgrade,
                                                int level, ConfigurationSection levelSection) {
         if (levelSection.isConfigurationSection("prices")) {
-            List<UpgradeCost> upgradeCosts = new ArrayList<>();
+            List<UpgradeCost> upgradeCosts = new LinkedList<>();
 
             for (String name : levelSection.getConfigurationSection("prices").getKeys(false)) {
                 ConfigurationSection priceSection = levelSection.getConfigurationSection("prices." + name);
@@ -338,11 +338,8 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
         } else {
             UpgradeCost upgradeCost = loadUpgradeCost(plugin, upgrade, level, levelSection);
 
-            if (!(upgradeCost instanceof EmptyUpgradeCost)) {
-                return Collections.singletonList(upgradeCost);
-            } else {
-                return Collections.emptyList();
-            }
+            return upgradeCost instanceof EmptyUpgradeCost ? Collections.emptyList()
+                    : Collections.singletonList(upgradeCost);
         }
     }
 

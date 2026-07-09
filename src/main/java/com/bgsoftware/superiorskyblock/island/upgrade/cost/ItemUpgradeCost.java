@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Material;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -23,7 +24,8 @@ public class ItemUpgradeCost extends UpgradeCostAbstract {
     public boolean hasEnoughBalance(SuperiorPlayer superiorPlayer) {
         int currentAmount = 0;
 
-        for (ItemStack itemStack : superiorPlayer.asPlayer().getInventory()) {
+        Inventory playerInventory = superiorPlayer.asPlayer().getInventory();
+        for (ItemStack itemStack : playerInventory.getContents()) {
             if (itemStack != null && itemStack.getType() != Material.AIR && keySet.contains(Key.of(itemStack))) {
                 currentAmount += itemStack.getAmount();
             }
@@ -37,17 +39,15 @@ public class ItemUpgradeCost extends UpgradeCostAbstract {
         int amountToRemove = cost.intValue();
 
         PlayerInventory playerInventory = superiorPlayer.asPlayer().getInventory();
-
-        for (int i = 0; i < playerInventory.getSize(); i++) {
-            ItemStack itemStack = playerInventory.getItem(i);
+        for (ItemStack itemStack : playerInventory.getContents()) {
             if (itemStack != null && itemStack.getType() != Material.AIR && keySet.contains(Key.of(itemStack))) {
                 int amount = itemStack.getAmount();
 
-                if (amount <= amountToRemove) {
-                    playerInventory.setItem(i, null);
-                    amountToRemove -= amount;
-                } else {
-                    itemStack.setAmount(amount - amountToRemove);
+                int newAmount = Math.max(0, amount - amountToRemove);
+                itemStack.setAmount(newAmount);
+
+                amountToRemove -= amount;
+                if (amountToRemove <= 0) {
                     return;
                 }
             }

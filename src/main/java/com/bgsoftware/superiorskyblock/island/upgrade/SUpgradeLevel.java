@@ -79,7 +79,7 @@ public class SUpgradeLevel implements UpgradeLevel {
                          Value<Map<PotionEffectType, Integer>> islandEffects, Value<Optional<BigDecimal>> bankLimit,
                          Value<Int2IntMapView> roleLimits) {
         this.level = level;
-        this.costs = costs;
+        this.costs = Collections.unmodifiableList(costs);
         this.commands = commands;
         this.permission = permission;
         this.requirements = requirements;
@@ -105,19 +105,13 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     @Deprecated
-    public double getPrice() {
-        return costs.get(0).getCost().doubleValue();
-    }
-
-    @Override
-    @Deprecated
     public UpgradeCost getCost() {
-        return costs.get(0);
+        return costs == null || costs.isEmpty() ? null : costs.get(0);
     }
 
     @Override
     public List<UpgradeCost> getCosts() {
-        return Collections.unmodifiableList(costs);
+        return costs;
     }
 
     @Override

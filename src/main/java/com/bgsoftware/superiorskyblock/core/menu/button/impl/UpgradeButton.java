@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButt
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.impl.IslandMenuView;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -54,7 +55,7 @@ public class UpgradeButton extends AbstractMenuViewButton<IslandMenuView> {
         String permission = nextUpgradeLevel == null ? "" : nextUpgradeLevel.getPermission();
         String requirements = nextUpgradeLevel == null ? "" : nextUpgradeLevel.checkRequirements(inventoryViewer);
 
-        boolean nextLevel = upgradeLevel.getCosts().stream().allMatch(upgradeCost -> upgradeCost.hasEnoughBalance(inventoryViewer)) &&
+        boolean nextLevel = IslandUtils.hasEnoughBalance(upgradeLevel.getCosts(), inventoryViewer) &&
                 (permission.isEmpty() || inventoryViewer.hasPermission(permission)) && requirements.isEmpty();
 
         TemplateItem buttonItem = nextLevel ? itemData.hasNextLevel : itemData.noNextLevel;
