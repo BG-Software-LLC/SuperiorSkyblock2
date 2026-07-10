@@ -119,12 +119,11 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
     @Override
     public void loadData() {
-        BukkitExecutor.ensureMain(() -> {
+        BukkitExecutor.sync(() -> {
             registerGeneralHooks();
             registerSpawnersProvider();
             registerStackedBlocksProvider();
             registerEntitiesProvider();
-            registerMessagesProvider();
             registerPermissionsProvider();
             registerPricesProvider();
             registerVanishProvider();
@@ -134,6 +133,8 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             registerPlaceholdersProvider();
             registerChunksProvider();
         });
+
+        registerMessagesProvider();
 
         // We try to forcefully load prices after a second the server has enabled.
         BukkitExecutor.sync(this::forcePricesLoad, 60L);
