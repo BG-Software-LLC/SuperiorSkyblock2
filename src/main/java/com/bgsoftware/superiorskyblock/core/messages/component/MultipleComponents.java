@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
@@ -15,12 +16,17 @@ import java.util.Locale;
 
 public class MultipleComponents implements IMessageComponent {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final LazyReference<MessagesService> messagesService = new LazyReference<MessagesService>() {
+        @Override
+        protected MessagesService create() {
+            return SuperiorSkyblockPlugin.getPlugin().getServices().getService(MessagesService.class);
+        }
+    };
 
     private final List<IMessageComponent> messageComponents;
 
     public static IMessageComponent parseSection(ConfigurationSection section) {
-        MessagesService.Builder builder = plugin.getServices().getService(MessagesService.class).newBuilder();
+        MessagesService.Builder builder = messagesService.get().newBuilder();
 
         for (String key : section.getKeys(false)) {
             switch (key) {
