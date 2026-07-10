@@ -74,7 +74,6 @@ public class WorldsSection extends SettingsContainerHolder implements SettingsMa
     public static abstract class BaseDimensionConfig implements DimensionConfig {
 
         private final boolean isEnabled;
-        private final boolean isUseVoidGenerator;
         private final boolean isUnlocked;
         private final boolean isSchematicOffset;
         private final String biome;
@@ -83,7 +82,6 @@ public class WorldsSection extends SettingsContainerHolder implements SettingsMa
 
         protected BaseDimensionConfig(ConfigurationSection section, Dimension dimension, String defaultName) {
             this.isEnabled = section.getBoolean("enabled");
-            this.isUseVoidGenerator = section.getBoolean("use-void-generator", true);
             this.isUnlocked = section.getBoolean("unlock");
             this.isSchematicOffset = section.getBoolean("schematic-offset");
             this.biome = section.getString("biome");
@@ -149,11 +147,6 @@ public class WorldsSection extends SettingsContainerHolder implements SettingsMa
         @Override
         public boolean isEnabled() {
             return this.isEnabled;
-        }
-
-        @Override
-        public boolean isUseVoidGenerator() {
-            return this.isUseVoidGenerator;
         }
 
         @Override

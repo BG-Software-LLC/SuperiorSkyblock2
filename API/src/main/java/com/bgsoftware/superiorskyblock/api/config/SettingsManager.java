@@ -1167,12 +1167,6 @@ public interface SettingsManager {
             boolean isEnabled();
 
             /**
-             * Whether this dimension should use the void generator or the vanilla/datapack generator.
-             * Config-path: worlds.dimensions.<dimension>.use-void-generator
-             */
-            boolean isUseVoidGenerator();
-
-            /**
              * Whether this dimension is unlocked by default or not.
              * Config-path: worlds.dimensions.<dimension>.unlock
              */
